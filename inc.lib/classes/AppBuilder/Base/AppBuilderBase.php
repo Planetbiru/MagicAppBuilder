@@ -138,8 +138,8 @@ class AppBuilderBase //NOSONAR
         $this->allField = $allField;
         $this->ajaxSupport = $ajaxSupport;
         
-        $this->currentAction = $appBuilderConfig->getCurrentAction();
-        $this->configBaseDirectory = $appBuilderConfig->getConfigBaseDirectory();
+        $this->currentAction = $appConfig->getCurrentAction();
+        $this->configBaseDirectory = $appConfig->getConfigBaseDirectory();
         $this->entityInfo = $entityInfo;
         $this->entityApvInfo = $entityApvInfo;
         $this->skipedAutoSetter = array(
