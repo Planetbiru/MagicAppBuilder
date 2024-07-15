@@ -1,0 +1,130 @@
+#nav li.h1 {
+    padding: 0 0 0 0px;
+    position: relative;
+}
+
+#nav li.h1:before {
+    content: '+ ';
+    position: absolute;
+    left: -15px;
+    top: 1px;
+    display: block;
+}
+
+#nav li.h2 {
+    padding: 0 0 0 10px;
+    position: relative;
+}
+
+#nav li.h2:before {
+    content: '+ ';
+    position: absolute;
+    left: -5px;
+    top: 1px;
+    display: block;
+    z-index: 1;
+}
+
+#nav li.h3 {
+    padding: 0 0 0 20px;
+    position: relative;
+}
+
+#nav li.h3:before {
+    content: '+ ';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    display: block;
+    z-index: 1;
+}
+
+#nav li.h4 {
+    padding: 0 0 0 30px;
+    
+}
+
+#nav li.h4:before {
+    content: '+ ';
+    position: absolute;
+    left: 15px;
+    top: 1px;
+    display: block;
+    z-index: 1;
+}
+
+#nav li.h5 {
+    padding: 0 0 0 40px;
+}
+
+#nav li.h5:before {
+    content: 'h5 ';
+}
+
+#nav li.h6 {
+    padding: 0 0 0 50px;
+}
+
+#nav li.h6:before {
+    content: 'h6 ';
+}
+
+#nav {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 230px;
+    height: calc(100% - 40px);
+    overflow: auto;
+    z-index: 2;
+}
+
+#nav ul {
+    list-style-type: none;
+    height: 100%;
+    font-size: 13px;
+    line-height: 1.5;
+}
+#nav ul li a{
+    text-decoration: none;
+    color: rgb(14, 117, 143);
+}
+#nav ul li a:hover{
+    text-decoration: underline;
+    color: rgb(25, 152, 184);
+}
+body {
+    margin: 0;
+    padding: auto;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #333333;
+}
+
+.articles {
+    padding: 20px 20px 0 250px;
+}
+
+pre {
+    font-family: 'Courier New', Courier, monospace;
+    border: 1px solid #DDDDDD;
+    background-color: #F4F4F4;
+    width: 100%;
+    padding: 20px 20px;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+code {
+    display: inline-block;
+    background-color: #F4F4F4;
+    padding: 2px 4px;
+    border-radius: 1px;
+}
+
+pre code {
+    display: block;
+    background-color: #F4F4F4;
+    padding: 0;
+    line-height: 1.3;
+}

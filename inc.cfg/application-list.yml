@@ -1,0 +1,12 @@
+-
+    id: sipro
+    name: Sipro
+    documentRoot: 'C:\bitbucket\sipro'
+    author: Sipro
+    selected: true
+-
+    id: app1
+    name: YourAppName1
+    documentRoot: 'C:\bitbucket\app1'
+    author: YourName1
+    selected: false
