@@ -432,7 +432,10 @@ class AppBuilderApproval extends AppBuilderBase
         {
             $trash = "new $entityTrashName()";
         }
-
+        error_log($currentUser);
+        error_log($currentTime);
+        error_log($currentIp);
+        error_log($this->getCurrentAction());
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->approve("
         .parent::VAR."columToBeCopied, new $entityApprovalName(), $trash, ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$currentUser.",  ".parent::NEW_LINE 
