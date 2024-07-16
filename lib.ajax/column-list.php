@@ -20,7 +20,7 @@ try
         ->from("INFORMATION_SCHEMA.COLUMNS")
         ->where("TABLE_SCHEMA = ? AND TABLE_NAME = ? and column_name != ? and column_name != ? and column_name != ? ", 
         $databaseName, $tableName, $tableName."_apv_id", 'draft', 'waiting_for' );
-
+    error_log($queryBuilder);
     $rs = $database->executeQuery($queryBuilder);
     
 	$rows = $rs->fetchAll();
@@ -48,6 +48,7 @@ try
     );
 	header('Content-type: application/json');
 	echo json_encode($json);
+    error_log(json_encode($json));
 }
 catch(Exception $e)
 {
