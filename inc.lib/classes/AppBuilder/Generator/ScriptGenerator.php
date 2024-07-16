@@ -326,7 +326,7 @@ class ScriptGenerator
         $uses[] = "use MagicApp\\UserAction;";
         $uses[] = "use MagicApp\\AppUserPermission;";
         $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
-        $uses[] = "use MagicApp\\AppInclude;";
+        $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntities);      
@@ -356,7 +356,7 @@ class ScriptGenerator
 
         $declaration[] = 'if(!$userPermission->allowedAccess($inputGet, $inputPost))'."\r\n".
         '{'."\r\n".
-        "\t".'require_once AppInclude::getInstance()->appForbiddenPage(__DIR__, $appConfig, $appModule);'."\r\n".
+        "\t".'require_once AppIncludeImpl::getInstance()->appForbiddenPage(__DIR__, $appConfig, $appModule);'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
         $declaration[] = '';

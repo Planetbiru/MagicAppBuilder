@@ -234,7 +234,7 @@ class AppBuilderBase //NOSONAR
         } else {
             $dataToLoad = self::VAR . $dataToLoad;
         }
-        return self::VAR . $objectName . " = new $entityName($dataToLoad, " . self::VAR . $this->appBuilderConfig->getGlobalVariableDatabase() . ");";
+        return self::VAR . $objectName . " = new $entityName($dataToLoad, " . self::VAR . $this->appConfig->getGlobalVariableDatabase() . ");";
     }
 
     /**
@@ -3684,7 +3684,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeHeader()
     {
-        return "require_once AppInclude::getInstance()->mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
+        return "require_once AppIncludeImpl::getInstance()->mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
     }
     
     /**
@@ -3694,7 +3694,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeFooter()
     {
-        return "require_once AppInclude::getInstance()->mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
+        return "require_once AppIncludeImpl::getInstance()->mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
     }
     
     /**

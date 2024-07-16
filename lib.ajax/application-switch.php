@@ -3,6 +3,7 @@
 use AppBuilder\AppSecretObject;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 
@@ -24,6 +25,11 @@ $appListPath = dirname(__DIR__) . "/inc.cfg/application-list.yml";
 if(file_exists($builderConfigPath))
 {
     $builderConfig->loadYamlFile($builderConfigPath, false, true, true);
+}
+
+if($builderConfig->getCurrentApplication() == null)
+{
+    $builderConfig->setCurrentApplication(new SecretObject());
 }
 
 $builderConfig->getCurrentApplication()->setId($currentApplication);

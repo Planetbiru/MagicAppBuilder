@@ -420,7 +420,7 @@ require_once __DIR__ . "/inc.app/navs.php";
                         <td>
                           <select class="form-control" name="current_module_location" id="current_module_location">
                           <?php
-                          $moduleLocation = $appConfig->getApplication()->getBaseModuleDirectory();
+                          $moduleLocation = $appConfig->getApplication() != null ? $appConfig->getApplication()->getBaseModuleDirectory() : array();
                           if (!empty($moduleLocation)) {
                             foreach ($moduleLocation as $key => $value) {
                           ?>
