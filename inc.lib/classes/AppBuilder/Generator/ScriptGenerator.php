@@ -370,7 +370,7 @@ class ScriptGenerator
         $specification = $request->getSpecification();
         $sortable = $request->getSortable();
 
-        $ajaxSupport = $request->getFeatures()->getAjaxSupport();
+        $ajaxSupport = $request->getFeatures()->getAjaxSupport() == 'true' || $request->getFeatures()->getAjaxSupport() == 1;
 
         // prepare CRUD section begin
         if($approvalRequired)

@@ -141,6 +141,7 @@ class AppBuilderBase //NOSONAR
      * @param EntityInfo $entityInfo
      * @param EntityApvInfo $entityApvInfo
      * @param AppField[] $allField
+     * @param boolean $ajaxSupport
      */
     public function __construct($appBuilderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport)
     {
@@ -1051,7 +1052,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
         }
         if($this->ajaxSupport)
         {
-            $dataSection->appendChild($dom->createTextNode("\n\t".'<?php } ?>'));
+            $dataSection->appendChild($dom->createTextNode("\n\t".'<?php } /*ajaxSupport*/ ?>'));
         }
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG)); 
         
@@ -1097,7 +1098,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
 
         if($this->ajaxSupport)
         {
-            $dataSection->appendChild($dom->createTextNode("\t".'<?php if(!$currentAction->isRequestViaAjax()){ ?>'."\n"));
+            $dataSection->appendChild($dom->createTextNode("\t".'<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>'."\n"));
         }
         $dom->appendChild($dataSection);
         
@@ -1117,6 +1118,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
         $getData[] = $this->constructEntityLabel($entityName);
         if($this->ajaxSupport)
         {
+            $getData[] = '/*ajaxSupport*/';
             $getData[] = 'if(!$currentAction->isRequestViaAjax()){';
         }
         $getData[] = $this->getIncludeHeader();
@@ -1126,6 +1128,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
         if($this->ajaxSupport)
         {
             $getData[] = '}';
+            $getData[] = '/*ajaxSupport*/';
         }
 
         return 
