@@ -352,11 +352,12 @@ class ScriptGenerator
         $declaration[] = '';
         $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", "'.$request->getModuleName().'");';
         $declaration[] = '$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
+        $declaration[] = '$appInclude = new AppIncludeImpl($appConfig, $currentModule);';
         $declaration[] = '';
 
         $declaration[] = 'if(!$userPermission->allowedAccess($inputGet, $inputPost))'."\r\n".
         '{'."\r\n".
-        "\t".'require_once AppIncludeImpl::getInstance()->appForbiddenPage(__DIR__, $appConfig, $appModule);'."\r\n".
+        "\t".'require_once $appInclude->appForbiddenPage(__DIR__);'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
         $declaration[] = '';

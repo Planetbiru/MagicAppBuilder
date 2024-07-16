@@ -3684,7 +3684,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeHeader()
     {
-        return "require_once AppIncludeImpl::getInstance()->mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
+        return "require_once \$appInclude->mainAppHeader(__DIR__);";
     }
     
     /**
@@ -3694,7 +3694,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeFooter()
     {
-        return "require_once AppIncludeImpl::getInstance()->mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
+        return "require_once \$appInclude->mainAppFooter(__DIR__);";
     }
     
     /**

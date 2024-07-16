@@ -12,15 +12,27 @@ try
 { 
     $databaseName = $databaseConfig->getDatabaseName();
     $tableName = $inputPost->getTableName();
-     
+    
+    $excludeColumns = array();
+    
+    
+    $excludeColumns[] = $appConfig->entityInfo->getDraft();
+    $excludeColumns[] = $appConfig->entityInfo->getWaitingFor();
+    $excludeColumns[] = $appConfig->entityInfo->getAdminAskEdit();
+    $excludeColumns[] = $appConfig->entityInfo->getTimeAskEdit();
+    $excludeColumns[] = $appConfig->entityInfo->getIpAskEdit();
+    $excludeColumns[] = $appConfig->entityInfo->getApprovalId();
+    $excludeColumns[] = $appConfig->entityInfo->getApprovalNote();
+    $excludeColumns[] = $appConfig->entityInfo->getApprovalStatus();
+
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
     $queryBuilder->newQuery()
         ->select("column_name, data_type, column_key")
         ->from("INFORMATION_SCHEMA.COLUMNS")
-        ->where("TABLE_SCHEMA = ? AND TABLE_NAME = ? and column_name != ? and column_name != ? and column_name != ? ", 
-        $databaseName, $tableName, $tableName."_apv_id", 'draft', 'waiting_for' );
-    error_log($queryBuilder);
+        ->where("TABLE_SCHEMA = ? AND TABLE_NAME = ? and column_name not in(?)", 
+        $databaseName, $tableName, $excludeColumns );
+
     $rs = $database->executeQuery($queryBuilder);
     
 	$rows = $rs->fetchAll();
@@ -48,6 +60,7 @@ try
     );
 	header('Content-type: application/json');
 	echo json_encode($json);
+    error_log(json_encode($json));
 }
 catch(Exception $e)
 {

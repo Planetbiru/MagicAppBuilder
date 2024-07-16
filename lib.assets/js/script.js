@@ -1116,33 +1116,36 @@ function restoreForm(data) {
     for (let i in data.fields) {
       if (data.fields.hasOwnProperty(i)) {
         let tr = $('.main-table tbody tr[data-field-name="' + data.fields[i].fieldName + '"]');
-        tr.appendTo(tr.parent());
+        if(tr.length > 0)
+        {
+          tr.appendTo(tr.parent());
 
-        tr.find('.include_insert')[0].checked = data.fields[i].includeInsert === true || data.fields[i].includeInsert == 'true';
-        tr.find('.include_edit')[0].checked = data.fields[i].includeEdit === true || data.fields[i].includeEdit == 'true';
-        tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
-        tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
+          tr.find('.include_insert')[0].checked = data.fields[i].includeInsert === true || data.fields[i].includeInsert == 'true';
+          tr.find('.include_edit')[0].checked = data.fields[i].includeEdit === true || data.fields[i].includeEdit == 'true';
+          tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
+          tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
 
-        tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
-        tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
+          tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
+          tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
 
-        tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
-        if (data.fields[i].elementType == 'select') {
-          tr.find('.reference-data').val(JSON.stringify(data.fields[i].referenceData));
-          tr.find('.reference-button-data').css('display', 'inline');
+          tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
+          if (data.fields[i].elementType == 'select') {
+            tr.find('.reference-data').val(JSON.stringify(data.fields[i].referenceData));
+            tr.find('.reference-button-data').css('display', 'inline');
+          }
+
+          if (data.fields[i].filterElementType == 'select') {
+            tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
+            tr.find('.reference-button-filter').css('display', 'inline');
+            tr.find('.input-field-filter[value="select"]')[0].checked = true;
+          }
+          if (data.fields[i].filterElementType == 'text') {
+            tr.find('.input-field-filter[value="text"]')[0].checked = true;
+          }
+
+          tr.find('.input-field-data-type').val(data.fields[i].dataType)
+          tr.find('.input-data-filter').val(data.fields[i].inputFilter)
         }
-
-        if (data.fields[i].filterElementType == 'select') {
-          tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
-          tr.find('.reference-button-filter').css('display', 'inline');
-          tr.find('.input-field-filter[value="select"]')[0].checked = true;
-        }
-        if (data.fields[i].filterElementType == 'text') {
-          tr.find('.input-field-filter[value="text"]')[0].checked = true;
-        }
-
-        tr.find('.input-field-data-type').val(data.fields[i].dataType)
-        tr.find('.input-data-filter').val(data.fields[i].inputFilter)
 
       }
     }

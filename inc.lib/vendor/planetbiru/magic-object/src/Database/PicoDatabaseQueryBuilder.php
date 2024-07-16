@@ -526,15 +526,23 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else if(is_array($value) || is_object($value))
 		{
 			// encode to JSON and escapethe value
-			$ret = "'".$this->escapeSQL(json_encode($value))."'";
+			$ret = $this->implodeValues($value);
 		}
 		else
 		{
 			// force convert to string and escapethe value
 			$ret = "'".$this->escapeSQL($value)."'";
 		}
-		
 		return $ret;
+	}
+	
+	private function implodeValues($values)
+	{
+		foreach($values as $key=>$value)
+		{
+			$values[$key] = $this->escapeValue($value);
+		}
+		return implode(", ", $values);
 	}
 
 	/**
