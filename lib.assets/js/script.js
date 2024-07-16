@@ -919,7 +919,8 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
-    target: $('#current_module_location').val()
+    target: $('#current_module_location').val(),
+    updateEntity: $('[name="update_entity"]')[0].checked,
   };
   generateAllCode(dataToPost);
 }

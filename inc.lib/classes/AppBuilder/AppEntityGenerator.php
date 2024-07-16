@@ -10,6 +10,11 @@ use MagicObject\Util\PicoStringUtil;
 class AppEntityGenerator extends PicoEntityGenerator
 {
     /**
+     * Update entiry
+     * @var boolean
+     */
+    private $updateEntity = false;
+    /**
      * Prepare directory
      *
      * @param string $dir
@@ -209,7 +214,11 @@ class '.$className.' extends MagicObject
 {
 '.implode("\r\n", $attrs).'
 }';
-        return file_put_contents($path, $classStr);
+        if($this->updateEntity || !file_exists($path))
+        {
+            return file_put_contents($path, $classStr);
+        }
+        return 0;
     }
     
     /**
@@ -280,5 +289,29 @@ class '.$className.' extends MagicObject
             }
         }
         return $result;
+    }
+
+    /**
+     * Get update entiry
+     *
+     * @return  boolean
+     */ 
+    public function getUpdateEntity()
+    {
+        return $this->updateEntity;
+    }
+
+    /**
+     * Set update entiry
+     *
+     * @param  boolean  $updateEntity  Update entiry
+     *
+     * @return  self
+     */ 
+    public function setUpdateEntity($updateEntity)
+    {
+        $this->updateEntity = $updateEntity;
+
+        return $this;
     }
 }

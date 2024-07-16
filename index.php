@@ -412,11 +412,11 @@ require_once __DIR__ . "/inc.app/navs.php";
                     </tbody>
                   </table>
 
-                  <h4>Target</h4>
+                  <h4>Module Option</h4>
                   <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                       <tr>
-                        <td>Current Location</td>
+                        <td>Target</td>
                         <td>
                           <select class="form-control" name="current_module_location" id="current_module_location">
                           <?php
@@ -437,6 +437,10 @@ require_once __DIR__ . "/inc.app/navs.php";
                         <td>
                           <button class="btn btn-primary" type="button" name="update_current_location" id="update_current_location">Update Current Location</button>
                         </td>
+                      </tr>
+                      <tr>
+                        <td>Update Entity</td>
+                        <td><label for=""><input type="checkbox" name="update_entity"> Yes</label></td>
                       </tr>
                     </tbody>
                   </table>

@@ -127,6 +127,12 @@ class AppBuilderBase //NOSONAR
     protected $target = "/";
 
     /**
+     * Update entity
+     * @var boolean
+     */
+    protected $updateEntity = false;
+
+    /**
      * Constructor
      *
      * @param SecretObject $appBuilderConfig
@@ -3452,6 +3458,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
         $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
+        $generator->setUpdateEntity($this->getUpdateEntity());
         $generator->generateCustomEntity($entityMain->getEntityName(), $entityMain->getTableName(), null, $this->getSucessorMainColumns(), false, $referenceData, $nonupdatables);
     }
     
@@ -3902,6 +3909,30 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
     public function setTarget($target)
     {
         $this->target = $target;
+
+        return $this;
+    }
+
+    /**
+     * Get update entity
+     *
+     * @return  boolean
+     */ 
+    public function getUpdateEntity()
+    {
+        return $this->updateEntity;
+    }
+
+    /**
+     * Set update entity
+     *
+     * @param  boolean  $updateEntity  Update entity
+     *
+     * @return  self
+     */ 
+    public function setUpdateEntity($updateEntity)
+    {
+        $this->updateEntity = $updateEntity;
 
         return $this;
     }

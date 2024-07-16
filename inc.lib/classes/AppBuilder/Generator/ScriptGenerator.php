@@ -476,6 +476,11 @@ class ScriptGenerator
             $finalScript = str_replace("use MagicApp\AppFormBuilder;\r\n", '', $finalScript);
         }
         file_put_contents($path, $finalScript);
+
+        $updateEntity = $request->getUpdateEntity() == '1' || $request->getUpdateEntity() == 'true';
+        $appBuilder->setUpdateEntity($updateEntity);
+        
+
         
         $appBuilder->generateMainEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $referenceData);
         if($approvalRequired)
