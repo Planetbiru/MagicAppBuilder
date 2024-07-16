@@ -208,6 +208,28 @@ class ScriptGenerator
     }
 
     /**
+     * Get absolute direcory
+     * @param string $dir
+     * @param string $target
+     * @return string
+     */
+    private function getAbsoludeDir($dir, $target)
+    {
+        $tg = trim($target, "\\/");
+        $tg = str_replace("\\", "/", $tg);
+        if(empty($tg))
+        {
+            return $dir;
+        }
+        $count = count(explode("/", $tg));
+        for($i = 0; $i < $count; $i++)
+        {
+            $dir = "dirname($dir)";
+        }
+        return $dir;
+    }
+
+    /**
      * Generate
      *
      * @param PicoDatabase $database
@@ -314,8 +336,11 @@ class ScriptGenerator
         $includes = array();
         
         $includeDir = $this->getAuthFile($appConf);
+
+        $dir = "__DIR__";
+        $dir = $this->getAbsoludeDir($dir, $request->getTarget());
         
-        $includes[] = "require_once __DIR__ . $includeDir;";
+        $includes[] = "require_once $dir . $includeDir;";
         $includes[] = "";
         
         $usesSection = implode("\r\n", $uses);
@@ -329,9 +354,11 @@ class ScriptGenerator
         $declaration[] = '$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
         $declaration[] = '';
 
+        $target = $request->getTarget();
+
         $declaration[] = 'if(!$userPermission->allowedAccess($inputGet, $inputPost))'."\r\n".
         '{'."\r\n".
-        "\t".'require_once AppInclude::appForbiddenPage(__DIR__, $appConfig);'."\r\n".
+        "\t".'require_once AppInclude::appForbiddenPage(__DIR__, $appConfig, "'.$target.'");'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
         $declaration[] = '';
@@ -350,6 +377,7 @@ class ScriptGenerator
         if($approvalRequired)
         {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
+            $appBuilder->setTarget($request->getTarget());
 
             // CRUD
             $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval);
@@ -369,7 +397,8 @@ class ScriptGenerator
         else
         {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
-
+            $appBuilder->setTarget($request->getTarget());
+            
             // CRUD
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields);
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields);

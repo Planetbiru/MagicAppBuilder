@@ -121,6 +121,12 @@ class AppBuilderBase //NOSONAR
     protected $allField;
 
     /**
+     * Target
+     * @var string
+     */
+    protected $target = "/";
+
+    /**
      * Constructor
      *
      * @param SecretObject $appBuilderConfig
@@ -3671,7 +3677,8 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeHeader()
     {
-        return "require_once AppInclude::mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.");";
+        $target = $this->getTarget();
+        return "require_once AppInclude::mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \"$target\");";
     }
     
     /**
@@ -3681,7 +3688,8 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeFooter()
     {
-        return "require_once AppInclude::mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.");";
+        $target = $this->getTarget();
+        return "require_once AppInclude::mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \"$target\");";
     }
     
     /**
@@ -3873,4 +3881,28 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
         return str_replace('$$', '$', $input);
     }
     
+
+    /**
+     * Get target
+     *
+     * @return  string
+     */ 
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * Set target
+     *
+     * @param  string  $target  Target
+     *
+     * @return  self
+     */ 
+    public function setTarget($target)
+    {
+        $this->target = $target;
+
+        return $this;
+    }
 }
