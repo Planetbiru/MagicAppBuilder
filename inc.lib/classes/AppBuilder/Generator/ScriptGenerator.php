@@ -526,6 +526,13 @@ class ScriptGenerator
         }
     }
 
+    /**
+     * Prepare application
+     *
+     * @param SecretObject $appConf
+     * @param string $baseDir
+     * @return void
+     */
     public function prepareApplication($appConf, $baseDir)
     {
         $libDir = $appConf->getBaseApplicationDirectory()."/".$appConf->getComposer()->getBaseApplicationDirectory();
@@ -546,9 +553,15 @@ class ScriptGenerator
             {
                 copy(dirname(dirname(__DIR__))."/".$file, $baseAppBuilder."/".$file);
             }
-            
         }
     }
+    
+    /**
+     * Prepare composer
+     *
+     * @param SecretObject $appConf
+     * @return void
+     */
     public function prepareComposer($appConf)
     {
         $composer = $appConf->getComposer();
@@ -573,6 +586,13 @@ class ScriptGenerator
             $this->updateComposer($appConf, $composer);
         }
     }
+    
+    /**
+     * Prepare direciry
+     *
+     * @param string $baseDir
+     * @return void
+     */
     public function prepareDir($baseDir)
     {
         if(!file_exists($baseDir)) {
@@ -580,6 +600,13 @@ class ScriptGenerator
         }
     }
     
+    /**
+     * Update composer
+     *
+     * @param SecretObject $appConf
+     * @param SecretObject $composer
+     * @return void
+     */
     public function updateComposer($appConf, $composer)
     {
         $composerJsonFile = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseApplicationDirectory()."/composer.json";   
