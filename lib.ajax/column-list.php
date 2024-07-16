@@ -47,7 +47,6 @@ try
         'primary_keys'=>$primaryKeys,
     );
 	header('Content-type: application/json');
-	echo json_encode($json);
     error_log(json_encode($json));
 }
 catch(Exception $e)
