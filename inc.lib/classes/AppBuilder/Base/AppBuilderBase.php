@@ -3684,8 +3684,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeHeader()
     {
-        $target = $this->getTarget();
-        return "require_once AppInclude::mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \"$target\");";
+        return "require_once AppInclude::getInstance()->mainAppHeader(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
     }
     
     /**
@@ -3695,8 +3694,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
      */
     public function getIncludeFooter()
     {
-        $target = $this->getTarget();
-        return "require_once AppInclude::mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \"$target\");";
+        return "require_once AppInclude::getInstance()->mainAppFooter(__DIR__, ".self::VAR.self::APP_CONFIG.", \$appModule);";
     }
     
     /**

@@ -314,7 +314,6 @@ class ScriptGenerator
         $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
         $uses[] = "use MagicObject\\Request\\InputGet;";
         $uses[] = "use MagicObject\\Request\\InputPost;";
-        $uses[] = "use MagicApp\\AppInclude;";
         $uses[] = "use MagicApp\\AppEntityLanguage;";
         $uses[] = "use MagicApp\\AppFormBuilder;";
         $uses[] = "use MagicApp\\Field;";
@@ -327,6 +326,7 @@ class ScriptGenerator
         $uses[] = "use MagicApp\\UserAction;";
         $uses[] = "use MagicApp\\AppUserPermission;";
         $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
+        $uses[] = "use MagicApp\\AppInclude;";
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntities);      
@@ -350,15 +350,13 @@ class ScriptGenerator
         $declaration[] = AppBuilderBase::VAR."inputGet = new InputGet();";
         $declaration[] = AppBuilderBase::VAR."inputPost = new InputPost();";
         $declaration[] = '';
-        $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getModuleCode().'", "'.$request->getModuleName().'");';
+        $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", "'.$request->getModuleName().'");';
         $declaration[] = '$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
         $declaration[] = '';
 
-        $target = $request->getTarget();
-
         $declaration[] = 'if(!$userPermission->allowedAccess($inputGet, $inputPost))'."\r\n".
         '{'."\r\n".
-        "\t".'require_once AppInclude::appForbiddenPage(__DIR__, $appConfig, "'.$target.'");'."\r\n".
+        "\t".'require_once AppInclude::getInstance()->appForbiddenPage(__DIR__, $appConfig, $appModule);'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
         $declaration[] = '';

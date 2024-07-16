@@ -15,7 +15,7 @@ class AppInclude
      * @param MagicObject|SecretObject $config
      * @return string
      */
-    public static function mainAppHeader($dir, $config)
+    public function mainAppHeader($dir, $config)
     {
         $path = $config->getBaseIncludeDirectory()."/".$config->getInludeHeaderFile();
         if($config != null && PicoStringUtil::endsWith($path, ".php") && file_exists($path))
@@ -35,7 +35,7 @@ class AppInclude
      * @param MagicObject|SecretObject $config
      * @return string
      */
-    public static function mainAppFooter($dir, $config)
+    public function mainAppFooter($dir, $config)
     {
         $path = $config->getBaseIncludeDirectory()."/".$config->getInludeFooterFile();
         if($config != null && PicoStringUtil::endsWith($path, ".php") && file_exists($path))
@@ -55,7 +55,7 @@ class AppInclude
      * @param MagicObject|SecretObject $config
      * @return string
      */
-    public static function appForbiddenPage($dir, $config)
+    public function appForbiddenPage($dir, $config)
     {
         $path = $config->getBaseIncludeDirectory()."/".$config->getInludeForbiddenFile();
         if($config != null && PicoStringUtil::endsWith($path, ".php") && file_exists($path))
@@ -75,7 +75,7 @@ class AppInclude
      * @param MagicObject|SecretObject $config
      * @return string
      */
-    public static function appNotFoundPage($dir, $config)
+    public function appNotFoundPage($dir, $config)
     {
         $path = $config->getBaseIncludeDirectory()."/".$config->getInludeNotFoundFile();
         if($config != null && PicoStringUtil::endsWith($path, ".php") && file_exists($path))
