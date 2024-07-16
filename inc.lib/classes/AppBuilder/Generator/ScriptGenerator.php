@@ -426,7 +426,19 @@ class ScriptGenerator
         $baseDir = $appConf->getBaseApplicationDirectory();
         $this->prepareApplication($appConf, $baseDir);
 
-        $path = $baseDir."/".$moduleFile;
+
+
+        $target = trim($request->getTarget(), "/\\");
+        if(!empty($target))
+        {
+            $target = "/".$target;
+        }
+
+        $path = $baseDir."$target/".$moduleFile;
+        if(!file_exists(dirname($path)))
+        {
+            mkdir(dirname($path), 0755, true);
+        }
 
         
         $finalScript = "<"."?php\r\n\r\n".$merged."\r\n\r\n";

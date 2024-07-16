@@ -12,7 +12,13 @@ try
 {
 	$baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
     $moduleFile = $inputGet->getModuleFile();
-    $path = dirname(__DIR__) . "/inc.cfg/applications/".$curApp->getId()."/module/".basename($inputGet->getModuleFile(), ".php") . ".json";
+    $target = trim($inputGet->getTarget(), "/\\");
+    if(!empty($target))
+    {
+        $target = "/".$target;
+    }
+
+    $path = dirname(__DIR__) . "/inc.cfg/applications/".$curApp->getId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
     if(isset($moduleFile) && !empty($moduleFile) && file_exists($path))
     {
         header("Content-type: application/json");

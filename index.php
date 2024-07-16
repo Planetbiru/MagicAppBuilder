@@ -374,7 +374,7 @@ require_once __DIR__ . "/inc.app/navs.php";
                       <tr>
                         <td>&nbsp;</td>
                         <td>
-                          <input class="btn btn-primary" type="button" name="load_table" id="load_table" value="Load Table">
+                          <button class="btn btn-primary" type="button" name="load_table" id="load_table">Load Table</button>
                         </td>
                       </tr>
                       <tr>
@@ -411,6 +411,36 @@ require_once __DIR__ . "/inc.app/navs.php";
                       </tr>
                     </tbody>
                   </table>
+
+                  <h4>Target</h4>
+                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tbody>
+                      <tr>
+                        <td>Current Location</td>
+                        <td>
+                          <select class="form-control" name="current_module_location" id="current_module_location">
+                          <?php
+                          $moduleLocation = $appConfig->getApplication()->getBaseModuleDirectory();
+                          if (!empty($moduleLocation)) {
+                            foreach ($moduleLocation as $key => $value) {
+                          ?>
+                              <option value="<?php echo $value->getPath(); ?>"<?php echo $value->getActive() ? " selected":"";?>><?php echo $value->getName(); ?> - <?php echo $value->getPath(); ?></option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>  
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                          <button class="btn btn-primary" type="button" name="update_current_location" id="update_current_location">Update Current Location</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
                   <h4>Module</h4>
                   <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tbody>

@@ -919,6 +919,7 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
+    target: $('#current_module_location').val()
   };
   generateAllCode(dataToPost);
 }
@@ -1094,7 +1095,7 @@ function loadColumn(tableName, selector) {
         }
       }
       if ($('[name="module_load_previous"]')[0].checked) {
-        loadSavedModuleData($('#module_file').val(), function () {
+        loadSavedModuleData($('#module_file').val(), $('#current_module_location').val(), function () {
           $(".define-wrapper").css("display", "block");
           $("#define-column-tab").click();
         });
@@ -1230,11 +1231,11 @@ function restoreForm(data) {
   }
 }
 
-function loadSavedModuleData(moduleFile, clbk) {
+function loadSavedModuleData(moduleFile, target, clbk) {
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-data.php",
-    data: { moduleFile: moduleFile },
+    data: { moduleFile: moduleFile, target:target },
     dataType: "json",
     success: function (data) {
       restoreForm(data)
