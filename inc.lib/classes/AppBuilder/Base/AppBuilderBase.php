@@ -1068,7 +1068,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
     \'<i class="fa-solid fa-angle-left"></i>\', \'<i class="fa-solid fa-angle-right"></i>\',
     \'<i class="fa-solid fa-angles-left"></i>\', \'<i class="fa-solid fa-angles-right"></i>\'
     )
-    ->setMargin($appConfig->getPageMargin())
+    ->setMargin($appConfig->getData()->getPageMargin())
     ;';
         $paginationVar = str_replace("\r\n", "\n", $paginationVar);
         $pagination1 = $dom->createTextNode($this->createPagination("pagination-top", '$pageControl'));
@@ -1310,7 +1310,7 @@ $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 // Pay attention to security issues
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, '.$sortableParam.');
 
-$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getPageSize()), $sortable);
+$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
 $dataLoader = new '.$entityMain->getEntityName().'(null, $database);
 ';
         $features = $this->appFeatures;
