@@ -2,21 +2,21 @@
 
 namespace AppBuilder\Base;
 
-use AppBuilder\AppEntityGenerator;
-use AppBuilder\AppFeatures;
-use AppBuilder\AppField;
-use AppBuilder\AppSecretObject;
-use AppBuilder\ElementClass;
-use AppBuilder\ElementType;
-use AppBuilder\EntityApvInfo;
-use AppBuilder\EntityInfo;
-use DOMDocument;
-use DOMElement;
 use DOMText;
-use MagicObject\Database\PicoDatabase;
+use DOMElement;
+use DOMDocument;
+use AppBuilder\AppField;
+use AppBuilder\EntityInfo;
+use AppBuilder\AppFeatures;
+use AppBuilder\ElementType;
+use AppBuilder\ElementClass;
 use MagicObject\MagicObject;
+use AppBuilder\EntityApvInfo;
 use MagicObject\SecretObject;
+use AppBuilder\AppSecretObject;
+use AppBuilder\AppEntityGenerator;
 use MagicObject\Util\PicoStringUtil;
+use MagicObject\Database\PicoDatabase;
 
 class AppBuilderBase //NOSONAR
 {
