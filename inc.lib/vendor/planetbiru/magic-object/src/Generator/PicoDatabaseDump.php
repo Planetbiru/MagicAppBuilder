@@ -155,10 +155,24 @@ class PicoDatabaseDump
             }
             else
             {
-                $query .= " DEFAULT ".PicoDatabaseUtil::escapeValue($entityColumn['default_value'], true);
+                $query .= " DEFAULT ".$this->fixValue(PicoDatabaseUtil::escapeValue($entityColumn['default_value'], true));
             }
         }
         return $query;
+    }
+
+    /**
+     * Fix value
+     * @param mixed $value
+     * @return mixed
+     */
+    public function fixValue($value)
+    {
+        if(is_string($value) && strcasecmp($value, 'true') != 0 && strcasecmp($value, 'false') != 0)
+        {
+            return "'".$value."'";
+        }
+        return $value;
     }
     
     /**

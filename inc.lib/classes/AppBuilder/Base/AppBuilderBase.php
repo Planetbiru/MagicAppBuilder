@@ -1057,10 +1057,12 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG)); 
         
         $dataSection->appendChild($dom->createTextNode($this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable))); 
+        $dataSection->appendChild($dom->createTextNode("try{\n")); 
+        $dataSection->appendChild($dom->createTextNode("\t\t".$this->getFindAllScript())); 
         
-        $dataSection->appendChild($dom->createTextNode("\n\tif(\$pageData->getTotalResult() > 0)")); 
+        $dataSection->appendChild($dom->createTextNode("\n\t\tif(\$pageData->getTotalResult() > 0)")); 
         
-        $dataSection->appendChild($dom->createTextNode("\n\t".self::CURLY_BRACKET_OPEN)); 
+        $dataSection->appendChild($dom->createTextNode("\n\t\t".self::CURLY_BRACKET_OPEN)); 
 
         $paginationVar = '
     $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
@@ -1074,6 +1076,7 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
         $pagination1 = $dom->createTextNode($this->createPagination("pagination-top", '$pageControl'));
         $pagination2 = $dom->createTextNode($this->createPagination("pagination-bottom", '$pageControl'));
 
+        $paginationVar = $this->addIndent($paginationVar, 2);
         $dataSection->appendChild($dom->createTextNode($paginationVar)); 
 
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_CLOSE_TAG)); 
@@ -1096,9 +1099,24 @@ else if($'.$objectName.self::CALL_GET.$upperWaitingFor.'() == WaitingFor::DELETE
 
         $dom->appendChild($filterSection);
 
+        $catch = '
+<?php
+}
+catch(Exception $e)
+{
+    ?>
+    <div class="alert alert-danger"><?php echo $appInclude->printException($e);?></div>
+    <?php
+} 
+?>
+';
+    $catch = str_replace("\r\n", "\n", $this->addIndent($catch, 1));
+
+        $dataSection->appendChild($dom->createTextNode($catch));
+
         if($this->ajaxSupport)
         {
-            $dataSection->appendChild($dom->createTextNode("\t".'<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>'."\n"));
+            $dataSection->appendChild($dom->createTextNode("".'<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>'."\n"));
         }
         $dom->appendChild($dataSection);
         
@@ -1319,13 +1337,11 @@ $dataLoader = new '.$entityMain->getEntityName().'(null, $database);
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '
 $subqueryMap = '.$referece.';
-$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
 ';
         }
         else
         {
             $subqueryVar = '
-$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
 ';
         }
         
@@ -1336,6 +1352,19 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
         $script = str_replace("\r\n", "\n", $script);
         
         return $script;
+    }
+
+    private function getFindAllScript()
+    {
+        $features = $this->appFeatures;
+        if($features->getSubquery())
+        {
+            return '$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);';
+        }
+        else
+        {
+            return '$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);';
+        }        
     }
 
     /**
@@ -3771,7 +3800,7 @@ $pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, nul
         {
             $lines[$index] = $tab.$line;
         }
-        return implode(self::NEW_LINE, $lines);
+        return implode(self::NEW_LINE_N, $lines);
     }
 
     /**

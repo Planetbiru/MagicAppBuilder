@@ -25,11 +25,8 @@ try
         if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
             $inputEntity = $inputPost->getEntity();
-
             $entities = array();
-
             $entityNames = array();
-
             foreach($inputEntity as $idx=>$entityName)
             {
                 $className = "\\".$baseEntity."\\".$entityName;
@@ -57,8 +54,7 @@ try
             foreach($entities as $tableName=>$entity)
             {
                 $entityQueries = array();
-                $dumper = new PicoDatabaseDump();
-    
+                $dumper = new PicoDatabaseDump();   
                 $quertArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database);
                 foreach($quertArr as $sql)
                 {
