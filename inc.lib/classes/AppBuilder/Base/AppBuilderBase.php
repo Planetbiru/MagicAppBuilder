@@ -2518,6 +2518,7 @@ $subqueryMap = '.$referece.';
         $td3 = $dom->createElement('td');
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
+        $upperFieldNameOri = $upperFieldName;
         if($field->getElementType() == 'select' 
             && $field->getReferenceData() != null 
             && $field->getReferenceData()->getType() == 'entity'
@@ -2590,8 +2591,8 @@ $subqueryMap = '.$referece.';
         $valueWrapper1 = $dom->createElement('span');
         $valueWrapper2 = $dom->createElement('span');
         
-        $valueWrapper1->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldName."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldName."()));".self::PHP_CLOSE_TAG);
-        $valueWrapper2->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldName."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldName."()));".self::PHP_CLOSE_TAG);
+        $valueWrapper1->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri."()));".self::PHP_CLOSE_TAG);
+        $valueWrapper2->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri."()));".self::PHP_CLOSE_TAG);
 
         $valueWrapper1->appendChild($value);
         $valueWrapper2->appendChild($value2);
