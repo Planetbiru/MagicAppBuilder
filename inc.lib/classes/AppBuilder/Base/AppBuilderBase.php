@@ -394,6 +394,23 @@ class AppBuilderBase //NOSONAR
         $table->setAttribute('width', '100%');
         return $table;
     }
+
+    /**
+     * Create element table responsive
+     *
+     * @param DOMDocument $dom
+     * @return DOMElement
+     */
+    private function createElementTableResponsiveApproval($dom)
+    {
+        $table = $dom->createElement('table');
+        $table->setAttribute('class', 'responsive responsive-three-cols');
+        $table->setAttribute('border', '0');
+        $table->setAttribute('cellpadding', '0');
+        $table->setAttribute('cellspacing', '0');
+        $table->setAttribute('width', '100%');
+        return $table;
+    }
     
     /**
      * Create element submit button
@@ -1266,6 +1283,14 @@ else
             }
         }
 
+        if($this->appFeatures->isApprovalRequired())
+        {
+            $additionalFilter .= "\n".'if($inputGet->isShowRequireApprovalOnly()){';
+            $additionalFilter .= "\n\t".'$specification->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->waitingFor, WaitingFor::NOTHING));';
+            $additionalFilter .= "\n\t".'$specification->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->waitingFor, null));';
+            $additionalFilter .= "\n".'}';
+        }
+
         return $additionalFilter;
     }
 
@@ -2005,16 +2030,55 @@ $subqueryMap = '.$referece.';
     
         $addWrapper->appendChild($whiteSpace4);
 
+
+
+
+        ////
+        $approvalFilterWrapper = $dom->createElement('span');
+        $approvalFilterWrapper->setAttribute('class', 'filter-group');    
+        $buttonSearch = $dom->createElement('button');
+        $buttonSearch->setAttribute('type', 'submit');
+        $buttonSearch->setAttribute('name', 'show_require_approval_only');
+        $buttonSearch->setAttribute('value', 'true');
+        $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
+        $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonShowRequireApproval();".self::PHP_CLOSE_TAG));
+        $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");
+        
+        
+        $approvalFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));
+   
+        $approvalFilterWrapper->appendChild($buttonSearch);
+        
+        $whiteSpace5 = $dom->createTextNode("\n\t\t");
+        
+    
+        $approvalFilterWrapper->appendChild($whiteSpace5);
+        ////
+
+
+
         
         $whiteSpace = $dom->createTextNode("\n\t\t");
         $form->appendChild($whiteSpace);
         
         $form->appendChild($submitWrapper);
 
+        if($this->appFeatures->isApprovalRequired())
+        {
+            $form->appendChild($dom->createTextNode("\n\t\t".'<?php if($userPermission->isAllowedApprove()){ ?>'));
+            $form->appendChild($dom->createTextNode("\n\n\t\t"));
+            $form->appendChild($approvalFilterWrapper);
+            $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
+        }
+
         $form->appendChild($dom->createTextNode("\n\t\t".'<?php if($userPermission->isAllowedCreate()){ ?>'));
         $form->appendChild($dom->createTextNode("\n\n\t\t"));
         $form->appendChild($addWrapper);
         $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
+
+
+
+
 
         $whiteSpace3 = $dom->createTextNode("\n\t");
         $form->appendChild($whiteSpace3);
@@ -2260,8 +2324,27 @@ $subqueryMap = '.$referece.';
      */
     private function createDetailTableCompare($dom, $mainEntity, $objectName, $fields, $primaryKeyName, $approvalEntity, $objectApprovalName)
     {
-        $table = $this->createElementTableResponsive($dom);
+        $table = $this->createElementTableResponsiveApproval($dom);
+        $thead = $dom->createElement('thead');
         $tbody = $dom->createElement('tbody');
+
+
+        $trh = $dom->createElement('tr');
+        $td1 = $dom->createElement('td');
+        $td2 = $dom->createElement('td');
+        $td3 = $dom->createElement('td');
+
+        $td1->appendChild($dom->createTextNode('<?php echo $appLanguage->getColumnName();?>'));
+        $td2->appendChild($dom->createTextNode('<?php echo $appLanguage->getValueBefore();?>'));
+        $td3->appendChild($dom->createTextNode('<?php echo $appLanguage->getValueAfter();?>'));
+
+        $trh->appendChild($td1);
+        $trh->appendChild($td2);
+        $trh->appendChild($td3);
+
+        $thead->appendChild($trh);
+
+
         foreach($fields as $field)
         {
             if($field->getIncludeDetail())
@@ -2270,6 +2353,7 @@ $subqueryMap = '.$referece.';
                 $tbody->appendChild($tr);
             }
         }
+        $table->appendChild($thead);
         $table->appendChild($tbody);
         return $table;
     }
