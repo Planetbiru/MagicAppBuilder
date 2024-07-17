@@ -1833,7 +1833,7 @@ $subqueryMap = '.$referece.';
         $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
         $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>')); 
         
-        $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if($'.$objectName.'->getWaitingFor() != null){ ?>')); 
+        $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::requireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
         $td3->appendChild($buttonApprove); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t"));  
@@ -1889,7 +1889,7 @@ $subqueryMap = '.$referece.';
         $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
         $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>')); 
         
-        $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if($'.$objectName.'->getWaitingFor() != null){ ?>')); 
+        $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::requireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
         $td3->appendChild($buttonApprove); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t"));  
