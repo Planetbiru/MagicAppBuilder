@@ -615,9 +615,34 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->hasValue".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
+
         $getData[] = $this->constructEntityLabel($entityName);
         $getData[] = $this->getIncludeHeader();
+
+        if($approvalRequired)
+        {
+            $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
+            $getData[] = self::TAB1.self::TAB1."if(!UserAction::isRequireApproval(".self::VAR.$objectName."->get".$upperWaitingFor."()))";
+            $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
+        }
+
+
         $getData[] = self::PHP_CLOSE_TAG.self::NEW_LINE.$html.self::NEW_LINE.self::PHP_OPEN_TAG;
+
+        if($approvalRequired)
+        {
+            $getData[] = self::TAB1.self::TAB1."}";
+            $getData[] = self::TAB1.self::TAB1."else";
+            $getData[] = self::TAB1.self::TAB1."{";
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'?>';
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageNoneditableDataWaitingApproval();?></div>';
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="button-area"><button type="button" class="btn btn-primary" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<?php';
+    
+            $getData[] = self::TAB1.self::TAB1."}";
+        }
+
+
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1.self::TAB1."else";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
@@ -627,6 +652,9 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.'<?php';
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = $this->getIncludeFooter();
+
+        
+
         $getData[] = self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1."catch(Exception ".self::VAR."e)";
         $getData[] = self::TAB1.self::CURLY_BRACKET_OPEN;
@@ -636,7 +664,10 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.'<div class="alert alert-danger"><?php echo $e->getMessage();?></div>';
         $getData[] = self::TAB1.self::TAB1.'<?php';
         $getData[] = $this->getIncludeFooter();
+
+
         $getData[] = self::TAB1.self::CURLY_BRACKET_CLOSE.self::NEW_LINE;
+        
 
         return "if(".self::VAR."inputGet->getUserAction() == UserAction::UPDATE)\r\n"
         ."{\r\n"
@@ -1874,13 +1905,13 @@ $subqueryMap = '.$referece.';
         $buttonApprove->setAttribute('type', 'button');
         $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
         $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
-        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>')); 
+        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
         
         $buttonReject = $dom->createElement('button');
         $buttonReject->setAttribute('type', 'button');
         $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
         $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
-        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>')); 
+        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
         
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
@@ -1930,13 +1961,13 @@ $subqueryMap = '.$referece.';
         $buttonApprove->setAttribute('type', 'button');
         $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
         $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
-        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>')); 
+        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
         
         $buttonReject = $dom->createElement('button');
         $buttonReject->setAttribute('type', 'button');
         $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
         $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
-        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>')); 
+        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
         
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
