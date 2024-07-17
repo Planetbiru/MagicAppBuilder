@@ -3324,10 +3324,6 @@ $subqueryMap = '.$referece.';
         $tr2 = $dom->createElement('tr');
         $td1 = $dom->createElement('td');
         $td2 = $dom->createElement('td');
-        
-        //$btn1 = $this->createSubmitButton($dom, $this->getTextOfLanguage('button_approve'), 'action_approval', 'action_approval');
-        //$btn2 = $this->createSubmitButton($dom, $this->getTextOfLanguage('button_reject'), 'action_approval', 'action_approval');
-
 
         $btn1 = $dom->createElement('button');
         $btn1->setAttribute('type', 'submit');
@@ -3341,7 +3337,7 @@ $subqueryMap = '.$referece.';
         $btn2->setAttribute('class', 'btn btn-warning');
         $btn2->setAttribute('name', 'user_action');
         $btn2->setAttribute('value', '<?php echo UserAction::REJECT;?>');
-        $btn1->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
+        $btn2->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
 
         $btn3 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, null, 'currentModule->getRedirectUrl()');
         $btn4 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, null, 'currentModule->getRedirectUrl()');
@@ -3934,6 +3930,13 @@ $subqueryMap = '.$referece.';
         }
     }
 
+    /**
+     * Create sort order session
+     * @param string $objectName
+     * @param string $entityName
+     * @param string $primaryKeyName
+     * @return string
+     */
     public function createSortOrderSection($objectName, $entityName, $primaryKeyName)
     {
         $camelPrimaryKey = PicoStringUtil::camelize($primaryKeyName);
