@@ -1005,7 +1005,7 @@ else
             
         $messagePhp = '
 <?php
-UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaitingFor());
+echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaitingFor());
 ?>
 ';
         $messagePhp = str_replace("\r\n", "\n", $messagePhp);
