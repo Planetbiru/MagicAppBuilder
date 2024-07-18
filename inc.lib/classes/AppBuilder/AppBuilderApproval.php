@@ -236,6 +236,15 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()".parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR."rowId))";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()".parent::CALL_SET.$upperWaitingFor."(WaitingFor::NOTHING))";
 
+        if($waitingForValue == WaitingFor::ACTIVATE)
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", true))";
+        }
+        else if($waitingForValue == WaitingFor::DEACTIVATE)
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", false))";
+        }
+
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperAdminAskEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).")";

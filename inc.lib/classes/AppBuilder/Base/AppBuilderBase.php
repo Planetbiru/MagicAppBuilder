@@ -642,6 +642,7 @@ class AppBuilderBase //NOSONAR
             $getData[] = self::TAB1.self::TAB1."}";
         }
 
+        
 
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1.self::TAB1."else";
@@ -651,6 +652,8 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>';
         $getData[] = self::TAB1.self::TAB1.self::TAB1.'<?php';
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
+
+        
         $getData[] = $this->getIncludeFooter();
 
         
@@ -825,7 +828,14 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName);
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1."try";
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
-        $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->find(".self::VAR.$objectName.self::CALL_GET."ApprovalId());";
+        if($features->getSubquery())
+        {
+        $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->findOneWithPrimaryKeyValue(".self::VAR.$objectName.self::CALL_GET."ApprovalId(), ".self::VAR."subqueryMap);";
+        }
+        else
+        {
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->find(".self::VAR.$objectName.self::CALL_GET."ApprovalId());";
+        }
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1."catch(Exception ".self::VAR."e)";
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
@@ -1164,6 +1174,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG));    
 
         $dataSection->appendChild($dom->createTextNode("\n")); 
+        $dataSection->appendChild($dom->createTextNode("\t}\n")); 
         
         $dataSection->appendChild($dom->createTextNode($this->scriptWhenListNotFound())); 
         
@@ -1230,15 +1241,35 @@ catch(Exception $e)
     
     public function scriptWhenListNotFound()
     {
+        if($this->appFeatures->isApprovalRequired())
+        {
         $script = 
-'}
+'else if($inputGet->isShowRequireApprovalOnly())
+{
+    ?>
+    <div class="alert alert-info"><?php echo $appLanguage->getMessageNoDataRequireApproval();?></div>
+    <?php
+}
 else
 {
-?>
+    ?>
     <div class="alert alert-info"><?php echo $appLanguage->getMessageDataNotFound();?></div>
-<?php
+    <?php
 }
 ?>';
+        }
+        else
+        {
+            $script = 
+'else
+{
+    ?>
+    <div class="alert alert-info"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+    <?php
+}
+?>';
+        }
+
         $script = str_replace("\r\n", "\n", $script);
         $script = $this->addIndent($script, 1);
         $script = str_replace("\r\n", "\n", $script);

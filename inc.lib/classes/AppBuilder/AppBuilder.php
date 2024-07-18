@@ -199,6 +199,7 @@ class AppBuilder extends AppBuilderBase
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
+        $upperPrimaryKeyName = ucfirst($pkName);
 
         $objectName = lcfirst($entityName);
         $lines = array();
@@ -209,11 +210,59 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->countableCheckedRowId())";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        
+        
+        /*
         $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperPkName."(".parent::VAR."rowId)->set".$upperActivationKey."($act)->update();";
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        */
+
+        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
+        $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
+
+
+
+            
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(Field::of()->".$pkName.", ".parent::VAR."rowId))";
+
+        if($activationValue)
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", true))";
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", false))";
+        }
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
+        if($activationValue)
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperActivationKey."(true)";
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperActivationKey."(false)";
+        }
+        
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_UPDATE_END;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here when record is not found";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
         $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
