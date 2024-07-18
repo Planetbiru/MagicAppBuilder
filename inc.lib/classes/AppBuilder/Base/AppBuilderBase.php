@@ -830,7 +830,7 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         if($features->getSubquery())
         {
-        $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->findOneWithPrimaryKeyValue(".self::VAR.$objectName.self::CALL_GET."ApprovalId(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->findOneWithPrimaryKeyValue(".self::VAR.$objectName.self::CALL_GET."ApprovalId(), ".self::VAR."subqueryMap);";
         }
         else
         {
