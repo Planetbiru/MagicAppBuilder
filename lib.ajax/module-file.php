@@ -11,14 +11,12 @@ $inputPost = new InputPost();
 try
 {
 	$baseModuleDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
-
     $module = $inputPost->getModule().".php";
     $path = trim($baseModuleDirectory."/".$module);
     if(file_exists($path))
     {
         echo file_get_contents($path);
     }
-
 }
 catch(Exception $e)
 {

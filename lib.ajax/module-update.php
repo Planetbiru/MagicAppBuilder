@@ -19,7 +19,6 @@ try
         $path = $baseDirectory."/".$moduleName.".php";       
         file_put_contents($path, $content);
     }
-
 }
 catch(Exception $e)
 {

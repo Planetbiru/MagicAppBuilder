@@ -17,7 +17,6 @@ try
     {
         $target = "/".$target;
     }
-
     $path = dirname(__DIR__) . "/inc.cfg/applications/".$curApp->getId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
     if(isset($moduleFile) && !empty($moduleFile) && file_exists($path))
     {
@@ -31,7 +30,6 @@ try
         header("Content-lenght: 2");
         echo "{}"; 
     }
-
 }
 catch(Exception $e)
 {

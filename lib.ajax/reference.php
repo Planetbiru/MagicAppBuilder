@@ -19,7 +19,6 @@ try
             $referenceConfig->loadYamlFile($referenceConfigPath, false, true, true);
         }
     }
-
     $reference = $referenceConfig->getReferenceData();
     $fieldName = $inputGet->getFieldName();
     $camelFieldName = PicoStringUtil::camelize($fieldName);

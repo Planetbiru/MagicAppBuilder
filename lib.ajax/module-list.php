@@ -11,27 +11,19 @@ try
 {
 	$baseModuleDirectory = $appConfig->getApplication()->getBaseModuleDirectory();
     echo "<div>\r\n";
-
     foreach($baseModuleDirectory as $elem)
     {
         echo "<h4>".$elem->getName()."</h4>\r\n";
-        
-       
-
         $target = trim($elem->getPath(), "/\\");
         if(!empty($target))
         {
             $target = "/".$target;
         }
-
         $baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
         $dir =  $baseDirectory."$target";
-
         $pattern = $baseDirectory."$target/*.php";
-
         $list = glob($pattern);
         $li = array();
-
         foreach($list as $idx=>$file)
         {
             $module = basename($file, '.php');

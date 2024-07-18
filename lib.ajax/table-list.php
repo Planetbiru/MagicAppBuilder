@@ -24,10 +24,9 @@ try
 	$column = "";
 	$i = 0;
 
+	$tables = array();
     $fields = array();
 	$cols = array();
-
-	$tables = array();
 
 	foreach ($rows as $i=>$data) { 
 		
