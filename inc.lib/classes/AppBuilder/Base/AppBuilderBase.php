@@ -1822,6 +1822,61 @@ $subqueryMap = '.$referece.';
         
         return $thead;
     }
+
+    /**
+     * Create table list body
+     *
+     * @param DOMDocument $dom
+     * @param string $objectName
+     * @param string $primaryKey
+     * @param string $upperPkName
+     * @return DOMElement
+     */
+    private function createButtonApprove($dom, $objectName, $primaryKey, $upperPkName)
+    {
+        $buttonApprove = $dom->createElement('button');
+        $buttonApprove->setAttribute('type', 'button');
+        $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
+
+        $approvalType = $this->appFeatures->getApprovalType();
+        if($approvalType == 2)
+        {
+            $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>\'');
+        }
+        else
+        {
+            $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
+        }
+        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
+        return $buttonApprove;
+    }
+
+    /**
+     * Create table list body
+     *
+     * @param DOMDocument $dom
+     * @param string $objectName
+     * @param string $primaryKey
+     * @param string $upperPkName
+     * @return DOMElement
+     */
+    private function createButtonReject($dom, $objectName, $primaryKey, $upperPkName)
+    {
+        $approvalType = $this->appFeatures->getApprovalType();
+        if($approvalType == 2)
+        {
+            $buttonReject = $dom->createTextNode('<?php echo UserAction::getWaitingForText($appLanguage, $supervisor->getWaitingFor());?>');
+        }
+        else
+        {
+            $buttonReject = $dom->createElement('button');
+            $buttonReject->setAttribute('type', 'button');
+            $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
+            $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
+            $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
+        }
+        return $buttonReject;
+    }
     
     /**
      * Create table list body
@@ -1932,17 +1987,9 @@ $subqueryMap = '.$referece.';
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
         
-        $buttonApprove = $dom->createElement('button');
-        $buttonApprove->setAttribute('type', 'button');
-        $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
-        $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
-        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
+        $buttonApprove = $this->createButtonApprove($dom, $objectName, $primaryKey, $upperPkName);
+        $buttonReject = $this->createButtonReject($dom, $objectName, $primaryKey, $upperPkName);
         
-        $buttonReject = $dom->createElement('button');
-        $buttonReject->setAttribute('type', 'button');
-        $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-        $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
-        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
         
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
@@ -1988,17 +2035,8 @@ $subqueryMap = '.$referece.';
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
         
-        $buttonApprove = $dom->createElement('button');
-        $buttonApprove->setAttribute('type', 'button');
-        $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
-        $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
-        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
-        
-        $buttonReject = $dom->createElement('button');
-        $buttonReject->setAttribute('type', 'button');
-        $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-        $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
-        $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
+        $buttonApprove = $this->createButtonApprove($dom, $objectName, $primaryKey, $upperPkName);
+        $buttonReject = $this->createButtonReject($dom, $objectName, $primaryKey, $upperPkName);
         
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t".'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
         $td3->appendChild($dom->createTextNode("\n\t\t\t\t\t\t\t")); 
@@ -2699,8 +2737,9 @@ $subqueryMap = '.$referece.';
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
             $val = '->hasValue'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val2 = '->hasValue'.$upperObjName.'() ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
             $result = self::VAR.$objectName.$val;
-            $result2 = self::VAR.$objectApprovalName.$val;
+            $result2 = self::VAR.$objectApprovalName.$val2;
         }
         else if($field->getElementType() == 'select' 
             && $field->getReferenceData() != null 
@@ -3405,6 +3444,7 @@ $subqueryMap = '.$referece.';
         $btn3->setAttribute('name', 'user_action');
         $btn3->setAttribute('value', '<?php echo UserAction::APPROVE;?>');
         $btn3->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>'));
+        $btn32 = clone $btn3;
 
         $btn4 = $dom->createElement('button');
         $btn4->setAttribute('type', 'submit');
@@ -3412,12 +3452,28 @@ $subqueryMap = '.$referece.';
         $btn4->setAttribute('name', 'user_action');
         $btn4->setAttribute('value', '<?php echo UserAction::REJECT;?>');
         $btn4->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
+        $btn42 = clone $btn4;
 
         $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'())');
         $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, null, 'currentModule->getRedirectUrl()');
         
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($dom->createTextNode('<?php if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+        $td2->appendChild($dom->createTextNode('<?php '));
+
+        $approvalType = $this->appFeatures->getApprovalType();
+        if($approvalType == 2)
+        {
+        $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($btn32);
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($btn42);
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($dom->createTextNode('<?php } else '));
+        }
+
+
+        $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
         $td2->appendChild($btn3);
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
@@ -3478,6 +3534,8 @@ $subqueryMap = '.$referece.';
         $btn1->setAttribute('value', '<?php echo UserAction::APPROVE;?>');
         $btn1->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>'));
 
+        $btn12 = clone $btn1;
+
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'submit');
         $btn2->setAttribute('class', 'btn btn-warning');
@@ -3485,13 +3543,18 @@ $subqueryMap = '.$referece.';
         $btn2->setAttribute('value', '<?php echo UserAction::REJECT;?>');
         $btn2->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
 
+        $btn22 = clone $btn2;
+
         $btn3 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, null, 'currentModule->getRedirectUrl()');
+        $btn32 = clone $btn3;
         $btn4 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, null, 'currentModule->getRedirectUrl()');
         
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
         $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
+
+        $pkInputApprove2 = clone $pkInputApprove;
 
         $pkInputReject = $dom->createElement('input');
         $pkInputReject->setAttribute("type", "hidden");
@@ -3500,7 +3563,23 @@ $subqueryMap = '.$referece.';
 
         
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t<?php"));
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t".'if($inputGet->getNextAction() == UserAction::APPROVE)'));
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t".'if($inputGet->getNextAction() == UserAction::APPROVAL)'));
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t{"));
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t?>"));
+        
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($btn12);
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($btn22);
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($btn32);
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        $td2->appendChild($pkInputApprove2);
+        
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t<?php"));
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t}"));
+
+        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t".'else if($inputGet->getNextAction() == UserAction::APPROVE)'));
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t{"));
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t?>"));
         

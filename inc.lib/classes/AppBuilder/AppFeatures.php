@@ -45,6 +45,13 @@ class AppFeatures
     private $trashRequired = false;
     
     /**
+     * Approval type
+     *
+     * @var integer
+     */
+    private $approvalType = 1;
+
+    /**
      * Approval position
      *
      * @var string
@@ -68,6 +75,7 @@ class AppFeatures
             $this->approvalNote = $this->isTrue($features->get('approvalNote'));
             $this->trashRequired = $this->isTrue($features->get('trashRequired'));
             $this->subquery = $this->isTrue($features->get('subquery'));
+            $this->approvalType = $features->get('approvalType') == 2 ? 2 : 1;
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
         }
     }
@@ -150,5 +158,29 @@ class AppFeatures
     public function getSubquery()
     {
         return $this->subquery == 1;
+    }
+
+    /**
+     * Get approval type
+     *
+     * @return  integer
+     */ 
+    public function getApprovalType()
+    {
+        return $this->approvalType;
+    }
+
+    /**
+     * Set approval type
+     *
+     * @param  integer  $approvalType  Approval type
+     *
+     * @return  self
+     */ 
+    public function setApprovalType($approvalType)
+    {
+        $this->approvalType = $approvalType;
+
+        return $this;
     }
 }

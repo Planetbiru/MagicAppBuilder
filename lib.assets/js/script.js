@@ -869,6 +869,7 @@ function generateScript(selector) {
   let activateDeactivate = $("#activate_deactivate")[0].checked && true;
   let withApprovalNote = $("#with_approval_note")[0].checked && true;
   let approvalPosition = $('[name="approval_position"]:checked').val();
+  let approvalType = $('[name="approval_type"]:checked').val();
   let ajaxSupport = $("#ajax_support")[0].checked && true;
   let entity = {
     mainEntity: {
@@ -903,6 +904,7 @@ function generateScript(selector) {
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
     trashRequired: withTrash,
+    approvalType: approvalType,
     approvalPosition: approvalPosition,
     ajaxSupport: ajaxSupport
   };
@@ -1226,6 +1228,9 @@ function restoreForm(data) {
 
     if ($('#modal-module-features [name="with_trash"]').length)
       $('#modal-module-features [name="with_trash"]')[0].checked = data.features.trashRequired === true || data.features.trashRequired == 'true';
+
+    if ($('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]').length)
+      $('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]')[0].checked = true;
 
     if ($('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]').length)
       $('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;

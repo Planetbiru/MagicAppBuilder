@@ -654,6 +654,10 @@ require_once __DIR__ . "/inc.app/navs.php";
                               <td><label><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1"> Approval Note</label> &nbsp;</td>
                             </tr>
                             <tr>
+                              <td>Approval Type</td>
+                              <td><label><input type="radio" name="approval_type" id="approval_type" value="1"> Separated</label> &nbsp; <label><input type="radio" name="approval_type" id="approval_type" value="2" checked> Combined</label> &nbsp;</td>
+                            </tr>
+                            <tr>
                               <td>Approval Position</td>
                               <td><label><input type="radio" name="approval_position" id="approval_position" value="before-data"> Before Data</label> &nbsp; <label><input type="radio" name="approval_position" id="approval_position" value="after-data" checked> After Data</label> &nbsp;</td>
                             </tr>
