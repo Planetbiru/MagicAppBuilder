@@ -19,7 +19,7 @@ function format() {
 
   let totalLinesEntityTran1 = trasEd1.lineCount();
   let totalLinesEntityTran2 = trasEd2.lineCount();
-  
+
   trasEd1.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesEntityTran1 });
   trasEd2.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesEntityTran2 });
 }
@@ -119,7 +119,7 @@ $(document).ready(function () {
     }
   );
 
-  
+
 
 
 
@@ -134,24 +134,22 @@ $(document).ready(function () {
     }
   );
 
-  trasEd1.on('focus', function(){
+  trasEd1.on('focus', function () {
     focused['trasEd1'] = true;
     hilightLine1();
   });
-  trasEd2.on('focus', function(){
+  trasEd2.on('focus', function () {
     focused['trasEd2'] = true;
     hilightLine2();
   });
-  trasEd1.on('cursorActivity', function(){
-    if(typeof focused['trasEd1'] != 'undefined')
-    {
+  trasEd1.on('cursorActivity', function () {
+    if (typeof focused['trasEd1'] != 'undefined') {
       hilightLine1();
     }
   });
 
-  trasEd2.on('cursorActivity', function(){
-    if(typeof focused['trasEd2'] != 'undefined')
-    {
+  trasEd2.on('cursorActivity', function () {
+    if (typeof focused['trasEd2'] != 'undefined') {
       hilightLine2();
     }
   });
@@ -203,8 +201,7 @@ $(document).ready(function () {
 
 });
 
-function hilightLine1()
-{
+function hilightLine1() {
   var cursor = trasEd1.getCursor();
   var lineNumber = cursor.line;
 
@@ -217,8 +214,7 @@ function hilightLine1()
   lastLine = lineNumber;
 }
 
-function hilightLine2()
-{
+function hilightLine2() {
   var cursor = trasEd2.getCursor();
   var lineNumber = cursor.line;
 

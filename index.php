@@ -791,7 +791,7 @@ require_once __DIR__ . "/inc.app/navs.php";
                     <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
                   </div>
                   <div class="button-area">
-                    <button class="btn btn-success" id="button-save-entity-file" type="button">Save Translation</button>
+                    <button class="btn btn-success" id="button-save-entity-translation" type="button">Save Translation</button>
                   </div>
                 </div>
               </div>
