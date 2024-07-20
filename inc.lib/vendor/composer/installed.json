@@ -85,6 +85,48 @@
             "install-path": "../phpmailer/phpmailer"
         },
         {
+            "name": "planetbiru/magic-app",
+            "version": "0.6.2",
+            "version_normalized": "0.6.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Planetbiru/MagicApp.git",
+                "reference": "adb1cabb1c68772c8c8507b5cce11e84072311d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/adb1cabb1c68772c8c8507b5cce11e84072311d7",
+                "reference": "adb1cabb1c68772c8c8507b5cce11e84072311d7",
+                "shasum": ""
+            },
+            "require": {
+                "planetbiru/magic-object": "^1.15"
+            },
+            "time": "2024-07-20T10:27:40+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "MagicApp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Kamshory"
+                }
+            ],
+            "description": "Magic app",
+            "support": {
+                "issues": "https://github.com/Planetbiru/MagicApp/issues",
+                "source": "https://github.com/Planetbiru/MagicApp/tree/0.6.2"
+            },
+            "install-path": "../planetbiru/magic-app"
+        },
+        {
             "name": "planetbiru/magic-object",
             "version": "1.15.5",
             "version_normalized": "1.15.5.0",

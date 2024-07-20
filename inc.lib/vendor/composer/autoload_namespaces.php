@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'MagicApp\\' => array($vendorDir . '/planetbiru/magic-app/src'),
     'AppBuilder\\' => array($baseDir . '/classes'),
 );

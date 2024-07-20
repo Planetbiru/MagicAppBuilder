@@ -780,7 +780,10 @@ require_once __DIR__ . "/inc.app/navs.php";
               </div>
               <div class="col col-10">
                 <div class="column-title">
-                  <h4>Content</h4>
+                  <select class="form-control" name="entity-target-language" id="entity-target-language">
+                    <option value="id">Indonesia</option>
+                    <option value="en">English</option>
+                  </select>
                 </div>
                 <div class="column-body">
                   <div class="row">

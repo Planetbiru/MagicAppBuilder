@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04b4824ce568ff6bad5ce95bc332c4ad",
+    "content-hash": "314bebb43b953232ea3f749ae3ff3a3c",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
@@ -86,6 +86,45 @@
                 }
             ],
             "time": "2023-11-25T22:23:28+00:00"
+        },
+        {
+            "name": "planetbiru/magic-app",
+            "version": "0.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Planetbiru/MagicApp.git",
+                "reference": "adb1cabb1c68772c8c8507b5cce11e84072311d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/adb1cabb1c68772c8c8507b5cce11e84072311d7",
+                "reference": "adb1cabb1c68772c8c8507b5cce11e84072311d7",
+                "shasum": ""
+            },
+            "require": {
+                "planetbiru/magic-object": "^1.15"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "MagicApp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Kamshory"
+                }
+            ],
+            "description": "Magic app",
+            "support": {
+                "issues": "https://github.com/Planetbiru/MagicApp/issues",
+                "source": "https://github.com/Planetbiru/MagicApp/tree/0.6.2"
+            },
+            "time": "2024-07-20T10:27:40+00:00"
         },
         {
             "name": "planetbiru/magic-object",

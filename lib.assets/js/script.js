@@ -277,7 +277,6 @@ $(document).ready(function () {
         dataToPost.entity_info[name.substring(12)] = inputs[i].value;
       }
     }
-
     updateCurrentApplivation(dataToPost);
   });
 
@@ -549,7 +548,9 @@ $(document).ready(function () {
     });
   });
 
-  $(document).on('click', '.entity-container-translate-etity .entity-list a', function(e){
+  $(document).on('click', '.entity-container-translate-etity .entity-list a', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
     let entityName = $(this).attr('data-entity-name');
     $.ajax({
       method: "POST",
@@ -559,8 +560,7 @@ $(document).ready(function () {
       success: function (data) {
         let textOut1 = [];
         let textOut2 = [];
-        for(let i in data)
-        {
+        for (let i in data) {
           textOut1.push(data[i].original);
           textOut2.push(data[i].translated);
         }

@@ -1,0 +1,18 @@
+{
+    "name": "planetbiru/magic-object",
+    "description": "Magic object",
+    "license": "GPL-3.0-only",
+    "autoload": {
+        "psr-4": {
+            "MagicObject\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kamshory"
+        }
+    ],
+    "require": {
+        "symfony/yaml": "3.4"
+    }
+}

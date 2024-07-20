@@ -187,11 +187,11 @@ table.table.table-reference tr>td:last-child {
 	overflow: auto;
 	display: block;
 	width: calc(100% - 400px);
-	height: calc(100vh - 160px);
+	height: calc(100vh - 180px);
   }
   .CodeMirror {
 	line-height: 1.6;
-	height: calc(100vh - 160px);
+	height: calc(100vh - 180px);
 }
 
 
@@ -262,4 +262,6 @@ table.table.table-reference tr>td:last-child {
 	border-bottom: none;
   }
   
-  
+  .column-title{
+	height: 48px;
+  }

@@ -14,6 +14,13 @@ function format() {
 
   let totalLinesSql = cmEditorFile.lineCount();
   cmEditorSQL.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesSql });
+
+
+  let totalLinesEntityTran1 = trasEd1.lineCount();
+  let totalLinesEntityTran2 = trasEd2.lineCount();
+  
+  trasEd1.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesEntityTran1 });
+  trasEd2.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesEntityTran2 });
 }
 
 function isHidden(el) {
@@ -33,6 +40,13 @@ $(document).ready(function () {
     if (currId == 'entity-query-tab') {
       cmEditorSQL.focus();
       cmEditorSQL.refresh();
+    }
+
+    if (currId == 'translate-entity-tab') {
+      trasEd1.focus();
+      trasEd1.refresh();
+      trasEd2.focus();
+      trasEd2.refresh();
     }
   });
 
@@ -92,7 +106,6 @@ $(document).ready(function () {
     }
   );
 
-
   trasEd1 = CodeMirror.fromTextArea(
     document.querySelector('.entity-translate-original'),
     {
@@ -103,7 +116,7 @@ $(document).ready(function () {
       indentWithTabs: true,
       readOnly: true
     }
-  )
+  );
 
   trasEd2 = CodeMirror.fromTextArea(
     document.querySelector('.entity-translate-target'),
@@ -114,8 +127,7 @@ $(document).ready(function () {
       indentUnit: 4,
       indentWithTabs: true,
     }
-  )
-
+  );
 
   let modeModule;
   let specModule;
@@ -161,9 +173,5 @@ $(document).ready(function () {
       cmEditorSQL.refresh();
     }, 1);
   }
-
-
-
-
 
 });
