@@ -1,4 +1,5 @@
 <?php
+
 namespace MagicObject\Response\Generated;
 
 use PDO;
