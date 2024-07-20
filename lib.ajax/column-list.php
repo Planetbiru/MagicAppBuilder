@@ -1,4 +1,5 @@
 <?php
+
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Request\InputPost;
 

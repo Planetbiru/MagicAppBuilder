@@ -1,4 +1,5 @@
 <?php
+
 use AppBuilder\AppSecretObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Util\PicoStringUtil;

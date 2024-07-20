@@ -1,7 +1,5 @@
 <?php
 
-use MagicApp\AppEntityLanguage;
-use MagicObject\Database\PicoEntityLabel;
 use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\Request\InputPost;
 
