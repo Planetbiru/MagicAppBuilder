@@ -566,6 +566,10 @@ $(document).ready(function () {
         }
         trasEd1.getDoc().setValue(textOut1.join('\r\n'));
         trasEd2.getDoc().setValue(textOut2.join('\r\n'));
+        focused = {};
+        trasEd1.removeLineClass(lastLine, 'background', 'highlight-line');
+        trasEd2.removeLineClass(lastLine, 'background', 'highlight-line');
+        lastLine = -1;
       },
     });
   });

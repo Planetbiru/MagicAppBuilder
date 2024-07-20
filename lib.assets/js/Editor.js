@@ -5,6 +5,8 @@ let cmEditorSQL = null;
 let trasEd1 = null;
 let trasEd2 = null;
 let currentTab = "";
+let lastLine = -1;
+let focused = {};
 function format() {
   let totalLinesModule = cmEditorModule.lineCount();
   cmEditorModule.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesModule });
@@ -42,9 +44,9 @@ $(document).ready(function () {
     }
 
     if (currId == 'translate-entity-tab') {
-      trasEd1.focus();
+      //trasEd1.focus();
       trasEd1.refresh();
-      trasEd2.focus();
+      //trasEd2.focus();
       trasEd2.refresh();
     }
   });
@@ -117,6 +119,10 @@ $(document).ready(function () {
     }
   );
 
+  
+
+
+
   trasEd2 = CodeMirror.fromTextArea(
     document.querySelector('.entity-translate-target'),
     {
@@ -127,6 +133,28 @@ $(document).ready(function () {
       indentWithTabs: true,
     }
   );
+
+  trasEd1.on('focus', function(){
+    focused['trasEd1'] = true;
+    hilightLine1();
+  });
+  trasEd2.on('focus', function(){
+    focused['trasEd2'] = true;
+    hilightLine2();
+  });
+  trasEd1.on('cursorActivity', function(){
+    if(typeof focused['trasEd1'] != 'undefined')
+    {
+      hilightLine1();
+    }
+  });
+
+  trasEd2.on('cursorActivity', function(){
+    if(typeof focused['trasEd2'] != 'undefined')
+    {
+      hilightLine2();
+    }
+  });
 
   let modeModule;
   let specModule;
@@ -174,3 +202,31 @@ $(document).ready(function () {
   }
 
 });
+
+function hilightLine1()
+{
+  var cursor = trasEd1.getCursor();
+  var lineNumber = cursor.line;
+
+  trasEd1.removeLineClass(lastLine, 'background', 'highlight-line');
+  trasEd2.removeLineClass(lastLine, 'background', 'highlight-line');
+
+  trasEd2.addLineClass(lineNumber, 'background', 'highlight-line');
+  trasEd1.addLineClass(lineNumber, 'background', 'highlight-line');
+
+  lastLine = lineNumber;
+}
+
+function hilightLine2()
+{
+  var cursor = trasEd2.getCursor();
+  var lineNumber = cursor.line;
+
+  trasEd1.removeLineClass(lastLine, 'background', 'highlight-line');
+  trasEd2.removeLineClass(lastLine, 'background', 'highlight-line');
+
+  trasEd2.addLineClass(lineNumber, 'background', 'highlight-line');
+  trasEd1.addLineClass(lineNumber, 'background', 'highlight-line');
+
+  lastLine = lineNumber;
+}
