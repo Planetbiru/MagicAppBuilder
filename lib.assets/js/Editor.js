@@ -15,7 +15,6 @@ function format() {
   let totalLinesSql = cmEditorFile.lineCount();
   cmEditorSQL.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesSql });
 
-
   let totalLinesEntityTran1 = trasEd1.lineCount();
   let totalLinesEntityTran2 = trasEd2.lineCount();
   
