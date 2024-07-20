@@ -1,9 +1,11 @@
 @charset "utf-8";
+
 :root {
 	font-size: 13px;
 }
 
-.h4, h4 {
+.h4,
+h4 {
 	font-size: 1.2rem;
 }
 
@@ -30,14 +32,17 @@ body {
 .main-table thead td {
 	font-weight: bold;
 }
-.main-table thead td.data-sort, .main-table tbody td.data-sort {
+
+.main-table thead td.data-sort,
+.main-table tbody td.data-sort {
 	background-color: #797979;
 	cursor: move;
 }
-  
+
 .main-table tbody tr:hover td {
 	background-color: #E8E8EE;
 }
+
 .main-table tbody tr:hover td.data-sort {
 	background-color: #797979;
 }
@@ -101,8 +106,6 @@ button {
 	padding-top: 8px;
 }
 
-
-
 .code-area {
 	margin: -10px -10px -11px -10px;
 	display: none;
@@ -154,65 +157,78 @@ table.table.table-reference tr>td:last-child {
 	display: none;
 }
 
-.display-reference{
+.display-reference {
 	display: none;
 }
-[data-reference-type="data"] .display-reference{
+
+[data-reference-type="data"] .display-reference {
 	display: table-row;
 }
 
-.entity-list ul, .module-list ul{
+.entity-list ul,
+.module-list ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	line-height: 1.7;
 	margin-bottom: 10px;
 }
-.entity-list ul li, .module-list ul li{
+
+.entity-list ul li,
+.module-list ul li {
 	white-space: nowrap;
 }
-.entity-list > div, .module-list > div{
+
+.entity-list>div,
+.module-list>div {
 	height: calc(100vh - 146px);
 	overflow-x: auto;
 }
-.column-body{
+
+.column-body {
 	position: relative;
 }
+
 .app-code {
 	padding: 20px;
 	font-family: 'Courier New', Courier, monospace;
-	
+
 	border: 1px solid #DDD;
 	background-color: #FAFAFA;
 	overflow: auto;
 	display: block;
 	width: calc(100% - 400px);
 	height: calc(100vh - 184px);
-  }
-  .CodeMirror {
+}
+
+.CodeMirror {
 	line-height: 1.6;
 	height: calc(100vh - 184px);
 }
 
 
-  .tabs .tab-content>.tab-pane {
+.tabs .tab-content>.tab-pane {
 	transition: opacity 0.01s ease 0s;
-  }
-  
+}
 
-.main-table thead td.data-sort{
+
+.main-table thead td.data-sort {
 	width: 24px;
 }
-.main-table tbody  td.data-sort {
-	cursor: move;  
-  }
-  .entity-list ul li, .module-list ul li {
+
+.main-table tbody td.data-sort {
+	cursor: move;
+}
+
+.entity-list ul li,
+.module-list ul li {
 	position: relative;
 	padding-right: 20px;
 	text-overflow: ellipsis;
 	overflow: hidden;
-  }
-  .selected-file::after{
+}
+
+.selected-file::after {
 	content: "\2713";
 	display: block;
 	border-radius: 50%;
@@ -221,51 +237,57 @@ table.table.table-reference tr>td:last-child {
 	position: absolute;
 	right: 10px;
 	top: 2px;
-  }
-  
-  li.file-syntax-error, li.file-syntax-error a{
+}
+
+li.file-syntax-error,
+li.file-syntax-error a {
 	color: #DD0000;
-  }
-  
-  .accordion .card-header button.btn{
+}
+
+.accordion .card-header button.btn {
 	display: block;
 	width: 100%;
 	box-sizing: border-box;
 	text-align: left;
 	padding-left: 0;
-  }
-  .accordion .card-header button.btn:focus, .accordion .card-header button.btn:focus-visible{
+}
+
+.accordion .card-header button.btn:focus,
+.accordion .card-header button.btn:focus-visible {
 	outline: none;
 	box-shadow: none;
-  }
-  .collapsible-card .card:first-child{
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
-	border-bottom: none;
-  }
-  .collapsible-card .card:last-child{
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-  }
-  
-  .accordion .card:first-child{
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
-  }
-  .accordion .card:last-child{
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
-	border-bottom: none;
-  }
-  
-  .column-title{
-	height: 48px;
-  }
+}
 
-  .highlight-line {
-	background-color: #e8f2ff; 
-  }
+.collapsible-card .card:first-child {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border-bottom: none;
+}
+
+.collapsible-card .card:last-child {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.accordion .card:first-child {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.accordion .card:last-child {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border-bottom: none;
+}
+
+.column-title {
+	height: 48px;
+}
+
+.highlight-line {
+	background-color: #e8f2ff;
+}
