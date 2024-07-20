@@ -27,7 +27,8 @@ try
     
     $list = glob($baseDir."/*.php");
     $li = array();
-
+    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"$s> <a href="#" data-entity-name="%s\\%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled> %s</li>';
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
@@ -41,7 +42,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity['.$idx.']" value="'.$dir.'\\'.$entity.'"'.$chk.'> <a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $entity);
         }
         else
         {
@@ -49,7 +50,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity['.$idx.']" value="'.$dir.'\\'.$entity.'" disabled> '.$entity.'</li>';
+            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $entity);
         }
     }
     ksort($li);
@@ -82,7 +83,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity['.$idx.']" value="'.$dir.'\\'.$entity.'"'.$chk.'> <a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $entity);
         }
         else
         {
@@ -90,7 +91,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity['.$idx.']" value="'.$dir.'\\'.$entity.'" disabled> '.$entity.'</li>';
+            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $entity);
         }
     }
     ksort($li);

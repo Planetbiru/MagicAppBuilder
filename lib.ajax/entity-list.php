@@ -21,6 +21,9 @@ try
     $list = glob($baseDir."/*.php");
     $li = array();
 
+    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s">%s</a></li>';
+
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
@@ -34,7 +37,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = '<li class="entity-li"><a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$tableName][] = sprintf($format1, $dir, $entity, $entity);
         }
         else
         {
@@ -42,7 +45,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$idx][] = sprintf($format2, $dir, $entity, $entity);
         }
     }
     ksort($li);
@@ -76,7 +79,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = '<li class="entity-li"><a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$tableName][] = sprintf($format1, $dir, $entity, $entity);
         }
         else
         {
@@ -84,7 +87,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="'.$dir.'\\'.$entity.'">'.$entity.'</a></li>';
+            $li[$idx][] = sprintf($format2, $dir, $entity, $entity);
         }
     }
     ksort($li);
