@@ -25,7 +25,6 @@ if(isset($_POST) && !empty($_POST))
     {
         mkdir(dirname($path), 0755, true);
     }
-    error_log($path);
     file_put_contents($path, $request);
 
     if($request->issetFields())

@@ -31,17 +31,24 @@ class PicoPredicate //NOSONAR
     private $filterLogic = null;
 
     /**
-     * Constructor. If $field given, it will call equals method
+     * Constructor. If $field given, it will call in method for array and equals for others
      *
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return void
      */
     public function __construct($field = null, $value = null)
     {
         if($field != null)
         {
-            $this->equals($field, $value);
+            if(is_array($value))
+            {
+                $this->in($field, $value);
+            }
+            else
+            {
+                $this->equals($field, $value);
+            }
         }
     }
     
@@ -57,8 +64,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Equals
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function equals($field, $value)
@@ -71,7 +78,7 @@ class PicoPredicate //NOSONAR
     
     /**
      * Is NULL
-     * @param string $field
+     * @param string $field Field name
      * @return self
      */
     public function isNull($field)
@@ -81,8 +88,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Not equals
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function notEquals($field, $value)
@@ -95,7 +102,7 @@ class PicoPredicate //NOSONAR
     
     /**
      * Is Not NULL
-     * @param string $field
+     * @param string $field Field name
      * @return self
      */
     public function isNotNull($field)
@@ -105,8 +112,8 @@ class PicoPredicate //NOSONAR
     
     /**
      * In
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function in($field, $value)
@@ -118,9 +125,23 @@ class PicoPredicate //NOSONAR
     }
 
     /**
+     * Not in
+     * @param string $field Field name
+     * @param mixed $value Value
+     * @return self
+     */
+    public function notIn($field, $value)
+    {
+        $this->field = $field;
+        $this->value = $value;
+        $this->comparation = PicoDataComparation::notIn($value);
+        return $this;
+    }
+
+    /**
      * Like
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function like($field, $value)
@@ -133,8 +154,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Not like
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function notLike($field, $value)
@@ -147,8 +168,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Less than
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function lessThan($field, $value)
@@ -161,8 +182,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Greater than
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function greaterThan($field, $value)
@@ -175,8 +196,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Less than or equals
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function lessThanOrEquals($field, $value)
@@ -189,8 +210,8 @@ class PicoPredicate //NOSONAR
 
     /**
      * Greater than or equals
-     * @param string $field
-     * @param mixed $value
+     * @param string $field Field name
+     * @param mixed $value Value
      * @return self
      */
     public function greaterThanOrEquals($field, $value)
@@ -311,7 +332,7 @@ class PicoPredicate //NOSONAR
      */
     public static function getInstance()
     {
-        return new PicoPredicate();
+        return new self;
     }
     
     /**
@@ -323,6 +344,28 @@ class PicoPredicate //NOSONAR
     public static function functionLower($value)
     {
         return "lower($value)";
+    }
+    
+    /**
+     * Function upper
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function functionUpper($value)
+    {
+        return "upper($value)";
+    }
+    
+    /**
+     * Function lower
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function functionAndValue($function, $value)
+    {
+        return sprintf("%s(%s)", $function, $value);
     }
     
     /**

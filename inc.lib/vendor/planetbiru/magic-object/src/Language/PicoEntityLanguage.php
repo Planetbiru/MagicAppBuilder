@@ -2,13 +2,10 @@
 
 namespace MagicObject\Language;
 
-use Exception;
-use MagicObject\Database\PicoTableInfo;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoGenericObject;
 use MagicObject\Util\PicoStringUtil;
-use MagicObject\Util\PicoTableUtil;
 use ReflectionClass;
 use stdClass;
 
@@ -173,10 +170,9 @@ class PicoEntityLanguage
      * @var boolean $asArrayProps
      * @return array
      */
-    protected function propertyList($asArrayProps = false)
+    public function propertyList($asArrayProps = false)
     {
         $class = new ReflectionClass($this->_entityClassName);
-
         // filter only the calling class properties
         // skip parent properties
         $properties = array_filter(
@@ -191,8 +187,7 @@ class PicoEntityLanguage
             $index = 0;
             foreach ($properties as $key) {
                 $prop = $key->name;
-                $result[$index] = $prop;
-                
+                $result[$index] = $prop;               
                 $index++;
             }
             return $result;
@@ -320,7 +315,7 @@ class PicoEntityLanguage
     /**
      * Get entity language
      *
-     * @return  string
+     * @return string
      */ 
     public function getEntityLanguage()
     {
@@ -330,7 +325,7 @@ class PicoEntityLanguage
     /**
      * Get entity class name
      *
-     * @return  string
+     * @return string
      */ 
     public function getEntityClassName()
     {

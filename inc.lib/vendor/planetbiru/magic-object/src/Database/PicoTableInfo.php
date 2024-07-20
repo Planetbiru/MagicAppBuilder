@@ -119,7 +119,7 @@ class PicoTableInfo
     /**
      * Set table name
      *
-     * @param string $tableName  Table name
+     * @param string $tableName Table name
      *
      * @return self
      */ 
@@ -143,7 +143,7 @@ class PicoTableInfo
     /**
      * Set columns
      *
-     * @param array $columns  Columns
+     * @param array $columns Columns
      *
      * @return self
      */ 
@@ -167,7 +167,7 @@ class PicoTableInfo
     /**
      * Set join columns
      *
-     * @param array $joinColumns  Join columns
+     * @param array $joinColumns Join columns
      *
      * @return self
      */ 
@@ -191,7 +191,7 @@ class PicoTableInfo
     /**
      * Set primary keys
      *
-     * @param array $primaryKeys  Primary keys
+     * @param array $primaryKeys Primary keys
      *
      * @return self
      */ 
@@ -215,7 +215,7 @@ class PicoTableInfo
     /**
      * Set auto increment keys
      *
-     * @param array $autoIncrementKeys  Auto increment keys
+     * @param array $autoIncrementKeys Auto increment keys
      *
      * @return self
      */ 
@@ -239,7 +239,7 @@ class PicoTableInfo
     /**
      * Set default value keys
      *
-     * @param array $defaultValue  Default value keys
+     * @param array $defaultValue Default value keys
      *
      * @return self
      */ 
@@ -263,7 +263,7 @@ class PicoTableInfo
     /**
      * Set not null columns
      *
-     * @param array $notNullColumns  Not null columns
+     * @param array $notNullColumns Not null columns
      *
      * @return self
      */ 

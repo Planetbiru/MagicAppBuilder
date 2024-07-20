@@ -56,7 +56,7 @@ class PicoRequest extends PicoRequestBase
      */
     public static function getRequestHeaders()
     {
-        if (!function_exists('getallheaders')) 
+        if(!function_exists('getallheaders')) 
         {
             foreach ($_SERVER as $name => $value) 
             {

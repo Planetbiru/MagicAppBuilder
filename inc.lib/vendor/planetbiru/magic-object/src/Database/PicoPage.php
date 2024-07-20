@@ -31,6 +31,8 @@ class PicoPage
 
     /**
      * Get the value of pageNumber
+     * 
+     * @return integer
      */ 
     public function getPageNumber()
     {
@@ -40,6 +42,7 @@ class PicoPage
     /**
      * Set the value of pageNumber
      *
+     * @param integer $pageNumber
      * @return self
      */ 
     public function setPageNumber($pageNumber)
@@ -55,6 +58,8 @@ class PicoPage
 
     /**
      * Get the value of pageSize
+     * 
+     * @return integer
      */ 
     public function getPageSize()
     {
@@ -64,6 +69,7 @@ class PicoPage
     /**
      * Set the value of pageSize
      *
+     * @param integer $pageSize
      * @return self
      */ 
     public function setPageSize($pageSize)

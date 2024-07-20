@@ -35,6 +35,8 @@ class PicoLimit
 
     /**
      * Get the value of limit
+     * 
+     * @return integer
      */ 
     public function getLimit()
     {
@@ -44,6 +46,7 @@ class PicoLimit
     /**
      * Set the value of limit
      *
+     * @param integer $limit
      * @return self
      */ 
     public function setLimit($limit)
@@ -58,6 +61,8 @@ class PicoLimit
 
     /**
      * Get the value of offset
+     * 
+     * @return integer
      */ 
     public function getOffset()
     {
@@ -67,6 +72,7 @@ class PicoLimit
     /**
      * Set the value of offset
      *
+     * @param integer $offset
      * @return self
      */ 
     public function setOffset($offset)

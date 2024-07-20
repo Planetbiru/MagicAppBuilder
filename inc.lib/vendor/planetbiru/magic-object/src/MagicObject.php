@@ -714,7 +714,7 @@ class MagicObject extends stdClass // NOSONAR
     {
         if($this->_database != null && ($this->_database->getDatabaseType() != null && $this->_database->getDatabaseType() != ""))
         {
-            $persist = new PicoDatabasePersistence($this->_database, $this);
+            $persist = new PicoDatabasePersistenceExtended($this->_database, $this);
             return $persist->whereWithSpecification($specification);
         }
         else
@@ -1242,7 +1242,8 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 else
                 {
-                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, 0, null, $stmt, $this, $subqueryMap);
+                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData;
             }
@@ -1306,7 +1307,8 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 else
                 {
-                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, 0, null, $stmt, $this, $subqueryMap);
+                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData;
             }

@@ -84,7 +84,7 @@ class PicoPageable
     /**
      * Set sortable
      *
-     * @param PicoSortable  $sortable  Sortable
+     * @param PicoSortable $sortable Sortable
      *
      * @return self
      */ 
@@ -140,7 +140,7 @@ class PicoPageable
     /**
      * Set page
      *
-     * @param PicoPage  $page  Page
+     * @param PicoPage $page Page
      *
      * @return self
      */ 

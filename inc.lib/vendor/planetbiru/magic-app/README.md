@@ -1,2 +1,0 @@
-# MagicApp
-MagicApp for AppBuilder

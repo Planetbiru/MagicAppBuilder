@@ -742,7 +742,6 @@ require_once __DIR__ . "/inc.app/navs.php";
 
 
         <div id="entity-query" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-query-tab">
-
           <div class="entity-container-query">
             <div class="row">
               <div class="col col-2">
@@ -767,6 +766,41 @@ require_once __DIR__ . "/inc.app/navs.php";
             </div>
           </div>
         </div>
+
+
+        <div id="translate-entity" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-entity-tab">
+          <div class="entity-container-translate-etity">
+            <div class="row">
+              <div class="col col-2">
+                <div class="column-title">
+                  <h4>Entities</h4>
+                </div>
+                <div class="column-body">
+                  <div class="entity-list"></div>
+                </div>
+              </div>
+              <div class="col col-10">
+                <div class="column-title">
+                  <h4>Content</h4>
+                </div>
+                <div class="column-body">
+                  <div class="row">
+                    <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                    <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                  </div>
+                  <div class="button-area">
+                    <button class="btn btn-success" id="button-save-entity-file" type="button" disabled>Save File</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="translate-application" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-application-tab">
+          
+        </div>
+
         <div id="docs" class="tab-pane fade" role="tabpanel" aria-labelledby="docs-tab">
           <div class="desc">
             <h4>Column Description</h4>

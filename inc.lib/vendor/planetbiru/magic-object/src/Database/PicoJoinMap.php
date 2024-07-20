@@ -60,7 +60,7 @@ class PicoJoinMap
     /**
      * Get property name name
      *
-     * @return  string
+     * @return string
      */ 
     public function getPropertyName()
     {
@@ -70,7 +70,7 @@ class PicoJoinMap
     /**
      * Get column name
      *
-     * @return  string
+     * @return string
      */ 
     public function getColumnName()
     {
@@ -80,7 +80,7 @@ class PicoJoinMap
     /**
      * Get entity name
      *
-     * @return  string
+     * @return string
      */ 
     public function getEntity()
     {
@@ -90,7 +90,7 @@ class PicoJoinMap
     /**
      * Get table name
      *
-     * @return  string
+     * @return string
      */ 
     public function getJoinTable()
     {
@@ -100,7 +100,7 @@ class PicoJoinMap
     /**
      * Get table alias
      *
-     * @return  string
+     * @return string
      */ 
     public function getJoinTableAlias()
     {

@@ -7,6 +7,7 @@ class PicoDataComparation
     const EQUALS = "=";
     const NOT_EQUALS = "!=";
     const IN = "in";
+    const NOT_IN = "not in";
     const IS = "is";
     const IS_NOT = "is not";
     const LIKE = "like";
@@ -47,7 +48,7 @@ class PicoDataComparation
      */
     public static function equals($value)
     {
-        return new PicoDataComparation($value, self::EQUALS);
+        return new self($value, self::EQUALS);
     }
 
     /**
@@ -56,7 +57,7 @@ class PicoDataComparation
      */
     public static function notEquals($value)
     {
-        return new PicoDataComparation($value, self::NOT_EQUALS);
+        return new self($value, self::NOT_EQUALS);
     }
     
     /**
@@ -65,7 +66,16 @@ class PicoDataComparation
      */
     public static function in($value)
     {
-        return new PicoDataComparation($value, self::IN);
+        return new self($value, self::IN);
+    }
+
+    /**
+     * Not in
+     * @param mixed $value
+     */
+    public static function notIn($value)
+    {
+        return new self($value, self::NOT_IN);
     }
 
     /**
@@ -74,7 +84,7 @@ class PicoDataComparation
      */
     public static function like($value)
     {
-        return new PicoDataComparation($value, self::LIKE);
+        return new self($value, self::LIKE);
     }
 
     /**
@@ -83,7 +93,7 @@ class PicoDataComparation
      */
     public static function notLike($value)
     {
-        return new PicoDataComparation($value, self::NOT_LIKE);
+        return new self($value, self::NOT_LIKE);
     }
 
     /**
@@ -92,7 +102,7 @@ class PicoDataComparation
      */
     public static function lessThan($value)
     {
-        return new PicoDataComparation($value, self::LESS_THAN);
+        return new self($value, self::LESS_THAN);
     }
 
     /**
@@ -101,7 +111,7 @@ class PicoDataComparation
      */
     public static function greaterThan($value)
     {
-        return new PicoDataComparation($value, self::GREATER_THAN);
+        return new self($value, self::GREATER_THAN);
     }
 
     /**
@@ -110,7 +120,7 @@ class PicoDataComparation
      */
     public static function lessThanOrEquals($value)
     {
-        return new PicoDataComparation($value, self::LESS_THAN_OR_EQUALS);
+        return new self($value, self::LESS_THAN_OR_EQUALS);
     }
 
     /**
@@ -119,7 +129,7 @@ class PicoDataComparation
      */
     public static function greaterThanOrEquals($value)
     {
-        return new PicoDataComparation($value, self::GREATER_THAN_OR_EQUALS);
+        return new self($value, self::GREATER_THAN_OR_EQUALS);
     }
 
     /**
@@ -238,7 +248,7 @@ class PicoDataComparation
         {
             $ret = $this->comparison;
         }
-        else if($this->comparison == self::IN)
+        else if($this->comparison == self::IN || $this->comparison == self::NOT_IN)
         {
             $ret = $this->comparison;
         }

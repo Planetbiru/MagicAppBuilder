@@ -62,6 +62,10 @@ For large applications, users can scale the database and storage. So that a user
 
 ![](https://github.com/Planetbiru/MagicObject/blob/main/scale-up.svg)
 
+# Stable Version
+
+Stable version of MagicObject is `1.15.4` or above. Please don't install versions bellow it.
+
 # Tutorial
 
 Tutorial is provided here https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md

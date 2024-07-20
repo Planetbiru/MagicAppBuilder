@@ -9,8 +9,12 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
 {
     public function __call($method, $params)
     {
-        if (strncasecmp($method, "set", 3) === 0 && isset($params) && isset($params[0])){
+        if (strncasecmp($method, "set", 3) === 0 && isset($params) && is_array($params)){
             $var = lcfirst(substr($method, 3));
+            if(empty($params))
+            {
+                $params[0] = null;
+            }
             $this->object->set($var, $params[0]);     
             return $this;
         }

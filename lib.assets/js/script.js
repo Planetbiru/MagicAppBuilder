@@ -537,7 +537,7 @@ $(document).ready(function () {
     saveQuery();
   });
 
-  $("tbody.data-table-manual-sort").each(function () {
+  $("tbody.data-table-manual-sort").each(function (e) {
     let dataToSort = $(this)[0];
     Sortable.create(dataToSort, {
       animation: 150,
@@ -545,6 +545,27 @@ $(document).ready(function () {
       handle: ".data-sort-handler",
       onEnd: function () {
         // do nothing
+      },
+    });
+  });
+
+  $(document).on('click', '.entity-container-translate-etity .entity-list a', function(e){
+    let entityName = $(this).attr('data-entity-name');
+    $.ajax({
+      method: "POST",
+      url: "lib.ajax/entity-translate.php",
+      dataType: "json",
+      data: { entityName: entityName },
+      success: function (data) {
+        let textOut1 = [];
+        let textOut2 = [];
+        for(let i in data)
+        {
+          textOut1.push(data[i].original);
+          textOut2.push(data[i].translated);
+        }
+        trasEd1.getDoc().setValue(textOut1.join('\r\n'));
+        trasEd2.getDoc().setValue(textOut2.join('\r\n'));
       },
     });
   });
@@ -709,6 +730,7 @@ function updateEntityFile() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
+      $(".entity-container-translate-etity .entity-list").empty().append(data);
     },
   });
 }
@@ -807,7 +829,7 @@ function switchApplication(currentApplication) {
     type: "post",
     url: "lib.ajax/application-switch.php",
     dataType: "json",
-    data: {currentApplication:currentApplication},
+    data: { currentApplication: currentApplication },
     success: function (data) {
       window.location.reload();
     },
@@ -1103,8 +1125,7 @@ function loadColumn(tableName, selector) {
           $("#define-column-tab").click();
         });
       }
-      else
-      {
+      else {
         $(".define-wrapper").css("display", "block");
         $("#define-column-tab").click();
       }
@@ -1118,8 +1139,7 @@ function restoreForm(data) {
     for (let i in data.fields) {
       if (data.fields.hasOwnProperty(i)) {
         let tr = $('.main-table tbody tr[data-field-name="' + data.fields[i].fieldName + '"]');
-        if(tr.length > 0)
-        {
+        if (tr.length > 0) {
           tr.appendTo(tr.parent());
 
           tr.find('.include_insert')[0].checked = data.fields[i].includeInsert === true || data.fields[i].includeInsert == 'true';
@@ -1211,32 +1231,42 @@ function restoreForm(data) {
   }
 
   if (typeof data.features != 'undefined') {
-    if ($('#modal-module-features [name="subquery"]').length)
+
+    if ($('#modal-module-features [name="subquery"]').length) {
       $('#modal-module-features [name="subquery"]')[0].checked = data.features.subquery === true || data.features.subquery == 'true';
+    }
 
-    if ($('#modal-module-features [name="activate_deactivate"]').length)
+    if ($('#modal-module-features [name="activate_deactivate"]').length) {
       $('#modal-module-features [name="activate_deactivate"]')[0].checked = data.features.activateDeactivate === true || data.features.activateDeactivate == 'true';
+    }
 
-    if ($('#modal-module-features [name="manualsortorder"]').length)
+    if ($('#modal-module-features [name="manualsortorder"]').length) {
       $('#modal-module-features [name="manualsortorder"]')[0].checked = data.features.sortOrder === true || data.features.sortOrder == 'true';
+    }
 
-    if ($('#modal-module-features [name="with_approval"]').length)
+    if ($('#modal-module-features [name="with_approval"]').length) {
       $('#modal-module-features [name="with_approval"]')[0].checked = data.features.approvalRequired === true || data.features.approvalRequired == 'true';
+    }
 
-    if ($('#modal-module-features [name="with_approval_note"]').length)
+    if ($('#modal-module-features [name="with_approval_note"]').length) {
       $('#modal-module-features [name="with_approval_note"]')[0].checked = data.features.approvalNote === true || data.features.approvalNote == 'true';
+    }
 
-    if ($('#modal-module-features [name="with_trash"]').length)
+    if ($('#modal-module-features [name="with_trash"]').length) {
       $('#modal-module-features [name="with_trash"]')[0].checked = data.features.trashRequired === true || data.features.trashRequired == 'true';
+    }
 
-    if ($('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]').length)
+    if ($('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]').length) {
       $('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]')[0].checked = true;
+    }
 
-    if ($('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]').length)
+    if ($('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]').length) {
       $('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
+    }
 
-    if ($('#modal-module-features [name="ajax_support"]').length)
+    if ($('#modal-module-features [name="ajax_support"]').length) {
       $('#modal-module-features [name="ajax_support"]')[0].checked = data.features.ajaxSupport === true || data.features.ajaxSupport == 'true';
+    }
   }
 }
 
@@ -1244,7 +1274,7 @@ function loadSavedModuleData(moduleFile, target, clbk) {
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-data.php",
-    data: { moduleFile: moduleFile, target:target },
+    data: { moduleFile: moduleFile, target: target },
     dataType: "json",
     success: function (data) {
       restoreForm(data)
@@ -1558,7 +1588,7 @@ function generateRow(field, args, skipedOnInsertEdit) {
     field +
     '" value="' +
     field.replaceAll("_", " ").capitalize().prettify().trim() +
-    '" autocomplete="off" spellcheck="false">'+field.replaceAll("_", " ").capitalize().prettify().trim()+'</td>\r\n' +
+    '" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
     insertRow +
     editRow +
     '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' +

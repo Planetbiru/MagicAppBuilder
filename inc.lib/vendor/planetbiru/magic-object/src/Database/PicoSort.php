@@ -100,7 +100,7 @@ class PicoSort
      */
     public static function getInstance()
     {
-        return new PicoSort();
+        return new self;
     }
     
     /**

@@ -1834,18 +1834,17 @@ $subqueryMap = '.$referece.';
      */
     private function createButtonApprove($dom, $objectName, $primaryKey, $upperPkName)
     {
-        $buttonApprove = $dom->createElement('button');
-        $buttonApprove->setAttribute('type', 'button');
+        $buttonApprove = $dom->createElement('a');
         $buttonApprove->setAttribute('class', 'btn btn-tn btn-success');
 
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>\'');
+            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>');
         }
         else
         {
-            $buttonApprove->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>\'');
+            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>');
         }
         $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
         return $buttonApprove;
@@ -1869,10 +1868,9 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $buttonReject = $dom->createElement('button');
-            $buttonReject->setAttribute('type', 'button');
+            $buttonReject = $dom->createElement('a');
             $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-            $buttonReject->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>\'');
+            $buttonReject->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>');
             $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
         }
         return $buttonReject;

@@ -46,8 +46,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     
     /**
      * Load data to object
-     * @param mixed $data
-     * @param boolean $tolower
+     * @param mixed $data Request data
+     * @param boolean $tolower Flag to tolower case
      */
     public function loadData($data, $tolower = false)
     {
@@ -66,8 +66,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Set property value
      *
-     * @param string $propertyName
-     * @param mixed|null
+     * @param string $propertyName Property name
+     * @param mixed|null $propertyValue Property value
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -80,8 +80,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get property value
      *
-     * @param string $propertyName
-     * @param array $params
+     * @param string $propertyName Property name
+     * @param array $params Parameters
      * @return mixed|null
      */
     public function get($propertyName, $params = null)
@@ -114,7 +114,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get value
      *
-     * @var boolean $snakeCase
+     * @var boolean $snakeCase Flag to snake case
      */
     public function value($snakeCase = false)
     {
@@ -143,8 +143,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Property list
      *
-     * @var boolean $reflectSelf
-     * @var boolean $asArrayProps
+     * @var boolean $reflectSelf Refect to self
+     * @var boolean $asArrayProps Flag that list is an array
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -180,13 +180,13 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Filter input
      *
-     * @param integer $type
-     * @param string $variable_name
-     * @param integer $filter
+     * @param integer $type Input type
+     * @param string $variableName Variable name
+     * @param integer $filter Filter
      * @param boolean $escapeSQL
      * @return mixed
      */
-    public function filterInput($type, $variable_name, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
+    public function filterInput($type, $variableName, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
     {
         $var = array();
         switch ($type) {
@@ -208,17 +208,17 @@ class PicoRequestBase extends stdClass //NOSONAR
             default:
                 $var = $_GET;
         }
-        return $this->filterValue(isset($var[$variable_name])?$var[$variable_name]:null, $filter, $escapeSQL);
+        return $this->filterValue(isset($var[$variableName])?$var[$variableName]:null, $filter, $escapeSQL);
     }
     
     /**
      * Filter value
      *
-     * @param mixed $val
-     * @param integer $filter
-     * @param boolean $escapeSQL
-     * @param boolean $nullIfEmpty
-     * @param boolean $requireScalar
+     * @param mixed $val Value
+     * @param integer $filter Filter type
+     * @param boolean $escapeSQL Flag to escape SQL
+     * @param boolean $nullIfEmpty Flag to set null if empty
+     * @param boolean $requireScalar Flag to only get scalar value
      * @return mixed|null
      */
     public function filterValue($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false, $requireScalar = false)
@@ -257,10 +257,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Filter single value
      *
-     * @param mixed $val
-     * @param integer $filter
-     * @param boolean $escapeSQL
-     * @param boolean $nullIfEmpty
+     * @param mixed $val Value
+     * @param integer $filter Filter type
+     * @param boolean $escapeSQL Flag to escape SQL
+     * @param boolean $nullIfEmpty Flag to set null if empty
      * @return mixed
      */
     public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) //NOSONAR
@@ -403,19 +403,19 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Addslahes
      *
-     * @param string $inp
+     * @param string $input Input value
      * @return string
      */
-    public function addslashes($inp)
+    public function addslashes($input)
     {
-        return addslashes($inp);
+        return addslashes($input);
     }
 
     /**
      * Get value from formated number
      *
      * @param stdClass|MagicObject $cfg
-     * @param mixed $input
+     * @param mixed $input Input value
      * @return float
      */
     public function _getValue($cfg, $input)
@@ -482,17 +482,20 @@ class PicoRequestBase extends stdClass //NOSONAR
             $this->$var = $params[0];
             return $this;
         }
-        else if (strncasecmp($method, "equals", 6) === 0) {
+        else if (strncasecmp($method, "equals", 6) === 0) 
+        {
             $var = lcfirst(substr($method, 6));
             $value = isset($this->$var) ? $this->$var : null;
             return isset($params[0]) && $params[0] == $value;
         }
-        else if (strncasecmp($method, "checkbox", 8) === 0) {
+        else if (strncasecmp($method, "checkbox", 8) === 0) 
+        {
             $var = lcfirst(substr($method, 8));
             $this->$var = isset($this->$var) ? $this->$var : $params[0];
             return $this;
         }
-        else if (strncasecmp($method, "filter", 6) === 0) {
+        else if (strncasecmp($method, "filter", 6) === 0) 
+        {
             $var = lcfirst(substr($method, 6));
             if(isset($this->$var))
             {
@@ -500,21 +503,24 @@ class PicoRequestBase extends stdClass //NOSONAR
             }
             return $this;
         }
-        else if (strncasecmp($method, "createSelected", 14) === 0) {
+        else if (strncasecmp($method, "createSelected", 14) === 0) 
+        {
             $var = lcfirst(substr($method, 14));
             if(isset($this->$var))
             {
                 return $this->$var == $params[0] ? ' selected="selected"' : '';
             }
         }
-        else if (strncasecmp($method, "createChecked", 13) === 0) {
+        else if (strncasecmp($method, "createChecked", 13) === 0) 
+        {
             $var = lcfirst(substr($method, 13));
             if(isset($this->$var))
             {
                 return $this->$var == $params[0] ? ' checked="checked"' : '';
             }
         }
-        else if (strncasecmp($method, "unset", 5) === 0) {
+        else if (strncasecmp($method, "unset", 5) === 0) 
+        {
             $var = lcfirst(substr($method, 5));
             $this->removeValue($var, $params[0]);
             return $this;
@@ -524,8 +530,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Apply filter
      *
-     * @param string $value
-     * @param string $filterType
+     * @param string $value Input value
+     * @param integer $filterType Filter type
      * @return string|null
      */
     private function applyFilter($value, $filterType)

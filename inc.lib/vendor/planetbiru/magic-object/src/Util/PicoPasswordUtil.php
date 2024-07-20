@@ -78,7 +78,7 @@ class PicoPasswordUtil{
     /**
      * Get regular expression format
      *
-     * @return  string
+     * @return string
      */ 
     public function getRegex()
     {
@@ -102,7 +102,7 @@ class PicoPasswordUtil{
     /**
      * Get minimum length of the password
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getMinLength()
     {

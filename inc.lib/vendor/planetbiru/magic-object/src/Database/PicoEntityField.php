@@ -42,7 +42,7 @@ class PicoEntityField
     /**
      * Get entity
      *
-     * @return  string
+     * @return string
      */ 
     public function getEntity()
     {
@@ -52,7 +52,7 @@ class PicoEntityField
     /**
      * Get field
      *
-     * @return  string
+     * @return string
      */ 
     public function getField()
     {
@@ -62,7 +62,7 @@ class PicoEntityField
     /**
      * Get parent field
      *
-     * @return  string
+     * @return string
      */ 
     public function getParentField()
     {
@@ -72,7 +72,7 @@ class PicoEntityField
     /**
      * Get function format
      *
-     * @return  string
+     * @return string
      */ 
     public function getFunctionFormat()
     {

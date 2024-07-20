@@ -70,7 +70,7 @@ class PicoSession
     public static function getInstance($name = null, $maxLifeTime = 0)
     {
         if (!isset(self::$_instance)) {
-            self::$_instance = new self();
+            self::$_instance = new self;
             if(isset($name))
             {
                 self::$_instance->setSessionName($name);
@@ -138,11 +138,22 @@ class PicoSession
         }
     }
 
+    /**
+     * Check if value is set or not
+     *
+     * @param string $name
+     * @return boolean
+     */
     public function __isset($name)
     {
         return isset($_SESSION[$name]);
     }
 
+    /**
+     * Unset value
+     *
+     * @param string $name
+     */
     public function __unset($name)
     {
         unset($_SESSION[$name]);
@@ -239,7 +250,7 @@ class PicoSession
     /**
      * Set path
      *
-     * @param string $path
+     * @param string $path Session save path. If sassion save handler is file, session save path is directory of the sesion files. If session save handler is redis, session save path is redis connection string include its key if any.
      * @return string|false
      */
     public function setSessionSavePath($path)
@@ -250,7 +261,7 @@ class PicoSession
     /**
      * Set maximum lifetime
      *
-     * @param integer $lifeTime
+     * @param integer $lifeTime Maximum lifetime
      * @return self
      */
     public function setSessionMaxLifeTime($lifeTime)
@@ -290,7 +301,7 @@ class PicoSession
     }
 
     /**
-     * Get session ID
+     * Get current session ID
      *
      * @return string
      */
@@ -300,8 +311,9 @@ class PicoSession
     }
 
     /**
-     * Get session ID
+     * Set session ID
      *
+     * @param string $id New session ID
      * @return self
      */
     public function setSessionId($id)

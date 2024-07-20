@@ -2,6 +2,8 @@ let modified = true;
 let cmEditorModule = null;
 let cmEditorFile = null;
 let cmEditorSQL = null;
+let trasEd1 = null;
+let trasEd2 = null;
 let currentTab = "";
 function format() {
   let totalLinesModule = cmEditorModule.lineCount();
@@ -89,6 +91,31 @@ $(document).ready(function () {
       indentWithTabs: true,
     }
   );
+
+
+  trasEd1 = CodeMirror.fromTextArea(
+    document.querySelector('.entity-translate-original'),
+    {
+      lineNumbers: true,
+      lineWrapping: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      indentWithTabs: true,
+      readOnly: true
+    }
+  )
+
+  trasEd2 = CodeMirror.fromTextArea(
+    document.querySelector('.entity-translate-target'),
+    {
+      lineNumbers: true,
+      lineWrapping: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      indentWithTabs: true,
+    }
+  )
+
 
   let modeModule;
   let specModule;

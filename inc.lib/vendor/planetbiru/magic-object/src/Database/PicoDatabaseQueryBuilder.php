@@ -536,6 +536,12 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		return $ret;
 	}
 	
+	/**
+	 * Convert array to list
+	 *
+	 * @param array $values Values given
+	 * @return string
+	 */
 	private function implodeValues($values)
 	{
 		foreach($values as $key=>$value)

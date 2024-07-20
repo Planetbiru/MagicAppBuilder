@@ -44,7 +44,7 @@ class PicoSpecification
     /**
      * Add AND specification
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate
+     * @param PicoSpecification|PicoPredicate|array $predicate Filter
      * @return self
      */
     public function add($predicate)
@@ -56,7 +56,7 @@ class PicoSpecification
     /**
      * Add AND specification
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate
+     * @param PicoSpecification|PicoPredicate|array $predicate Filter
      * @return self
      */
     public function addAnd($predicate)
@@ -75,7 +75,7 @@ class PicoSpecification
     /**
      * Add OR specification
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate
+     * @param PicoSpecification|PicoPredicate|array $predicate Filter
      * @return self
      */
     public function addOr($predicate)
@@ -94,8 +94,8 @@ class PicoSpecification
     /**
      * Add filter
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate
-     * @param string $logic
+     * @param PicoSpecification|PicoPredicate|array $predicate Filter
+     * @param string $logic Filter logic
      * @return self
      */
     private function addFilter($predicate, $logic)
@@ -128,15 +128,15 @@ class PicoSpecification
     /**
      * Add subfilter
      *
-     * @param PicoSpecification|array $predicate
-     * @param string $logic
+     * @param PicoSpecification|array $predicate Filter
+     * @param string $logic Filter logic
      * @return self
      */
     private function addSubFilter($predicate, $logic)
     {
         if($predicate instanceof PicoSpecification)
         {
-            $specification = new self();
+            $specification = new self;
             $specification->setParentFilterLogic($logic);
             $specifications = $predicate->getSpecifications();
             foreach($specifications as $pred)
@@ -181,7 +181,7 @@ class PicoSpecification
     /**
      * Set parent filter logic
      *
-     * @param string $parentFilterLogic  Parent filter logic
+     * @param string $parentFilterLogic Parent filter logic
      *
      * @return self
      */ 
@@ -222,7 +222,7 @@ class PicoSpecification
     /**
      * Create WHERE from specification
      *
-     * @param PicoSpecification $specification
+     * @param PicoSpecification $specification Filter
      * @return string
      */
     private function createWhereFromSpecification($specification)
@@ -272,7 +272,7 @@ class PicoSpecification
      */
     public static function getInstance()
     {
-        return new PicoSpecification();
+        return new self;
     }
     
     /**
@@ -293,13 +293,13 @@ class PicoSpecification
     /**
      * Get specification from user input
      *
-     * @param PicoRequestBase $request
-     * @param PicoSpecificationFilter[]|null $map
+     * @param PicoRequestBase $request Request
+     * @param PicoSpecificationFilter[]|null $map Filter map
      * @return PicoSpecification
      */
     public static function fromUserInput($request, $map = null)
     {
-        $specification = new PicoSpecification();
+        $specification = new self;
         if(isset($map) && is_array($map))
         {
             foreach($map as $key=>$filter)
@@ -328,8 +328,8 @@ class PicoSpecification
     /**
      * Create full text search
      *
-     * @param string $columnName
-     * @param string $keywords
+     * @param string $columnName Column name
+     * @param string $keywords Keywords
      * @return self
      */
     public static function fullTextSearch($columnName, $keywords)
@@ -340,7 +340,10 @@ class PicoSpecification
         {
             if(!empty($word))
             {
-                $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateCenterLike(strtolower($word))));
+                $specification->addAnd(
+                    PicoPredicate::getInstance()
+                        ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateCenterLike(strtolower($word)))
+                );
             }
         }
         return $specification;
@@ -349,8 +352,8 @@ class PicoSpecification
     /**
      * Filter
      *
-     * @param string $columnName
-     * @param string $dataType
+     * @param string $columnName Column name
+     * @param string $dataType Data type
      * @return PicoSpecificationFilter
      */
     public static function filter($columnName, $dataType)
