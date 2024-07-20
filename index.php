@@ -767,7 +767,6 @@ require_once __DIR__ . "/inc.app/navs.php";
           </div>
         </div>
 
-
         <div id="translate-entity" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-entity-tab">
           <div class="entity-container-translate-etity">
             <div class="row">
