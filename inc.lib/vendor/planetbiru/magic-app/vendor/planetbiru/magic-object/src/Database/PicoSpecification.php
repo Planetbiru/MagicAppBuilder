@@ -141,7 +141,14 @@ class PicoSpecification
             $specifications = $predicate->getSpecifications();
             foreach($specifications as $pred)
             {
-                $specification->addFilter($pred, $pred->getFilterLogic());
+                if($pred instanceof PicoPredicate)
+                {
+                    $specification->addFilter($pred, $pred->getFilterLogic());
+                }
+                else if($pred instanceof PicoSpecification)
+                {
+                    $specification->addSubFilter($pred, $pred->getParentFilterLogic());
+                }
             }
             $this->specifications[count($this->specifications)] = $specification;
         }

@@ -83,7 +83,7 @@ class PicoModule
      * @param string $moduleName
      * @param string $moduleTitle
      */
-    public function __construct($appConfig, $database, $appModule, $targetDirectory, $moduleName, $moduleTitle = null)
+    public function __construct($appConfig, $database, $appModule = null, $targetDirectory = null, $moduleName = null, $moduleTitle = null)
     {
         $this->appConfig = $appConfig;
         $this->database = $database;
@@ -127,7 +127,7 @@ class PicoModule
             $this->allowedModules = array();
             foreach($appUserRoles as $role)
             {
-                if($role->getModuleName() ==  $this->appModule->getModuleName())
+                if(isset($this->appModule) && $role->getModuleName() == $this->appModule->getModuleName())
                 {
                     $this->userRole = $role;
                 }
@@ -142,7 +142,10 @@ class PicoModule
                 ||  $role->getAllowedSortOrder()
                 )
                 {
-                    $this->allowedModules[] = $role->getModuleId();
+                    if($role->getModuleId() != null)
+                    {
+                        $this->allowedModules[] = $role->getModuleId();
+                    }
                 }
             }
         }

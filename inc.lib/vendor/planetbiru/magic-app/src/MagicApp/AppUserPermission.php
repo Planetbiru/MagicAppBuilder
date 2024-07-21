@@ -3,7 +3,6 @@
 namespace MagicApp;
 
 use Exception;
-use MagicApp\PicoModule;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\MagicObject;
 use MagicObject\Request\PicoRequestBase;
@@ -204,6 +203,13 @@ class AppUserPermission
         {
             $userAction = $inputGet->getUserAction();
         }
+
+
+        if(!$this->currentModule->getAppModule()->hasValueModuleId())
+        {
+            $this->currentModule->getAppModule()->findOneByModuleCode($this->currentModule->getModuleName());
+        }
+
         if(!isset($userAction) || empty($userAction))
         {
             return $this->isAllowedTo(UserAction::SHOW_ALL);
@@ -252,22 +258,38 @@ class AppUserPermission
      */
     public function isAllowedTo($userAction) // NOSONAR
     {
-        if($userAction != null)
+        if($this->currentModule->getAppModule()->getSpecialAccess() && $this->getCurrentUser()->getUserLevel()->getSpecialAccess())
         {
-            $forbidden = 
-            ($userAction == UserAction::SHOW_ALL && !$this->isAllowedList())
-            || ($userAction == UserAction::CREATE && !$this->isAllowedCreate())
-            || ($userAction == UserAction::UPDATE && !$this->isAllowedUpdate())
-            || ($userAction == UserAction::ACTIVATE && !$this->isAllowedUpdate())
-            || ($userAction == UserAction::DELETE && !$this->isAllowedUpdate())
-            || ($userAction == UserAction::DETAIL && !$this->isAllowedDetail())
-            || ($userAction == UserAction::DELETE && !$this->isAllowedDelete())
-            || ($userAction == UserAction::SORT_ORDER && !$this->isAllowedSortOrder())
-            || ($userAction == UserAction::APPROVE && !$this->isAllowedApprove())
-            || ($userAction == UserAction::REJECT && !$this->isAllowedApprove())
-            ;
+            $this->allowedList =  true;
+            $this->allowedDetail =  true;
+            $this->allowedCreate =  true;
+            $this->allowedUpdate =  true;
+            $this->allowedDelete =  true;
+            $this->allowedApprove =  true;
+            $this->allowedSortOrder =  true;
+            return true;
         }
-        return !$forbidden;
+        else
+        {
+            if($userAction != null)
+            {
+                $forbidden = 
+                (
+                ($userAction == UserAction::SHOW_ALL && !$this->isAllowedList())
+                || ($userAction == UserAction::CREATE && !$this->isAllowedCreate())
+                || ($userAction == UserAction::UPDATE && !$this->isAllowedUpdate())
+                || ($userAction == UserAction::ACTIVATE && !$this->isAllowedUpdate())
+                || ($userAction == UserAction::DELETE && !$this->isAllowedUpdate())
+                || ($userAction == UserAction::DETAIL && !$this->isAllowedDetail())
+                || ($userAction == UserAction::DELETE && !$this->isAllowedDelete())
+                || ($userAction == UserAction::SORT_ORDER && !$this->isAllowedSortOrder())
+                || ($userAction == UserAction::APPROVE && !$this->isAllowedApprove())
+                || ($userAction == UserAction::REJECT && !$this->isAllowedApprove())
+                )
+                ;  
+            }
+            return !$forbidden;
+        }
     }
 
     /**
