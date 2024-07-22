@@ -72,9 +72,14 @@ As long as all database access by the application is done using entities only, M
 
 | Object                                  | Free       | Pro        |
 | --------------------------------------- | ---------- | ---------- |
-| Full feature                            | Yes        | Yes        |
+| Module generator                        | Yes        | Yes        |
+| Entity generator                        | Yes        | Yes        |
+| Entity translator                       | Yes        | Yes        |
+| Application translator                  | Yes        | Yes        |
+| Table creator                           | Yes        | Yes        |
+| Table modifier                          | Yes        | Yes        |
 | Number of project                       | Unlimited  | Unlimited  |
-| Simultaneous projects                   | No         | Yes        |
+| Simultaneous projects                   | 1          | Unlimited  |
 | Number of table                         | Unlimited  | Unlimited  |
 | Number of directory                     | Unlimited  | Unlimited  |
 | Number of entity                        | Unlimited  | Unlimited  |
@@ -82,6 +87,7 @@ As long as all database access by the application is done using entities only, M
 | Number of theme                         | 2          | 3          |
 | Number of theme                         | 2          | 3          |
 | Number of user                          | 5          | 100        |
+| User management                         | No         | Yes        |
 | Collaboration                           | No         | Yes        |
 | Push notification                       | No         | Yes        |
 
