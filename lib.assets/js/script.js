@@ -511,7 +511,7 @@ $(document).ready(function () {
     let module = $(this).attr("data-file-name");
     let el = $(this);
     getModuleFile(module, function () {
-      $('.entity-li').removeClass("selected-file");
+      $('.file-li').removeClass("selected-file");
       el.parent().addClass("selected-file");
     });
   });
