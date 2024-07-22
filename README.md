@@ -67,3 +67,21 @@ Next, the developer starts creating application modules by selecting tables from
 MagicAppBuilder will display all columns of the selected table. When a developer uses certain features of MagicAppBuilder, MagicAppBuilder may add several columns needed by the application. In this case, developers don't need to be afraid because AppBuilder will create a query to alter tables in the database. Developers can copy the query to run on the database.
 
 As long as all database access by the application is done using entities only, MagicAppBuilder can make queries from automatically created entities. If the developer uses native queries to access the database and adds tables or columns that are not in the existing entity, then the developer must alter the table manually by creating the required alter query himself. Applications generated using MagicAppBuilder almost do not have native queries due to the fact that MagicAppBuilder never uses native queries in applications. Native queries may only be created by developers in conditions where they are needed. Using entities allows developers to create application installers without explicitly including SQL scripts. The installer will create an application script according to the database engine selected by the user.
+
+# User Plan
+
+| Object                                  | Free       | Pro        |
+| --------------------------------------- | ---------- | ---------- |
+| Full feature                            | Yes        | Yes        |
+| Number of project                       | Unlimited  | Unlimited  |
+| Simultaneous projects                   | No         | Yes        |
+| Number of table                         | Unlimited  | Unlimited  |
+| Number of directory                     | Unlimited  | Unlimited  |
+| Number of entity                        | Unlimited  | Unlimited  |
+| Number of module                        | Unlimited  | Unlimited  |
+| Number of theme                         | 2          | 3          |
+| Number of theme                         | 2          | 3          |
+| Number of user                          | 5          | 100        |
+| Collaboration                           | No         | Yes        |
+| Push notification                       | No         | Yes        |
+
