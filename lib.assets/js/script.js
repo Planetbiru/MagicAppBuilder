@@ -6,6 +6,7 @@ String.prototype.replaceAll = function (search, replacement) {
   let target = this;
   return target.replace(new RegExp(search, "g"), replacement);
 };
+
 function upperCamelize(input) {
   return input
     .replaceAll("_", " ")
@@ -25,6 +26,7 @@ function hasKey(defdata, key) {
   }
   return false;
 }
+
 function loadState(defdata, frm1, frm2) {
   let i;
   frm2.find("tbody tr").each(function (index, e) {
@@ -499,7 +501,7 @@ $(document).ready(function () {
     let entity = $(this).attr("data-entity-name");
     let el = $(this);
     getEntityFile([entity], function () {
-      el.parent().siblings().removeClass("selected-file");
+      $('.entity-li').removeClass("selected-file");
       el.parent().addClass("selected-file");
     });
   });
@@ -509,7 +511,7 @@ $(document).ready(function () {
     let module = $(this).attr("data-file-name");
     let el = $(this);
     getModuleFile(module, function () {
-      el.parent().siblings().removeClass("selected-file");
+      $('.entity-li').removeClass("selected-file");
       el.parent().addClass("selected-file");
     });
   });
