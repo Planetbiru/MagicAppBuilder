@@ -21,13 +21,14 @@ try
     $list = glob($baseDir."/*.php");
     $li = array();
 
-    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s">%s</a></li>';
+    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
 
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         exec("php -l $file 2>&1", $output, $return_var);
         if($return_var === 0)
         {
@@ -37,7 +38,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $dir, $entity, $entity);
+            $li[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
         }
         else
         {
@@ -45,7 +46,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $dir, $entity, $entity);
+            $li[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);
@@ -70,6 +71,7 @@ try
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         exec("php -l $file 2>&1", $output, $return_var);
         if($return_var === 0)
         {
@@ -79,7 +81,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $dir, $entity, $entity);
+            $li[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
         }
         else
         {
@@ -87,7 +89,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $dir, $entity, $entity);
+            $li[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);

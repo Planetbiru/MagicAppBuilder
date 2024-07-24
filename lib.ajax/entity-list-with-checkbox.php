@@ -27,12 +27,13 @@ try
     
     $list = glob($baseDir."/*.php");
     $li = array();
-    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"$s> <a href="#" data-entity-name="%s\\%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled> %s</li>';
+    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         exec("php -l $file 2>&1", $output, $return_var);
         if($return_var === 0)
         {
@@ -42,7 +43,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $entity);
+            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
         }
         else
         {
@@ -50,7 +51,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $entity);
+            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);
@@ -74,6 +75,7 @@ try
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         exec("php -l $file 2>&1", $output, $return_var);
         if($return_var === 0)
         {
@@ -83,7 +85,7 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $entity);
+            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
         }
         else
         {
@@ -91,7 +93,7 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $entity);
+            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);

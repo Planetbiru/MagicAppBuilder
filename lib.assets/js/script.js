@@ -721,6 +721,10 @@ function updateEntityQuery(autoload) {
     dataType: "html",
     success: function (data) {
       $(".entity-container-query .entity-list").empty().append(data);
+      $('.entity-container-query .entity-list [data-toggle="tooltip"]').tooltip({
+        placement: 'top'
+      });
+
       let ents = getEntitySelection();
       let merged = $(".entity-merge")[0].checked;
       if (autoload) {
@@ -736,7 +740,10 @@ function updateEntityFile() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
-      $(".entity-container-translate-etity .entity-list").empty().append(data);
+      $(".entity-container-translate-etity .entity-list").empty().append(data);  
+      $('.entity-container-file .entity-list [data-toggle="tooltip"], .entity-container-translate-etity .entity-list [data-toggle="tooltip"]').tooltip({
+        placement: 'top'
+      });
     },
   });
 }
@@ -747,6 +754,9 @@ function updateModuleFile() {
     dataType: "html",
     success: function (data) {
       $(".module-container .module-list").empty().append(data);
+      $('.module-container .module-list [data-toggle="tooltip"]').tooltip({
+        placement: 'top'
+      });
     },
   });
 }
