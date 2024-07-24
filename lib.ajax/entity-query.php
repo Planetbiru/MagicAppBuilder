@@ -17,7 +17,6 @@ try
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     
     $allQueries = array();
-
     $merged = $inputPost->getMerged();
 
     if($merged)
@@ -78,19 +77,19 @@ try
     {
         if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
-            $allQueries[] = '-- Important to understand!'."\r\n".'-- Queries must be run one by one manually because there may be duplicate columns from different entities for the same table.';
+            $allQueries[] = "-- Important to understand!\r\n-- Queries must be run one by one manually because there may be duplicate columns from different entities for the same table.";
             $inputEntity = $inputPost->getEntity();
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);
                 $path = $baseDir."/".$entityName.".php";
                 
-                exec("php -l $path 2>&1", $output, $return_var);
-                if ($return_var === 0)
-                {         
-                    $entityQueries = array();
-                    if(file_exists($path))
-                    {
+                if(file_exists($path))
+                {
+                    // check error
+                    exec("php -l $path 2>&1", $output, $returnVar);
+                    if ($returnVar === 0)
+                    {         
                         include_once $path;
                         
                         $className = "\\".$baseEntity."\\".$entityName;
@@ -98,6 +97,7 @@ try
                         $dumper = new PicoDatabaseDump();
             
                         $quertArr = $dumper->createAlterTableAdd($entity);
+                        $entityQueries = array();
                         foreach($quertArr as $sql)
                         {
                             if(!empty($sql))
