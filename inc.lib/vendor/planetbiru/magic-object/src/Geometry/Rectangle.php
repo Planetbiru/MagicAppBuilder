@@ -23,7 +23,7 @@ class Rectangle {
      */
     public $b;
 
-    public $polygon = new Polygon();
+    public $polygon;
 
     /**
      * Constructor to initialize the Rectangle with two Point objects
@@ -32,6 +32,12 @@ class Rectangle {
      * @param Point $b
      */
     public function __construct(Point $a, Point $b) {
+        
+        if(!isset($this->polygon))
+        {
+            $this->polygon = new Polygon();
+        }
+        
         $this->a = $a;
         $this->b = $b;
 

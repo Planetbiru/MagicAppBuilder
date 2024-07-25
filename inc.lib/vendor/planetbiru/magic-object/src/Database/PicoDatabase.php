@@ -6,7 +6,6 @@ use Exception;
 use PDO;
 use PDOException;
 use PDOStatement;
-use MagicObject\Constants\PicoConstants;
 use MagicObject\Exceptions\InvalidDatabaseConfiguration;
 use MagicObject\Exceptions\NullPointerException;
 use MagicObject\SecretObject;
@@ -23,6 +22,7 @@ class PicoDatabase //NOSONAR
 	const QUERY_UPDATE = "update";
 	const QUERY_DELETE = "delete";
 	const QUERY_TRANSACTION = "transaction";
+	const DATABASE_NONECTION_IS_NULL = "Database connection is null";
 
 	/**
 	 * Database credential
@@ -274,7 +274,7 @@ class PicoDatabase //NOSONAR
 	{
 		if($this->databaseConnection == null)
 		{
-			throw new NullPointerException(PicoConstants::DATABASE_NONECTION_IS_NULL);
+			throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
 		}
 		$result = array();
 		$this->executeDebug($sql);
@@ -301,7 +301,7 @@ class PicoDatabase //NOSONAR
 	{
 		if($this->databaseConnection == null)
 		{
-			throw new NullPointerException(PicoConstants::DATABASE_NONECTION_IS_NULL);
+			throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
 		}
 		$this->executeDebug($sql);
 		$stmt = $this->databaseConnection->prepare($sql);
@@ -328,7 +328,7 @@ class PicoDatabase //NOSONAR
 	{
 		if($this->databaseConnection == null)
 		{
-			throw new NullPointerException(PicoConstants::DATABASE_NONECTION_IS_NULL);
+			throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
 		}
 		$result = array();
 		$this->executeDebug($sql);
@@ -353,7 +353,7 @@ class PicoDatabase //NOSONAR
 	{
 		if($this->databaseConnection == null)
 		{
-			throw new NullPointerException(PicoConstants::DATABASE_NONECTION_IS_NULL);
+			throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
 		}
 		$this->executeDebug($sql);
 		$stmt = $this->databaseConnection->prepare($sql);
@@ -376,7 +376,7 @@ class PicoDatabase //NOSONAR
 	{
 		if($this->databaseConnection == null)
 		{
-			throw new NullPointerException(PicoConstants::DATABASE_NONECTION_IS_NULL);
+			throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
 		}
 		$this->executeDebug($sql);
 		$stmt = $this->databaseConnection->prepare($sql);

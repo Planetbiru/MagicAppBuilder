@@ -170,9 +170,10 @@ class PicoEntityLanguage
      * @var boolean $asArrayProps
      * @return array
      */
-    public function propertyList($asArrayProps = false)
+    protected function propertyList($asArrayProps = false)
     {
         $class = new ReflectionClass($this->_entityClassName);
+
         // filter only the calling class properties
         // skip parent properties
         $properties = array_filter(
@@ -187,7 +188,8 @@ class PicoEntityLanguage
             $index = 0;
             foreach ($properties as $key) {
                 $prop = $key->name;
-                $result[$index] = $prop;               
+                $result[$index] = $prop;
+                
                 $index++;
             }
             return $result;
@@ -293,6 +295,13 @@ class PicoEntityLanguage
         return isset($this->$name) ? $this->$name : null;
     }
 
+    /**
+     * Magic method to handle undefined methods
+     *
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
     public function __call($method, $args) //NOSONAR
     {
         if(stripos($method, "get") === 0 && strlen($method) > 3)

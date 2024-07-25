@@ -164,7 +164,7 @@ class PicoDatabaseUtilMySql
      * @param MagicObject|PicoPageData $data
      * @return string
      */
-    public static function dumpData($columns, $picoTableName, $data)
+    public static function dumpData($columns, $picoTableName, $data) //NOSONAR
     {
         if($data instanceof PicoPageData && isset($data->getResult()[0]))
         {

@@ -8,8 +8,8 @@ class PicoStringUtil
     /**
      * Convert snake case to camel case
      *
-     * @param string $input
-     * @param string $glue
+     * @param string $input Inout string
+     * @param string $glue Glue
      * @return string
      */
     public static function camelize($input, $glue = '_')
@@ -21,8 +21,8 @@ class PicoStringUtil
     /**
      * Convert snake case to upper camel case
      *
-     * @param string $input
-     * @param string $glue
+     * @param string $input Inout string
+     * @param string $glue Glue
      * @return string
      */
     public static function upperCamelize($input, $glue = '_')
@@ -34,8 +34,8 @@ class PicoStringUtil
     /**
      * Convert camel case to snake case
      *
-     * @param string $input
-     * @param string $glue
+     * @param string $input Inout string
+     * @param string $glue Glue
      * @return string
      */
     public static function snakeize($input, $glue = '_') {
@@ -50,7 +50,7 @@ class PicoStringUtil
     /**
      * Snakeize object
      *
-     * @param mixed $object
+     * @param mixed $object Object
      * @return mixed
      */
     public static function snakeizeObject($object)
