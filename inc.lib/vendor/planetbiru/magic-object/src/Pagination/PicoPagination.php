@@ -45,9 +45,9 @@ class PicoPagination
     /**
      * Constructor
      *
-     * @param integer $pageSize
-     * @param string $orderby
-     * @param string $ordertype
+     * @param integer $pageSize Page suze
+     * @param string $orderby Order by
+     * @param string $ordertype Order type
      */
     public function __construct($pageSize = 20, $orderby = 'orderby', $ordertype = 'ordertype')
     {

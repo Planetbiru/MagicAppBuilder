@@ -2,6 +2,7 @@
 
 namespace MagicObject\Database;
 
+use MagicObject\Exceptions\InvalidParameterException;
 use stdClass;
 
 class PicoPageable
@@ -104,6 +105,9 @@ class PicoPageable
      */
     public function addSortable($sortBy, $sortType)
     {
+        if (!isset($sortBy) || empty($sortBy)) {
+            throw new InvalidParameterException("Sort by can not be null or empty");
+        }
         if($this->sortable == null)
         {
             $this->sortable = new PicoSortable();

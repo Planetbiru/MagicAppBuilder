@@ -10,6 +10,7 @@ use MagicObject\Database\PicoDatabasePersistence;
 use MagicObject\Database\PicoDatabasePersistenceExtended;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoDatabaseStructure;
+use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoSortable;
@@ -1176,11 +1177,13 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param PicoDatabasePersistence $persist
      * @param PicoSpecification $specification
+     * @param PicoPageable $pageable
+     * @param PicoSortable $sortable
      * @param integer $findOption
      * @param array $result
      * @return integer
      */
-    private function countData($persist, $specification, $findOption, $result)
+    private function countData($persist, $specification, $pageable, $sortable, $findOption, $result)
     {
         if($findOption & self::FIND_OPTION_NO_COUNT_DATA)
         {
@@ -1195,7 +1198,7 @@ class MagicObject extends stdClass // NOSONAR
         }
         else
         {
-            $match = $persist->countAll($specification);
+            $match = $persist->countAll($specification, $pageable, $sortable);
         }
 
         return $match;
@@ -1230,19 +1233,18 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 else
                 {
-
                     $result = $persist->findAll($specification, $pageable, $sortable, $subqueryMap);
                     $stmt = null;
                 }
                 
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
                 else
                 {
-                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData;
@@ -1302,12 +1304,12 @@ class MagicObject extends stdClass // NOSONAR
                 
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
                 else
                 {
-                    $match = $this->countData($persist, $specification, $findOption, $result);
+                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData;
@@ -1335,11 +1337,13 @@ class MagicObject extends stdClass // NOSONAR
      * Count all record
      *
      * @param PicoSpecification $specification
+     * @param PicoPageable $pageable
+     * @param PicoSortable $sortable
      * @return integer|false
      * @throws NoRecordFoundException if no record found
      * @throws NoDatabaseConnectionException if no database connection
      */
-    public function countAll($specification = null)
+    public function countAll($specification = null, $pageable = null, $sortable = null)
     {
         $result = false;
         try
@@ -1349,11 +1353,11 @@ class MagicObject extends stdClass // NOSONAR
                 $persist = new PicoDatabasePersistence($this->_database, $this);
                 if($specification != null && $specification instanceof PicoSpecification)
                 {
-                    $result = $persist->countAll($specification);
+                    $result = $persist->countAll($specification, $pageable, $sortable);
                 }
                 else
                 {
-                    $result = $persist->countAll(null);
+                    $result = $persist->countAll(null, null, null);
                 }
             }
             else

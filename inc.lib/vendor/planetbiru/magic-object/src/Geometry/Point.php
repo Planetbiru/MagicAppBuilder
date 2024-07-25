@@ -23,8 +23,8 @@ class Point {
     /**
      * Constructor to initialize the Point with x and y coordinates
      *
-     * @param double $x
-     * @param double $y
+     * @param double $x x coordinate
+     * @param double $y y coordinate
      */
     public function __construct($x, $y) {
         $this->x = $x;

@@ -31,64 +31,64 @@ class ComplexNumber {
     /**
      * Add complex number
      *
-     * @param self $complexNumber
+     * @param self $self
      * @return self
      */
-    public function add(ComplexNumber $complexNumber) { 
-        return new ComplexNumber( 
-            $this->real + $complexNumber->getReal(), 
-            $this->imaginary + $complexNumber->getImaginary() 
+    public function add(self $self) { 
+        return new self( 
+            $this->real + $self->getReal(), 
+            $this->imaginary + $self->getImaginary() 
         ); 
     } 
   
     /**
      * Subtract complex number
      *
-     * @param self $complexNumber
+     * @param self $self
      * @return self
      */
-    public function subtract(ComplexNumber $complexNumber) { 
-        return new ComplexNumber( 
-            $this->real - $complexNumber->getReal(), 
-            $this->imaginary - $complexNumber->getImaginary() 
+    public function subtract(self $self) { 
+        return new self( 
+            $this->real - $self->getReal(), 
+            $this->imaginary - $self->getImaginary() 
         ); 
     } 
   
     /**
      * Multiply complex number
      *
-     * @param self $complexNumber
+     * @param self $self
      * @return self
      */
-    public function multiply(ComplexNumber $complexNumber) { 
-        $real = $this->real * $complexNumber->getReal()  
-            - $this->imaginary * $complexNumber->getImaginary(); 
+    public function multiply(self $self) { 
+        $real = $this->real * $self->getReal()  
+            - $this->imaginary * $self->getImaginary(); 
               
-        $imaginary = $this->real * $complexNumber->getImaginary()  
-            + $this->imaginary * $complexNumber->getReal(); 
+        $imaginary = $this->real * $self->getImaginary()  
+            + $this->imaginary * $self->getReal(); 
               
-        return new ComplexNumber($real, $imaginary); 
+        return new self($real, $imaginary); 
     } 
 
     /**
      * Divide complex number
      *
-     * @param ComplexNumber $complexNumber
+     * @param self $self
      * @return self
      */
-    public function divide(ComplexNumber $complexNumber) { 
-        $denominator = $complexNumber->getReal()**2  
-            + $complexNumber->getImaginary()**2; 
+    public function divide(self $self) { 
+        $denominator = $self->getReal()**2  
+            + $self->getImaginary()**2; 
               
-        $real = ($this->real * $complexNumber->getReal()  
-            + $this->imaginary * $complexNumber->getImaginary())  
+        $real = ($this->real * $self->getReal()  
+            + $this->imaginary * $self->getImaginary())  
             / $denominator; 
               
-        $imaginary = ($this->imaginary * $complexNumber->getReal()  
-            - $this->real * $complexNumber->getImaginary())  
+        $imaginary = ($this->imaginary * $self->getReal()  
+            - $this->real * $self->getImaginary())  
             / $denominator; 
               
-        return new ComplexNumber($real, $imaginary); 
+        return new self($real, $imaginary); 
     } 
   
     /**
@@ -106,7 +106,7 @@ class ComplexNumber {
      * @return self
      */
     public function conjugate() { 
-        return new ComplexNumber($this->real, -$this->imaginary); 
+        return new self($this->real, -$this->imaginary); 
     }
   
     /**
