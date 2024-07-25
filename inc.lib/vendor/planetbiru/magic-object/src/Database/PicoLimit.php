@@ -31,9 +31,6 @@ class PicoLimit
      */
     public function __construct($offset = 0, $limit = 0)
     {
-        if (!is_int($offset) || !is_int($limit)) {
-            throw new InvalidParameterException("Limit and offset must an integer");
-        }
         if($offset < 0)
         {
             $offset = 0;
@@ -41,6 +38,9 @@ class PicoLimit
         if($limit < 1)
         {
             $limit = 1;
+        }
+        if (!is_int($offset) || !is_int($limit)) {
+            throw new InvalidParameterException("Limit and offset must an integer");
         }
         $this->setOffset($offset);
         $this->setLimit($limit);

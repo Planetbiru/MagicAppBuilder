@@ -330,11 +330,7 @@ class PicoAnnotationParser
         {
             return null;
         }
-        if(is_string($parameters[0]))
-        {
-            return $parameters;
-        }
-        else if(is_array($parameters) && is_string($parameters[0]))
+        if(is_array($parameters) && is_string($parameters[0]))
         {
             return $parameters[0];
         }

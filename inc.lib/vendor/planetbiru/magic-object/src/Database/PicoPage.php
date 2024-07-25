@@ -27,9 +27,6 @@ class PicoPage
      */
     public function __construct($pageNumber, $pageSize)
     {
-        if (!is_int($pageNumber) || !is_int($pageSize)) {
-            throw new InvalidParameterException("Page number and page size and must an integer");
-        }
         if($pageNumber < 1)
         {
             $pageNumber = 1;
@@ -37,6 +34,9 @@ class PicoPage
         if($pageSize < 1)
         {
             $pageSize = 1;
+        }
+        if (!is_int($pageNumber) || !is_int($pageSize)) {
+            throw new InvalidParameterException("Page number and page size and must an integer");
         }
         $this->setPageNumber($pageNumber);
         $this->setPageSize($pageSize);

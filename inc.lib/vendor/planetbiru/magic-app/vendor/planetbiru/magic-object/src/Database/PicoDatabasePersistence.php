@@ -2101,15 +2101,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             if($sortable instanceof PicoSortable)
             {
-                $sr = $sortable->getSortable();
-                foreach($sr as $s)
-                {
-                    if(strpos($s->getSortBy(), ".") !== false)
-                    {
-                        $result = true;
-                        break;
-                    }
-                }
+                $result = strpos($sortable->__toString(), ".") !== false;
             }
             else if(is_string($sortable))
             {
@@ -2135,7 +2127,9 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function isRequireJoinFromSpecification($specification)
     {
-        return isset($specification) && $specification instanceof PicoSpecification && $specification->isRequireJoin();
+        return isset($specification) && (
+            ($specification instanceof PicoSpecification && $specification->isRequireJoin()) 
+        );
     }
 
     /**
@@ -2198,9 +2192,9 @@ class PicoDatabasePersistence // NOSONAR
         {
             $info = $this->getTableInfo();
         }
-        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+        $sqlQuery = new PicoDatabaseQueryBuilder($this->database);
         
-        $sqlQuery = $queryBuilder
+        $sqlQuery
             ->newQuery()
             ->select($selected)
             ->from($info->getTableName());
@@ -2224,7 +2218,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             $sqlQuery = $this->setSortable($sqlQuery, $pageable, $sortable, $info);        
         }
-        return $queryBuilder;
+        return $sqlQuery;
     }
 
     /**
@@ -2560,10 +2554,12 @@ class PicoDatabasePersistence // NOSONAR
      * Get all record from database wihout filter
      *
      * @param PicoSpecification|null $specification Specification
+     * @param PicoPageable $pageable
+     * @param PicoSortable $sortable
      * @return integer
      * @throws EntityException|EmptyResultException
      */
-    public function countAll($specification)
+    public function countAll($specification = null, $pageable = null, $sortable = null)
     {
         $info = $this->getTableInfo();
         $primaryKeys = array_values($info->getPrimaryKeys());
@@ -2584,7 +2580,7 @@ class PicoDatabasePersistence // NOSONAR
                
         if($specification != null && $specification instanceof PicoSpecification)
         {
-            if($this->isRequireJoinFromSpecification($specification))
+            if($this->isRequireJoin($specification, $pageable, $sortable, $info))
             {
                 $sqlQuery = $this->addJoinQuery($sqlQuery, $info);
             }
@@ -2931,15 +2927,18 @@ class PicoDatabasePersistence // NOSONAR
             {
                 $referenceColumName = $this->getReferenceColumnName($join);
                 $classNameJoin = $join[self::KEY_PROPERTY_TYPE];
+                $columnName = $join[self::KEY_NAME];
                 $joinKeyName = $this->getJoinKeyName($classNameJoin, $referenceColumName);
-                $joinKeyValue = $this->getJoinKeyValue($row, $referenceColumName);
                 try
                 {
-                    $this->prepareJoinCache($classNameJoin);
-                    $obj = $this->getJoinData($classNameJoin, $joinKeyName, $joinKeyValue);
-                    if($obj != null)
+                    if(isset($row[$columnName]))
                     {
-                        $data = $this->addProperty($data, $propName, $obj);
+                        $this->prepareJoinCache($classNameJoin);
+                        $obj = $this->getJoinData($classNameJoin, $joinKeyName, $row[$columnName]);
+                        if($obj != null)
+                        {
+                            $data = $this->addProperty($data, $propName, $obj);
+                        }
                     }
                 }
                 catch(Exception $e)
