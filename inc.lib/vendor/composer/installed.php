@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '00106f423565367804c7b26c9acb59fa03d047db',
+        'reference' => '5e0d4034de55e724b5e29d15d43e828966a59a6d',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '00106f423565367804c7b26c9acb59fa03d047db',
+            'reference' => '5e0d4034de55e724b5e29d15d43e828966a59a6d',
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(
@@ -29,12 +29,12 @@
             'dev_requirement' => false,
         ),
         'planetbiru/magic-app' => array(
-            'pretty_version' => '0.6.9',
-            'version' => '0.6.9.0',
+            'pretty_version' => '0.6.12',
+            'version' => '0.6.12.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-app',
             'aliases' => array(),
-            'reference' => '3fa018e45fd4df4bfce315606b8c6f014017bd59',
+            'reference' => '290a5ee37270a83486b258b340a8e2c19a830734',
             'dev_requirement' => false,
         ),
         'planetbiru/magic-object' => array(
@@ -43,7 +43,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-object',
             'aliases' => array(),
-            'reference' => '399fb32109f3a79aed5e47910f4b86cb7369fa70',
+            'reference' => 'c912b294c564d99382e0e50f1e5ada2b1865f29d',
             'dev_requirement' => false,
         ),
         'symfony/yaml' => array(
