@@ -14,6 +14,21 @@ class AppEntityGenerator extends PicoEntityGenerator
      * @var boolean
      */
     private $updateEntity = false;
+
+    /**
+     * 
+     * Entity info
+     * @var EntityInfo
+     */
+    private $entityInfo;
+
+    public function __construct($database, $baseDir, $tableName, $baseNamespace, $entityName = null, $entityInfo = null, $updateEntity = true)
+    {
+        parent::__construct($database, $baseDir, $tableName, $baseNamespace, $entityName);
+        $this->entityInfo = $entityInfo;
+        $this->updateEntity = $updateEntity;
+    }
+
     /**
      * Prepare directory
      *
@@ -121,6 +136,18 @@ class AppEntityGenerator extends PicoEntityGenerator
         return $picoTableName;
     }
 
+    public function getReservedColumns()
+    {
+        $reserved = array();
+        $reserved[] = $this->entityInfo->getDraft();
+        $reserved[] = $this->entityInfo->getWaitingFor();
+        $reserved[] = $this->entityInfo->getApprovalId();
+        $reserved[] = $this->entityInfo->getAdminAskEdit();
+        $reserved[] = $this->entityInfo->getTimeAskEdit();
+        $reserved[] = $this->entityInfo->getIpAskEdit();
+        return $reserved;
+    }
+
     /**
      * Generate custom entity
      *
@@ -154,6 +181,7 @@ class AppEntityGenerator extends PicoEntityGenerator
         }
 
         $picoTableName = $this->getTableName($realTableName);
+        $reservedColumns = $this->getReservedColumns();
         
 
         $attrs = array();
@@ -171,7 +199,11 @@ class AppEntityGenerator extends PicoEntityGenerator
                 $nonupdatable = in_array($columnName, $nonupdatables);
 
                 $prop = $this->createProperty($typeMap, $row, $nonupdatables);
-                $attrs[] = $prop;
+
+                if(!in_array($columnName, $reservedColumns))
+                {
+                    $attrs[] = $prop;
+                }
 
                 if(isset($referenceData) && is_array($referenceData) && isset($referenceData[$columnName]) && $referenceData[$columnName]->getType() == 'entity')
                 {

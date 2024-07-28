@@ -3758,21 +3758,20 @@ $subqueryMap = '.$referece.';
      * Create main entity function
      *
      * @param PicoDatabase $database
-     * @param SecretObject $builderConfig
      * @param SecretObject $appConf
      * @param MagicObject $entityMain
      * @param EntityInfo $entityInfo
      * @param MagicObject[] $referenceData
      * @return void
      */
-    public function generateMainEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $referenceData)
+    public function generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData)
     {
         $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
-        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
+        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
         $generator->setUpdateEntity($this->getUpdateEntity());
         $generator->generateCustomEntity($entityMain->getEntityName(), $entityMain->getTableName(), null, $this->getSucessorMainColumns(), false, $referenceData, $nonupdatables);
     }
@@ -3781,7 +3780,6 @@ $subqueryMap = '.$referece.';
      * Create approval entity function
      *
      * @param PicoDatabase $database
-     * @param SecretObject $builderConfig
      * @param SecretObject $appConf
      * @param MagicObject $entityMain
      * @param EntityInfo $entityInfo
@@ -3789,15 +3787,15 @@ $subqueryMap = '.$referece.';
      * @param MagicObject[] $referenceData
      * @return void
      */
-    public function generateApprovalEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData)
+    public function generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData)
     {
+
         $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
-        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
-
+        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
         $generator->generateCustomEntity($entityApproval->getEntityName(), $entityApproval->getTableName(), $this->getPredecessorApprovalColumns($entityApproval), $this->getSucessorApprovalColumns(), true, $referenceData, $nonupdatables);
     }
     
@@ -3805,7 +3803,6 @@ $subqueryMap = '.$referece.';
      * Create trash entity function
      *
      * @param PicoDatabase $database
-     * @param SecretObject $builderConfig
      * @param SecretObject $appConf
      * @param MagicObject $entityMain
      * @param EntityInfo $entityInfo
@@ -3813,14 +3810,14 @@ $subqueryMap = '.$referece.';
      * @param MagicObject[] $referenceData
      * @return void
      */
-    public function generateTrashEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData)
+    public function generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData)
     {
         $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
-        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
+        $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
         $generator->generateCustomEntity($entityTrash->getEntityName(), $entityTrash->getTableName(), $this->getPredecessorTrashColumns($entityTrash), $this->getSucessorTrashColumns(), true, $referenceData, $nonupdatables);
     }
 

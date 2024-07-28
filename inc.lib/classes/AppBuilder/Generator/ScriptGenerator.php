@@ -478,17 +478,16 @@ class ScriptGenerator
 
         $updateEntity = $request->getUpdateEntity() == '1' || $request->getUpdateEntity() == 'true';
         $appBuilder->setUpdateEntity($updateEntity);
-        
 
-        
-        $appBuilder->generateMainEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $referenceData);
+        $appBuilder->generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData);
+
         if($approvalRequired)
         {
-            $appBuilder->generateApprovalEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData);
+            $appBuilder->generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData);
         }
         if($trashRequired)
         {
-            $appBuilder->generateTrashEntity($database, $builderConfig, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
+            $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
     }
@@ -580,7 +579,6 @@ class ScriptGenerator
         error_log("copy($sourcePath, $targetPath)");
         if($success)
         {
-            
             $cmd = "cd $targetDir"."&&"."php composer.phar require planetbiru/magic-app$version";
             error_log("CMD: ".$cmd."\r\n");
             exec($cmd);     
