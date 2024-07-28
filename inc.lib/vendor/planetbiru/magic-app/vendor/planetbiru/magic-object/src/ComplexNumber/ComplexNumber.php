@@ -34,7 +34,7 @@ class ComplexNumber {
      * @param self $self
      * @return self
      */
-    public function add(self $self) { 
+    public function add($self) { 
         return new self( 
             $this->real + $self->getReal(), 
             $this->imaginary + $self->getImaginary() 
@@ -47,7 +47,7 @@ class ComplexNumber {
      * @param self $self
      * @return self
      */
-    public function subtract(self $self) { 
+    public function subtract($self) { 
         return new self( 
             $this->real - $self->getReal(), 
             $this->imaginary - $self->getImaginary() 
@@ -60,7 +60,7 @@ class ComplexNumber {
      * @param self $self
      * @return self
      */
-    public function multiply(self $self) { 
+    public function multiply($self) { 
         $real = $this->real * $self->getReal()  
             - $this->imaginary * $self->getImaginary(); 
               
@@ -76,7 +76,7 @@ class ComplexNumber {
      * @param self $self
      * @return self
      */
-    public function divide(self $self) { 
+    public function divide($self) { 
         $denominator = $self->getReal()**2  
             + $self->getImaginary()**2; 
               

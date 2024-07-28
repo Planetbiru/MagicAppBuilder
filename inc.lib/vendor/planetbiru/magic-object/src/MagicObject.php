@@ -10,7 +10,6 @@ use MagicObject\Database\PicoDatabasePersistence;
 use MagicObject\Database\PicoDatabasePersistenceExtended;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoDatabaseStructure;
-use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoSortable;
@@ -1177,7 +1176,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param PicoDatabasePersistence $persist
      * @param PicoSpecification $specification
-     * @param PicoPageable $pageable
+     * @param PicoPageable|string $pageable
      * @param PicoSortable $sortable
      * @param integer $findOption
      * @param array $result
@@ -1740,6 +1739,7 @@ class MagicObject extends stdClass // NOSONAR
      * set &raquo; set property value. This method not require database connection.
      * unset &raquo; unset property value. This method not require database connection.
      * findOneBy &raquo; search data from database and return one record. This method require database connection.
+     * findOneIfExistsBy &raquo; search data from database and return one record. This method require database connection.
      * deleteOneBy &raquo; delete data from database and return one record. This method require database connection.
      * findFirstBy &raquo; search data from database and return first record. This method require database connection.
      * findLastBy &raquo; search data from database and return last record. This method require database connection.

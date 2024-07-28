@@ -276,6 +276,39 @@ class PicoPredicate //NOSONAR
     }
     
     /**
+     * Generate LIKE STARTS wildcard
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function generateLikeStarts($value)
+    {
+        return $value."%";
+    }
+    
+    /**
+     * Generate LIKE ENDS wildcard
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function generateLikeEnds($value)
+    {
+        return "%".$value;
+    }
+    
+    /**
+     * Generate LIKE CONTAINS wildcard
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function generateLikeContians($value)
+    {
+        return "%".$value."%";
+    }
+    
+    /**
      * Generate LEFT LIKE wildcard
      *
      * @param string $value

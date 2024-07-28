@@ -3773,6 +3773,7 @@ $subqueryMap = '.$referece.';
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
         $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
         $generator->setUpdateEntity($this->getUpdateEntity());
+        $generator->setMainEntity(true);
         $generator->generateCustomEntity($entityMain->getEntityName(), $entityMain->getTableName(), null, $this->getSucessorMainColumns(), false, $referenceData, $nonupdatables);
     }
     
@@ -3796,6 +3797,7 @@ $subqueryMap = '.$referece.';
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
         $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
+        $generator->setMainEntity(false);
         $generator->generateCustomEntity($entityApproval->getEntityName(), $entityApproval->getTableName(), $this->getPredecessorApprovalColumns($entityApproval), $this->getSucessorApprovalColumns(), true, $referenceData, $nonupdatables);
     }
     
@@ -3818,6 +3820,7 @@ $subqueryMap = '.$referece.';
         $baseDir = $appConf->getBaseEntityDirectory();
         $baseNamespace = $appConf->getBaseEntityDataNamespace();
         $generator = new AppEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName, $entityInfo, $this->updateEntity);
+        $generator->setMainEntity(false);
         $generator->generateCustomEntity($entityTrash->getEntityName(), $entityTrash->getTableName(), $this->getPredecessorTrashColumns($entityTrash), $this->getSucessorTrashColumns(), true, $referenceData, $nonupdatables);
     }
 

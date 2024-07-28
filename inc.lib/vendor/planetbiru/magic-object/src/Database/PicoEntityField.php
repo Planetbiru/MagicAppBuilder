@@ -88,7 +88,7 @@ class PicoEntityField
     public function __construct($fieldRaw, $info = null)
     {
         $field = $this->extractField($fieldRaw);
-        if(strpos($field, "."))
+        if(strpos($field, ".") !== false)
         {
             $arr = explode(".", $field, 2);
             $this->field = $arr[1];

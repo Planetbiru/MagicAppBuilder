@@ -22,11 +22,28 @@ class AppEntityGenerator extends PicoEntityGenerator
      */
     private $entityInfo;
 
+    /**
+     * Main entiti
+     * @var boolean
+     */
+    private $mainEntity = false;
+
     public function __construct($database, $baseDir, $tableName, $baseNamespace, $entityName = null, $entityInfo = null, $updateEntity = true)
     {
         parent::__construct($database, $baseDir, $tableName, $baseNamespace, $entityName);
         $this->entityInfo = $entityInfo;
         $this->updateEntity = $updateEntity;
+    }
+
+    /**
+     * Set main entity
+     * @param boolean $mainEntity
+     * @return self
+     */
+    public function setMainEntity($mainEntity)
+    {
+        $this->mainEntity = $mainEntity;
+        return $this;
     }
 
     /**
@@ -139,12 +156,15 @@ class AppEntityGenerator extends PicoEntityGenerator
     public function getReservedColumns()
     {
         $reserved = array();
-        $reserved[] = $this->entityInfo->getDraft();
-        $reserved[] = $this->entityInfo->getWaitingFor();
-        $reserved[] = $this->entityInfo->getApprovalId();
-        $reserved[] = $this->entityInfo->getAdminAskEdit();
-        $reserved[] = $this->entityInfo->getTimeAskEdit();
-        $reserved[] = $this->entityInfo->getIpAskEdit();
+        if(!$this->mainEntity)
+        {
+            $reserved[] = $this->entityInfo->getDraft();
+            $reserved[] = $this->entityInfo->getWaitingFor();
+            $reserved[] = $this->entityInfo->getApprovalId();
+            $reserved[] = $this->entityInfo->getAdminAskEdit();
+            $reserved[] = $this->entityInfo->getTimeAskEdit();
+            $reserved[] = $this->entityInfo->getIpAskEdit();
+        }
         return $reserved;
     }
 

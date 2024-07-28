@@ -6,7 +6,6 @@ use MagicObject\SecretObject;
 
 class PicoSession
 {
-
     const SESSION_STARTED = true;
     const SESSION_NOT_STARTED = false;
     const SAME_SITE_LAX = "Lax";
@@ -34,17 +33,14 @@ class PicoSession
      */
     public function __construct($sessConf = null)
     {
-
         if($sessConf->getName() != "")
         {
             $this->setSessionName($sessConf->getName());
         }
-        
         if($sessConf->getMaxLifeTime() > 0)
         {
             $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
         }
-        
         if($sessConf->getSaveHandler() == "redis")
         {
             $path = $sessConf->getSaveHandler();
@@ -55,8 +51,7 @@ class PicoSession
         else if($sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "")
         {
             $this->saveToFiles($sessConf->getSavePath());
-        }
-        
+        }     
     }
 
     /**
@@ -69,7 +64,8 @@ class PicoSession
      **/
     public static function getInstance($name = null, $maxLifeTime = 0)
     {
-        if (!isset(self::$_instance)) {
+        if (!isset(self::$_instance)) 
+        {
             self::$_instance = new self;
             if(isset($name))
             {
@@ -80,7 +76,6 @@ class PicoSession
                 self::$_instance->setSessionMaxLifeTime($maxLifeTime);
             }
         }
-
         self::$_instance->startSession();
         return self::$_instance;
     }
@@ -93,7 +88,8 @@ class PicoSession
      **/
     public function startSession()
     {
-        if ($this->_sessionState == self::SESSION_NOT_STARTED) {
+        if ($this->_sessionState == self::SESSION_NOT_STARTED) 
+        {
             $this->_sessionState = session_start();
         }
         $this->sessionStarted = true;
@@ -122,7 +118,6 @@ class PicoSession
     {
         $_SESSION[$name] = $value;
     }
-
 
     /**
      * Gets datas from the session.
@@ -166,10 +161,10 @@ class PicoSession
      **/
     public function destroy()
     {
-        if ($this->_sessionState == self::SESSION_STARTED) {
+        if ($this->_sessionState == self::SESSION_STARTED) 
+        {
             $this->_sessionState = !session_destroy();
             unset($_SESSION);
-
             return !$this->_sessionState;
         }
         return false;

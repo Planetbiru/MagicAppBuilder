@@ -4096,7 +4096,7 @@ function generateSelectType(field, args)
 	var matchByType = {
 		'int':['bit', 'varbit', 'smallint', 'int', 'integer', 'bigint', 'smallserial', 'serial', 'bigserial', 'bool', 'boolean'],
 		'float':['numeric', 'double', 'real', 'money'],
-		'text':['char', 'character', 'varchar', 'character varying', 'text'],
+		'text':['char', 'character', 'varchar', 'character varying', 'text', 'enum'],
 		'date':['date'],
 		'datetime':['datetime', 'timestamp'],
 		'time':['time']

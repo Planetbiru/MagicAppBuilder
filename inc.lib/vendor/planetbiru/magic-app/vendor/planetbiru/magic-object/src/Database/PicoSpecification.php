@@ -38,7 +38,7 @@ class PicoSpecification
      */
     public function isRequireJoin()
     {
-        return strpos($this, ".") !== false;
+        return strpos($this->__toString(), ".") !== false;
     }
 
     /**
@@ -241,9 +241,10 @@ class PicoSpecification
             {
                 $entityField = new PicoEntityField($spec->getField());
                 $field = $entityField->getField();
-                $entityName = $entityField->getEntity();
-                $column = ($entityName == null) ? $field : $entityName.".".$field;
-                $arr[] = $spec->getFilterLogic() . " " . $column . " " . $spec->getComparation()->getComparison() . " " . PicoDatabaseUtil::escapeValue($spec->getValue());               
+                $parentField = $entityField->getParentField();
+                $column = ($parentField == null) ? $field : $parentField.".".$field;
+                $where = $spec->getFilterLogic() . " " . $column . " " . $spec->getComparation()->getComparison() . " " . PicoDatabaseUtil::escapeValue($spec->getValue());
+                $arr[] = $where;               
             }
             else if($spec instanceof PicoSpecification)
             {
@@ -262,7 +263,6 @@ class PicoSpecification
      */
     private function createWhereFromSpecification($specification)
     {
-        
         $arr = array();
         $arr[] = "(1=1)";
         if($specification != null && !$specification->isEmpty())
@@ -270,6 +270,7 @@ class PicoSpecification
             $specifications = $specification->getSpecifications();
             foreach($specifications as $spec)
             {           
+                
                 if($spec instanceof PicoPredicate)
                 {
                     $entityField = new PicoEntityField($spec->getField());
