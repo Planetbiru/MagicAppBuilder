@@ -298,7 +298,7 @@ class ScriptGenerator
         
         $uses = array();
         $uses[] = "// This script is generated automatically by AppBuilder";
-        $uses[] = "// Visit https://github.com/Planetbiru/AppBuilder";
+        $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
         $uses[] = "use MagicObject\\MagicObject;";
         if($approvalRequired || $sortOrder)
