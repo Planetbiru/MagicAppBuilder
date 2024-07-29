@@ -246,6 +246,7 @@ class ScriptGenerator
         $editFields = array();
         $detailFields = array();
         $listFields = array();
+        $exportFields = array();
         $filterFields = array();
         $referenceData = array();
         $referenceEntities = array();
@@ -271,6 +272,9 @@ class ScriptGenerator
             }
             if($field->getIncludeList()) {
                 $listFields[$field->getFieldName()] = $field;
+            }
+            if($field->getIncludeExport()) {
+                $exportFields[$field->getFieldName()] = $field;
             }
             if($field->getFilterElementType() != "") {
                 $filterFields[$field->getFieldName()] = $field;

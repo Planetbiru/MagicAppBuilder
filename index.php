@@ -508,6 +508,7 @@ require_once __DIR__ . "/inc.app/navs.php";
                     <td rowspan="2" align="center" width="32" title="Update">U</td>
                     <td rowspan="2" align="center" width="32" title="Detail">D</td>
                     <td rowspan="2" align="center" width="32" title="List">L</td>
+                    <td rowspan="2" align="center" width="32" title="Export">E</td>
                     <td rowspan="2" align="center" width="32" title="Key">K</td>
                     <td rowspan="2" align="center" width="32" title="Required">R</td>
                     <td colspan="5" align="center">Element Type</td>

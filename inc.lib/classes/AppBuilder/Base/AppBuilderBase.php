@@ -1112,7 +1112,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
      * @param array $sortable
      * @return string
      */
-    public function createGuiList($entityMain, $listFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable)
+    public function createGuiList($entityMain, $listFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable) //NOSONAR
     {
         $entityName = $entityMain->getentityName();
         $primaryKey = $entityMain->getPrimaryKey();
@@ -1137,9 +1137,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $dataSection->appendChild($dom->createTextNode("\n\t".'<?php } /*ajaxSupport*/ ?>'));
         }
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG)); 
-        
-        //$dataSection->appendChild($dom->createTextNode($this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable))); 
-        
+                
         $dataSection->appendChild($dom->createTextNode("try{\n")); 
         $dataSection->appendChild($dom->createTextNode("\t\t".$this->getFindAllScript())); 
         
@@ -1220,6 +1218,7 @@ catch(Exception $e)
         
         $getData[] = $this->constructEntityLabel($entityName);
 
+        // before script
         $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable);
 
         if($this->ajaxSupport)

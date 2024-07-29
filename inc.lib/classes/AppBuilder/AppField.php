@@ -51,6 +51,13 @@ class AppField
     private $includeList;
 
     /**
+     * Include export
+     *
+     * @var boolean
+     */
+    private $includeExport;
+
+    /**
      * Key
      *
      * @var boolean
@@ -315,5 +322,29 @@ class AppField
     public function getAdditionalOutput()
     {
         return $this->additionalOutput;
+    }
+
+    /**
+     * Get include export
+     *
+     * @return  boolean
+     */ 
+    public function getIncludeExport()
+    {
+        return $this->includeExport;
+    }
+
+    /**
+     * Set include export
+     *
+     * @param  boolean  $includeExport  Include export
+     *
+     * @return  self
+     */ 
+    public function setIncludeExport($includeExport)
+    {
+        $this->includeExport = $includeExport;
+
+        return $this;
     }
 }

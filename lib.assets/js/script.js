@@ -863,6 +863,7 @@ function generateScript(selector) {
       let includeEdit = $(this).find("input.include_edit")[0].checked;
       let includeDetail = $(this).find("input.include_detail")[0].checked;
       let includeList = $(this).find("input.include_list")[0].checked;
+      let includeExport = $(this).find("input.include_export")[0].checked;
       let isKey = $(this).find("input.include_key")[0].checked;
       let isInputRequired = $(this).find("input.include_required")[0].checked;
       let elementType = $(this).find("input.input-element-type:checked").val();
@@ -887,6 +888,7 @@ function generateScript(selector) {
         includeEdit: includeEdit,
         includeDetail: includeDetail,
         includeList: includeList,
+        includeExport:includeExport,
         isKey: isKey,
         isInputRequired: isInputRequired,
         elementType: elementType,
@@ -1162,6 +1164,7 @@ function restoreForm(data) {
           tr.find('.include_edit')[0].checked = data.fields[i].includeEdit === true || data.fields[i].includeEdit == 'true';
           tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
           tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
+          tr.find('.include_export')[0].checked = data.fields[i].includeExport === true || data.fields[i].includeExport == 'true';
 
           tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
           tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
@@ -1560,6 +1563,7 @@ function generateRow(field, args, skipedOnInsertEdit) {
   let insertRow = "";
   let editRow = "";
   let listRow = "";
+  let exportRow = "";
   if ($.inArray(field, skipedOnInsertEdit) != -1) {
     insertRow =
       '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
@@ -1588,6 +1592,11 @@ function generateRow(field, args, skipedOnInsertEdit) {
       '" value="1" checked="checked"></td>\r\n';
   }
 
+  exportRow =
+      '  <td align="center"><input type="checkbox" class="include_export" name="include_export_' +
+      field +
+      '" value="1" checked="checked"></td>\r\n';
+
   let rowHTML =
     '<tr data-field-name="' +
     field +
@@ -1602,33 +1611,17 @@ function generateRow(field, args, skipedOnInsertEdit) {
     '"></td>\r\n' +
     '  <td><input type="hidden" class="input-field-name" name="caption_' +
     field +
-    '" value="' +
-    field.replaceAll("_", " ").capitalize().prettify().trim() +
-    '" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
-    insertRow +
-    editRow +
-    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' +
-    field +
-    '" value="1" checked="checked"></td>\r\n' +
+    '" value="' +field.replaceAll("_", " ").capitalize().prettify().trim() +'" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
+    insertRow + editRow +
+    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' +field +'" value="1" checked="checked"></td>\r\n' +
     listRow +
-    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' +
-    field +
-    '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' +
-    field +
-    '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +
-    field +
-    '" value="text" checked="checked"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +
-    field +
-    '" value="textarea"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +
-    field +
-    '" value="checkbox"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +
-    field +
-    '" value="select"></td>\r\n' +
+    exportRow +
+    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' +field +'" value="1"></td>\r\n' +
+    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' +field +'" value="1"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="text" checked="checked"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="textarea"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="checkbox"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="select"></td>\r\n' +
     '  <td align="center"><input type="hidden" class="reference-data" name="reference_data_' +
     field +
     '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference-button-data">Source</button></td>\r\n' +
