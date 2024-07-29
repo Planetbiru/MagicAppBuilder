@@ -1138,7 +1138,8 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         }
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG)); 
         
-        $dataSection->appendChild($dom->createTextNode($this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable))); 
+        //$dataSection->appendChild($dom->createTextNode($this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable))); 
+        
         $dataSection->appendChild($dom->createTextNode("try{\n")); 
         $dataSection->appendChild($dom->createTextNode("\t\t".$this->getFindAllScript())); 
         
@@ -1216,7 +1217,11 @@ catch(Exception $e)
 
         
         $getData = array();
+        
         $getData[] = $this->constructEntityLabel($entityName);
+
+        $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable);
+
         if($this->ajaxSupport)
         {
             $getData[] = '/*ajaxSupport*/';
@@ -1421,8 +1426,7 @@ else
             $arrSort[] = '"'.PicoStringUtil::camelize($field->getFieldName()).'" => "'.PicoStringUtil::camelize($field->getFieldName()).'"';
         }
         $script = 
-'
-'.$map.'
+''.$map.'
 $specMap = array(
     '.implode(",\n\t", $arrFilter).'
 );
@@ -1459,7 +1463,6 @@ $subqueryMap = '.$referece.';
         $script = $script.$subqueryVar;
 
         $script = str_replace("\r\n", "\n", $script);
-        $script = $this->addIndent($script, 1);
         $script = str_replace("\r\n", "\n", $script);
         
         return $script;
