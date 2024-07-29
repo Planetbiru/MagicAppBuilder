@@ -149,8 +149,8 @@ class ScriptGenerator
      * Add use from approval
      *
      * @param string[] $uses
-     * @param array $referenceEntity
      * @param AppSecretObject $appConf
+     * @param array $referenceEntity
      * @return string[]
      */
     public function addUseFromReference($uses, $appConf, $referenceEntity)
@@ -249,15 +249,22 @@ class ScriptGenerator
         $filterFields = array();
         $referenceData = array();
         $referenceEntities = array();
+        $referenceEntitiesUse = array();
         $allField = array();
         foreach($request->getFields() as $value) {
             $field = new AppField($value);
             $allField[] = $field;
+
+            $create = false;
+            $update = false;
+
             if($field->getIncludeInsert()) {
                 $insertFields[$field->getFieldName()] = $field;
+                $create = true;
             }
             if($field->getIncludeEdit()) {
                 $editFields[$field->getFieldName()] = $field;
+                $update = true;
             }
             if($field->getIncludeDetail()) {
                 $detailFields[$field->getFieldName()] = $field;
@@ -272,10 +279,17 @@ class ScriptGenerator
                 $referenceData[$field->getFieldName()] = $field->getReferenceData();
             }
             if($this->hasReferenceData($field)){
-                $referenceEntities[] = $field->getReferenceData()->getEntity();
+                $ent = $field->getReferenceData()->getEntity();
+                $referenceEntities[] = $ent;
+                if($create && $update)
+                {
+                    $referenceEntitiesUse[] = $ent;
+                }
             }
             if($this->hasReferenceFilter($field)){
-                $referenceEntities[] = $field->getReferenceFilter()->getEntity();
+                $ent = $field->getReferenceFilter()->getEntity();
+                $referenceEntities[] = $ent;
+                $referenceEntitiesUse[] = $ent;
             }
         }
         
@@ -329,7 +343,7 @@ class ScriptGenerator
         $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
-        $uses = $this->addUseFromReference($uses, $appConf, $referenceEntities);      
+        $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);      
         
         $uses[] = "";
         
