@@ -647,12 +647,12 @@ require_once __DIR__ . "/inc.app/navs.php";
                               <td><label><input type="checkbox" name="manualsortorder" id="manualsortorder" value="1"> Manual Sort Order</label> &nbsp;</td>
                             </tr>
                             <tr>
-                              <td>Approval</td>
-                              <td><label><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
-                            </tr>
-                            <tr>
                               <td>Export to Excel</td>
                               <td><label><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1"> Export to Excel</label> &nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td>Approval</td>
+                              <td><label><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
                             </tr>
                             <tr>
                               <td>Approval Note</td>

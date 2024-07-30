@@ -1265,6 +1265,11 @@ function restoreForm(data) {
     if ($('#modal-module-features [name="manualsortorder"]').length) {
       $('#modal-module-features [name="manualsortorder"]')[0].checked = data.features.sortOrder === true || data.features.sortOrder == 'true';
     }
+    
+    if ($('#modal-module-features [name="export_to_excel"]').length) {
+      $('#modal-module-features [name="export_to_excel"]')[0].checked = data.features.exportToExcel === true || data.features.exportToExcel == 'true';
+    }
+    
 
     if ($('#modal-module-features [name="with_approval"]').length) {
       $('#modal-module-features [name="with_approval"]')[0].checked = data.features.approvalRequired === true || data.features.approvalRequired == 'true';
