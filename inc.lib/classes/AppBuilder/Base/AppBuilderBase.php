@@ -2306,11 +2306,10 @@ $subqueryMap = '.$referece.';
         $exportFilterWrapper->setAttribute('class', 'filter-group');    
         $buttonExport = $dom->createElement('button');
         $buttonExport->setAttribute('type', 'submit');
-        $buttonExport->setAttribute('name', 'export');
-        $buttonExport->setAttribute('value', 'true');
+        $buttonExport->setAttribute('name', 'user_action');
+        $buttonExport->setAttribute('value', 'export');
         $buttonExport->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonExport->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonExport();".self::PHP_CLOSE_TAG));
-        $buttonExport->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::EXPORT);".self::PHP_CLOSE_TAG."'");
               
         $exportFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));  
         $exportFilterWrapper->appendChild($buttonExport);
