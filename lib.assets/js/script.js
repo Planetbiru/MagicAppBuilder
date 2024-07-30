@@ -1168,11 +1168,10 @@ function restoreForm(data) {
           tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
           tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
           tr.find('.include_export')[0].checked = data.fields[i].includeExport === true || data.fields[i].includeExport == 'true';
-
           tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
           tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
-
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
+          
           if (data.fields[i].elementType == 'select') {
             tr.find('.reference-data').val(JSON.stringify(data.fields[i].referenceData));
             tr.find('.reference-button-data').css('display', 'inline');
