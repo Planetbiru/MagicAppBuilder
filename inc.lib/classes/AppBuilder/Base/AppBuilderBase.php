@@ -2294,16 +2294,28 @@ $subqueryMap = '.$referece.';
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonShowRequireApproval();".self::PHP_CLOSE_TAG));
         $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");
-        
-        
-        $approvalFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));
-   
+              
+        $approvalFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));  
         $approvalFilterWrapper->appendChild($buttonSearch);
-        
         $whiteSpace5 = $dom->createTextNode("\n\t\t");
-        
-    
         $approvalFilterWrapper->appendChild($whiteSpace5);
+        ////
+        
+        ////
+        $exportFilterWrapper = $dom->createElement('span');
+        $exportFilterWrapper->setAttribute('class', 'filter-group');    
+        $buttonExport = $dom->createElement('button');
+        $buttonExport->setAttribute('type', 'submit');
+        $buttonExport->setAttribute('name', 'export');
+        $buttonExport->setAttribute('value', 'true');
+        $buttonExport->setAttribute('class', ElementClass::BUTTON_SUCCESS);
+        $buttonExport->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonExport();".self::PHP_CLOSE_TAG));
+        $buttonExport->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::EXPORT);".self::PHP_CLOSE_TAG."'");
+              
+        $exportFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));  
+        $exportFilterWrapper->appendChild($buttonExport);
+        $whiteSpace6 = $dom->createTextNode("\n\t\t");
+        $exportFilterWrapper->appendChild($whiteSpace6);
         ////
 
 
@@ -2319,6 +2331,14 @@ $subqueryMap = '.$referece.';
             $form->appendChild($dom->createTextNode("\n\t\t".'<?php if($userPermission->isAllowedApprove()){ ?>'));
             $form->appendChild($dom->createTextNode("\n\n\t\t"));
             $form->appendChild($approvalFilterWrapper);
+            $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
+        }
+
+        if($this->appFeatures->isExportToExcel())
+        {
+            $form->appendChild($dom->createTextNode("\n\t\t".'<?php if($userPermission->isAllowedDetail()){ ?>'));
+            $form->appendChild($dom->createTextNode("\n\n\t\t"));
+            $form->appendChild($exportFilterWrapper);
             $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
         }
 
