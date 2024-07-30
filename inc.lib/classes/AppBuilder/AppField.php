@@ -129,6 +129,7 @@ class AppField
         $this->includeEdit = $this->isTrue($value->getIncludeEdit());
         $this->includeDetail = $this->isTrue($value->getIncludeDetail());
         $this->includeList = $this->isTrue($value->getIncludeList());
+        $this->includeExport = $this->isTrue($value->getIncludeExport());
         $this->key = $this->isTrue($value->getIsKey());
         $this->required = $this->isTrue($value->getIsInputRequired());
         $this->elementType = $value->getelementType();

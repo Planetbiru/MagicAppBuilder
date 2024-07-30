@@ -58,7 +58,17 @@ class AppFeatures
      */
     private $approvalPosition = '';
     
+    /**
+     * Subquery
+     * @var boolean
+     */
     private $subquery = false;
+
+    /**
+     * Export to Excel
+     * @var boolean
+     */
+    private $exportToExcel = false;
     
     /**
      * Constructor
@@ -71,6 +81,7 @@ class AppFeatures
         {
             $this->activateDeactivate = $this->isTrue($features->get('activateDeactivate'));
             $this->sortOrder = $this->isTrue($features->get('sortOrder'));
+            $this->exportToExcel = $this->isTrue($features->get('exportToExcel'));
             $this->approvalRequired = $this->isTrue($features->get('approvalRequired'));
             $this->approvalNote = $this->isTrue($features->get('approvalNote'));
             $this->trashRequired = $this->isTrue($features->get('trashRequired'));
@@ -180,6 +191,30 @@ class AppFeatures
     public function setApprovalType($approvalType)
     {
         $this->approvalType = $approvalType;
+
+        return $this;
+    }
+
+    /**
+     * Get export to Excel
+     *
+     * @return  boolean
+     */ 
+    public function isExportToExcel()
+    {
+        return $this->exportToExcel;
+    }
+
+    /**
+     * Set export to Excel
+     *
+     * @param  boolean  $exportToExcel  Export to Excel
+     *
+     * @return  self
+     */ 
+    public function setExportToExcel($exportToExcel)
+    {
+        $this->exportToExcel = $exportToExcel;
 
         return $this;
     }

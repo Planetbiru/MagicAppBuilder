@@ -1100,6 +1100,153 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         return $htmlDetail;
     }
 
+    private function createExportValue($objectName, $field)
+    {
+        $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
+        
+        $yes = self::VAR."appLanguage->getYes()";
+        $no = self::VAR."appLanguage->getNo()";
+
+        $true = self::VAR."appLanguage->getTrue()";
+        $false = self::VAR."appLanguage->getFalse()";
+
+        if(($field->getElementType() == 'checkbox') ||
+            ($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null
+            && $field->getReferenceData()->getType() == 'yesno')
+        )
+        {
+            $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
+            $result = self::VAR.'row'.$val;
+        }
+        else if($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getEntity() != null
+            && $field->getReferenceData()->getEntity()->getObjectName() != null
+            && $field->getReferenceData()->getEntity()->getPropertyName() != null
+            )
+        {
+            $objName = $field->getReferenceData()->getEntity()->getObjectName();
+            $propName = $field->getReferenceData()->getEntity()->getPropertyName();
+            $upperObjName = PicoStringUtil::upperCamelize($objName);
+            $upperPropName = PicoStringUtil::upperCamelize($propName);
+
+            $val = '->hasValue'.$upperObjName.'() ? $'.'row'.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $result = self::VAR.'row'.$val;
+        }
+        else if($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getMap() != null
+            )
+        {
+            $v1 = 'isset('.'$mapFor'.$upperFieldName.')';
+            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()])';
+            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()]["label"])';
+            $v4 = '$mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()]["label"]';
+            $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
+            $result = $val;
+        }
+        else if($field->getElementType() == 'select' 
+        && $field->getReferenceData() != null
+            && $field->getReferenceData()->getType() == 'truefalse'
+            )
+        {
+            $val = "->option".$upperFieldName."(".$true.", ".$false.")";
+            $result = self::VAR.'row'.$val;
+        }
+        else if($field->getElementType() == 'select' 
+        && $field->getReferenceData() != null
+            && $field->getReferenceData()->getType() == 'onezero'
+            )
+        {
+            $val = "->option".$upperFieldName."(\"1\", \"0\")";
+            $result = self::VAR.'row'.$val;
+        }
+        else
+        {
+            $val = "".self::CALL_GET.$upperFieldName."()";
+            $result = self::VAR.'row'.$val;
+        }
+        
+        return $result;
+
+    }
+
+    private function createExportScript($entityMain, $exportFields)
+    {
+        $entityName = $entityMain->getentityName();
+        $objectName = lcfirst($entityName);
+        $headers = array();
+        $data = array();
+        error_log(print_r($exportFields, true));
+        $globals = array();
+        foreach($exportFields as $field)
+        {
+            $caption = PicoStringUtil::upperCamelize($field->getFieldName());
+            if($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getEntity() != null
+            && $field->getReferenceData()->getEntity()->getObjectName() != null
+            && $field->getReferenceData()->getEntity()->getPropertyName() != null
+            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
+            )
+            {
+                $caption = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
+            }
+
+            if($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getMap() != null
+            )
+            {
+                $globals[] = 'global $'.PicoStringUtil::camelize('map_for_'.$field->getFieldName()).';';
+            }
+
+
+            if($field->getElementType() == 'text')
+            {
+                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption."() => ".self::VAR."headerFormat".self::CALL_GET.$caption."()"; 
+            }
+            else
+            {
+                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption."() => ".self::VAR."headerFormat->asString()";
+            }
+
+
+
+            $headers[] = $line1;
+            $line2 = $this->createExportValue($objectName, $field);          
+            $data[] = $line2;
+
+        }
+
+return 'if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = new XLSXDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		'.implode(",\n\t\t", $headers).'
+	), 
+	function($index, $row, $appLanguage){
+        '.implode("\n\t\t", $globals).'
+		return array(
+			sprintf("%d", $index + 1),
+			'.implode(",\n\t\t\t", $data).'
+		);
+	});
+	exit();
+}';
+    }
+
     /**
      * Create GUI LIST section 
      *
@@ -1112,7 +1259,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
      * @param array $sortable
      * @return string
      */
-    public function createGuiList($entityMain, $listFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable) //NOSONAR
+    public function createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable) //NOSONAR
     {
         $entityName = $entityMain->getentityName();
         $primaryKey = $entityMain->getPrimaryKey();
@@ -1220,6 +1367,10 @@ catch(Exception $e)
 
         // before script
         $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable);
+        if($this->appFeatures->isExportToExcel())
+        {
+            $getData[] = $this->createExportScript($entityMain, $exportFields);
+        }
 
         if($this->ajaxSupport)
         {

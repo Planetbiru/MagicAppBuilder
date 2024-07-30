@@ -899,6 +899,7 @@ function generateScript(selector) {
         referenceData: referenceData,
         referenceFilter: referenceFilter,
       };
+      console.log(field)
       fields.push(field);
     });
 
@@ -906,6 +907,7 @@ function generateScript(selector) {
   let requireApproval = $("#with_approval")[0].checked && true;
   let withTrash = $("#with_trash")[0].checked && true;
   let manualSortOrder = $("#manualsortorder")[0].checked && true;
+  let exportToExcel = $("#export_to_excel")[0].checked && true;
   let activateDeactivate = $("#activate_deactivate")[0].checked && true;
   let withApprovalNote = $("#with_approval_note")[0].checked && true;
   let approvalPosition = $('[name="approval_position"]:checked').val();
@@ -941,6 +943,7 @@ function generateScript(selector) {
     subquery: subquery,
     activateDeactivate: activateDeactivate,
     sortOrder: manualSortOrder,
+    exportToExcel: exportToExcel,
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
     trashRequired: withTrash,

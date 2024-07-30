@@ -348,6 +348,11 @@ class ScriptGenerator
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);      
+        if($appFeatures->isExportToExcel())
+        {
+            $uses[] = "use MagicApp\\XLSX\\XLSXDocumentWriter;";
+            $uses[] = "use MagicApp\\XLSX\\XLSXDataFormat;";
+        }
         
         $uses[] = "";
         
@@ -409,7 +414,7 @@ class ScriptGenerator
             $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields, $approvalRequired, $entityApproval); 
             $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired, $entityApproval); 
             $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
-            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
         }
         else
         {
@@ -428,7 +433,7 @@ class ScriptGenerator
             $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
             $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields); 
             $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData); 
-            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
         }
         
         // prepare CRUD section end
