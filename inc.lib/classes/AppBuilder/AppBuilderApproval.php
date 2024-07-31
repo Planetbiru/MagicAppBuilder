@@ -215,6 +215,8 @@ class AppBuilderApproval extends AppBuilderBase
         $objectName = lcfirst($entityName);
         $lines = array();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($pkName);
+        $fieldWaitingFor = $this->getentityInfo()->getWaitingFor();
+        $camelWaitingFor = PicoStringUtil::camelize($fieldWaitingFor);
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->getentityInfo()->getWaitingFor());
         $waitingFor = str_replace('UserAction', 'WaitingFor', $userAction);
 
@@ -234,15 +236,21 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()".parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR."rowId))";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()".parent::CALL_SET.$upperWaitingFor."(WaitingFor::NOTHING))";
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."PicoSpecification::getInstance()";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->equals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getWaitingFor())).", WaitingFor::NOTHING))";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->equals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getWaitingFor())).", null))";
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
 
         if($waitingForValue == WaitingFor::ACTIVATE)
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", true))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
         }
         else if($waitingForValue == WaitingFor::DEACTIVATE)
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", false))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
