@@ -156,26 +156,31 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
-            
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."try";    
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($withTrash)
         {
             $entityTrashName = $trashEntity->getEntityName();
             $objectTrashName = lcfirst($entityTrashName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->findOneBy".$upperPkName."(".parent::VAR."rowId);";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectNameBk."->hasValue".$upperPkName."())";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;       
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectTrashName, $entityTrashName, $objectNameBk);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_INSERT_END;
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->delete();";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->findOneBy".$upperPkName."(".parent::VAR."rowId);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectNameBk."->hasValue".$upperPkName."())";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;       
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectTrashName, $entityTrashName, $objectNameBk);
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_INSERT_END;
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->delete();";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->deleteOneBy".$upperPkName."(".parent::VAR."rowId);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->deleteOneBy".$upperPkName."(".parent::VAR."rowId);";
         }   
-            
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception \$e)";    
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
@@ -210,16 +215,6 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->countableCheckedRowId())";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        
-        
-        /*
-        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
-        $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperPkName."(".parent::VAR."rowId)->set".$upperActivationKey."($act)->update();";
-        $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
-        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
-        */
 
         $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
@@ -231,15 +226,15 @@ class AppBuilder extends AppBuilderBase
 
             
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(Field::of()->".$pkName.", ".parent::VAR."rowId))";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".$this->getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
 
         if($activationValue)
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", true))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->".$this->entityInfo->getActive().", false))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
@@ -258,7 +253,7 @@ class AppBuilder extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here when record is not found";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
 
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
