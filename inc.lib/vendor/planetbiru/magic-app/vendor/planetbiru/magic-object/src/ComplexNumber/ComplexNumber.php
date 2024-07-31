@@ -20,8 +20,8 @@ class ComplexNumber {
     /**
      * Constructor
      *
-     * @param double $real
-     * @param double $imaginary
+     * @param double $real Real value
+     * @param double $imaginary Imaginary value
      */
     public function __construct($real, $imaginary) { 
         $this->real = $real; 

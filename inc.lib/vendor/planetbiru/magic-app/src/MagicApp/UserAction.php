@@ -19,15 +19,16 @@ class UserAction
     const USER_ACTION       = "user_action";
     const NEXT_ACTION       = "next_action";
     const SPECIAL_ACTION    = "special_action";
+    const EXPORT            = "export";
 
     public static function isRequireApproval($waitingFor)
     {
-        return (isset($waitingFor) && $waitingFor != WaitingFor::NOTHING);
+        return isset($waitingFor) && $waitingFor != WaitingFor::NOTHING;
     }
 
     public static function isRequireNextAction($inputGet)
     {
-        return (isset($inputGet) && $inputGet->getNextAction() != null);
+        return isset($inputGet) && $inputGet->getNextAction() != null;
     }
 
     public static function getWaitingForMessage($appLanguage, $waitingFor)

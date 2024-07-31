@@ -1,8 +1,6 @@
 <?php
 namespace MagicObject\Database;
 
-use MagicObject\Exceptions\InvalidParameterException;
-
 class PicoPage
 {
     /**
@@ -35,9 +33,10 @@ class PicoPage
         {
             $pageSize = 1;
         }
-        if (!is_int($pageNumber) || !is_int($pageSize)) {
-            throw new InvalidParameterException("Page number and page size and must an integer");
-        }
+
+        $pageNumber = intval($pageNumber);
+        $pageSize = intval($pageSize);
+        
         $this->setPageNumber($pageNumber);
         $this->setPageSize($pageSize);
     }

@@ -54,6 +54,8 @@ class PicoTableInfo
      * @var array
      */
     protected $notNullColumns = array();
+    
+    protected $columnType;
 
     /**
      * Get instance
@@ -150,7 +152,6 @@ class PicoTableInfo
     public function setColumns($columns)
     {
         $this->columns = $columns;
-
         return $this;
     }
 

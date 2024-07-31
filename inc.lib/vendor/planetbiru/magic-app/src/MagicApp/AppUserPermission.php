@@ -207,7 +207,14 @@ class AppUserPermission
 
         if(!$this->currentModule->getAppModule()->hasValueModuleId())
         {
-            $this->currentModule->getAppModule()->findOneByModuleCode($this->currentModule->getModuleName());
+            try
+            {
+                $this->currentModule->getAppModule()->findOneByModuleCode($this->currentModule->getModuleName());
+            }
+            catch(Exception $e)
+            {
+                // do nothing
+            }
         }
 
         if(!isset($userAction) || empty($userAction))

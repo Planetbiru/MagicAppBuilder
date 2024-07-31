@@ -307,39 +307,6 @@ class PicoPredicate //NOSONAR
     {
         return "%".$value."%";
     }
-    
-    /**
-     * Generate LEFT LIKE wildcard
-     *
-     * @param string $value
-     * @return string
-     */
-    public static function generateLeftLike($value)
-    {
-        return "%".$value;
-    }
-    
-    /**
-     * Generate CENTER LIKE wildcard
-     *
-     * @param string $value
-     * @return string
-     */
-    public static function generateCenterLike($value)
-    {
-        return "%".$value."%";
-    }
-    
-    /**
-     * Generate RIGHT LIKE wildcard
-     *
-     * @param string $value
-     * @return string
-     */
-    public static function generateRightLike($value)
-    {
-        return $value."%";
-    }
 
     /**
      * Magic method

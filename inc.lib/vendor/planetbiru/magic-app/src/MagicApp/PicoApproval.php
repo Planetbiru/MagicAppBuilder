@@ -3,6 +3,8 @@
 namespace MagicApp;
 
 use Exception;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
 
@@ -288,7 +290,11 @@ class PicoApproval
      */
     private function approveUpdate($entityApv, $columToBeCopied)
     {
+        $tableInfo = $this->entity->tableInfo();
+        $pimaryKeys = array_keys($tableInfo->getPrimaryKeys());
         $approvalId = $this->entity->get($this->entityInfo->getApprovalId());
+        $pimaryKeyName = $pimaryKeys[0];
+        $oldPrimaryKeyValue = $this->entity->get($pimaryKeyName);
         if($approvalId != null)
         {
             // copy database connection from entity to entityApv
@@ -298,17 +304,21 @@ class PicoApproval
                 $entityApv->find($approvalId);
                 $values = $entityApv->valueArray();
                 $updated = 0;
+                $specs = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals($pimaryKeyName, $oldPrimaryKeyValue));
+                $updater = $this->entity->where($specs);
                 foreach($values as $field=>$value)
                 {
                     if(in_array($field, $columToBeCopied))
                     {
-                        $this->entity->set($field, $value);
+                        //$this->entity->set($field, $value);
+                        $updater->set($field, $value);
                         $updated++;
                     }
                 }
                 if($updated > 0)
                 {
-                    $this->entity->update();
+                    //$this->entity->update();
+                    $updater->update();
                 }
                 $entityApv->set($this->entityApvInfo->getApprovalStatus(), self::APPROVAL_REJECT)->update();
                 $this->entity

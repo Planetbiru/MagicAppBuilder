@@ -66,7 +66,7 @@ For large applications, users can scale the database and storage. So that a user
 
 # Stable Version
 
-Stable version of MagicObject is `1.15.11` or above. Please don't install versions bellow it.
+Stable version of MagicObject is `1.16.1` or above. Please don't install versions bellow it.
 
 # Tutorial
 
@@ -158,6 +158,6 @@ $cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true, true);
 Applications that uses **MagicObjects** are :
 
 1. **Music Production Manager** https://github.com/kamshory/MusicProductionManager
-2. **AppBuilder** https://github.com/Planetbiru/MagicAppBuilder
+2. **AppBuilder** https://github.com/Planetbiru/AppBuilder
 3. **Koperasi-Simpan-Pinjam-Syariah** https://github.com/kamshory/Koperasi-Simpan-Pinjam-Syariah
 4. **Toserba Online** https://toserba-online.top/
