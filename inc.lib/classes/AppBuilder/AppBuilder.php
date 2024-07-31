@@ -112,7 +112,7 @@ class AppBuilder extends AppBuilderBase
         {
             $lines[] = ''; 
             $lines[] = parent::TAB1.'// update primary key value';      
-            $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->'.PicoStringUtil::camelize($primaryKeyName).', $inputPost->get'.$upperPrimaryKeyName.'()));';
+            $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.$this->getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
                 
             $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
             $lines[] = parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
