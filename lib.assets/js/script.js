@@ -228,7 +228,13 @@ function getReferenceResource() {
   `;
 }
 
-$(document).ready(function () {
+jQuery(function(){
+  $(document).on('click', '#vscode', function(){
+    let dir = $('#current_application option:selected').attr('data-directory');
+    let lnk = 'vscode://file/'+dir;
+    window.location = lnk;
+  });
+
   $(document).on("click", "#load_table", function (e) {
     e.preventDefault();
     loadTable();
@@ -1886,7 +1892,6 @@ function getSortableData() {
 }
 
 function setAdditionalOutputData(data) {
-  let result = [];
   let selector = '[data-name="additional-output"]';
   let table = $(selector);
   let additional = data.entity.additionalOutput;
@@ -1930,9 +1935,11 @@ function setMapData(data) {
   let keys = [];
   data.map = data.map ? data.map : [];
   let map = data.map;
+  let mapKey = [];
   if (map.length > 0) {
     let map0 = map[0];
     let objLength = 0;
+    let j = 0;
     for (let i in map0) {
       if (map0.hasOwnProperty(i)) {
         objLength++;
@@ -1941,6 +1948,7 @@ function setMapData(data) {
         }
         if (i != "value" && i != "label" && i != "default") {
           keys.push(i);
+          mapKey[j] = i;
         }
       }
     }
@@ -1976,7 +1984,8 @@ function setMapData(data) {
 
       for (let k in keys) {
         let j = parseInt(k) + 1;
-        tr.find(".map-value:nth-child(" + j + ")").val(map[i][keys[k]]);
+        let refValue = map[i][keys[k]];
+        tr.find(".map-value:nth-child(" + j + ")").val(refValue);
       }
     }
   }

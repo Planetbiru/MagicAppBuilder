@@ -3166,12 +3166,14 @@ $subqueryMap = '.$referece.';
     {
         foreach($map as $opt)
         {
+            error_log($opt);
             $value = $opt->getValue();
             $caption = $this->buildCaption($opt->getLabel());
             $option = $dom->createElement('option');
             $option->setAttribute('value', $value);
             $textLabel = $dom->createTextNode($caption);
             $option->appendChild($textLabel);
+            $option = $this->addSelectAttribute($option, $opt);
             if($selected != null)
             {
                 $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
@@ -3185,6 +3187,33 @@ $subqueryMap = '.$referece.';
             $input->appendChild($option);
         }
         $input->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+        return $input;
+    }
+
+    /**
+     * Create insert form table
+     *
+     * @param DOMElement $input
+     * @param MagicObject $opt
+     * @return DOMElement
+     */
+    private function addSelectAttribute($input, $opt)
+    {
+        $reserved = array('value', 'label', 'default');
+        $arr = $opt->valueArray();
+        foreach($arr as $key=>$value)
+        {
+            if(!in_array($key, $reserved))
+            {
+                $att = PicoStringUtil::snakeize($key);
+                $att = str_replace('_', '-', $att);
+                if(!PicoStringUtil::startsWith($att, '-data'))
+                {
+                    $att = "data-$att";
+                }
+                $input->setAttribute($att, $this->buildCaption($value));
+            }
+        }
         return $input;
     }
 

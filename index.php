@@ -24,7 +24,7 @@ require_once __DIR__ . "/inc.app/navs.php";
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
@@ -201,16 +201,6 @@ require_once __DIR__ . "/inc.app/navs.php";
                   </div>
                 </div>
               </div>
-
-              <script>
-                jQuery(function(){
-                  $(document).on('click', '#vscode', function(){
-                    let dir = $('#current_application option:selected').attr('data-directory');
-                    let lnk = 'vscode://file/'+dir;
-                    window.location = lnk;
-                  });
-                })
-              </script>
 
               <div id="accordion" class="accordion">
                 <div class="card">
