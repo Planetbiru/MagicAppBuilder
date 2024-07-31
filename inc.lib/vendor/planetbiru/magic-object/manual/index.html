@@ -1954,21 +1954,21 @@ function createAlbumSpecification($inputGet)
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesificationTitle-&gt;addOr($predicate1);
 
             $predicate2 = new PicoPredicate();
-            $predicate2-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesificationTitle-&gt;addOr($predicate2);
         }
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate3 = new PicoPredicate();
-            $predicate3-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+            $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
             $spesificationTitle-&gt;addOr($predicate3);
 
             $predicate4 = new PicoPredicate();
-            $predicate4-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+            $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
             $spesificationTitle-&gt;addOr($predicate4);
         }
 
@@ -2062,14 +2062,14 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+            $predicate1-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2124,7 +2124,7 @@ class SpecificationUtil
         if($inputGet-&gt;getProducerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('producer.name', PicoPredicate::generateCenterLike($inputGet-&gt;getProducerName()));
+            $predicate1-&gt;like('producer.name', PicoPredicate::generateLikeContians($inputGet-&gt;getProducerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2135,21 +2135,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2159,7 +2159,7 @@ class SpecificationUtil
         if($inputGet-&gt;getSubtitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('subtitle', PicoPredicate::generateCenterLike($inputGet-&gt;getSubtitle()));
+            $predicate1-&gt;like('subtitle', PicoPredicate::generateLikeContians($inputGet-&gt;getSubtitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2173,7 +2173,7 @@ class SpecificationUtil
         if($inputGet-&gt;getVocalistName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('vocalist.name', PicoPredicate::generateCenterLike($inputGet-&gt;getVocalistName()));
+            $predicate1-&gt;like('vocalist.name', PicoPredicate::generateLikeContians($inputGet-&gt;getVocalistName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2187,7 +2187,7 @@ class SpecificationUtil
         if($inputGet-&gt;getComposerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('composer.name', PicoPredicate::generateCenterLike($inputGet-&gt;getComposerName()));
+            $predicate1-&gt;like('composer.name', PicoPredicate::generateLikeContians($inputGet-&gt;getComposerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2201,7 +2201,7 @@ class SpecificationUtil
         if($inputGet-&gt;getArrangerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('arranger.name', PicoPredicate::generateCenterLike($inputGet-&gt;getArrangerName()));
+            $predicate1-&gt;like('arranger.name', PicoPredicate::generateLikeContians($inputGet-&gt;getArrangerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2273,7 +2273,7 @@ class SpecificationUtil
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+            $predicate1-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2328,21 +2328,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2399,7 +2399,7 @@ class SpecificationUtil
         if($inputGet-&gt;getLyric() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('lyric', PicoPredicate::generateCenterLike($inputGet-&gt;getLyric()));
+            $predicate1-&gt;like('lyric', PicoPredicate::generateLikeContians($inputGet-&gt;getLyric()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2439,21 +2439,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateCenterLike($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2489,7 +2489,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2515,7 +2515,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2541,7 +2541,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2567,21 +2567,21 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateCenterLike($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getUsername() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('username', PicoPredicate::generateCenterLike($inputGet-&gt;getUsername()));
+            $predicate1-&gt;like('username', PicoPredicate::generateLikeContians($inputGet-&gt;getUsername()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getEmail() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('email', PicoPredicate::generateCenterLike($inputGet-&gt;getEmail()));
+            $predicate1-&gt;like('email', PicoPredicate::generateLikeContians($inputGet-&gt;getEmail()));
             $spesification-&gt;addAnd($predicate1);
         }
 

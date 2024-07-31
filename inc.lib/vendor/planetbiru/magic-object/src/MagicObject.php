@@ -1246,7 +1246,7 @@ class MagicObject extends stdClass // NOSONAR
                     $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
-                return $pageData;
+                return $pageData->setFindOption($findOption);
             }
             else
             {
@@ -1311,7 +1311,7 @@ class MagicObject extends stdClass // NOSONAR
                     $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
-                return $pageData;
+                return $pageData->setFindOption($findOption);
             }
             else
             {
@@ -1490,7 +1490,7 @@ class MagicObject extends stdClass // NOSONAR
             {
                 $pageData = new PicoPageData(array(), $startTime);
             }
-            return $pageData;
+            return $pageData->setFindOption(self::FIND_OPTION_DEFAULT);
         }
         catch(Exception $e)
         {

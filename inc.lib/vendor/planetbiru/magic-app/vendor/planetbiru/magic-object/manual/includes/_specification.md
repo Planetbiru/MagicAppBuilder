@@ -72,6 +72,6 @@ lessThanOrEquals
 greaterThanOrEquals
 
 Static Methods:
-generateLeftLike
-generateCenterLike
-generateRightLike
+generateLikeStarts
+generateLikeEnds
+generateLikeContians

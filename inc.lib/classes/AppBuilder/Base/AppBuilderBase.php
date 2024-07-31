@@ -1180,7 +1180,6 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         $objectName = lcfirst($entityName);
         $headers = array();
         $data = array();
-        error_log(print_r($exportFields, true));
         $globals = array();
         foreach($exportFields as $field)
         {

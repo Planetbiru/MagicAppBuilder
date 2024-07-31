@@ -360,7 +360,7 @@ class PicoSpecification
                     }
                     else
                     {
-                        $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateCenterLike(strtolower($filterValue))));
+                        $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateLikeContians(strtolower($filterValue))));
                     }
                 }
             }
@@ -385,7 +385,7 @@ class PicoSpecification
             {
                 $specification->addAnd(
                     PicoPredicate::getInstance()
-                        ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateCenterLike(strtolower($word)))
+                        ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateLikeContians(strtolower($word)))
                 );
             }
         }
