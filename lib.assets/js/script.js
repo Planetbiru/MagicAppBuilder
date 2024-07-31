@@ -73,7 +73,7 @@ function getReferenceResource() {
 	<div class="reference-container">
 	  <div class="reference-section entity-section">
 		<h4>Entity</h4>
-		<table data-name="entity" class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+		<table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tbody>
 			<tr>
 			  <td>Entity Name</td>
@@ -106,7 +106,7 @@ function getReferenceResource() {
 		  </tbody>
 		</table>
 		<h4>Option Node</h4>
-		<table data-name="entity" class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+		<table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tbody>
 		  <tr>
 		  <td>Format and Pamareters</td>
@@ -1751,6 +1751,24 @@ function removeLastColumn(table) {
 
 function selectReferenceType(data) {
   let referenceType = data.type ? data.type : "entity";
+  let obj = $('#modal-create-reference-data .modal-dialog');
+  if(referenceType == 'entity' || referenceType == 'map')
+  {
+    obj.addClass('modal-lg');
+    if(obj.hasClass('modal-md'))
+    {
+      obj.removeClass('modal-md');
+    }
+  }
+  else
+  {
+    obj.addClass('modal-md');
+    if(obj.hasClass('modal-lg'))
+    {
+      obj.removeClass('modal-lg');
+    }
+  }
+  
   if ($('.reference_type[value="' + referenceType + '"]').length > 0) {
     $('.reference_type[value="' + referenceType + '"]')[0].checked = true;
   }

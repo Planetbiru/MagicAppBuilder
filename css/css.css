@@ -129,11 +129,16 @@ button {
 	margin: auto;
 }
 
-.config-table td {
+.modal-table{
+	width: 100%;
+	margin: auto;	
+}
+
+.config-table td, .modal-table td {
 	padding: 4px 0;
 }
 
-.config-table tbody>tr:nth-child(1)>td:nth-child(1) {
+.config-table tbody>tr:nth-child(1)>td:nth-child(1), .modal-table tbody>tr:nth-child(1)>td:nth-child(1) {
 	width: 200px;
 }
 
@@ -290,4 +295,7 @@ li.file-syntax-error a {
 
 .highlight-line {
 	background-color: #e8f2ff;
+}
+#modal-create-reference-data .modal-dialog{
+	transition: max-width ease-in-out 0.24s;
 }

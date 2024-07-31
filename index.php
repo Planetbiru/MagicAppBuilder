@@ -24,7 +24,7 @@ require_once __DIR__ . "/inc.app/navs.php";
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
@@ -156,7 +156,6 @@ require_once __DIR__ . "/inc.app/navs.php";
                 <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
                   <div class="card-body">
                     <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td>Current Application</td>
                           <td>
