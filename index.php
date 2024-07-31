@@ -172,7 +172,7 @@ require_once __DIR__ . "/inc.app/navs.php";
                                     $selected = '';
                                   }
                               ?>
-                                  <option value="<?php echo $app['id']; ?>" <?php echo $selected; ?>><?php echo $app['name']; ?></option>
+                                  <option value="<?php echo $app['id']; ?>" data-directory="<?php echo str_replace("\\", "/", $app['documentRoot']);?>" <?php echo $selected; ?>><?php echo $app['name']; ?></option>
                               <?php
                                 }
                               }
@@ -187,6 +187,10 @@ require_once __DIR__ . "/inc.app/navs.php";
                               Apply
                             </button>
 
+                            <button type="button" class="btn btn-success" id="vscode">
+                              Open in VS Code
+                            </button>
+
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-create-application">
                               Create New
                             </button>
@@ -197,6 +201,16 @@ require_once __DIR__ . "/inc.app/navs.php";
                   </div>
                 </div>
               </div>
+
+              <script>
+                jQuery(function(){
+                  $(document).on('click', '#vscode', function(){
+                    let dir = $('#current_application option:selected').attr('data-directory');
+                    let lnk = 'vscode://file/'+dir;
+                    window.location = lnk;
+                  });
+                })
+              </script>
 
               <div id="accordion" class="accordion">
                 <div class="card">

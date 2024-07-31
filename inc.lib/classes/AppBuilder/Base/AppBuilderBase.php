@@ -413,30 +413,6 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create element submit button
-     *
-     * @param DOMDocument $dom
-     * @return DOMElement
-     */
-    private function createSubmitButton($dom, $value, $name = null, $id = null, $caption = null)
-    {
-        $input = $dom->createElement('button');
-        $input->setAttribute('type', 'submit');
-        $input->setAttribute('class', ElementClass::BUTTON_SUCCESS);
-        if($name != null)
-        {
-            $input->setAttribute('name', $name);
-        }
-        if($id != null)
-        {
-            $input->setAttribute('id', $id);
-        }
-        $input->setAttribute('value', $value);
-        $input->appendChild($dom->createTextNode($caption));
-        return $input;
-    }
-    
-    /**
      * Create element cancel button
      *
      * @param DOMDocument $dom
@@ -524,7 +500,7 @@ class AppBuilderBase //NOSONAR
      * @param MagicObject $approvalEntity
      * @return string
      */
-    public function createGuiInsert($mainEntity, $fields, $approvalRequired = false, $approvalEntity = null)
+    public function createGuiInsert($mainEntity, $fields)
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
@@ -574,7 +550,7 @@ class AppBuilderBase //NOSONAR
      * @param MagicObject $approvalEntity
      * @return string
      */
-    public function createGuiUpdate($mainEntity, $fields, $approvalRequired = false, $approvalEntity = null)
+    public function createGuiUpdate($mainEntity, $fields, $approvalRequired = false)
     {
         
         $entityName = $mainEntity->getEntityName();
@@ -588,7 +564,7 @@ class AppBuilderBase //NOSONAR
         
         $table1 = $this->createUpdateFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName);      
 
-        $table2 = $this->createButtonContainerTableUpdate($dom, "save-update", "save-update", 'UserAction::UPDATE', $objectName, $primaryKeyName);
+        $table2 = $this->createButtonContainerTableUpdate($dom, $objectName, $primaryKeyName);
 
         $form->appendChild($table1);
         $form->appendChild($table2);
@@ -797,7 +773,7 @@ class AppBuilderBase //NOSONAR
 
         $objectName = lcfirst($entityName);
         
-        $htmlDetail = $this->createTableDetail($mainEntity, $objectName, $appFields, $primaryKeyName);
+        $htmlDetail = $this->createTableDetail($objectName, $appFields, $primaryKeyName);
 
         $htmlDetailCompare = $this->createTableDetailCompare($mainEntity, $objectName, $appFields, $primaryKeyName, $approvalEntity, $objectApprovalName);
 
@@ -905,7 +881,7 @@ class AppBuilderBase //NOSONAR
 
         $objectName = lcfirst($entityName);
         
-        $htmlDetail = $this->createTableDetail($mainEntity, $objectName, $appFields, $primaryKeyName);
+        $htmlDetail = $this->createTableDetail($objectName, $appFields, $primaryKeyName);
 
         $getData = array();
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
@@ -963,19 +939,18 @@ class AppBuilderBase //NOSONAR
     /**
      * Undocumented function
      *
-     * @param MagicObject $mainEntity
      * @param string $objectName
      * @param AppField[] $appFields
      * @param string $primaryKeyName
      * @return string
      */
-    public function createTableDetail($mainEntity, $objectName, $appFields, $primaryKeyName)
+    public function createTableDetail($objectName, $appFields, $primaryKeyName)
     {
         $dom = new DOMDocument();
         
         $formDetail = $this->createElementForm($dom, 'detailform');
-        $tableDetail1 = $this->createDetailTable($dom, $mainEntity, $objectName, $appFields, $primaryKeyName);
-        $tableDetail2 = $this->createButtonContainerTableDetail($dom, "save-update", "save-update", 'UserAction::DETAIL', $objectName, $primaryKeyName);
+        $tableDetail1 = $this->createDetailTable($dom, $objectName, $appFields);
+        $tableDetail2 = $this->createButtonContainerTableDetail($dom, $objectName, $primaryKeyName);
 
         
 
@@ -993,37 +968,13 @@ if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($
         $dom->appendChild($dom->createTextNode($approval));
         $formDetail->appendChild($tableDetail1);
 
-        /*
-        $formDetail->appendChild($dom->createTextNode(base64_encode(str_replace("\r\n", "\n", '<?php
-if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()))
-{?>'))));
-        */
-
-
 
         $formDetail->appendChild($tableDetail2);
 
-        /*
-        $formDetail->appendChild($dom->createTextNode(base64_encode(str_replace("\r\n", "\n", '<?php
-}
-else
-{
-?>'))));        
-        */
         $formDetail->appendChild($tableDetail2);
-        /*
-        $formDetail->appendChild($dom->createTextNode(base64_encode(str_replace("\r\n", "\n", '<?php
-}
-else
-{
-?>'))));    
-        */
+
         $dom->appendChild($formDetail);
-        /*
-        $formDetail->appendChild($dom->createTextNode(base64_encode(str_replace("\r\n", "\n", '<?php
-}
-?>'))));  
-        */
+
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
@@ -1055,9 +1006,7 @@ else
         $dom = new DOMDocument();
         
         $formDetail = $this->createElementForm($dom, 'detailform');
-        
-        $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
-        
+                
         $div = $dom->createElement('div');
         $div->setAttribute('class', 'alert alert-info');
             
@@ -1077,7 +1026,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         $formDetail->appendChild($div);
         
         $tableDetail1 = $this->createDetailTableCompare($dom, $mainEntity, $objectName, $appFields, $primaryKeyName, $approvalEntity, $objectApprovalName);
-        $tableDetail2 = $this->createButtonContainerTableApproval($dom, "save-update", "save-update", '$inputGet->getNextAction()', $objectName, $primaryKeyName);
+        $tableDetail2 = $this->createButtonContainerTableApproval($dom, $objectName, $primaryKeyName);
 
         $formDetail->appendChild($tableDetail1);
         $formDetail->appendChild($tableDetail2);
@@ -1268,7 +1217,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $filterSection->setAttribute('class', 'filter-section');
         
         $filterSection->appendChild($dom->createTextNode("\n\t"));      
-        $filterSection->appendChild($this->createFilterForm($dom, $listFields, $filterFields));
+        $filterSection->appendChild($this->createFilterForm($dom, $filterFields));
         $filterSection->appendChild($dom->createTextNode("\n"));
         
         $dataSection = $dom->createElement('div');
@@ -1311,7 +1260,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $dataSection->appendChild($pagination1);
         $dataSection->appendChild($dom->createTextNode("\n\t")); 
         
-        $dataSection->appendChild($this->createDataList($dom, $listFields, $objectName, $primaryKey, $sortOrder, $approvalRequired));
+        $dataSection->appendChild($this->createDataList($dom, $listFields, $objectName, $primaryKey, $approvalRequired));
         
         $dataSection->appendChild($dom->createTextNode("\n")); 
         $dataSection->appendChild($pagination2);
@@ -1673,7 +1622,7 @@ $subqueryMap = '.$referece.';
      * @param boolean $approvalRequired
      * @return DOMElement
      */
-    public function createDataList($dom, $listFields, $objectName, $primaryKey, $sortOrder, $approvalRequired)
+    public function createDataList($dom, $listFields, $objectName, $primaryKey, $approvalRequired)
     {
         $form = $dom->createElement('form');
         $form->setAttribute('action', '');
@@ -1799,7 +1748,7 @@ $subqueryMap = '.$referece.';
         $table->setAttribute('class', 'table table-row table-sort-by-column');
         
         
-        $thead = $this->createTableListHead($dom, $listFields, $objectName, $primaryKey, $approvalRequired);
+        $thead = $this->createTableListHead($dom, $listFields, $primaryKey, $approvalRequired);
         $tbody = $this->createTableListBody($dom, $listFields, $objectName, $primaryKey, $approvalRequired);
         
         $table->appendChild($dom->createTextNode("\n\t\t\t\t")); 
@@ -1825,7 +1774,7 @@ $subqueryMap = '.$referece.';
      * @param boolean $approvalRequired
      * @return DOMElement
      */
-    public function createTableListHead($dom, $listFields, $objectName, $primaryKey, $approvalRequired = false)
+    public function createTableListHead($dom, $listFields, $primaryKey, $approvalRequired = false)
     {
         
         $thead = $dom->createElement('thead');
@@ -2236,11 +2185,10 @@ $subqueryMap = '.$referece.';
      * Create filter
      *
      * @param DOMDocument $dom
-     * @param AppField[] $listFields
      * @param AppField[] $filterFields
      * @return DOMElement
      */
-    public function createFilterForm($dom, $listFields, $filterFields)
+    public function createFilterForm($dom, $filterFields)
     {
         $form = $dom->createElement('form');
         $form->setAttribute('action', '');
@@ -2440,9 +2388,7 @@ $subqueryMap = '.$referece.';
                 $select = $dom->createElement('select');
                 $select->setAttribute('name', $field->getFieldName());
                 $select->setAttribute('class', 'form-control');
-                
-                $objectName = lcfirst($this->getObjectNameFromFieldName($field->getFieldName()));
-                
+                                
                 $inputGetName = PicoStringUtil::upperCamelize($field->getFieldName());
 
                 $referenceFilter = $field->getReferenceFilter();
@@ -2456,15 +2402,12 @@ $subqueryMap = '.$referece.';
                 $value->appendChild($textLabel);
                 $select->appendChild($dom->createTextNode("\n\t\t\t\t\t\t"));
                 $select->appendChild($value);
-                $select = $this->appendOption($dom, $select, $objectName, $field, $referenceFilter, self::VAR."inputGet".self::CALL_GET.$inputGetName."()");
+                $select = $this->appendOption($dom, $select, $referenceFilter, self::VAR."inputGet".self::CALL_GET.$inputGetName."()");
 
+                $filterGroup->appendChild($dom->createTextNode("\n\t\t\t"));               
+                $filterGroup->appendChild($labelWrapper);               
                 $filterGroup->appendChild($dom->createTextNode("\n\t\t\t"));
-                
-                $filterGroup->appendChild($labelWrapper);
-                
-                $filterGroup->appendChild($dom->createTextNode("\n\t\t\t"));
-                
-                
+
                 $inputWrapper = $dom->createElement('span');
                 $inputWrapper->setAttribute('class', 'filter-control');
                 $inputWrapper->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
@@ -2472,20 +2415,13 @@ $subqueryMap = '.$referece.';
                 $inputWrapper->appendChild($dom->createTextNode("\n\t\t\t"));
                 
                 $filterGroup->appendChild($inputWrapper);
-                                
-                
-                $filterGroup->appendChild($dom->createTextNode("\n\t\t"));
-                
+                $filterGroup->appendChild($dom->createTextNode("\n\t\t")); 
 
-                
                 $form->appendChild($filterGroup);
                 
                 $form->appendChild($dom->createTextNode("\n\t\t"));
-            }
-            
-            
+            }  
         }
-        
         return $form;
     }
     
@@ -2557,13 +2493,11 @@ $subqueryMap = '.$referece.';
      * Create detail table
      *
      * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
      * @param string $objectName
      * @param AppField[] $fields
-     * @param string $primaryKeyName
      * @return DOMElement
      */
-    private function createDetailTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName)
+    private function createDetailTable($dom, $objectName, $fields)
     {
         $table = $this->createElementTableResponsive($dom);
         $tbody = $dom->createElement('tbody');
@@ -2571,7 +2505,7 @@ $subqueryMap = '.$referece.';
         {
             if($field->getIncludeDetail())
             {
-                $tr = $this->createDetailRow($dom, $mainEntity, $objectName, $field, $primaryKeyName);
+                $tr = $this->createDetailRow($dom, $objectName, $field);
                 $tbody->appendChild($tr);
             }
         }
@@ -2618,7 +2552,7 @@ $subqueryMap = '.$referece.';
         {
             if($field->getIncludeDetail())
             {
-                $tr = $this->createDetailCompareRow($dom, $mainEntity, $objectName, $field, $primaryKeyName, $approvalEntity, $objectApprovalName);
+                $tr = $this->createDetailCompareRow($dom, $objectName, $field, $objectApprovalName);
                 $tbody->appendChild($tr);
             }
         }
@@ -2661,7 +2595,7 @@ $subqueryMap = '.$referece.';
 
         $td1->appendChild($label);
 
-        $input = $this->createInsertControl($dom, $mainEntity, $objectName, $field, $primaryKeyName, $field->getFieldName());
+        $input = $this->createInsertControl($dom, $field, $field->getFieldName());
 
         if($input != null)
         {
@@ -2708,7 +2642,7 @@ $subqueryMap = '.$referece.';
 
         $td1->appendChild($label);
 
-        $input = $this->createUpdateControl($dom, $mainEntity, $objectName, $field, $primaryKeyName, $field->getFieldName());
+        $input = $this->createUpdateControl($dom, $objectName, $field, $primaryKeyName, $field->getFieldName());
 
         if($input != null)
         {
@@ -2725,13 +2659,11 @@ $subqueryMap = '.$referece.';
      * Create detail form table
      *
      * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
      * @param string $objectName
      * @param AppField $field
-     * @param string $primaryKeyName
      * @return DOMElement
      */
-    private function createDetailRow($dom, $mainEntity, $objectName, $field, $primaryKeyName)
+    private function createDetailRow($dom, $objectName, $field)
     {
         $tr = $dom->createElement('tr');
         $td1 = $dom->createElement('td');
@@ -2853,15 +2785,12 @@ $subqueryMap = '.$referece.';
      * Create detail form table
      *
      * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
      * @param string $objectName
      * @param AppField $field
-     * @param string $primaryKeyName
-     * @param MagicObject $approvalEntity
      * @param string $objectApprovalName
      * @return DOMElement
      */
-    private function createDetailCompareRow($dom, $mainEntity, $objectName, $field, $primaryKeyName, $approvalEntity, $objectApprovalName)
+    private function createDetailCompareRow($dom, $objectName, $field, $objectApprovalName)
     {
         $yes = self::VAR."appLanguage->getYes()";
         $no = self::VAR."appLanguage->getNo()";
@@ -2964,14 +2893,11 @@ $subqueryMap = '.$referece.';
      * Create insert form table
      *
      * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
      * @param AppField $field
-     * @param string $primaryKeyName
      * @param string $id
      * @return DOMElement
      */
-    private function createInsertControl($dom, $mainEntity, $objectName, $field, $primaryKeyName, $id = null)
+    private function createInsertControl($dom, $field, $id = null)
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $input = $dom->createElement('input');
@@ -3023,7 +2949,7 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $input->appendChild($value);
             $referenceData = $field->getReferenceData();
-            $input = $this->appendOption($dom, $input, $objectName, $field, $referenceData);
+            $input = $this->appendOption($dom, $input, $referenceData);
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
@@ -3053,14 +2979,13 @@ $subqueryMap = '.$referece.';
      * Create insert form table
      *
      * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
      * @param string $objectName
      * @param AppField $field
      * @param string $primaryKeyName
      * @param string $id
      * @return DOMElement
      */
-    private function createUpdateControl($dom, $mainEntity, $objectName, $field, $primaryKeyName, $id = null)
+    private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null)
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $fieldName = $field->getFieldName();
@@ -3123,7 +3048,7 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $input->appendChild($value);
             $referenceData = $field->getReferenceData();
-            $input = $this->appendOption($dom, $input, $objectName, $field, $referenceData, self::VAR.$objectName.self::CALL_GET.$upperFieldName.'()');
+            $input = $this->appendOption($dom, $input, $referenceData, self::VAR.$objectName.self::CALL_GET.$upperFieldName.'()');
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
@@ -3175,13 +3100,11 @@ $subqueryMap = '.$referece.';
      *
      * @param DOMDocument $dom
      * @param DOMElement $input
-     * @param string $objectName
-     * @param AppField $field
      * @param MagicObject $referenceData
      * @param string $selected
      * @return DOMElement
      */
-    private function appendOption($dom, $input, $objectName, $field, $referenceData, $selected = null)
+    private function appendOption($dom, $input,  $referenceData, $selected = null)
     {
         if($referenceData != null)
         {        
@@ -3217,8 +3140,7 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'entity')
             {      
                 
-                $entity = $referenceData->getEntity();
-                
+                $entity = $referenceData->getEntity();         
                 $specification = $entity->getSpecification();
                 $sortable = $entity->getSortable();
                 $additionalOutput = $entity->getAdditionalOutput();
@@ -3245,7 +3167,7 @@ $subqueryMap = '.$referece.';
         foreach($map as $opt)
         {
             $value = $opt->getValue();
-            $caption = $opt->getLabel();
+            $caption = $this->buildCaption($opt->getLabel());
             $option = $dom->createElement('option');
             $option->setAttribute('value', $value);
             $textLabel = $dom->createTextNode($caption);
@@ -3265,6 +3187,27 @@ $subqueryMap = '.$referece.';
         $input->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
         return $input;
     }
+
+    /**
+     * Build caption for option
+     * @param string $caption Original
+     * @return string Final
+     */
+    private function buildCaption($caption)
+    {
+        $test = trim(preg_replace('/\s+/', '', $caption), " \r\n\t ");
+        if(strpos($test, '{$') === 0)
+        {
+            if(PicoStringUtil::endsWith($test, '}'))
+            {
+                $caption2 = trim($caption);
+                $caption2 = substr($caption2, 1, strlen($caption2) - 2);
+                return '<?php echo '.$caption2.'; ?>';
+            }
+            return '<?php echo "'.addslashes($caption).'"; ?>';
+        }
+        return $caption;
+    }
     
     /**
      * Append option from entiry
@@ -3282,23 +3225,19 @@ $subqueryMap = '.$referece.';
     {
         if($entity != null)
         {
-            
             $paramAdditionalOutput = "";
             if($additionalOutput != null && !empty($additionalOutput))
             {
-                
                 $paramSelected = ($selected != null) ? ", $selected": ", null";
                 $output = array();
                 foreach($additionalOutput as $add)
                 {
                     $output[] = $this->getStringOf(PicoStringUtil::camelize($add->getColumn()));
                 }
-                $paramAdditionalOutput = ', array('.implode(', ', $output).')';
-                
+                $paramAdditionalOutput = ', array('.implode(', ', $output).')';               
             }
             else
             {
-                
                 $paramSelected = ($selected != null) ? ", $selected": "";
             }
             
@@ -3309,18 +3248,8 @@ $subqueryMap = '.$referece.';
             $val = $this->getStringOf(PicoStringUtil::camelize($entity->getValue()));
             $textNodeFormat = $entity->getTextNodeFormat();
             $indent = $entity->getIndent();
-            $format = "";
-            $indentStr = "";
-            if(isset($textNodeFormat) && !empty($textNodeFormat))
-            {
-                $format = self::NEW_LINE_N.self::TAB3.self::TAB3."->setTextNodeFormat('".str_replace("'", "\\'", $textNodeFormat)."')";
-            }
-            if(isset($indent) && !empty($indent))
-            {
-                $indentVal = intval($indent);
-                $indentStr = self::NEW_LINE_N.self::TAB3.self::TAB3."->setIndent($indentVal)";
-            }
-
+            $format = $this->getEntityOptionFormat($textNodeFormat);
+            $indentStr = $this->getIndentString($indent);
             
             $option = $dom->createTextNode(self::NEW_LINE_N.self::TAB3.self::TAB3
             .self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::getInstance()'
@@ -3335,6 +3264,36 @@ $subqueryMap = '.$referece.';
         return $input;
     }
 
+    /**
+     * Get entity option format
+     * @param string $textNodeFormat
+     * @return string
+     */
+    private function getEntityOptionFormat($textNodeFormat)
+    {
+        $format = "";
+        if(isset($textNodeFormat) && !empty($textNodeFormat))
+        {
+            $format = self::NEW_LINE_N.self::TAB3.self::TAB3."->setTextNodeFormat('".str_replace("'", "\\'", $textNodeFormat)."')";
+        }
+        return $format;
+    }
+
+    /**
+     * Get indent string
+     * @param integer $indent
+     * @return string
+     */
+    private function getIndentString($indent)
+    {
+        $indentStr = "";
+        if(isset($indent) && !empty($indent))
+        {
+            $indentVal = intval($indent);
+            $indentStr = self::NEW_LINE_N.self::TAB3.self::TAB3."->setIndent($indentVal)";
+        }
+        return $indentStr;
+    }
     
     /**
      * Build specification
@@ -3540,9 +3499,11 @@ $subqueryMap = '.$referece.';
      * Create button container table for update
      *
      * @param DOMDocument $dom
+     * @param string $objectName
+     * @param string $primaryKeyName
      * @return DOMElement
      */
-    private function createButtonContainerTableUpdate($dom, $name, $id, $userAction, $objectName, $primaryKeyName)
+    private function createButtonContainerTableUpdate($dom, $objectName, $primaryKeyName)
     {
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $table = $this->createElementTableResponsive($dom);
@@ -3594,9 +3555,11 @@ $subqueryMap = '.$referece.';
      * Create button container table
      *
      * @param DOMDocument $dom
+     * @param string $objectName
+     * @param string $primaryKeyName
      * @return DOMElement
      */
-    private function createButtonContainerTableDetail($dom, $name, $id, $userAction, $objectName, $primaryKeyName)
+    private function createButtonContainerTableDetail($dom,  $objectName, $primaryKeyName)
     {
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $table = $this->createElementTableResponsive($dom);
@@ -3683,9 +3646,11 @@ $subqueryMap = '.$referece.';
      * Create button container table for approval
      *
      * @param DOMDocument $dom
+     * @param string $objectName
+     * @param string $primaryKeyName
      * @return DOMElement
      */
-    private function createButtonContainerTableApproval($dom, $name, $id, $userAction, $objectName, $primaryKeyName)
+    private function createButtonContainerTableApproval($dom, $objectName, $primaryKeyName)
     {
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $table = $this->createElementTableResponsive($dom);

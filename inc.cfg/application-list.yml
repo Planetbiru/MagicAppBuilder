@@ -1,7 +1,7 @@
 -
     id: sipro
     name: Sipro
-    documentRoot: 'C:\bitbucket\sipro'
+    documentRoot: 'D:\xampp\htdocs\new-sipro'
     author: Sipro
     selected: true
 -

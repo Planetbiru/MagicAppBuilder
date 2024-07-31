@@ -411,8 +411,8 @@ class ScriptGenerator
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
 
             // GUI
-            $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields, $approvalRequired, $entityApproval); 
-            $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired, $entityApproval); 
+            $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
+            $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
             $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
             $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
         }
