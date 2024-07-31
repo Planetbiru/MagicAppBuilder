@@ -1201,7 +1201,8 @@ function restoreForm(data) {
   cnt = 0;
   selector = '#modal-filter-data tbody tr:last-child';
 
-  while ($('#modal-filter-data tbody tr').length > 1) {
+  while ($('#modal-filter-data tbody tr').length > 1) 
+  {
     $(selector).remove();
   }
   $(selector).find('.data-filter-column-name').val('');
@@ -1319,15 +1320,12 @@ function getSkipedCol() {
   skiped.push($('[name="entity_info_waiting_for"]').val());
   skiped.push($('[name="entity_info_approval_note"]').val());
   skiped.push($('[name="entity_info_approval_id"]').val());
-
   skiped.push($('[name="entity_info_admin_create"]').val());
   skiped.push($('[name="entity_info_admin_edit"]').val());
   skiped.push($('[name="entity_info_admin_ask_edit"]').val());
-
   skiped.push($('[name="entity_info_time_create"]').val());
   skiped.push($('[name="entity_info_time_edit"]').val());
   skiped.push($('[name="entity_info_time_ask_edit"]').val());
-
   skiped.push($('[name="entity_info_ip_create"]').val());
   skiped.push($('[name="entity_info_ip_edit"]').val());
   skiped.push($('[name="entity_info_ip_ask_edit"]').val());
