@@ -600,13 +600,9 @@ jQuery(function(){
   });
 
   loadTable();
-
   updateEntityQuery(false);
   updateEntityFile();
   updateModuleFile();
-
-  if (window.location.hash) {
-  }
 });
 
 function showAlertUI(title, message) {
@@ -747,7 +743,6 @@ function updateEntityQuery(autoload) {
       $('.entity-container-query .entity-list [data-toggle="tooltip"]').tooltip({
         placement: 'top'
       });
-
       let ents = getEntitySelection();
       let merged = $(".entity-merge")[0].checked;
       if (autoload) {
@@ -819,7 +814,6 @@ function updateTableName(
   let masterEntityName = upperCamelize(masterTableName);
   let approvalEntityName = masterEntityName + "Apv";
   let trashEntityName = masterEntityName + "Trash";
-
   let approvalTableName = masterTableName + "_apv";
   let approvalPrimaryKeyName = approvalTableName + "_id";
   let trashTableName = masterTableName + "_trash";
