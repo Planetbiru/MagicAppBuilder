@@ -170,7 +170,7 @@ class PicoEntityLanguage
      * @var boolean $asArrayProps
      * @return array
      */
-    protected function propertyList($asArrayProps = false)
+    public function propertyList($asArrayProps = false)
     {
         $class = new ReflectionClass($this->_entityClassName);
 

@@ -40,11 +40,11 @@ class XLSXDocumentWriter
     /**
      * Write data
      *
-     * @param PicoPageData $pageData
-     * @param string $fileName
-     * @param string $sheetName
-     * @param string[] $headerFormat
-     * @param callable $writerFunction
+     * @param PicoPageData $pageData Page data
+     * @param string $fileName File name
+     * @param string $sheetName Sheet name
+     * @param string[] $headerFormat Data format
+     * @param callable $writerFunction Writer function
      * @return self
      */
     public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction)
@@ -72,10 +72,10 @@ class XLSXDocumentWriter
 
     /**
      * Write data with format
-     * @param XLSXWriter $writer
-     * @param PicoPageData $pageData
-     * @param string $sheetName
-     * @return XLSXWriter
+     * @param XLSXWriter $writer XLSX writter
+     * @param PicoPageData $pageData Page data
+     * @param string $sheetName Sheet name
+     * @return XLSXWriter XLSX writter
      */
     private function writeDataWithoutFormat($writer, $pageData, $sheetName)
     {
@@ -111,10 +111,10 @@ class XLSXDocumentWriter
 
     /**
      * Write header format
-     * @param XLSXWriter $writer
-     * @param string $sheetName
-     * @param string[] $keys
-     * @return XLSXWriter
+     * @param XLSXWriter $writer XLSX writter
+     * @param string $sheetName Sheet name
+     * @param string[] $keys Data keys
+     * @return XLSXWriter XLSX writter
      */
     private function writeHeader($writer, $sheetName, $keys)
     {
@@ -128,11 +128,11 @@ class XLSXDocumentWriter
 
     /**
      * Write header format
-     * @param XLSXWriter $writer
-     * @param string $sheetName
-     * @param string[] $keys
-     * @param MagicObject $row
-     * @return XLSXWriter
+     * @param XLSXWriter $writer XLSX writter
+     * @param string $sheetName Sheet name
+     * @param string[] $keys Data keys
+     * @param MagicObject $row Data row
+     * @return XLSXWriter XLSX writter
      */
     private function writeData($writer, $sheetName, $keys, $row)
     {
@@ -147,12 +147,12 @@ class XLSXDocumentWriter
 
     /**
      * Write data with format
-     * @param XLSXWriter $writer
-     * @param PicoPageData $pageData
-     * @param string $sheetName
-     * @param string[] $headerFormat
-     * @param callable $writerFunction
-     * @return XLSXWriter
+     * @param XLSXWriter $writer XLSX writter
+     * @param PicoPageData $pageData Page data
+     * @param string $sheetName Sheet name
+     * @param string[] $headerFormat Data format
+     * @param callable $writerFunction Writer function
+     * @return XLSXWriter XLSX writter
      */
     private function writeDataWithFormat($writer, $pageData, $sheetName, $headerFormat, $writerFunction)
     {
@@ -205,7 +205,7 @@ class XLSXDocumentWriter
      *
      * @return  self
      */ 
-    public function setAppLanguage(AppLanguage $appLanguage)
+    public function setAppLanguage($appLanguage)
     {
         $this->appLanguage = $appLanguage;
 

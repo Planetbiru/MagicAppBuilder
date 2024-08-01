@@ -30,7 +30,6 @@ try
             $entity = new $className(null);
             $entityLabel = new PicoEntityLanguage($entity);
             $list = $entityLabel->propertyList(true);
-
             $result = array();
             foreach($list as $prop)
             {
