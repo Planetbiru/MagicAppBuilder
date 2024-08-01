@@ -14,11 +14,9 @@ try
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
-    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
-    
+    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = array();
     $merged = $inputPost->getMerged();
-
     if($merged)
     {
         if($inputPost->getEntity() != null && $inputPost->countableEntity())
@@ -31,16 +29,12 @@ try
                 $className = "\\".$baseEntity."\\".$entityName;
                 $entityName = trim($entityName);
                 $path = $baseDir."/".$entityName.".php";
-
                 if(file_exists($path))
                 {
-                    include_once $path;
-                    
+                    include_once $path;                  
                     $entity = new $className(null, $database);
-
                     $tableInfo = EntityUtil::getTableName($path);
                     $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
-
                     if(!isset($entities[$tableName]))
                     {
                         $entities[$tableName] = array();
@@ -82,8 +76,7 @@ try
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);
-                $path = $baseDir."/".$entityName.".php";
-                
+                $path = $baseDir."/".$entityName.".php";               
                 if(file_exists($path))
                 {
                     // check error
@@ -117,7 +110,6 @@ try
         }
         echo implode("\r\n\r\n", $allQueries);
     }
-
 }
 catch(Exception $e)
 {

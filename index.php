@@ -922,7 +922,6 @@ require_once __DIR__ . "/inc.app/navs.php";
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="copy-from-other">Copy From Filter</button>
           <button type="button" class="btn btn-primary" id="load-from-cache">Load</button>
           <button type="button" class="btn btn-primary" id="save-to-cache">Save</button>
           <button type="button" class="btn btn-success" id="apply-reference">OK</button>

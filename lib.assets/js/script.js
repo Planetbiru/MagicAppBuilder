@@ -101,7 +101,7 @@ function getReferenceResource() {
 			</tr>
 			<tr class="entity-generator">
 			  <td></td>
-			  <td><button type="button" class="btn btn-primary generate-entity">Generate Entity Now</button></td>
+			  <td><button type="button" class="btn btn-primary generate-entity">Generate Entity</button></td>
 			</tr>
 		  </tbody>
 		</table>
@@ -580,6 +580,23 @@ jQuery(function(){
         lastLine = -1;
       },
     });
+  });
+
+  $(document).on('click', '.generate-entity', function(){
+    let entityName = $('.rd-entity-name').val();
+    let tableName = $('.rd-table-name').val();
+    if(confirm('Are you sure you want to generate entity and replace existing file?'))
+    {
+      $.ajax({
+        method: "POST",
+        url: "lib.ajax/entity-generator.php",
+        data: { entityName:entityName, tableName:tableName},
+        success: function (data) {
+          updateEntityFile();
+          updateEntityQuery(true);
+        },
+      });
+    }
   });
 
   loadTable();
