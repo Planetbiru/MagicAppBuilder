@@ -119,20 +119,20 @@ function getReferenceResource() {
 		</tbody>
 		  </table>
 		<h4>Specfification</h4>
-		<p>Just leave it blank if it doesn't exist. Click Rem button to remove value.</p>
+		<p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
 		<table data-name="specification" class="table table-reference" data-empty-on-remove="true">
 		  <thead>
 			<tr>
 			  <td width="45%">Column Name</td>
 			  <td>Value</td>
-			  <td width="62">Rem</td>
+			  <td width="70">Remove</td>
 			</tr>
 		  </thead>
 			  <tbody>
 			  <tr>
 				<td><input class="form-control rd-column-name" type="text" value=""></td>
 				<td><input class="form-control rd-value" type="text" value=""></td>
-				<td><button type="button" class="btn btn-danger btn-remove-row">Rem</button></td>
+				<td><button type="button" class="btn btn-danger btn-remove-row">Remove</button></td>
 			  </tr>
 			</tbody>
 			<tfoot>
@@ -150,7 +150,7 @@ function getReferenceResource() {
 			<tr>
 			  <td width="65%">Column</td>
 			  <td>Value</td>
-			  <td width="62">Rem</td>
+			  <td width="70">Remove</td>
 			</tr>
 		  </thead>
 			  <tbody>
@@ -160,7 +160,7 @@ function getReferenceResource() {
 				  <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
 				  <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
 				</select></td>
-				<td><button type="button" class="btn btn-danger btn-remove-row">Rem</button></td>
+				<td><button type="button" class="btn btn-danger btn-remove-row">Remove</button></td>
 			  </tr>
 			</tbody>
 			<tfoot>
@@ -170,18 +170,18 @@ function getReferenceResource() {
 			</tfoot>
 		</table>
 		<h4>Additional Output</h4>
-		<p>Just leave it blank if it doesn't exist. Click Rem button to remove value.</p>
+		<p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
 		<table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
 		  <thead>
 			<tr>
 			  <td>Column</td>
-			  <td width="62">Rem</td>
+			  <td width="70">Remove</td>
 			</tr>
 		  </thead>
 			  <tbody>
 			  <tr>
 				<td><input class="form-control rd-column-name" type="text" value=""></td>
-				<td><button type="button" class="btn btn-danger btn-remove-row">Rem</button></td>
+				<td><button type="button" class="btn btn-danger btn-remove-row">Remove</button></td>
 			  </tr>
 			</tbody>
 			<tfoot>
@@ -200,7 +200,7 @@ function getReferenceResource() {
 			  <td>Label</td>
 			  <td><input class="form-control map-key" type="text" value="" placeholder="Additional attribute name"></td>
 			  <td>Def</td>
-			  <td>Rem</td>
+			  <td width="70">Remove</td>
 			</tr>
 		  </thead>
 			  <tbody>
@@ -209,7 +209,7 @@ function getReferenceResource() {
 				<td><input class="form-control rd-label" type="text" value=""></td>
 				<td><input class="form-control map-value" type="text" value="" placeholder="Additional attribute value"></td>
 				<td><input type="checkbox" class="rd-selected"></td>
-				<td><button type="button" class="btn btn-danger btn-remove-row">Rem</button></td>
+				<td><button type="button" class="btn btn-danger btn-remove-row">Remove</button></td>
 			  </tr>
 			</tbody>
 			<tfoot>
@@ -599,11 +599,41 @@ jQuery(function(){
     }
   });
 
+  $(document).on('change', '.map-key', function(e){
+    onChangeMapKey($(this));
+  });
+  $(document).on('keyup', '.map-key', function(e){
+    onChangeMapKey($(this));
+  });
+
   loadTable();
   updateEntityQuery(false);
   updateEntityFile();
   updateModuleFile();
 });
+
+function onChangeMapKey(obj)
+{
+  let val = obj.val();
+  if((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default'))
+  {
+    if(!obj.hasClass('input-invalid-value'))
+    {
+      obj.addClass('input-invalid-value');
+      setTimeout(function(){
+        obj.val('data-'+val.toLowerCase());
+        onChangeMapKey(obj);
+      }, 500);
+    }
+  }
+  else
+  {
+    if(obj.hasClass('input-invalid-value'))
+    {
+      obj.removeClass('input-invalid-value');
+    }
+  }
+}
 
 function showAlertUI(title, message) {
   $('#alert-dialog .modal-title').text(title);

@@ -307,4 +307,17 @@ li.file-syntax-error a {
 
 #modal-create-reference-data .modal-dialog {
   transition: max-width ease-in-out 0.24s;
+}
+
+.input-invalid-value {
+  color: #c11515;
+  border-color: #b92525;
+}
+
+.input-invalid-value:focus {
+  color: #c11515;
+  background-color: #fff;
+  border-color: #b92525;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(168, 54, 54, 0.1215686275);
 }/*# sourceMappingURL=css.css.map */
