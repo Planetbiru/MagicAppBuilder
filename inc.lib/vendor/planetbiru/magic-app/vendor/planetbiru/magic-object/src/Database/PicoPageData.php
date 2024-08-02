@@ -11,7 +11,7 @@ use stdClass;
 class PicoPageData
 {
     const RESULT = 'result';
-    const PAGEABLE = 'pagable';
+    const PAGEABLE = 'pageable';
 
     /**
      * Result
@@ -21,7 +21,7 @@ class PicoPageData
     private $result = array();
 
     /**
-     * Pagable
+     * Pageable
      *
      * @var PicoPageable
      */
@@ -135,7 +135,7 @@ class PicoPageData
      * @param MagicObject[] $result Array of MagicObject or null
      * @param integer $startTime Timestamp when query is sent
      * @param integer $totalResult Total result of 0 for no result
-     * @param PicoPageable $pageable Pagable
+     * @param PicoPageable $pageable Pageable
      * @param PDOStatement $stmt PDO statement
      * @param MagicObject $entity Entity
      * @param array $subqueryMap Subquery map
@@ -362,11 +362,11 @@ class PicoPageData
     }
 
     /**
-     * Get pagable
+     * Get pageable
      *
      * @return PicoPageable
      */ 
-    public function getPagable()
+    public function getPageable()
     {
         return $this->pageable;
     }

@@ -229,7 +229,7 @@ class PicoSortable
     /**
      * Get instance of PicoSortable
      *
-     * @return PicoSortable
+     * @return self
      */
     public static function getInstance()
     {
@@ -252,7 +252,7 @@ class PicoSortable
      * @param PicoRequestBase $request
      * @param string[]|null $map
      * @param array|null $defaultSortable
-     * @return PicoSortable
+     * @return self
      */
     public static function fromUserInput($request, $map = null, $defaultSortable = null)
     {

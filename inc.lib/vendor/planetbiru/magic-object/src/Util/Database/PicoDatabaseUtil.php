@@ -29,11 +29,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get pagable from parameters
+     * Get pageable from parameters
      * @param array $params
      * @return PicoPageable|null
      */
-    public static function pagableFromParams($params)
+    public static function pageableFromParams($params)
     {
         if(self::isArray($params))
         {
@@ -69,7 +69,7 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get pagable from parameters
+     * Get pageable from parameters
      * @param array $params
      * @return array
      */

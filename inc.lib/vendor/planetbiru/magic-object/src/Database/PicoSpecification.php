@@ -65,9 +65,13 @@ class PicoSpecification
         {
             $this->addFilter($predicate, self::LOGIC_AND);
         }
-        if($predicate instanceof PicoSpecification)
+        else if($predicate instanceof PicoSpecification)
         {
             $this->addSubfilter($predicate, self::LOGIC_AND);      
+        }
+        else if(is_array($predicate) && count($predicate) > 1 && is_string($predicate[0]))
+        {
+            $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_AND);      
         } 
         return $this;
     }
@@ -84,10 +88,14 @@ class PicoSpecification
         {
             $this->addFilter($predicate, self::LOGIC_OR);      
         }  
-        if($predicate instanceof PicoSpecification)
+        else if($predicate instanceof PicoSpecification)
         {
             $this->addSubfilter($predicate, self::LOGIC_OR);      
-        }  
+        }
+        else if(is_array($predicate) && count($predicate) > 1 && is_string($predicate[0]))
+        {
+            $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_OR);      
+        }   
         return $this;
     }
 
@@ -360,7 +368,7 @@ class PicoSpecification
                     }
                     else
                     {
-                        $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateLikeContians(strtolower($filterValue))));
+                        $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateLikeContains(strtolower($filterValue))));
                     }
                 }
             }
@@ -385,7 +393,7 @@ class PicoSpecification
             {
                 $specification->addAnd(
                     PicoPredicate::getInstance()
-                        ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateLikeContians(strtolower($word)))
+                        ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateLikeContains(strtolower($word)))
                 );
             }
         }

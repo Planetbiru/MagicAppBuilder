@@ -24,6 +24,7 @@ includes:
   - input
   - session
   - entity
+  - specification
   - pagination
   - database-dump
   - object-label

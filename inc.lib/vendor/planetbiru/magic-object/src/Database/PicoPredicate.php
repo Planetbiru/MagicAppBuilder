@@ -303,7 +303,7 @@ class PicoPredicate //NOSONAR
      * @param string $value
      * @return string
      */
-    public static function generateLikeContians($value)
+    public static function generateLikeContains($value)
     {
         return "%".$value."%";
     }

@@ -1922,13 +1922,13 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Add pagable to query builder
+     * Add pageable to query builder
      *
      * @param PicoDatabaseQueryBuilder $sqlQuery Query builder
-     * @param PicoPageable $pageable Pagable
+     * @param PicoPageable $pageable Pageable
      * @return PicoDatabaseQueryBuilder
      */
-    private function setPagable($sqlQuery, $pageable)
+    private function setPageable($sqlQuery, $pageable)
     {
         if($pageable instanceof PicoPageable)
         {
@@ -1948,7 +1948,7 @@ class PicoDatabasePersistence // NOSONAR
      * Add sortable to query builder
      *
      * @param PicoDatabaseQueryBuilder $sqlQuery Query builder
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
      * @return PicoDatabaseQueryBuilder
@@ -2068,7 +2068,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if need join query
      *
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
      * @return boolean
@@ -2079,7 +2079,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             return true;
         }
-        if($this->isRequireJoinFromPagableAndSortable($pageable, $sortable, $info))
+        if($this->isRequireJoinFromPageableAndSortable($pageable, $sortable, $info))
         {
             return true;
         }
@@ -2089,12 +2089,12 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Require join from sortable
      *
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
      * @return boolean
      */
-    private function isRequireJoinFromPagableAndSortable($pageable, $sortable, $info)
+    private function isRequireJoinFromPageableAndSortable($pageable, $sortable, $info)
     {
         $result = false;
         if($sortable != null)
@@ -2127,9 +2127,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function isRequireJoinFromSpecification($specification)
     {
-        return isset($specification) && (
-            ($specification instanceof PicoSpecification && $specification->isRequireJoin()) 
-        );
+        return isset($specification) && $specification instanceof PicoSpecification && $specification->isRequireJoin();
     }
 
     /**
@@ -2162,7 +2160,7 @@ class PicoDatabasePersistence // NOSONAR
      * Get findAll query
      *
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
      * @return PicoDatabaseQueryBuilder
@@ -2181,7 +2179,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $selected
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
      * @return PicoDatabaseQueryBuilder
@@ -2211,7 +2209,7 @@ class PicoDatabasePersistence // NOSONAR
         
         if($pageable != null)
         {
-            $sqlQuery = $this->setPagable($sqlQuery, $pageable);      
+            $sqlQuery = $this->setPageable($sqlQuery, $pageable);      
         }
         
         if($pageable != null || $sortable != null)
@@ -2225,7 +2223,7 @@ class PicoDatabasePersistence // NOSONAR
      * Get all record from database wihout filter
      *
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param array $subqueryMap
      * @throws EntityException|EmptyResultException
@@ -2303,7 +2301,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $selected
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param array $subqueryMap
      * @throws EntityException|EmptyResultException
@@ -2414,7 +2412,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $selected
      * @param PicoSpecification $specification Specification
-     * @param PicoPageable|null $pageable Pagable
+     * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @return array|null
      * @throws EntityException|EmptyResultException
@@ -2455,7 +2453,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @param PicoPageable $pageable Pagable
+     * @param PicoPageable $pageable Pageable
      * @param PicoSortable|string $sortable Sortable
      * @param PicoTableInfo $info Table info
      * @return PicoDatabaseQueryBuilder
@@ -2481,7 +2479,7 @@ class PicoDatabasePersistence // NOSONAR
             ->where($where);
         if($pageable != null)
         {
-            $sqlQuery = $this->setPagable($sqlQuery, $pageable);        
+            $sqlQuery = $this->setPageable($sqlQuery, $pageable);        
         }
         if($pageable != null || $sortable != null)
         {
@@ -2496,7 +2494,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @param PicoPageable $pageable Pagable
+     * @param PicoPageable $pageable Pageable
      * @param PicoSortable|string $sortable Sortable
      * @param array $subqueryMap
      * @return array|null
@@ -2834,18 +2832,6 @@ class PicoDatabasePersistence // NOSONAR
         {
             return $join[self::KEY_NAME];
         }
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param array $row Row
-     * @param string $referenceColumName Reference column name
-     * @return string|null
-     */
-    private function getJoinKeyValue($row, $referenceColumName)
-    {
-        return isset($row[$referenceColumName]) ? $row[$referenceColumName] : null;
     }
 
     /**

@@ -1954,21 +1954,21 @@ function createAlbumSpecification($inputGet)
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesificationTitle-&gt;addOr($predicate1);
 
             $predicate2 = new PicoPredicate();
-            $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate2-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesificationTitle-&gt;addOr($predicate2);
         }
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate3 = new PicoPredicate();
-            $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+            $predicate3-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
             $spesificationTitle-&gt;addOr($predicate3);
 
             $predicate4 = new PicoPredicate();
-            $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+            $predicate4-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
             $spesificationTitle-&gt;addOr($predicate4);
         }
 
@@ -2062,14 +2062,14 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+            $predicate1-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2124,7 +2124,7 @@ class SpecificationUtil
         if($inputGet-&gt;getProducerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('producer.name', PicoPredicate::generateLikeContians($inputGet-&gt;getProducerName()));
+            $predicate1-&gt;like('producer.name', PicoPredicate::generateLikeContains($inputGet-&gt;getProducerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2135,21 +2135,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2159,7 +2159,7 @@ class SpecificationUtil
         if($inputGet-&gt;getSubtitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('subtitle', PicoPredicate::generateLikeContians($inputGet-&gt;getSubtitle()));
+            $predicate1-&gt;like('subtitle', PicoPredicate::generateLikeContains($inputGet-&gt;getSubtitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2173,7 +2173,7 @@ class SpecificationUtil
         if($inputGet-&gt;getVocalistName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('vocalist.name', PicoPredicate::generateLikeContians($inputGet-&gt;getVocalistName()));
+            $predicate1-&gt;like('vocalist.name', PicoPredicate::generateLikeContains($inputGet-&gt;getVocalistName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2187,7 +2187,7 @@ class SpecificationUtil
         if($inputGet-&gt;getComposerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('composer.name', PicoPredicate::generateLikeContians($inputGet-&gt;getComposerName()));
+            $predicate1-&gt;like('composer.name', PicoPredicate::generateLikeContains($inputGet-&gt;getComposerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2201,7 +2201,7 @@ class SpecificationUtil
         if($inputGet-&gt;getArrangerName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('arranger.name', PicoPredicate::generateLikeContians($inputGet-&gt;getArrangerName()));
+            $predicate1-&gt;like('arranger.name', PicoPredicate::generateLikeContains($inputGet-&gt;getArrangerName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2273,7 +2273,7 @@ class SpecificationUtil
         if($inputGet-&gt;getTitle() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+            $predicate1-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2328,21 +2328,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2399,7 +2399,7 @@ class SpecificationUtil
         if($inputGet-&gt;getLyric() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('lyric', PicoPredicate::generateLikeContians($inputGet-&gt;getLyric()));
+            $predicate1-&gt;like('lyric', PicoPredicate::generateLikeContains($inputGet-&gt;getLyric()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2439,21 +2439,21 @@ class SpecificationUtil
             if($inputGet-&gt;getName() != "")
             {
                 $predicate1 = new PicoPredicate();
-                $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate1);
 
                 $predicate2 = new PicoPredicate();
-                $predicate2-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+                $predicate2-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
                 $spesificationTitle-&gt;addOr($predicate2);
             }
             if($inputGet-&gt;getTitle() != "")
             {
                 $predicate3 = new PicoPredicate();
-                $predicate3-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate3-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate3);
 
                 $predicate4 = new PicoPredicate();
-                $predicate4-&gt;like('title', PicoPredicate::generateLikeContians($inputGet-&gt;getTitle()));
+                $predicate4-&gt;like('title', PicoPredicate::generateLikeContains($inputGet-&gt;getTitle()));
                 $spesificationTitle-&gt;addOr($predicate4);
             }
 
@@ -2489,7 +2489,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2515,7 +2515,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2541,7 +2541,7 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -2567,21 +2567,21 @@ class SpecificationUtil
         if($inputGet-&gt;getName() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('name', PicoPredicate::generateLikeContians($inputGet-&gt;getName()));
+            $predicate1-&gt;like('name', PicoPredicate::generateLikeContains($inputGet-&gt;getName()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getUsername() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('username', PicoPredicate::generateLikeContians($inputGet-&gt;getUsername()));
+            $predicate1-&gt;like('username', PicoPredicate::generateLikeContains($inputGet-&gt;getUsername()));
             $spesification-&gt;addAnd($predicate1);
         }
 
         if($inputGet-&gt;getEmail() != "")
         {
             $predicate1 = new PicoPredicate();
-            $predicate1-&gt;like('email', PicoPredicate::generateLikeContians($inputGet-&gt;getEmail()));
+            $predicate1-&gt;like('email', PicoPredicate::generateLikeContains($inputGet-&gt;getEmail()));
             $spesification-&gt;addAnd($predicate1);
         }
 
@@ -5437,6 +5437,339 @@ while($data = $result-&gt;fetch())
 </article>
 
 <article class="article" id="part13">
+<h3>Specification</h3>
+<p>Specifications are implemented in the PicoSpecification and PicoPredicate classes. PicoSpecification is a framework that can contain one or more PicoPredicate.</p>
+<p>For example, we have the following query:</p>
+<pre><code class="language-sql">DELETE FROM album
+WHERE album_id = '1234' AND (waiting_for = 0 or waiting_for IS NULL)
+</code></pre>
+<p>We can write it as follows:</p>
+<pre><code class="language-php">$specfification = new PicoSpecification();
+$specfification-&gt;addAnd(new PicoPredicate('albumId', '1234'));
+$spec2 = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('waitingFor', 0);
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('waitingFor', null);
+$spec2-&gt;addOr($predicate1);
+$spec2-&gt;addOr($predicate2);
+$specfification-&gt;addAnd($spec2);
+
+$album = new Album(null, $database);
+$album-&gt;where($specfification)-&gt;delete();
+</code></pre>
+<p><strong>PicoSpecification</strong></p>
+<p>Method:</p>
+<ol>
+<li>addAnd</li>
+</ol>
+<p>Parameters:</p>
+<ul>
+<li>PicoSpecification|PicoPredicate|array</li>
+</ul>
+<ol start="2">
+<li>addOr</li>
+</ol>
+<p>Parameters:</p>
+<ul>
+<li>PicoSpecification|PicoPredicate|array</li>
+</ul>
+<p>We can form specifications in an unlimited number of stages. Note that users need to simplify the logic before implementing it into the specification.</p>
+<p><strong>PicoPredicate</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<ul>
+<li>string $field = null</li>
+<li>mixed $value = null</li>
+</ul>
+<p>If the field is given a value, the constructor will call the <code>equals</code> method with the <code>field</code> and <code>value</code> from the constructor. This will make it easier for users to create specifications in a line of code.</p>
+<p>Methods:</p>
+<ul>
+<li>equals</li>
+<li>isNull</li>
+<li>notEquals</li>
+<li>isNotNull</li>
+<li>like</li>
+<li>notLike</li>
+<li>in</li>
+<li>notIn</li>
+<li>lessThan</li>
+<li>greaterThan</li>
+<li>lessThanOrEquals</li>
+<li>greaterThanOrEquals</li>
+</ul>
+<p>Static Methods:</p>
+<ul>
+<li>getInstance</li>
+<li>generateLikeStarts</li>
+<li>generateLikeEnds</li>
+<li>generateLikeContains</li>
+<li>functionUpper</li>
+<li>functionLower</li>
+<li>functionAndValue</li>
+</ul>
+<p>Example:</p>
+<p>We want to create a query like this:</p>
+<p><code>SELECT * FROM album WHERE producer_id = 'asdf'</code></p>
+<p>Instead of using the <code>findByProducerId</code> method, we will use a specification. The advantage of using a specification is that we can easily add parameters to the specification for specific needs.</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('producerId', 'asdf');
+$specification-&gt;addAnd($predicate1)</code></pre>
+<p><strong>Logic AND</strong></p>
+<p>Since we are only using one predicate, we use the <code>addAnd</code> method. We can add predicates to the specification. For example, we will add the following condition:</p>
+<p><code>SELECT * FROM album WHERE producer_id = 'asdf' AND active = true</code></p>
+<p>So we can write it as</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('producerId', 'asdf');
+$specification-&gt;addAnd($predicate1)
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;equals('active', true);
+$specification-&gt;addAnd($predicate2)</code></pre>
+<p>We can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('producerId', 'asdf'))
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('active', true))
+;</code></pre>
+<p>For predicates with <code>equals</code> comparison, we can specify them by passing parameters into the constructor, so we can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(new PicoPredicate('producerId', 'asdf'))
+    -&gt;addAnd(new PicoPredicate('active', true))
+;</code></pre>
+<p>And because <code>addAnd</code> and <code>addOr</code> can accept parameters in the form of <code>PicoSpecification</code>, <code>PicoPredicate</code> and also <code>array</code>, then our code can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(['producerId', 'asdf'])
+    -&gt;addAnd(['active', true])
+;</code></pre>
+<p>When a user passes an array as a parameter to the <code>addAnd</code> and <code>addOr</code> methods, MagicObject will convert it to an instance of <code>PicoPredicate</code> with <code>equals</code> comparison. If using <code>array</code> is easier, feel free to use it but it is recommended to use <code>PicoPredicate</code> so that it can be used directly by MagicObject.</p>
+<p>For comparisons other than <code>equals</code>, we must specify them explicitly. Here are some examples of specifying AND logic.</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;notEquals('producerId', 'asdf');
+$specification-&gt;addAnd($predicate1)
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;notEquals('active', true);
+$specification-&gt;addAnd($predicate2)</code></pre>
+<p><code>$predicate1-&gt;notEquals('active', true)</code> does not automatically become <code>$predicate1-&gt;equals('active', false)</code>. Don't forget about <code>null</code> values ​​that may exist in some rows of data.</p>
+<p>We can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;notEquals('producerId', 'asdf'))
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;notEquals('active', true))
+;</code></pre>
+<p>Since the comparison used is not <code>equals</code>, there is no shorter way to write the code above.</p>
+<p>MagicObject will use <code>is</code> instead of <code>=</code> and <code>is not</code> instead of <code>!=</code> if the given value is <code>null</code>. If the supplied values ​​are a list, use <code>in</code> and <code>notIn</code> instead of <code>equals</code> and <code>notEquals</code>.</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;in('producerId', ['asdf', 'qwerty', 'zxcv']))
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;notEquals('active', null))
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;in('producerId', ['asdf', 'qwerty', 'zxcv']))
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;isNotNull('active'))
+;</code></pre>
+<p>To search for partial text in a row, we can use <code>like</code>. In MySQL and MariaDB, <code>like</code> comparison is <code>case insensitive</code> but in other databases it is <code>case sensitive</code>. For that, <code>like</code> comparison is usually combined with <code>upper</code> or <code>lower</code> function to make the comparison <code>case insensitive</code>.</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('name'), PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addAnd(['active', true])
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionAndValue('lower', 'name'), PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addAnd(['active', true])
+;</code></pre>
+<p>or </p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;like('lower(name)', PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addAnd(['active', true])
+;</code></pre>
+<p>or </p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;like('lower(name)', '%kamshory%'))
+    -&gt;addAnd(['active', true])
+;</code></pre>
+<p>The first writing style is more recommended.</p>
+<p><strong>Logic OR</strong></p>
+<p>The <code>OR</code> logic requires at least two criteria. Never use <code>OR</code> logic if it only uses one criterion because it will not mean anything. For example, we will add the following condition:</p>
+<p><code>SELECT * FROM album WHERE producer_id = 'asdf' OR active = true</code></p>
+<p>So we can write it as</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('producerId', 'asdf');
+$specification-&gt;addOr($predicate1)
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;equals('active', true);
+$specification-&gt;addOr($predicate2)</code></pre>
+<p>We can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;equals('producerId', 'asdf'))
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;equals('active', true))
+;</code></pre>
+<p>For predicates with <code>equals</code> comparison, we can specify them by passing parameters into the constructor, so we can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(new PicoPredicate('producerId', 'asdf'))
+    -&gt;addOr(new PicoPredicate('active', true))
+;</code></pre>
+<p>And because <code>addAnd</code> and <code>addOr</code> can accept parameters in the form of <code>PicoSpecification</code>, <code>PicoPredicate</code> and also <code>array</code>, then our code can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(['producerId', 'asdf'])
+    -&gt;addOr(['active', true])
+;</code></pre>
+<p>For comparisons other than <code>equals</code>, we must specify them explicitly. Here are some examples of specifying OR logic.</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;notEquals('producerId', 'asdf');
+$specification-&gt;addOr($predicate1)
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;notEquals('active', true);
+$specification-&gt;addOr($predicate2)</code></pre>
+<p><code>$predicate1-&gt;notEquals('active', true)</code> does not automatically become <code>$predicate1-&gt;equals('active', false)</code>. Don't forget about <code>null</code> values ​​that may exist in some rows of data.</p>
+<p>We can also write them with</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;notEquals('producerId', 'asdf'))
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;notEquals('active', true))
+;</code></pre>
+<p>Since the comparison used is not <code>equals</code>, there is no shorter way to write the code above.</p>
+<p>MagicObject will use <code>is</code> instead of <code>=</code> and <code>is not</code> instead of <code>!=</code> if the given value is <code>null</code>. If the supplied values ​​are a list, use <code>in</code> and <code>notIn</code> instead of <code>equals</code> and <code>notEquals</code>.</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;in('producerId', ['asdf', 'qwerty', 'zxcv']))
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;notEquals('active', null))
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;in('producerId', ['asdf', 'qwerty', 'zxcv']))
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;isNotNull('active'))
+;</code></pre>
+<p>To search for partial text in a row, we can use <code>like</code>. In MySQL and MariaDB, <code>like</code> comparison is <code>case insensitive</code> but in other databases it is <code>case sensitive</code>. For that, <code>like</code> comparison is usually combined with <code>upper</code> or <code>lower</code> function to make the comparison <code>case insensitive</code>.</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('name'), PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addOr(['active', true])
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionAndValue('lower', 'name'), PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addOr(['active', true])
+;</code></pre>
+<p>or </p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;like('lower(name)', PicoPredicate::generateLikeContains('kamshory')))
+    -&gt;addOr(['active', true])
+;</code></pre>
+<p>or </p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;like('lower(name)', '%kamshory%'))
+    -&gt;addOr(['active', true])
+;</code></pre>
+<p>The first writing style is more recommended.</p>
+<p><strong>Nested Logic</strong></p>
+<p>In real applications, logic is not always simple. Even very simple applications often have nested and complex logic. Nested logic is <code>AND</code> inside <code>OR</code> or <code>OR</code> inside <code>AND</code>.</p>
+<ol>
+<li><strong>OR inside AND</strong></li>
+</ol>
+<p>Example:</p>
+<p><code>SELECT * FROM album WHERE active = true and (lower(name) like '%jakarta%' or lower(title) like '%jakarta%')</code></p>
+<p>We can create specifications within specifications.</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+
+// create predicate1
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('active', true);
+
+// create predicate2
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;equals(PicoPredicate::functionLower('name'), PicoPredicate::generateLikeContains('jakarta'));
+
+// create predicate3
+$predicate3 = new PicoPredicate();
+$predicate3-&gt;equals(PicoPredicate::functionLower('title'), PicoPredicate::generateLikeContains('jakarta'));
+
+// create specification2
+$specification2 = new PicoSpecification();
+
+// add predicate2 into specification2 with logic OR
+$specification2-&gt;addOr($predicate2);
+
+// add predicate3 into specification2 with logic OR
+$specification2-&gt;addOr($predicate3);
+
+// add predicate1 into specification with logic AND
+$specification-&gt;addAnd($predicate1)
+
+// add specification2 into specification with logic AND
+$specification-&gt;addAnd($specification2)</code></pre>
+<p>A shorter code to create the above specification is as follows</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('active', true))
+    -&gt;addAnd(
+        PicoSpecification::getInstance()
+            -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('name'), PicoPredicate::generateLikeContains('jakarta')))
+            -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('title'), PicoPredicate::generateLikeContains('jakarta')))
+    )
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addAnd(['active', true])
+    -&gt;addAnd(
+        PicoSpecification::getInstance()
+            -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('name'), PicoPredicate::generateLikeContains('jakarta')))
+            -&gt;addOr(PicoPredicate::getInstance()-&gt;like(PicoPredicate::functionLower('title'), PicoPredicate::generateLikeContains('jakarta')))
+    )
+;</code></pre>
+<ol start="2">
+<li><strong>AND inside OR</strong></li>
+</ol>
+<p>Example:</p>
+<p><code>SELECT * FROM album WHERE waiting_for = 0 or (waiting_for is null and approval_id is null)</code></p>
+<p>We can create specifications within specifications.</p>
+<pre><code class="language-php">$specification = new PicoSpecification();
+
+// create predicate1
+$predicate1 = new PicoPredicate();
+$predicate1-&gt;equals('waitingFor', 0);
+
+// create predicate2
+$predicate2 = new PicoPredicate();
+$predicate2-&gt;equals('waitingFor', null);
+
+// create predicate3
+$predicate3 = new PicoPredicate();
+$predicate3-&gt;equals('approvalId', null);
+
+// create specification2
+$specification2 = new PicoSpecification();
+
+// add predicate2 into specification2 with logic AND
+$specification2-&gt;addAnd($predicate2);
+
+// add predicate3 into specification2 with logic AND
+$specification2-&gt;addAnd($predicate3);
+
+// add predicate1 into specification with logic OR
+$specification-&gt;addOr($predicate1)
+
+// add specification2 into specification with logic OR
+$specification-&gt;addOr($specification2)</code></pre>
+<p>A shorter code to create the above specification is as follows</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(PicoPredicate::getInstance()-&gt;equals('waitingFor', 0))
+    -&gt;addOr(
+        PicoSpecification::getInstance()
+            -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('waitingFor', null))
+            -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('approvalId', null))
+    )
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$specification = PicoSpecification::getInstance()
+    -&gt;addOr(['waitingFor', 0])
+    -&gt;addOr(
+        PicoSpecification::getInstance()
+            -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('waitingFor', null))
+            -&gt;addAnd(PicoPredicate::getInstance()-&gt;equals('approvalId', null))
+    )
+;</code></pre>
+</article>
+
+<article class="article" id="part14">
 <h2>Filtering, Ordering and Pagination</h2>
 <p>MagicObject will filter data according to the given criteria. On the other hand, MagicObject will only retrieve data on the specified page by specifying <code>limit</code> and <code>offset</code> data in the <code>select</code> query.</p>
 <p>Example parameters:</p>
@@ -6319,7 +6652,7 @@ require_once "inc/footer.php";
 ?&gt;</code></pre>
 </article>
 
-<article class="article" id="part14">
+<article class="article" id="part15">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <pre><code class="language-php">&lt;?php
@@ -6788,7 +7121,7 @@ $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);</code></pre>
 </article>
 
-<article class="article" id="part15">
+<article class="article" id="part16">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -6913,7 +7246,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part16">
+<article class="article" id="part17">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -7180,7 +7513,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part17">
+<article class="article" id="part18">
 <h2>Upload File</h2>
 <p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
 <p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
@@ -7229,7 +7562,7 @@ else
 }</code></pre>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part19">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>

@@ -2,14 +2,14 @@
 
 namespace MagicApp\XLSX;
 
-use MagicApp\AppLanguage;
 use MagicObject\Database\PicoPageData;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
-class XLSXDocumentWriter extends DocumentWriter
+class CSVDocumentWriter extends DocumentWriter
 {
-    
+    private $temporaryFile;
+    private $filePointer;
     /**
      * Write data
      *
@@ -22,35 +22,36 @@ class XLSXDocumentWriter extends DocumentWriter
      */
     public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction)
     {
-        $writer = new XLSXWriter();
+        $this->temporaryFile = tempnam(sys_get_temp_dir(), 'my-temp-file');
+        $this->filePointer = fopen($this->temporaryFile, 'w');
+
         if(isset($headerFormat) && is_array($headerFormat) && is_callable($writerFunction))
         {
-            $writer = $this->writeDataWithFormat($writer, $pageData, $sheetName, $headerFormat, $writerFunction);
+            $this->writeDataWithFormat($pageData, $headerFormat, $writerFunction);
         }
         else
         {
-            $writer = $this->writeDataWithoutFormat($writer, $pageData, $sheetName);
+            $this->writeDataWithoutFormat($pageData);
         }
         
         header('Content-disposition: attachment; filename="'.$fileName.'"');
-        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Type: text/csv");
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         
-        $writer->writeToStdOut();
-
+        readfile($this->temporaryFile);
+        unlink($this->temporaryFile);
         return $this;
     }
 
     /**
      * Write data with format
-     * @param XLSXWriter $writer XLSX writter
      * @param PicoPageData $pageData Page data
      * @param string $sheetName Sheet name
-     * @return XLSXWriter XLSX writter
+     * @return void
      */
-    private function writeDataWithoutFormat($writer, $pageData, $sheetName)
+    private function writeDataWithoutFormat($pageData)
     {
         $idx = 0;
         if($this->noFetchData($pageData))
@@ -60,9 +61,9 @@ class XLSXDocumentWriter extends DocumentWriter
                 $keys = array_keys($row->valueArray());
                 if($idx == 0)
                 {
-                    $writer = $this->writeHeader($writer, $sheetName, $keys);
+                    $this->writeHeader($keys);
                 }
-                $writer = $this->writeData($writer, $sheetName, $keys, $row);
+                $this->writeData($keys, $row);
                 $idx++;
             }
         }
@@ -73,79 +74,65 @@ class XLSXDocumentWriter extends DocumentWriter
                 $keys = array_keys($row->valueArray());
                 if($idx == 0)
                 {
-                    $writer = $this->writeHeader($writer, $sheetName, $keys);
+                    $this->writeHeader($keys);
                 }
-                $writer = $this->writeData($writer, $sheetName, $keys, $row);
+                $this->writeData($keys, $row);
                 $idx++;
             }
         }
-        return $writer;
     }
 
     /**
      * Write header format
-     * @param XLSXWriter $writer XLSX writter
-     * @param string $sheetName Sheet name
      * @param string[] $keys Data keys
-     * @return XLSXWriter XLSX writter
+     * @return self
      */
-    private function writeHeader($writer, $sheetName, $keys)
+    private function writeHeader($keys)
     {
+        $upperKeys = array();
         foreach($keys as $key)
         {
-            $this->headerFormat[PicoStringUtil::camelToTitle($key)] = XLSXDataType::TYPE_STRING;
+            $upperKeys[] = PicoStringUtil::camelToTitle($key);
         }
-        $writer->writeSheetHeader($sheetName, $this->headerFormat);
-        return $writer;
+        fputcsv($this->filePointer, $upperKeys);
+        return $this;
     }
 
     /**
      * Write header format
-     * @param XLSXWriter $writer XLSX writter
-     * @param string $sheetName Sheet name
      * @param string[] $keys Data keys
      * @param MagicObject $row Data row
-     * @return XLSXWriter XLSX writter
+     * return self;
      */
-    private function writeData($writer, $sheetName, $keys, $row)
+    private function writeData($keys, $row)
     {
         $data = array();
         foreach($keys as $key)
         {
             $data[] = $row->get($key);
         }            
-        $writer->writeSheetRow($sheetName, $data);
-        return $writer;
+        fputcsv($this->filePointer, $data);
+        return $this;
     }
 
     /**
      * Write data with format
-     * @param XLSXWriter $writer XLSX writter
      * @param PicoPageData $pageData Page data
-     * @param string $sheetName Sheet name
      * @param string[] $headerFormat Data format
      * @param callable $writerFunction Writer function
-     * @return XLSXWriter XLSX writter
+     * @return void
      */
-    private function writeDataWithFormat($writer, $pageData, $sheetName, $headerFormat, $writerFunction)
+    private function writeDataWithFormat($pageData, $headerFormat, $writerFunction)
     {
-        foreach($headerFormat as $key=>$value)
-        {
-            if($value instanceof XLSXDataType)
-            {
-                $headerFormat[$key] = $value->toString();
-            }
-        }
-        $this->headerFormat = $headerFormat;
+        fputcsv($this->filePointer, array_keys($headerFormat)); 
         
-        $writer->writeSheetHeader($sheetName, $this->headerFormat);
         $idx = 0;
         if($this->noFetchData($pageData))
         {
             while($row = $pageData->fetch())
             {
                 $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
-                $writer->writeSheetRow($sheetName, $data);
+                $this->writeRow($data);
                 $idx++;
             }
         }
@@ -154,10 +141,20 @@ class XLSXDocumentWriter extends DocumentWriter
             foreach($pageData->getResult() as $row)
             {
                 $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
-                $writer->writeSheetRow($sheetName, $data);
+                $this->writeRow($data);
                 $idx++;
             }
         }
-        return $writer;
+    }
+
+    /**
+     * Write data
+     * @param array $data
+     * @return self
+     */
+    private function writeRow($data)
+    {
+        fputcsv($this->filePointer, $data);
+        return $this;
     }
 }

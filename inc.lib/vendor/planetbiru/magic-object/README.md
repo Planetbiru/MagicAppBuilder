@@ -66,7 +66,7 @@ For large applications, users can scale the database and storage. So that a user
 
 # Stable Version
 
-Stable version of MagicObject is `1.16.1` or above. Please don't install versions bellow it.
+Stable version of MagicObject is `1.17.1` or above. Please don't install versions bellow it.
 
 # Tutorial
 

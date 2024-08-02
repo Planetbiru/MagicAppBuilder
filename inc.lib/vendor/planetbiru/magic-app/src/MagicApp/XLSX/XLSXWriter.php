@@ -500,6 +500,10 @@ class XLSXWriter //NOSONAR
 		}
 	}
 
+	/**
+	 * Style font indexes
+	 * @return array
+	 */
 	protected function styleFontIndexes() //NOSONAR
 	{
 		static $border_allowed = array('left', 'right', 'top', 'bottom');

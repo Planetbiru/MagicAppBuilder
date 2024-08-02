@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '4d3a5859b9f64e5920b97c14fe5be81c7081c372',
+        'reference' => '89a4e800ba47bdbb69c8726275c95895fa927824',
         'name' => 'planetbiru/magic-app',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '4d3a5859b9f64e5920b97c14fe5be81c7081c372',
+            'reference' => '89a4e800ba47bdbb69c8726275c95895fa927824',
             'dev_requirement' => false,
         ),
         'planetbiru/magic-object' => array(
@@ -25,7 +25,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-object',
             'aliases' => array(),
-            'reference' => '5262823d24b8da3111c5c9b11fc3a875b9d99c9d',
+            'reference' => '2561f040ab12671a391c6695683e2c7f6772f125',
             'dev_requirement' => false,
         ),
         'symfony/yaml' => array(

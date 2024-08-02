@@ -96,7 +96,7 @@ class PicoSort
     /**
      * Get instance of PicoSort
      *
-     * @return PicoSort
+     * @return self
      */
     public static function getInstance()
     {
