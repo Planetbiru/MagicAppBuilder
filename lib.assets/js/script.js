@@ -606,6 +606,21 @@ jQuery(function(){
     onChangeMapKey($(this));
   });
 
+  $(document).on('change', '#export_to_excel', function(e){
+    let chk = $(this)[0].checked;
+    if(chk)
+    {
+      $('#export_to_csv')[0].checked = false;
+    }
+  });
+  $(document).on('change', '#export_to_csv', function(e){
+    let chk = $(this)[0].checked;
+    if(chk)
+    {
+      $('#export_to_excel')[0].checked = false;
+    }
+  });
+
   loadTable();
   updateEntityQuery(false);
   updateEntityFile();
@@ -955,6 +970,7 @@ function generateScript(selector) {
   let withTrash = $("#with_trash")[0].checked && true;
   let manualSortOrder = $("#manualsortorder")[0].checked && true;
   let exportToExcel = $("#export_to_excel")[0].checked && true;
+  let exportToCsv = $("#export_to_csv")[0].checked && true;
   let activateDeactivate = $("#activate_deactivate")[0].checked && true;
   let withApprovalNote = $("#with_approval_note")[0].checked && true;
   let approvalPosition = $('[name="approval_position"]:checked').val();
@@ -991,6 +1007,7 @@ function generateScript(selector) {
     activateDeactivate: activateDeactivate,
     sortOrder: manualSortOrder,
     exportToExcel: exportToExcel,
+    exportToCsv: exportToCsv,
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
     trashRequired: withTrash,
@@ -1316,7 +1333,11 @@ function restoreForm(data) {
     if ($('#modal-module-features [name="export_to_excel"]').length) {
       $('#modal-module-features [name="export_to_excel"]')[0].checked = data.features.exportToExcel === true || data.features.exportToExcel == 'true';
     }
-    
+
+    if ($('#modal-module-features [name="export_to_csv"]').length) {
+      $('#modal-module-features [name="export_to_csv"]')[0].checked = data.features.exportToCsv === true || data.features.exportToCsv == 'true';
+    }
+
 
     if ($('#modal-module-features [name="with_approval"]').length) {
       $('#modal-module-features [name="with_approval"]')[0].checked = data.features.approvalRequired === true || data.features.approvalRequired == 'true';

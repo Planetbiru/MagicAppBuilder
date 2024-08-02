@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac576820c9d6b1f404944ef346f3a0ce",
+    "content-hash": "505a9759a3b3d5c135322ecb6b15b826",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
@@ -89,16 +89,16 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "0.8.2",
+            "version": "0.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "0a157b7af6ea7b8e946273965cdf99eb9b312b16"
+                "reference": "2c8e32c0bda594aadb14c7e84f9a5c9726128507"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/0a157b7af6ea7b8e946273965cdf99eb9b312b16",
-                "reference": "0a157b7af6ea7b8e946273965cdf99eb9b312b16",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/2c8e32c0bda594aadb14c7e84f9a5c9726128507",
+                "reference": "2c8e32c0bda594aadb14c7e84f9a5c9726128507",
                 "shasum": ""
             },
             "require": {
@@ -122,9 +122,9 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.2"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.3"
             },
-            "time": "2024-08-01T15:22:09+00:00"
+            "time": "2024-08-01T15:46:21+00:00"
         },
         {
             "name": "planetbiru/magic-object",

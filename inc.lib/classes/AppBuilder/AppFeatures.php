@@ -69,6 +69,12 @@ class AppFeatures
      * @var boolean
      */
     private $exportToExcel = false;
+
+    /**
+     * Export to CSV
+     * @var boolean
+     */
+    private $exportToCsv = false;
     
     /**
      * Constructor
@@ -82,6 +88,7 @@ class AppFeatures
             $this->activateDeactivate = $this->isTrue($features->get('activateDeactivate'));
             $this->sortOrder = $this->isTrue($features->get('sortOrder'));
             $this->exportToExcel = $this->isTrue($features->get('exportToExcel'));
+            $this->exportToCsv = $this->isTrue($features->get('exportToCsv'));
             $this->approvalRequired = $this->isTrue($features->get('approvalRequired'));
             $this->approvalNote = $this->isTrue($features->get('approvalNote'));
             $this->trashRequired = $this->isTrue($features->get('trashRequired'));
@@ -215,6 +222,30 @@ class AppFeatures
     public function setExportToExcel($exportToExcel)
     {
         $this->exportToExcel = $exportToExcel;
+
+        return $this;
+    }
+
+    /**
+     * Get export to CSV
+     *
+     * @return  boolean
+     */ 
+    public function isExportToCsv()
+    {
+        return $this->exportToCsv;
+    }
+
+    /**
+     * Set export to CSV
+     *
+     * @param  boolean  $exportToCsv  Export to CSV
+     *
+     * @return  self
+     */ 
+    public function setExportToCsv($exportToCsv)
+    {
+        $this->exportToCsv = $exportToCsv;
 
         return $this;
     }

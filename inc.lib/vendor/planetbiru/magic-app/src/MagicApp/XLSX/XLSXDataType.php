@@ -4,9 +4,12 @@ namespace MagicApp\XLSX;
 
 class XLSXDataType
 {
-    const TYPE_DOUBLE = "double";
-    const TYPE_INTEGER = "integer";
-    const TYPE_STRING = "string";
+    const TYPE_DOUBLE    = "double";
+    const TYPE_INTEGER   = "integer";
+    const TYPE_STRING    = "string";
+    const TYPE_DATETIME  = "datetime";
+    const TYPE_DATE      = "date";
+    const TYPE_TIME      = "time";
     
     /**
      * Column type
@@ -38,10 +41,10 @@ class XLSXDataType
         "enum" => self::TYPE_STRING,   
         "bool" => self::TYPE_STRING,
         "boolean" => self::TYPE_STRING,
-        "timestamp" => self::TYPE_STRING,
-        "datetime" => self::TYPE_STRING,
-        "date" => self::TYPE_STRING,
-        "time" => self::TYPE_STRING
+        "timestamp" => self::TYPE_DATETIME,
+        "datetime" => self::TYPE_DATETIME,
+        "date" => self::TYPE_DATE,
+        "time" => self::TYPE_TIME
     );
 
     /**

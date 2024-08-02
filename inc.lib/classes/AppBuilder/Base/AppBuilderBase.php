@@ -1172,12 +1172,26 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
 
         }
 
-return 'if($inputGet->getUserAction() == UserAction::EXPORT)
-{
-	$exporter = new XLSXDocumentWriter($appLanguage);
-	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
-	$sheetName = "Sheet 1";
+        if($this->appFeatures->isExportToExcel())
+        {
+            $exporter = '
+    $exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
+    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+    $sheetName = "Sheet 1";
+';
+        }
+        else
+        {
+            $exporter = '
+    $exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+    $sheetName = "Sheet 1";
+';
+        }
 
+
+return 'if($inputGet->getUserAction() == UserAction::EXPORT)
+{'.$exporter.'
 	$headerFormat = new XLSXDataFormat($dataLoader, 3);
 	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
 	$exporter->write($pageData, $fileName, $sheetName, array(
@@ -1315,7 +1329,7 @@ catch(Exception $e)
 
         // before script
         $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable);
-        if($this->appFeatures->isExportToExcel())
+        if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
             $getData[] = $this->createExportScript($entityMain, $exportFields);
         }

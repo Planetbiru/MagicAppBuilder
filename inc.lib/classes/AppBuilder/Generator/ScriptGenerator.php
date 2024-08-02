@@ -348,9 +348,9 @@ class ScriptGenerator
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);      
-        if($appFeatures->isExportToExcel())
+        if($appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
-            $uses[] = "use MagicApp\\XLSX\\XLSXDocumentWriter;";
+            $uses[] = "use MagicApp\\XLSX\\DocumentWriter;";
             $uses[] = "use MagicApp\\XLSX\\XLSXDataFormat;";
         }
         
