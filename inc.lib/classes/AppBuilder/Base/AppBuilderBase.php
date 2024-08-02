@@ -2294,7 +2294,7 @@ $subqueryMap = '.$referece.';
             $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
         }
 
-        if($this->appFeatures->isExportToExcel())
+        if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
             $form->appendChild($dom->createTextNode("\n\t\t".'<?php if($userPermission->isAllowedDetail()){ ?>'));
             $form->appendChild($dom->createTextNode("\n\n\t\t"));
