@@ -9,6 +9,7 @@ Imagine a large application consisting of dozens of CRUD (Create, Read, Update, 
 3. delete existing data
 4. requires approval to create new data, change data and delete data
 5. have a rule that the user who approves the creation, change and deletion of data must be different from the user who creates, changes and deletes data
+6. Data can be exported to Microsoft Excel and CSV formats.
 
 This project must be created in a very fast time, even less than 3 months.
 
@@ -27,7 +28,7 @@ MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for
 ## Requirement
 
 1. Apache Server
-2. PHP Runtime version 7 or above
+2. PHP Runtime version 5.6 or above
 3. MariaDB or MySQL database
 
 ## Dependency
@@ -50,7 +51,8 @@ The following PHP code was created in less than 5 minute and already has the fol
 10. update sort order
 11. join entity
 12. select control with entity and map
-13. multiple language support
+13. data can be exported to Microsoft Excel and CSV formats.
+14. multiple language support
 
 Apart from the features above, the module is also equipped with data filters that are adjusted to the data type.
 
