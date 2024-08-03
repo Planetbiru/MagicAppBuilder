@@ -70,6 +70,91 @@ MagicAppBuilder will display all columns of the selected table. When a developer
 
 As long as all database access by the application is done using entities only, MagicAppBuilder can make queries from automatically created entities. If the developer uses native queries to access the database and adds tables or columns that are not in the existing entity, then the developer must alter the table manually by creating the required alter query himself. Applications generated using MagicAppBuilder almost do not have native queries due to the fact that MagicAppBuilder never uses native queries in applications. Native queries may only be created by developers in conditions where they are needed. Using entities allows developers to create application installers without explicitly including SQL scripts. The installer will create an application script according to the database engine selected by the user.
 
+### Steps
+
+Steps to create an application with MagicAppBuilder
+
+1. Create a complete entity relationship diagram with the following rules:
+a. The column for the primary key of a table must be the same as the table name and added with the suffix _id.
+b. Columns that are foreign keys that refer to other tables are strongly recommended to be given the same name as the primary key of the table in question.
+d. If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
+c. Columns with the same purpose of use must have the same name in all tables.
+d. Application features should be determined before the entity relationship diagram is created.
+2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
+3. Install MagicAppBuilder on your server.
+4. Create MagicAppBuilder settings.
+5. Add the application to be created in MagicAppBuilder.
+6. Create application settings and column mapping.
+7. Click the "Load Table" button to load all tables from the specified database.
+8. Select a table from one of the tables. MagicAppBuilder will automatically fill in some inputs from the form. You can change some inputs before continuing.
+9. Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
+10. Check the check boxes and radio buttons according to how the module will be created.
+11. If you choose "select" in the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to determine the reference you will create. This section will be explained separately.
+12. Click the "Data Filter" button to determine the data filter.
+13. Click the "Data Order" button to determine the order of the data.
+14. Click the "Module Filter" button to determine the module features.
+15. Click the "Generate Script" button to create a script automatically. MagicAppBuilder will create a module script and some entity scripts required by the module. If in step number 8 you check "Update Entity", then MagicAppBuilder will update the existing entity. Be careful if you have defined the entity before.
+
+### Reserved Column Mapping
+
+Reserved columns can be mapped to other names according to the native language used by the application and the terminology that will be used in each entity. Each entity must consistently use the full name if it is going to use it.
+
+For example:
+
+The `album` entity requires the `sort_order` column to sort the albums. So the `album` entity must use the `sort_order` column and not others to sort the data.
+
+The `album` entity also requires the `active` column to activate and deactivate data. So the `album` entity must use the `active` column and not others to activate and deactivate data.
+
+On the other hand, the `artist` entity only does not need the `sort_order` column because artist data is not sorted by default by the user but still uses the `active` column to activate and deactivate data. So the `artist` entity must use the `active` column and not others to activate and deactivate data.
+
+If the application is built in a language other than English, it would be strange to still use column names such as `active`, `admin_create`, `ip_create` and so on. Therefore, developers are free to choose other names but must create column mappings.
+
+The following is an example of column mapping into Indonesian.
+
+| Original Key    | Translated Key |
+| --------------- | -------------- | 
+| name            | nama |
+| sort_order      | sort_order |
+| active          | aktif |
+| draft           | draft |
+| waiting_for     | waiting_for |
+| admin_create    | admin_buat |
+| admin_edit      | admin_ubah |
+| admin_ask_edit  | admin_minta_ubah |
+| time_create     | waktu_buat |
+| time_edit       | waktu_ubah |
+| time_ask_edit   | waktu_minta_ubah |
+| ip_create       | ip_buat |
+| ip_edit         | ip_ubah |
+| ip_ask_edit     | ip_minta_ubah |
+| approval_id     | approval_id |
+| approval_note   | approval_note |
+| approval_status | approval_status |
+
+Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
+
+Here is an explanation of the reserved columns above.
+
+| Original Key    | Description |
+| --------------- | -------------- | 
+| name            | A column that will represent a single row as a whole in an entity. |
+| sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
+| active          | Columns to activate and deactivate data |
+| draft           | Column that marks that the data is new data that has not yet received approval. |
+| waiting_for     | Column that specifies what approvals are required by a row. |
+| admin_create    | Column for user ID who created the data first |
+| admin_edit      | Column for user ID who last changed the data |
+| admin_ask_edit  | Column for user ID who requested the data change |
+| time_create     | Column for time when created the data first |
+| time_edit       | Column for time when last changed the data |
+| time_ask_edit   | Column for time requested the data change |
+| ip_create       | Column for IP Address from where created the data first |
+| ip_edit         | Column for IP Address from where last changed the data |
+| ip_ask_edit     | Column for IP Address from where requested the data change |
+| approval_id     | Column for ID of the data in the approval table |
+| approval_note   | Column for approval note |
+| approval_status | Column for approval status |
+
 # User Plan
 
 | Object                                  | Free       | Pro        |
