@@ -89,7 +89,7 @@ d. Application features should be determined before the entity relationship diag
 8. Select a table from one of the tables. MagicAppBuilder will automatically fill in some inputs from the form. You can change some inputs before continuing.
 9. Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
 10. Check the check boxes and radio buttons according to how the module will be created.
-11. If you select "select" in the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to determine the reference you will create. This section will be explained separately.
+11. If you choose "select" in the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to determine the reference you will create. This section will be explained separately.
 12. Click the "Data Filter" button to determine the data filter.
 13. Click the "Data Order" button to determine the order of the data.
 14. Click the "Module Filter" button to determine the module features.
