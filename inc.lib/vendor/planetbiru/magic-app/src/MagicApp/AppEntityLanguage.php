@@ -94,7 +94,7 @@ class AppEntityLanguage extends PicoEntityLanguage
     /**
      * Get app config
      *
-     * @return  SecretObject
+     * @return SecretObject
      */ 
     public function getAppConfig()
     {
@@ -104,7 +104,7 @@ class AppEntityLanguage extends PicoEntityLanguage
     /**
      * Get current language
      *
-     * @return  string
+     * @return string
      */ 
     public function getCurrentLanguage()
     {

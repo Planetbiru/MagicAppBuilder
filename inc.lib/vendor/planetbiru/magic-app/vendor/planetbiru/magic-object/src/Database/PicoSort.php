@@ -21,6 +21,11 @@ class PicoSort
      */
     private $sortType = "";
     
+    /**
+     * Constructor
+     * @param string $sortBy
+     * @param string $sortType
+     */
     public function __construct($sortBy = null, $sortType = null)
     {
         $this->setSortBy($sortBy);
@@ -40,7 +45,7 @@ class PicoSort
     /**
      * Set sort by
      *
-     * @param string $sortBy  Sort by
+     * @param string $sortBy Sort by
      *
      * @return self
      */ 
@@ -64,7 +69,7 @@ class PicoSort
     /**
      * Set sort type
      *
-     * @param string $sortType  Sort type
+     * @param string $sortType Sort type
      *
      * @return self
      */ 

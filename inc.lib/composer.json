@@ -6,6 +6,6 @@
     },
     "require": {
         "phpmailer/phpmailer": "^6.9",
-        "planetbiru/magic-app": "^0.8.4"
+        "planetbiru/magic-app": "^0.8.6"
     }
 }

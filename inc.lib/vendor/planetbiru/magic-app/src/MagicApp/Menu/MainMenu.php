@@ -55,7 +55,7 @@ class MainMenu extends BasicMenu
     /**
      * Get menu
      *
-     * @return  array
+     * @return array
      */ 
     public function getMenu()
     {

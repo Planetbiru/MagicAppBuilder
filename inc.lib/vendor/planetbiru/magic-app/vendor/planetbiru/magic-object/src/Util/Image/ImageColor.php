@@ -76,7 +76,7 @@ class ImageColor
     /**
      * Get red component
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getRed()
     {
@@ -86,9 +86,9 @@ class ImageColor
     /**
      * Set red component
      *
-     * @param  integer  $red  Red component
+     * @param integer  $red  Red component
      *
-     * @return  self
+     * @return self
      */ 
     public function setRed($red)
     {
@@ -100,7 +100,7 @@ class ImageColor
     /**
      * Get green component
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getGreen()
     {
@@ -110,9 +110,9 @@ class ImageColor
     /**
      * Set green component
      *
-     * @param  integer  $green  Green component
+     * @param integer  $green  Green component
      *
-     * @return  self
+     * @return self
      */ 
     public function setGreen($green)
     {
@@ -124,7 +124,7 @@ class ImageColor
     /**
      * Get blue component
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getBlue()
     {
@@ -134,9 +134,9 @@ class ImageColor
     /**
      * Set blue component
      *
-     * @param  integer  $blue  Blue component
+     * @param integer  $blue  Blue component
      *
-     * @return  self
+     * @return self
      */ 
     public function setBlue($blue)
     {

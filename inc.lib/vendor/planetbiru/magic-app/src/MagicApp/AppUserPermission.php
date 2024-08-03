@@ -327,7 +327,7 @@ class AppUserPermission
     /**
      * Get allowed show list
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedList()
     {
@@ -342,7 +342,7 @@ class AppUserPermission
     /**
      * Get allowed show detail
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedDetail()
     {
@@ -357,7 +357,7 @@ class AppUserPermission
     /**
      * Get allowed create
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedCreate()
     {
@@ -372,7 +372,7 @@ class AppUserPermission
     /**
      * Get allowed update
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedUpdate()
     {
@@ -387,7 +387,7 @@ class AppUserPermission
     /**
      * Get allowed delete
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedDelete()
     {
@@ -402,7 +402,7 @@ class AppUserPermission
     /**
      * Get allowed short order
      *
-     * @return  boolean
+     * @return boolean
      */ 
     public function isAllowedSortOrder()
     {
@@ -417,7 +417,7 @@ class AppUserPermission
     /**
      * Get user level
      *
-     * @return  string
+     * @return string
      */ 
     public function getUserLevelId()
     {
@@ -428,7 +428,7 @@ class AppUserPermission
     /**
      * Get current user
      *
-     * @return  MagicObject
+     * @return MagicObject
      */ 
     public function getCurrentUser()
     {
@@ -438,7 +438,7 @@ class AppUserPermission
     /**
      * Get user action
      *
-     * @return  string
+     * @return string
      */ 
     public function getUserAction()
     {

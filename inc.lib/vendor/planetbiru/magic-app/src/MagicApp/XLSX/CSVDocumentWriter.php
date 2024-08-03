@@ -24,7 +24,6 @@ class CSVDocumentWriter extends DocumentWriter
     {
         $this->temporaryFile = tempnam(sys_get_temp_dir(), 'my-temp-file');
         $this->filePointer = fopen($this->temporaryFile, 'w');
-
         if(isset($headerFormat) && is_array($headerFormat) && is_callable($writerFunction))
         {
             $this->writeDataWithFormat($pageData, $headerFormat, $writerFunction);
@@ -33,13 +32,11 @@ class CSVDocumentWriter extends DocumentWriter
         {
             $this->writeDataWithoutFormat($pageData);
         }
-        
         header('Content-disposition: attachment; filename="'.$fileName.'"');
         header("Content-Type: text/csv");
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        
+        header('Pragma: public');       
         readfile($this->temporaryFile);
         unlink($this->temporaryFile);
         return $this;
@@ -124,8 +121,7 @@ class CSVDocumentWriter extends DocumentWriter
      */
     private function writeDataWithFormat($pageData, $headerFormat, $writerFunction)
     {
-        fputcsv($this->filePointer, array_keys($headerFormat)); 
-        
+        fputcsv($this->filePointer, array_keys($headerFormat));     
         $idx = 0;
         if($this->noFetchData($pageData))
         {

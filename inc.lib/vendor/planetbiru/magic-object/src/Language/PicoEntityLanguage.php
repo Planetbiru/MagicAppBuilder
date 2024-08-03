@@ -314,7 +314,7 @@ class PicoEntityLanguage
     /**
      * Get table identity
      *
-     * @return  PicoGenericObject
+     * @return PicoGenericObject
      */ 
     public function getTableIdentity()
     {

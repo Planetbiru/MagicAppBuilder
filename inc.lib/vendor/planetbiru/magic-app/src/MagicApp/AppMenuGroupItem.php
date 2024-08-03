@@ -27,7 +27,7 @@ class AppMenuGroupItem
     /**
      * Get label
      *
-     * @return  string
+     * @return string
      */ 
     public function getLabel()
     {
@@ -37,9 +37,9 @@ class AppMenuGroupItem
     /**
      * Set label
      *
-     * @param  string  $label  Label
+     * @param string  $label  Label
      *
-     * @return  self
+     * @return self
      */ 
     public function setLabel($label)
     {
@@ -51,7 +51,7 @@ class AppMenuGroupItem
     /**
      * Get class name
      *
-     * @return  string
+     * @return string
      */ 
     public function getClass()
     {
@@ -61,9 +61,9 @@ class AppMenuGroupItem
     /**
      * Set class name
      *
-     * @param  string  $class  Class name
+     * @param string  $class  Class name
      *
-     * @return  self
+     * @return self
      */ 
     public function setClass($class)
     {
@@ -75,7 +75,7 @@ class AppMenuGroupItem
     /**
      * Get menu item
      *
-     * @return  AppMenuItem[]
+     * @return AppMenuItem[]
      */ 
     public function getMenuItem()
     {
@@ -85,9 +85,9 @@ class AppMenuGroupItem
     /**
      * Set menu item
      *
-     * @param  AppMenuItem[]  $menuItem  Menu item
+     * @param AppMenuItem[]  $menuItem  Menu item
      *
-     * @return  self
+     * @return self
      */ 
     public function setMenuItem($menuItem)
     {

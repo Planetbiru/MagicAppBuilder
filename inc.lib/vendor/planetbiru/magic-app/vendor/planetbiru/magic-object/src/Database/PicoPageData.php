@@ -384,7 +384,7 @@ class PicoPageData
     /**
      * Get PDO statement
      *
-     * @return  PDOStatement
+     * @return PDOStatement
      */ 
     public function getPDOStatement()
     {
@@ -455,7 +455,7 @@ class PicoPageData
     /**
      * Get find option
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getFindOption()
     {
@@ -465,9 +465,9 @@ class PicoPageData
     /**
      * Set find option
      *
-     * @param  integer  $findOption  Find option
+     * @param integer  $findOption  Find option
      *
-     * @return  self
+     * @return self
      */ 
     public function setFindOption($findOption)
     {

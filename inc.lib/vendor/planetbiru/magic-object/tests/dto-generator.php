@@ -14,5 +14,5 @@ $database = new PicoDatabase($databaseCredential);
 $database->connect();
 
 
-$gen = new PicoDtoGenerator($database, __DIR__."/entity", "song", "Music\\Dto", 'DtoSong', "Music\\Entity", 'EntitySong', true);
+$gen = new PicoDtoGenerator($database, __DIR__."/entity", "song", "Music\\Dto", 'DtoSong', "Music\\Entity", 'EntitySong');
 $gen->generate();

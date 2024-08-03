@@ -110,6 +110,12 @@ class PicoModule
         return $this->userRole;
     }
 
+    /**
+     * Get get allowed modules
+     *
+     * @param MagicObject[] $appUserRoles
+     * @return array
+     */
     public function getAllowedModules($appUserRoles)
     {
         if(empty($this->allowedModules))
@@ -119,11 +125,15 @@ class PicoModule
         return $this->allowedModules;
     }
 
+    /**
+     * Parse roles
+     * @param MagicObject[] $appUserRoles
+     * @return self
+     */
     public function parseRole($appUserRoles)
     {
         if(isset($appUserRoles) && is_array($appUserRoles))
         {
-
             $this->allowedModules = array();
             foreach($appUserRoles as $role)
             {
@@ -131,25 +141,29 @@ class PicoModule
                 {
                     $this->userRole = $role;
                 }
-
-                if(
-                    $role->getAllowedList()
-                ||  $role->getAllowedDetail()
-                ||  $role->getAllowedCreate()
-                ||  $role->getAllowedUpdate()
-                ||  $role->getAllowedDelete()
-                ||  $role->getAllowedApprove()
-                ||  $role->getAllowedSortOrder()
-                )
+                if($this->getAccess($role) && $role->getModuleId() != null)
                 {
-                    if($role->getModuleId() != null)
-                    {
-                        $this->allowedModules[] = $role->getModuleId();
-                    }
+                    $this->allowedModules[] = $role->getModuleId();
                 }
             }
         }
         return $this;
+    }
+
+    /**
+     * Get access
+     * @param MagicObject $role
+     * @return boolean
+     */
+    public function getAccess($role)
+    {
+        return $role->getAllowedList()
+        ||  $role->getAllowedDetail()
+        ||  $role->getAllowedCreate()
+        ||  $role->getAllowedUpdate()
+        ||  $role->getAllowedDelete()
+        ||  $role->getAllowedApprove()
+        ||  $role->getAllowedSortOrder();
     }
 
     /**
@@ -265,7 +279,7 @@ class PicoModule
     /**
      * Get module name
      *
-     * @return  string
+     * @return string
      */ 
     public function getModuleName()
     {
@@ -275,7 +289,7 @@ class PicoModule
     /**
      * Get module title
      *
-     * @return  string
+     * @return string
      */ 
     public function getModuleTitle()
     {
@@ -285,7 +299,7 @@ class PicoModule
     /**
      * Get database
      *
-     * @return  PicoDatabase
+     * @return PicoDatabase
      */ 
     public function getDatabase()
     {
@@ -295,7 +309,7 @@ class PicoModule
     /**
      * Get app module
      *
-     * @return  AppModule|mixed
+     * @return AppModule|mixed
      */ 
     public function getAppModule()
     {
@@ -305,7 +319,7 @@ class PicoModule
     /**
      * Get target directory
      *
-     * @return  string
+     * @return string
      */ 
     public function getTargetDirectory()
     {

@@ -122,7 +122,7 @@ class AppInclude
     /**
      * Get app config
      *
-     * @return  SecretObject
+     * @return SecretObject
      */ 
     public function getAppConfig()
     {
@@ -132,9 +132,9 @@ class AppInclude
     /**
      * Set app config
      *
-     * @param  SecretObject  $appConfig  App config
+     * @param SecretObject  $appConfig  App config
      *
-     * @return  self
+     * @return self
      */ 
     public function setAppConfig($appConfig)
     {
@@ -146,7 +146,7 @@ class AppInclude
     /**
      * Get current module
      *
-     * @return  PicoModule
+     * @return PicoModule
      */ 
     public function getCurrentModule()
     {
@@ -156,9 +156,9 @@ class AppInclude
     /**
      * Set current module
      *
-     * @param  PicoModule  $currentModule  Current module
+     * @param PicoModule  $currentModule  Current module
      *
-     * @return  self
+     * @return self
      */ 
     public function setCurrentModule($currentModule)
     {

@@ -56,6 +56,8 @@ To see available versions of MagicObject, visit https://packagist.org/packages/p
 
 # Advantages
 
+MagicObject is designed to be easy to use and can even be coded using a code generator. An example of a code generator that successfully creates MagicObject code using only parameters is MagicAppBuilder. MagicObject provides many ways to write code. Users can choose the way that is easiest to implement.
+
 MagicObject does not only pay attention to the ease of users in creating applications. MagicObject also pays attention to the efficiency of both time and resources used by applications so that applications can be run on servers with minimum specifications. This of course will save costs used both in application development and operations.
 
 # Application Scaling
@@ -66,7 +68,7 @@ For large applications, users can scale the database and storage. So that a user
 
 # Stable Version
 
-Stable version of MagicObject is `1.17.1` or above. Please don't install versions bellow it.
+Stable version of MagicObject is `1.17.2` or above. Please don't install versions bellow it.
 
 # Tutorial
 

@@ -209,7 +209,7 @@ class AppFormOption
     /**
      * Get text node
      *
-     * @return  string
+     * @return string
      */ 
     public function getTextNode()
     {
@@ -219,9 +219,9 @@ class AppFormOption
     /**
      * Set text node
      *
-     * @param  string  $textNode  Text node
+     * @param string  $textNode  Text node
      *
-     * @return  self
+     * @return self
      */ 
     public function setTextNode($textNode)
     {
@@ -233,7 +233,7 @@ class AppFormOption
     /**
      * Get data
      *
-     * @return  MagicObject
+     * @return MagicObject
      */ 
     public function getData()
     {

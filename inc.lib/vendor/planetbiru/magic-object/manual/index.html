@@ -5770,6 +5770,298 @@ $specification-&gt;addOr($specification2)</code></pre>
 </article>
 
 <article class="article" id="part14">
+<h3>Pageable and Sortable</h3>
+<p>In MagicObject, pageable is used to divide data rows into several pages. This is required by the application to display a lot of data per page. While sortable is used to sort data before the data is divided per page.</p>
+<p>Pageable can stand alone without sortable. However, this method is not recommended because the data sequence is not as expected. If new data is entered, users will have difficulty finding where it is located in the list and on which page the data will appear. The solution is to add a sortable that will sort the data based on certain columns. For example, the time of data creation is descending, then the new data will be on the first page. Conversely, if sorted based on the time of data creation is ascending, then the new data will be on the last page.</p>
+<p>Sortable can use multiple columns. The order in which the columns are determined will determine the priority order in sorting the data.</p>
+<p>An example of implementing pageable and sortable in MagicObject.</p>
+<pre><code class="language-php">$pageNumber = 1;
+$pageSize = 20;
+
+$albumFinder = new Album(null, $database);
+$specification = null;
+$sortable = new PicoSortable();
+$sort1 = new PicoSort('releaseDate', PicoSort::ORDER_TYPE_DESC);
+$sortable-&gt;addSortable($sort1);
+$page = new PicoPage($pageNumber, $pageSize);
+$pageable = new PicoPageable($page);
+
+try
+{
+    $albumFinder-&gt;findAll($specification, $pagable, $sortable);
+    $pageData = $albumFinder-&gt;getResult();
+    foreach($pageData as $album)
+    {
+        echo $album."\r\n";
+    }
+}
+catch(Exception $e)
+{
+    error_log($e-&gt;getMessage());
+}
+</code></pre>
+<p>or</p>
+<pre><code class="language-php">$pageNumber = 1;
+$pageSize = 20;
+
+$albumFinder = new Album(null, $database);
+$sortable = PicoSortable::getInstance()
+    -&gt;add(new PicoSort('releaseDate', PicoSort::ORDER_TYPE_DESC))
+;
+$pageable = new PicoPageable(new PicoPage($pageNumber, $pageSize));
+
+try
+{
+    $albumFinder-&gt;findAll(null, $pagable, $sortable);
+    $pageData = $albumFinder-&gt;getResult();
+    foreach($pageData as $album)
+    {
+        echo $album."\r\n";
+    }
+}
+catch(Exception $e)
+{
+    error_log($e-&gt;getMessage());
+}
+</code></pre>
+<p><strong>PicoPageable</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<ul>
+<li>PicoPage|PicoLimit|array $page</li>
+<li>PicoSortable|array $sortable</li>
+</ul>
+<p>Method:</p>
+<ul>
+<li>getSortable</li>
+<li>setSortable</li>
+<li>addSortable</li>
+<li>createOrderBy</li>
+<li>getPage</li>
+<li>setPage</li>
+<li>getOffsetLimit</li>
+<li>setOffsetLimit</li>
+</ul>
+<p><strong>PicoPage</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<ul>
+<li>integer $pageNumber</li>
+<li>integer $pageSize</li>
+</ul>
+<p>Metods:</p>
+<ul>
+<li>getPageNumber</li>
+<li>setPageNumber</li>
+<li>getPageSize</li>
+<li>setPageSize</li>
+</ul>
+<p><strong>PicoLimit</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<ul>
+<li>integer $offset</li>
+<li>integer $limit</li>
+</ul>
+<p>Metods:</p>
+<ul>
+<li>getOffset</li>
+<li>setOffset</li>
+<li>getLimit</li>
+<li>setLimit</li>
+</ul>
+<p><strong>PicoSortable</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<p>Users can enter an even number of parameters where odd numbered parameters are columns while even numbered parameters are methods.</p>
+<p>Example:</p>
+<pre><code class="language-php">$sortable = new PicoSortable("name", "asc", "phone", "desc");</code></pre>
+<p>Method:</p>
+<ul>
+<li>add</li>
+<li>addSortable</li>
+<li>createSortable</li>
+<li>createOrderBy</li>
+<li>isEmpty</li>
+<li>getSortable</li>
+</ul>
+<p>Static methods:</p>
+<ul>
+<li>getInstance</li>
+</ul>
+<p>addSortable</p>
+<p>Parameters:</p>
+<ul>
+<li>PicoSort|array</li>
+</ul>
+<p><strong>PicoSort</strong></p>
+<p>Constructor:</p>
+<p>Parameters:</p>
+<ul>
+<li>string $sortBy</li>
+<li>string $sortType</li>
+</ul>
+<p>Metods:</p>
+<ul>
+<li>getSortBy</li>
+<li>setSortBy</li>
+<li>getSortType</li>
+<li>setSortType</li>
+<li>__call</li>
+</ul>
+<p>Static methods:</p>
+<ul>
+<li>getInstance</li>
+<li>fixSortType</li>
+</ul>
+<p>Example:</p>
+<p><strong>Pageable without Sortable</strong></p>
+<pre><code class="language-php">$pageable = new PicoPageable(new Page(1, 100));
+// page number = 1
+// page size = 100
+// no sortable</code></pre>
+<p><strong>Pageable with Sortable</strong></p>
+<pre><code class="language-php">$sortable = new PicoSortable();
+
+$sort1 = new PicoSort('userName', 'asc');
+$sort2 = new PicoSort('email', 'desc');
+$sort3 = new PicoSort('phone', 'asc');
+
+$sortable-&gt;add($sort1);
+$sortable-&gt;add($sort2);
+$sortable-&gt;add($sort3);
+
+$pageable = new PicoPageable(new Page(1, 100), $sortable);
+// page number = 1
+// page size = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = PicoSortable::getInstance()
+    -&gt;add(new PicoSort('userName', 'asc'))
+    -&gt;add(new PicoSort('email', 'desc'))
+    -&gt;add(new PicoSort('phone', 'asc'))
+;</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = PicoSortable::getInstance()
+    -&gt;add(new PicoSort('userName', PicoSort::ORDER_TYPE_ASC))
+    -&gt;add(new PicoSort('email', PicoSort::ORDER_TYPE_DESC))
+    -&gt;add(new PicoSort('phone', PicoSort::ORDER_TYPE_ASC))
+;
+
+$pageable = new PicoPageable(new Page(1, 100), $sortable);
+// page number = 1
+// page size = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p><strong>With Limit and Sortable</strong></p>
+<pre><code class="language-php">$sortable = new PicoSortable();
+
+$sort1 = new PicoSort('userName', 'asc');
+$sort2 = new PicoSort('email', 'desc');
+$sort3 = new PicoSort('phone', 'asc');
+
+$sortable-&gt;add($sort1);
+$sortable-&gt;add($sort2);
+$sortable-&gt;add($sort3);
+
+$pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
+// offset = 0
+/// limit = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = new PicoSortable(
+    'userName', 'asc',
+    'email', 'desc',
+    'phone', 'asc'
+);
+
+$pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
+// offset = 0
+/// limit = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = PicoSortable::getInstance()
+    -&gt;add(new PicoSort('userName', 'asc'))
+    -&gt;add(new PicoSort('email', 'desc'))
+    -&gt;add(new PicoSort('phone', 'asc'))
+;
+
+$pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
+// offset = 0
+/// limit = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = PicoSortable::getInstance()
+    -&gt;add(new PicoSort('userName', PicoSort::ORDER_TYPE_ASC))
+    -&gt;add(new PicoSort('email', PicoSort::ORDER_TYPE_DESC))
+    -&gt;add(new PicoSort('phone', PicoSort::ORDER_TYPE_ASC))
+;
+
+$pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
+// offset = 0
+/// limit = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<p>or</p>
+<pre><code class="language-php">$sortable = PicoSortable::getInstance()
+    -&gt;add(PicoSort::getInstance()-&gt;sortByUserName(PicoSort::ORDER_TYPE_ASC))
+    -&gt;add(PicoSort::getInstance()-&gt;sortByEmail(PicoSort::ORDER_TYPE_DESC))
+    -&gt;add(PicoSort::getInstance()-&gt;sortByPhone(PicoSort::ORDER_TYPE_ASC))
+;
+
+$pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
+// offset = 0
+/// limit = 100
+// ORDER BY user_name ASC, email DESC, phone ASC</code></pre>
+<ol>
+<li>Construtor with page as PicoPageable and sortable as PicoSortable</li>
+</ol>
+<p><code>$pageable = new PicoPageable(new PicoPage(1, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 0</code></p>
+<p><code>$pageable = new PicoPageable(new PicoPage(3, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 200</code></p>
+<ol start="2">
+<li>Construtor with page as PicoPage and sortable as array</li>
+</ol>
+<p><code>$pageable = new PicoPageable(new PicoPage(1, 100), array('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 0</code></p>
+<p><code>$pageable = new PicoPageable(new PicoPage(5, 50), array('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 50 OFFSET 200</code></p>
+<ol start="3">
+<li>Construtor with page as PicoLimit and sortable as PicoSortable</li>
+</ol>
+<p><code>$pageable = new PicoPageable(new PicoLimit(0, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 0</code></p>
+<p><code>$pageable = new PicoPageable(new PicoLimit(50, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 50</code></p>
+<ol start="4">
+<li>Construtor with page as PicoLimit and sortable as array</li>
+</ol>
+<p><code>$pageable = new PicoPageable(new PicoLimit(0, 100), array('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 0</code></p>
+<p><code>$pageable = new PicoPageable(new PicoLimit(20, 100), array('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 20</code></p>
+<ol start="5">
+<li>Construtor with page as array and sortable as PicoSortable</li>
+</ol>
+<p><code>$pageable = new PicoPageable(array(10, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 100 OFFSET 900</code></p>
+<ol start="6">
+<li>Construtor with page as array and sortable as array</li>
+</ol>
+<p><code>$pageable = new PicoPageable(array(3, 200), array('userName', 'asc', 'email', 'desc', 'phone', 'asc'));</code></p>
+<p>will be</p>
+<p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 200 OFFSET 400</code></p>
+</article>
+
+<article class="article" id="part15">
 <h2>Filtering, Ordering and Pagination</h2>
 <p>MagicObject will filter data according to the given criteria. On the other hand, MagicObject will only retrieve data on the specified page by specifying <code>limit</code> and <code>offset</code> data in the <code>select</code> query.</p>
 <p>Example parameters:</p>
@@ -6652,7 +6944,7 @@ require_once "inc/footer.php";
 ?&gt;</code></pre>
 </article>
 
-<article class="article" id="part15">
+<article class="article" id="part16">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <pre><code class="language-php">&lt;?php
@@ -7121,7 +7413,7 @@ $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);</code></pre>
 </article>
 
-<article class="article" id="part16">
+<article class="article" id="part17">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -7246,7 +7538,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part17">
+<article class="article" id="part18">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -7513,7 +7805,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part19">
 <h2>Upload File</h2>
 <p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
 <p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
@@ -7562,7 +7854,7 @@ else
 }</code></pre>
 </article>
 
-<article class="article" id="part19">
+<article class="article" id="part20">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>

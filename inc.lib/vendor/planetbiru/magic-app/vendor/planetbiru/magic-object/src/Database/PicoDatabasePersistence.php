@@ -2505,9 +2505,7 @@ class PicoDatabasePersistence // NOSONAR
         $info = $this->getTableInfo();
         $data = null;
         $result = array();
-
         $sqlQuery = $this->findByQuery($propertyName, $propertyValue, $pageable, $sortable, $info, $subqueryMap);
-
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
@@ -2561,21 +2559,18 @@ class PicoDatabasePersistence // NOSONAR
     {
         $info = $this->getTableInfo();
         $primaryKeys = array_values($info->getPrimaryKeys());
+        $agg = "*";
         if(is_array($primaryKeys) && isset($primaryKeys[0][self::KEY_NAME]))
         {
             // it will be faster than asterisk
             $agg = $primaryKeys[0][self::KEY_NAME];
         }
-        else
-        {
-            $agg = "*";
-        }
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
         $sqlQuery = $queryBuilder
             ->newQuery()
             ->select($this->getAllColumns($info))
-            ->from($info->getTableName());  
-               
+            ->from($info->getTableName())
+        ;
         if($specification != null && $specification instanceof PicoSpecification)
         {
             if($this->isRequireJoin($specification, $pageable, $sortable, $info))
@@ -2590,7 +2585,7 @@ class PicoDatabasePersistence // NOSONAR
                 ->newQuery()
                 ->select($agg)
                 ->from($info->getTableName())
-                ;
+            ;
         }
         try
         {
@@ -2615,14 +2610,11 @@ class PicoDatabasePersistence // NOSONAR
     {
         $info = $this->getTableInfo();
         $primaryKeys = array_values($info->getPrimaryKeys());
+        $agg = "*";
         if(is_array($primaryKeys) && isset($primaryKeys[0][self::KEY_NAME]))
         {
             // it will be faster than asterisk
             $agg = $primaryKeys[0][self::KEY_NAME];
-        }
-        else
-        {
-            $agg = "*";
         }
         $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
         if(!$this->isValidFilter($where))
@@ -2634,7 +2626,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->select($agg)
             ->from($info->getTableName())
-            ->where($where);
+            ->where($where)
+        ;
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
@@ -2674,7 +2667,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->delete()
             ->from($info->getTableName())
-            ->where($where);
+            ->where($where)
+        ;
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
@@ -2718,8 +2712,7 @@ class PicoDatabasePersistence // NOSONAR
             ->from($info->getTableName())
             ->where($where);
         $sqlQuery = $this->setSortable($sqlQuery, null, $sortable, $info);  
-        $sqlQuery->limit(1)
-            ->offset(0);
+        $sqlQuery->limit(1)->offset(0);
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
@@ -2763,7 +2756,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->delete()
             ->from($info->getTableName())
-            ->where($where);
+            ->where($where)
+        ;
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
@@ -3375,7 +3369,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->select($this->getAllColumns($info))
             ->from($info->getTableName())
-            ->where($where);
+            ->where($where)
+        ;
     }
 
     /**
@@ -3457,7 +3452,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->update($info->getTableName())
             ->set($set)
-            ->where($where);
+            ->where($where)
+        ;
     }
 
     /**
@@ -3533,7 +3529,8 @@ class PicoDatabasePersistence // NOSONAR
             ->newQuery()
             ->delete()
             ->from($info->getTableName())
-            ->where($where);
+            ->where($where)
+        ;
     }
 
     /**
@@ -3562,7 +3559,6 @@ class PicoDatabasePersistence // NOSONAR
         {
             // Do nothing
         }
-
         return $persist;
     }
 

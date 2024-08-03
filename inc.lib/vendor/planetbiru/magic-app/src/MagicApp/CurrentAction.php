@@ -61,7 +61,7 @@ class CurrentAction
     /**
      * Get current user set by constructor
      *
-     * @return  string
+     * @return string
      */ 
     public function getUser()
     {
@@ -71,7 +71,7 @@ class CurrentAction
     /**
      * Get current IP
      *
-     * @return  string
+     * @return string
      */ 
     public function getIp()
     {

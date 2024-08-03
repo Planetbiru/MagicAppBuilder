@@ -15,7 +15,7 @@ class DocumentWriter
     protected $headerFormat = array();
 
     /**
-     * App language
+     * Application language
      * @var AppLanguage
      */
     protected $appLanguage;
@@ -32,7 +32,7 @@ class DocumentWriter
     /**
      * Check if never fetch data
      *
-     * @param PicoPageData $pageData
+     * @param PicoPageData $pageData Page data
      * @return boolean
      */
     protected function noFetchData($pageData)
@@ -43,7 +43,7 @@ class DocumentWriter
     /**
      * Get app language
      *
-     * @return  AppLanguage
+     * @return AppLanguage
      */ 
     public function getAppLanguage()
     {
@@ -53,9 +53,9 @@ class DocumentWriter
     /**
      * Set app language
      *
-     * @param  AppLanguage  $appLanguage  App language
+     * @param AppLanguage  $appLanguage  Application language
      *
-     * @return  self
+     * @return self
      */ 
     public function setAppLanguage($appLanguage)
     {
@@ -65,8 +65,8 @@ class DocumentWriter
     }
 
     /**
-     * App language
-     * @param AppLanguage $appLanguage
+     * Application language
+     * @param AppLanguage $appLanguage Application language
      * @return XLSXDocumentWriter
      */
     public static function getXLSXDocumentWriter($appLanguage)
@@ -75,7 +75,7 @@ class DocumentWriter
     }
 
     /**
-     * App language
+     * Application language
      * @param AppLanguage $appLanguage
      * @return CSVDocumentWriter
      */

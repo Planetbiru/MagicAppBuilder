@@ -56,7 +56,8 @@ class XLSXDataType
     /**
      * Constructor
      *
-     * @param string $columnType
+     * @param string $columnType Column type
+     * @param integer $precision Precision
      */
     public function __construct($columnType, $precision = null)
     {
@@ -93,7 +94,7 @@ class XLSXDataType
 
     /**
      * Get number format
-     * @param mixed $precision
+     * @param mixed $precision Precision
      * @return string
      */
     public function getNumberFormat($precision)

@@ -9,7 +9,6 @@ use MagicObject\Util\PicoStringUtil;
 
 class XLSXDocumentWriter extends DocumentWriter
 {
-    
     /**
      * Write data
      *
@@ -30,16 +29,13 @@ class XLSXDocumentWriter extends DocumentWriter
         else
         {
             $writer = $this->writeDataWithoutFormat($writer, $pageData, $sheetName);
-        }
-        
+        }    
         header('Content-disposition: attachment; filename="'.$fileName.'"');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        
         $writer->writeToStdOut();
-
         return $this;
     }
 
@@ -136,8 +132,7 @@ class XLSXDocumentWriter extends DocumentWriter
                 $headerFormat[$key] = $value->toString();
             }
         }
-        $this->headerFormat = $headerFormat;
-        
+        $this->headerFormat = $headerFormat;        
         $writer->writeSheetHeader($sheetName, $this->headerFormat);
         $idx = 0;
         if($this->noFetchData($pageData))

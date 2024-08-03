@@ -25,6 +25,7 @@ includes:
   - session
   - entity
   - specification
+  - pagable
   - pagination
   - database-dump
   - object-label

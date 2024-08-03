@@ -76,7 +76,6 @@ class XLSXDataFormat
         {
             return strtolower(substr($name, 2));
         }
-        
     }
     
     /**

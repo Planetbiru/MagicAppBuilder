@@ -155,9 +155,9 @@ class PicoPasswordUtil{
     /**
      * Set regular expression format
      *
-     * @param  string  $regex  Regular expression format
+     * @param string  $regex  Regular expression format
      *
-     * @return  self
+     * @return self
      */ 
     public function setRegex($regex)
     {
@@ -179,9 +179,9 @@ class PicoPasswordUtil{
     /**
      * Set minimum length of the password
      *
-     * @param  integer  $minLength  Minimum length of the password
+     * @param integer  $minLength  Minimum length of the password
      *
-     * @return  self
+     * @return self
      */ 
     public function setMinLength($minLength)
     {
@@ -201,7 +201,7 @@ class PicoPasswordUtil{
     /**
      * Set the value of hashAlgorithm
      *
-     * @return  self
+     * @return self
      */ 
     public function setHashAlgorithm($hashAlgorithm)
     {

@@ -219,7 +219,7 @@ class PicoSortable
     /**
      * Get sortable
      *
-     * @return  PicoSort[]
+     * @return PicoSort[]
      */ 
     public function getSortable()
     {
