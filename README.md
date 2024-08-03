@@ -122,6 +122,8 @@ The following is an example of column mapping into Indonesian.
 | approval_note   | approval_note |
 | approval_status | approval_status |
 
+Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
+
 Here is an explanation of the reserved columns above.
 
 | Original Key    | Description |
