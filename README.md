@@ -88,10 +88,46 @@ d. Application features should be determined before the entity relationship diag
 
 ### Reserved Column Mapping
 
+Reserved columns can be mapped to other names according to the native language used by the application and the terminology that will be used in each entity. Each entity must consistently use the full name if it is going to use it.
+
+For example:
+
+The `album` entity requires the `sort_order` column to sort the albums. So the `album` entity must use the `sort_order` column and not others to sort the data.
+
+The `album` entity also requires the `active` column to activate and deactivate data. So the `album` entity must use the `active` column and not others to activate and deactivate data.
+
+On the other hand, the `artist` entity only does not need the `sort_order` column because artist data is not sorted by default by the user but still uses the `active` column to activate and deactivate data. So the `artist` entity must use the `active` column and not others to activate and deactivate data.
+
+If the application is built in a language other than English, it would be strange to still use column names such as `active`, `admin_create`, `ip_create` and so on. Therefore, developers are free to choose other names but must create column mappings.
+
+The following is an example of column mapping into Indonesian.
+
 | Original Key    | Translated Key |
 | --------------- | -------------- | 
 | name            | nama |
 | sort_order      | sort_order |
+| active          | aktif |
+| draft           | draft |
+| waiting_for     | waiting_for |
+| admin_create    | admin_buat |
+| admin_edit      | admin_ubah |
+| admin_ask_edit  | admin_minta_ubah |
+| time_create     | waktu_buat |
+| time_edit       | waktu_ubah |
+| time_ask_edit   | waktu_minta_ubah |
+| ip_create       | ip_buat |
+| ip_edit         | ip_ubah |
+| ip_ask_edit     | ip_minta_ubah |
+| approval_id     | approval_id |
+| approval_note   | approval_note |
+| approval_status | approval_status |
+
+Here is an explanation of the reserved columns above.
+
+| Original Key    | Description |
+| --------------- | -------------- | 
+| name            | A column that will represent a single row as a whole in an entity. |
+| sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
 | active          | aktif |
 | draft           | draft |
 | waiting_for     | waiting_for |
