@@ -70,6 +70,44 @@ MagicAppBuilder will display all columns of the selected table. When a developer
 
 As long as all database access by the application is done using entities only, MagicAppBuilder can make queries from automatically created entities. If the developer uses native queries to access the database and adds tables or columns that are not in the existing entity, then the developer must alter the table manually by creating the required alter query himself. Applications generated using MagicAppBuilder almost do not have native queries due to the fact that MagicAppBuilder never uses native queries in applications. Native queries may only be created by developers in conditions where they are needed. Using entities allows developers to create application installers without explicitly including SQL scripts. The installer will create an application script according to the database engine selected by the user.
 
+### Steps
+
+Steps to create an application with MagicAppBuilder
+
+1. Create a complete entity relationship diagram with the following rules:
+a. The column for the primary key of a table must be the same as the table name and added with the suffix _id.
+b. Columns that are foreign keys that refer to other tables are strongly recommended to be given the same name as the primary key of the table in question.
+d. If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
+c. Columns with the same purpose of use must have the same name in all tables.
+d. Application features should be determined before the entity relationship diagram is created.
+2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
+3. Install MagicAppBuilder on your server.
+4. Create MagicAppBuilder settings.
+5. Add the application to be created in MagicAppBuilder.
+6. Create application settings and column mapping.
+
+### Reserved Column Mapping
+
+| Original Key    | Translated Key |
+| --------------- | -------------- | 
+| name            | nama |
+| sort_order      | sort_order |
+| active          | aktif |
+| draft           | draft |
+| waiting_for     | waiting_for |
+| admin_create    | admin_buat |
+| admin_edit      | admin_ubah |
+| admin_ask_edit  | admin_minta_ubah |
+| time_create     | waktu_buat |
+| time_edit       | waktu_ubah |
+| time_ask_edit   | waktu_minta_ubah |
+| ip_create       | ip_buat |
+| ip_edit         | ip_ubah |
+| ip_ask_edit     | ip_minta_ubah |
+| approval_id     | approval_id |
+| approval_note   | approval_note |
+| approval_status | approval_status |
+
 # User Plan
 
 | Object                                  | Free       | Pro        |
