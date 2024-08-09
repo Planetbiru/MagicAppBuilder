@@ -115,7 +115,7 @@ class CSVDocumentWriter extends DocumentWriter
                 {
                     $this->writeHeaderToOb($keys);
                 }
-                $this->writeDataToFile($keys, $row);
+                $this->writeDataToOb($keys, $row);
                 $idx++;
             }
         }
@@ -128,7 +128,7 @@ class CSVDocumentWriter extends DocumentWriter
                 {
                     $this->writeHeaderToOb($keys);
                 }
-                $this->writeDataToFile($keys, $row);
+                $this->writeDataToOb($keys, $row);
                 $idx++;
             }
         }
@@ -186,6 +186,22 @@ class CSVDocumentWriter extends DocumentWriter
         fputcsv($this->filePointer, $upperKeys);
         return $this;
     }
+    
+    /**
+     * Write header format
+     * @param string[] $keys Data keys
+     * @return self
+     */
+    private function writeHeaderToOb($keys)
+    {
+        $upperKeys = array();
+        foreach($keys as $key)
+        {
+            $upperKeys[] = PicoStringUtil::camelToTitle($key);
+        }
+        self::fputcsv($this->filePointer, $upperKeys);
+        return $this;
+    }
 
     /**
      * Write header format
@@ -202,6 +218,53 @@ class CSVDocumentWriter extends DocumentWriter
         }            
         fputcsv($this->filePointer, $data);
         return $this;
+    }
+    
+    /**
+     * Write header format
+     * @param string[] $keys Data keys
+     * @param MagicObject $row Data row
+     * return self;
+     */
+    private function writeDataToOb($keys, $row)
+    {
+        $data = array();
+        foreach($keys as $key)
+        {
+            $data[] = $row->get($key);
+        }            
+        self::fputcsv($this->filePointer, $data);
+        return $this;
+    }
+    
+    /**
+     * Write data with format
+     * @param PicoPageData $pageData Page data
+     * @param string[] $headerFormat Data format
+     * @param callable $writerFunction Writer function
+     * @return void
+     */
+    private function writeDataToObWithFormat($pageData, $headerFormat, $writerFunction)
+    {
+        $idx = 0;
+        if($this->noFetchData($pageData))
+        {
+            while($row = $pageData->fetch())
+            {
+                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $this->writeRowToOb($data);
+                $idx++;
+            }
+        }
+        else
+        {
+            foreach($pageData->getResult() as $row)
+            {
+                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $this->writeRowToOb($data);
+                $idx++;
+            }
+        }
     }
 
     /**
@@ -220,7 +283,7 @@ class CSVDocumentWriter extends DocumentWriter
             while($row = $pageData->fetch())
             {
                 $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
-                $this->writeRow($data);
+                $this->writeRowToFile($data);
                 $idx++;
             }
         }
@@ -229,7 +292,7 @@ class CSVDocumentWriter extends DocumentWriter
             foreach($pageData->getResult() as $row)
             {
                 $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
-                $this->writeRow($data);
+                $this->writeRowToFile($data);
                 $idx++;
             }
         }
@@ -240,9 +303,39 @@ class CSVDocumentWriter extends DocumentWriter
      * @param array $data
      * @return self
      */
-    private function writeRow($data)
+    private function writeRowToFile($data)
     {
         fputcsv($this->filePointer, $data);
         return $this;
+    }
+    
+    /**
+     * Write data
+     * @param array $data
+     * @return self
+     */
+    private function writeRowToOb($data)
+    {
+        echo $data;
+        return $this;
+    }
+    
+    /**
+     * Custom fputcsv
+     * @param int $handle filehandle
+     * @param mixed[] $fields array of values to write
+     * @param string $delimiter field delimiter
+     * @param string $enclosure field enclosures
+     * @param string $escape_char escape enclosure chars in fields
+     * @param string $record_seperator 
+     * @return self
+     */
+    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escape_char = "\\", $record_seperator = "\r\n")
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[] = $enclosure . str_replace($enclosure, $escape_char . $enclosure, $field) . $enclosure;
+        }
+        echo implode($delimiter, $result) . $record_seperator;
     }
 }
