@@ -101,7 +101,7 @@ class CSVDocumentWriter extends DocumentWriter
         {
             $upperKeys[] = PicoStringUtil::camelToTitle($key);
         }
-        fputcsv($this->filePointer, $upperKeys);
+        self::fputcsv($this->filePointer, $upperKeys);
         return $this;
     }
 
@@ -118,7 +118,7 @@ class CSVDocumentWriter extends DocumentWriter
         {
             $data[] = $row->get($key);
         }            
-        fputcsv($this->filePointer, $data);
+        self::fputcsv($this->filePointer, $data);
         return $this;
     }
 
@@ -131,7 +131,7 @@ class CSVDocumentWriter extends DocumentWriter
      */
     private function writeDataWithFormat($pageData, $headerFormat, $writerFunction)
     {
-        fputcsv($this->filePointer, array_keys($headerFormat));     
+        self::fputcsv($this->filePointer, array_keys($headerFormat));     
         $idx = 0;
         if($this->noFetchData($pageData))
         {
@@ -160,7 +160,33 @@ class CSVDocumentWriter extends DocumentWriter
      */
     private function writeRow($data)
     {
-        fputcsv($this->filePointer, $data);
+        self::fputcsv($this->filePointer, $data);
         return $this;
+    }
+    
+    /**
+     * Custom self::fputcsv
+     * @param int $handle filehandle
+     * @param mixed[] $fields array of values to write
+     * @param string $delimiter field delimiter
+     * @param string $enclosure field enclosures
+     * @param string $escape_char escape enclosure chars in fields
+     * @param string $record_seperator 
+     * @return self
+     */
+    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escape_char = "\\", $record_seperator = "\r\n")
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[] = $enclosure . str_replace($enclosure, $escape_char . $enclosure, $field) . $enclosure;
+        }
+        if($handle == null)
+        {
+            echo implode($delimiter, $result) . $record_seperator;
+        }
+        else
+        {
+            return fwrite($handle, implode($delimiter, $result) . $record_seperator);
+        }
     }
 }
