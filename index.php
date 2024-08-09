@@ -658,6 +658,10 @@ require_once __DIR__ . "/inc.app/navs.php";
                               <td><label><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1"> Export to CSV</label> &nbsp;</td>
                             </tr>
                             <tr>
+                              <td>Use Temporary File</td>
+                              <td><label><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled> Use Temporary File</label> &nbsp;</td>
+                            </tr>
+                            <tr>
                               <td>Approval</td>
                               <td><label><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
                             </tr>

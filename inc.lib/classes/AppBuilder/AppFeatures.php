@@ -77,6 +77,13 @@ class AppFeatures
     private $exportToCsv = false;
     
     /**
+     * Export use temporary
+     *
+     * @var boolean
+     */
+    private $exportUseTemporary = false;
+    
+    /**
      * Constructor
      *
      * @param MagicObject $features
@@ -95,6 +102,7 @@ class AppFeatures
             $this->subquery = $this->isTrue($features->get('subquery'));
             $this->approvalType = $features->get('approvalType') == 2 ? 2 : 1;
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
+            $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
         }
     }
     
@@ -191,7 +199,7 @@ class AppFeatures
     /**
      * Set approval type
      *
-     * @param  integer  $approvalType  Approval type
+     * @param  integer $approvalType Approval type
      *
      * @return  self
      */ 
@@ -215,7 +223,7 @@ class AppFeatures
     /**
      * Set export to Excel
      *
-     * @param  boolean  $exportToExcel  Export to Excel
+     * @param  boolean $exportToExcel Export to Excel
      *
      * @return  self
      */ 
@@ -239,13 +247,37 @@ class AppFeatures
     /**
      * Set export to CSV
      *
-     * @param  boolean  $exportToCsv  Export to CSV
+     * @param  boolean $exportToCsv Export to CSV
      *
      * @return  self
      */ 
     public function setExportToCsv($exportToCsv)
     {
         $this->exportToCsv = $exportToCsv;
+
+        return $this;
+    }
+
+    /**
+     * Get export use temporary
+     *
+     * @return  boolean
+     */ 
+    public function getExportUseTemporary()
+    {
+        return $this->exportUseTemporary;
+    }
+
+    /**
+     * Set export use temporary
+     *
+     * @param  boolean $exportUseTemporary Export use temporary
+     *
+     * @return  self
+     */ 
+    public function setExportUseTemporary($exportUseTemporary)
+    {
+        $this->exportUseTemporary = $exportUseTemporary;
 
         return $this;
     }

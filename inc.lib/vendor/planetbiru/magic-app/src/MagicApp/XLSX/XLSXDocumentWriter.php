@@ -17,9 +17,10 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param string $sheetName Sheet name
      * @param string[] $headerFormat Data format
      * @param callable $writerFunction Writer function
+     * @param boolean $useTemporary Use temporary file
      * @return self
      */
-    public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction)
+    public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction, $useTemporary = true)
     {
         $writer = new XLSXWriter();
         if(isset($headerFormat) && is_array($headerFormat) && is_callable($writerFunction))

@@ -611,6 +611,7 @@ jQuery(function(){
     if(chk)
     {
       $('#export_to_csv')[0].checked = false;
+      $('#export_use_temporary')[0].disabled = true;
     }
   });
   $(document).on('change', '#export_to_csv', function(e){
@@ -618,6 +619,11 @@ jQuery(function(){
     if(chk)
     {
       $('#export_to_excel')[0].checked = false;
+      $('#export_use_temporary')[0].disabled = false;
+    }
+    else
+    {
+      $('#export_use_temporary')[0].disabled = true;
     }
   });
 
