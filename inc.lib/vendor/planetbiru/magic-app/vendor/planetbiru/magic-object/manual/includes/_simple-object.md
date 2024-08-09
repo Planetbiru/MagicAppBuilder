@@ -75,7 +75,7 @@ echo "Phone     : " . $someObject->getPhone() . "\r\n";
 echo "Email     : " . $someObject->getEmail() . "\r\n";
 
 $someObject->unsetPhone();
-if($someObject->hasValuePhone())
+if($someObject->issetPhone())
 {
     echo "Phone     : " . $someObject->getPhone() . "\r\n";
 }

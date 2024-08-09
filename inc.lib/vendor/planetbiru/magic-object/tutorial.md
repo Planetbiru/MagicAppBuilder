@@ -103,7 +103,7 @@ echo "Phone     : " . $someObject->getPhone() . "\r\n";
 echo "Email     : " . $someObject->getEmail() . "\r\n";
 
 $someObject->unsetPhone();
-if($someObject->hasValuePhone())
+if($someObject->issetPhone())
 {
     echo "Phone     : " . $someObject->getPhone() . "\r\n";
 }
@@ -7106,14 +7106,14 @@ foreach($rowData->getPagination() as $pg)
 	<th class="text-right" scope="row"><?php echo $no;?></th>
 	<td class="text-nowrap"><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $song->getName();?></a></td>
 	<td class="text-nowrap"><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
-	<td class="text-data text-data-rating text-nowrap"><?php echo $song->hasValueRating() ? $song->getRating() : "";?></td>
-	<td class="text-data text-data-album-name text-nowrap"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
-	<td class="text-data text-data-producer-name text-nowrap"><?php echo $song->hasValueProducer() ? $song->getProducer()->getName() : "";?></td>
-	<td class="text-data text-data-track-number text-nowrap"><?php echo $song->hasValueTrackNumber() ? $song->getTrackNumber() : "";?></td>
-	<td class="text-data text-data-genre-name text-nowrap"><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
-	<td class="text-data text-data-artist-vocal-name text-nowrap"><?php echo $song->hasValueVocalist() ? $song->getVocalist()->getName() : "";?></td>
-	<td class="text-data text-data-artist-composer-name text-nowrap"><?php echo $song->hasValueComposer() ? $song->getComposer()->getName() : "";?></td>
-	<td class="text-data text-data-artist-arranger-name text-nowrap"><?php echo $song->hasValueArranger() ? $song->getArranger()->getName() : "";?></td>
+	<td class="text-data text-data-rating text-nowrap"><?php echo $song->issetRating() ? $song->getRating() : "";?></td>
+	<td class="text-data text-data-album-name text-nowrap"><?php echo $song->issetAlbum() ? $song->getAlbum()->getName() : "";?></td>
+	<td class="text-data text-data-producer-name text-nowrap"><?php echo $song->issetProducer() ? $song->getProducer()->getName() : "";?></td>
+	<td class="text-data text-data-track-number text-nowrap"><?php echo $song->issetTrackNumber() ? $song->getTrackNumber() : "";?></td>
+	<td class="text-data text-data-genre-name text-nowrap"><?php echo $song->issetGenre() ? $song->getGenre()->getName() : "";?></td>
+	<td class="text-data text-data-artist-vocal-name text-nowrap"><?php echo $song->issetVocalist() ? $song->getVocalist()->getName() : "";?></td>
+	<td class="text-data text-data-artist-composer-name text-nowrap"><?php echo $song->issetComposer() ? $song->getComposer()->getName() : "";?></td>
+	<td class="text-data text-data-artist-arranger-name text-nowrap"><?php echo $song->issetArranger() ? $song->getArranger()->getName() : "";?></td>
 	<td class="text-data text-data-duration text-nowrap"><?php echo (new Dms())->ddToDms($song->getDuration() / 3600)->printDms(true, true); ?></td>
 	<td class="text-data text-data-vocal text-nowrap"><?php echo $song->isVocal() ? 'Yes' : 'No';?></td>
 	<td class="text-data text-data-subtitle-complete text-nowrap"><?php echo $song->isSsubtitleComplete() ? 'Yes' : 'No';?></td>
