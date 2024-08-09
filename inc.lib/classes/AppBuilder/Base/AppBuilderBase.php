@@ -589,7 +589,7 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
         $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->hasValue".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
         $getData[] = $this->constructEntityLabel($entityName);
@@ -794,7 +794,7 @@ class AppBuilderBase //NOSONAR
             $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         }
         
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->hasValue".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         $getData[] = self::TAB1.self::TAB1.self::TAB1.'// define map here';
         $getData[] = $map;
@@ -900,7 +900,7 @@ class AppBuilderBase //NOSONAR
             $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         }       
         
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->hasValue".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
         $getData[] = $this->constructEntityLabel($entityName);
@@ -1081,7 +1081,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->hasValue'.$upperObjName.'() ? $'.'row'.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.'() ? $'.'row'.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
             $result = self::VAR.'row'.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -2753,7 +2753,7 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->hasValue'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
             $result = self::VAR.$objectName.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -2848,8 +2848,8 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->hasValue'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
-            $val2 = '->hasValue'.$upperObjName.'() ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val2 = '->isset'.$upperObjName.'() ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val2;
         }

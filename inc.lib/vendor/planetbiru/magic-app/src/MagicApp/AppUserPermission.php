@@ -205,7 +205,7 @@ class AppUserPermission
         }
 
 
-        if(!$this->currentModule->getAppModule()->hasValueModuleId())
+        if(!$this->currentModule->getAppModule()->issetModuleId())
         {
             try
             {
