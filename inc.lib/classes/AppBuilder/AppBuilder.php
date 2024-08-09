@@ -174,7 +174,10 @@ class AppBuilder extends AppBuilderBase
         else
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->deleteOneBy".$upperPkName."(".parent::VAR."rowId);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->where(PicoSpecification::getInstance()";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".$this->getStringOf($pkName).", ".parent::VAR."rowId))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->delete();";
         }   
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception \$e)";    

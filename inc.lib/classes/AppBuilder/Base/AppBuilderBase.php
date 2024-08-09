@@ -2208,7 +2208,6 @@ $subqueryMap = '.$referece.';
         $form->setAttribute('action', '');
         $form->setAttribute('method', 'get');
         $form->setAttribute('class', 'filter-form');
-
         
         $form = $this->appendFilter($dom, $form, $filterFields);    
         
@@ -2218,11 +2217,10 @@ $subqueryMap = '.$referece.';
         $buttonSearch->setAttribute('type', 'submit');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonSearch();".self::PHP_CLOSE_TAG));
-        $whiteSpace2 = $dom->createTextNode("\n\t\t\t");
-        $submitWrapper->appendChild($whiteSpace2);
+
+        $submitWrapper->appendChild($dom->createTextNode("\n\t\t\t"));
         $submitWrapper->appendChild($buttonSearch);
-        $submitWrapper->appendChild($dom->createTextNode("\n\t\t"));
-        
+        $submitWrapper->appendChild($dom->createTextNode("\n\t\t"));    
         
         $addWrapper = $dom->createElement('span');
         $addWrapper->setAttribute('class', 'filter-group');    
@@ -2230,20 +2228,11 @@ $subqueryMap = '.$referece.';
         $buttonSearch->setAttribute('type', 'button');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_PRIMARY);
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonAdd();".self::PHP_CLOSE_TAG));
-        $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");
+        $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");       
         
-        
-        $addWrapper->appendChild($dom->createTextNode("\n\t\t\t"));
-   
-        $addWrapper->appendChild($buttonSearch);
-        
-        $whiteSpace4 = $dom->createTextNode("\n\t\t");
-        
-    
-        $addWrapper->appendChild($whiteSpace4);
-
-
-
+        $addWrapper->appendChild($dom->createTextNode("\n\t\t\t")); 
+        $addWrapper->appendChild($buttonSearch); 
+        $addWrapper->appendChild($dom->createTextNode("\n\t\t"));
 
         ////
         $approvalFilterWrapper = $dom->createElement('span');
@@ -2254,12 +2243,10 @@ $subqueryMap = '.$referece.';
         $buttonSearch->setAttribute('value', 'true');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonShowRequireApproval();".self::PHP_CLOSE_TAG));
-        $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");
               
         $approvalFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));  
         $approvalFilterWrapper->appendChild($buttonSearch);
-        $whiteSpace5 = $dom->createTextNode("\n\t\t");
-        $approvalFilterWrapper->appendChild($whiteSpace5);
+        $approvalFilterWrapper->appendChild($dom->createTextNode("\n\t\t"));
         ////
         
         ////
@@ -2274,15 +2261,10 @@ $subqueryMap = '.$referece.';
               
         $exportFilterWrapper->appendChild($dom->createTextNode("\n\t\t\t"));  
         $exportFilterWrapper->appendChild($buttonExport);
-        $whiteSpace6 = $dom->createTextNode("\n\t\t");
-        $exportFilterWrapper->appendChild($whiteSpace6);
+        $exportFilterWrapper->appendChild($dom->createTextNode("\n\t\t"));
         ////
-
-
-
         
-        $whiteSpace = $dom->createTextNode("\n\t\t");
-        $form->appendChild($whiteSpace);
+        $form->appendChild($dom->createTextNode("\n\t\t"));
         
         $form->appendChild($submitWrapper);
 
@@ -2307,12 +2289,7 @@ $subqueryMap = '.$referece.';
         $form->appendChild($addWrapper);
         $form->appendChild($dom->createTextNode("\n\t\t".'<?php } ?>'));
 
-
-
-
-
-        $whiteSpace3 = $dom->createTextNode("\n\t");
-        $form->appendChild($whiteSpace3);
+        $form->appendChild($dom->createTextNode("\n\t"));
 
         return $form;
     }
@@ -2699,7 +2676,6 @@ $subqueryMap = '.$referece.';
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
-
         $td1->appendChild($label);
         
         $value = $this->createDetailValue($dom, $objectName, $field);
@@ -3079,7 +3055,6 @@ $subqueryMap = '.$referece.';
             $inputStrl->setAttribute('name', $fieldName);
 
             $inputStrl = $this->addAttributeId($inputStrl, $id);
-
              
             $inputStrl->setAttribute('value', '1');
             $inputStrl->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.'->createChecked'.$upperFieldName.'();'.self::PHP_CLOSE_TAG));
@@ -3087,9 +3062,7 @@ $subqueryMap = '.$referece.';
             $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
             $textLabel = $dom->createTextNode(' '.$caption);
             $input->appendChild($textLabel);
-
         }
-        
         return $input;
     }
 
@@ -3130,30 +3103,29 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'truefalse')
             {
                 $map = (new MagicObject())
-                ->setValue2((new MagicObject())->setValue('true')->setLabel('<?php echo $appLanguage->getOptionLabelTrue();?>'))
-                ->setValue3((new MagicObject())->setValue('false')->setLabel('<?php echo $appLanguage->getOptionLabelFalse();?>'));
+                    ->setValue2((new MagicObject())->setValue('true')->setLabel('<?php echo $appLanguage->getOptionLabelTrue();?>'))
+                    ->setValue3((new MagicObject())->setValue('false')->setLabel('<?php echo $appLanguage->getOptionLabelFalse();?>'));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
             else if($referenceData->getType() == 'yesno')
             {
                 $map = (new MagicObject())
-                ->setValue2((new MagicObject())->setValue('yes')->setLabel('<?php echo $appLanguage->getOptionLabelYes();?>'))
-                ->setValue3((new MagicObject())->setValue('no')->setLabel('<?php echo $appLanguage->getOptionLabelNo();?>'));
+                    ->setValue2((new MagicObject())->setValue('yes')->setLabel('<?php echo $appLanguage->getOptionLabelYes();?>'))
+                    ->setValue3((new MagicObject())->setValue('no')->setLabel('<?php echo $appLanguage->getOptionLabelNo();?>'));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
             else if($referenceData->getType() == 'onezero')
             {
                 $map = (new MagicObject())
-                ->setValue2((new MagicObject())->setValue('1')->setLabel('1'))
-                ->setValue3((new MagicObject())->setValue('0')->setLabel('0'));
+                    ->setValue2((new MagicObject())->setValue('1')->setLabel('1'))
+                    ->setValue3((new MagicObject())->setValue('0')->setLabel('0'));
 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
             else if($referenceData->getType() == 'entity')
-            {      
-                
+            {    
                 $entity = $referenceData->getEntity();         
                 $specification = $entity->getSpecification();
                 $sortable = $entity->getSortable();
@@ -3180,7 +3152,6 @@ $subqueryMap = '.$referece.';
     {
         foreach($map as $opt)
         {
-            error_log($opt);
             $value = $opt->getValue();
             $caption = $this->buildCaption($opt->getLabel());
             $option = $dom->createElement('option');
@@ -3481,6 +3452,11 @@ $subqueryMap = '.$referece.';
         return $input;
     }
 
+    /**
+     * Create map input type
+     * @param string $dataType
+     * @return string
+     */
     private function mapInputType($dataType)
     {
         $map = array(
@@ -3636,27 +3612,33 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($dom->createTextNode('<?php '));
 
         $approvalType = $this->appFeatures->getApprovalType();
-        if($approvalType == 2)
+
+        if($this->appFeatures->isApprovalRequired())
         {
-        $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($btn32);
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($btn42);
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($dom->createTextNode('<?php } else '));
+
+            if($approvalType == 2)
+            {
+                $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+                $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+                $td2->appendChild($btn32);
+                $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+                $td2->appendChild($btn42);
+                $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+                $td2->appendChild($dom->createTextNode('<?php } else '));
+            }
+
+            $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+            $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+            $td2->appendChild($btn3);
+            $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+            $td2->appendChild($dom->createTextNode('<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+            $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+            $td2->appendChild($btn4);
+            $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
+            $td2->appendChild($dom->createTextNode('<?php } else '));
         }
 
-
-        $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($btn3);
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($dom->createTextNode('<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($btn4);
-        $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
-        $td2->appendChild($dom->createTextNode('<?php } else if($userPermission->isAllowedUpdate()){ ?>'));
+        $td2->appendChild($dom->createTextNode('if($userPermission->isAllowedUpdate()){ ?>'));
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
         $td2->appendChild($btn1);
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
@@ -3671,7 +3653,6 @@ $subqueryMap = '.$referece.';
 
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t\t"));
         $td2->appendChild($pkInputApprove);
-
 
         $td2->appendChild($dom->createTextNode("\n\t\t\t\t"));
               
