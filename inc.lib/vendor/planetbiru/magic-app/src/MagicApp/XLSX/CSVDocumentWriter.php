@@ -18,12 +18,22 @@ class CSVDocumentWriter extends DocumentWriter
      * @param string $sheetName Sheet name
      * @param string[] $headerFormat Data format
      * @param callable $writerFunction Writer function
+     * @param boolean $useTemporary
      * @return self
      */
-    public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction)
+    public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction, $useTemporary = true)
     {
-        $this->temporaryFile = tempnam(sys_get_temp_dir(), 'my-temp-file');
-        $this->filePointer = fopen($this->temporaryFile, 'w');
+        header('Content-disposition: attachment; filename="'.$fileName.'"');
+        header("Content-Type: text/csv");
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');       
+        
+        if($useTemporary)
+        {
+            $this->temporaryFile = tempnam(sys_get_temp_dir(), 'my-temp-file');
+            $this->filePointer = fopen($this->temporaryFile, 'w');
+        }
         if(isset($headerFormat) && is_array($headerFormat) && is_callable($writerFunction))
         {
             $this->writeDataWithFormat($pageData, $headerFormat, $writerFunction);
@@ -32,13 +42,13 @@ class CSVDocumentWriter extends DocumentWriter
         {
             $this->writeDataWithoutFormat($pageData);
         }
-        header('Content-disposition: attachment; filename="'.$fileName.'"');
-        header("Content-Type: text/csv");
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');       
-        readfile($this->temporaryFile);
-        unlink($this->temporaryFile);
+        
+        if($useTemporary)
+        {
+            header('Content-length: '.filesize($this->temporaryFile));
+            readfile($this->temporaryFile);
+            unlink($this->temporaryFile);
+        }
         return $this;
     }
 
