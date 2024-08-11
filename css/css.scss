@@ -162,6 +162,27 @@ button {
 		}
 	}
 }
+.modal-md, .modal-sm{
+	.config-table {
+		width: 100%;
+		max-width: 800px;
+		margin: auto;
+		td {
+			padding: 4px 0;
+		}
+		tbody {
+			>tr {
+				&:nth-child(1) {
+					>td {
+						&:nth-child(1) {
+							width: 35%;
+						}
+					}
+				}
+			}
+		}
+	}
+}
 .modal-table {
 	width: 100%;
 	margin: auto;
@@ -358,4 +379,9 @@ li.file-syntax-error {
 	border-color: #b92525;
 	outline: 0;
 	box-shadow: 0 0 0 0.2rem #a836361f;
+}
+
+.target-language{
+	display: inline;
+	width: auto;
 }

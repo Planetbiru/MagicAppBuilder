@@ -27,6 +27,12 @@ require_once __DIR__ . "/inc.app/navs.php";
   <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
+  <script>
+    let languages = <?php echo json_encode($appConfig->getLanguages());?>;
+    jQuery(function(){
+      setLanguage(languages);
+    });
+  </script>
 </head>
 
 <body>
@@ -795,11 +801,12 @@ require_once __DIR__ . "/inc.app/navs.php";
                 </div>
               </div>
               <div class="col col-10">
-                <div class="column-title">
-                  <select class="form-control" name="entity-target-language" id="entity-target-language">
-                    <option value="id">Indonesia</option>
-                    <option value="en">English</option>
+                <div class="column-title"> 
+                  Target Language
+                  <select class="form-control target-language">
                   </select>
+                  <button class="btn btn-primary" type="button">Apply</button>
+                  <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add-language-dialog">Add</button>
                 </div>
                 <div class="column-body">
                   <div class="row">
@@ -869,7 +876,7 @@ require_once __DIR__ . "/inc.app/navs.php";
   </div>
 
   <div class="modal fade" id="modal-create-application" tabindex="-1" aria-labelledby="application_modal_label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create New Application</h5>
@@ -951,6 +958,36 @@ require_once __DIR__ . "/inc.app/navs.php";
         </div>
         <div class="modal-body">
 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Language</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">            
+             <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+                <tr>
+                  <td>Language</td>
+                  <td><input class="form-control" type="text" name="language_name"></td>
+                </tr>
+                <tr>
+                  <td>Code</td>
+                  <td><input class="form-control" type="text" name="language_code"></td>
+                </tr>
+              </tbody>
+            </table>      
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

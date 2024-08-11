@@ -2144,3 +2144,16 @@ function isNumeric(str) {
   if (typeof str != "string") return false;
   return !isNaN(str) && !isNaN(parseFloat(str));
 }
+function setLanguage(languages)
+{
+  $('select.target-language').each(function(){
+    let obj = $(this);
+    obj.empty();
+    for(let i in languages)
+    {
+      let language = languages[i];
+      let opt = '<option value="'+language.code+'"'+(language.selected ? ' selected':'')+'>'+language.name+'</option>';
+      obj.append(opt);
+    }
+  });
+}
