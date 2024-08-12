@@ -18,7 +18,7 @@ body {
 }
 
 .all {
-  padding: 20px;
+  padding: 16px;
 }
 
 .main-table {
@@ -139,7 +139,7 @@ button {
   margin: auto;
 }
 .config-table td {
-  padding: 4px 0;
+  padding: 3px 0;
 }
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 200px;

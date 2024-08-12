@@ -474,8 +474,8 @@ require_once __DIR__ . "/inc.app/navs.php";
                         <td><label for=""><input type="checkbox" name="module_load_previous" checked> Yes</label></td>
                       </tr>
                       <tr>
-                        <td>Add To Database</td>
-                        <td><label for=""><input type="checkbox" name="module_add_to_database"> Yes</label></td>
+                        <td>Add To Module List</td>
+                        <td><label for=""><input type="checkbox" name="module_add_to_list"> Yes</label></td>
                       </tr>
                       <tr>
                         <td>Special Access</td>

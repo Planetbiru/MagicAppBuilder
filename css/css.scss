@@ -27,7 +27,7 @@ body {
 	padding: 0;
 }
 .all {
-	padding: 20px;
+	padding: 16px;
 }
 .main-table {
 	border-collapse: collapse;
@@ -73,6 +73,7 @@ body {
 				&:nth-child(1) {
 					padding-left: 10px;
 				}
+				
 			}
 		}
 	}
@@ -148,7 +149,7 @@ button {
 	max-width: 800px;
 	margin: auto;
 	td {
-		padding: 4px 0;
+		padding: 3px 0;
 	}
 	tbody {
 		>tr {
