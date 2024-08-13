@@ -10,6 +10,7 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
         'S' => 
         array (
             'Symfony\\Component\\Yaml\\' => 23,
+            'SVG\\' => 4,
         ),
         'P' => 
         array (
@@ -25,6 +26,10 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'SVG\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/meyfa/php-svg/src',
         ),
         'PHPMailer\\PHPMailer\\' => 
         array (

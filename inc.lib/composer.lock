@@ -4,8 +4,61 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fdcf85cf390c59a1d0cdb9dec4cb709f",
+    "content-hash": "1e6bc43b248bf4cbaed0fe8310f3849a",
     "packages": [
+        {
+            "name": "meyfa/php-svg",
+            "version": "v0.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/meyfa/php-svg.git",
+                "reference": "f6cc2fa743c4a2012cdec9143033f69eee3b501d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/f6cc2fa743c4a2012cdec9143033f69eee3b501d",
+                "reference": "f6cc2fa743c4a2012cdec9143033f69eee3b501d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "meyfa/phpunit-assert-gd": "^1.2",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^4.8"
+            },
+            "suggest": {
+                "ext-gd": "Needed to rasterize images",
+                "ext-simplexml": "Needed to read SVG strings and files"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SVG\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabian Meyer",
+                    "homepage": "http://meyfa.net"
+                }
+            ],
+            "description": "Read, edit, write, and render SVG files with PHP",
+            "homepage": "https://github.com/meyfa/php-svg",
+            "keywords": [
+                "svg"
+            ],
+            "support": {
+                "issues": "https://github.com/meyfa/php-svg/issues",
+                "source": "https://github.com/meyfa/php-svg/tree/v0.12.0"
+            },
+            "time": "2022-11-15T15:49:03+00:00"
+        },
         {
             "name": "phpmailer/phpmailer",
             "version": "v6.9.1",
