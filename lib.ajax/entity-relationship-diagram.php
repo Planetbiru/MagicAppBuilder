@@ -1,23 +1,53 @@
 <?php
 
+use AppBuilder\Generator\EntityRelationshipDiagram;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
+
 require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
-use SVG\SVG;
-use SVG\Nodes\Shapes\SVGRect;
+$inputGet = new InputGet();
+try
+{
+	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
+    $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
+    $baseEntity = str_replace("\\\\", "\\", $baseEntity);
+    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
+    $allQueries = array();
+    $merged = $inputGet->getMerged();
 
-// Setup the document
-$image = new SVG(220, 820);
-$doc = $image->getDocument();
+    if($inputGet->getEntity() != null && $inputGet->countableEntity())
+    {
+        $inputEntity = $inputGet->getEntity();
+        $entities = array();
+        $entityNames = array();
+        
+        
+        $entities = array();
+        
+        $entityRelationshipDiagram = new EntityRelationshipDiagram(200);
+        
+        foreach($inputEntity as $idx=>$entityName)
+        {
+            $className = "\\".$baseEntity."\\".$entityName;
+            $entityName = trim($entityName);
+            $path = $baseDir."/".$entityName.".php";
+            if(file_exists($path))
+            {
+                include_once $path;                  
+                $entity = new $className(null, $database);
+                $entityRelationshipDiagram->addEntity($entity);
+            }
+        }
+        header('Content-Type: image/svg+xml');
 
-// Create a small blue rectangle
-$square = new SVGRect(20, 20, 200, 800);
-$square->setStyle('fill', '#0000FF');
-$doc->addChild($square);
-
-// Add the proper header and echo the SVG
-header('Content-Type: image/svg+xml');
-
-$image->getDocument()->setWidth(100);
-$image->getDocument()->setHeight(100);
-
-echo $image;
+        echo $entityRelationshipDiagram;
+        
+    }
+}
+catch(Exception $e)
+{
+    error_log($e->getMessage());
+    // do nothing
+}

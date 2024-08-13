@@ -5,11 +5,15 @@ namespace AppBuilder\Generator;
 use Exception;
 use MagicObject\Database\PicoTableInfo;
 use MagicObject\MagicObject;
+use SVG\Nodes\Shapes\SVGLine;
 use SVG\SVG;
 use SVG\Nodes\Shapes\SVGRect;
+use SVG\Nodes\Structures\SVGGroup;
+use SVG\Nodes\Texts\SVGText;
 
 class EntityRelationshipDiagram
 {
+    const STROKE_LINE = '#999999';
     /**
      * Entity DiagramItem
      *
@@ -19,7 +23,8 @@ class EntityRelationshipDiagram
     private $relationshipDiagramItem = array();
     
     private $entityWidth = 1;
-    private $entityMaxHeight = 1;
+    private $entityMaxHeight;
+    private $entityMargin = 50;
 
     
     private $width = 1;
@@ -39,29 +44,53 @@ class EntityRelationshipDiagram
      *
      * @var MagicObject[]
      */
-    private $entities;
+    private $entities = array();
     
     /**
      * Constructor
      *
      * @param MagicObject[] $entities
      */
-    public function __construct($entities, $entityWidth, $entityMaxHeight)
+    public function __construct($entityWidth, $entityMaxHeight = null, $entities = null)
     {
         $this->entityWidth = $entityWidth;
-        $this->entityMaxHeight = $entityMaxHeight;
-        $this->entities = $entities;
-        foreach($this->entities as $entity)
+        if(isset($entityMaxHeight))
         {
-            $info = $entity->tableInfo();
-            $this->entityTable[basename(get_class($entity))] = $info->getTableName();
+            $this->entityMaxHeight = $entityMaxHeight;
         }
-        foreach($this->entities as $entity)
+        if(isset($entities) && is_array($entities))
         {
-            $info = $entity->tableInfo();
-            $entityName = basename(get_class($entity));
-            $this->updateDiagram($entityName, $info);
+            $this->addEntities($entities);
         }
+        
+    }
+    
+    public function addEntities($entities)
+    {
+        foreach($entities as $entity)
+        {
+            $this->addEntity($entity);
+        }
+        return $this;
+    }
+    
+    /**
+     * Add entity
+     *
+     * @param MagicObject $entity
+     * @return self
+     */
+    public function addEntity($entity)
+    {
+        $this->entities[] = $entity;
+        $info = $entity->tableInfo();
+        $this->entityTable[basename(get_class($entity))] = $info->getTableName();
+
+        $info = $entity->tableInfo();
+        $entityName = basename(get_class($entity));
+        $this->updateDiagram($entityName, $info);
+
+        return $this;
     }
     
     /**
@@ -76,13 +105,15 @@ class EntityRelationshipDiagram
         $tableName = $info->getTableName();
         if(!isset($this->entitieDiagramItem[$tableName]))
         {
-            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $this->entityWidth, $this->entityMaxHeight);
+            $x = 20 + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMargin);
+            $y = 20;
+            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $x, $y, $this->entityWidth, $this->entityMaxHeight);
         }
         
         // update column
         foreach($info->getColumns() as $column)
         {
-            $columnName = $column['NAME'];
+            $columnName = $column['name'];
             if(!$this->entitieDiagramItem[$tableName]->hasColumn($columnName))
             {
                 $this->entitieDiagramItem[$tableName]->addColumn($column);
@@ -92,7 +123,7 @@ class EntityRelationshipDiagram
         // update join column
         foreach($info->getJoinColumns() as $column)
         {
-            $columnName = $column['NAME'];
+            $columnName = $column['name'];
             if($this->entitieDiagramItem[$tableName]->hasColumn($columnName))
             {
                 $propertyType = $column['propertyType'];
@@ -198,6 +229,86 @@ class EntityRelationshipDiagram
     {
         $this->width = $this->calculateWidth();
         $this->height = $this->calculateHeight();
+        
+        
+        $image = new SVG($this->width, $this->height);
+        $doc = $image->getDocument();
+
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $index = 0;
+            $svgGroup = new SVG($diagram->getWidth(), $diagram->getHeight());
+            
+            $group = $svgGroup->getDocument();
+            
+            $group->setAttribute('x', $diagram->getX());
+            $group->setAttribute('y', $diagram->getY());
+            $group->setAttribute('name', $diagram->getEntityName());
+            $group->setAttribute('x', $diagram->getX());
+            $group->setAttribute('y', $diagram->getY());
+            
+            $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
+            $square->setStyle('fill', 'none');
+            $square->setStyle('stroke', self::STROKE_LINE);
+            
+            
+            $group->addChild($square);
+            
+            $headerBg = new SVGRect(1, 1, $diagram->getWidth()-2, $diagram->getHeaderHeight()-2);
+            $headerBg->setStyle('fill', '#EEEEEE');
+            $group->addChild($headerBg);
+            
+            
+            $x = 10;
+            $y = 13 + ($index * $diagram->getColumnHeight());
+            $entityHeader = new SVGText($diagram->getTableName(), $x, $y);
+            $entityHeader->setStyle('font-family', 'Arial');
+            $entityHeader->setStyle('font-size', '8pt');
+            $entityHeader->setStyle('font-weight', 'normal');            
+            $group->addChild($entityHeader);
+
+            $separator = new SVGLine(0, $diagram->getColumnHeight(), $diagram->getWidth(), $diagram->getColumnHeight());
+            $separator->setStyle('stroke', self::STROKE_LINE);
+            $group->addChild($separator);         
+
+            foreach($diagram->getColumns() as $column)
+            {
+                $index++;
+                $y = -7 + $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
+                
+                if($index > 1)
+                {
+                    $separator = new SVGLine(0, $y - 14, $diagram->getWidth(), $y - 14);
+                    $separator->setStyle('stroke', self::STROKE_LINE);
+                    $group->addChild($separator);
+                }
+                
+                $group->addChild($this->createColumn($diagram, $column, $x, $y));
+
+            }
+            $doc->addChild($group);       
+        }
+        return $image->__toString();
+    }
+    
+    private function createColumn($diagram, $column, $x, $y)
+    {
+        $svgColumn = new SVG($diagram->getWidth(), 40);
+        $columnElem = $svgColumn->getDocument();
+        
+        $columnElem->setAttribute('x', $x);
+        $columnElem->setAttribute('y', $y-10);
+        
+        $columnSvg = new SVGText($column->getColumnName(), 0, 10);
+        $columnSvg->setStyle('font-family', 'Arial');
+        $columnSvg->setStyle('font-size', '8pt');
+        $columnSvg->setStyle('font-weight', 'normal');
+        
+        
+        $columnElem->addChild($columnSvg);
+        
+        return $columnElem;
+        
     }
     
     public function calculateWidth()
@@ -226,5 +337,10 @@ class EntityRelationshipDiagram
             }
         }
         return $maxY;
+    }
+    
+    public function __toString()
+    {
+        return $this->drawERD();
     }
 }
