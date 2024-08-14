@@ -26,6 +26,8 @@ try
         $entities = array();
         
         $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 170, null, 30);
+        $entityRelationshipDiagram->setMarginX(0);
+        $entityRelationshipDiagram->setMarginY(0);
         
         foreach($inputEntity as $idx=>$entityName)
         {

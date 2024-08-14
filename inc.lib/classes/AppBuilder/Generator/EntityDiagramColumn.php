@@ -12,6 +12,20 @@ class EntityDiagramColumn
     private $referenceColumnName;
     
     /**
+     * Position X
+     *
+     * @var integer
+     */
+    private $x;
+    
+    /**
+     * Position Y
+     *
+     * @var integer
+     */
+    private $y;
+    
+    /**
      * Reference column
      *
      * @var boolean
@@ -242,6 +256,54 @@ class EntityDiagramColumn
     public function setReferenceColumn($referenceColumn)
     {
         $this->referenceColumn = $referenceColumn;
+
+        return $this;
+    }
+
+    /**
+     * Get position X
+     *
+     * @return  integer
+     */ 
+    public function getX()
+    {
+        return $this->x;
+    }
+
+    /**
+     * Set position X
+     *
+     * @param  integer  $x  Position X
+     *
+     * @return  self
+     */ 
+    public function setX($x)
+    {
+        $this->x = $x;
+
+        return $this;
+    }
+
+    /**
+     * Get position Y
+     *
+     * @return  integer
+     */ 
+    public function getY()
+    {
+        return $this->y;
+    }
+
+    /**
+     * Set position Y
+     *
+     * @param  integer  $y  Position Y
+     *
+     * @return  self
+     */ 
+    public function setY($y)
+    {
+        $this->y = $y;
 
         return $this;
     }

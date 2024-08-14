@@ -12,6 +12,8 @@ use SVG\Nodes\Shapes\SVGLine;
 use SVG\Nodes\Shapes\SVGPath;
 use SVG\SVG;
 use SVG\Nodes\Shapes\SVGRect;
+use SVG\Nodes\Structures\SVGGroup;
+use SVG\Nodes\SVGNode;
 use SVG\Nodes\Texts\SVGText;
 
 class EntityRelationshipDiagram
@@ -19,7 +21,9 @@ class EntityRelationshipDiagram
     const NAMESPACE_SEPARATOR = "\\";
     const STROKE_LINE = '#999999';
     const HEADER_BACKGROUND_COLOR = '#EEEEEE';
-    const TEXT_OFFSET_X = 15;
+    const TEXT_COLOR_COLUMN = '#555555';
+    const TEXT_COLOR_TABLE = '#214497';
+    const TEXT_OFFSET_X = 16;
     const TEXT_OFFSET_Y = 14;
     const FONT_FAMILY = 'Arial';
     const FONT_SIZE = '8pt';
@@ -31,6 +35,13 @@ class EntityRelationshipDiagram
      */
     private $entitieDiagramItem = array();
     
+    /**
+     * Entity reference
+     *
+     * @var EntityRelationship[]
+     */
+    private $entityRelationships = array();
+    
     private $entityWidth = 1;
     private $entityMaxHeight;
     private $entityMargin = 40;
@@ -38,8 +49,8 @@ class EntityRelationshipDiagram
     
     private $width = 1;
     private $height = 1;
-    private $x = 0;
-    private $y = 0;
+    private $marginX = 20;
+    private $marginY = 20;
     
     /**
      * Entity table
@@ -128,8 +139,8 @@ class EntityRelationshipDiagram
         $tableName = $info->getTableName();
         if(!isset($this->entitieDiagramItem[$tableName]))
         {
-            $x = 20 + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMargin);
-            $y = 20;
+            $x = $this->marginX + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMargin);
+            $y = $this->marginY;
             $entityId = $tableName;
             $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $entityId, $x, $y, $this->entityWidth, $this->entityMaxHeight);
         }
@@ -260,56 +271,151 @@ class EntityRelationshipDiagram
         return $this;
     }
     
+    private function prepareEntityRelationship()
+    {
+        $this->entityRelationships = array();
+        
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $index = 0;
+            foreach($diagram->getColumns() as $column)
+            {
+                $x = 0;
+                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
+                $column->setX($x);
+                $column->setY($y);
+                $index++;
+            }
+        }
+        
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $index = 0;
+            foreach($diagram->getColumns() as $column)
+            {
+                $x = 0;
+                if($column->getReferenceTableName() != null && $column->getReferenceColumnName() != null)
+                {
+                    $tableName = $column->getReferenceTableName();
+                    $referenceColumnName = $column->getReferenceColumnName();
+                    $referenceDiagram = $this->getDiagramByTableName($tableName);
+                    if(isset($referenceDiagram))
+                    {
+                        $referenceColumn = $this->getDiagramColumnByTableColumnName($referenceDiagram, $referenceColumnName);
+                        if(isset($referenceColumn))
+                        {
+                            $this->entityRelationships[] = new EntityRelationship($diagram, $column, $referenceDiagram, $referenceColumn);
+                        }
+                    }
+                }
+                $index++;
+            }
+        }
+    }
+    
+    private function getDiagramByTableName($tableName)
+    {
+        return isset($this->entitieDiagramItem[$tableName]) ? $this->entitieDiagramItem[$tableName] : null;
+    }
+    
+    /**
+     * Get column by name
+     *
+     * @param EntityDiagramItem $diagram
+     * @return EntityDiagramColumn
+     */
+    private function getDiagramColumnByTableColumnName($diagram, $columnName)
+    {
+        if(!isset($diagram))
+        {
+            return null;
+        }
+        $columns = $diagram->getColumns();
+        return isset($columns[$columnName]) ? $columns[$columnName] : null;
+    }
+    
     public function drawERD()
     {
+        $this->prepareEntityRelationship();
         $this->width = $this->calculateWidth();
         $this->height = $this->calculateHeight();
         
         
+        
         $image = new SVG($this->width, $this->height);
         $doc = $image->getDocument();
+        
+        $relationGroup = new SVG($this->width, $this->height);
+        $relationGroupDoc = $relationGroup->getDocument();
+        $relationGroupDoc->setAttribute('y', 10);
+        $relationGroupDoc->setStyle('position', 'absolute');
+        $relationGroupDoc->setStyle('z-index', 0);
+        foreach($this->entityRelationships as $entityRelationship)
+        {
+            $p1 = $entityRelationship->getStart();
+            $p2 = $entityRelationship->getEnd();
+            error_log(print_r(array($p1->getAbsolutePosition()->x, $p1->getAbsolutePosition()->y, $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth(), $p2->getAbsolutePosition()->y), true));
+            $line = new SVGLine($p1->getAbsolutePosition()->x, $p1->getAbsolutePosition()->y, $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth(), $p2->getAbsolutePosition()->y);
+            $line->setStyle('stroke', 'black');
+            $relationGroupDoc->addChild($line);
+             
+        }
+        $doc->addChild($relationGroupDoc); 
 
         foreach($this->entitieDiagramItem as $diagram)
         {
-            $index = 0;
-            $svgGroup = new SVG($diagram->getWidth(), $diagram->getHeight());
-            
-            $group = $svgGroup->getDocument();
-            
-            $group->setAttribute('x', $diagram->getX());
-            $group->setAttribute('y', $diagram->getY());
-            $group->setAttribute('name', $diagram->getEntityName());
-            $group->setAttribute('x', $diagram->getX());
-            $group->setAttribute('y', $diagram->getY());
-            
-            $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
-            $square->setStyle('fill', 'none');
-            $square->setStyle('stroke', self::STROKE_LINE);
-            
-            
-            
-            
-            $headerBg = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight());
-            $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
-            $group->addChild($headerBg);
-            $group->addChild($square);
-            
-            $x = 0;
-            $y = self::TEXT_OFFSET_Y + ($index * $diagram->getColumnHeight());
-            $entityHeader = new SVGText($diagram->getTableName(), self::TEXT_OFFSET_X, $y);
-            $entityHeader->setStyle('font-family', self::FONT_FAMILY);
-            $entityHeader->setStyle('font-size', self::FONT_SIZE);
-            $group->addChild($entityHeader);
-
-            foreach($diagram->getColumns() as $column)
-            {
-                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());                
-                $group->addChild($this->createColumn($diagram, $column, $x, $y));
-                $index++;
-            }
-            $doc->addChild($group);       
+            $diagramSVG = $this->createEntityItem($diagram);
+            $doc->addChild($diagramSVG);       
         }
         return $image->__toString();
+    }
+    
+    /**
+     * Create entity item
+     *
+     * @param EntityDiagramItem $diagram
+     * @return SVGNode
+     */
+    private function createEntityItem($diagram)
+    {
+        $index = 0;
+        $svgGroup = new SVG($diagram->getWidth(), $diagram->getHeight());
+        
+        $group = $svgGroup->getDocument();
+        
+        $group->setAttribute('x', $diagram->getX());
+        $group->setAttribute('y', $diagram->getY());
+        $group->setAttribute('name', $diagram->getEntityName());
+        $group->setStyle('position', 'absolute');
+        $group->setStyle('z-index', 1);
+
+        $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
+        $square->setStyle('fill', 'none');
+        $square->setStyle('stroke', self::STROKE_LINE);
+        
+        $headerBg = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight());
+        $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
+        $group->addChild($headerBg);
+        $group->addChild($square);
+        
+        $x = 0;
+        $y = self::TEXT_OFFSET_Y + ($index * $diagram->getColumnHeight());
+        $entityHeader = new SVGText($diagram->getTableName(), self::TEXT_OFFSET_X, $y);
+        $entityHeader->setStyle('font-family', self::FONT_FAMILY);
+        $entityHeader->setStyle('font-size', self::FONT_SIZE);
+        $entityHeader->setStyle('fill', self::TEXT_COLOR_TABLE);
+        $group->addChild($entityHeader);
+        
+        $iconTable = $this->createIconTable();
+        $group->addChild($iconTable);
+
+        foreach($diagram->getColumns() as $column)
+        {
+            $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());                
+            $group->addChild($this->createColumn($diagram, $column, $x, $y));
+            $index++;
+        }
+        return $group;
     }
     
     /**
@@ -346,20 +452,69 @@ class EntityRelationshipDiagram
         $columnSvg = new SVGText($column->getColumnName(), self::TEXT_OFFSET_X, self::TEXT_OFFSET_Y);
         $columnSvg->setStyle('font-family', self::FONT_FAMILY);
         $columnSvg->setStyle('font-size', self::FONT_SIZE);
+        $columnSvg->setStyle('fill', self::TEXT_COLOR_COLUMN);
         
         $columnElem->setAttribute('class', $diagram->getEntityId().'_'.$column->getColumnName());
         if($column->getReferenceTableName() != null && $column->getReferenceColumnName() != null)
         {
-            $columnElem->setAttribute('reference', $column->getReferenceTableName() . '_' . $column->getReferenceColumnName());
+            $columnElem->setAttribute('reference-table-name', $column->getReferenceTableName());
+            $columnElem->setAttribute('reference-column-name', $column->getReferenceColumnName());
+            $columnElem->setAttribute('reference-name', $column->getReferenceTableName() . '_' . $column->getReferenceColumnName());
         }
         
         $columnElem->addChild($columnSvg);
         $columnElem->addChild($this->createSeparatorLine($diagram));
-        $icon = $this->createIconColumn($column);
-        $columnElem->addChild($icon);
+        $iconColumn = $this->createIconColumn($column);
+        $columnElem->addChild($iconColumn);
         
         return $columnElem;
         
+    }
+    
+    /**
+     * Create icon column
+     *
+     * @return SVGPath
+     */
+    private function createIconTable()
+    {
+        $group = new SVGGroup();
+        
+        $points = array();
+        $points[] = new Point(4, 10);
+        $points[] = new Point(4, 7);
+        $points[] = new Point(12, 7);
+        $points[] = new Point(12, 14);
+        $points[] = new Point(4, 14);
+        $points[] = new Point(4, 10);
+        $points[] = new Point(12, 10);
+        $points[] = new Point(12, 12);
+        $points[] = new Point(4, 12);
+        $description = $this->createPathDescription($points, true);
+        $path1 = new SVGPath($description);
+
+        $fillStyle = '#2A56BD';
+        $path1->setStyle('fill', 'white');   
+        $path1->setStyle('stroke', $fillStyle); 
+        $path1->setAttribute('stroke-width', 0.5); 
+        
+        $points = array();
+        $points[] = new Point(6, 14);
+        $points[] = new Point(6, 7);
+        $points[] = new Point(8, 7);
+        $points[] = new Point(8, 14);
+        $points[] = new Point(10, 14);
+        $points[] = new Point(10, 7);
+
+        $description = $this->createPathDescription($points, false);
+        $path2 = new SVGPath($description);
+        $path2->setStyle('fill', 'transparent');   
+        $path2->setStyle('stroke', $fillStyle); 
+        $path2->setAttribute('stroke-width', 0.5); 
+        
+        $group->addChild($path1);
+        $group->addChild($path2);
+        return $group;
     }
     
     /**
@@ -370,6 +525,7 @@ class EntityRelationshipDiagram
      */
     private function createIconColumn($column)
     {
+        $group = new SVGGroup();
         $points = array();
         $points[] = new Point(8, 6);
         $points[] = new Point(12, 10);
@@ -380,34 +536,38 @@ class EntityRelationshipDiagram
         
         $path = new SVGPath($description);
         
+        $pkColor = '#CC0088';
+        $columnColor = '#2A56BD';
+        
         if($column->getPrimaryKey())
         {
-            $fillStyle = '#CC0088';
-            $path->setStyle('fill', $fillStyle);
+            $path->setStyle('fill', $pkColor);
+            $path->setStyle('stroke', $pkColor);
         }
         else if($column->hasReference())
         {
-            $fillStyle = '#5522EE';
-            $path->setStyle('fill', $fillStyle);
+            $path->setStyle('fill', $columnColor);
+            $path->setStyle('stroke', $columnColor);
+            
         }
         else
         {
-            $fillStyle = '#5522EE';
             $path->setStyle('fill', 'transparent');   
-            $path->setStyle('stroke', $fillStyle); 
+            $path->setStyle('stroke', $columnColor); 
         }
         
-        return $path;
+        $group->addChild($path);
+        return $group;
     }
     
-    private function createPathDescription($points)
+    private function createPathDescription($points, $closed = true)
     {
         $coords = array();
         foreach($points as $point)
         {
             $coords[] = $point->x . ' ' . $point->y;
         }
-        return "M".implode("L", $coords)." Z";
+        return "M".implode(" L", $coords).($closed?" Z":"");
     }
     
     public function calculateWidth()
@@ -421,6 +581,7 @@ class EntityRelationshipDiagram
                 $maxX = $maxDiagramX;
             }
         }
+        $maxX += $this->marginX;
         return $maxX;
     }
     
@@ -435,11 +596,54 @@ class EntityRelationshipDiagram
                 $maxY = $maxDiagramY;
             }
         }
+        $maxY += $this->marginY;
         return $maxY;
     }
     
     public function __toString()
     {
         return $this->drawERD();
+    }
+
+
+
+    /**
+     * Get the value of marginX
+     */ 
+    public function getMarginX()
+    {
+        return $this->marginX;
+    }
+
+    /**
+     * Set the value of marginX
+     *
+     * @return  self
+     */ 
+    public function setMarginX($marginX)
+    {
+        $this->marginX = $marginX;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of marginY
+     */ 
+    public function getMarginY()
+    {
+        return $this->marginY;
+    }
+
+    /**
+     * Set the value of marginY
+     *
+     * @return  self
+     */ 
+    public function setMarginY($marginY)
+    {
+        $this->marginY = $marginY;
+
+        return $this;
     }
 }
