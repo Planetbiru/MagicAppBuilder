@@ -230,7 +230,8 @@ class EntityRelationshipDiagram //NOSONAR
             if($this->entitieDiagramItem[$tableName]->hasColumn($columnName))
             {
                 $propertyType = $column['propertyType'];
-                $this->processReference($reflectionClass, $tableName, $columnName, $propertyType, $level);
+                $referenceColumnName = $column['referenceColumnName'];
+                $this->processReference($reflectionClass, $tableName, $columnName, $referenceColumnName, $propertyType, $level);
             }
         }
     }
@@ -244,7 +245,7 @@ class EntityRelationshipDiagram //NOSONAR
      * @param integer $level
      * @return void
      */
-    private function processReference($reflectionClass, $tableName, $columnName, $propertyType, $level)
+    private function processReference($reflectionClass, $tableName, $columnName, $referenceColumnName, $propertyType, $level)
     {
         try
         {
@@ -271,7 +272,6 @@ class EntityRelationshipDiagram //NOSONAR
                     $obj = new $realClassName();
                     $info2 = $obj->tableInfo();
                     $referenceTableName = $info2->getTableName();
-                    $referenceColumnName = $columnName;
                     $this->entitieDiagramItem[$tableName]->setJoinColumn($columnName, $propertyType, $referenceTableName, $referenceColumnName);
                     $this->addEntity($obj, $level + 1);
                 }
@@ -379,6 +379,10 @@ class EntityRelationshipDiagram //NOSONAR
                         if(isset($referenceColumn))
                         {
                             $this->entityRelationships[] = new EntityRelationship($diagram, $column, $referenceDiagram, $referenceColumn);
+                        }
+                        else
+                        {
+                            error_log($referenceColumnName);
                         }
                     }
                 }
