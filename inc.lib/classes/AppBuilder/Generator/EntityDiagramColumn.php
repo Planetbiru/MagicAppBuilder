@@ -12,6 +12,19 @@ class EntityDiagramColumn
     private $referenceColumnName;
     
     /**
+     * Reference column
+     *
+     * @var boolean
+     */
+    private $referenceColumn = false;
+    
+    /**
+     * Primary key
+     *
+     * @var boolean
+     */
+    private $primaryKey = false;
+    /**
      * Construuctor
      *
      * @param array $column
@@ -51,7 +64,7 @@ class EntityDiagramColumn
     public function setJoinColumn($referenceEntityName, $referenceTableName, $referenceColumnName)
     {
         $this->referenceEntityName = $referenceEntityName;
-        $this->referenceColumnName = $referenceTableName;
+        $this->referenceTableName = $referenceTableName;
         $this->referenceColumnName = $referenceColumnName;
     }
 
@@ -171,6 +184,64 @@ class EntityDiagramColumn
     public function setReferenceColumnName($referenceColumnName)
     {
         $this->referenceColumnName = $referenceColumnName;
+
+        return $this;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return  boolean
+     */ 
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set primary key
+     *
+     * @param  boolean  $primaryKey  Primary key
+     *
+     * @return  self
+     */ 
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+    
+    /**
+     * Check if column has reference
+     *
+     * @return boolean
+     */
+    public function hasReference()
+    {
+        return $this->referenceColumn || isset($this->referenceColumnName);
+    }
+
+    /**
+     * Get reference column
+     *
+     * @return  boolean
+     */ 
+    public function getReferenceColumn()
+    {
+        return $this->referenceColumn;
+    }
+
+    /**
+     * Set reference column
+     *
+     * @param  boolean  $referenceColumn  Reference column
+     *
+     * @return  self
+     */ 
+    public function setReferenceColumn($referenceColumn)
+    {
+        $this->referenceColumn = $referenceColumn;
 
         return $this;
     }

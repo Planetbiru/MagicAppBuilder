@@ -6,6 +6,7 @@ class EntityDiagramItem
 {
     private $entityName;
     private $tableName;
+    private $entityId;
     private $width = 1;
     private $height = 20;
     private $maxHeight = 1;
@@ -14,10 +15,11 @@ class EntityDiagramItem
     private $x = 0;
     private $y = 0;
     
-    public function __construct($entityName, $tableName, $x = 0, $y = 0, $width = 1, $maxHeight = 1)
+    public function __construct($entityName, $tableName, $entityId, $x = 0, $y = 0, $width = 1, $maxHeight = 1)
     {
         $this->entityName = $entityName;
         $this->tableName = $tableName;
+        $this->entityId = $entityId;
         $this->x = $x;
         $this->y = $y;
         $this->width = $width;
@@ -45,6 +47,18 @@ class EntityDiagramItem
         
         $this->height = $this->headerHeight + ($this->columnHeight * count($this->columns));
         
+        return $this;
+    }
+    
+    public function setPrimaryKeyColumn($columnName)
+    {
+        $this->columns[$columnName]->setPrimaryKey(true);
+        return $this;
+    }
+    
+    public function setReferenceColumn($columnName)
+    {
+        $this->columns[$columnName]->setReferenceColumn(true);
         return $this;
     }
     
@@ -252,6 +266,26 @@ class EntityDiagramItem
     public function setHeaderHeight($headerHeight)
     {
         $this->headerHeight = $headerHeight;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of entityId
+     */ 
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * Set the value of entityId
+     *
+     * @return  self
+     */ 
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
 
         return $this;
     }

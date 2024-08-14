@@ -2,7 +2,6 @@
 
 use AppBuilder\Generator\EntityRelationshipDiagram;
 use MagicObject\Request\InputGet;
-use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
@@ -26,7 +25,7 @@ try
         
         $entities = array();
         
-        $entityRelationshipDiagram = new EntityRelationshipDiagram(200);
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 170, null, 30);
         
         foreach($inputEntity as $idx=>$entityName)
         {
@@ -36,7 +35,7 @@ try
             if(file_exists($path))
             {
                 include_once $path;                  
-                $entity = new $className(null, $database);
+                $entity = new $className(null);
                 $entityRelationshipDiagram->addEntity($entity);
             }
         }
