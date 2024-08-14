@@ -594,6 +594,7 @@ jQuery(function(){
         success: function (data) {
           updateEntityFile();
           updateEntityQuery(true);
+          updateEntityRelationshipDiagram();
         },
       });
     }
@@ -713,6 +714,7 @@ function saveEntity() {
         $("#button-save-entity-file").removeAttr("disabled");
         updateEntityFile();
         updateEntityQuery(true);
+        updateEntityRelationshipDiagram();
         if (!data.success) {
           showAlertUI(data.error_title, data.error_message);
           setTimeout(function () { closeAlertUI() }, 2000);
@@ -1150,6 +1152,7 @@ function generateAllCode(dataToPost) {
     success: function (data) {
       updateEntityFile();
       updateEntityQuery(true);
+      updateEntityRelationshipDiagram();
       if (data.success) {
         showAlertUI(data.title, data.message);
         setTimeout(function () { closeAlertUI() }, 2000);
