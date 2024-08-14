@@ -25,9 +25,9 @@ try
         
         $entities = array();
         
-        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 170, null, 30);
-        $entityRelationshipDiagram->setMarginX(20);
-        $entityRelationshipDiagram->setMarginY(20);
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 160, null, 20);
+        $entityRelationshipDiagram->setMarginX(0);
+        $entityRelationshipDiagram->setMarginY(0);
         
         foreach($inputEntity as $idx=>$entityName)
         {
@@ -42,8 +42,22 @@ try
             }
         }
         header('Content-Type: image/svg+xml');
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
 
         echo $entityRelationshipDiagram;
+        
+    }
+    else
+    {
+        header('Content-Type: image/svg+xml');
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+
+        echo '<?xml version="1.0" encoding="utf-8"?>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1" height="1"></svg>';
         
     }
 }

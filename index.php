@@ -762,7 +762,30 @@ require_once __DIR__ . "/inc.app/navs.php";
           </div>
         </div>
 
-
+        <div id="entity-relationship" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-relationship-tab">
+          <div class="entity-container-relationship">
+            <div class="row">
+              <div class="col col-2">
+                <div class="column-title">
+                  <h4>Entities</h4>
+                </div>
+                <div class="column-body">
+                  <div class="entity-list"></div>
+                </div>
+              </div>
+              <div class="col col-10">
+                <div class="column-title">
+                  <h4>Entity Relationship Diagram</h4>
+                </div>
+                <div class="column-body">
+                  <div class="erd-image"></div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div id="entity-query" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-query-tab">
           <div class="entity-container-query">
             <div class="row">

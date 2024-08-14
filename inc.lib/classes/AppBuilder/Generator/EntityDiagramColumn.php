@@ -235,6 +235,16 @@ class EntityDiagramColumn
     {
         return $this->referenceColumn || isset($this->referenceColumnName);
     }
+    
+    /**
+     * Check if column has reference
+     *
+     * @return boolean
+     */
+    public function hasReferenceEntity()
+    {
+        return $this->referenceTableName != null && $this->referenceColumnName != null;
+    }
 
     /**
      * Get reference column

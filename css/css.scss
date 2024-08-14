@@ -248,6 +248,11 @@ table.table.table-reference {
 		overflow-x: auto;
 	}
 }
+.erd-image{
+	height: calc(100vh - 146px); 
+	overflow-x: auto;
+	overflow-y: auto;
+}
 .module-list {
 	ul {
 		list-style: none;

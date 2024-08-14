@@ -461,7 +461,7 @@ jQuery(function(){
     }
   });
 
-  $(document).on("change", ".entity-checkbox", function (e) {
+  $(document).on("change", ".entity-container-query .entity-checkbox", function (e) {
     let ents = getEntitySelection();
     let merged = $(".entity-merge")[0].checked;
     getEntityQuery(ents, merged);
@@ -626,9 +626,25 @@ jQuery(function(){
       $('#export_use_temporary')[0].disabled = true;
     }
   });
+  
+  $(document).on('change', '.entity-container-relationship .entity-checkbox', function(e){
+    let params = [];
+    $('.entity-container-relationship .entity-checkbox').each(function(){
+      if($(this)[0].checked)
+      {
+        params.push('entity[]='+$(this).val());
+      }
+    });
+    params.push('rnd='+(new Date()).getTime());
+    let img = $('<img />');
+    img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
+    $('.erd-image').empty().append(img);
+  });
+  
 
   loadTable();
   updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
 });
@@ -802,6 +818,22 @@ function updateEntityQuery(autoload) {
     },
   });
 }
+
+function updateEntityRelationshipDiagram() {
+  $.ajax({
+    type: "GET",
+    url: "lib.ajax/entity-list-for-diagram.php",
+    dataType: "html",
+    success: function (data) {
+      $(".entity-container-relationship .entity-list").empty().append(data);
+      $('.entity-container-relationship .entity-list [data-toggle="tooltip"]').tooltip({
+        placement: 'top'
+      });
+
+    },
+  });
+}
+
 function updateEntityFile() {
   $.ajax({
     type: "GET",

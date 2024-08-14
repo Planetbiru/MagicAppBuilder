@@ -19,8 +19,8 @@ use SVG\Nodes\Texts\SVGText;
 class EntityRelationshipDiagram
 {
     const NAMESPACE_SEPARATOR = "\\";
-    const STROKE_LINE = '#999999';
-    const HEADER_BACKGROUND_COLOR = '#EEEEEE';
+    const STROKE_LINE = '#8496B1';
+    const HEADER_BACKGROUND_COLOR = '#F0F6FF';
     const TEXT_COLOR_COLUMN = '#555555';
     const TEXT_COLOR_TABLE = '#214497';
     const TEXT_OFFSET_X = 16;
@@ -274,27 +274,18 @@ class EntityRelationshipDiagram
     private function prepareEntityRelationship()
     {
         $this->entityRelationships = array();
-        
+        $this->prepareColumnPosition();
+        $this->prepareRelationships();
+    }
+    
+    private function prepareRelationships()
+    {
         foreach($this->entitieDiagramItem as $diagram)
         {
             $index = 0;
             foreach($diagram->getColumns() as $column)
             {
-                $x = 0;
-                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
-                $column->setX($x);
-                $column->setY($y);
-                $index++;
-            }
-        }
-        
-        foreach($this->entitieDiagramItem as $diagram)
-        {
-            $index = 0;
-            foreach($diagram->getColumns() as $column)
-            {
-                $x = 0;
-                if($column->getReferenceTableName() != null && $column->getReferenceColumnName() != null)
+                if($column->hasReferenceEntity())
                 {
                     $tableName = $column->getReferenceTableName();
                     $referenceColumnName = $column->getReferenceColumnName();
@@ -308,6 +299,22 @@ class EntityRelationshipDiagram
                         }
                     }
                 }
+                $index++;
+            }
+        }
+    }
+    
+    private function prepareColumnPosition()
+    {
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $index = 0;
+            foreach($diagram->getColumns() as $column)
+            {
+                $x = 0;
+                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
+                $column->setX($x);
+                $column->setY($y);
                 $index++;
             }
         }
@@ -340,33 +347,33 @@ class EntityRelationshipDiagram
         $this->width = $this->calculateWidth();
         $this->height = $this->calculateHeight();
         
-        
-        
         $image = new SVG($this->width, $this->height);
         $doc = $image->getDocument();
         
-        $relationGroup = new SVG($this->width, $this->height);
-        $relationGroupDoc = $relationGroup->getDocument();
-        $relationGroupDoc->setAttribute('y', 10);
-        $relationGroupDoc->setStyle('position', 'absolute');
-        $relationGroupDoc->setStyle('z-index', 0);
+        $relationGroupDoc = new SVGGroup();
+
+        $yOffset = 10;
         foreach($this->entityRelationships as $entityRelationship)
         {
             $p1 = $entityRelationship->getStart();
             $p2 = $entityRelationship->getEnd();
-            error_log(print_r(array($p1->getAbsolutePosition()->x, $p1->getAbsolutePosition()->y, $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth(), $p2->getAbsolutePosition()->y), true));
-            $line = new SVGLine($p1->getAbsolutePosition()->x, $p1->getAbsolutePosition()->y, $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth(), $p2->getAbsolutePosition()->y);
-            $line->setStyle('stroke', 'black');
+            
+            $x1 = $p1->getAbsolutePosition()->x;
+            $y1 = $p1->getAbsolutePosition()->y + $yOffset;
+            $x2 = $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth();
+            $y2 = $p2->getAbsolutePosition()->y + $yOffset;
+            
+            $line = new SVGLine($x1, $y1, $x2, $y2);
+            $line->setStyle('stroke', self::STROKE_LINE);
             $relationGroupDoc->addChild($line);
-             
         }
-        $doc->addChild($relationGroupDoc); 
 
         foreach($this->entitieDiagramItem as $diagram)
         {
             $diagramSVG = $this->createEntityItem($diagram);
             $doc->addChild($diagramSVG);       
         }
+        $doc->addChild($relationGroupDoc); 
         return $image->__toString();
     }
     
@@ -390,13 +397,14 @@ class EntityRelationshipDiagram
         $group->setStyle('z-index', 1);
 
         $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
-        $square->setStyle('fill', 'none');
+        $square->setStyle('fill', '#FFFFFF');
         $square->setStyle('stroke', self::STROKE_LINE);
         
-        $headerBg = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight());
+        $headerBg = new SVGRect(1, 1, $diagram->getWidth() - 2, $diagram->getHeaderHeight() - 1);
         $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
-        $group->addChild($headerBg);
         $group->addChild($square);
+        $group->addChild($headerBg);
+        
         
         $x = 0;
         $y = self::TEXT_OFFSET_Y + ($index * $diagram->getColumnHeight());
