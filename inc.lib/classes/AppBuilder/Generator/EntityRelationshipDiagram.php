@@ -17,12 +17,12 @@ use SVG\Nodes\Structures\SVGGroup;
 use SVG\Nodes\SVGNode;
 use SVG\Nodes\Texts\SVGText;
 
-class EntityRelationshipDiagram
+class EntityRelationshipDiagram //NOSONAR
 {
     const NAMESPACE_SEPARATOR = "\\";
     const STROKE_DIAGRAM = '#8496B1';
     const STROKE_LINE = '#606C80';
-    const HEADER_BACKGROUND_COLOR = '#F0F6FF';
+    const HEADER_BACKGROUND_COLOR = '#E0EDFF';
     const TEXT_COLOR_COLUMN = '#555555';
     const TEXT_COLOR_TABLE = '#214497';
     const TEXT_OFFSET_X = 16;

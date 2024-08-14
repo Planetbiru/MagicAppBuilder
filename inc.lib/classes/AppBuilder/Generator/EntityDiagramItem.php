@@ -2,17 +2,76 @@
 
 namespace AppBuilder\Generator;
 
-class EntityDiagramItem
+class EntityDiagramItem //NOSONAR
 {
+    /**
+     * Entity name
+     *
+     * @var string
+     */
     private $entityName;
+    
+    /**
+     * Table name
+     *
+     * @var string
+     */
     private $tableName;
+    
+    /**
+     * Entity ID
+     *
+     * @var string
+     */
     private $entityId;
+    
+    /**
+     * Width
+     *
+     * @var integer
+     */
     private $width = 1;
+    
+    /**
+     * Height
+     *
+     * @var integer
+     */
     private $height = 20;
+    
+    /**
+     * Max height
+     *
+     * @var integer
+     */
     private $maxHeight = 1;
+    
+    /**
+     * Header height
+     *
+     * @var integer
+     */
     private $headerHeight = 20;
+    
+    /**
+     * Column height
+     *
+     * @var integer
+     */
     private $columnHeight = 20;
+    
+    /**
+     * Coordinate X
+     *
+     * @var integer
+     */
     private $x = 0;
+    
+    /**
+     * Coordinate Y
+     *
+     * @var integer
+     */
     private $y = 0;
     
     public function __construct($entityName, $tableName, $entityId, $x = 0, $y = 0, $width = 1, $maxHeight = 1)
