@@ -1,7 +1,7 @@
 -
     id: sipro
     name: Sipro
-    documentRoot: 'D:\xampp\htdocs\new-sipro'
+    documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Sipro
     selected: true
 -
