@@ -2,7 +2,7 @@
 
 namespace AppBuilder\Generator;
 
-class EntityDiagramColumn
+class EntityDiagramColumn //NOSONAR
 {
     private $columnName;
     private $dataType;
