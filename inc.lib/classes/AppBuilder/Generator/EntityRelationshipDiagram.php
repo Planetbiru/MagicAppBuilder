@@ -8,6 +8,7 @@ use MagicObject\Geometry\Point;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use ReflectionClass;
+use SVG\Nodes\Shapes\SVGCircle;
 use SVG\Nodes\Shapes\SVGLine;
 use SVG\Nodes\Shapes\SVGPath;
 use SVG\SVG;
@@ -19,7 +20,8 @@ use SVG\Nodes\Texts\SVGText;
 class EntityRelationshipDiagram
 {
     const NAMESPACE_SEPARATOR = "\\";
-    const STROKE_LINE = '#8496B1';
+    const STROKE_DIAGRAM = '#8496B1';
+    const STROKE_LINE = '#606C80';
     const HEADER_BACKGROUND_COLOR = '#F0F6FF';
     const TEXT_COLOR_COLUMN = '#555555';
     const TEXT_COLOR_TABLE = '#214497';
@@ -363,9 +365,19 @@ class EntityRelationshipDiagram
             $x2 = $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth();
             $y2 = $p2->getAbsolutePosition()->y + $yOffset;
             
+            //<circle r="45" cx="50" cy="50" fill="red" />
+            
             $line = new SVGLine($x1, $y1, $x2, $y2);
             $line->setStyle('stroke', self::STROKE_LINE);
             $relationGroupDoc->addChild($line);
+            
+            $dot1 = new SVGCircle($x1, $y1, 2);
+            $dot2 = new SVGCircle($x2, $y2, 2);
+            $dot1->setStyle('fill', self::STROKE_LINE);
+            $dot2->setStyle('fill', self::STROKE_LINE);
+            $relationGroupDoc->addChild($dot1);
+            $relationGroupDoc->addChild($dot2);
+            
         }
 
         foreach($this->entitieDiagramItem as $diagram)
@@ -398,7 +410,7 @@ class EntityRelationshipDiagram
 
         $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
         $square->setStyle('fill', '#FFFFFF');
-        $square->setStyle('stroke', self::STROKE_LINE);
+        $square->setStyle('stroke', self::STROKE_DIAGRAM);
         
         $headerBg = new SVGRect(1, 1, $diagram->getWidth() - 2, $diagram->getHeaderHeight() - 1);
         $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
