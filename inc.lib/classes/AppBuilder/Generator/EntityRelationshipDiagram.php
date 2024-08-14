@@ -23,12 +23,16 @@ class EntityRelationshipDiagram //NOSONAR
     const STROKE_DIAGRAM = '#8496B1';
     const STROKE_LINE = '#606C80';
     const HEADER_BACKGROUND_COLOR = '#E0EDFF';
-    const TEXT_COLOR_COLUMN = '#555555';
-    const TEXT_COLOR_TABLE = '#214497';
+    const ENTITY_BACKGROUND_COLOR = '#FFFFFF';
+    const TEXT_COLOR_COLUMN = '#444444';
+    const TEXT_COLOR_TABLE = '#1d3c86';
     const TEXT_OFFSET_X = 16;
     const TEXT_OFFSET_Y = 14;
     const FONT_FAMILY = 'Arial';
     const FONT_SIZE = '8pt';
+    
+    const ICON_COLUMN_PRIMARY_KEY_COLOR = '#CC0088';
+    const ICON_COLUMN_COLOR = '#2A56BD';
     
     /**
      * Entity DiagramItem
@@ -52,10 +56,39 @@ class EntityRelationshipDiagram //NOSONAR
     private $entityWidth = 1;
     
 
+    /**
+     * Margin between 2 entitis
+     *
+     * @var integer
+     */
     private $entityMargin = 40;
+    
+    /**
+     * Width
+     *
+     * @var integer
+     */
     private $width = 1;
+    
+    /**
+     * Height
+     *
+     * @var integer
+     */
     private $height = 1;
+    
+    /**
+     * Margin X
+     *
+     * @var integer
+     */
     private $marginX = 20;
+    
+    /**
+     * Margin Y
+     *
+     * @var integer
+     */
     private $marginY = 20;
     
     /**
@@ -79,7 +112,18 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private $appConfig;
     
+    /**
+     * Header height
+     *
+     * @var integer
+     */
     private $headerHeight = 20;
+    
+    /**
+     * Column height
+     *
+     * @var integer
+     */
     private $columnHeight = 20;
     
     /**
@@ -106,7 +150,6 @@ class EntityRelationshipDiagram //NOSONAR
         {
             $this->addEntities($entities);
         }
-        
     }
     
     public function addEntities($entities)
@@ -130,12 +173,10 @@ class EntityRelationshipDiagram //NOSONAR
         $this->entities[] = $entity;
         $info = $entity->tableInfo();
         $this->entityTable[basename(get_class($entity))] = $info->getTableName();
-
         $info = $entity->tableInfo();
         $reflectionClass = new ReflectionClass($entity);
         $entityName = basename(get_class($entity));
         $this->updateDiagram($reflectionClass, $entityName, $info, $level);
-
         return $this;
     }
     
@@ -244,6 +285,12 @@ class EntityRelationshipDiagram //NOSONAR
         }
     }
     
+    /**
+     * Include file
+     *
+     * @param string $realClassName
+     * @return void
+     */
     private function includeFile($realClassName)
     {
         $application = $this->appConfig->getApplication();
@@ -297,6 +344,11 @@ class EntityRelationshipDiagram //NOSONAR
         return $this;
     }
     
+    /**
+     * Prepare entity relationship
+     *
+     * @return void
+     */
     private function prepareEntityRelationship()
     {
         $this->entityRelationships = array();
@@ -304,6 +356,11 @@ class EntityRelationshipDiagram //NOSONAR
         $this->prepareRelationships();
     }
     
+    /**
+     * Prepare relationships
+     *
+     * @return void
+     */
     private function prepareRelationships()
     {
         foreach($this->entitieDiagramItem as $diagram)
@@ -330,6 +387,11 @@ class EntityRelationshipDiagram //NOSONAR
         }
     }
     
+    /**
+     * Prepare column position
+     *
+     * @return void
+     */
     private function prepareColumnPosition()
     {
         foreach($this->entitieDiagramItem as $diagram)
@@ -346,6 +408,12 @@ class EntityRelationshipDiagram //NOSONAR
         }
     }
     
+    /**
+     * Get diagram by name
+     *
+     * @param string $tableName
+     * @return void
+     */
     private function getDiagramByTableName($tableName)
     {
         return isset($this->entitieDiagramItem[$tableName]) ? $this->entitieDiagramItem[$tableName] : null;
@@ -367,6 +435,11 @@ class EntityRelationshipDiagram //NOSONAR
         return isset($columns[$columnName]) ? $columns[$columnName] : null;
     }
     
+    /**
+     * Draw ERD
+     *
+     * @return string
+     */
     public function drawERD()
     {
         $this->prepareEntityRelationship();
@@ -422,23 +495,23 @@ class EntityRelationshipDiagram //NOSONAR
         $index = 0;
         $svgGroup = new SVG($diagram->getWidth(), $diagram->getHeight());
         
-        $group = $svgGroup->getDocument();
+        $entity = $svgGroup->getDocument();
         
-        $group->setAttribute('x', $diagram->getX());
-        $group->setAttribute('y', $diagram->getY());
-        $group->setAttribute('name', $diagram->getEntityName());
-        $group->setAttribute('data-table-name', $diagram->getTableName());
-        $group->setStyle('position', 'absolute');
-        $group->setStyle('z-index', 1);
+        $entity->setAttribute('x', $diagram->getX());
+        $entity->setAttribute('y', $diagram->getY());
+        $entity->setAttribute('name', $diagram->getEntityName());
+        $entity->setAttribute('data-table-name', $diagram->getTableName());
+        $entity->setStyle('position', 'absolute');
+        $entity->setStyle('z-index', 1);
 
         $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
-        $square->setStyle('fill', '#FFFFFF');
+        $square->setStyle('fill', self::ENTITY_BACKGROUND_COLOR);
         $square->setStyle('stroke', self::STROKE_DIAGRAM);
         
         $headerBg = new SVGRect(1, 1, $diagram->getWidth() - 2, $diagram->getHeaderHeight() - 1);
         $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
-        $group->addChild($square);
-        $group->addChild($headerBg);
+        $entity->addChild($square);
+        $entity->addChild($headerBg);
         
         
         $x = 0;
@@ -447,18 +520,18 @@ class EntityRelationshipDiagram //NOSONAR
         $entityHeader->setStyle('font-family', self::FONT_FAMILY);
         $entityHeader->setStyle('font-size', self::FONT_SIZE);
         $entityHeader->setStyle('fill', self::TEXT_COLOR_TABLE);
-        $group->addChild($entityHeader);
+        $entity->addChild($entityHeader);
         
         $iconTable = $this->createIconTable();
-        $group->addChild($iconTable);
+        $entity->addChild($iconTable);
 
         foreach($diagram->getColumns() as $column)
         {
             $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());                
-            $group->addChild($this->createColumn($diagram, $column, $x, $y));
+            $entity->addChild($this->createColumn($diagram, $column, $x, $y));
             $index++;
         }
-        return $group;
+        return $entity;
     }
     
     /**
@@ -521,7 +594,7 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private function createIconTable()
     {
-        $group = new SVGGroup();
+        $icon = new SVGGroup();
         
         $points = array();
         $points[] = new Point(4, 10);
@@ -555,11 +628,11 @@ class EntityRelationshipDiagram //NOSONAR
         $path2->setStyle('stroke', $fillStyle); 
         $path2->setAttribute('stroke-width', 0.5); 
         
-        $group->addChild($path1);
-        $group->addChild($path2);
+        $icon->addChild($path1);
+        $icon->addChild($path2);
         
-        $group->setAttribute('class', 'entity-icon icon-table');
-        return $group;
+        $icon->setAttribute('class', 'entity-icon icon-table');
+        return $icon;
     }
     
     /**
@@ -570,7 +643,7 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private function createIconColumn($column)
     {
-        $group = new SVGGroup();
+        $icon = new SVGGroup();
         $points = array();
         $points[] = new Point(8, 6);
         $points[] = new Point(12, 10);
@@ -581,8 +654,8 @@ class EntityRelationshipDiagram //NOSONAR
         
         $path = new SVGPath($description);
         
-        $pkColor = '#CC0088';
-        $columnColor = '#2A56BD';
+        $pkColor = self::ICON_COLUMN_PRIMARY_KEY_COLOR;
+        $columnColor = self::ICON_COLUMN_COLOR;
         
         if($column->getPrimaryKey())
         {
@@ -600,9 +673,9 @@ class EntityRelationshipDiagram //NOSONAR
             $path->setStyle('fill', 'transparent');   
             $path->setStyle('stroke', $columnColor); 
         }
-        $group->setAttribute('class', 'entity-icon icon-column');
-        $group->addChild($path);
-        return $group;
+        $icon->setAttribute('class', 'entity-icon icon-column');
+        $icon->addChild($path);
+        return $icon;
     }
     
     private function createPathDescription($points, $closed = true)
