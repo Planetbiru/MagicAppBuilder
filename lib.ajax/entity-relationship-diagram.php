@@ -22,7 +22,7 @@ try
         $entities = array();
         $entityNames = array();
         $entities = array();
-        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 150, 20);
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 20);
         $entityRelationshipDiagram->setMarginX(0);
         $entityRelationshipDiagram->setMarginY(0);
         $entityRelationshipDiagram->setMaximumLevel(0);
