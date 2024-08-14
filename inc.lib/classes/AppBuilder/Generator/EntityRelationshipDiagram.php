@@ -44,11 +44,15 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private $entityRelationships = array();
     
+    /**
+     * Entity width
+     *
+     * @var integer
+     */
     private $entityWidth = 1;
-    private $entityMaxHeight;
-    private $entityMargin = 40;
-
     
+
+    private $entityMargin = 40;
     private $width = 1;
     private $height = 1;
     private $marginX = 20;
@@ -75,19 +79,25 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private $appConfig;
     
+    private $headerHeight = 20;
+    private $columnHeight = 20;
+    
+    /**
+     * Maximum level
+     *
+     * @var integer
+     */
+    private $maximumLevel;
+    
     /**
      * Constructor
      *
      * @param MagicObject[] $entities
      */
-    public function __construct($appConfig, $entityWidth, $entityMaxHeight = null, $entityMargin = null, $entities = null)
+    public function __construct($appConfig, $entityWidth, $entityMargin = null, $entities = null)
     {
         $this->appConfig = $appConfig;
         $this->entityWidth = $entityWidth;
-        if(isset($entityMaxHeight))
-        {
-            $this->entityMaxHeight = $entityMaxHeight;
-        }
         if(isset($entityMargin))
         {
             $this->entityMargin = $entityMargin;
@@ -112,9 +122,10 @@ class EntityRelationshipDiagram //NOSONAR
      * Add entity
      *
      * @param MagicObject $entity
+     * @param integer $level
      * @return self
      */
-    public function addEntity($entity)
+    public function addEntity($entity, $level = 1)
     {
         $this->entities[] = $entity;
         $info = $entity->tableInfo();
@@ -123,7 +134,7 @@ class EntityRelationshipDiagram //NOSONAR
         $info = $entity->tableInfo();
         $reflectionClass = new ReflectionClass($entity);
         $entityName = basename(get_class($entity));
-        $this->updateDiagram($reflectionClass, $entityName, $info);
+        $this->updateDiagram($reflectionClass, $entityName, $info, $level);
 
         return $this;
     }
@@ -134,9 +145,10 @@ class EntityRelationshipDiagram //NOSONAR
      * @param ReflectionClass $reflectionClass
      * @param string $entityName
      * @param PicoTableInfo $info
+     * @param integer $level
      * @return self
      */
-    private function updateDiagram($reflectionClass, $entityName, $info)
+    private function updateDiagram($reflectionClass, $entityName, $info, $level)
     {
         $tableName = $info->getTableName();
         if(!isset($this->entitieDiagramItem[$tableName]))
@@ -144,7 +156,9 @@ class EntityRelationshipDiagram //NOSONAR
             $x = $this->marginX + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMargin);
             $y = $this->marginY;
             $entityId = $tableName;
-            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $entityId, $x, $y, $this->entityWidth, $this->entityMaxHeight);
+            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $entityId, $x, $y, $this->entityWidth);
+            $this->entitieDiagramItem[$tableName]->setHeaderHeight($this->headerHeight);
+            $this->entitieDiagramItem[$tableName]->setColumnHeight($this->columnHeight);
         }
         
         // update column
@@ -175,12 +189,21 @@ class EntityRelationshipDiagram //NOSONAR
             if($this->entitieDiagramItem[$tableName]->hasColumn($columnName))
             {
                 $propertyType = $column['propertyType'];
-                $this->processReference($reflectionClass, $tableName, $columnName, $propertyType);
+                $this->processReference($reflectionClass, $tableName, $columnName, $propertyType, $level);
             }
         }
     }
     
-    private function processReference($reflectionClass, $tableName, $columnName, $propertyType)
+    /**
+     * Process reference
+     *
+     * @param ReflectionClass $reflectionClass
+     * @param string $entityName
+     * @param PicoTableInfo $info
+     * @param integer $level
+     * @return void
+     */
+    private function processReference($reflectionClass, $tableName, $columnName, $propertyType, $level)
     {
         try
         {
@@ -195,22 +218,23 @@ class EntityRelationshipDiagram //NOSONAR
                 $realClassName = $propertyType;
             }
 
-            
-            $this->includeFile($realClassName);
-            
-            $reflect = new ReflectionClass($realClassName);
-            $file = $reflect->getFileName();
-            if(file_exists($file))
+            if((isset($this->maximumLevel) && $level < $this->maximumLevel) || $this->maximumLevel < 1)
             {
-                include_once $file;
-                $obj = new $realClassName();
-                $info2 = $obj->tableInfo();
-                $referenceTableName = $info2->getTableName();
-                $referenceColumnName = $columnName;
-                $this->entitieDiagramItem[$tableName]->setJoinColumn($columnName, $propertyType, $referenceTableName, $referenceColumnName);
-                $this->addEntity($obj);
+                $this->includeFile($realClassName);
+                
+                $reflect = new ReflectionClass($realClassName);
+                $file = $reflect->getFileName();
+                if(file_exists($file))
+                {
+                    include_once $file;
+                    $obj = new $realClassName();
+                    $info2 = $obj->tableInfo();
+                    $referenceTableName = $info2->getTableName();
+                    $referenceColumnName = $columnName;
+                    $this->entitieDiagramItem[$tableName]->setJoinColumn($columnName, $propertyType, $referenceTableName, $referenceColumnName);
+                    $this->addEntity($obj, $level + 1);
+                }
             }
-            
             
         }
         catch(Exception $e)
@@ -354,7 +378,7 @@ class EntityRelationshipDiagram //NOSONAR
         
         $relationGroupDoc = new SVGGroup();
 
-        $yOffset = 10;
+        $yOffset = intval($this->columnHeight / 2);
         foreach($this->entityRelationships as $entityRelationship)
         {
             $p1 = $entityRelationship->getStart();
@@ -364,9 +388,7 @@ class EntityRelationshipDiagram //NOSONAR
             $y1 = $p1->getAbsolutePosition()->y + $yOffset;
             $x2 = $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth();
             $y2 = $p2->getAbsolutePosition()->y + $yOffset;
-            
-            //<circle r="45" cx="50" cy="50" fill="red" />
-            
+                        
             $line = new SVGLine($x1, $y1, $x2, $y2);
             $line->setStyle('stroke', self::STROKE_LINE);
             $relationGroupDoc->addChild($line);
@@ -405,6 +427,7 @@ class EntityRelationshipDiagram //NOSONAR
         $group->setAttribute('x', $diagram->getX());
         $group->setAttribute('y', $diagram->getY());
         $group->setAttribute('name', $diagram->getEntityName());
+        $group->setAttribute('data-table-name', $diagram->getTableName());
         $group->setStyle('position', 'absolute');
         $group->setStyle('z-index', 1);
 
@@ -502,8 +525,8 @@ class EntityRelationshipDiagram //NOSONAR
         
         $points = array();
         $points[] = new Point(4, 10);
-        $points[] = new Point(4, 7);
-        $points[] = new Point(12, 7);
+        $points[] = new Point(4, 8);
+        $points[] = new Point(12, 8);
         $points[] = new Point(12, 14);
         $points[] = new Point(4, 14);
         $points[] = new Point(4, 10);
@@ -520,11 +543,11 @@ class EntityRelationshipDiagram //NOSONAR
         
         $points = array();
         $points[] = new Point(6, 14);
-        $points[] = new Point(6, 7);
-        $points[] = new Point(8, 7);
+        $points[] = new Point(6, 8);
+        $points[] = new Point(8, 8);
         $points[] = new Point(8, 14);
         $points[] = new Point(10, 14);
-        $points[] = new Point(10, 7);
+        $points[] = new Point(10, 8);
 
         $description = $this->createPathDescription($points, false);
         $path2 = new SVGPath($description);
@@ -534,6 +557,8 @@ class EntityRelationshipDiagram //NOSONAR
         
         $group->addChild($path1);
         $group->addChild($path2);
+        
+        $group->setAttribute('class', 'entity-icon icon-table');
         return $group;
     }
     
@@ -575,7 +600,7 @@ class EntityRelationshipDiagram //NOSONAR
             $path->setStyle('fill', 'transparent');   
             $path->setStyle('stroke', $columnColor); 
         }
-        
+        $group->setAttribute('class', 'entity-icon icon-column');
         $group->addChild($path);
         return $group;
     }
@@ -663,6 +688,82 @@ class EntityRelationshipDiagram //NOSONAR
     public function setMarginY($marginY)
     {
         $this->marginY = $marginY;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of entityMargin
+     */ 
+    public function getEntityMargin()
+    {
+        return $this->entityMargin;
+    }
+
+    /**
+     * Set the value of entityMargin
+     *
+     * @return  self
+     */ 
+    public function setEntityMargin($entityMargin)
+    {
+        $this->entityMargin = $entityMargin;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of headerHeight
+     */ 
+    public function getHeaderHeight()
+    {
+        return $this->headerHeight;
+    }
+
+    /**
+     * Set the value of headerHeight
+     *
+     * @return  self
+     */ 
+    public function setHeaderHeight($headerHeight)
+    {
+        $this->headerHeight = $headerHeight;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of columnHeight
+     *
+     * @return  self
+     */ 
+    public function setColumnHeight($columnHeight)
+    {
+        $this->columnHeight = $columnHeight;
+
+        return $this;
+    }
+
+    /**
+     * Get maximum level
+     *
+     * @return  integer
+     */ 
+    public function getMaximumLevel()
+    {
+        return $this->maximumLevel;
+    }
+
+    /**
+     * Set maximum level
+     *
+     * @param  integer  $maximumLevel  Maximum level
+     *
+     * @return  self
+     */ 
+    public function setMaximumLevel($maximumLevel)
+    {
+        $this->maximumLevel = $maximumLevel;
 
         return $this;
     }

@@ -40,13 +40,6 @@ class EntityDiagramItem //NOSONAR
     private $height = 20;
     
     /**
-     * Max height
-     *
-     * @var integer
-     */
-    private $maxHeight = 1;
-    
-    /**
      * Header height
      *
      * @var integer
@@ -74,7 +67,7 @@ class EntityDiagramItem //NOSONAR
      */
     private $y = 0;
     
-    public function __construct($entityName, $tableName, $entityId, $x = 0, $y = 0, $width = 1, $maxHeight = 1)
+    public function __construct($entityName, $tableName, $entityId, $x = 0, $y = 0, $width = 160)
     {
         $this->entityName = $entityName;
         $this->tableName = $tableName;
@@ -82,10 +75,7 @@ class EntityDiagramItem //NOSONAR
         $this->x = $x;
         $this->y = $y;
         $this->width = $width;
-        if(isset($maxHeight))
-        {
-            $this->maxHeight = $maxHeight;
-        }
+
     }
     /**
      * Column
@@ -183,26 +173,6 @@ class EntityDiagramItem //NOSONAR
     public function setWidth($width)
     {
         $this->width = $width;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of maxHeight
-     */ 
-    public function getMaxHeight()
-    {
-        return $this->maxHeight;
-    }
-
-    /**
-     * Set the value of maxHeight
-     *
-     * @return  self
-     */ 
-    public function setMaxHeight($maxHeight)
-    {
-        $this->maxHeight = $maxHeight;
 
         return $this;
     }

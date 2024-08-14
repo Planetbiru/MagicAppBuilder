@@ -642,6 +642,16 @@ jQuery(function(){
     $('.erd-image').empty().append(img);
   });
   
+  $(document).on('click', '.entity-container-relationship .entity-li a', function(e){
+    e.preventDefault();
+    let params = [];
+    params.push('entity[]='+$(this).attr('data-entity-name'));
+    params.push('rnd='+(new Date()).getTime());
+    let img = $('<img />');
+    img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
+    $('.erd-image').empty().append(img);
+  });
+  
 
   loadTable();
   updateEntityQuery(false);
