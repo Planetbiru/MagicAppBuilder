@@ -582,8 +582,6 @@ class EntityRelationshipDiagram //NOSONAR
             $this->height = $originalHeight;
             $this->width = $this->calculateWidth();
         }
-        
-        
     }
     
     /**
@@ -613,8 +611,7 @@ class EntityRelationshipDiagram //NOSONAR
         $headerBg = new SVGRect(1, 1, $diagram->getWidth() - 2, $diagram->getHeaderHeight() - 1);
         $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
         $entity->addChild($square);
-        $entity->addChild($headerBg);
-        
+        $entity->addChild($headerBg);     
         
         $x = 0;
         $y = self::TEXT_OFFSET_Y + ($index * $diagram->getColumnHeight());
@@ -650,12 +647,12 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create separator
+     * Create column
      *
      * @param EntityDiagramItem $diagram
      * @param EntityDiagramColumn $column
-     * @param integer $x
-     * @param integer $y
+     * @param integer $x X coordinate
+     * @param integer $y Y coordinate
      * @return SVGLine
      */
     private function createColumn($diagram, $column, $x, $y)
@@ -690,7 +687,7 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create icon column
+     * Create icon table
      *
      * @return SVGPath
      */
@@ -780,6 +777,13 @@ class EntityRelationshipDiagram //NOSONAR
         return $icon;
     }
     
+    /**
+     * Create path description from points
+     *
+     * @param Point $points
+     * @param boolean $closed
+     * @return string
+     */
     private function createPathDescription($points, $closed = true)
     {
         $coords = array();
@@ -790,6 +794,11 @@ class EntityRelationshipDiagram //NOSONAR
         return "M".implode(" L", $coords).($closed?" Z":"");
     }
     
+    /**
+     * Calculate diagram width
+     *
+     * @return integer
+     */
     public function calculateWidth()
     {
         $maxX = 0;
@@ -805,6 +814,11 @@ class EntityRelationshipDiagram //NOSONAR
         return $maxX;
     }
     
+    /**
+     * Calculate diagram height
+     *
+     * @return integer
+     */
     public function calculateHeight()
     {
         $maxY = 0;
