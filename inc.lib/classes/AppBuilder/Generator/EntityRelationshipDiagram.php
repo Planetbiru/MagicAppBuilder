@@ -502,6 +502,22 @@ class EntityRelationshipDiagram //NOSONAR
         return $image->__toString();
     }
     
+    /**
+     * Check if need to wrap diagram
+     *
+     * @param integer $countDiagram
+     * @return boolean
+     */
+    private function needWrapDiagram($countDiagram)
+    {
+        return $this->maximumColumn > 0 && $countDiagram > $this->maximumColumn;
+    }
+    
+    /**
+     * Arange diagram
+     *
+     * @return void
+     */
     private function arrangeDiagram()
     {
         $countDiagram = count($this->entitieDiagramItem);
@@ -509,7 +525,7 @@ class EntityRelationshipDiagram //NOSONAR
         $originalHeight = $this->calculateHeight();
         $maxHeightLastLine = 0;
         
-        if($max > 0 && $countDiagram > $max)
+        if($this->needWrapDiagram($countDiagram))
         {
             $rows = ceil($countDiagram / $max);
             
@@ -539,14 +555,10 @@ class EntityRelationshipDiagram //NOSONAR
             {
                 $mod = $index % $max;
                 $row = floor($index / $max);
-                
-                
-                
                 $x = ($mod * $diagram->getWidth()) + $this->marginX + ($mod * $this->entityMarginX);
                 $y = $currentRowTop;
                 $diagram->setX($x);
-                $diagram->setY($y);
-                
+                $diagram->setY($y);         
                 if($row == ($rows - 1))
                 {
                     $maxHeightLastLine = max($maxHeightLastLine, $diagram->getHeight());
@@ -559,13 +571,9 @@ class EntityRelationshipDiagram //NOSONAR
                     $currentRowTop += ($currentRowHeight + $this->entityMarginY);
                     $currentRowHeight = 0;
                 }
-                
-                 
-                
                 $index++;
             }
             
-            //$height = $height + $maxHeightLastLine + (2 * $this->marginY) - $originalHeight;
             $this->width = $width;
             $this->height = $height;
         }
