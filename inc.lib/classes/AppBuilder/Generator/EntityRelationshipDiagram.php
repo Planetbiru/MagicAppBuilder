@@ -22,6 +22,7 @@ class EntityRelationshipDiagram //NOSONAR
     const NAMESPACE_SEPARATOR = "\\";
     const STROKE_DIAGRAM = '#8496B1';
     const STROKE_LINE = '#606C80';
+    const TRANSPARENT = 'transparent';
     const HEADER_BACKGROUND_COLOR = '#E0EDFF';
     const ENTITY_BACKGROUND_COLOR = '#FFFFFF';
     const TEXT_COLOR_COLUMN = '#444444';
@@ -604,14 +605,21 @@ class EntityRelationshipDiagram //NOSONAR
         $entity->setStyle('position', 'absolute');
         $entity->setStyle('z-index', 1);
 
-        $square = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
-        $square->setStyle('fill', self::ENTITY_BACKGROUND_COLOR);
-        $square->setStyle('stroke', self::STROKE_DIAGRAM);
+        $mainFrame = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
+        $mainFrame->setStyle('fill', self::TRANSPARENT);
+        $mainFrame->setStyle('stroke', self::STROKE_DIAGRAM);
+
         
-        $headerBg = new SVGRect(1, 1, $diagram->getWidth() - 2, $diagram->getHeaderHeight() - 1);
-        $headerBg->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
-        $entity->addChild($square);
-        $entity->addChild($headerBg);     
+        $bodyBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
+        $bodyBG->setStyle('fill', self::ENTITY_BACKGROUND_COLOR);
+        
+        $headerBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight());
+        $headerBG->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
+        
+        $entity->addChild($bodyBG); 
+        $entity->addChild($headerBG);   
+        
+        $entity->addChild($mainFrame);
         
         $x = 0;
         $y = self::TEXT_OFFSET_Y + ($index * $diagram->getColumnHeight());
@@ -642,7 +650,7 @@ class EntityRelationshipDiagram //NOSONAR
     private function createSeparatorLine($diagram)
     {
         $separator = new SVGLine(0, 0, $diagram->getWidth(), 0);
-        $separator->setStyle('stroke', self::STROKE_LINE);
+        $separator->setStyle('stroke', self::STROKE_DIAGRAM);
         return $separator;
     }
     
@@ -693,6 +701,9 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private function createIconTable()
     {
+        $offsetX = 0;
+        $offsetY = -1;
+        
         $icon = new SVGGroup();
         
         $points = array();
@@ -705,7 +716,7 @@ class EntityRelationshipDiagram //NOSONAR
         $points[] = new Point(12, 10);
         $points[] = new Point(12, 12);
         $points[] = new Point(4, 12);
-        $description = $this->createPathDescription($points, true);
+        $description = $this->createPathDescription($points, true, $offsetX, $offsetY);
         $path1 = new SVGPath($description);
 
         $fillStyle = '#2A56BD';
@@ -721,9 +732,9 @@ class EntityRelationshipDiagram //NOSONAR
         $points[] = new Point(10, 14);
         $points[] = new Point(10, 8);
 
-        $description = $this->createPathDescription($points, false);
+        $description = $this->createPathDescription($points, false, $offsetX, $offsetY);
         $path2 = new SVGPath($description);
-        $path2->setStyle('fill', 'transparent');   
+        $path2->setStyle('fill', self::TRANSPARENT);   
         $path2->setStyle('stroke', $fillStyle); 
         $path2->setAttribute('stroke-width', 0.5); 
         
@@ -769,7 +780,7 @@ class EntityRelationshipDiagram //NOSONAR
         }
         else
         {
-            $path->setStyle('fill', 'transparent');   
+            $path->setStyle('fill', self::TRANSPARENT);   
             $path->setStyle('stroke', $columnColor); 
         }
         $icon->setAttribute('class', 'entity-icon icon-column');
@@ -784,12 +795,12 @@ class EntityRelationshipDiagram //NOSONAR
      * @param boolean $closed
      * @return string
      */
-    private function createPathDescription($points, $closed = true)
+    private function createPathDescription($points, $closed = true, $offsetX = 0, $offsetY = 0)
     {
         $coords = array();
         foreach($points as $point)
         {
-            $coords[] = $point->x . ' ' . $point->y;
+            $coords[] = ($point->x + $offsetX) . ' ' . ($point->y + $offsetY);
         }
         return "M".implode(" L", $coords).($closed?" Z":"");
     }
