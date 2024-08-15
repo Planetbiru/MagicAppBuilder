@@ -54,14 +54,20 @@ class EntityRelationshipDiagram //NOSONAR
      * @var integer
      */
     private $entityWidth = 1;
-    
 
     /**
-     * Margin between 2 entitis
+     * Margin between 2 entities in X axis
      *
      * @var integer
      */
-    private $entityMargin = 40;
+    private $entityMarginX = 40;
+    
+    /**
+     * Margin between 2 entities in Y axis
+     *
+     * @var integer
+     */
+    private $entityMarginY = 20;
     
     /**
      * Width
@@ -134,17 +140,28 @@ class EntityRelationshipDiagram //NOSONAR
     private $maximumLevel;
     
     /**
+     * Maximum columns
+     *
+     * @var integer
+     */
+    private $maximumColumn = 0;
+    
+    /**
      * Constructor
      *
      * @param MagicObject[] $entities
      */
-    public function __construct($appConfig, $entityWidth, $entityMargin = null, $entities = null)
+    public function __construct($appConfig, $entityWidth, $entityMarginX = null, $entityMarginY = null, $entities = null)
     {
         $this->appConfig = $appConfig;
         $this->entityWidth = $entityWidth;
-        if(isset($entityMargin))
+        if(isset($entityMarginX))
         {
-            $this->entityMargin = $entityMargin;
+            $this->entityMarginX = $entityMarginX;
+        }
+        if(isset($entityMarginY))
+        {
+            $this->entityMarginY = $entityMarginY;
         }
         if(isset($entities) && is_array($entities))
         {
@@ -194,7 +211,7 @@ class EntityRelationshipDiagram //NOSONAR
         $tableName = $info->getTableName();
         if(!isset($this->entitieDiagramItem[$tableName]))
         {
-            $x = $this->marginX + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMargin);
+            $x = $this->marginX + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMarginX);
             $y = $this->marginY;
             $entityId = $tableName;
             $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $entityId, $x, $y, $this->entityWidth);
@@ -380,10 +397,6 @@ class EntityRelationshipDiagram //NOSONAR
                         {
                             $this->entityRelationships[] = new EntityRelationship($diagram, $column, $referenceDiagram, $referenceColumn);
                         }
-                        else
-                        {
-                            error_log($referenceColumnName);
-                        }
                     }
                 }
                 $index++;
@@ -446,9 +459,10 @@ class EntityRelationshipDiagram //NOSONAR
      */
     public function drawERD()
     {
+        $this->arrangeDiagram();
         $this->prepareEntityRelationship();
-        $this->width = $this->calculateWidth();
-        $this->height = $this->calculateHeight();
+        
+        
         
         $image = new SVG($this->width, $this->height);
         $doc = $image->getDocument();
@@ -486,6 +500,82 @@ class EntityRelationshipDiagram //NOSONAR
         }
         $doc->addChild($relationGroupDoc); 
         return $image->__toString();
+    }
+    
+    private function arrangeDiagram()
+    {
+        $countDiagram = count($this->entitieDiagramItem);
+        $max = $this->maximumColumn;
+        $originalHeight = $this->calculateHeight();
+        $maxHeightLastLine = 0;
+        
+        if($max > 0 && $countDiagram > $max)
+        {
+            $rows = ceil($countDiagram / $max);
+            
+            $height = ($rows * $originalHeight) + (($rows - 1) * $this->entityMarginY);
+        
+            $maxX = 0;
+            $index = 1;
+            foreach($this->entitieDiagramItem as $diagram)
+            {
+                $maxDiagramX = $diagram->getMaxX();
+                
+                $maxX = max($maxX, $maxDiagramX);
+                $index++;
+                if($index > $max)
+                {
+                    break;
+                }
+            }
+            $maxX += $this->marginX;
+            $width = $maxX;   
+            
+            $currentRowHeight = 0;
+            $currentRowTop = $this->marginY;
+            
+            $index = 0;
+            foreach($this->entitieDiagramItem as $diagram)
+            {
+                $mod = $index % $max;
+                $row = floor($index / $max);
+                
+                
+                
+                $x = ($mod * $diagram->getWidth()) + $this->marginX + ($mod * $this->entityMarginX);
+                $y = $currentRowTop;
+                $diagram->setX($x);
+                $diagram->setY($y);
+                
+                if($row == ($rows - 1))
+                {
+                    $maxHeightLastLine = max($maxHeightLastLine, $diagram->getHeight());
+                }
+                $currentRowHeight = max($currentRowHeight, $diagram->getHeight());
+                $height = $currentRowTop + $currentRowHeight;
+                
+                if($mod == ($max - 1))
+                {
+                    $currentRowTop += ($currentRowHeight + $this->entityMarginY);
+                    $currentRowHeight = 0;
+                }
+                
+                 
+                
+                $index++;
+            }
+            
+            //$height = $height + $maxHeightLastLine + (2 * $this->marginY) - $originalHeight;
+            $this->width = $width;
+            $this->height = $height;
+        }
+        else
+        {
+            $this->height = $originalHeight;
+            $this->width = $this->calculateWidth();
+        }
+        
+        
     }
     
     /**
@@ -727,8 +817,6 @@ class EntityRelationshipDiagram //NOSONAR
         return $this->drawERD();
     }
 
-
-
     /**
      * Get the value of marginX
      */ 
@@ -765,26 +853,6 @@ class EntityRelationshipDiagram //NOSONAR
     public function setMarginY($marginY)
     {
         $this->marginY = $marginY;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of entityMargin
-     */ 
-    public function getEntityMargin()
-    {
-        return $this->entityMargin;
-    }
-
-    /**
-     * Set the value of entityMargin
-     *
-     * @return  self
-     */ 
-    public function setEntityMargin($entityMargin)
-    {
-        $this->entityMargin = $entityMargin;
 
         return $this;
     }
@@ -841,6 +909,32 @@ class EntityRelationshipDiagram //NOSONAR
     public function setMaximumLevel($maximumLevel)
     {
         $this->maximumLevel = $maximumLevel;
+
+        return $this;
+    }
+
+    
+
+    /**
+     * Get maximum columns
+     *
+     * @return  integer
+     */ 
+    public function getMaximumColumn()
+    {
+        return $this->maximumColumn;
+    }
+
+    /**
+     * Set maximum columns
+     *
+     * @param  integer  $maximumColumn  Maximum columns
+     *
+     * @return  self
+     */ 
+    public function setMaximumColumn($maximumColumn)
+    {
+        $this->maximumColumn = $maximumColumn;
 
         return $this;
     }

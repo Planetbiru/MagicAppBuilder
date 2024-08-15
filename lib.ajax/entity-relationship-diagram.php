@@ -22,10 +22,11 @@ try
         $entities = array();
         $entityNames = array();
         $entities = array();
-        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 20);
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 50, 20);
         $entityRelationshipDiagram->setMarginX(0);
         $entityRelationshipDiagram->setMarginY(0);
         $entityRelationshipDiagram->setMaximumLevel(0);
+        $entityRelationshipDiagram->setMaximumColumn(8);
         foreach($inputEntity as $idx=>$entityName)
         {
             $className = "\\".$baseEntity."\\".$entityName;
