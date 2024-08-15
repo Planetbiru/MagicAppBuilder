@@ -463,8 +463,6 @@ class EntityRelationshipDiagram //NOSONAR
         $this->arrangeDiagram();
         $this->prepareEntityRelationship();
         
-        
-        
         $image = new SVG($this->width, $this->height);
         $doc = $image->getDocument();
         
@@ -493,8 +491,7 @@ class EntityRelationshipDiagram //NOSONAR
             $dot1->setStyle('fill', $dotColor1);
             $dot2->setStyle('fill', $dotColor2);
             $relationGroupDoc->addChild($dot1);
-            $relationGroupDoc->addChild($dot2);
-            
+            $relationGroupDoc->addChild($dot2);     
         }
 
         foreach($this->entitieDiagramItem as $diagram)
@@ -579,7 +576,7 @@ class EntityRelationshipDiagram //NOSONAR
             }
             
             $this->width = $width;
-            $this->height = $height;
+            $this->height = $height + $this->marginY;
         }
         else
         {
