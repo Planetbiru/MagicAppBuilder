@@ -485,10 +485,13 @@ class EntityRelationshipDiagram //NOSONAR
             $line->setStyle('stroke', self::STROKE_LINE);
             $relationGroupDoc->addChild($line);
             
+            $dotColor1 = $p1->getType() == EntityRelationship::MANY ? self::ICON_COLUMN_PRIMARY_KEY_COLOR : self::ICON_COLUMN_COLOR;
+            $dotColor2 = $p2->getType() == EntityRelationship::MANY ? self::ICON_COLUMN_PRIMARY_KEY_COLOR : self::ICON_COLUMN_COLOR;
+            
             $dot1 = new SVGCircle($x1, $y1, 2);
             $dot2 = new SVGCircle($x2, $y2, 2);
-            $dot1->setStyle('fill', self::STROKE_LINE);
-            $dot2->setStyle('fill', self::STROKE_LINE);
+            $dot1->setStyle('fill', $dotColor1);
+            $dot2->setStyle('fill', $dotColor2);
             $relationGroupDoc->addChild($dot1);
             $relationGroupDoc->addChild($dot2);
             
@@ -775,8 +778,7 @@ class EntityRelationshipDiagram //NOSONAR
         else if($column->hasReference())
         {
             $path->setStyle('fill', $columnColor);
-            $path->setStyle('stroke', $columnColor);
-            
+            $path->setStyle('stroke', $columnColor);   
         }
         else
         {

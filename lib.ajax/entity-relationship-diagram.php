@@ -23,8 +23,8 @@ try
         $entityNames = array();
         $entities = array();
         $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 40, 20);
-        $entityRelationshipDiagram->setMarginX(0);
-        $entityRelationshipDiagram->setMarginY(0);
+        $entityRelationshipDiagram->setMarginX(20);
+        $entityRelationshipDiagram->setMarginY(20);
         $entityRelationshipDiagram->setMaximumLevel(0);
         $entityRelationshipDiagram->setMaximumColumn(8);
         foreach($inputEntity as $idx=>$entityName)

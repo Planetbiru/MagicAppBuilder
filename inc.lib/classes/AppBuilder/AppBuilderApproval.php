@@ -69,6 +69,8 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
 
+        /*
+        No approval record required
         $lines[] = "";
         $lines[] = parent::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName, $objectName);
         $lines[] = parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;
@@ -76,7 +78,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::VAR.$objectName."Update".parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR
         .$objectName.parent::CALL_GET.$upperPrimaryKeyName."())".parent::CALL_SET.$approvalId."(".parent::VAR.$objectApprovalName.parent::CALL_GET.$upperApprovalPkName."())".parent::CALL_UPDATE_END;
         
-        
+        */
 
         $lines[] = parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
         $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';

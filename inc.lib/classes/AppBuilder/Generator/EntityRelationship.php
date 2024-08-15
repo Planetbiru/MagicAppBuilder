@@ -6,6 +6,10 @@ use MagicObject\Geometry\Point;
 
 class EntityRelationship
 {
+    const ONE = 'ONE';
+    const MANY = 'MANY';
+    const ONE_TO_MANY = 'ONE_TO_MANY';
+    const MANY_TO_ONE = 'MANY_TO_ONE';
     /**
      * Diagram
      *
@@ -76,17 +80,27 @@ class EntityRelationship
         $pa1 = new Point($diagram->getX() + $this->column->getX(), $diagram->getY() + $this->column->getY());
         $pa2 = new Point($referenceDiagram->getX() + $this->referenceColumn->getX(), $referenceDiagram->getY() + $this->referenceColumn->getY());
         
-        if($diagram->getX() < $referenceDiagram->getX())
+        
+        if($diagram->getTableName() == $this->referenceDiagram->getTableName())
         {
-            $this->type = 'ONE_TO_MANY';
-            $this->start = new EntityRelationshipEnd('', $pr2, $pa2);
-            $this->end = new EntityRelationshipEnd('', $pr1, $pa1);
+            $this->type = self::ONE_TO_MANY;
+            $this->start = new EntityRelationshipEnd(self::MANY, $pr2, $pa2);
+            $this->end = new EntityRelationshipEnd(self::ONE, $pr1, $pa1);
         }
         else
         {
-            $this->type = 'ONE_TO_MANY';
-            $this->start = new EntityRelationshipEnd('', $pr1, $pa1);
-            $this->end = new EntityRelationshipEnd('', $pr2, $pa2);
+            if($diagram->getX() < $referenceDiagram->getX())
+            {
+                $this->type = self::ONE_TO_MANY;
+                $this->start = new EntityRelationshipEnd(self::MANY, $pr2, $pa2);
+                $this->end = new EntityRelationshipEnd(self::ONE, $pr1, $pa1);
+            }
+            else
+            {
+                $this->type = self::ONE_TO_MANY;
+                $this->start = new EntityRelationshipEnd(self::ONE, $pr1, $pa1);
+                $this->end = new EntityRelationshipEnd(self::MANY, $pr2, $pa2);
+            }
         }
     }
     
