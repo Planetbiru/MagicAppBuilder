@@ -24,10 +24,10 @@ try
         $entities = array();
         
         $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 40, 20);
-        $entityRelationshipDiagram->setMarginX(0);
-        $entityRelationshipDiagram->setMarginY(0);
-        $entityRelationshipDiagram->setMaximumLevel(0);
-        $entityRelationshipDiagram->setMaximumColumn(8);
+        $entityRelationshipDiagram->setMarginX($inputGet->getMagrginX());
+        $entityRelationshipDiagram->setMarginY($inputGet->getMagrginY());
+        $entityRelationshipDiagram->setMaximumLevel($inputGet->getMaximumLevel());
+        $entityRelationshipDiagram->setMaximumColumn($inputGet->getMaximumColumn());
         
         foreach($inputEntity as $idx=>$entityName)
         {

@@ -629,22 +629,17 @@ jQuery(function(){
   });
   
   $(document).on('change', '.entity-container-relationship .entity-checkbox', function(e){
-    let params = [];
-    $('.entity-container-relationship .entity-checkbox').each(function(){
-      if($(this)[0].checked)
-      {
-        params.push('entity[]='+$(this).val());
-      }
-    });
-    params.push('rnd='+(new Date()).getTime());
-    let img = $('<img />');
-    img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
-    $('.erd-image').empty().append(img);
+    loadDiagramMultiple();
+  });
+  $(document).on('click', '.reload-diagram', function(e){
+    loadDiagramMultiple();
   });
   
   $(document).on('click', '.entity-container-relationship .entity-li a', function(e){
     e.preventDefault();
     let params = [];
+    params = addDiagramOption(params);
+    
     params.push('entity[]='+$(this).attr('data-entity-name'));
     params.push('rnd='+(new Date()).getTime());
     let img = $('<img />');
@@ -659,6 +654,34 @@ jQuery(function(){
   updateEntityFile();
   updateModuleFile();
 });
+
+function addDiagramOption(params)
+{
+  params.push('maximum_level='+$('[name="maximum_level"]').val());
+  params.push('maximum_column='+$('[name="maximum_column"]').val());
+  params.push('margin_x='+$('[name="margin_x"]').val());
+  params.push('margin_y='+$('[name="margin_y"]').val());
+  params.push('entity_margin_x='+$('[name="entity_margin_x"]').val());
+  params.push('entity_margin_y='+$('[name="entity_margin_y"]').val());
+  return params;
+}
+
+function loadDiagramMultiple()
+{
+  let params = [];
+  params = addDiagramOption(params);
+  
+  $('.entity-container-relationship .entity-checkbox').each(function(){
+    if($(this)[0].checked)
+    {
+      params.push('entity[]='+$(this).val());
+    }
+  });
+  params.push('rnd='+(new Date()).getTime());
+  let img = $('<img />');
+  img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
+  $('.erd-image').empty().append(img);
+}
 
 function onChangeMapKey(obj)
 {

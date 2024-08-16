@@ -21,7 +21,7 @@ class EntityRelationshipDiagram //NOSONAR
 {
     const NAMESPACE_SEPARATOR = "\\";
     const STROKE_DIAGRAM = '#8496B1';
-    const STROKE_LINE = '#606C80';
+    const STROKE_LINE = '#2E4C95';
     const TRANSPARENT = 'transparent';
     const HEADER_BACKGROUND_COLOR = '#E0EDFF';
     const ENTITY_BACKGROUND_COLOR = '#FFFFFF';
