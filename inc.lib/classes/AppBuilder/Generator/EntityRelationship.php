@@ -74,12 +74,13 @@ class EntityRelationship
         $this->referenceDiagram = $referenceDiagram;
         $this->referenceColumn = $referenceColumn;
         
+        // relative position
         $pr1 = new Point($this->column->getX(), $this->column->getY());
-        $pr2 = new Point($this->referenceColumn->getX(), $this->referenceColumn->getY());
+        $pr2 = new Point($this->referenceColumn->getX(), $this->referenceColumn->getY());      
         
+        // absolute position
         $pa1 = new Point($diagram->getX() + $this->column->getX(), $diagram->getY() + $this->column->getY());
-        $pa2 = new Point($referenceDiagram->getX() + $this->referenceColumn->getX(), $referenceDiagram->getY() + $this->referenceColumn->getY());
-        
+        $pa2 = new Point($referenceDiagram->getX() + $this->referenceColumn->getX(), $referenceDiagram->getY() + $this->referenceColumn->getY());    
         
         if($diagram->getTableName() == $this->referenceDiagram->getTableName())
         {
@@ -89,7 +90,7 @@ class EntityRelationship
         }
         else
         {
-            if($diagram->getX() < $referenceDiagram->getX())
+            if($diagram->getX() <= $referenceDiagram->getX())
             {
                 $this->type = self::ONE_TO_MANY;
                 $this->start = new EntityRelationshipEnd(self::MANY, $pr2, $pa2);
@@ -103,7 +104,6 @@ class EntityRelationship
             }
         }
     }
-    
 
 
     /**

@@ -210,9 +210,18 @@ table.table.table-reference tr > td:last-child {
 }
 
 .erd-image {
-  height: calc(100vh - 146px);
+  height: calc(100vh - 188px);
   overflow-x: auto;
   overflow-y: auto;
+}
+
+.diagram-option {
+  padding-bottom: 10px;
+}
+
+.diagram-option .form-control {
+  display: inline;
+  width: 60px;
 }
 
 .module-list ul {

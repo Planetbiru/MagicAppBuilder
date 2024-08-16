@@ -663,6 +663,7 @@ function addDiagramOption(params)
   params.push('margin_y='+$('[name="margin_y"]').val());
   params.push('entity_margin_x='+$('[name="entity_margin_x"]').val());
   params.push('entity_margin_y='+$('[name="entity_margin_y"]').val());
+  params.push('zoom='+$('[name="zoom"]').val());
   return params;
 }
 
@@ -681,6 +682,31 @@ function loadDiagramMultiple()
   let img = $('<img />');
   img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
   $('.erd-image').empty().append(img);
+}
+
+function downloadSVG()
+{
+  const imageSVG = document.querySelector('.erd-image img');
+  let url = imageSVG.getAttribute('src');                      
+  window.open(url);
+
+}
+function downloadPNG()
+{
+  const imageSVG = document.querySelector('.erd-image img');
+  let url = imageSVG.getAttribute('src');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = imageSVG.width;
+  canvas.height = imageSVG.height;
+  const img = new Image();
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const pngData = canvas.toDataURL('image/png');
+      window.open(pngData);
+  };
+  img.src = url;
 }
 
 function onChangeMapKey(obj)

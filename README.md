@@ -70,6 +70,12 @@ MagicAppBuilder will display all columns of the selected table. When a developer
 
 As long as all database access by the application is done using entities only, MagicAppBuilder can make queries from automatically created entities. If the developer uses native queries to access the database and adds tables or columns that are not in the existing entity, then the developer must alter the table manually by creating the required alter query himself. Applications generated using MagicAppBuilder almost do not have native queries due to the fact that MagicAppBuilder never uses native queries in applications. Native queries may only be created by developers in conditions where they are needed. Using entities allows developers to create application installers without explicitly including SQL scripts. The installer will create an application script according to the database engine selected by the user.
 
+Users can display Entity Relationship Diagram or ERD based on the entity file that has been created. This ERD can be a guide for developers in the application development phase and also as a guide for users about the relationship between entities in the application. By knowing this relationship, users can determine the sequence in creating data and know the impact of changes to data.
+
+Users can select the entities to be displayed on the ERD, determine how many levels of relationships will be displayed, set the number of entities horizontally to limit the width of the ERD to be created, set the distance between entities and set the width of the ERD edge for aesthetic purposes.
+
+The image format of ERD is SVG. This format can be converted to PNG if needed. Please note that the image quality in PNG format will decrease if rescaled. Therefore, set the appropriate zoom before converting it to PNG format.
+
 ### Steps
 
 Steps to create an application with MagicAppBuilder

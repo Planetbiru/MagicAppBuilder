@@ -23,11 +23,29 @@ try
         $entityNames = array();
         $entities = array();
         
-        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, 40, 20);
-        $entityRelationshipDiagram->setMarginX($inputGet->getMagrginX());
-        $entityRelationshipDiagram->setMarginY($inputGet->getMagrginY());
+        $entityMarginX = $inputGet->getEntityMarginX();
+        $entityMarginY = $inputGet->getEntityMarginY();
+        $zoom = $inputGet->getZoom();
+        
+        if($entityMarginX < 1)
+        {
+            $entityMarginX = 40;
+        }
+        if($entityMarginY < 1)
+        {
+            $entityMarginY = 20;
+        }
+        if($zoom < 0.25)
+        {
+            $zoom = 1;
+        }
+        
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 180, $entityMarginX, $entityMarginY);
+        $entityRelationshipDiagram->setMarginX($inputGet->getMarginX());
+        $entityRelationshipDiagram->setMarginY($inputGet->getMarginY());
         $entityRelationshipDiagram->setMaximumLevel($inputGet->getMaximumLevel());
         $entityRelationshipDiagram->setMaximumColumn($inputGet->getMaximumColumn());
+        $entityRelationshipDiagram->setZoom($zoom);
         
         foreach($inputEntity as $idx=>$entityName)
         {

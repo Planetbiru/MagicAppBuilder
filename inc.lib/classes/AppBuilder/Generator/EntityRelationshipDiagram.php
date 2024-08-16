@@ -147,6 +147,8 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private $maximumColumn = 0;
     
+    private $zoom = 1;
+    
     /**
      * Constructor
      *
@@ -500,6 +502,19 @@ class EntityRelationshipDiagram //NOSONAR
             $doc->addChild($diagramSVG);       
         }
         $doc->addChild($relationGroupDoc); 
+        
+        //viewBox="0 0 100 100" width="200" height="200"
+        $width = $this->width;
+        $height = $this->height;
+        
+        $width2 = $this->width * $this->zoom;
+        $height2 = $this->height * $this->zoom;
+        
+        $doc->setAttribute('width', $width2);
+        $doc->setAttribute('height', $height2);
+        
+        $doc->setAttribute('viewBox', "0 0 $width $height");
+        
         return $image->__toString();
     }
     
@@ -967,6 +982,26 @@ class EntityRelationshipDiagram //NOSONAR
     public function setMaximumColumn($maximumColumn)
     {
         $this->maximumColumn = $maximumColumn;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of zoom
+     */ 
+    public function getZoom()
+    {
+        return $this->zoom;
+    }
+
+    /**
+     * Set the value of zoom
+     *
+     * @return  self
+     */ 
+    public function setZoom($zoom)
+    {
+        $this->zoom = $zoom;
 
         return $this;
     }

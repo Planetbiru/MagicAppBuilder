@@ -777,15 +777,6 @@ require_once __DIR__ . "/inc.app/navs.php";
                 <div class="column-title">
                   <h4>Entity Relationship Diagram</h4>
                 </div>
-                <style>
-                  .diagram-option{
-                    padding-bottom: 10px;
-                  }
-                  .diagram-option .form-control{
-                    display: inline;
-                    width: 80px;
-                  }
-                </style>
                 <div class="column-body">
                   <div class="diagram-option">
                     Max Level <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
@@ -794,8 +785,12 @@ require_once __DIR__ . "/inc.app/navs.php";
                     Margin Y <input class="form-control" type="number" name="margin_y" value="0">
                     H Space <input class="form-control" type="number" name="entity_margin_x" value="40">
                     V Space <input class="form-control" type="number" name="entity_margin_y" value="20">
+                    Zoom <input class="form-control" type="number" step="0.05" name="zoom" value="1" min="0.25">
                     <button type="button" class="btn btn-primary reload-diagram">Reload</button>
+                    <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()">Download SVG</button>
+                    <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()">Download PNG</button>
                   </div>
+                  
                   <div class="erd-image"></div>
                   
                 </div>
