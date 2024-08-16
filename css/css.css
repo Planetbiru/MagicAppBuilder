@@ -221,7 +221,9 @@ table.table.table-reference tr > td:last-child {
 
 .diagram-option .form-control {
   display: inline;
-  width: 60px;
+  width: 68px;
+  padding-left: 8px;
+  padding-right: 6px;
 }
 
 .module-list ul {

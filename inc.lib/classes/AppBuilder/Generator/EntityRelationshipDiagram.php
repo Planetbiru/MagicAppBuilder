@@ -22,18 +22,20 @@ class EntityRelationshipDiagram //NOSONAR
     const NAMESPACE_SEPARATOR = "\\";
     const STROKE_DIAGRAM = '#8496B1';
     const STROKE_LINE = '#2E4C95';
+    const STROKE_ICON = '#2A56BD';
+    
     const TRANSPARENT = 'transparent';
     const HEADER_BACKGROUND_COLOR = '#E0EDFF';
     const ENTITY_BACKGROUND_COLOR = '#FFFFFF';
-    const TEXT_COLOR_COLUMN = '#444444';
+    const TEXT_COLOR_COLUMN = '#3a4255';
     const TEXT_COLOR_TABLE = '#1d3c86';
-    const TEXT_OFFSET_X = 16;
+    const TEXT_OFFSET_X = 20;
     const TEXT_OFFSET_Y = 14;
     const FONT_FAMILY = 'Arial';
     const FONT_SIZE = '8pt';
-    
     const ICON_COLUMN_PRIMARY_KEY_COLOR = '#CC0088';
     const ICON_COLUMN_COLOR = '#2A56BD';
+    
     
     /**
      * Entity DiagramItem
@@ -365,7 +367,7 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Prepare entity relationship
+     * Prepare entity relationship depend on the entities
      *
      * @return void
      */
@@ -374,6 +376,27 @@ class EntityRelationshipDiagram //NOSONAR
         $this->entityRelationships = array();
         $this->prepareColumnPosition();
         $this->prepareRelationships();
+    }
+    
+    /**
+     * Prepare column position
+     *
+     * @return void
+     */
+    private function prepareColumnPosition()
+    {
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $index = 0;
+            foreach($diagram->getColumns() as $column)
+            {
+                $x = 0;
+                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
+                $column->setX($x);
+                $column->setY($y);
+                $index++;
+            }
+        }
     }
     
     /**
@@ -402,27 +425,6 @@ class EntityRelationshipDiagram //NOSONAR
                         }
                     }
                 }
-                $index++;
-            }
-        }
-    }
-    
-    /**
-     * Prepare column position
-     *
-     * @return void
-     */
-    private function prepareColumnPosition()
-    {
-        foreach($this->entitieDiagramItem as $diagram)
-        {
-            $index = 0;
-            foreach($diagram->getColumns() as $column)
-            {
-                $x = 0;
-                $y = $diagram->getHeaderHeight() + ($index * $diagram->getColumnHeight());
-                $column->setX($x);
-                $column->setY($y);
                 $index++;
             }
         }
@@ -462,6 +464,7 @@ class EntityRelationshipDiagram //NOSONAR
      */
     public function drawERD()
     {
+        $offsetX = 3;
         $this->arrangeDiagram();
         $this->prepareEntityRelationship();
         
@@ -476,9 +479,9 @@ class EntityRelationshipDiagram //NOSONAR
             $p1 = $entityRelationship->getStart();
             $p2 = $entityRelationship->getEnd();
             
-            $x1 = $p1->getAbsolutePosition()->x;
+            $x1 = $p1->getAbsolutePosition()->x + $offsetX;
             $y1 = $p1->getAbsolutePosition()->y + $yOffset;
-            $x2 = $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth();
+            $x2 = $p2->getAbsolutePosition()->x + $entityRelationship->getDiagram()->getWidth() - $offsetX;
             $y2 = $p2->getAbsolutePosition()->y + $yOffset;
                         
             $line = new SVGLine($x1, $y1, $x2, $y2);
@@ -503,16 +506,14 @@ class EntityRelationshipDiagram //NOSONAR
         }
         $doc->addChild($relationGroupDoc); 
         
-        //viewBox="0 0 100 100" width="200" height="200"
+        // set zoom
         $width = $this->width;
         $height = $this->height;
         
         $width2 = $this->width * $this->zoom;
         $height2 = $this->height * $this->zoom;
-        
         $doc->setAttribute('width', $width2);
         $doc->setAttribute('height', $height2);
-        
         $doc->setAttribute('viewBox', "0 0 $width $height");
         
         return $image->__toString();
@@ -530,7 +531,7 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Arange diagram
+     * Arange diagram into a atrix
      *
      * @return void
      */
@@ -608,6 +609,8 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private function createEntityItem($diagram)
     {
+        $offsetX = 3;
+        $offsetY = 0;
         $index = 0;
         $svgGroup = new SVG($diagram->getWidth(), $diagram->getHeight());
         
@@ -623,7 +626,6 @@ class EntityRelationshipDiagram //NOSONAR
         $mainFrame = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
         $mainFrame->setStyle('fill', self::TRANSPARENT);
         $mainFrame->setStyle('stroke', self::STROKE_DIAGRAM);
-
         
         $bodyBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
         $bodyBG->setStyle('fill', self::ENTITY_BACKGROUND_COLOR);
@@ -632,8 +634,7 @@ class EntityRelationshipDiagram //NOSONAR
         $headerBG->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
         
         $entity->addChild($bodyBG); 
-        $entity->addChild($headerBG);   
-        
+        $entity->addChild($headerBG);
         $entity->addChild($mainFrame);
         
         $x = 0;
@@ -644,7 +645,7 @@ class EntityRelationshipDiagram //NOSONAR
         $entityHeader->setStyle('fill', self::TEXT_COLOR_TABLE);
         $entity->addChild($entityHeader);
         
-        $iconTable = $this->createIconTable();
+        $iconTable = $this->createIconTable($offsetX, $offsetY);
         $entity->addChild($iconTable);
 
         foreach($diagram->getColumns() as $column)
@@ -680,10 +681,10 @@ class EntityRelationshipDiagram //NOSONAR
      */
     private function createColumn($diagram, $column, $x, $y)
     {
+        $offsetX = 3;
+        $offsetY = 0;
         $svgColumn = new SVG($diagram->getWidth(), $diagram->getColumnHeight());
         $columnElem = $svgColumn->getDocument();
-        
-        
         $columnElem->setAttribute('x', $x);
         $columnElem->setAttribute('y', $y);
         
@@ -702,11 +703,10 @@ class EntityRelationshipDiagram //NOSONAR
         
         $columnElem->addChild($columnSvg);
         $columnElem->addChild($this->createSeparatorLine($diagram));
-        $iconColumn = $this->createIconColumn($column);
+        $iconColumn = $this->createIconColumn($column, $offsetX, $offsetY);
         $columnElem->addChild($iconColumn);
         
         return $columnElem;
-        
     }
     
     /**
@@ -714,38 +714,34 @@ class EntityRelationshipDiagram //NOSONAR
      *
      * @return SVGPath
      */
-    private function createIconTable()
+    private function createIconTable($offsetX = 0, $offsetY = 0)
     {
-        $offsetX = 0;
-        $offsetY = -1;
-        
         $icon = new SVGGroup();
-        
         $points = array();
-        $points[] = new Point(4, 10);
-        $points[] = new Point(4, 8);
-        $points[] = new Point(12, 8);
-        $points[] = new Point(12, 14);
-        $points[] = new Point(4, 14);
-        $points[] = new Point(4, 10);
-        $points[] = new Point(12, 10);
-        $points[] = new Point(12, 12);
-        $points[] = new Point(4, 12);
+        $points[] = new Point(4, 9);
+        $points[] = new Point(4, 7);
+        $points[] = new Point(12, 7);
+        $points[] = new Point(12, 13);
+        $points[] = new Point(4, 13);
+        $points[] = new Point(4, 9);
+        $points[] = new Point(12, 9);
+        $points[] = new Point(12, 11);
+        $points[] = new Point(4, 11);
         $description = $this->createPathDescription($points, true, $offsetX, $offsetY);
         $path1 = new SVGPath($description);
 
-        $fillStyle = '#2A56BD';
+        $fillStyle = self::STROKE_ICON;
         $path1->setStyle('fill', 'white');   
         $path1->setStyle('stroke', $fillStyle); 
         $path1->setAttribute('stroke-width', 0.5); 
         
         $points = array();
-        $points[] = new Point(6, 14);
-        $points[] = new Point(6, 8);
-        $points[] = new Point(8, 8);
-        $points[] = new Point(8, 14);
-        $points[] = new Point(10, 14);
-        $points[] = new Point(10, 8);
+        $points[] = new Point(6, 13);
+        $points[] = new Point(6, 7);
+        $points[] = new Point(8, 7);
+        $points[] = new Point(8, 13);
+        $points[] = new Point(10, 13);
+        $points[] = new Point(10, 7);
 
         $description = $this->createPathDescription($points, false, $offsetX, $offsetY);
         $path2 = new SVGPath($description);
@@ -766,7 +762,7 @@ class EntityRelationshipDiagram //NOSONAR
      * @param EntityDiagramColumn $column
      * @return SVGPath
      */
-    private function createIconColumn($column)
+    private function createIconColumn($column, $offsetX = 0, $offsetY = 0)
     {
         $icon = new SVGGroup();
         $points = array();
@@ -775,25 +771,30 @@ class EntityRelationshipDiagram //NOSONAR
         $points[] = new Point(8, 14);
         $points[] = new Point(4, 10);
         
-        $description = $this->createPathDescription($points);
         
-        $path = new SVGPath($description);
+        
         
         $pkColor = self::ICON_COLUMN_PRIMARY_KEY_COLOR;
         $columnColor = self::ICON_COLUMN_COLOR;
         
         if($column->getPrimaryKey())
         {
+            $description = $this->createPathDescription($points, true, $offsetX, $offsetY);
+            $path = new SVGPath($description);
             $path->setStyle('fill', $pkColor);
             $path->setStyle('stroke', $pkColor);
         }
         else if($column->hasReference())
         {
+            $description = $this->createPathDescription($points, true, $offsetX, $offsetY);
+            $path = new SVGPath($description);
             $path->setStyle('fill', $columnColor);
             $path->setStyle('stroke', $columnColor);   
         }
         else
         {
+            $description = $this->createPathDescription($points, true, $offsetX, $offsetY);
+            $path = new SVGPath($description);
             $path->setStyle('fill', self::TRANSPARENT);   
             $path->setStyle('stroke', $columnColor); 
         }
