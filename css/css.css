@@ -226,6 +226,10 @@ table.table.table-reference tr > td:last-child {
   padding-right: 6px;
 }
 
+.diagram-option .form-control[name=maximum_level], .diagram-option .form-control[name=maximum_column] {
+  width: 60px;
+}
+
 .module-list ul {
   list-style: none;
   margin: 0;

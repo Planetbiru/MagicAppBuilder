@@ -2,18 +2,20 @@
 
 use AppBuilder\Util\EntityUtil;
 use AppBuilder\Util\ErrorCacheUtil;
+use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $separatorNLT = "\r\n\t";
 
+
+
 try
 {
+    $inputGet = new InputGet();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
-    echo "<div>\r\n";
-
-    echo "<h4>Data</h4>\r\n";
+    $chk = $inputGet->getAutoload() == 'true' ? ' checked' : '';
 
     $baseEntity = $appConfig->getApplication()->getBaseEntityDataNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
@@ -21,16 +23,15 @@ try
     
     $list = glob($baseDir."/*.php");
     $li = array();
-
-    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
-
+    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
+    
     $cacheDir = dirname(__DIR__)."/tmp/";
     
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
-        $dir = basename(dirname($file));
+        $dir = basename(dirname($file));       
         
         // begin check
         $ft = filemtime($file);
@@ -60,7 +61,15 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
+            //$li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
+            $li[$tableName][] = array(
+                'index'=>$idx, 
+                'directory'=>$dir, 
+                'entity'=>$entity, 
+                'checked'=>$chk, 
+                'filetime'=>$filetime,
+                'error'=>false
+            );
         }
         else
         {
@@ -68,32 +77,43 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
+            //$li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
+            $li[$idx][] = array(
+                'index'=>$idx, 
+                'directory'=>$dir, 
+                'entity'=>$entity, 
+                'checked'=>$chk, 
+                'filetime'=>$filetime,
+                'error'=>true
+            );
         }
+        
     }
     ksort($li);
+
     $lim = array();
     foreach($li as $elem)
     {
         $lim = array_merge($lim, $elem);
     }
-    echo '<ul class="entity-ul">'.$separatorNLT.implode($separatorNLT, $lim)."\r\n".'</ul>'."\r\n";
 
-    # ---------------------------------------------------------------------------------------------------------- #
-
-    echo "<h4>App</h4>\r\n";
+    $finalResult = array();
+    
+    
+    $arrDir = explode("\\", $baseEntity, 3);
+    $baseEntity = $arrDir[2];
+    $finalResult[$baseEntity] = $lim;
 
     $baseEntity = $appConfig->getApplication()->getBaseEntityAppNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     $list = glob($baseDir."/*.php");
     $li = array();
-
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
-        
+
         // begin check
         $ft = filemtime($file);
         $filetime = date('Y-m-d H:i:s', $ft);
@@ -122,7 +142,14 @@ try
             {
                 $li[$tableName]  = array();
             }
-            $li[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
+            $li[$tableName][] = array(
+                'index'=>$idx, 
+                'directory'=>$dir, 
+                'entity'=>$entity, 
+                'checked'=>$chk, 
+                'filetime'=>$filetime,
+                'error'=>false
+            );
         }
         else
         {
@@ -130,19 +157,27 @@ try
             {
                 $li[$idx]  = array();
             }
-            $li[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
+            $li[$idx][] = array(
+                'index'=>$idx, 
+                'directory'=>$dir, 
+                'entity'=>$entity, 
+                'checked'=>$chk, 
+                'filetime'=>$filetime,
+                'error'=>true
+            );
         }
     }
     ksort($li);
+ 
     $lim = array();
     foreach($li as $elem)
     {
         $lim = array_merge($lim, $elem);
     }
-    echo '<ul class="entity-ul">'.$separatorNLT.implode($separatorNLT, $lim)."\r\n".'</ul>'."\r\n";
-
-    echo "</div>\r\n";
-
+    $arrDir = explode("\\", $baseEntity, 3);
+    $baseEntity = $arrDir[2];
+    $finalResult[$baseEntity] = $lim;
+    print_r($finalResult);
 }
 catch(Exception $e)
 {

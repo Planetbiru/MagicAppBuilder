@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Util\EntityUtil;
+use AppBuilder\Util\ErrorCacheUtil;
 use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -28,12 +29,35 @@ try
     $li = array();
     $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
+    
+    $cacheDir = dirname(__DIR__)."/tmp/";
+    
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
-        $filetime = date('Y-m-d H:i:s', filemtime($file));
-        exec("php -l $file 2>&1", $output, $return_var);
+        
+        
+        // begin check
+        $ft = filemtime($file);
+        $filetime = date('Y-m-d H:i:s', $ft);
+        $cachePath = $cacheDir.preg_replace("/[^a-zA-Z0-9]/", "", $file);
+        $return_var = 1;
+        if(file_exists($cachePath."-".$ft))
+        {
+            $err = ErrorCacheUtil::getCacheError($cachePath, $ft);
+            if($err != 'true')
+            {
+                $return_var = 0;
+            }
+        }
+        else
+        {
+            exec("php -l $file 2>&1", $output, $return_var);
+            ErrorCacheUtil::saveCacheError($cachePath, $ft, $return_var === 0 ? 'false': 'true');
+        }
+        // end check
+        
         if($return_var === 0)
         {
             $tableInfo = EntityUtil::getTableName($file);
@@ -74,8 +98,27 @@ try
     {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));
-        $filetime = date('Y-m-d H:i:s', filemtime($file));
-        exec("php -l $file 2>&1", $output, $return_var);
+        
+        // begin check
+        $ft = filemtime($file);
+        $filetime = date('Y-m-d H:i:s', $ft);
+        $cachePath = $cacheDir.preg_replace("/[^a-zA-Z0-9]/", "", $file);
+        $return_var = 1;
+        if(file_exists($cachePath."-".$ft))
+        {
+            $err = ErrorCacheUtil::getCacheError($cachePath, $ft);
+            if($err != 'true')
+            {
+                $return_var = 0;
+            }
+        }
+        else
+        {
+            exec("php -l $file 2>&1", $output, $return_var);
+            ErrorCacheUtil::saveCacheError($cachePath, $ft, $return_var === 0 ? 'false': 'true');
+        }
+        // end check
+        
         if($return_var === 0)
         {
             $tableInfo = EntityUtil::getTableName($file);
