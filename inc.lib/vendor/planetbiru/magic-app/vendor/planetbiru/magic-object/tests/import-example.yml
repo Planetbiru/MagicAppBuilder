@@ -1,0 +1,38 @@
+database_target:
+  driver: mysql
+  host: localhost
+  port: 3306
+  username: root
+  password: password
+  database_name: db1
+  databseSchema: public
+  timeZone: Asia/Jakarta
+database_source:
+  driver: mysql
+  host: localhost
+  port: 3306
+  username: root
+  password: password
+  database_name: db1_ori
+  databseSchema: public
+  timeZone: Asia/Jakarta
+maximum_record: 100
+table:
+  - source: modul
+    target: modul
+    map: 
+    - 'default_data : default'
+    - 'sort_order : order'
+    pre_import_script: 
+    - "truncate modul"
+  - source: hak_akses
+    target: hak_akses
+    map:
+    - 'allowed_detail : view'
+    - 'allowed_create : insert'
+    - 'allowed_update : update'
+    - 'allowed_delete : delete'
+    pre_import_script: 
+    - "truncate hak_akses"
+    post_import_script: 
+    - "update hak_akses set allowed_list = true, allowed_approve = true, allowed_sort_order = true"

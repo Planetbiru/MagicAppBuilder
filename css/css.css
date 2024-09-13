@@ -1,0 +1,429 @@
+@charset "UTF-8";
+:root {
+  font-size: 13px;
+}
+
+.h4 {
+  font-size: 1.2rem;
+}
+
+h4 {
+  font-size: 1.2rem;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.all {
+  padding: 16px;
+}
+
+.main-table {
+  border-collapse: collapse;
+  border-color: #6e6e6e;
+}
+.main-table td {
+  padding: 4px;
+  border-color: #6e6e6e;
+}
+.main-table td select {
+  width: 100%;
+  box-sizing: border-box;
+}
+.main-table td input[type=text] {
+  width: 100%;
+  box-sizing: border-box;
+}
+.main-table thead td {
+  font-weight: bold;
+}
+.main-table thead td.data-sort {
+  background-color: #797979;
+  cursor: move;
+  width: 24px;
+}
+.main-table tbody td.data-sort {
+  background-color: #797979;
+  cursor: move;
+  cursor: move;
+}
+.main-table tbody tr:hover td {
+  background-color: #E8E8EE;
+}
+.main-table tbody tr:hover td.data-sort {
+  background-color: #797979;
+}
+.main-table tbody tr > td:nth-child(1) {
+  padding-left: 10px;
+}
+.main-table tr td button {
+  display: none;
+}
+
+form {
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  margin: 0;
+}
+
+select {
+  margin: 0;
+}
+
+textarea {
+  margin: 0;
+}
+
+button {
+  margin: 0;
+}
+
+.database-info {
+  padding: 0 0 4px 0;
+}
+
+.info-cell {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+.text-code {
+  box-sizing: border-box;
+  padding: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #333333;
+  background-color: #FFFFFF;
+  border: 1px solid #BBBBBB;
+  resize: vertical;
+}
+
+.ui-tabs .ui-tabs-panel {
+  padding: 10px;
+}
+
+.define-wrapper {
+  display: none;
+}
+
+.button-area {
+  padding-top: 8px;
+}
+
+.code-area {
+  margin: -10px -10px -11px -10px;
+  display: none;
+}
+
+.desc {
+  line-height: 1.5;
+}
+
+.reserved .field-name {
+  color: #bf0101;
+}
+
+.tab-content {
+  padding-top: 20px;
+}
+
+.config-table {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+.config-table td {
+  padding: 3px 0;
+}
+.config-table tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: 200px;
+}
+
+.modal-md .config-table,
+.modal-sm .config-table {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+.modal-md .config-table td,
+.modal-sm .config-table td {
+  padding: 4px 0;
+}
+.modal-md .config-table td.paths, .modal-md .config-table td.languages,
+.modal-sm .config-table td.paths,
+.modal-sm .config-table td.languages {
+  position: relative;
+}
+.modal-md .config-table td.paths table, .modal-md .config-table td.languages table,
+.modal-sm .config-table td.paths table,
+.modal-sm .config-table td.languages table {
+  width: 100%;
+  box-sizing: border-box;
+}
+.modal-md .config-table td.paths table tr td, .modal-md .config-table td.languages table tr td,
+.modal-sm .config-table td.paths table tr td,
+.modal-sm .config-table td.languages table tr td {
+  padding: 4px 3px;
+}
+.modal-md .config-table td.paths table tr td:nth-child(1), .modal-md .config-table td.languages table tr td:nth-child(1),
+.modal-sm .config-table td.paths table tr td:nth-child(1),
+.modal-sm .config-table td.languages table tr td:nth-child(1) {
+  width: calc(50% - 40px);
+  padding-left: 0;
+}
+.modal-md .config-table td.paths table tr td:nth-child(2), .modal-md .config-table td.languages table tr td:nth-child(2),
+.modal-sm .config-table td.paths table tr td:nth-child(2),
+.modal-sm .config-table td.languages table tr td:nth-child(2) {
+  width: calc(50% - 40px);
+}
+.modal-md .config-table td.paths table tr td:nth-child(4), .modal-md .config-table td.languages table tr td:nth-child(4),
+.modal-sm .config-table td.paths table tr td:nth-child(4),
+.modal-sm .config-table td.languages table tr td:nth-child(4) {
+  padding-right: 0;
+}
+.modal-md .config-table td.paths table tbody tr td input[type=text], .modal-md .config-table td.languages table tbody tr td input[type=text],
+.modal-sm .config-table td.paths table tbody tr td input[type=text],
+.modal-sm .config-table td.languages table tbody tr td input[type=text] {
+  width: 100%;
+  box-sizing: border-box;
+}
+@media screen and (max-width: 600px) {
+  .modal-md .config-table td.paths .modal-md .config-table > tbody > tr > td, .modal-md .config-table td.languages .modal-md .config-table > tbody > tr > td,
+  .modal-sm .config-table td.paths .modal-md .config-table > tbody > tr > td,
+  .modal-sm .config-table td.languages .modal-md .config-table > tbody > tr > td {
+    width: 100%;
+    display: block;
+  }
+}
+.modal-md .config-table tbody > tr:nth-child(1) > td:nth-child(1),
+.modal-sm .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: 35%;
+}
+
+.modal-table {
+  width: 100%;
+  margin: auto;
+}
+.modal-table td {
+  padding: 4px 0;
+}
+.modal-table tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: 200px;
+}
+
+table.table.table-reference td {
+  padding: 5px 4px;
+}
+table.table.table-reference tr > td:first-child {
+  padding: 5px 2px 5px 0;
+}
+table.table.table-reference tr > td:last-child {
+  padding: 5px 0px 5px 2px;
+}
+
+.map-section {
+  display: none;
+}
+
+.display-reference {
+  display: none;
+}
+
+[data-reference-type=data] .display-reference {
+  display: table-row;
+}
+
+.entity-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.entity-list ul li {
+  white-space: nowrap;
+  position: relative;
+  padding-right: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.entity-list > div {
+  height: calc(100vh - 146px);
+  overflow-x: auto;
+}
+
+.erd-image {
+  height: calc(100vh - 188px);
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.diagram-option {
+  padding-bottom: 10px;
+}
+
+.diagram-option .form-control {
+  display: inline;
+  width: 68px;
+  padding-left: 8px;
+  padding-right: 6px;
+}
+
+.diagram-option .form-control[name=maximum_level],
+.diagram-option .form-control[name=maximum_column] {
+  width: 60px;
+}
+
+.module-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.module-list ul li {
+  white-space: nowrap;
+  position: relative;
+  padding-right: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.module-list > div {
+  height: calc(100vh - 146px);
+  overflow-x: auto;
+}
+
+.column-body {
+  position: relative;
+}
+
+.app-code {
+  padding: 20px;
+  font-family: "Courier New", Courier, monospace;
+  border: 1px solid #DDD;
+  background-color: #FAFAFA;
+  overflow: auto;
+  display: block;
+  width: calc(100% - 400px);
+  height: calc(100vh - 184px);
+}
+
+.tabs .tab-content > .tab-pane {
+  transition: opacity 0.01s ease 0s;
+}
+
+.selected-file::after {
+  content: "✓";
+  display: block;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  right: 10px;
+  top: 2px;
+}
+
+li.file-syntax-error {
+  color: #DD0000;
+}
+li.file-syntax-error a {
+  color: #DD0000;
+}
+
+.accordion .card-header button.btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding-left: 0;
+}
+.accordion .card-header button.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+.accordion .card-header button.btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.accordion .card:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.accordion .card:last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.collapsible-card .card:first-child {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+.collapsible-card .card:last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.column-title {
+  height: 48px;
+}
+
+.highlight-line {
+  background-color: #e8f2ff;
+}
+
+#modal-create-reference-data .modal-dialog {
+  transition: max-width ease-in-out 0.24s;
+}
+
+.input-invalid-value {
+  color: #c11515;
+  border-color: #b92525;
+}
+
+.input-invalid-value:focus {
+  color: #c11515;
+  background-color: #fff;
+  border-color: #b92525;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(168, 54, 54, 0.1215686275);
+}
+
+.target-language, .filter-translate {
+  display: inline;
+  width: auto;
+}
+
+.table-reference-container {
+  overflow-x: auto;
+}
+
+.CodeMirror-lines {
+  padding-left: 0.5rem;
+}
+
+.CodeMirror-linenumber {
+  left: -0.5em !important;
+}
+
+.CodeMirror {
+  line-height: 1.6;
+  height: calc(100vh - 184px);
+}
+
+.CodeMirror-linebackground {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  width: calc(100% + 1rem);
+}/*# sourceMappingURL=css.css.map */

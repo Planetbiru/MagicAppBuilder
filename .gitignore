@@ -1,0 +1,6 @@
+/inc.cfg/applications/*
+/inc.cfg/core.yml
+/tmp/*
+
+.cache/*
+inc.cfg/application-list.yml

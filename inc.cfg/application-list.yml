@@ -1,0 +1,12 @@
+-
+    id: sipro-baru
+    name: 'Sipro Baru'
+    documentRoot: 'D:\xampp\htdocs\sipro-baru'
+    author: Kamshory
+    selected: false
+-
+    id: sipro
+    name: SIPRO
+    documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
+    author: Kamshory
+    selected: true

@@ -1,0 +1,461 @@
+<!doctype html>
+
+<title>CodeMirror: LiveScript mode</title>
+<meta charset="utf-8"/>
+<link rel=stylesheet href="../../doc/docs.css">
+
+<link rel="stylesheet" href="../../lib/codemirror.css">
+<link rel="stylesheet" href="../../theme/solarized.css">
+<script src="../../lib/codemirror.js"></script>
+<script src="livescript.js"></script>
+<style>.CodeMirror {font-size: 80%;border-top: 1px solid silver; border-bottom: 1px solid silver;}</style>
+<div id=nav>
+  <a href="http://codemirror.net"><h1>CodeMirror</h1><img id=logo src="../../doc/logo.png"></a>
+
+  <ul>
+    <li><a href="../../index.html">Home</a>
+    <li><a href="../../doc/manual.html">Manual</a>
+    <li><a href="https://github.com/codemirror/codemirror">Code</a>
+  </ul>
+  <ul>
+    <li><a href="../index.html">Language modes</a>
+    <li><a class=active href="#">LiveScript</a>
+  </ul>
+</div>
+
+<article>
+<h2>LiveScript mode</h2>
+<form>
+<textarea id="code" name="code">
+# LiveScript mode for CodeMirror
+# The following script, prelude.ls, is used to
+# demonstrate LiveScript mode for CodeMirror.
+#   https://github.com/gkz/prelude-ls
+
+export objToFunc = objToFunc = (obj) -&gt;
+  (key) -&gt; obj[key]
+
+export each = (f, xs) --&gt;
+  if typeof! xs is \Object
+    for , x of xs then f x
+  else
+    for x in xs then f x
+  xs
+
+export map = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  type = typeof! xs
+  if type is \Object
+    {[key, f x] for key, x of xs}
+  else
+    result = [f x for x in xs]
+    if type is \String then result * '' else result
+
+export filter = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  type = typeof! xs
+  if type is \Object
+    {[key, x] for key, x of xs when f x}
+  else
+    result = [x for x in xs when f x]
+    if type is \String then result * '' else result
+
+export reject = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  type = typeof! xs
+  if type is \Object
+    {[key, x] for key, x of xs when not f x}
+  else
+    result = [x for x in xs when not f x]
+    if type is \String then result * '' else result
+
+export partition = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  type = typeof! xs
+  if type is \Object
+    passed = {}
+    failed = {}
+    for key, x of xs
+      (if f x then passed else failed)[key] = x
+  else
+    passed = []
+    failed = []
+    for x in xs
+      (if f x then passed else failed)push x
+    if type is \String
+      passed *= ''
+      failed *= ''
+  [passed, failed]
+
+export find = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  if typeof! xs is \Object
+    for , x of xs when f x then return x
+  else
+    for x in xs when f x then return x
+  void
+
+export head = export first = (xs) -&gt;
+  return void if not xs.length
+  xs.0
+
+export tail = (xs) -&gt;
+  return void if not xs.length
+  xs.slice 1
+
+export last = (xs) -&gt;
+  return void if not xs.length
+  xs[*-1]
+
+export initial = (xs) -&gt;
+  return void if not xs.length
+  xs.slice 0 xs.length - 1
+
+export empty = (xs) -&gt;
+  if typeof! xs is \Object
+    for x of xs then return false
+    return yes
+  not xs.length
+
+export values = (obj) -&gt;
+  [x for , x of obj]
+
+export keys = (obj) -&gt;
+  [x for x of obj]
+
+export len = (xs) -&gt;
+  xs = values xs if typeof! xs is \Object
+  xs.length
+
+export cons = (x, xs) --&gt;
+  if typeof! xs is \String then x + xs else [x] ++ xs
+
+export append = (xs, ys) --&gt;
+  if typeof! ys is \String then xs + ys else xs ++ ys
+
+export join = (sep, xs) --&gt;
+  xs = values xs if typeof! xs is \Object
+  xs.join sep
+
+export reverse = (xs) -&gt;
+  if typeof! xs is \String
+  then (xs / '')reverse! * ''
+  else xs.slice!reverse!
+
+export fold = export foldl = (f, memo, xs) --&gt;
+  if typeof! xs is \Object
+    for , x of xs then memo = f memo, x
+  else
+    for x in xs then memo = f memo, x
+  memo
+
+export fold1 = export foldl1 = (f, xs) --&gt; fold f, xs.0, xs.slice 1
+
+export foldr = (f, memo, xs) --&gt; fold f, memo, xs.slice!reverse!
+
+export foldr1 = (f, xs) --&gt;
+  xs.=slice!reverse!
+  fold f, xs.0, xs.slice 1
+
+export unfoldr = export unfold = (f, b) --&gt;
+  if (f b)?
+    [that.0] ++ unfoldr f, that.1
+  else
+    []
+
+export andList = (xs) -&gt;
+  for x in xs when not x
+    return false
+  true
+
+export orList = (xs) -&gt;
+  for x in xs when x
+    return true
+  false
+
+export any = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  for x in xs when f x
+    return yes
+  no
+
+export all = (f, xs) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  for x in xs when not f x
+    return no
+  yes
+
+export unique = (xs) -&gt;
+  result = []
+  if typeof! xs is \Object
+    for , x of xs when x not in result then result.push x
+  else
+    for x   in xs when x not in result then result.push x
+  if typeof! xs is \String then result * '' else result
+
+export sort = (xs) -&gt;
+  xs.concat!sort (x, y) -&gt;
+    | x &gt; y =&gt;  1
+    | x &lt; y =&gt; -1
+    | _     =&gt;  0
+
+export sortBy = (f, xs) --&gt;
+  return [] unless xs.length
+  xs.concat!sort f
+
+export compare = (f, x, y) --&gt;
+  | (f x) &gt; (f y) =&gt;  1
+  | (f x) &lt; (f y) =&gt; -1
+  | otherwise     =&gt;  0
+
+export sum = (xs) -&gt;
+  result = 0
+  if typeof! xs is \Object
+    for , x of xs then result += x
+  else
+    for x   in xs then result += x
+  result
+
+export product = (xs) -&gt;
+  result = 1
+  if typeof! xs is \Object
+    for , x of xs then result *= x
+  else
+    for x   in xs then result *= x
+  result
+
+export mean = export average = (xs) -&gt; (sum xs) / len xs
+
+export concat = (xss) -&gt; fold append, [], xss
+
+export concatMap = (f, xs) --&gt; fold ((memo, x) -&gt; append memo, f x), [], xs
+
+export listToObj = (xs) -&gt;
+  {[x.0, x.1] for x in xs}
+
+export maximum = (xs) -&gt; fold1 (&gt;?), xs
+
+export minimum = (xs) -&gt; fold1 (&lt;?), xs
+
+export scan = export scanl = (f, memo, xs) --&gt;
+  last = memo
+  if typeof! xs is \Object
+  then [memo] ++ [last = f last, x for , x of xs]
+  else [memo] ++ [last = f last, x for x in xs]
+
+export scan1 = export scanl1 = (f, xs) --&gt; scan f, xs.0, xs.slice 1
+
+export scanr = (f, memo, xs) --&gt;
+  xs.=slice!reverse!
+  scan f, memo, xs .reverse!
+
+export scanr1 = (f, xs) --&gt;
+  xs.=slice!reverse!
+  scan f, xs.0, xs.slice 1 .reverse!
+
+export replicate = (n, x) --&gt;
+  result = []
+  i = 0
+  while i &lt; n, ++i then result.push x
+  result
+
+export take = (n, xs) --&gt;
+  | n &lt;= 0
+    if typeof! xs is \String then '' else []
+  | not xs.length =&gt; xs
+  | otherwise     =&gt; xs.slice 0, n
+
+export drop = (n, xs) --&gt;
+  | n &lt;= 0        =&gt; xs
+  | not xs.length =&gt; xs
+  | otherwise     =&gt; xs.slice n
+
+export splitAt = (n, xs) --&gt; [(take n, xs), (drop n, xs)]
+
+export takeWhile = (p, xs) --&gt;
+  return xs if not xs.length
+  p = objToFunc p if typeof! p isnt \Function
+  result = []
+  for x in xs
+    break if not p x
+    result.push x
+  if typeof! xs is \String then result * '' else result
+
+export dropWhile = (p, xs) --&gt;
+  return xs if not xs.length
+  p = objToFunc p if typeof! p isnt \Function
+  i = 0
+  for x in xs
+    break if not p x
+    ++i
+  drop i, xs
+
+export span = (p, xs) --&gt; [(takeWhile p, xs), (dropWhile p, xs)]
+
+export breakIt = (p, xs) --&gt; span (not) &lt;&lt; p, xs
+
+export zip = (xs, ys) --&gt;
+  result = []
+  for zs, i in [xs, ys]
+    for z, j in zs
+      result.push [] if i is 0
+      result[j]?push z
+  result
+
+export zipWith = (f,xs, ys) --&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  if not xs.length or not ys.length
+    []
+  else
+    [f.apply this, zs for zs in zip.call this, xs, ys]
+
+export zipAll = (...xss) -&gt;
+  result = []
+  for xs, i in xss
+    for x, j in xs
+      result.push [] if i is 0
+      result[j]?push x
+  result
+
+export zipAllWith = (f, ...xss) -&gt;
+  f = objToFunc f if typeof! f isnt \Function
+  if not xss.0.length or not xss.1.length
+    []
+  else
+    [f.apply this, xs for xs in zipAll.apply this, xss]
+
+export compose = (...funcs) -&gt;
+  -&gt;
+    args = arguments
+    for f in funcs
+      args = [f.apply this, args]
+    args.0
+
+export curry = (f) -&gt;
+  curry$ f # using util method curry$ from livescript
+
+export id = (x) -&gt; x
+
+export flip = (f, x, y) --&gt; f y, x
+
+export fix = (f) -&gt;
+  ( (g, x) -&gt; -&gt; f(g g) ...arguments ) do
+    (g, x) -&gt; -&gt; f(g g) ...arguments
+
+export lines = (str) -&gt;
+  return [] if not str.length
+  str / \\n
+
+export unlines = (strs) -&gt; strs * \\n
+
+export words = (str) -&gt;
+  return [] if not str.length
+  str / /[ ]+/
+
+export unwords = (strs) -&gt; strs * ' '
+
+export max = (&gt;?)
+
+export min = (&lt;?)
+
+export negate = (x) -&gt; -x
+
+export abs = Math.abs
+
+export signum = (x) -&gt;
+  | x &lt; 0     =&gt; -1
+  | x &gt; 0     =&gt;  1
+  | otherwise =&gt;  0
+
+export quot = (x, y) --&gt; ~~(x / y)
+
+export rem = (%)
+
+export div = (x, y) --&gt; Math.floor x / y
+
+export mod = (%%)
+
+export recip = (1 /)
+
+export pi = Math.PI
+
+export tau = pi * 2
+
+export exp = Math.exp
+
+export sqrt = Math.sqrt
+
+# changed from log as log is a
+# common function for logging things
+export ln = Math.log
+
+export pow = (^)
+
+export sin = Math.sin
+
+export tan = Math.tan
+
+export cos = Math.cos
+
+export asin = Math.asin
+
+export acos = Math.acos
+
+export atan = Math.atan
+
+export atan2 = (x, y) --&gt; Math.atan2 x, y
+
+# sinh
+# tanh
+# cosh
+# asinh
+# atanh
+# acosh
+
+export truncate = (x) -&gt; ~~x
+
+export round = Math.round
+
+export ceiling = Math.ceil
+
+export floor = Math.floor
+
+export isItNaN = (x) -&gt; x isnt x
+
+export even = (x) -&gt; x % 2 == 0
+
+export odd = (x) -&gt; x % 2 != 0
+
+export gcd = (x, y) --&gt;
+  x = Math.abs x
+  y = Math.abs y
+  until y is 0
+    z = x % y
+    x = y
+    y = z
+  x
+
+export lcm = (x, y) --&gt;
+  Math.abs Math.floor (x / (gcd x, y) * y)
+
+# meta
+export installPrelude = !(target) -&gt;
+  unless target.prelude?isInstalled
+    target &lt;&lt;&lt; out$ # using out$ generated by livescript
+    target &lt;&lt;&lt; target.prelude.isInstalled = true
+
+export prelude = out$
+</textarea>
+</form>
+    <script type="text/javascript">
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"),{
+        theme: "solarized light",
+        lineNumbers: true
+      });
+    </script>
+
+    <p><strong>MIME types defined:</strong> <code>text/x-livescript</code>.</p>
+
+    <p>The LiveScript mode was written by Kenneth Bentley.</p>
+
+  </article>

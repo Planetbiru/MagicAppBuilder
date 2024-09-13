@@ -1,0 +1,111 @@
+<?php
+
+use AppBuilder\Util\Error\ErrorChecker;
+use MagicObject\Language\PicoEntityLanguage;
+use MagicObject\MagicObject;
+use MagicObject\Request\InputPost;
+use MagicObject\Util\PicoIniUtil;
+
+require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/sessions.php";
+
+$inputPost = new InputPost();
+if($inputPost->getUserAction() == 'get')
+{
+    try
+    {
+        $cacheDir = dirname(__DIR__)."/.cache/";
+        $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
+        $filter = $inputPost->getFilter();
+        $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
+        $baseEntity = str_replace("\\\\", "\\", $baseEntity);
+        $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
+        $targetLanguage = $inputPost->getTargetLanguage();
+        $allQueries = array();
+
+        if($inputPost->getEntityName())
+        {
+            $entityName = $inputPost->getEntityName();
+            $className = "\\".$baseEntity."\\".$entityName;
+            $entityName = trim($entityName);
+            $path = $baseDir."/".$entityName.".php";
+
+            $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
+            $langs = new MagicObject();
+            if(file_exists($pathTrans))
+            {
+                $langs->loadIniFile($pathTrans);
+            }
+            if(file_exists($path))
+            {
+                $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+                if($return_var == 0)
+                {
+                    include_once $path;
+                    $entity = new $className(null);
+                    $entityLabel = new PicoEntityLanguage($entity);
+                    $list = $entityLabel->propertyList(true);
+                    $response = array();
+                    foreach($list as $key)
+                    {
+                        $original = $entityLabel->get($key);
+                        $translated = $langs->get($key);
+
+                        if($translated == null)
+                        {
+                            $translated = $original;
+                            $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                        }  
+                        else if($filter == 'all') 
+                        {
+                            $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                        }
+                    }
+                    header('Content-type: application/json');
+                    echo json_encode($response);
+                }
+            }
+        }
+    }
+    catch(Exception $e)
+    {
+        // do nothing
+    }
+}
+if($inputPost->getUserAction() == 'set')
+{
+    $entityName = $inputPost->getEntityName();
+    $translated = $inputPost->getTranslated();
+    $propertyNames = $inputPost->getPropertyNames();
+    $targetLanguage = $inputPost->getTargetLanguage();
+    $keys = explode("|", $propertyNames);
+    $values = explode("\n", str_replace("\r", "", $translated));
+    $translatedLabel = array_combine($keys, $values);
+
+    try
+    {
+        $cacheDir = dirname(__DIR__)."/.cache/";
+        $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
+        $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
+        $baseEntity = str_replace("\\\\", "\\", $baseEntity);
+        $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
+        
+        $allQueries = array();
+
+        if($inputPost->getEntityName())
+        {
+            $path = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
+            $dir = dirname($path); 
+            if(!file_exists($dir))
+            {
+                mkdir($dir, 0755, true);
+            }
+            PicoIniUtil::writeIniFile($translatedLabel, $path);
+        }
+    }
+    catch(Exception $e)
+    {
+        // do nothing
+    }
+    
+}
