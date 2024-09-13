@@ -268,7 +268,7 @@ class PicoDtoGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = [];
+        $attrs = array();
         if(is_array($rows))
         {
             foreach($rows as $row)

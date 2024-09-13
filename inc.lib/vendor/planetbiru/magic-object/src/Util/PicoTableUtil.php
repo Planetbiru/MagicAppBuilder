@@ -7,6 +7,11 @@ use MagicObject\Exceptions\InvalidParameterException;
 
 class PicoTableUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Set class
      *

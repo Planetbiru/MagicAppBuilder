@@ -8,6 +8,11 @@ namespace MagicObject\Util;
  */
 class PicoIniUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Write INI file
      *

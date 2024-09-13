@@ -44,6 +44,7 @@ class PicoPageData
      * @var integer
      */
     private $totalPage = 0;
+    
     /**
      * Page number
      * @var integer

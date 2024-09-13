@@ -10,6 +10,11 @@ use stdClass;
  */
 class PicoArrayUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Camelize array keys
      *
