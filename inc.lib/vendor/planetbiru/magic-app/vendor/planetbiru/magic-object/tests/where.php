@@ -428,7 +428,7 @@ $specs->setIpEdit(null);
 
 try
 {
-	$album->findAll($specs);
+	$album->findByNameAndNumberOfSongAndActiveAndDraft(['Album 1', 'Album 2'], 11, true, false);
 }
 catch(Exception $e)
 {

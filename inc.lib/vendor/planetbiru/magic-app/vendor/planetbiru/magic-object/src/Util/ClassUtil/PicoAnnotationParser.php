@@ -115,7 +115,7 @@ class PicoAnnotationParser
     /**
      * Parse single annotation
      *
-     * @param string $key
+     * @param string $key Key
      * @return array|null
      */
     private function parseSingle($key)
@@ -210,7 +210,7 @@ class PicoAnnotationParser
     /**
      * Get declared variables
      *
-     * @param string $name
+     * @param string $name Name
      * @return string[]
      */
     public function getVariableDeclarations($name)
@@ -225,8 +225,8 @@ class PicoAnnotationParser
     /**
      * Get declared variable
      *
-     * @param mixed $declaration
-     * @param string $name
+     * @param mixed $declaration Declaration
+     * @param string $name Name
      * @return string[]
      * @throws InvalidArgumentException
      */
@@ -264,7 +264,7 @@ class PicoAnnotationParser
     /**
      * Parse value
      *
-     * @param string $originalValue
+     * @param string $originalValue Original value
      * @return array
      */
     private function parseValue($originalValue)
@@ -313,7 +313,7 @@ class PicoAnnotationParser
     /**
      * Get parameter
      *
-     * @param string $key
+     * @param string $key Key
      * @return array
      */
     public function getParameter($key)
@@ -324,7 +324,7 @@ class PicoAnnotationParser
     /**
      * Get first parameter
      *
-     * @param string $key
+     * @param string $key Key
      * @return string
      */
     public function getFirstParameter($key)
@@ -347,15 +347,15 @@ class PicoAnnotationParser
     /**
      * Combine and merge array
      *
-     * @param array $matches2
-     * @param array $pair
+     * @param array $matches Matched
+     * @param array $pair Pair
      * @return array
      */
-    private function combineAndMerge($matches2, $pair)
+    private function combineAndMerge($matches, $pair)
     {
-        if(isset($matches2[1]) && isset($matches2[2]) && is_array($matches2[1]) && is_array($matches2[2]))
+        if(isset($matches[1]) && isset($matches[2]) && is_array($matches[1]) && is_array($matches[2]))
         {
-            $pair2 = array_combine($matches2[1], $matches2[2]);
+            $pair2 = array_combine($matches[1], $matches[2]);
             // merge $pair and $pair2 into $pair3
             return array_merge($pair, $pair2);
         }
@@ -368,7 +368,7 @@ class PicoAnnotationParser
     /**
      * Parse parameters. Note that all numeric attributes will be started with underscore (_). Do not use it as is
      *
-     * @param string $queryString
+     * @param string $queryString Query string
      * @return string[]
      * @throws InvalidQueryInputException
      */
@@ -428,8 +428,8 @@ class PicoAnnotationParser
     /**
      * Check if argument is match
      *
-     * @param array $keys
-     * @param string $val
+     * @param array $keys Keys
+     * @param string $val Value
      * @return boolean
      */
     private function matchArgs($keys, $val)
@@ -439,7 +439,7 @@ class PicoAnnotationParser
     /**
      * Parse parameters as object. Note that all numeric attributes will be started with underscore (_). Do not use it as is
      *
-     * @param string $queryString
+     * @param string $queryString Query string
      * @return PicoGenericObject
      * @throws InvalidAnnotationException
      */

@@ -636,4 +636,9 @@ class PicoLocale
     const VAI_LATN_L = "vai-Latn_L";
     const AR_SO = "ar_SO";
     const RU_BY = "ru_BY";
+
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
 }

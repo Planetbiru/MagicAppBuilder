@@ -142,23 +142,23 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "0.8.21",
-            "version_normalized": "0.8.21.0",
+            "version": "0.8.26",
+            "version_normalized": "0.8.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "7c672d814628923a3933bd497a858df27a86a496"
+                "reference": "97e3e1a609e4816be78232c6ce0b57a0ff9dc742"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/7c672d814628923a3933bd497a858df27a86a496",
-                "reference": "7c672d814628923a3933bd497a858df27a86a496",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/97e3e1a609e4816be78232c6ce0b57a0ff9dc742",
+                "reference": "97e3e1a609e4816be78232c6ce0b57a0ff9dc742",
                 "shasum": ""
             },
             "require": {
-                "planetbiru/magic-object": "^1.20"
+                "planetbiru/magic-object": "1.20.0"
             },
-            "time": "2024-09-08T10:06:50+00:00",
+            "time": "2024-09-13T11:58:46+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -178,7 +178,7 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.21"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.26"
             },
             "install-path": "../planetbiru/magic-app"
         },

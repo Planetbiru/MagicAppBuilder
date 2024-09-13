@@ -8,6 +8,11 @@ namespace MagicObject\Util;
  */
 class AttrUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * return selected="selected" if $param1 == $param2
      *

@@ -30,7 +30,6 @@ use ReflectionClass;
  */
 class ExtendedReflectionClass extends ReflectionClass {
 
-
 	/**
 	 * Array of use statements for class.
 	 *
@@ -38,14 +37,12 @@ class ExtendedReflectionClass extends ReflectionClass {
 	 */
 	protected $useStatements = array();
 
-
 	/**
 	 * Check if use statements have been parsed.
 	 *
 	 * @var boolean
 	 */
 	protected $useStatementsParsed = false;
-
 
 	/**
 	 * Parse class file and get use statements from current namespace.
@@ -68,7 +65,6 @@ class ExtendedReflectionClass extends ReflectionClass {
 		$this->useStatementsParsed = true;
 		return $this->useStatements;
 	}
-
 
 	/**
 	 * Read file source up to the line where our class is defined.
@@ -96,13 +92,12 @@ class ExtendedReflectionClass extends ReflectionClass {
 		return $source;
 	}
 
-
 	/**
 	 * Parse the use statements from read source by
 	 * tokenizing and reading the tokens. Returns
 	 * an array of use statements and aliases.
 	 *
-	 * @param string $source
+	 * @param string $source Source
 	 * @return array
 	 */
 	private function tokenizeSource($source) //NOSONAR
@@ -204,7 +199,6 @@ class ExtendedReflectionClass extends ReflectionClass {
 			}
 		}
 
-
 		// Make sure the as key has the name of the class even
 		// if there is no alias in the use statement.
 		foreach ($useStatements as &$useStatement) {
@@ -217,7 +211,6 @@ class ExtendedReflectionClass extends ReflectionClass {
 
 		return $useStatements;
 	}
-
 
 	/**
 	 * Return array of use statements from class.
@@ -232,7 +225,7 @@ class ExtendedReflectionClass extends ReflectionClass {
 	/**
 	 * Base name of class
 	 *
-	 * @param string $className
+	 * @param string $className Class name
 	 * @return string
 	 */
 	private function baseName($className)
@@ -246,11 +239,10 @@ class ExtendedReflectionClass extends ReflectionClass {
 		return $className;
 	}
 
-
 	/**
 	 * Check if class is using a class or an alias of a class.
 	 *
-	 * @param string $class
+	 * @param string $class Class name
 	 * @return boolean
 	 */
 	public function hasUseStatement($class) {

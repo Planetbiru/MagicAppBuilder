@@ -5,6 +5,11 @@ use stdClass;
 
 class PicoStringUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Convert snake case to camel case
      *

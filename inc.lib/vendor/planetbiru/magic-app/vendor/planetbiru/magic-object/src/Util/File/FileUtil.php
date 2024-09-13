@@ -4,6 +4,11 @@ namespace MagicObject\Util\File;
 
 class FileUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     public static function getFiles($directory, $level = 0, $origin = null)
     {
         if($level == 0)

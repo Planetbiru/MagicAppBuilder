@@ -43,7 +43,7 @@ class PicoResponse
      * @param string $body Response body
      * @param string $contentType Content type
      * @param array $headers Response headers
-     * @param boolean $async
+     * @param boolean $async Send response asynchronously
      * @return void
      */
     public static function sendResponse($body, $contentType = null, $headers = null, $httpStatusCode = PicoHttpStatus::HTTP_OK, $async = false)
@@ -62,7 +62,7 @@ class PicoResponse
      *
      * @param stdClass|object|array|string $body Response body
      * @param array $headers Response headers
-     * @param boolean $async
+     * @param boolean $async Send response asynchronously
      * @return void
      */
     public static function sendResponseJSON($body, $headers = null, $httpStatusCode = PicoHttpStatus::HTTP_OK, $async = false)
@@ -127,7 +127,7 @@ class PicoResponse
      * Send response body
      *
      * @param string $body Response body
-     * @param boolean $async
+     * @param boolean $async Send response asynchronously
      * @return void
      */
     public static function sendBody($body, $async = false)
@@ -197,8 +197,8 @@ class PicoResponse
     /**
      * Send http status
      *
-     * @param integer $code
-     * @param string $text
+     * @param integer $code HTTP status code
+     * @param string $text HTTP status text
      * @return integer
      */
     public static function sendHttpStatus($code = 0, $text = null)
@@ -225,7 +225,7 @@ class PicoResponse
     /**
      * Get HTTP response code
      *
-     * @param integer $code
+     * @param integer $code HTTP status code
      * @return string
      */
     public static function getHttpResponseCode($code)

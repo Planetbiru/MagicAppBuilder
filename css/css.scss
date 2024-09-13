@@ -16,7 +16,11 @@ $border-color_1: #6e6e6e;
 	font-size: 13px;
 }
 
-h4, .h4 {
+.h4 {
+	font-size: 1.2rem;
+}
+
+h4 {
 	font-size: 1.2rem;
 }
 
@@ -512,17 +516,17 @@ li.file-syntax-error {
 	overflow-x: auto;
 }
 
-.CodeMirror {
-	line-height: 1.6;
-	height: calc(100vh - 184px);
-}
-
 .CodeMirror-lines {
 	padding-left: 0.5rem;
 }
 
 .CodeMirror-linenumber {
 	left: -0.5em !important;
+}
+
+.CodeMirror {
+	line-height: 1.6;
+	height: calc(100vh - 184px);
 }
 
 .CodeMirror-linebackground{

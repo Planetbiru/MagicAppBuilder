@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a206060ad50374b188e3872fb071a1a",
+    "content-hash": "b7ac3946045f1cfb492135685a3a94cd",
     "packages": [
         {
             "name": "meyfa/php-svg",
@@ -142,20 +142,20 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "0.8.21",
+            "version": "0.8.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "7c672d814628923a3933bd497a858df27a86a496"
+                "reference": "97e3e1a609e4816be78232c6ce0b57a0ff9dc742"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/7c672d814628923a3933bd497a858df27a86a496",
-                "reference": "7c672d814628923a3933bd497a858df27a86a496",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/97e3e1a609e4816be78232c6ce0b57a0ff9dc742",
+                "reference": "97e3e1a609e4816be78232c6ce0b57a0ff9dc742",
                 "shasum": ""
             },
             "require": {
-                "planetbiru/magic-object": "^1.20"
+                "planetbiru/magic-object": "1.20.0"
             },
             "type": "library",
             "autoload": {
@@ -175,9 +175,9 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.21"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/0.8.26"
             },
-            "time": "2024-09-08T10:06:50+00:00"
+            "time": "2024-09-13T11:58:46+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -288,5 +288,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.6.0"
 }

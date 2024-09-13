@@ -8,6 +8,11 @@ namespace MagicObject\Util;
  */
 class PicoHttpCache
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Send header to browser to cache current URL
      *

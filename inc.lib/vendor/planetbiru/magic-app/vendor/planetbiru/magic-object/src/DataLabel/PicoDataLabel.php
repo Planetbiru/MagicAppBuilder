@@ -85,7 +85,7 @@ class PicoDataLabel extends SetterGetter
      *
      * @return stdClass
      */
-    public function getObjectInfo() // NOSONAR
+    public function getObjectInfo()
     {
         $reflexClass = new PicoAnnotationParser($this->className);
         $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);

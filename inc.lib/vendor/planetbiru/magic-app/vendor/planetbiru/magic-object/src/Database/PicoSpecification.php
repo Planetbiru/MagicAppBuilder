@@ -220,11 +220,11 @@ class PicoSpecification //NOSONAR
      */
     public static function isValueEmpty($value)
     {
-        if(is_string($value))
+        if(!isset($value) && is_string($value))
         {
             return empty(trim($value));
         }
-        return empty($value);
+        return false;
     }
 
     /**
@@ -551,5 +551,15 @@ class PicoSpecification //NOSONAR
         $this->defaultLogic = self::LOGIC_OR;
 
         return $this;
+    }
+
+    /**
+     * Get check if require real join table
+     *
+     * @return boolean
+     */ 
+    public function getRequireJoin()
+    {
+        return $this->requireJoin;
     }
 }
