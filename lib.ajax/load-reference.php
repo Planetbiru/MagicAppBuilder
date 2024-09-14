@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/app.php";
 $inputPost = new InputPost();
 if ($inputPost->getFieldName() != null && $inputPost->getKey() != null) {
     header("Content-type: application/json");
-    $path = dirname(__DIR__) . "/inc.cfg/applications/" . $curApp->getId() . "/reference/" . $inputPost->getFieldName() . "-" . $inputPost->getKey() . ".json";
+    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/reference/" . $inputPost->getFieldName() . "-" . $inputPost->getKey() . ".json";
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }

@@ -14,7 +14,7 @@ try
     $referenceConfig = new AppSecretObject();
     if($curApp != null && $curApp->getId() != null)
     {
-        $referenceConfigPath = dirname(__DIR__) . "/inc.cfg/applications/".$curApp->getId()."/reference.yml";
+        $referenceConfigPath = $workspaceDirectory."/applications/".$curApp->getId()."/reference.yml";
         if(file_exists($referenceConfigPath))
         {
             $referenceConfig->loadYamlFile($referenceConfigPath, false, true, true);

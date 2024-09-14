@@ -13,12 +13,12 @@ $inputGet = new InputGet();
 if (isset($_POST) && !empty($_POST)) {
     $request = new InputPost(true);
 
-    $path = dirname(__DIR__) . "/inc.cfg/applications/" . $curApp->getId() . "/module/" . basename($request->getModuleFile(), ".php") . ".json";
+    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/module/" . basename($request->getModuleFile(), ".php") . ".json";
     $target = trim($request->getTarget(), "/\\");
     if (!empty($target)) {
         $target = "/" . $target;
     }
-    $path = dirname(__DIR__) . "/inc.cfg/applications/" . $curApp->getId() . "/module$target/" . basename($request->getModuleFile(), ".php") . ".json";
+    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/module$target/" . basename($request->getModuleFile(), ".php") . ".json";
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }

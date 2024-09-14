@@ -7,7 +7,7 @@ use MagicObject\Request\InputPost;
 require_once dirname(__DIR__) . "/inc.app/app.php";
 
 $inputPost = new InputPost();
-$path = dirname(__DIR__) . "/inc.cfg/application-list.yml";
+$path = $workspaceDirectory."/application-list.yml";
 $dir = dirname($path);
 if (!file_exists($dir)) {
     mkdir($dir, 0755, true);
@@ -116,7 +116,7 @@ $newApp->setCurrentAction(array(
 ));
 $newApp->setGlobalVariableDatabase('database');
 
-$dir2 = dirname(__DIR__) . "/inc.cfg/applications/$newAppId";
+$dir2 = $workspaceDirectory."/applications/$newAppId";
 
 if (!file_exists($dir2)) {
     mkdir($dir2, 0755, true);
