@@ -23,7 +23,6 @@ if(PicoStringUtil::startsWith($workspaceDirectory, "./"))
 
 $appListPath = $workspaceDirectory."/application-list.yml";
 
-
 $appConfig = new AppSecretObject(null);
 
 $curApp = $builderConfig->getCurrentApplication();
