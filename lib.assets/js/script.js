@@ -393,8 +393,8 @@ jQuery(function(){
     let entity = $(this).attr("data-entity-name");
     let el = $(this);
     getEntityFile([entity], function () {
-      $('.entity-li').removeClass("selected-file");
-      el.parent().addClass("selected-file");
+      $('.entity-container-file .entity-li').removeClass("selected-file");
+      el.closest('li').addClass("selected-file");
     });
   });
 
@@ -563,12 +563,16 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', '.container-translate-entity .entity-list a', function (e) {
+  $(document).on('click', '.container-translate-entity .entity-list .entity-li a', function (e) {
     e.preventDefault();
     e.stopPropagation();
+    let el = $(this);
     let entityName = $(this).attr('data-entity-name');
     currentEntity2Translated = entityName;
-    translateEntity();
+    translateEntity(function () {
+      $('.container-translate-entity .entity-list .entity-li').removeClass("selected-file");
+      el.closest('li').addClass("selected-file");
+    });
     
   });
 
@@ -759,7 +763,7 @@ function reloadTranslate(translateFor)
   }
 }
 
-function translateEntity()
+function translateEntity(clbk)
 {
   entityName = currentEntity2Translated;
   if(entityName != '')
@@ -790,6 +794,10 @@ function translateEntity()
         lastLine1 = -1;
       },
     });
+  }
+  if(typeof clbk != 'undefined')
+  {
+    clbk();
   }
 }
 

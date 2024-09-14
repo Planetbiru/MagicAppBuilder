@@ -80,6 +80,20 @@ if($inputPost->getUserAction() == 'set')
     $targetLanguage = $inputPost->getTargetLanguage();
     $keys = explode("|", $propertyNames);
     $values = explode("\n", str_replace("\r", "", $translated));
+    $keysLength = count($keys);
+    
+    while(count($values) > $keysLength)
+    {
+        unset($values[count($values) - 1]);
+    }
+
+    $valuesLength = count($values);
+    
+    while(count($keys) > $valuesLength)
+    {
+        unset($keys[count($keys) - 1]);
+    }
+    
     $translatedLabel = array_combine($keys, $values);
 
     try

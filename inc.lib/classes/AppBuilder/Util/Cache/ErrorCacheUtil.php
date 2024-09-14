@@ -29,7 +29,7 @@ class ErrorCacheUtil
     {
         $files = glob($path . '-*');
         foreach ($files as $file) {
-            if (is_file($file)) {
+            if (is_file($file) && file_exists($file)) {
                 unlink($file);
             }
         }

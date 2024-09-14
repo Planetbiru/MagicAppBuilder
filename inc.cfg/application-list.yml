@@ -3,10 +3,10 @@
     name: 'Sipro Baru'
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
-    selected: false
+    selected: true
 -
     id: sipro
     name: SIPRO
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
-    selected: true
+    selected: false
