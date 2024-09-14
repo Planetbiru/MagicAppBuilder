@@ -112,12 +112,27 @@ if($inputPost->getUserAction() == 'set')
     $propertyNames = $inputPost->getPropertyNames();
     $targetLanguage = $inputPost->getTargetLanguage();
     $keys = explode("|", $propertyNames);
+    $values = explode("\n", str_replace("\r", "", $translated));
+    $keysLength = count($keys);
+    
+    while(count($values) > $keysLength)
+    {
+        unset($values[count($values) - 1]);
+    }
+
+    $valuesLength = count($values);
+    
+    while(count($keys) > $valuesLength)
+    {
+        unset($keys[count($keys) - 1]);
+    }
+    
+    $translatedLabel = array_combine($keys, $values);
+
     foreach($keys as $i=>$key)
     {
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
-    $values = explode("\n", str_replace("\r", "", $translated));
-    $translatedLabel = array_combine($keys, $values);
 
 
     $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
