@@ -3,13 +3,13 @@
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
 use MagicObject\Generator\PicoDatabaseDump;
-use MagicObject\Request\InputPost;
+use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
-$inputPost = new InputPost();
+$inputGet = new InputGet();
 try
 {
     $cacheDir = dirname(__DIR__)."/.cache/";
@@ -19,12 +19,12 @@ try
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = array();
-    $merged = $inputPost->getMerged();
+    $merged = $inputGet->getMerged();
     if($merged)
     {
-        if($inputPost->getEntity() != null && $inputPost->countableEntity())
+        if($inputGet->getEntity() != null && $inputGet->countableEntity())
         {
-            $inputEntity = $inputPost->getEntity();
+            $inputEntity = $inputGet->getEntity();
             $entities = array();
             $entityNames = array();
             foreach($inputEntity as $idx=>$entityName)
@@ -76,10 +76,10 @@ try
     }
     else
     {
-        if($inputPost->getEntity() != null && $inputPost->countableEntity())
+        if($inputGet->getEntity() != null && $inputGet->countableEntity())
         {
             $allQueries[] = "-- Important to understand!\r\n-- Queries must be run one by one manually because there may be duplicate columns from different entities for the same table.";
-            $inputEntity = $inputPost->getEntity();
+            $inputEntity = $inputGet->getEntity();
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);

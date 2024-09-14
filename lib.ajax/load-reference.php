@@ -1,15 +1,15 @@
 <?php
 
-use MagicObject\Request\InputPost;
+use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 
-$inputPost = new InputPost();
-if ($inputPost->getFieldName() != null && $inputPost->getKey() != null) {
+$inputGet = new InputGet();
+if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
     header("Content-type: application/json");
-    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/reference/" . $inputPost->getFieldName() . "-" . $inputPost->getKey() . ".json";
+    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/reference/" . $inputGet->getFieldName() . "-" . $inputGet->getKey() . ".json";
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }
@@ -20,7 +20,7 @@ if ($inputPost->getFieldName() != null && $inputPost->getKey() != null) {
         if (empty($entityConstant->valueArray())) {
             $entityConstant = new SecretObject($builderConfig->getEntityInfo());
         }
-        $fieldName = trim($inputPost->getFieldName());
+        $fieldName = trim($inputGet->getFieldName());
         if (PicoStringUtil::endsWith($fieldName, "_id", true)) {
             $objectName = substr($fieldName, 0, strlen($fieldName) - 3);
         } else {

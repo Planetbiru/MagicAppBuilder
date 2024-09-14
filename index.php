@@ -799,13 +799,6 @@ $constSelected = ' selected';
                     <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()">SVG</button>
                     <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()">PNG</button>
                   </div>
-                  <script>
-                    jQuery(function(){
-                      $(document).on('click', 'area', function(e){
-                        e.preventDefault();
-                      });
-                    });
-                  </script>
                   <div class="erd-image"></div>
                   <map name="erd-map"></map>
                 </div>
@@ -1179,7 +1172,7 @@ $constSelected = ' selected';
     </div>
   </div>
 
-  <div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_path" aria-hidden="true">
+  <div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_language" aria-hidden="true">
     <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
@@ -1228,6 +1221,25 @@ $constSelected = ' selected';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" id="update-application-language">Update</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-entity-detail" tabindex="-1" aria-labelledby="application_entity" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Entity Detail</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="entity-detail"></div>
+        </div>
+        <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

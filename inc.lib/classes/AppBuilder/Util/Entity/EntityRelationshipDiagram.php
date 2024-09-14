@@ -206,7 +206,8 @@ class EntityRelationshipDiagram //NOSONAR
         $info = $entity->tableInfo();
         $reflectionClass = new ReflectionClass($entity);
         $entityName = basename(get_class($entity));
-        $this->updateDiagram($reflectionClass, $entityName, $info, $level);
+        $namespace = basename(dirname(get_class($entity)));
+        $this->updateDiagram($reflectionClass, $entityName, $namespace, $info, $level);
         return $this;
     }
     
@@ -215,11 +216,12 @@ class EntityRelationshipDiagram //NOSONAR
      *
      * @param ReflectionClass $reflectionClass
      * @param string $entityName
+     * @param string $namespace
      * @param PicoTableInfo $info
      * @param integer $level
      * @return self
      */
-    private function updateDiagram($reflectionClass, $entityName, $info, $level)
+    private function updateDiagram($reflectionClass, $entityName, $namespace, $info, $level)
     {
         $tableName = $info->getTableName();
         if(!isset($this->entitieDiagramItem[$tableName]))
@@ -227,7 +229,7 @@ class EntityRelationshipDiagram //NOSONAR
             $x = $this->marginX + (count($this->entitieDiagramItem) * $this->entityWidth) + (count($this->entitieDiagramItem) * $this->entityMarginX);
             $y = $this->marginY;
             $entityId = $tableName;
-            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $tableName, $entityId, $x, $y, $this->entityWidth);
+            $this->entitieDiagramItem[$tableName] = new EntityDiagramItem($entityName, $namespace, $tableName, $entityId, $x, $y, $this->entityWidth);
             $this->entitieDiagramItem[$tableName]->setHeaderHeight($this->headerHeight);
             $this->entitieDiagramItem[$tableName]->setColumnHeight($this->columnHeight);
         }
@@ -474,7 +476,13 @@ class EntityRelationshipDiagram //NOSONAR
         foreach($this->entitieDiagramItem as $diagram)
         {
             $rect = new Rectangle(new Point($diagram->getX(), $diagram->getY()), new Point($diagram->getX()+$diagram->getWidth(), $diagram->getY()+$diagram->getHeight()));
-            $area[] = new Area($rect, $this->zoom, '#'.$diagram->getTableName(), "area-entity");
+            $attributes = array(
+                'data-type'=>'area-entity',
+                'data-namespace'=>$diagram->getNamespace(),
+                'data-entity'=>$diagram->getEntityName(),
+                'data-table-name'=>$diagram->getTableName()
+            );
+            $area[] = new Area($rect, $this->zoom, '#'.$diagram->getTableName(), $attributes);
         }
         foreach($this->entityRelationships as $entityRelationship)
         {
@@ -509,7 +517,18 @@ class EntityRelationshipDiagram //NOSONAR
             .'-'.$entityRelationship->getReferenceDiagram()->getTableName()
             .'-'.$entityRelationship->getReferenceColumn()->getColumnName();
             
-            $area[] = new Area($poly, $this->zoom, $href, "area-relation");
+            $attributes = array(
+                'data-type'=>'area-relation',
+                'data-namespace'=>$entityRelationship->getDiagram()->getNamespace(),
+                'data-entity'=>$entityRelationship->getDiagram()->getEntityName(),
+                'data-table-name'=>$entityRelationship->getDiagram()->getTableName(),
+                'data-column-name'=>$entityRelationship->getColumn()->getColumnName(),
+                'data-reference-namespace'=>$entityRelationship->getReferenceDiagram()->getNamespace(),
+                'data-reference-entity'=>$entityRelationship->getReferenceDiagram()->getEntityName(),
+                'data-reference-table-name'=>$entityRelationship->getReferenceDiagram()->getTableName(),
+                'data-reference-column-name'=>$entityRelationship->getReferenceColumn()->getColumnName(),
+            );
+            $area[] = new Area($poly, $this->zoom, $href, $attributes);
         }
         
         

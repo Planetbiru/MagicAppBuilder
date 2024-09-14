@@ -1,17 +1,17 @@
 <?php
 
-use MagicObject\Request\InputPost;
+use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
-$inputPost = new InputPost();
+$inputGet = new InputGet();
 
 try
 {
 	$baseModuleDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
-    $module = $inputPost->getModule().".php";
+    $module = $inputGet->getModule().".php";
     $path = trim($baseModuleDirectory."/".$module);
     if(file_exists($path))
     {

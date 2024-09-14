@@ -10,6 +10,13 @@ class EntityDiagramItem //NOSONAR
      * @var string
      */
     private $entityName;
+
+    /**
+     * Namespace
+     *
+     * @var string
+     */
+    private $namespace;
     
     /**
      * Table name
@@ -67,16 +74,28 @@ class EntityDiagramItem //NOSONAR
      */
     private $y = 0;
     
-    public function __construct($entityName, $tableName, $entityId, $x = 0, $y = 0, $width = 160)
+    /**
+     * Constructor
+     *
+     * @param string $entityName
+     * @param string $namespace
+     * @param string $tableName
+     * @param string $entityId
+     * @param integer $x
+     * @param integer $y
+     * @param integer $width
+     */
+    public function __construct($entityName, $namespace, $tableName, $entityId, $x = 0, $y = 0, $width = 160)
     {
         $this->entityName = $entityName;
+        $this->namespace = $namespace;
         $this->tableName = $tableName;
         $this->entityId = $entityId;
         $this->x = $x;
         $this->y = $y;
         $this->width = $width;
-
     }
+
     /**
      * Column
      *
@@ -99,18 +118,39 @@ class EntityDiagramItem //NOSONAR
         return $this;
     }
     
+    /**
+     * Set primary key column
+     *
+     * @param string $columnName
+     * @return self
+     */
     public function setPrimaryKeyColumn($columnName)
     {
         $this->columns[$columnName]->setPrimaryKey(true);
         return $this;
     }
     
+    /**
+     * Set reference column
+     *
+     * @param string $columnName
+     * @return self
+     */
     public function setReferenceColumn($columnName)
     {
         $this->columns[$columnName]->setReferenceColumn(true);
         return $this;
     }
     
+    /**
+     * Set join column
+     *
+     * @param string $columnName
+     * @param string $propertyType
+     * @param string $referenceTableName
+     * @param string $referenceColumnName
+     * @return self
+     */
     public function setJoinColumn($columnName, $propertyType, $referenceTableName, $referenceColumnName)
     {
         $this->columns[$columnName]->setJoinColumn($propertyType, $referenceTableName, $referenceColumnName);
@@ -315,6 +355,30 @@ class EntityDiagramItem //NOSONAR
     public function setEntityId($entityId)
     {
         $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * Get namespace
+     *
+     * @return  string
+     */ 
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Set namespace
+     *
+     * @param  string  $namespace  Namespace
+     *
+     * @return  self
+     */ 
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
 
         return $this;
     }

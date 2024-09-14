@@ -743,6 +743,54 @@ jQuery(function(){
       },
     });
   });
+
+  $(document).on('click', 'area', function(e){
+    e.preventDefault();
+    let dataType = $(this).attr('data-type');
+    let request = {};
+    let modalTitle = '';
+    let url = '';
+    if(dataType == 'area-entity')
+    {
+      url = 'lib.ajax/entity-detail.php';
+      modalTitle = 'Entity Detail';
+      let namespaceName = $(this).attr('data-namespace');
+      let entityName = $(this).attr('data-entity');
+      let tableName = $(this).attr('data-table-name');
+      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName};
+    }
+    if(dataType == 'area-relation')
+    {
+      url = 'lib.ajax/entity-relationship.php';
+      modalTitle = 'Entity Relationship';
+      let namespaceName = $(this).attr('data-namespace');
+      let entityName = $(this).attr('data-entity');
+      let tableName = $(this).attr('data-table-name');
+      let columnName = $(this).attr('data-column-name');
+
+      let referenceNamespaceName = $(this).attr('data-reference-namespace');
+      let referenceEntityName = $(this).attr('data-reference-entity');
+      let referenceTableName = $(this).attr('data-reference-table-name');
+      let referenceColumnName = $(this).attr('data-reference-column-name');
+      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName, columnName:columnName, referenceNamespaceName:referenceNamespaceName, referenceEntityName:referenceEntityName, referenceTableName:referenceTableName, referenceColumnName:referenceColumnName};
+      console.log(namespaceName, entityName, tableName, columnName, referenceNamespaceName, referenceEntityName, referenceTableName, referenceColumnName);
+    }
+    $('.entity-detail').empty();
+    $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+    
+    $('#modal-entity-detail .modal-title').html(modalTitle);
+    $('#modal-entity-detail').modal('show');
+    $.ajax({
+      type: 'GET',
+      dataType: 'html',
+      url: url,
+      data: request,
+      success: function(data){
+        $('.entity-detail').empty();
+        $('.entity-detail').append(data);
+      }
+    });
+  });
   
   loadTable();
   updateEntityQuery(false);
@@ -1094,7 +1142,7 @@ function getEntitySelection() {
 
 function getEntityQuery(entity, merged) {
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "lib.ajax/entity-query.php",
     data: { entity: entity, merged: merged ? 1 : 0 },
     dataType: "html",
@@ -1110,7 +1158,7 @@ function getEntityQuery(entity, merged) {
 
 function getEntityFile(entity, clbk) {
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "lib.ajax/entity-file.php",
     data: { entity: entity },
     dataType: "html",
@@ -1130,7 +1178,7 @@ function getEntityFile(entity, clbk) {
 
 function getModuleFile(module, clbk) {
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "lib.ajax/module-file.php",
     data: { module: module },
     dataType: "html",
@@ -1232,7 +1280,7 @@ function saveReference(fieldName, key, value) {
 }
 function loadReference(fieldName, key, clbk) {
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "lib.ajax/load-reference.php",
     data: { fieldName: fieldName, key: key },
     dataType: "json",
