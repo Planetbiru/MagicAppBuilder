@@ -516,6 +516,10 @@ li.file-syntax-error {
 	overflow-x: auto;
 }
 
+.reference-selector{
+	padding: 2px 0px 10px 0px;
+}
+
 .CodeMirror-lines {
 	padding-left: 0.5rem;
 }
@@ -534,3 +538,4 @@ li.file-syntax-error {
 	margin-right: -0.5rem;
 	width: calc(100% + 1.0rem);
 }
+

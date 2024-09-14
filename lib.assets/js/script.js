@@ -2569,16 +2569,18 @@ function setLanguage(languages)
 function getReferenceResource() {
   return `
 <form action="">
-    <label for="reference_type_entity"><input type="radio" class="reference_type" name="reference_type"
-            id="reference_type_entity" value="entity" checked> Entity</label>
-    <label for="reference_type_map"><input type="radio" class="reference_type" name="reference_type"
-            id="reference_type_map" value="map"> Map</label>
-    <label for="reference_type_yesno"><input type="radio" class="reference_type" name="reference_type"
-            id="reference_type_yesno" value="yesno"> Yes/No</label>
-    <label for="reference_type_truefalse"><input type="radio" class="reference_type" name="reference_type"
-            id="reference_type_truefalse" value="truefalse"> True/False</label>
-    <label for="reference_type_onezero"><input type="radio" class="reference_type" name="reference_type"
-            id="reference_type_onezero" value="onezero"> 1/0</label>
+    <div class="reference-selector">
+      <label for="reference_type_entity"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_entity" value="entity" checked> Entity</label>
+      <label for="reference_type_map"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_map" value="map"> Map</label>
+      <label for="reference_type_yesno"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_yesno" value="yesno"> Yes/No</label>
+      <label for="reference_type_truefalse"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_truefalse" value="truefalse"> True/False</label>
+      <label for="reference_type_onezero"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_onezero" value="onezero"> 1/0</label>
+    </div>
     <div class="reference-container">
         <div class="reference-section entity-section">
             <h4>Entity</h4>

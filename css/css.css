@@ -409,6 +409,10 @@ li.file-syntax-error a {
   overflow-x: auto;
 }
 
+.reference-selector {
+  padding: 2px 0px 10px 0px;
+}
+
 .CodeMirror-lines {
   padding-left: 0.5rem;
 }
