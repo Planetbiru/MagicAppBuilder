@@ -2275,7 +2275,12 @@ function setEntityData(data) {
   $(selector).find(".rd-reference-property-name").val(entity.propertyName);
   $(selector).find(".rd-option-text-node-format").val(entity.textNodeFormat);
   $(selector).find(".rd-option-indent").val(entity.indent);
-  $('.multiple-selection').val(data.multipleSelection);
+  let multiple = data.multipleSelection || '0';
+  if(multiple != '1')
+  {
+    multiple = '0';
+  }
+  $('.multiple-selection').val(multiple);
 
   setSpecificationData(data);
   setSortableData(data);
