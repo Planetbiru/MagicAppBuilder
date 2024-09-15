@@ -1568,10 +1568,10 @@ else
         $script = 
 ''.$map.'
 $specMap = array(
-    '.implode(",\n\t", $arrFilter).'
+'."\t".implode(",\n\t", $arrFilter).'
 );
 $sortOrderMap = array(
-    '.implode(",\n\t", $arrSort).'
+'."\t".implode(",\n\t", $arrSort).'
 );
 
 // You can define your own specifications
