@@ -5,65 +5,47 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityApplication is entity of table application. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityApplicationGroup is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application")
+ * @Table(name="application_group")
  */
-class EntityApplication extends MagicObject
+class EntityApplicationGroup extends MagicObject
 {
 	/**
-	 * Application ID
+	 * Application Group ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=false, extra="auto_increment")
-	 * @Label(content="Application ID")
+	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Application Group ID")
 	 * @var string
 	 */
-	protected $applicationId;
+	protected $applicationGroupId;
 
 	/**
 	 * Name
 	 * 
-	 * @Column(name="name", type="varchar(255)", length=255, nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
 	protected $name;
 
 	/**
-	 * Description
+	 * Icon
 	 * 
-	 * @Column(name="description", type="text", nullable=true)
-	 * @Label(content="Description")
+	 * @Column(name="icon", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Icon")
 	 * @var string
 	 */
-	protected $description;
-    
-    /**
-	 * Directory
-	 * 
-	 * @Column(name="directory", type="text", nullable=true)
-	 * @Label(content="Directory")
-	 * @var string
-	 */
-	protected $directory;
-    
-    /**
-	 * Author
-	 * 
-	 * @Column(name="author", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Author")
-	 * @var string
-	 */
-	protected $author;
-    
-    /**
+	protected $icon;
+
+	/**
 	 * Time Create
 	 * 
 	 * @Column(name="time_create", type="timestamp", nullable=true)

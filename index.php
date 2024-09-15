@@ -1070,7 +1070,7 @@ $constSelected = ' selected';
           <div class="application-setting"></div>
         </div>
         <div class="modal-footer">
-          <input class="btn btn-success button-save-application-config" type="button" name="button-save-application-config" value="Save Config">
+          <input class="btn btn-success button-save-application-config" type="button" name="button-save-application-config" value="Save">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

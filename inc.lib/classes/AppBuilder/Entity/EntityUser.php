@@ -21,7 +21,7 @@ class EntityUser extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=false, extra="auto_increment")
+	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User ID")
 	 * @var string
 	 */

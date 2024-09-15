@@ -50,6 +50,8 @@ jQuery(function(){
     let inputs = form.serializeArray();
 
     let dataToPost = {
+      applicationName: form.find('[name="application_name"]').val(),
+      description: form.find('[name="description"]').val(),
       database: {},
       sessions: {},
       entity_info: {},
@@ -1625,9 +1627,8 @@ function generateAllCode(dataToPost) {
 
 function updateCurrentApplivation(dataToPost) {
   $.ajax({
-    type: "post",
+    type: "POST",
     url: "lib.ajax/application-update.php",
-    dataType: "json",
     data: dataToPost,
     success: function (data) {
       $('select[name="source_table"]').empty();
@@ -1640,7 +1641,8 @@ function updateCurrentApplivation(dataToPost) {
       if (val != null && val != "") {
         $('select[name="source_table"]').val(val);
       }
-    },
+      reloadApplicationList();
+    }
   });
 }
 

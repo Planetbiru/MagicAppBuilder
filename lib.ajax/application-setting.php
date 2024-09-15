@@ -28,10 +28,39 @@ if($applicationId != null)
 
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
 $cfgSession = new SecretObject($appConfig->getSessions());
-
+$app = new SecretObject($appConfig->getApplication());
 ?>
 <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
+        <div id="accordion" class="accordion">
+        <div class="card">
+            <div class="card-header" id="heading0">
+            <h5 class="mb-0">
+                <button type="button" class="btn" data-toggle="collapse" data-target="#collapse0" aria-expanded="true" aria-controls="collapse0">
+                Application
+                </button>
+            </h5>
+            </div>
+
+            <div id="collapse0" class="collapse collapsed" aria-labelledby="heading0" data-parent="#accordion">
+            <div class="card-body">
+
+                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                    <td>Application Name</td>
+                    <td><input class="form-control" type="text" name="application_name" id="application_name" value="<?php echo $app->getName(); ?>"></td>
+                    </tr>
+                    <tr>
+                    <td>Description</td>
+                    <td><input class="form-control" type="text" name="description" id="description" value="<?php echo $app->getDescription(); ?>"></td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+
         <div id="accordion" class="accordion">
         <div class="card">
             <div class="card-header" id="heading1">

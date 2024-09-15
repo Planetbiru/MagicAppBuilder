@@ -7,9 +7,15 @@
     selected: true
 -
     id: sipro
-    name: SIPRO
+    name: 'SIPRO PLN'
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: false
-
+-
+    id: 066e6d90a4c63eadc929
+    name: 'Coba Aplikasi'
+    description: 'Deskripsi aplikasi'
+    documentRoot: 'D:\xampp\htdocs\066e6d90a4c63eadc929'
+    author: 'Your Name'
+    selected: false

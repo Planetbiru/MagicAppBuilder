@@ -447,6 +447,10 @@ h3.entity-table-name {
   min-height: 40px;
 }
 
+.card-header {
+  padding: 0.5rem 1.25rem;
+}
+
 .entity-table-container {
   overflow-x: auto;
 }
