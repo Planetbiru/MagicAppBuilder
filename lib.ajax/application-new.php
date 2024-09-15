@@ -18,4 +18,5 @@ echo json_encode(array(
     'application_directory' => $appBaseDir,
     'application_namespace' => 'ApplicationName',
     'application_author' => 'Your Name',
+    'application_description' => 'Description',
 ));

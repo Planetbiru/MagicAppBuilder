@@ -271,7 +271,7 @@ jQuery(function(){
     e.preventDefault();
     let modal = $(this).closest(".modal");
     let name = modal.find('[name="application_name"]').val().trim();
-    let description = modal.find('[name="application_decription"]').val().trim();
+    let description = modal.find('[name="application_description"]').val().trim();
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
@@ -286,17 +286,19 @@ jQuery(function(){
       paths.push({name:name, path:path, active:active});
     });
     
-    
+    console.log('any')
     if (name != "" && id != "" && directory != "" && author != "") {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
         data: { id: id, name: name, description: description, directory: directory, namespace:namespace, author: author, paths:paths },
         success: function (data) {
-          window.location = "./#module";
+          reloadApplicationList();
         },
       });
     }
+    $(modal).modal('hide');
+    
   });
 
   $('#modal-update-path').on('show.bs.modal', function () {
@@ -560,6 +562,8 @@ jQuery(function(){
         $('[name="application_directory"]').val(data.application_directory);
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);
+        $('[name="application_description"]').val(data.application_description);
+        reloadApplicationList();
       }
     });
   });

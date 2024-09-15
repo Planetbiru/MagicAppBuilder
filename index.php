@@ -29,7 +29,7 @@ $constSelected = ' selected';
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
   <script>
@@ -166,8 +166,8 @@ $constSelected = ' selected';
           </div>
           
 
-          <div class="container application-container">
-            <div class="card-deck application-card">
+          <div class="container-fluid application-container">
+            <div class="row application-card">
             
             </div>
           </div>
