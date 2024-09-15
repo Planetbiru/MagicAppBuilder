@@ -2,6 +2,7 @@ let initielized = false;
 let currentEntity = "";
 let currentModule = "";
 let currentEntity2Translated = "";
+let lastErrorLine = -1;
 
 String.prototype.replaceAll = function (search, replacement) {
   let target = this;
@@ -9,10 +10,12 @@ String.prototype.replaceAll = function (search, replacement) {
 };
 
 jQuery(function(){
+
   $(document).on('change', '.multiple-selection', function(e){
     let val = $(this).val();
     $('.multiple-selection').val(val);
   });
+
   $(document).on('click', '#vscode', function(){
     let dir = $('#current_application option:selected').attr('data-directory');
     let lnk = 'vscode://file/'+dir;
@@ -23,12 +26,14 @@ jQuery(function(){
     e.preventDefault();
     loadTable();
   });
+
   $(document).on("click", "#load_column", function (e) {
     e.preventDefault();
     let tableName = $('[name="source_table"]').val();
     let selector = $("table.main-table tbody");
     loadColumn(tableName, selector);
   });
+
   $(document).on("change", 'select[name="source_table"]', function (e) {
     let masterTableName = $(this).val();
     let moduleFileName = masterTableName + ".php";
@@ -44,11 +49,11 @@ jQuery(function(){
       masterPrimaryKeyName
     );
   });
+
   $(document).on("click", ".button-save-application-config", function (e) {
     e.preventDefault();
     let form = $(this).closest(".modal").find('form');
     let inputs = form.serializeArray();
-
     let dataToPost = {
       applicationName: form.find('[name="application_name"]').val(),
       description: form.find('[name="description"]').val(),
@@ -182,6 +187,7 @@ jQuery(function(){
     $('[name="' + key + '"]').val(value);
     $("#modal-create-reference-data").modal("hide");
   });
+
   $(document).on("click", "#save_to_cache", function (e) {
     let fieldName = $("#modal-create-reference-data").attr("data-field-name");
     let key = $("#modal-create-reference-data").attr("data-input-name");
@@ -288,7 +294,6 @@ jQuery(function(){
       paths.push({name:name, path:path, active:active});
     });
     
-    console.log('any')
     if (name != "" && id != "" && directory != "" && author != "") {
       $.ajax({
         method: "POST",
@@ -343,7 +348,6 @@ jQuery(function(){
       paths.push({name:name, path:path, active:active});
     });
     let select = $('#current_module_location');
-    
     if (paths.length > 0) {
       $.ajax({
         method: "POST",
@@ -367,7 +371,6 @@ jQuery(function(){
         },
       });
     }
-
     $('#modal-update-path').modal('hide');
   });
 
@@ -391,7 +394,6 @@ jQuery(function(){
       },
     });
   });
-  
 
   $(document).on("click", ".entity-container-file .entity-li a", function (e) {
     e.preventDefault();
@@ -425,6 +427,7 @@ jQuery(function(){
     e.preventDefault();
     saveModule();
   });
+
   $(document).on("click", "#button_save_entity_file", function (e) {
     e.preventDefault();
     saveEntity();
@@ -507,7 +510,6 @@ jQuery(function(){
     e.preventDefault();
     let params = [];
     params = addDiagramOption(params);
-    
     params.push('entity[]='+$(this).attr('data-entity-name'));
     params.push('rnd='+(new Date()).getTime());
     let img = $('<img />');
@@ -554,7 +556,6 @@ jQuery(function(){
     $('[name="application_directory"]').val('');
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
-  
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
@@ -580,7 +581,6 @@ jQuery(function(){
       $('.container-translate-entity .entity-list .entity-li').removeClass("selected-file");
       el.closest('li').addClass("selected-file");
     });
-    
   });
 
   $(document).on('click', '#button-save-entity-translation', function(){
@@ -594,7 +594,6 @@ jQuery(function(){
       dataType: "json",
       data: { userAction: 'set', entityName: entityName, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
-        
       },
     });
   });
@@ -609,7 +608,6 @@ jQuery(function(){
       dataType: "json",
       data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
-        
       },
     });
   });
@@ -620,6 +618,7 @@ jQuery(function(){
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
+
   $(document).on('change', '.filter-translate', function(){
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
@@ -670,8 +669,7 @@ jQuery(function(){
         {
           if(d > 0)
           {
-            let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
-            
+            let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone(); 
             $('#modal-update-language table.language-manager > tbody').append(clone);
           }
           let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child('+(parseInt(d)+1)+')');
@@ -679,8 +677,7 @@ jQuery(function(){
           clone2.find('input[type="text"].language-code').val(data[d].code);
           clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
         }
-        fixLanguageForm()
-
+        fixLanguageForm();
       },
     });
   });
@@ -723,7 +720,6 @@ jQuery(function(){
         },
       });
     }
-
     $('#modal-update-language').modal('hide');
   });
 
@@ -774,7 +770,6 @@ jQuery(function(){
       let entityName = $(this).attr('data-entity');
       let tableName = $(this).attr('data-table-name');
       let columnName = $(this).attr('data-column-name');
-
       let referenceNamespaceName = $(this).attr('data-reference-namespace');
       let referenceEntityName = $(this).attr('data-reference-entity');
       let referenceTableName = $(this).attr('data-reference-table-name');
@@ -784,7 +779,6 @@ jQuery(function(){
     }
     $('.entity-detail').empty();
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
-    
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
     $.ajax({
@@ -857,7 +851,6 @@ function reloadApplicationList()
         $('.application-card').empty().append(data);
       }
     });
-  
 }
 
 function reloadTranslate(translateFor)
@@ -1166,7 +1159,8 @@ function saveEntity() {
     showAlertUI("Alert", "No file open");
   }
 }
-let lastErrorLine = -1;
+
+
 function addHilightLineError(lineNumber) {
   if(lineNumber != -1)
   {
