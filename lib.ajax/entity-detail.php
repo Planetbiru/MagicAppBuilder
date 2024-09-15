@@ -10,8 +10,6 @@ require_once dirname(__DIR__) . "/inc.app/database.php";
 $inputGet = new InputGet();
 try
 {
-    
-    
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);

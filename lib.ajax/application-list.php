@@ -11,7 +11,7 @@ foreach ($arr as $app) {
             $selected = '';
         }
 ?>
-<div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
+<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
     <div class="card application-item" 
     data-selected="<?php echo $selected;?>"
     data-application-id="<?php echo $app['id']; ?>" 

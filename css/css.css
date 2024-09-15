@@ -433,11 +433,11 @@ h3.entity-table-name {
   font-weight: bold;
 }
 
-.application-container .col {
-  margin-bottom: 20px;
+.application-card > div {
+  margin-bottom: 1rem;
 }
 
-.application-container .col .card-text {
+.application-container .card .card-text {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
