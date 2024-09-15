@@ -26,8 +26,7 @@ try
     $fields = array();
 	$cols = array();
 
-	foreach ($rows as $i=>$data) { 
-		
+	foreach ($rows as $i=>$data) { 	
 		if(!isset($tables[$data['table_name']]) || $data['column_key'] == 'PRI')
 		{
 			if(!isset($tables[$data['table_name']]))
