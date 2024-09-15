@@ -97,7 +97,7 @@ $(document).ready(function(e) {
 	});
 	$(document).on('click', '#load_table', function(e){
 		var selector = ".main-table tbody";
-		var url = "table-list.php";
+		var url = "database-table-list.php";
 		var host = $('.config-table [name="host"]').val();
 		var port = $('.config-table [name="port"]').val();
 		var username = $('.config-table [name="username"]').val();

@@ -1642,7 +1642,7 @@ function updateCurrentApplivation(dataToPost) {
 function loadTable() {
   $.ajax({
     type: "post",
-    url: "lib.ajax/table-list.php",
+    url: "lib.ajax/database-table-list.php",
     dataType: "json",
     success: function (data) {
       $('select[name="source_table"]').empty();
@@ -1679,7 +1679,7 @@ function loadTable() {
 function loadColumn(tableName, selector) {
   $.ajax({
     type: "post",
-    url: "lib.ajax/column-list.php",
+    url: "lib.ajax/database-column-list.php",
     data: { table_name: tableName },
     dataType: "json",
     success: function (answer) {
