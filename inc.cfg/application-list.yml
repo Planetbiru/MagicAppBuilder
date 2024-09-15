@@ -3,10 +3,12 @@
     name: 'Sipro Baru'
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
+    description: Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)
     selected: true
 -
     id: sipro
     name: SIPRO
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
+    description: Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)
     selected: false

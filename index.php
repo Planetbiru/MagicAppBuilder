@@ -160,6 +160,20 @@ $constSelected = ' selected';
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
 
+        <div style="padding-bottom: 20px;">
+          <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
+          <button type="button" class="btn btn-primary">Manage</button>
+          <button type="button" class="btn btn-primary">Refresh</button>
+        </div>
+        
+
+        <div class="container">
+          <div class="card-deck">
+          <?php
+          require_once __DIR__ . "/lib.ajax/application-list.php";
+          ?>
+          </div>
+        </div>
           <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
 
             <div class="collapsible-card">
@@ -201,7 +215,7 @@ $constSelected = ' selected';
                               Open in VS Code
                             </button>
 
-                            <button type="button" class="btn btn-primary" data-toggle="modal" id="create-new-application" data-target="#modal-create-application">
+                            <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">
                               Create New
                             </button>
                           </td>
@@ -1001,6 +1015,10 @@ $constSelected = ' selected';
                 <tr>
                   <td>Author</td>
                   <td><input class="form-control" type="text" name="application_author"></td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td><input class="form-control" type="text" name="application_description"></td>
                 </tr>
                 <tr>
                   <td>Path</td>

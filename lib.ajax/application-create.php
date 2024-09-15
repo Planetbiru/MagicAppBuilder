@@ -17,6 +17,7 @@ $newAppId = trim($inputPost->getId());
 $application = array(
     'id' => $newAppId,
     'name' => trim($inputPost->getName()),
+    'description' => trim($inputPost->getDescription()),
     'documentRoot' => trim($inputPost->getDirectory()),
     'author' => trim($inputPost->getAuthor()),
     'selected' => false

@@ -271,6 +271,7 @@ jQuery(function(){
     e.preventDefault();
     let modal = $(this).closest(".modal");
     let name = modal.find('[name="application_name"]').val().trim();
+    let description = modal.find('[name="application_decription"]').val().trim();
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
@@ -290,7 +291,7 @@ jQuery(function(){
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
-        data: { name: name, id: id, directory: directory, namespace:namespace, author: author, paths:paths },
+        data: { id: id, name: name, description: description, directory: directory, namespace:namespace, author: author, paths:paths },
         success: function (data) {
           window.location = "./#module";
         },
@@ -543,7 +544,7 @@ jQuery(function(){
     fixPathForm();
   });
   
-  $(document).on('click', '#create-new-application', function(){
+  $(document).on('click', '.create-new-application', function(){
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
     $('[name="application_directory"]').val('');
