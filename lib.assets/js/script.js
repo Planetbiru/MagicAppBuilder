@@ -1342,7 +1342,7 @@ function saveReference(fieldName, key, value) {
 function loadReference(fieldName, key, clbk) {
   $.ajax({
     type: "GET",
-    url: "lib.ajax/load-reference.php",
+    url: "lib.ajax/reference-load.php",
     data: { fieldName: fieldName, key: key },
     dataType: "json",
     success: function (data) {
