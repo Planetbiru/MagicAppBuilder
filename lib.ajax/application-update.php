@@ -37,7 +37,6 @@ try
 
 	AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
 
-
 	$workspaceDirectory = $builderConfig->getWorkspaceDirectory();
     if(PicoStringUtil::startsWith($workspaceDirectory, "./"))
     {

@@ -8,7 +8,6 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 try
 {
 	$databaseName = $databaseConfig->getDatabaseName();
-     
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
     $queryBuilder->newQuery()

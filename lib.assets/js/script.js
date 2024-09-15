@@ -1326,7 +1326,7 @@ function updateModuleFile() {
 function saveReference(fieldName, key, value) {
   $.ajax({
     type: "POST",
-    url: "lib.ajax/save-reference.php",
+    url: "lib.ajax/reference-save.php",
     data: { fieldName: fieldName, key: key, value: value },
     dataType: "json",
     success: function (data) { },
