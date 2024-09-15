@@ -14,6 +14,13 @@ if (!file_exists($dir)) {
 }
 $newAppId = trim($inputPost->getId());
 
+$dir2 = $workspaceDirectory."/applications/$newAppId";
+
+if (!file_exists($dir2)) {
+    mkdir($dir2, 0755, true);
+}
+$path2 = $dir2 . "/default.yml";
+
 $application = array(
     'id' => $newAppId,
     'name' => trim($inputPost->getName()),
@@ -46,6 +53,7 @@ file_put_contents($path, (new MagicObject($existingApplication))->dumpYaml());
 $newApp = new MagicObject();
 
 $application = new MagicObject();
+$application->loadYamlFile($path2);
 $application->setId($newAppId);
 $application->setName(trim($inputPost->getName()));
 $application->setBaseApplicationNamespace(trim($inputPost->getNamespace()));
@@ -116,13 +124,6 @@ $newApp->setCurrentAction(array(
     'ip_function' => '$currentAction->getIp()'
 ));
 $newApp->setGlobalVariableDatabase('database');
-
-$dir2 = $workspaceDirectory."/applications/$newAppId";
-
-if (!file_exists($dir2)) {
-    mkdir($dir2, 0755, true);
-}
-$path2 = $dir2 . "/default.yml";
 
 file_put_contents($path2, (new MagicObject($newApp))->dumpYaml());
 

@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: true
+    selected: false
 -
     id: sipro
     name: 'SIPRO PLN'
@@ -18,4 +18,4 @@
     description: 'Deskripsi aplikasi'
     documentRoot: 'D:\xampp\htdocs\066e6d90a4c63eadc929'
     author: 'Your Name'
-    selected: false
+    selected: true

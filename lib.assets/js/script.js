@@ -115,7 +115,6 @@ jQuery(function(){
       .find(".modal-title")
       .text("Create Data Reference");
     $("#modal-create-reference-data").attr("data-reference-type", "data");
-    let parentTd = $(this).closest("td");
     let parentTr = $(this).closest("tr");
     let fieldName = parentTr.attr("data-field-name");
     let key = $(this).siblings("input").attr("name");
