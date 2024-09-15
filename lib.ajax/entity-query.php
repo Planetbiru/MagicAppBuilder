@@ -10,9 +10,12 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
 $inputGet = new InputGet();
+
+header("Content-type: text/plain");
+
 try
 {
-    $cacheDir = dirname(__DIR__)."/.cache/";
+    
     
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
@@ -89,8 +92,7 @@ try
                     $return_var = ErrorChecker::errorCheck($cacheDir, $path);
                     if($return_var == 0)
                     {         
-                        include_once $path;
-                        
+                        include_once $path;                     
                         $className = "\\".$baseEntity."\\".$entityName;
                         $entity = new $className(null, $database);
                         $dumper = new PicoDatabaseDump();

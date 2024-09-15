@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 $inputGet = new InputGet();
 try
 {
-    $cacheDir = dirname(__DIR__)."/.cache/";
+    
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);

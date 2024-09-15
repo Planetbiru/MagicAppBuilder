@@ -25,7 +25,7 @@ try
     $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
 
-    $cacheDir = dirname(__DIR__)."/.cache/";
+    
     
     foreach($list as $idx=>$file)
     {

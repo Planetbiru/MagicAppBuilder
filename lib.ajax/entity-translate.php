@@ -14,7 +14,7 @@ if($inputPost->getUserAction() == 'get')
 {
     try
     {
-        $cacheDir = dirname(__DIR__)."/.cache/";
+        
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $filter = $inputPost->getFilter();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
@@ -98,7 +98,7 @@ if($inputPost->getUserAction() == 'set')
 
     try
     {
-        $cacheDir = dirname(__DIR__)."/.cache/";
+        
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);

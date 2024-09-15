@@ -10,7 +10,7 @@ require_once dirname(__DIR__) . "/inc.app/database.php";
 $inputGet = new InputGet();
 try
 {
-    $cacheDir = dirname(__DIR__)."/.cache/";
+    
     
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
