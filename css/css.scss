@@ -476,6 +476,7 @@ li.file-syntax-error {
 		&:last-child {
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
+			border-bottom: 1px solid #dddddd;
 		}
 	}
 }
@@ -518,6 +519,16 @@ li.file-syntax-error {
 
 .reference-selector {
 	padding: 2px 0px 10px 0px;
+}
+
+.application-container {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.application-item[data-selected="true"] {
+	border-color: rgba(0, 0, 0, 0.15);
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .table td, .table th {

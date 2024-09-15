@@ -179,8 +179,7 @@ Here is an explanation of the reserved columns above.
 | Number of entity                        | Unlimited  | Unlimited  |
 | Number of module                        | Unlimited  | Unlimited  |
 | Number of theme                         | 2          | 3          |
-| Number of user                          | 5          | 100        |
+| Number of user                          | 1          | 100        |
 | User management                         | No         | Yes        |
 | Collaboration                           | No         | Yes        |
 | Push notification                       | No         | Yes        |
-

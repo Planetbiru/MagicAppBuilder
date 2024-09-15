@@ -21,7 +21,7 @@ $constSelected = ' selected';
   <link rel="shortcut icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.css">
-  <link rel="stylesheet" type="text/css" href="css/css.min.css">
+  <link rel="stylesheet" type="text/css" href="css/css.css">
   <link rel="stylesheet" type="text/css" href="css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -160,224 +160,18 @@ $constSelected = ' selected';
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
 
-        <div style="padding-bottom: 20px;">
-          <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
-          <button type="button" class="btn btn-primary">Refresh</button>
-        </div>
-        
-
-        <div class="container">
-          <div class="card-deck">
-          <?php
-          require_once __DIR__ . "/lib.ajax/application-list.php";
-          ?>
+          <div style="padding-bottom: 20px;">
+            <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
+            <button type="button" class="btn btn-primary refresh-application-list">Refresh</button>
           </div>
-        </div>
-          <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+          
 
-            <div class="collapsible-card">
-              <div class="card">
-                <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
-                  <div class="card-body">
-                    <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                          <td>Current Application</td>
-                          <td>
-                            <select class="form-control" name="current_application" id="current_application">
-                              <option value="">- Select One -</option>
-                              <?php
-                              $arr = $appList->valueArray();
-                              foreach ($arr as $app) {
-                                if ($app['id'] != null) {
-                                  if ($currentApplication != null && $currentApplication->getId() == $app['id']) {
-                                    $selected = $constSelected;
-                                  } else {
-                                    $selected = '';
-                                  }
-                              ?>
-                                  <option value="<?php echo $app['id']; ?>" data-directory="<?php echo str_replace("\\", "/", $app['documentRoot']);?>" <?php echo $selected; ?>><?php echo $app['name']; ?></option>
-                              <?php
-                                }
-                              }
-                              ?>
-                            </select>
-
-                          </td>
-                        <tr>
-                          <td></td>
-                          <td>
-                            <button type="button" class="btn btn-success" id="switch_application">
-                              Apply
-                            </button>
-
-                            <button type="button" class="btn btn-success" id="vscode">
-                              Open in VS Code
-                            </button>
-
-                            <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">
-                              Create New
-                            </button>
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                  </div>
-                </div>
-              </div>
-
-              <div id="accordion" class="accordion">
-                <div class="card">
-                  <div class="card-header" id="heading1">
-                    <h5 class="mb-0">
-                      <button type="button" class="btn" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
-                        Database
-                      </button>
-                    </h5>
-                  </div>
-
-                  <div id="collapse1" class="collapse collapsed" aria-labelledby="heading1" data-parent="#accordion">
-                    <div class="card-body">
-
-                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tbody>
-                          <tr>
-                            <td>Driver</td>
-                            <td>
-                              <select class="form-control" name="database_driver" id="database_driver">
-                                <option value="mysql" <?php echo $cfgDatabase->getDriver() == 'mysql' ? $constSelected : ''; ?>>MySQL</option>
-                                <option value="mariadb" <?php echo $cfgDatabase->getDriver() == 'mariadb' ? $constSelected : ''; ?>>MariaDB</option>
-                                <option value="postgresql" <?php echo $cfgDatabase->getDriver() == 'postgresql' ? $constSelected : ''; ?>>PostgreSQL</option>
-                              </select>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Host</td>
-                            <td><input class="form-control" type="text" name="database_host" id="database_host" value="<?php echo $cfgDatabase->getHost(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Port</td>
-                            <td><input class="form-control" type="text" name="database_port" id="database_port" value="<?php echo $cfgDatabase->getPort(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Username</td>
-                            <td><input class="form-control" type="text" name="database_username" id="database_username" value="<?php echo $cfgDatabase->getUsername(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Password</td>
-                            <td><input class="form-control" name="database_password" type="password" id="database_password" value="<?php echo $cfgDatabase->getPassword(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Name</td>
-                            <td><input class="form-control" type="text" name="database_database_name" id="database_database_name" value="<?php echo $cfgDatabase->getDatabaseName(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Schema</td>
-                            <td><input class="form-control" type="text" name="database_database_schema" id="database_database_schema" value="<?php echo $cfgDatabase->getDatabaseSchema(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Time Zone</td>
-                            <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-header" id="heading2">
-                    <h5 class="mb-0">
-                      <button type="button" class="btn" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
-                        Session
-                      </button>
-                    </h5>
-                  </div>
-
-                  <div id="collapse2" class="collapse collapsed" aria-labelledby="heading2" data-parent="#accordion">
-                    <div class="card-body">
-
-                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tbody>
-                          <tr>
-                            <td>Session Name</td>
-                            <td><input class="form-control" type="text" name="sessions_name" id="sessions_name" value="<?php echo $cfgSession->getName(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Session Life Time</td>
-                            <td><input class="form-control" type="text" name="sessions_lifetime" id="sessions_lifetime" value="<?php echo $cfgSession->getMaxLifeTime(); ?>"></td>
-                          </tr>
-                          <tr>
-                            <td>Session Save Handler</td>
-                            <td>
-                              <select class="form-control" name="sessions_save_handler" id="sessions_save_handler">
-                                <option value="files" <?php echo $cfgSession->getSaveHandler() == 'files' ? $constSelected : ''; ?>>files</option>
-                                <option value="redis" <?php echo $cfgSession->getSaveHandler() == 'redis' ? $constSelected : ''; ?>>redis</option>
-                              </select>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Session Save Path</td>
-                            <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value="<?php echo $cfgSession->getSavePath(); ?>"></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-header" id="heading3">
-                    <h5 class="mb-0">
-                      <button type="button" class="btn" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
-                        Reserved Columns
-                      </button>
-                    </h5>
-                  </div>
-
-                  <div id="collapse3" class="collapse collapsed" aria-labelledby="heading3" data-parent="#accordion">
-                    <div class="card-body">
-                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tbody>
-                          <?php
-                          $entityConstant = new SecretObject($appConfig->getEntityInfo());
-                          if (empty($entityConstant->valueArray())) {
-                            $entityConstant = new SecretObject($builderConfig->getEntityInfo());
-                          }
-                          $arr = $entityConstant->valueArray(true);
-
-                          if (!empty($arr)) {
-                            foreach ($arr as $key => $value) {
-                          ?>
-                              <tr>
-                                <td><?php echo $key ?></td>
-                                <td><input class="form-control" type="text" name="entity_info_<?php echo $key ?>" value="<?php echo $value; ?>"></td>
-                              </tr>
-                          <?php
-                            }
-                          }
-                          ?>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card">
-
-                <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
-                  <div class="card-body">
-                    <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                      <tbody>
-                        <tr>
-                          <td>&nbsp;</td>
-                          <td><input class="btn btn-success" type="button" name="save_application_config" id="save_application_config" value="Save Config"></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+          <div class="container application-container">
+            <div class="card-deck application-card">
+            
             </div>
-          </form>
+          </div>
+        
         </div>
 
         <?php
@@ -1257,6 +1051,26 @@ $constSelected = ' selected';
           <div class="entity-detail"></div>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Application Setting</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="application-setting"></div>
+        </div>
+        <div class="modal-footer">
+          <input class="btn btn-success button-save-application-config" type="button" name="button-save-application-config" value="Save Config">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

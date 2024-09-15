@@ -44,14 +44,12 @@ jQuery(function(){
       masterPrimaryKeyName
     );
   });
-  $(document).on("click", "#save_application_config", function (e) {
+  $(document).on("click", ".button-save-application-config", function (e) {
     e.preventDefault();
-    let frm = $(this).closest("form");
-    let inputs = $(this).closest("form").serializeArray();
-    let current_application = frm.find('[name="current_application"]').val();
+    let form = $(this).closest(".modal").find('form');
+    let inputs = form.serializeArray();
 
     let dataToPost = {
-      current_application: current_application,
       database: {},
       sessions: {},
       entity_info: {},
@@ -69,7 +67,9 @@ jQuery(function(){
         dataToPost.entity_info[name.substring(12)] = inputs[i].value;
       }
     }
+    dataToPost.application_id = form.find('[name="application_id"]').val();
     updateCurrentApplivation(dataToPost);
+    $('#modal-application-setting').modal('hide');
   });
 
   $(document).on("click", "#generate_script", function (e) {
@@ -792,13 +792,67 @@ jQuery(function(){
       }
     });
   });
+
+  $(document).on('click', '.button-application-setting', function(e){
+    e.preventDefault();
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-application-setting').modal('show');
+    $('#modal-application-setting .application-setting').empty();
+    $.ajax({
+      type:'GET',
+      url:'lib.ajax/application-setting.php',
+      data: {applicationId:applicationId},
+      dataType:'html',
+      success:function(data){
+        $('#modal-application-setting .application-setting').empty().append(data);
+        reloadApplicationList();
+      }
+    });
+  });
+
+  $(document).on('click', '.button-application-default', function(e){
+    e.preventDefault();
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $.ajax({
+      type:'POST',
+      url:'lib.ajax/application-default.php',
+      data: {applicationId:applicationId},
+      success:function(data){
+        reloadApplicationList();
+      }
+    });
+  });
+
+  $(document).on('click', '.button-application-open', function(e){
+    e.preventDefault();
+    let path = $(this).closest('.application-item').attr('data-path');
+    window.location = 'vscode://file/'+path;
+  });
+
+  $(document).on('click', '.refresh-application-list', function(e){
+    e.preventDefault();
+    reloadApplicationList();
+  });
   
+  reloadApplicationList();
   loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
 });
+
+function reloadApplicationList()
+{
+  $.ajax({
+      type:'GET',
+      url:'lib.ajax/application-list.php',
+      success:function(data){
+        $('.application-card').empty().append(data);
+      }
+    });
+  
+}
 
 function reloadTranslate(translateFor)
 {
@@ -1568,7 +1622,7 @@ function generateAllCode(dataToPost) {
 function updateCurrentApplivation(dataToPost) {
   $.ajax({
     type: "post",
-    url: "lib.ajax/update-current-application.php",
+    url: "lib.ajax/application-update.php",
     dataType: "json",
     data: dataToPost,
     success: function (data) {
