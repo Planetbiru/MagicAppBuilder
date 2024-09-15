@@ -162,7 +162,6 @@ $constSelected = ' selected';
 
         <div style="padding-bottom: 20px;">
           <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
-          <button type="button" class="btn btn-primary">Manage</button>
           <button type="button" class="btn btn-primary">Refresh</button>
         </div>
         
