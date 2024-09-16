@@ -1195,37 +1195,37 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         if($this->appFeatures->isExportToExcel())
         {
             $exporter = '
-    $exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
-    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
-    $sheetName = "Sheet 1";
+'."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
+'."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+'."\t".'$sheetName = "Sheet 1";
 ';
         }
         else
         {
             $exporter = '
-    $exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
-    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
-    $sheetName = "Sheet 1";
+'."\t".'$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+'."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+'."\t".'$sheetName = "Sheet 1";
 ';
         }
 
 
 return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 {'.$exporter.'
-	$headerFormat = new XLSXDataFormat($dataLoader, 3);
-	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
-	$exporter->write($pageData, $fileName, $sheetName, array(
-		$appLanguage->getNumero() => $headerFormat->asNumber(),
-		'.implode(",\n\t\t", $headers).'
-	), 
-	function($index, $row, $appLanguage){
-        '.implode(self::N_TAB2, $globals).'
-		return array(
-			sprintf("%d", $index + 1),
-			'.implode(",\n\t\t\t", $data).'
-		);
-	});
-	exit();
+'."\t".'$headerFormat = new XLSXDataFormat($dataLoader, 3);
+'."\t".'$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+'."\t".'$exporter->write($pageData, $fileName, $sheetName, array(
+'."\t".''."\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
+'."\t".''."\t".''.implode(",\n\t\t", $headers).'
+'."\t".'), 
+'."\t".'function($index, $row, $appLanguage){
+'."\t".''."\t".''.implode(self::N_TAB2, $globals).'
+'."\t".''."\t".'return array(
+'."\t".''."\t".''."\t".'sprintf("%d", $index + 1),
+'."\t".''."\t".''."\t".''.implode(",\n\t\t\t", $data).'
+'."\t".''."\t".');
+'."\t".'});
+'."\t".'exit();
 }';
     }
 

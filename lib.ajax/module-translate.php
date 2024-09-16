@@ -2,6 +2,7 @@
 
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
+use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 
@@ -133,14 +134,21 @@ if($inputPost->getUserAction() == 'set')
     {
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
-
-
+    
     $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
 
     $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
+    if(!is_array($storedTranslatedLabel))
+    {
+        $storedTranslatedLabel = array();
+    }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
-
+    $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
+    if(!file_exists(dirname($pathTrans)))
+    {
+        mkdir(dirname($pathTrans), 0755, true);
+    }
     PicoIniUtil::writeIniFile($storedTranslatedLabel, $pathTrans);
 }
