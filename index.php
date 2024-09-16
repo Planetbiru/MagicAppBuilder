@@ -1,6 +1,5 @@
 <?php
 
-use MagicObject\Database\PicoDatabaseType;
 use MagicObject\SecretObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
@@ -67,92 +66,6 @@ $constSelected = ' selected';
           <div class="main-menu">
             <button type="button" class="btn btn-primary change-workspace" data-toggle="modal" data-target="#modal-workspace">Workspace</button>
           </div>
-          <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
-            <div class="card">
-              <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
-                <div class="card-body">
-                  <h4>Database</h4>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>Driver</td>
-                        <td>
-                          <select class="form-control" name="database_driver" id="database_driver">
-                            <option value="mysql" <?php echo $cfgDatabase->getDriver() == PicoDatabaseType::DATABASE_TYPE_MYSQL ? $constSelected : ''; ?>>MySQL</option>
-                            <option value="mariadb" <?php echo $cfgDatabase->getDriver() == PicoDatabaseType::DATABASE_TYPE_MARIADB ? $constSelected : ''; ?>>MariaDB</option>
-                            <option value="postgresql" <?php echo $cfgDatabase->getDriver() == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL ? $constSelected : ''; ?>>PostgreSQL</option>
-                          </select>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Host</td>
-                        <td><input class="form-control" type="text" name="database_host" id="database_host" value="<?php echo $cfgDatabase->getHost(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Port</td>
-                        <td><input class="form-control" type="text" name="database_port" id="database_port" value="<?php echo $cfgDatabase->getPort(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Username</td>
-                        <td><input class="form-control" type="text" name="database_username" id="database_username" value="<?php echo $cfgDatabase->getUsername(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Password</td>
-                        <td><input class="form-control" name="database_password" type="password" id="database_password" value="<?php echo $cfgDatabase->getPassword(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Name</td>
-                        <td><input class="form-control" type="text" name="database_database_name" id="database_database_name" value="<?php echo $cfgDatabase->getName(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Schema</td>
-                        <td><input class="form-control" type="text" name="database_database_schema" id="database_database_schema" value="<?php echo $cfgDatabase->getSchema(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Time Zone</td>
-                        <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <h4>Session</h4>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>Session Name</td>
-                        <td><input class="form-control" type="text" name="sessions_name" id="sessions_name" value="<?php echo $cfgSession->getName(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Session Life Time</td>
-                        <td><input class="form-control" type="text" name="sessions_lifetime" id="sessions_lifetime" value="<?php echo $cfgSession->getMaxLifeTime(); ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>Session Save Handler</td>
-                        <td>
-                          <select class="form-control" name="sessions_save_handler" id="sessions_save_handler">
-                            <option value="files" <?php echo $cfgSession->getSaveHandler() == 'files' ? $constSelected : ''; ?>>files</option>
-                            <option value="redis" <?php echo $cfgSession->getSaveHandler() == 'redis' ? $constSelected : ''; ?>>redis</option>
-                          </select>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Session Save Path</td>
-                        <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value="<?php echo $cfgSession->getSavePath(); ?>"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td><input class="btn btn-success" type="button" name="save_config" id="save_config" value="Save Config"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </form>
         </div>
 
         <?php
@@ -241,16 +154,7 @@ $constSelected = ' selected';
                         <td>Target</td>
                         <td>
                           <select class="form-control" name="current_module_location" id="current_module_location">
-                          <?php
-                          $moduleLocation = $appConfig->getApplication() != null ? $appConfig->getApplication()->getBaseModuleDirectory() : array();
-                          if (!empty($moduleLocation)) {
-                            foreach ($moduleLocation as $key => $value) {
-                          ?>
-                              <option value="<?php echo $value->getPath(); ?>"<?php echo $value->getActive() ? " selected":"";?>><?php echo $value->getName(); ?> - <?php echo $value->getPath(); ?></option>
-                          <?php
-                            }
-                          }
-                          ?>
+                          
                         </select>  
                         </td>
                       </tr>

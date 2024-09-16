@@ -832,6 +832,20 @@ jQuery(function(){
     e.preventDefault();
     reloadApplicationList();
   });
+
+  $(document).on('click', '.button-save-workspace', function(e){
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let workspace = modal.find('[name="workspace"]').val();
+    $.ajax({
+      type:'POST',
+      url:'lib.ajax/workspace-update.php',
+      data: {workspace:workspace},
+      success:function(data){
+        modal.modal('hide');
+      }
+    });
+  });
   
   reloadApplicationList();
   loadTable();
@@ -849,7 +863,15 @@ function reloadApplicationList()
       success:function(data){
         $('.application-card').empty().append(data);
       }
-    });
+  });
+
+  $.ajax({
+    type:'GET',
+    url:'lib.ajax/path-list.php',
+    success:function(data){
+      $('[name="current_module_location"]').empty().append(data);
+    }
+  });
 }
 
 function reloadTranslate(translateFor)

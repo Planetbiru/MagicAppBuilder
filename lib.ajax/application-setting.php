@@ -1,4 +1,3 @@
-
 <?php
 
 use MagicObject\Request\InputGet;
