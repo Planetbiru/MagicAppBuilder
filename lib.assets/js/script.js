@@ -160,9 +160,7 @@ jQuery(function(){
     $("#modal-create-reference-data").find(".modal-body").empty();
     $("#modal-create-reference-data").find(".modal-body").append(getReferenceResource());
 
-    let value = $('[name="' + key + '"]')
-      .val()
-      .trim();
+    let value = $('[name="' + key + '"]').val().trim();
     if (value.length < 60) {
       loadReference(fieldName, key, function (obj) {
         if (obj != null) {
