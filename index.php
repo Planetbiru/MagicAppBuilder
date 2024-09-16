@@ -64,7 +64,9 @@ $constSelected = ' selected';
         $cfgSession = new SecretObject($builderConfig->getSessions());
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
-
+          <div class="main-menu">
+            <button type="button" class="btn btn-primary change-workspace" data-toggle="modal" data-target="#modal-workspace">Workspace</button>
+          </div>
           <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
             <div class="card">
               <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
@@ -160,7 +162,7 @@ $constSelected = ' selected';
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
 
-          <div style="padding-bottom: 20px;">
+          <div class="main-menu">
             <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
             <button type="button" class="btn btn-primary refresh-application-list">Refresh</button>
           </div>
@@ -1071,6 +1073,35 @@ $constSelected = ' selected';
         </div>
         <div class="modal-footer">
           <input class="btn btn-success button-save-application-config" type="button" name="button-save-application-config" value="Save">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-workspace" tabindex="-1" aria-labelledby="application_workspace" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Workspace</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="">
+            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+                <tr>
+                  <td>Workspace</td>
+                  <td><input class="form-control" type="text" name="workspace" value="<?php echo $builderConfig->getWorkspaceDirectory();;?>" autocomplete="off"></td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <input class="btn btn-success button-save-workspace" type="button" name="button-save-workspace" value="Save">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

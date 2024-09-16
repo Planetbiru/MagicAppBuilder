@@ -1,12 +1,13 @@
 <?php
 
-use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
-$inputGet = new InputGet();
+$inputPost = new InputPost();
+header("Content-type: text/plain");
 
 try
 {
@@ -16,9 +17,9 @@ try
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     $lines = array();
 
-    if($inputGet->getEntity() != null && $inputGet->countableEntity())
+    if($inputPost->getEntity() != null && $inputPost->countableEntity())
     {
-        $inputEntity = $inputGet->getEntity();
+        $inputEntity = $inputPost->getEntity();
         foreach($inputEntity as $entityName)
         {
             $entityName = trim($entityName);

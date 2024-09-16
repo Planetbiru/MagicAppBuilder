@@ -1196,10 +1196,10 @@ function getEntitySelection() {
 
 function getEntityQuery(entity, merged) {
   $.ajax({
-    type: "GET",
+    type: "POST",
     url: "lib.ajax/entity-query.php",
     data: { entity: entity, merged: merged ? 1 : 0 },
-    dataType: "html",
+    dataType: "text",
     success: function (data) {
       cmEditorSQL.getDoc().setValue(data);
       setTimeout(function () {
@@ -1212,10 +1212,10 @@ function getEntityQuery(entity, merged) {
 
 function getEntityFile(entity, clbk) {
   $.ajax({
-    type: "GET",
+    type: "POST",
     url: "lib.ajax/entity-file.php",
     data: { entity: entity },
-    dataType: "html",
+    dataType: "text",
     success: function (data) {
       cmEditorFile.getDoc().setValue(data);
       setTimeout(function () {

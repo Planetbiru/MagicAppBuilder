@@ -32,7 +32,7 @@ try
                 $columns = $tableInfo->getColumns();
                 ?>
                 <h3 class="entity-table-name">Entity Name: <?php echo $entityName;?></h3>
-                <h3 class="entity-table-name">Table Table: <?php echo $tableInfo->getTableName();?></h3>
+                <h3 class="entity-table-name">Table Name: <?php echo $tableInfo->getTableName();?></h3>
                 <div class="entity-table-container">
                 <table width="100%" class="table entity-table">
                     <thead>

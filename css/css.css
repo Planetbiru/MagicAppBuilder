@@ -433,6 +433,10 @@ h3.entity-table-name {
   font-weight: bold;
 }
 
+.main-menu {
+  margin-bottom: 20px;
+}
+
 .application-card > div {
   margin-bottom: 1rem;
 }

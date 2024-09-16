@@ -3,31 +3,29 @@
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
 use MagicObject\Generator\PicoDatabaseDump;
-use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
-$inputGet = new InputGet();
+$inputPost = new InputPost();
 
 header("Content-type: text/plain");
 
 try
 {
-    
-    
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = array();
-    $merged = $inputGet->getMerged();
+    $merged = $inputPost->getMerged();
     if($merged)
     {
-        if($inputGet->getEntity() != null && $inputGet->countableEntity())
+        if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
-            $inputEntity = $inputGet->getEntity();
+            $inputEntity = $inputPost->getEntity();
             $entities = array();
             $entityNames = array();
             foreach($inputEntity as $idx=>$entityName)
@@ -79,10 +77,10 @@ try
     }
     else
     {
-        if($inputGet->getEntity() != null && $inputGet->countableEntity())
+        if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
             $allQueries[] = "-- Important to understand!\r\n-- Queries must be run one by one manually because there may be duplicate columns from different entities for the same table.";
-            $inputEntity = $inputGet->getEntity();
+            $inputEntity = $inputPost->getEntity();
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);
