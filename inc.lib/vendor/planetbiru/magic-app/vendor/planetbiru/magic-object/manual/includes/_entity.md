@@ -14,8 +14,6 @@ Initial data
 
 Database connection
 
-When constructed, the `$album` object uses the `$database1` database connection. The application retrieves data with the primary key `123456` from `$database1` and then stores it in `$database2` without having to change many parameters and lots of code. Please note that to save `$album` data, you must use the `save` method instead of `insert` or `update` because there is a possibility that data with the same primary key already exists in `$database2`.
-
 ```php
 <?php
 

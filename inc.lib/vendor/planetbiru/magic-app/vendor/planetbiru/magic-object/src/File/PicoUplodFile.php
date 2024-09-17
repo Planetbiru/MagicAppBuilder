@@ -31,8 +31,8 @@ class PicoUplodFile
     /**
      * Magic method
      *
-     * @param string $method
-     * @param array $arguments
+     * @param string $method Method
+     * @param array $arguments Arguments
      * @return mixed
      */
     public function __call($method, $arguments) //NOSONAR
@@ -48,7 +48,7 @@ class PicoUplodFile
     /**
      * Get uploaded file
      *
-     * @param string $name
+     * @param string $name Parameter name
      * @return PicoUploadFileContainer|mixed
      */
     public function get($name)
@@ -59,7 +59,7 @@ class PicoUplodFile
     /**
      * Get uploaded file by key
      *
-     * @param string $name
+     * @param string $name Parameter name
      * @return PicoUploadFileContainer|mixed
      */
     public function __get($name)
@@ -77,7 +77,7 @@ class PicoUplodFile
     /**
      * Check if file is exists
      *
-     * @param string $name
+     * @param string $name Parameter name
      * @return boolean
      */
     public function __isset($name)
@@ -95,7 +95,7 @@ class PicoUplodFile
     {
         $keys = array_keys($_FILES);
         foreach ($keys as $key) {
-            $camel = PicoStringUtil::camelize($key);
+            $camel = PicoStringUtil::camelize(str_replace("-", "_", $key));
             $this->map[$camel] = $key;
             $this->values[$key] = new PicoUploadFileContainer($_FILES[$key]);
         }

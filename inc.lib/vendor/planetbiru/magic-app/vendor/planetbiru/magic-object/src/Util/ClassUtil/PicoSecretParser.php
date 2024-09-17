@@ -28,7 +28,7 @@ class PicoSecretParser
         $secretObject = new SecretObject();
         $values = $data->value();
         foreach ($values as $key => $value) {
-            $key2 = PicoStringUtil::camelize($key);
+            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
             if(is_scalar($value))
             {
                 $secretObject->set($key2, $value);
@@ -50,7 +50,7 @@ class PicoSecretParser
     {
         $secretObject = new SecretObject();
         foreach ($data as $key => $value) {
-            $key2 = PicoStringUtil::camelize($key);
+            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
             if(is_scalar($value))
             {
                 $secretObject->set($key2, $value);

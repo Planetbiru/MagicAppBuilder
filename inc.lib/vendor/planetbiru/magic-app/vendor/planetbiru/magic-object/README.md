@@ -21,10 +21,9 @@ Some examples of using MagicObject are as follows:
 13. PHP session
 14. object label
 15. multi language
-16. multi database connection
-17. upload file
-18. annotations
-19. debug objects 
+16. upload file
+17. annotations
+18. debug objects 
 
 # Installation
 

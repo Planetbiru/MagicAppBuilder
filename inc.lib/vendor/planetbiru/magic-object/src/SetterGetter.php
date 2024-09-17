@@ -69,13 +69,13 @@ class SetterGetter extends stdClass
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                 }
             }
@@ -258,7 +258,7 @@ class SetterGetter extends stdClass
         else if (strncasecmp($method, "unset", 5) === 0)
         {
             $var = lcfirst(substr($method, 5));
-            $this->removeValue($var, $params[0]);
+            unset($this->{$var});
             return $this;
         }
     }

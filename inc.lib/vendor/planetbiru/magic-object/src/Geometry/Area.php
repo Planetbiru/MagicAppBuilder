@@ -10,6 +10,7 @@ class Area
      * @var string
      */
     public $shape;
+    
     /**
      * Coordinates
      *
@@ -25,13 +26,6 @@ class Area
     public $href;
 
     /**
-     * Attributes
-     *
-     * @var string[]
-     */
-    public $attributes;
-
-    /**
      * Zoom
      *
      * @var float
@@ -44,17 +38,12 @@ class Area
      * @param Rectangle|Triangle|Polygon|Circle $object One of Rectangle, Triangle, Polygon, or Circle
      * @param float $zoom Zoom
      * @param string $href Href
-     * @param string[] $attributes
      */
-    public function __construct($object, $zoom = 1, $href = null, $attributes = null)
+    public function __construct($object, $zoom = 1, $href = null)
     {
         if(isset($href))
         {
             $this->href = $href;
-        }
-        if(isset($attributes))
-        {
-            $this->attributes = $attributes;
         }
         $this->zoom = $zoom;
         if($object instanceof Rectangle)
@@ -82,7 +71,7 @@ class Area
     /**
      * Get rectangle coordinates
      *
-     * @param Rectangle $object
+     * @param Rectangle $object Rectangle
      * @return float[]
      */
     public function coordsFromRectangle($object)
@@ -98,7 +87,7 @@ class Area
     /**
      * Get triangle coordinates
      *
-     * @param Triangle $object
+     * @param Triangle $object Triangle
      * @return float[]
      */
     public function coordsFromTriangle($object)
@@ -116,7 +105,7 @@ class Area
     /**
      * Get Polygon coordinates
      *
-     * @param Polygon $object
+     * @param Polygon $object Polygon
      * @return float[]
      */
     public function coordsFromPolygon($object)
@@ -176,13 +165,6 @@ class Area
         if(isset($this->href))
         {
             $attrs[] = 'href="'.$this->href.'"';
-        }
-        if(isset($this->attributes) && is_array($this->attributes))
-        {
-            foreach($this->attributes as $key=>$value)
-            {
-                $attrs[] = $key . "=\"" . htmlspecialchars($value) . "\"";
-            }
         }
         return '<area '.implode(' ', $attrs).' />';
     }

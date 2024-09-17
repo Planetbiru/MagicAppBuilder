@@ -10,6 +10,7 @@ class Area
      * @var string
      */
     public $shape;
+    
     /**
      * Coordinates
      *
@@ -70,7 +71,7 @@ class Area
     /**
      * Get rectangle coordinates
      *
-     * @param Rectangle $object
+     * @param Rectangle $object Rectangle
      * @return float[]
      */
     public function coordsFromRectangle($object)
@@ -86,7 +87,7 @@ class Area
     /**
      * Get triangle coordinates
      *
-     * @param Triangle $object
+     * @param Triangle $object Triangle
      * @return float[]
      */
     public function coordsFromTriangle($object)
@@ -104,7 +105,7 @@ class Area
     /**
      * Get Polygon coordinates
      *
-     * @param Polygon $object
+     * @param Polygon $object Polygon
      * @return float[]
      */
     public function coordsFromPolygon($object)

@@ -76,7 +76,7 @@ class PicoArrayUtil
             #  - camelCase to snake_case
             # $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
 
-            $transformedKey = PicoStringUtil::camelize($key);
+            $transformedKey = PicoStringUtil::camelize(str_replace("-", "_", $key));
 
             # Work recursively
             if (is_array($value))

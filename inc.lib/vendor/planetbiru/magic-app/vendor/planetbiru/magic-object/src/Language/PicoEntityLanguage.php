@@ -171,7 +171,7 @@ class PicoEntityLanguage
 
     /**
      * Property list
-     * @var boolean $asArrayProps
+     * @var boolean $asArrayProps Flag
      * @return array
      */
     public function propertyList($asArrayProps = false)
@@ -207,10 +207,10 @@ class PicoEntityLanguage
     /**
      * Annotation content
      *
-     * @param PicoAnnotationParser $reflexProp
-     * @param PicoGenericObject $parameters
-     * @param string $key
-     * @param string $defaultLabel
+     * @param PicoAnnotationParser $reflexProp Property reflection
+     * @param PicoGenericObject $parameters Parameters
+     * @param string $annotation Annotation
+     * @param string $attribute Attribute
      * @return mixed|null
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
@@ -229,9 +229,9 @@ class PicoEntityLanguage
     /**
      * Define label
      *
-     * @param PicoAnnotationParser $reflexProp
-     * @param PicoGenericObject $parameters
-     * @param string $defaultLabel
+     * @param PicoAnnotationParser $reflexProp Property reflection
+     * @param PicoGenericObject $parameters Parameters
+     * @param string $defaultLabel Default label
      * @return string
      */
     private function label($reflexProp, $parameters, $defaultLabel)
@@ -243,8 +243,8 @@ class PicoEntityLanguage
     /**
      * Set property value
      *
-     * @param string $propertyName
-     * @param mixed|null
+     * @param string $propertyName Property name
+     * @param mixed|null $propertyValue Property value
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -257,7 +257,7 @@ class PicoEntityLanguage
     /**
      * Get property value
      *
-     * @param string $propertyName
+     * @param string $propertyName Property name
      * @return mixed|null
      */
     public function get($propertyName)
@@ -291,7 +291,7 @@ class PicoEntityLanguage
     /**
      * Check if property has been set or not or has null value
      *
-     * @param string $name
+     * @param string $name Property name
      * @return boolean
      */
     public function __isset($name)
@@ -302,8 +302,8 @@ class PicoEntityLanguage
     /**
      * Magic method to handle undefined methods
      *
-     * @param string $method
-     * @param array $args
+     * @param string $method Method
+     * @param array $args Arguments
      * @return mixed
      */
     public function __call($method, $args) //NOSONAR

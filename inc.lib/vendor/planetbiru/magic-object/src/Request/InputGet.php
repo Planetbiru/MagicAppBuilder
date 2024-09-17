@@ -9,12 +9,6 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
  * @link https://github.com/Planetbiru/MagicObject
  */
 class  InputGet extends PicoRequestBase {
-    /**
-     * Recursive
-     *
-     * @var boolean
-     */
-    private $_recursive = false; //NOSONAR
 
     /**
      * Constructor

@@ -205,6 +205,12 @@ class SecretObject extends stdClass //NOSONAR
             $this->modifyNullProperties($var, $params[0]);
             return $this;
         }
+        else if (strncasecmp($method, "unset", 5) === 0)
+        {
+            $var = lcfirst(substr($method, 5));
+            unset($this->{$var});
+            return $this;
+        }
     }
 
     /**
@@ -483,13 +489,13 @@ class SecretObject extends stdClass //NOSONAR
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->_set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->_set($key2, $value);
                 }
             }

@@ -168,7 +168,7 @@ class PicoEntityGenerator
     /**
      * Get property name
      *
-     * @param string $name
+     * @param string $name Column name
      * @return string
      */
     protected function getPropertyName($name)

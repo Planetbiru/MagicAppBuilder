@@ -21,7 +21,7 @@ class PicoUploadFileItem
     /**
      * Constructor
      *
-     * @param array $file
+     * @param array $file Files
      */
     public function __construct($file)
     {
@@ -35,7 +35,7 @@ class PicoUploadFileItem
     /**
      * Copy file to destination path
      *
-     * @param string $path
+     * @param string $path Target path
      * @return boolean
      * @throws FileNotFoundException
      */
@@ -54,7 +54,7 @@ class PicoUploadFileItem
     /**
      * Move uploaded file to destination path
      *
-     * @param string $path
+     * @param string $path Target path
      * @return boolean
      * @throws FileNotFoundException
      */

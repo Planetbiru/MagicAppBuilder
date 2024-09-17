@@ -20,7 +20,7 @@ class PicoDataLabels
     /**
      * Append data
      *
-     * @param PicoDataLabel $data
+     * @param PicoDataLabel $data New data
      * @return self
      */
     public function append($data)

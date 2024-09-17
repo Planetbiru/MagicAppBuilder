@@ -26,7 +26,7 @@ class PicoLanguage
 
     /**
      * Load data to object
-     * @param stdClass|array $data
+     * @param stdClass|array $data Data to be loaded
      * @return self
      */
     public function loadData($data)
@@ -34,7 +34,7 @@ class PicoLanguage
         if($data != null && (is_array($data) || is_object($data)))
         {
             foreach ($data as $key => $value) {
-                $key2 = PicoStringUtil::camelize($key);
+                $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                 $this->set($key2, $value);
             }
         }
@@ -44,7 +44,7 @@ class PicoLanguage
     /**
      * Set property value
      *
-     * @param string $propertyName
+     * @param string $propertyName Property name
      * @param mixed|null
      * @return self
      */
@@ -58,7 +58,7 @@ class PicoLanguage
     /**
      * Get property value
      *
-     * @param string $propertyName
+     * @param string $propertyName Property name
      * @return mixed|null
      */
     public function get($propertyName)
@@ -99,7 +99,7 @@ class PicoLanguage
     /**
      * Check if property has been set or not or has null value
      *
-     * @param string $name
+     * @param string $name Property name
      * @return boolean
      */
     public function __isset($name)
@@ -110,7 +110,7 @@ class PicoLanguage
     /**
      * Unset property value
      *
-     * @param string $name
+     * @param string $name Property name
      * @return void
      */
     public function __unset($name)
@@ -121,8 +121,8 @@ class PicoLanguage
     /**
      * Magic method called when user call any undefined method
      *
-     * @param string $method
-     * @param string $params
+     * @param string $method Method
+     * @param string $params Parameters
      * @return mixed|null
      */
     public function __call($method, $params) // NOSONAR

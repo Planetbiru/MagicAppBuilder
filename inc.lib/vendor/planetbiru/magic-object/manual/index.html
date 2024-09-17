@@ -1257,7 +1257,6 @@ $sessions-&gt;startSession();</code></pre>
 <li>PicoDatabase $database</li>
 </ol>
 <p>Database connection</p>
-<p>When constructed, the <code>$album</code> object uses the <code>$database1</code> database connection. The application retrieves data with the primary key <code>123456</code> from <code>$database1</code> and then stores it in <code>$database2</code> without having to change many parameters and lots of code. Please note that to save <code>$album</code> data, you must use the <code>save</code> method instead of <code>insert</code> or <code>update</code> because there is a possibility that data with the same primary key already exists in <code>$database2</code>.</p>
 <pre><code class="language-php">&lt;?php
 
 namespace MusicProductionManager\Data\Entity;
@@ -7384,67 +7383,6 @@ require_once "inc/footer.php";
 </article>
 
 <article class="article" id="part16">
-<h2>Multiple Database Connection</h2>
-<p>MagicObject requires a database connection for object construction using database connections. In this way, users can use multiple database connections in a module very easily.</p>
-<p>Example:</p>
-<pre><code class="language-php">$album = new Album(null, $database1);
-try
-{
-    $album-&gt;find("123456");
-    $album-&gt;currentDatabase($database2);
-    $album-&gt;save();
-}
-catch(Exception $e)
-{
-    error_log($e-&gt;getMessage());
-}</code></pre>
-<p>From the example above, it can be seen that an entity can even use two databases interchangeably.</p>
-<p>When constructed, the <code>$album</code> object uses the <code>$database1</code> database connection. The application retrieves data with the primary key <code>123456</code> from <code>$database1</code> and then stores it in <code>$database2</code> without having to change many parameters and lots of code. Please note that to save <code>$album</code> data, you must use the <code>save</code> method instead of <code>insert</code> or <code>update</code> because there is a possibility that data with the same primary key already exists in <code>$database2</code>.</p>
-<pre><code class="language-yml">database_target:
-  driver: mysql
-  host: server1.domain.com
-  port: 3306
-  username: root
-  password: Tantrum2025
-  database_name: sipro
-  databseSchema: public
-  timeZone: Asia/Jakarta
-database_source:
-  driver: mysql
-  host: server1.domain.com
-  port: 3306
-  username: root
-  password: Tantrum2025
-  database_name: sipro_ori
-  databseSchema: public
-  timeZone: Asia/Jakarta
-maximum_record: 100</code></pre>
-<p>$cfg = new ConfigApp(null, true);
-$cfg-&gt;loadYamlFile(dirname(<strong>DIR</strong>).&quot;/.cfg/app.yml&quot;, true, true, true);</p>
-<p>$databaseCredentials = new PicoDatabaseCredentials($cfg-&gt;getDatabase());</p>
-<p>$database = new PicoDatabase($databaseCredentials,
-function($sql, $type) //NOSONAR
-{
-// callback when execute query that modify data
-},
-function($sql) //NOSONAR
-{
-// callback when execute all query
-}
-);</p>
-<p>try
-{
-$database-&gt;connect();
-$shutdownManager = new ShutdownManager($database);
-$shutdownManager-&gt;registerShutdown();
-}
-catch(Exception $e)
-{
-// do nothing
-}</p>
-</article>
-
-<article class="article" id="part17">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <pre><code class="language-php">&lt;?php
@@ -7913,7 +7851,7 @@ $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);</code></pre>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part17">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -8038,7 +7976,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part19">
+<article class="article" id="part18">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -8305,7 +8243,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part20">
+<article class="article" id="part19">
 <h2>Upload File</h2>
 <p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
 <p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
@@ -8354,7 +8292,7 @@ else
 }</code></pre>
 </article>
 
-<article class="article" id="part21">
+<article class="article" id="part20">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>
@@ -8574,7 +8512,7 @@ $apa = $rumah;
 echo $apa;</code></pre>
 </article>
 
-<article class="article" id="part22">
+<article class="article" id="part21">
 <h2>Database Migration</h2>
 <p>MagicObject allows users to import data from a database with different table names and column names between the source database and the destination database. This feature is used by developers who develop applications that are already used in production environments.</p>
 <p>On the one hand, the application requires a new database structure according to what is defined by the developer. On the other hand, users want to use existing data.</p>
@@ -8584,19 +8522,19 @@ echo $apa;</code></pre>
 <p>File <code>import.yml</code></p>
 <pre><code class="language-yml">database_target:
   driver: mysql
-  host: server1.domain.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Tantrum2025
+  password: Jenglotsaurus
   database_name: sipro
   databseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
-  host: server1.domain.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Tantrum2025
+  password: Jenglotsaurus
   database_name: sipro_ori
   databseSchema: public
   timeZone: Asia/Jakarta
@@ -8682,19 +8620,19 @@ $sql = PicoDatabaseUtilMySql::importData($config, function($sql, $source, $targe
 <p>File <code>import.yml</code></p>
 <pre><code class="language-yml">database_target:
   driver: mysql
-  host: server1.domain.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Tantrum2025
+  password: Jenglotsaurus
   database_name: sipro
   databseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
-  host: server1.domain.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Tantrum2025
+  password: Jenglotsaurus
   database_name: sipro_ori
   databseSchema: public
   timeZone: Asia/Jakarta

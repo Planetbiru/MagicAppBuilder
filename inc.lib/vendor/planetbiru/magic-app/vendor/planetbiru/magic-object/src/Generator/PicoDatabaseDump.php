@@ -453,7 +453,7 @@ class PicoDatabaseDump
 
     /**
      * Merge entities
-     * @param mixed $entities
+     * @param mixed $entities Entities
      * @return PicoTableInfoExtended
      * @deprecated deprecated since version 1.13
      */

@@ -91,7 +91,7 @@ class DataTable extends SetterGetter
     /**
      * Constructor
      *
-     * @param MagicObject|self|stdClass|array $data
+     * @param MagicObject|self|stdClass|array $data Data to be loaded
      */
     public function __construct($data = null)
     {
@@ -123,14 +123,14 @@ class DataTable extends SetterGetter
                     $this->_tableInfo = null;
                 }
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                     $this->_labels[$key2] = $data->label($key2);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                 }
             }
@@ -180,7 +180,7 @@ class DataTable extends SetterGetter
     /**
      * Set current language
      *
-     * @param string $code
+     * @param string $code Language code
      * @return self
      */
     public function selectLanguage($code)
@@ -221,7 +221,7 @@ class DataTable extends SetterGetter
 
     /**
      * Property list
-     * @var boolean $reflectSelf Reflexion
+     * @var boolean $reflectSelf Reflection
      * @var boolean $asArrayProps Properties
      * @return array
      */
@@ -259,7 +259,7 @@ class DataTable extends SetterGetter
     /**
      * Annotation content
      *
-     * @param PicoAnnotationParser $reflexProp Class reflexion
+     * @param PicoAnnotationParser $reflexProp Class reflection
      * @param PicoGenericObject $parameters Parameters
      * @param string $key Key
      * @param string $defaultLabel Default label
@@ -281,7 +281,7 @@ class DataTable extends SetterGetter
     /**
      * Define label
      *
-     * @param PicoAnnotationParser $reflexProp Class reflexion
+     * @param PicoAnnotationParser $reflexProp Class reflection
      * @param PicoGenericObject $parameters Parameters
      * @param string $key Key
      * @param string $defaultLabel Default label

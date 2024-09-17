@@ -21,6 +21,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * @var array
      */
     private $classParams = array();
+
     /**
      * Force input object as scalar
      *
@@ -29,8 +30,15 @@ class PicoRequestBase extends stdClass //NOSONAR
     protected $forceScalar = false;
 
     /**
+     * Recursive
+     *
+     * @var boolean
+     */
+    protected $_recursive = false;
+
+    /**
      * Constructor
-     * @param boolean $forceScalar
+     * @param boolean $forceScalar Only accept scalar value
      */
     public function __construct($forceScalar = false)
     {
@@ -50,8 +58,8 @@ class PicoRequestBase extends stdClass //NOSONAR
 
     /**
      * Load data to object
-     * @param mixed $data
-     * @param boolean $tolower
+     * @param mixed $data Data to be loaded
+     * @param boolean $tolower Flag to transform key to be lowercase
      */
     public function loadData($data, $tolower = false)
     {
@@ -70,8 +78,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Set property value
      *
-     * @param string $propertyName
-     * @param mixed|null
+     * @param string $propertyName Property name
+     * @param mixed|null $propertyValue Property value
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -84,8 +92,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get property value
      *
-     * @param string $propertyName
-     * @param array $params
+     * @param string $propertyName Property name
+     * @param array $params Parameters
      * @return mixed|null
      */
     public function get($propertyName, $params = null)
@@ -118,7 +126,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get value
      *
-     * @var boolean $snakeCase
+     * @var boolean $snakeCase Flag to define naming strategy
      */
     public function value($snakeCase = false)
     {
@@ -147,8 +155,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Property list
      *
-     * @var boolean $reflectSelf
-     * @var boolean $asArrayProps
+     * @var boolean $reflectSelf Class reflection
+     * @var boolean $asArrayProps As array
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -184,13 +192,13 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Filter input
      *
-     * @param integer $type
-     * @param string $variable_name
-     * @param integer $filter
-     * @param boolean $escapeSQL
+     * @param integer $type Request type
+     * @param string $variableName Variable name
+     * @param integer $filter Filter
+     * @param boolean $escapeSQL Flag to escape SQL
      * @return mixed
      */
-    public function filterInput($type, $variable_name, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
+    public function filterInput($type, $variableName, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
     {
         $var = array();
         switch ($type) {
@@ -212,17 +220,17 @@ class PicoRequestBase extends stdClass //NOSONAR
             default:
                 $var = $_GET;
         }
-        return $this->filterValue(isset($var[$variable_name])?$var[$variable_name]:null, $filter, $escapeSQL);
+        return $this->filterValue(isset($var[$variableName])?$var[$variableName]:null, $filter, $escapeSQL);
     }
 
     /**
      * Filter value
      *
-     * @param mixed $val
-     * @param integer $filter
-     * @param boolean $escapeSQL
-     * @param boolean $nullIfEmpty
-     * @param boolean $requireScalar
+     * @param mixed $val Value
+     * @param integer $filter Filter type
+     * @param boolean $escapeSQL Flag to escape SQL
+     * @param boolean $nullIfEmpty Flag to set to null if empty
+     * @param boolean $requireScalar Flag to accept scalar only
      * @return mixed|null
      */
     public function filterValue($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false, $requireScalar = false)
@@ -261,10 +269,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Filter single value
      *
-     * @param mixed $val
-     * @param integer $filter
-     * @param boolean $escapeSQL
-     * @param boolean $nullIfEmpty
+     * @param mixed $val Value
+     * @param integer $filter Filter type
+     * @param boolean $escapeSQL Flag to escape SQL
+     * @param boolean $nullIfEmpty Flag to set to null if empty
      * @return mixed
      */
     public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) //NOSONAR
@@ -407,19 +415,19 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Addslahes
      *
-     * @param string $inp
+     * @param string $input Input value
      * @return string
      */
-    public function addslashes($inp)
+    public function addslashes($input)
     {
-        return addslashes($inp);
+        return addslashes($input);
     }
 
     /**
      * Get value from formated number
      *
      * @param stdClass|MagicObject $cfg Configuration
-     * @param mixed $input Input
+     * @param mixed $input Input value
      * @return float
      */
     public function _getValue($cfg, $input)
