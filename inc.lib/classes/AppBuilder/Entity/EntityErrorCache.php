@@ -5,7 +5,7 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUser is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityErrorCache is entity of table error_cache. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
@@ -13,91 +13,73 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="user")
  */
-class EntityUser extends MagicObject
+class EntityErrorCache extends MagicObject
 {
 	/**
-	 * User ID
+	 * Error Cache ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User ID")
+	 * @Column(name="error_cache_id", type="varchar(2048)", length=2048, nullable=false)
+	 * @Label(content="Error Cache ID")
 	 * @var string
 	 */
 	protected $userId;
 
 	/**
-	 * Name
+	 * File Name
 	 * 
-	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Name")
+	 * @Column(name="file_name", type="varchar(512)", length=512, nullable=true)
+	 * @Label(content="File Name")
 	 * @var string
 	 */
-	protected $name;
+	protected $fileName;
     
     /**
-	 * Username
+	 * File Path
 	 * 
-	 * @Column(name="username", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Username")
+	 * @Column(name="file_path", type="varchar(512)", length=512, nullable=true)
+	 * @Label(content="File Path")
 	 * @var string
 	 */
-	protected $username;
+	protected $filePath;
+
+    /**
+	 * Modification Time
+	 * 
+	 * @Column(name="modification_time", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Modification Time")
+	 * @var string
+	 */
+	protected $modificationTime;
+
+    /**
+	 * Error Code
+	 * 
+	 * @Column(name="error_code", type="int(11)", length=11, nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @Label(content="Error Code")
+	 * @var boolean
+	 */
+	protected $errorCode;
     
     /**
-	 * Password
+	 * Error Message
 	 * 
-	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Password")
+	 * @Column(name="error_message", type="text", nullable=true)
+	 * @Label(content="Error Message")
 	 * @var string
 	 */
-	protected $password;
-    
+	protected $errorMessage;
+
     /**
-	 * Gender
+	 * Line Number
 	 * 
-	 * @Column(name="gender", type="varchar(1)", length=1, nullable=true)
-	 * @Label(content="Gender")
+	 * @Column(name="line_number", type="int(11)", length=11, nullable=true)
+	 * @Label(content="Line Number")
 	 * @var string
 	 */
-	protected $gender;
-    
-    /**
-	 * Birth Day
-	 * 
-	 * @Column(name="birth_day", type="text", nullable=true)
-	 * @Label(content="Birth Day")
-	 * @var string
-	 */
-	protected $birthDay;
-    
-    /**
-	 * Email
-	 * 
-	 * @Column(name="email", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Email")
-	 * @var string
-	 */
-	protected $email;
-    
-    /**
-	 * Phone
-	 * 
-	 * @Column(name="phone", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Phone")
-	 * @var string
-	 */
-	protected $phone;
-    
-    /**
-	 * Validation Code
-	 * 
-	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Validation Code")
-	 * @var string
-	 */
-	protected $vatidationCode;
+	protected $lineNumber;
     
     /**
 	 * Last Reset Password

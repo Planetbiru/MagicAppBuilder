@@ -5,38 +5,29 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityApplicationGroupMember is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityModule is entity of table module. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application_group")
+ * @Table(name="user")
  */
-class EntityApplicationGroupMember extends MagicObject
+class EntityModule extends MagicObject
 {
-    /**
-	 * Application Group Member ID
+	/**
+	 * Module ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_group_member_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Application Group Member ID")
+	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Module ID")
 	 * @var string
 	 */
-	protected $applicationGroupMemberId;
+	protected $moduleId;
 
-	/**
-	 * Application Group ID
-	 * 
-	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application Group ID")
-	 * @var string
-	 */
-	protected $applicationGroupId;
-
-	/**
+    /**
 	 * User ID
 	 * 
 	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=true)
@@ -45,6 +36,58 @@ class EntityApplicationGroupMember extends MagicObject
 	 */
 	protected $userId;
 
+    /**
+     * User
+     *
+     * @JoinColumn(name="user_id" referenceColumnName="user_id")
+     * @var EntityUser
+     */
+    protected $user;
+    
+    /**
+	 * Application ID
+	 * 
+	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Application ID")
+	 * @var string
+	 */
+	protected $applicationId;
+
+    /**
+     * Application
+     *
+     * @JoinColumn(name="application_id" referenceColumnName="application_id")
+     * @var EntityApplication
+     */
+    protected $application;
+
+    /**
+	 * File Name
+	 * 
+	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="File Name")
+	 * @var string
+	 */
+	protected $fileName;
+
+    /**
+	 * Directory Name
+	 * 
+	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Directory Name")
+	 * @var string
+	 */
+	protected $directoryName;
+
+    /**
+	 * Reference Value
+	 * 
+	 * @Column(name="reference_value", type="longtext", nullable=true)
+	 * @Label(content="Reference Value")
+	 * @var string
+	 */
+	protected $referenceValue;
+    
     /**
 	 * Time Create
 	 * 
@@ -62,7 +105,7 @@ class EntityApplicationGroupMember extends MagicObject
 	 * @var string
 	 */
 	protected $timeEdit;
-    
+
     /**
 	 * Admin Create
 	 * 
@@ -99,13 +142,4 @@ class EntityApplicationGroupMember extends MagicObject
 	 */
 	protected $ipEdit;
 
-	/**
-	 * Active
-	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
-	 * @DefaultColumn(value="1")
-	 * @Label(content="Active")
-	 * @var boolean
-	 */
-	protected $active;
 }
