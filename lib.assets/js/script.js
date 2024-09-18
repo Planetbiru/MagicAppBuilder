@@ -750,15 +750,6 @@ jQuery(function(){
     let request = {};
     let modalTitle = '';
     let url = '';
-    if(dataType == 'area-entity')
-    {
-      url = 'lib.ajax/entity-detail.php';
-      modalTitle = 'Entity Detail';
-      let namespaceName = $(this).attr('data-namespace');
-      let entityName = $(this).attr('data-entity');
-      let tableName = $(this).attr('data-table-name');
-      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName};
-    }
     if(dataType == 'area-relation')
     {
       url = 'lib.ajax/entity-relationship.php';
@@ -774,10 +765,21 @@ jQuery(function(){
       request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName, columnName:columnName, referenceNamespaceName:referenceNamespaceName, referenceEntityName:referenceEntityName, referenceTableName:referenceTableName, referenceColumnName:referenceColumnName};
       console.log(namespaceName, entityName, tableName, columnName, referenceNamespaceName, referenceEntityName, referenceTableName, referenceColumnName);
     }
+    else
+    {
+      url = 'lib.ajax/entity-detail.php';
+      modalTitle = 'Entity Detail';
+      let namespaceName = $(this).attr('data-namespace');
+      let entityName = $(this).attr('data-entity');
+      let tableName = $(this).attr('data-table-name');
+      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName};
+    }
+    
     $('.entity-detail').empty();
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
+    console.log(url)
     $.ajax({
       type: 'GET',
       dataType: 'html',
