@@ -22,7 +22,7 @@ class Map
     /**
      * Add area
      *
-     * @param Area $area
+     * @param Area $area Area
      * @return self
      */
     public function addArea($area)

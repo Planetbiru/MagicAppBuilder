@@ -16,20 +16,20 @@ class Polygon
     /**
      * Constructor
      *
-     * @param Point[] $poins
+     * @param Point[] $points Points
      */
-    public function __construct($poins = null)
+    public function __construct($points = null)
     {
-        if(isset($poins) && is_array($poins))
+        if(isset($points) && is_array($points))
         {
-            $this->points = $poins;
+            $this->points = $points;
         }
     }
 
     /**
      * Add point
      *
-     * @param Point $point
+     * @param Point $point Point
      * @return self
      */
     public function addPoint($point)
