@@ -1,8 +1,8 @@
 <?php
 use AppBuilder\AppBuilder;
 use AppBuilder\AppSecretObject;
-use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
+use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 
@@ -19,20 +19,54 @@ try
 	$applicationName = $inputPost->getApplicationName();
 	$description = $inputPost->getDescription();
 	
-	$databaseConfig = new MagicObject($inputPost->getDatabase());
-	$sessionConfig = new MagicObject($inputPost->getSessions());
+	$databaseConfig = new SecretObject($inputPost->getDatabase());
+	$sessionsConfig = new SecretObject($inputPost->getSessions());
 	
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
-	$sessionConfig->setLifetime(intval($sessionConfig->getLifetime()));
+	$sessionsConfig->setLifetime(intval($sessionsConfig->getLifetime()));
 
 	if($appConfig->getApplication() != null)
 	{
 		$appConfig->getApplication()->setName($applicationName);
 		$appConfig->getApplication()->setDescription($description);
 	}
+
+    $existingDatabase = $appConfig->getDatabase();
+    if($existingDatabase == null)
+    {
+        $existingDatabase = $databaseConfig;
+    }
+    else
+    {
+        $keys = array_keys($databaseConfig->valueArray());
+        foreach($keys as $key)
+        {
+            if($databaseConfig->get($key) != "")
+            {
+                $existingDatabase->set($key, $databaseConfig->get($key));
+            }
+        }
+    }
+
+    $existingSessions = $appConfig->getDatabase();
+    if($existingSessions == null)
+    {
+        $existingSessions = $sessionsConfig;
+    }
+    else
+    {
+        $keys = array_keys($sessionsConfig->valueArray());
+        foreach($keys as $key)
+        {
+            if($sessionsConfig->get($key) != "")
+            {
+                $existingSessions->set($key, $sessionsConfig->get($key));
+            }
+        }
+    }
 	
-	$appConfig->setDatabase($databaseConfig);
-	$appConfig->setSessions($sessionConfig);
+	$appConfig->setDatabase($existingDatabase);
+	$appConfig->setSessions($existingSessions);
 	$appConfig->setEntityInfo($inputPost->getEntityInfo());
 
 	AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);

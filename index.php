@@ -79,7 +79,6 @@ $constSelected = ' selected';
             <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
             <button type="button" class="btn btn-primary refresh-application-list">Refresh</button>
           </div>
-          
 
           <div class="container-fluid application-container">
             <div class="row application-card">
@@ -154,8 +153,7 @@ $constSelected = ' selected';
                         <td>Target</td>
                         <td>
                           <select class="form-control" name="current_module_location" id="current_module_location">
-                          
-                        </select>  
+                          </select>  
                         </td>
                       </tr>
                       <tr>

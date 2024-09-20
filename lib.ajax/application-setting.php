@@ -98,7 +98,7 @@ $app = new SecretObject($appConfig->getApplication());
                             </tr>
                             <tr>
                                 <td>Password</td>
-                                <td><input class="form-control" name="database_password" type="password" id="database_password" value="<?php echo $cfgDatabase->getPassword(); ?>"></td>
+                                <td><input class="form-control" name="database_password" type="password" id="database_password" value=""></td>
                             </tr>
                             <tr>
                                 <td>Name</td>
