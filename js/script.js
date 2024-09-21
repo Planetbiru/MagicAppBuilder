@@ -195,24 +195,16 @@ $(document).ready(function(e) {
 		e.preventDefault();
 	});
 	$(document).on('click', '#load_table', function(e){
-		var selector = ".main-table tbody";
 		var url = "database-table-list.php";
-		var host = $('.config-table [name="host"]').val();
-		var port = $('.config-table [name="port"]').val();
-		var username = $('.config-table [name="username"]').val();
-		var password = $('.config-table [name="password"]').val();
-		var database = $('.config-table [name="database"]').val();
 		var table = $('.config-table [name="table"]');
 		$.ajax({
 			url:url,
-			data:{host:host, port:port, username:username, password:password, database:database},
-			type:"POST",
+			type:"GET",
 			dataType:"JSON",
 			success: function(data)
 			{
 				var i;
 				var tablename;
-				var DOMHTML;
 				table.replaceWith($('<select name="table" id="table"></select>'));
 				for(i in data)
 				{
@@ -221,7 +213,6 @@ $(document).ready(function(e) {
 				}
 			},
 			error: function(err, err2){
-				console.log(err);
 			}
 		});
 	});

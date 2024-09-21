@@ -51,12 +51,18 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
         $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
 
-        $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
-
-        $lines[] = parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-        $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
-
+        $lines[] = parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        $lines[] = parent::TAB1."catch(Exception \$e)";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::CURLY_BRACKET_CLOSE;
+
         return implode(parent::NEW_LINE, $lines);
     }
     
@@ -106,28 +112,36 @@ class AppBuilder extends AppBuilderBase
             $line = $this->createSetter($objectName, $primaryKeyName, $this->getInputFilter($primaryKeyName));
             $lines[] = $line;
         }
-        $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_UPDATE_END;
-        
+
+        $lines[] = parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_UPDATE_END;
         if($updatePk)
         {
             $lines[] = ''; 
-            $lines[] = parent::TAB1.'// update primary key value';      
-            $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.$this->getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
+            $lines[] = parent::TAB1.parent::TAB1.'// update primary key value';      
+            $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.$this->getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
                 
-            $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
-            $lines[] = parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
+            $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
 
-            $lines[] = parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
-            $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
 
         }
         else
         {
-            $lines[] = parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-            $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
         }
         
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        $lines[] = parent::TAB1."catch(Exception \$e)";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::CURLY_BRACKET_CLOSE;
+        
         return implode(parent::NEW_LINE, $lines);
     }
     
