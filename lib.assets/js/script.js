@@ -55,7 +55,8 @@ jQuery(function(){
     let form = $(this).closest(".modal").find('form');
     let inputs = form.serializeArray();
     let dataToPost = {
-      applicationName: form.find('[name="application_name"]').val(),
+      name: form.find('[name="application_name"]').val(),
+      type: form.find('[name="application_type"]').val(),
       description: form.find('[name="description"]').val(),
       database: {},
       sessions: {},
@@ -276,6 +277,7 @@ jQuery(function(){
     e.preventDefault();
     let modal = $(this).closest(".modal");
     let name = modal.find('[name="application_name"]').val().trim();
+    let type = modal.find('[name="application_type"]').val().trim();
     let description = modal.find('[name="application_description"]').val().trim();
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
@@ -295,7 +297,7 @@ jQuery(function(){
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
-        data: { id: id, name: name, description: description, directory: directory, namespace:namespace, author: author, paths:paths },
+        data: { id: id, name: name, type:type, description: description, directory: directory, namespace:namespace, author: author, paths:paths },
         success: function (data) {
           reloadApplicationList();
         },
@@ -559,6 +561,7 @@ jQuery(function(){
       success:function(data){
         $('[name="application_name"]').val(data.application_name);
         $('[name="application_id"]').val(data.application_id);
+        $('[name="application_type"]').val(data.application_type);
         $('[name="application_directory"]').val(data.application_directory);
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);

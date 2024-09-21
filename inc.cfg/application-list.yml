@@ -5,6 +5,7 @@
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: true
+    type: api
 -
     id: sipro
     name: 'SIPRO PLN'
@@ -12,6 +13,7 @@
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: false
+    type: api
 -
     id: 066e6d90a4c63eadc929
     name: 'Coba Aplikasi'

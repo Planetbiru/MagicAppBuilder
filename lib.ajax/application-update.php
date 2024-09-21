@@ -16,8 +16,9 @@ try
 
 	$appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
 
-	$applicationName = $inputPost->getApplicationName();
+	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
+	$type = $inputPost->getType();
 	
 	$databaseConfig = new SecretObject($inputPost->getDatabase());
 	$sessionsConfig = new SecretObject($inputPost->getSessions());
@@ -29,6 +30,7 @@ try
 	{
 		$appConfig->getApplication()->setName($applicationName);
 		$appConfig->getApplication()->setDescription($description);
+		$appConfig->getApplication()->setType($type);
 	}
 
     $existingDatabase = $appConfig->getDatabase();
@@ -100,6 +102,7 @@ try
             {
                 $arr[$idx]['name'] = $applicationName;
 				$arr[$idx]['description'] = $description;
+				$arr[$idx]['type'] = $type;
             }
         }
         file_put_contents($appListPath, PicoYamlUtil::dump($arr, null, 4, 0));

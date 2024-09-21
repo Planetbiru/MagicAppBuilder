@@ -24,6 +24,7 @@ $path2 = $dir2 . "/default.yml";
 $application = array(
     'id' => $newAppId,
     'name' => trim($inputPost->getName()),
+    'type' => trim($inputPost->getType()),
     'description' => trim($inputPost->getDescription()),
     'documentRoot' => trim($inputPost->getDirectory()),
     'author' => trim($inputPost->getAuthor()),
@@ -56,6 +57,7 @@ $application = new MagicObject();
 $application->loadYamlFile($path2);
 $application->setId($newAppId);
 $application->setName(trim($inputPost->getName()));
+$application->setType(trim($inputPost->getType()));
 $application->setBaseApplicationNamespace(trim($inputPost->getNamespace()));
 $application->setBaseApplicationDirectory(trim($inputPost->getDirectory()));
 $application->setBaseEntityNamespace(trim($inputPost->getNamespace()) . "\\Entity");

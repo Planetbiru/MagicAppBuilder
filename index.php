@@ -702,6 +702,15 @@ $constSelected = ' selected';
                   <td><input class="form-control" type="text" name="application_id"></td>
                 </tr>
                 <tr>
+                  <td>Application Type</td>
+                  <td>
+                      <select class="form-control" name="application_type" id="application_type">
+                          <option value="fullstack">Fullstack Application</option>
+                          <option value="api">Application Programming Interface (API)</option>
+                      </select>
+                  </td>
+                </tr>
+                <tr>
                   <td>Application Directory</td>
                   <td><input class="form-control" type="text" name="application_directory"></td>
                 </tr>
