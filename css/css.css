@@ -266,6 +266,7 @@ table.table.table-reference tr > td:last-child {
 
 .diagram-option {
   padding-bottom: 10px;
+  line-height: 35px;
 }
 
 .diagram-option .form-control {
