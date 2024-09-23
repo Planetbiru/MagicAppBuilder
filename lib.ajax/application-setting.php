@@ -159,7 +159,7 @@ $app = new SecretObject($appConfig->getApplication());
                             </tr>
                             <tr>
                                 <td>Session Save Path</td>
-                                <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value="<?php echo $cfgSession->getSavePath(); ?>"></td>
+                                <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value=""></td>
                             </tr>
                         </tbody>
                     </table>

@@ -91,7 +91,7 @@ d. Application features should be determined before the entity relationship diag
 4. Create MagicAppBuilder settings.
 5. Add the application to be created in MagicAppBuilder.
 6. Create application settings and column mapping.
-7. Click the "Load Table" button to load all tables from the specified database.
+7. Click the "Reload Table" button to load all tables from the specified database.
 8. Select a table from one of the tables. MagicAppBuilder will automatically fill in some inputs from the form. You can change some inputs before continuing.
 9. Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
 10. Check the check boxes and radio buttons according to how the module will be created.

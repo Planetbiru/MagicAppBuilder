@@ -5,7 +5,7 @@
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: true
-    type: api
+    type: fullstack
 -
     id: sipro
     name: 'SIPRO PLN'

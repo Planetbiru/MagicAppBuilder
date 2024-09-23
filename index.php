@@ -108,7 +108,7 @@ $constSelected = ' selected';
                       <tr>
                         <td>&nbsp;</td>
                         <td>
-                          <button class="btn btn-primary" type="button" name="load_table" id="load_table">Load Table</button>
+                          <button class="btn btn-primary" type="button" name="load_table" id="load_table">Reload Table</button>
                         </td>
                       </tr>
                       <tr>

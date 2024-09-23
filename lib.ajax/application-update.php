@@ -24,7 +24,7 @@ try
 	$sessionsConfig = new SecretObject($inputPost->getSessions());
 	
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
-	$sessionsConfig->setLifetime(intval($sessionsConfig->getLifetime()));
+	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
 	if($appConfig->getApplication() != null)
 	{
@@ -50,7 +50,7 @@ try
         }
     }
 
-    $existingSessions = $appConfig->getDatabase();
+    $existingSessions = $appConfig->getSessions();
     if($existingSessions == null)
     {
         $existingSessions = $sessionsConfig;
