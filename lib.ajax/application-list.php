@@ -12,7 +12,8 @@ foreach ($arr as $app) {
         }
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-    <div class="card application-item" 
+    <div 
+    class="card application-item" 
     data-selected="<?php echo $selected;?>"
     data-application-id="<?php echo $app['id']; ?>" 
     data-application-name="<?php echo htmlspecialchars($app['name']); ?>"

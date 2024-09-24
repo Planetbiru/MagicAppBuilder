@@ -26,8 +26,6 @@ try
         $workspaceDirectory = dirname(__DIR__) . "/" . substr($workspaceDirectory, 2);
     }
 
-    $appListPath = $workspaceDirectory."/application-list.yml";
-
     $currentApplication = new AppSecretObject();
 
     $currentApplication->setId($appId);
@@ -39,6 +37,7 @@ try
     file_put_contents($builderConfigPath, $configYml);
 
     $appList = new AppSecretObject();
+    $appListPath = $workspaceDirectory."/application-list.yml";
     if(file_exists($appListPath))
     {
         $appList->loadYamlFile($appListPath, false, true, true);
