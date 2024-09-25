@@ -47,12 +47,12 @@ $app = new SecretObject($appConfig->getApplication());
                         <tbody>
                             <tr>
                                 <td>Application Name</td>
-                                <td><input class="form-control" type="text" name="application_name" id="application_name" value="<?php echo $app->getName(); ?>"></td>
+                                <td><input class="form-control" type="text" name="application_name" value="<?php echo $app->getName(); ?>"></td>
                             </tr>
                             <tr>
                                 <td>Application Type</td>
                                 <td>
-                                    <select class="form-control" name="application_type" id="application_type">
+                                    <select class="form-control" name="application_type">
                                         <option value="fullstack"<?php echo $app->getType() == 'fullstack' ? ' selected' : ''; ?>>Fullstack Application</option>
                                         <option value="api"<?php echo $app->getType() == 'api' ? ' selected' : ''; ?>>Application Programming Interface (API)</option>
                                     </select>
@@ -60,7 +60,7 @@ $app = new SecretObject($appConfig->getApplication());
                             </tr>
                             <tr>
                                 <td>Description</td>
-                                <td><input class="form-control" type="text" name="description" id="description" value="<?php echo $app->getDescription(); ?>"></td>
+                                <td><input class="form-control" type="text" name="description" value="<?php echo $app->getDescription(); ?>"></td>
                             </tr>
                         </tbody>
                     </table>

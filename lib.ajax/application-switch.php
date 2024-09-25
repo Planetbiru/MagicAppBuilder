@@ -1,7 +1,6 @@
 <?php
 
 use AppBuilder\AppSecretObject;
-use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use MagicObject\SecretObject;
 
@@ -33,7 +32,7 @@ if($builderConfig->getCurrentApplication() == null)
 }
 
 $builderConfig->getCurrentApplication()->setId($currentApplication);
-$existing = new MagicObject();
+$existing = new SecretObject();
 $existing->loadYamlFile($path);
 $existingApplication = $existing->valueArray();
 
@@ -57,7 +56,7 @@ else
     $existingApplication = array($application);
 }
 
-file_put_contents($path, (new MagicObject($existingApplication))->dumpYaml());
-file_put_contents($builderConfigPath, (new MagicObject($builderConfig))->dumpYaml());
+file_put_contents($path, (new SecretObject($existingApplication))->dumpYaml());
+file_put_contents($builderConfigPath, (new SecretObject($builderConfig))->dumpYaml());
 header('Content-type: application/json');
 echo '{}';

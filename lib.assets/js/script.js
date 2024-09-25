@@ -283,6 +283,7 @@ jQuery(function(){
     let directory = modal.find('[name="application_directory"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
+    let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
     
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function(){
@@ -297,10 +298,14 @@ jQuery(function(){
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
-        data: { id: id, name: name, type:type, description: description, directory: directory, namespace:namespace, author: author, paths:paths },
+        dataType: "html",
+        data: { id: id, name: name, type:type, description: description, directory: directory, namespace:namespace, author: author, paths:paths, magic_app_version:magic_app_version },
         success: function (data) {
           reloadApplicationList();
         },
+        error: function(e1, e2)
+        {
+        }
       });
     }
     $(modal).modal('hide');
@@ -550,11 +555,14 @@ jQuery(function(){
   });
   
   $(document).on('click', '.create-new-application', function(){
+    let createBtn = $('#modal-create-application #create_new_app');
+    createBtn[0].disabled = true;
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
     $('[name="application_directory"]').val('');
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
+    $('[name="magic_app_version"]').empty();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
@@ -566,7 +574,13 @@ jQuery(function(){
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
+
+        for(let i in data.magic_app_versions)
+        {
+          $('[name="magic_app_version"]')[0].appendChild(new Option(data.magic_app_versions[i], data.magic_app_versions[i]));;
+        }
         reloadApplicationList();
+        createBtn[0].disabled = false;
       }
     });
   });
@@ -693,7 +707,6 @@ jQuery(function(){
       languages.push({name:name, code:code, active:active});
     });
     let select = $('.target-language');
-    console.log('aa')
     if (languages.length > 0) {
       $.ajax({
         method: "POST",
@@ -766,7 +779,6 @@ jQuery(function(){
       let referenceTableName = $(this).attr('data-reference-table-name');
       let referenceColumnName = $(this).attr('data-reference-column-name');
       request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName, columnName:columnName, referenceNamespaceName:referenceNamespaceName, referenceEntityName:referenceEntityName, referenceTableName:referenceTableName, referenceColumnName:referenceColumnName};
-      console.log(namespaceName, entityName, tableName, columnName, referenceNamespaceName, referenceEntityName, referenceTableName, referenceColumnName);
     }
     else
     {
@@ -782,7 +794,6 @@ jQuery(function(){
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
-    console.log(url)
     $.ajax({
       type: 'GET',
       dataType: 'html',
@@ -797,6 +808,8 @@ jQuery(function(){
 
   $(document).on('click', '.button-application-setting', function(e){
     e.preventDefault();
+    let updateBtn = $('#modal-application-setting .button-save-application-config');
+    updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
@@ -808,6 +821,7 @@ jQuery(function(){
       success:function(data){
         $('#modal-application-setting .application-setting').empty().append(data);
         reloadApplicationList();
+        updateBtn[0].disabled = false;
       }
     });
   });

@@ -14,7 +14,6 @@ if($inputPost->getUserAction() == 'get')
 {
     try
     {
-        
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $filter = $inputPost->getFilter();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();

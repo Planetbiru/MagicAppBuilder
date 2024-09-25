@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\Composer\ComposerUtil;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -20,4 +21,5 @@ echo json_encode(array(
     'application_author' => 'Your Name',
     'application_type' => 'fullstack',
     'application_description' => 'Description',
+    'magic_app_versions' => ComposerUtil::getMagicAppVersionList()
 ));

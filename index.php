@@ -683,14 +683,6 @@ $constSelected = ' selected';
         </div>
         <div class="modal-body">
           <form action="">
-            <?php
-            $appName = "YourAppName";
-            $appAuthor = "YourName";
-            $appId = PicoDatabaseUtil::uuid();
-            $appBaseDir = dirname(__DIR__) . "/$appId";
-            $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
-            $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
-            ?>
             <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
               <tbody>
                 <tr>
@@ -704,9 +696,21 @@ $constSelected = ' selected';
                 <tr>
                   <td>Application Type</td>
                   <td>
-                      <select class="form-control" name="application_type" id="application_type">
+                      <select class="form-control" name="application_type">
                           <option value="fullstack">Fullstack Application</option>
                           <option value="api">Application Programming Interface (API)</option>
+                      </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td><textarea class="form-control" name="application_description"></textarea></td>
+                </tr>
+                <tr>
+                  <td>MagicApp Version</td>
+                  <td>
+                      <select class="form-control" name="magic_app_version">
+                          
                       </select>
                   </td>
                 </tr>
@@ -722,10 +726,7 @@ $constSelected = ' selected';
                   <td>Author</td>
                   <td><input class="form-control" type="text" name="application_author"></td>
                 </tr>
-                <tr>
-                  <td>Description</td>
-                  <td><input class="form-control" type="text" name="application_description"></td>
-                </tr>
+                
                 <tr>
                   <td>Path</td>
                   <td class="paths">

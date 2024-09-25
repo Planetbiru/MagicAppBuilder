@@ -12,10 +12,8 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 try
 {
 	$inputPost = new InputPost();
+
 	$appId = $inputPost->getApplicationId();
-
-	$appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
-
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
 	$type = $inputPost->getType();
@@ -23,8 +21,11 @@ try
 	$databaseConfig = new SecretObject($inputPost->getDatabase());
 	$sessionsConfig = new SecretObject($inputPost->getSessions());
 	
+    // fix data type
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
 	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
+
+    $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
 
 	if($appConfig->getApplication() != null)
 	{
