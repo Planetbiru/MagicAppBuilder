@@ -16,7 +16,7 @@ try
     {
         $content = $inputPost->getContent();
         $moduleName = trim($module);
-        $path = $baseDirectory."/".$moduleName.".php";       
+        $path = $baseDirectory . "/" . $moduleName.".php";       
         file_put_contents($path, $content);
     }
 }

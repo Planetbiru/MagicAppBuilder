@@ -67,7 +67,7 @@ if($inputPost->getUserAction() == 'get')
             }
             
             $parsedLanguage = new MagicObject($parsed);   
-            $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
+            $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory() . "/" . $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
             $langs = array();
             
             if(file_exists($pathTrans))
