@@ -34,7 +34,7 @@ class Point {
     /**
      * Method to calculate the distance between two Point objects
      *
-     * @param self $p
+     * @param self $p Point
      * @return double
      */
     public function distanceFrom(Point $p) {

@@ -44,7 +44,7 @@ class Area
      * @param Rectangle|Triangle|Polygon|Circle $object One of Rectangle, Triangle, Polygon, or Circle
      * @param float $zoom Zoom
      * @param string $href Href
-     * @param string[] $attributes
+     * @param string[] $attributes Attributes
      */
     public function __construct($object, $zoom = 1, $href = null, $attributes = null)
     {
@@ -82,7 +82,7 @@ class Area
     /**
      * Get rectangle coordinates
      *
-     * @param Rectangle $object
+     * @param Rectangle $object Rectangle
      * @return float[]
      */
     public function coordsFromRectangle($object)
@@ -98,7 +98,7 @@ class Area
     /**
      * Get triangle coordinates
      *
-     * @param Triangle $object
+     * @param Triangle $object Triangle
      * @return float[]
      */
     public function coordsFromTriangle($object)
@@ -116,7 +116,7 @@ class Area
     /**
      * Get Polygon coordinates
      *
-     * @param Polygon $object
+     * @param Polygon $object Polygon
      * @return float[]
      */
     public function coordsFromPolygon($object)
@@ -134,7 +134,7 @@ class Area
     /**
      * Get circle info
      *
-     * @param Circle $object
+     * @param Circle $object Circle
      * @return float[]
      */
     public function coordsFromCircle($object)
@@ -145,7 +145,7 @@ class Area
     /**
      * Get coordinates
      *
-     * @param float $zoom
+     * @param float $zoom Zoom
      * @return float[]
      */
     public function getCoords($zoom = 1)
@@ -208,6 +208,7 @@ class Area
     /**
      * Set the value of zoom
      *
+     * @param float $zoom Zoom
      * @return self
      */
     public function setZoom($zoom)
