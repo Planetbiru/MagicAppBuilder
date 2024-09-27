@@ -64,13 +64,13 @@ class EntityErrorCache extends MagicObject
 	protected $errorCode;
     
     /**
-	 * Error Message
+	 * Message
 	 * 
-	 * @Column(name="error_message", type="text", nullable=true)
-	 * @Label(content="Error Message")
+	 * @Column(name="message", type="text", nullable=true)
+	 * @Label(content="Message")
 	 * @var string
 	 */
-	protected $errorMessage;
+	protected $message;
 
     /**
 	 * Line Number

@@ -4,6 +4,7 @@ use AppBuilder\Util\Error\ErrorChecker;
 use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
+use MagicObject\Response\PicoResponse;
 use MagicObject\Util\PicoIniUtil;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -60,8 +61,7 @@ if($inputPost->getUserAction() == 'get')
                             $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
                         }
                     }
-                    header('Content-type: application/json');
-                    echo json_encode($response);
+                    PicoResponse::sendJSON($response);
                 }
             }
         }

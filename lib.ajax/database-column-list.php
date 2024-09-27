@@ -2,6 +2,7 @@
 
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Request\InputPost;
+use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
@@ -62,8 +63,7 @@ try {
         'columns' => $cols,
         'primary_keys' => $primaryKeys,
     );
-    header('Content-type: application/json');
-    echo json_encode($json);
+    PicoResponse::sendJSON($json);
 } catch (Exception $e) {
     error_log($e->getMessage());
     // do nothing

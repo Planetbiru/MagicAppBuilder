@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Request\InputPost;
+use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
@@ -44,16 +45,16 @@ try {
                 }
             }
 
-            echo json_encode(array(
+            PicoResponse::sendJSON(array(
                 "success" => false,
-                "error_title" => "Parse Error",
-                "error_message" => nl2br("<p>" . $errorMessage . "</p>"),
+                "title" => "Parse Error",
+                "message" => nl2br("<p>" . $errorMessage . "</p>"),
                 "error_line" => $lineNumber
             ));
         } else {
-            echo json_encode(array(
+            PicoResponse::sendJSON(array(
                 "success" => true,
-                "error_message" => "Success",
+                "message" => "Success",
                 "error_line" => 0
             ));
         }

@@ -1191,7 +1191,7 @@ function saveEntity() {
         removeHilightLineError();
         addHilightLineError(data.error_line - 1)
         if (!data.success) {
-          showAlertUI(data.error_title, data.error_message);
+          showAlertUI(data.title, data.message);
           setTimeout(function () { closeAlertUI() }, 2000);
         }
       },

@@ -1,5 +1,6 @@
 <?php
 use MagicObject\Database\PicoDatabaseQueryBuilder;
+use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
@@ -38,8 +39,7 @@ try
 			$tables[$data['table_name']]['primary_key'][] = $data['column_name'];
 		}
 	}
-	header('Content-type: application/json');
-	echo json_encode($tables);
+	PicoResponse::sendJSON($tables);
 }
 catch(Exception $e)
 {

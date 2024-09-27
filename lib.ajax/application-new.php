@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Util\Composer\ComposerUtil;
+use MagicObject\Response\PicoResponse;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -11,9 +12,7 @@ $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
 $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
-header("Content-type: application/json");
-
-echo json_encode(array(
+$data = array(
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
@@ -22,4 +21,6 @@ echo json_encode(array(
     'application_type' => 'fullstack',
     'application_description' => 'Description',
     'magic_app_versions' => ComposerUtil::getMagicAppVersionList()
-));
+);
+
+PicoResponse::sendJSON($data);

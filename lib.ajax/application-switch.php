@@ -2,6 +2,7 @@
 
 use AppBuilder\AppSecretObject;
 use MagicObject\Request\InputPost;
+use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -58,5 +59,4 @@ else
 
 file_put_contents($path, (new SecretObject($existingApplication))->dumpYaml());
 file_put_contents($builderConfigPath, (new SecretObject($builderConfig))->dumpYaml());
-header('Content-type: application/json');
-echo '{}';
+PicoResponse::sendJSON(new stdClass);

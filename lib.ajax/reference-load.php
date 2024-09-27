@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Request\InputGet;
+use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
@@ -37,43 +38,42 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
         $draft = $entityConstant->getDraft();
         $sortOrder = $entityConstant->getSortOrder();
         $draft = $entityConstant->getDraft();
-        echo json_encode(
-            array(
-                "type" => "entity",
-                "entity" => array(
-                    "entityName" => $entityName,
-                    "tableName" => $tableName,
-                    "primaryKey" => $fieldName,
-                    "value" => $name,
-                    "objectName" => $objectName,
-                    "propertyName" => $name,
-                    "specification" => array(
-                        array(
-                            "column" => PicoStringUtil::camelize($active),
-                            "value" => true
-                        ),
-                        array(
-                            "column" => PicoStringUtil::camelize($draft),
-                            "value" => true
-                        )
+        $data = array(
+            "type" => "entity",
+            "entity" => array(
+                "entityName" => $entityName,
+                "tableName" => $tableName,
+                "primaryKey" => $fieldName,
+                "value" => $name,
+                "objectName" => $objectName,
+                "propertyName" => $name,
+                "specification" => array(
+                    array(
+                        "column" => PicoStringUtil::camelize($active),
+                        "value" => true
                     ),
-                    "sortable" => array(
-                        array(
-                            "sortBy" => PicoStringUtil::camelize($sortOrder),
-                            "sortType" => "PicoSort::ORDER_TYPE_ASC"
-                        ),
-                        array(
-                            "sortBy" => PicoStringUtil::camelize($name),
-                            "sortType" => "PicoSort::ORDER_TYPE_ASC"
-                        )
-                    ),
-                    "additionalOutput" => array()
+                    array(
+                        "column" => PicoStringUtil::camelize($draft),
+                        "value" => true
+                    )
                 ),
-                "map" => array(),
-                "yesno" => null,
-                "truefalse" => null,
-                "onezero" => null
-            )
+                "sortable" => array(
+                    array(
+                        "sortBy" => PicoStringUtil::camelize($sortOrder),
+                        "sortType" => "PicoSort::ORDER_TYPE_ASC"
+                    ),
+                    array(
+                        "sortBy" => PicoStringUtil::camelize($name),
+                        "sortType" => "PicoSort::ORDER_TYPE_ASC"
+                    )
+                ),
+                "additionalOutput" => array()
+            ),
+            "map" => array(),
+            "yesno" => null,
+            "truefalse" => null,
+            "onezero" => null
         );
+        PicoResponse::sendJSON($data);
     }
 }

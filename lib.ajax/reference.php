@@ -2,6 +2,7 @@
 
 use AppBuilder\AppSecretObject;
 use MagicObject\Request\InputGet;
+use MagicObject\Response\PicoResponse;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -60,7 +61,7 @@ try
         file_put_contents($referenceConfigPath, $referenceConfig->dumpYaml());
     }
     header("Content-type: application/json");
-    echo $fieldReference;
+    PicoResponse::sendJSON($fieldReference);
 }
 catch(Exception $e)
 {
