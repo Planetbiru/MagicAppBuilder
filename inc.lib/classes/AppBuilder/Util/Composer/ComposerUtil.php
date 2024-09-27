@@ -40,14 +40,36 @@ class ComposerUtil
             {
                 if(isset($child))
                 {
+                    $attributes = $child->attributes;
                     $version = trim($child->textContent);
                     if(!empty($version) && stripos($version, 'dev-') === false)
                     {
-                        $versions[] = $version;
+                        $versions[] = array(
+                            "key"=>$version, 
+                            "value"=>$version,
+                            "latest"=>self::hasClass($attributes, "open")
+                        );
                     }
                 }
             }
         }
         return $versions;
+    }
+    
+    public static function hasClass($attributes, $className)
+    {
+        for($i = 0; $i < $attributes->length; $i++)
+        {
+            if($attributes->item($i)->name == "class")
+            {
+                $classes = $attributes->item($i)->value;
+                $arr = explode(" ", $classes);
+                if(in_array($className, $arr))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

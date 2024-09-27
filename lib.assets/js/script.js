@@ -574,10 +574,13 @@ jQuery(function(){
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
-
+        let value = '';
         for(let i in data.magic_app_versions)
         {
-          $('[name="magic_app_version"]')[0].appendChild(new Option(data.magic_app_versions[i], data.magic_app_versions[i]));;
+          let latest = data.magic_app_versions[i]['latest'];
+          $('[name="magic_app_version"]')[0].appendChild(
+            new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
+          );
         }
         reloadApplicationList();
         createBtn[0].disabled = false;
