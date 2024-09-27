@@ -1,6 +1,7 @@
 <?php
 use AppBuilder\AppBuilder;
 use MagicObject\Request\InputPost;
+use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -42,8 +43,7 @@ if($inputPost->getAction() == "update")
             $appConfig->setLanguages($currentLanguages);
             AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
         }
-        header("Content-type: application/json");
-        echo json_encode($currentLanguages);
+        PicoResponse::sendJSON($currentLanguages);
     }
     catch(Exception $e)
     {
@@ -62,8 +62,7 @@ else if($inputPost->getAction() == "get")
         {
             $currentLanguages = array();
         }
-        header("Content-type: application/json");
-        echo json_encode($currentLanguages);
+        PicoResponse::sendJSON($currentLanguages);
     }
     catch(Exception $e)
     {
@@ -94,8 +93,7 @@ else if($inputPost->getAction() == "default")
         }
         $appConfig->setLanguages($currentLanguages);
         AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
-        header("Content-type: application/json");
-        echo json_encode($currentLanguages);
+        PicoResponse::sendJSON($currentLanguages);
     }
     catch(Exception $e)
     {
