@@ -1,0 +1,7 @@
+{
+    "response_code": "0001",
+    "response_text": "Success",
+    "message": "Data has been saved successfuly",
+    "primary_key_name": "pekerjaanId",
+    "primary_key_value": "01"
+}

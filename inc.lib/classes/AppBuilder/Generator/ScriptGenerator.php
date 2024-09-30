@@ -240,7 +240,7 @@ class ScriptGenerator
      * @param EntityApvInfo $entityApvInfo
      * @return void
      */
-    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) // NOSONAR
+    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) 
     {
         $insertFields = array();
         $editFields = array();
@@ -314,45 +314,14 @@ class ScriptGenerator
         
         $appConf = $appConfig->getApplication();
         
-        $uses = array();
-        $uses[] = "// This script is generated automatically by AppBuilder";
-        $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
-        $uses[] = "";
-        $uses[] = "use MagicObject\\MagicObject;";
-        if($approvalRequired || $sortOrder)
-        {
-            $uses[] = "use MagicObject\\SetterGetter;";
-        }
-        $uses[] = "use MagicObject\\Database\\PicoPage;";
-        $uses[] = "use MagicObject\\Database\\PicoPageable;";
-        $uses[] = "use MagicObject\\Database\\PicoPredicate;";
-        $uses[] = "use MagicObject\\Database\\PicoSort;";
-        $uses[] = "use MagicObject\\Database\\PicoSortable;";
-        $uses[] = "use MagicObject\\Database\\PicoSpecification;";
-        $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
-        $uses[] = "use MagicObject\\Request\\InputGet;";
-        $uses[] = "use MagicObject\\Request\\InputPost;";
-        $uses[] = "use MagicApp\\AppEntityLanguage;";
-        $uses[] = "use MagicApp\\AppFormBuilder;";
-        $uses[] = "use MagicApp\\Field;";
-        $uses[] = "use MagicApp\\PicoModule;";
-        if($approvalRequired)
-        {
-            $uses[] = "use MagicApp\\PicoApproval;";
-            $uses[] = "use MagicApp\\WaitingFor;";
-        }
-        $uses[] = "use MagicApp\\UserAction;";
-        $uses[] = "use MagicApp\\AppUserPermission;";
-        $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
-        $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
+        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder);
+        
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
-        $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);      
-        if($appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
-        {
-            $uses[] = "use MagicApp\\XLSX\\DocumentWriter;";
-            $uses[] = "use MagicApp\\XLSX\\XLSXDataFormat;";
-        }
+        $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
+        $uses = $this->addExporterLibrary($uses, $appFeatures);      
+        $uses = $this->addAddEmptyLine($uses);
+        
         
         $uses[] = "";
         
@@ -513,6 +482,80 @@ class ScriptGenerator
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
+    }
+    
+    /**
+     * Add exporter library
+     *
+     * @param string[] $uses
+     * @param AppFeatures $appFeatures
+     * @return string[]
+     */
+    public function addExporterLibrary($uses, $appFeatures)
+    {
+        if($appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
+        {
+            $uses[] = "use MagicApp\\XLSX\\DocumentWriter;";
+            $uses[] = "use MagicApp\\XLSX\\XLSXDataFormat;";
+        }
+        return $uses;
+    }
+    
+    /**
+     * Add empty line
+     *
+     * @param string[] $uses
+     * @return string[]
+     */
+    public function addAddEmptyLine($uses)
+    {
+        $uses[] = "";
+        return $uses;
+    }
+    
+    /**
+     * Create use statements
+     *
+     * @param SecretObject $appConf
+     * @param string $entityMainName
+     * @param boolean $approvalRequired
+     * @param boolean $sortOrder
+     * @return string[]
+     */
+    public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder)
+    {
+        $uses = array();
+        $uses[] = "// This script is generated automatically by AppBuilder";
+        $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
+        $uses[] = "";
+        $uses[] = "use MagicObject\\MagicObject;";
+        if($approvalRequired || $sortOrder)
+        {
+            $uses[] = "use MagicObject\\SetterGetter;";
+        }
+        $uses[] = "use MagicObject\\Database\\PicoPage;";
+        $uses[] = "use MagicObject\\Database\\PicoPageable;";
+        $uses[] = "use MagicObject\\Database\\PicoPredicate;";
+        $uses[] = "use MagicObject\\Database\\PicoSort;";
+        $uses[] = "use MagicObject\\Database\\PicoSortable;";
+        $uses[] = "use MagicObject\\Database\\PicoSpecification;";
+        $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
+        $uses[] = "use MagicObject\\Request\\InputGet;";
+        $uses[] = "use MagicObject\\Request\\InputPost;";
+        $uses[] = "use MagicApp\\AppEntityLanguage;";
+        $uses[] = "use MagicApp\\AppFormBuilder;";
+        $uses[] = "use MagicApp\\Field;";
+        $uses[] = "use MagicApp\\PicoModule;";
+        if($approvalRequired)
+        {
+            $uses[] = "use MagicApp\\PicoApproval;";
+            $uses[] = "use MagicApp\\WaitingFor;";
+        }
+        $uses[] = "use MagicApp\\UserAction;";
+        $uses[] = "use MagicApp\\AppUserPermission;";
+        $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
+        $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
+        return $uses;
     }
 
     /**

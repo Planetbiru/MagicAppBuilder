@@ -1,0 +1,43 @@
+{
+    "response_code": "0001",
+    "response_text": "Success",
+    "primary_key_name": "pekerjaanId",
+    "data": {
+        "input": [
+            {
+                "field": "pekerjaanId",
+                "label": "Pekerjaan",
+                "input_type": "select",
+                "data_type": "string",
+                "filter": null,
+                "options": [{
+                    "label": "Pekerjaan 1",
+                    "value": "01",
+                    "selected": false
+                }]
+            },
+            {
+                "field": "acuanPengawasanId",
+                "label": "Acuan Pengawasan",
+                "input_type": "select",
+                "data_type": "string",
+                "filter": null,
+                "options": [{
+                    "label": "Acuan 1",
+                    "value": "01",
+                    "selected": false
+                }]
+            },
+            {
+                "field": "tanggal",
+                "label": "Tanggal",
+                "input_type": "text",
+                "data_type": "string",
+                "filter": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"
+            }
+        ],
+        "allowed_action": [
+            "create"
+        ]
+    }
+}
