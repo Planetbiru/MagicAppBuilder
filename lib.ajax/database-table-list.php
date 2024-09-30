@@ -1,6 +1,6 @@
 <?php
 use MagicObject\Database\PicoDatabaseQueryBuilder;
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
@@ -39,7 +39,7 @@ try
 			$tables[$data['table_name']]['primary_key'][] = $data['column_name'];
 		}
 	}
-	PicoResponse::sendJSON($tables);
+	ResponseUtil::sendJSON($tables);
 }
 catch(Exception $e)
 {

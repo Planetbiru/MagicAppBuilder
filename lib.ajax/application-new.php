@@ -1,7 +1,7 @@
 <?php
 
 use AppBuilder\Util\Composer\ComposerUtil;
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -23,4 +23,4 @@ $data = array(
     'magic_app_versions' => ComposerUtil::getMagicAppVersionList()
 );
 
-PicoResponse::sendJSON($data);
+ResponseUtil::sendJSON($data);

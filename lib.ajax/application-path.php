@@ -1,7 +1,7 @@
 <?php
 use AppBuilder\AppBuilder;
 use MagicObject\Request\InputPost;
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -48,7 +48,7 @@ if($inputPost->getAction() == "update")
             $appConf->setBaseModuleDirectory($currentPaths);
             AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
         }
-        PicoResponse::sendJSON($currentPaths);
+        ResponseUtil::sendJSON($currentPaths);
     }
     catch(Exception $e)
     {
@@ -68,7 +68,7 @@ else if($inputPost->getAction() == "get")
         {
             $currentPaths = array();
         }
-        PicoResponse::sendJSON($currentPaths);
+        ResponseUtil::sendJSON($currentPaths);
     }
     catch(Exception $e)
     {
@@ -103,7 +103,7 @@ else if($inputPost->getAction() == "default")
         }
         $appConf->setBaseModuleDirectory($currentPaths);
         AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
-        PicoResponse::sendJSON($currentPaths);
+        ResponseUtil::sendJSON($currentPaths);
     }
     catch(Exception $e)
     {

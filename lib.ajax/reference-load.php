@@ -1,7 +1,7 @@
 <?php
 
 use MagicObject\Request\InputGet;
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
@@ -74,6 +74,6 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
             "truefalse" => null,
             "onezero" => null
         );
-        PicoResponse::sendJSON($data);
+        ResponseUtil::sendJSON($data);
     }
 }

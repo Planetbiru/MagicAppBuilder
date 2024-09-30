@@ -3,7 +3,7 @@
 use AppBuilder\Generator\ScriptGenerator;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 
 $time_start = microtime(true);
 
@@ -42,4 +42,4 @@ $response = array(
     "message" => sprintf("All scripts are generated in %.3f seconds", $time)
 );
 
-PicoResponse::sendJSON($response);
+ResponseUtil::sendJSON($response);

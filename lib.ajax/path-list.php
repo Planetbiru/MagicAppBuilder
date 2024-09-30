@@ -1,9 +1,9 @@
 
 <?php
 
-use MagicObject\Response\PicoResponse;
+use AppBuilder\Util\ResponseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $moduleLocation = $appConfig->getApplication() != null ? $appConfig->getApplication()->getBaseModuleDirectory() : array();
-PicoResponse::sendJSON($moduleLocation);
+ResponseUtil::sendJSON($moduleLocation);
