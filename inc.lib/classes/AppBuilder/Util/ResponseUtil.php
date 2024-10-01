@@ -9,6 +9,7 @@ class ResponseUtil
      *
      * @param mixed $data
      * @param boolean $prettify
+     * @param boolean $async
      * @return void
      */
     public static function sendJSON($data, $prettify = false, $async = false)
@@ -31,13 +32,11 @@ class ResponseUtil
                 ignore_user_abort(true);
             }
             ob_start();
-
             if ($body != null) {
                 echo $body;
             }
         }
         header("Connection: close");
-
         if ($async) {
             ob_end_flush();
             ob_flush();
