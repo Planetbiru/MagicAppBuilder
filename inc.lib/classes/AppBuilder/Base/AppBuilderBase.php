@@ -60,6 +60,7 @@ class AppBuilderBase //NOSONAR
     const APP_CONFIG = "appConfig";
     const CURLY_BRACKET_OPEN = "{";
     const CURLY_BRACKET_CLOSE = "}";
+    const PHP_TRY = "try";
 
     /**
      * Set and get value style
@@ -627,15 +628,15 @@ class AppBuilderBase //NOSONAR
 
         if($approvalRequired)
         {
-            $getData[] = self::TAB1.self::TAB1."}";
+            $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
             $getData[] = self::TAB1.self::TAB1."else";
-            $getData[] = self::TAB1.self::TAB1."{";
+            $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'?>';
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageNoneditableDataWaitingApproval();?></div>';
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="button-area"><button type="button" class="btn btn-primary" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'<?php';
     
-            $getData[] = self::TAB1.self::TAB1."}";
+            $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         }
 
         
@@ -2354,7 +2355,6 @@ $subqueryMap = '.$referece.';
             $labelWrapper = $dom->createElement('span');
             $labelWrapper->setAttribute('class', 'filter-label');
             $labelWrapper->appendChild($label);
-
                 
             if($field->getFilterElementType() == "text")
             {
@@ -3784,7 +3784,7 @@ $subqueryMap = '.$referece.';
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'if($inputGet->getNextAction() == UserAction::APPROVAL)'));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."{"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
         $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -3797,10 +3797,10 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($pkInputApprove2);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."}"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
 
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'else if($inputGet->getNextAction() == UserAction::APPROVE)'));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."{"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
         $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -3811,10 +3811,10 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($pkInputApprove);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."}"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'else'));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."{"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
         $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -3825,7 +3825,7 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($pkInputReject);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."}"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
         

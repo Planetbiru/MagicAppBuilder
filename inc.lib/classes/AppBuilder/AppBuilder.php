@@ -51,7 +51,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
         $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
 
-        $lines[] = parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
@@ -113,7 +113,7 @@ class AppBuilder extends AppBuilderBase
             $lines[] = $line;
         }
 
-        $lines[] = parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_UPDATE_END;
         if($updatePk)
@@ -127,7 +127,6 @@ class AppBuilder extends AppBuilderBase
 
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
-
         }
         else
         {
@@ -170,7 +169,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."try";    
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::PHP_TRY;    
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($withTrash)
         {
@@ -228,7 +227,6 @@ class AppBuilder extends AppBuilderBase
         $upperTimeEdit = PicoStringUtil::upperCamelize($this->entityInfo->getTimeEdit());
         $upperIpEdit = PicoStringUtil::upperCamelize($this->entityInfo->getIpEdit());
         
-        
         $lines = array();
         $upperActivationKey = PicoStringUtil::upperCamelize($activationKey);
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == $userAction)";
@@ -239,8 +237,8 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."try";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::PHP_TRY;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
             
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".$this->getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
@@ -276,9 +274,9 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_UPDATE_END;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
