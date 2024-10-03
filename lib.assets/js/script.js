@@ -888,8 +888,13 @@ function reloadApplicationList()
   $.ajax({
     type:'GET',
     url:'lib.ajax/path-list.php',
+    dataType: 'json',
     success:function(data){
-      $('[name="current_module_location"]').empty().append(data);
+      $('[name="current_module_location"]').empty();
+      for(let i in data)
+      {
+        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
+      }
     }
   });
 }
@@ -1988,6 +1993,7 @@ function generateSelectFilter(field, args) {
     '" id="filter_type_' +
     field +
     '">\r\n' +
+    '<option value="FILTER_DEFAULT">DEFAULT</option>\r\n' +
     '<option value="FILTER_SANITIZE_BOOL">BOOL</option>\r\n' +
     '<option value="FILTER_SANITIZE_NUMBER_INT">NUMBER_INT</option>\r\n' +
     '<option value="FILTER_SANITIZE_NUMBER_UINT">NUMBER_UINT</option>\r\n' +
