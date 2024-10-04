@@ -188,7 +188,7 @@ class PicoResponse
         }
         $headers['Content-type'] = $contentType;
         if ($contentLength != 0) {
-            //$headers['Content-length'] = $contentLength;
+            $headers['Content-length'] = $contentLength;
         }
         return $headers;
     }

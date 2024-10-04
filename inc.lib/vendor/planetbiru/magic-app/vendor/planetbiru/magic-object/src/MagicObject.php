@@ -1811,6 +1811,8 @@ class MagicObject extends stdClass // NOSONAR
      * get &raquo; get property value. This method not require database connection.
      * set &raquo; set property value. This method not require database connection.
      * unset &raquo; unset property value. This method not require database connection.
+     * push &raquo; add new array element of property. This method not require database connection.
+     * pop &raquo; remove last element of property. This method not require database connection.
      * findOneBy &raquo; search data from database and return one record. This method require database connection.
      * findOneIfExistsBy &raquo; search data from database by any column values and return one record. This method require database connection.
      * deleteOneBy &raquo; delete data from database by any column values and return one record. This method require database connection.
@@ -1872,6 +1874,23 @@ class MagicObject extends stdClass // NOSONAR
             $var = lcfirst(substr($method, 5));
             $this->removeValue($var, $params[0]);
             return $this;
+        }
+        else if (strncasecmp($method, "push", 4) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
+            $var = lcfirst(substr($method, 4));
+            if(!isset($this->$var) || !is_array($this->$var))
+            {
+                $this->$var = array();
+            }
+            array_push($this->$var, isset($params) && isset($params[0]) ? $params[0] : null);
+            return $this;
+        }
+        else if (strncasecmp($method, "pop", 3) === 0) {
+            $var = lcfirst(substr($method, 3));
+            if(isset($this->$var) && is_array($this->$var))
+            {
+                return array_pop($this->$var);
+            }
+            return null;
         }
         else if (strncasecmp($method, "findOneBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));

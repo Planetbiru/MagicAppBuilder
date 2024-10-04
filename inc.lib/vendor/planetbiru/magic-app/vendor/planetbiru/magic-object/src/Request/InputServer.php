@@ -58,4 +58,48 @@ class  InputServer extends PicoRequestBase {
     {
         return PicoRequest::getRequestHeader($key);
     }
+
+    /**
+     * Parse language
+     *
+     * @param string $acceptLanguage
+     * @return array
+     */
+    public function parseLanguages($acceptLanguage) {
+        $langs = explode(',', $acceptLanguage);
+        $languageList = array();
+        foreach($langs as $lang) 
+        {
+            $parts = explode(';q=', $lang);
+            $language = $parts[0];
+            $quality = isset($parts[1]) ? (float)$parts[1] : 1.0;
+            $languageList[$language] = $quality;
+        }
+        arsort($languageList);
+        return $languageList;
+    }    
+
+    /**
+     * User language
+     *
+     * @return string
+     */
+    public function userLanguage($general = false)
+    {
+        if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+        {
+            $languages = self::parseLanguages($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            if(!empty($languages))
+            {
+                $langs = array_keys($languages);
+                if($general)
+                {
+                    $arr = explode('-', $langs[0]);
+                    return $arr[0];
+                }
+                return $langs[0];
+            }
+        }
+        return null;
+    }
 }

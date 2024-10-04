@@ -117,6 +117,104 @@ echo $someObject;
 
 // or you can debug with
 error_log($someObject);</code></pre>
+<h3>Push</h3>
+<p>Push is present in MagicObject version 1.22. Push is used to add array elements from a MagicObject property. The <code>push</code> method basically uses the <code>array_push</code> function which is a built-in PHP function.</p>
+<pre><code>&lt;?php
+use MagicObject\MagicObject;
+
+require_once __DIR__ . "/vendor/autoload.php";
+
+$someObject = new MagicObject();
+
+$someObject-&gt;pushData("Text 1");
+$someObject-&gt;pushData("Text 2");
+$someObject-&gt;pushData(3);
+$someObject-&gt;pushData(4.0);
+$someObject-&gt;pushData(true);
+
+echo $someObject;</code></pre>
+<p>Output will be</p>
+<pre><code class="language-json">{"data":["Text 1","Text 2",3,4.1,true]}</code></pre>
+<h3>Pop</h3>
+<p>Pop is present in MagicObject version 1.22. Pop is used to remove the last element of an array from a MagicObject property. The <code>pop</code> method basically uses the <code>array_pop</code> function which is a built-in PHP function.</p>
+<pre><code>&lt;?php
+use MagicObject\MagicObject;
+
+require_once __DIR__ . "/vendor/autoload.php";
+
+$someObject = new MagicObject();
+
+$someObject-&gt;setData(["Text 1", "Text 2", 3, 4.1, true]);
+echo $someObject."\r\n\r\n";
+
+echo "Pop\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";</code></pre>
+<p>Output will be:</p>
+<pre><code>{"data":["Text 1","Text 2",3,4.1,true]}
+
+Pop
+1
+After Pop
+{"data":["Text 1","Text 2",3,4.1]}
+
+4.1
+After Pop
+{"data":["Text 1","Text 2",3]}
+
+3
+After Pop
+{"data":["Text 1","Text 2"]}</code></pre>
+<p><code>push</code> and <code>pop</code> example:</p>
+<pre><code class="language-php">&lt;?php
+use MagicObject\MagicObject;
+
+require_once __DIR__ . "/vendor/autoload.php";
+$someObject = new MagicObject();
+
+$someObject-&gt;pushData("Text 1");
+$someObject-&gt;pushData("Text 2");
+$someObject-&gt;pushData(3);
+$someObject-&gt;pushData(4.1);
+$someObject-&gt;pushData(true);
+
+echo "After Push\r\n";
+
+echo $someObject."\r\n\r\n";
+
+echo "Pop\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";</code></pre>
+<p>Output will be:</p>
+<pre><code>After Push
+{"data":["Text 1","Text 2",3,4.1,true]}
+
+Pop
+1
+After Pop
+{"data":["Text 1","Text 2",3,4.1]}
+
+4.1
+After Pop
+{"data":["Text 1","Text 2",3]}
+
+3
+After Pop
+{"data":["Text 1","Text 2"]}</code></pre>
 </article>
 
 <article class="article" id="part4">
