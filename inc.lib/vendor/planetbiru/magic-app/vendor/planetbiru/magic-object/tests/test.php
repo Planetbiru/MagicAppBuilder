@@ -14,7 +14,7 @@ require_once dirname(__DIR__) . "/vendor/autoload.php";
 
 $someObject = new MagicObject();
 
-
+$someObject->setData(8); // push and pop will not change this
 $someObject->pushData("Text 1");
 $someObject->pushData("Text 2");
 $someObject->pushData(3);

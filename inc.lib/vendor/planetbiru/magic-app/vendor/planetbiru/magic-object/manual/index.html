@@ -119,6 +119,13 @@ echo $someObject;
 error_log($someObject);</code></pre>
 <h3>Push</h3>
 <p>Push is present in MagicObject version 1.22. Push is used to add array elements from a MagicObject property. The <code>push</code> method basically uses the <code>array_push</code> function which is a built-in PHP function.</p>
+<p>As with the <code>set</code> method, users can use the <code>push</code> method in two ways:</p>
+<ol>
+<li>using a subfix in the form of a property name written in camelcase style with one parameter, namely the value of the element to be added.</li>
+<li>using two parameters, namely the property name written in camelcase style and the value of the element to be added.</li>
+</ol>
+<p><strong>Warning!</strong></p>
+<p>Be careful when using the <code>push</code> method. If a property has a value other than an array and the user calls the <code>push</code> method on that property, MagicObject will ignore it and nothing will change the property value..</p>
 <pre><code>&lt;?php
 use MagicObject\MagicObject;
 
@@ -132,11 +139,28 @@ $someObject-&gt;pushData(3);
 $someObject-&gt;pushData(4.0);
 $someObject-&gt;pushData(true);
 
+/*
+or
+
+$someObject-&gt;push("data", "Text 1");
+$someObject-&gt;push("data", "Text 2");
+$someObject-&gt;push("data", 3);
+$someObject-&gt;push("data", 4.1);
+$someObject-&gt;push("data", true);
+*/
+
 echo $someObject;</code></pre>
 <p>Output will be</p>
 <pre><code class="language-json">{"data":["Text 1","Text 2",3,4.1,true]}</code></pre>
 <h3>Pop</h3>
 <p>Pop is present in MagicObject version 1.22. Pop is used to remove the last element of an array from a MagicObject property. The <code>pop</code> method basically uses the <code>array_pop</code> function which is a built-in PHP function.</p>
+<p>As with the <code>unset</code> method, users can use the <code>pop</code> method in two ways:</p>
+<ol>
+<li>using a subfix in the form of a property name written in camelcase style.</li>
+<li>using one parameter, namely the property name.</li>
+</ol>
+<p><strong>Warning!</strong></p>
+<p>The <code>pup</code> method only applies if the property is a traditional array. It does not apply to scalar, object, and associated array properties.</p>
 <pre><code>&lt;?php
 use MagicObject\MagicObject;
 
@@ -185,18 +209,31 @@ $someObject-&gt;pushData(3);
 $someObject-&gt;pushData(4.1);
 $someObject-&gt;pushData(true);
 
+/*
+or
+
+$someObject-&gt;push("data", "Text 1");
+$someObject-&gt;push("data", "Text 2");
+$someObject-&gt;push("data", 3);
+$someObject-&gt;push("data", 4.1);
+$someObject-&gt;push("data", true);
+*/
+
 echo "After Push\r\n";
 
 echo $someObject."\r\n\r\n";
 
 echo "Pop\r\n";
 echo $someObject-&gt;popData()."\r\n";
+// or echo $someObject-&gt;pop("data")."\r\n";
 echo "After Pop\r\n";
 echo $someObject."\r\n\r\n";
 echo $someObject-&gt;popData()."\r\n";
+// or echo $someObject-&gt;pop("data")."\r\n";
 echo "After Pop\r\n";
 echo $someObject."\r\n\r\n";
 echo $someObject-&gt;popData()."\r\n";
+// or echo $someObject-&gt;pop("data")."\r\n";
 echo "After Pop\r\n";
 echo $someObject."\r\n\r\n";</code></pre>
 <p>Output will be:</p>
@@ -215,6 +252,36 @@ After Pop
 3
 After Pop
 {"data":["Text 1","Text 2"]}</code></pre>
+<p><code>push</code> and <code>pop</code> only apply to properties that are arrays.</p>
+<pre><code class="language-php">
+&lt;?php
+use MagicObject\MagicObject;
+
+require_once __DIR__ . "/vendor/autoload.php";
+$someObject = new MagicObject();
+
+$someObject-&gt;setData(8); // push and pop will not change this
+$someObject-&gt;pushData("Text 1");
+$someObject-&gt;pushData("Text 2");
+$someObject-&gt;pushData(3);
+$someObject-&gt;pushData(4.1);
+$someObject-&gt;pushData(true);
+
+echo "After Push\r\n";
+
+echo $someObject."\r\n\r\n";
+
+echo "Pop\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+echo $someObject-&gt;popData()."\r\n";
+echo "After Pop\r\n";
+echo $someObject."\r\n\r\n";
+``</code></pre>
 </article>
 
 <article class="article" id="part4">
