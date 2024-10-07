@@ -14,7 +14,20 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 try
 {
-    $magicAppList = ComposerUtil::getMagicAppVersionList();
+    $cachePath = $workspaceDirectory."/magic-app-version.json";
+    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-1 days'))
+    {
+        $magicAppList = ComposerUtil::getMagicAppVersionList();
+        file_put_contents($cachePath, json_encode($magicAppList));
+    }
+    else
+    {
+        $magicAppList = json_decode(file_get_contents($cachePath));
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $magicAppList = ComposerUtil::getMagicAppVersionList();
+            file_put_contents($cachePath, json_encode($magicAppList));
+        }
+    }
 }
 catch(Exception $e)
 {
