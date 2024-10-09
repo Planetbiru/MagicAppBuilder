@@ -1,7 +1,6 @@
 <?php
 
 use MagicObject\Database\PicoDatabase;
-use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 

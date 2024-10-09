@@ -773,7 +773,7 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Add array element of property
+     * Adds array elements from a property at the end
      *
      * @param string $propertyName
      * @param mixed $propertyValue
@@ -789,9 +789,51 @@ class MagicObject extends stdClass // NOSONAR
         array_push($this->$var, $propertyValue);
         return $this;
     }
+    
+    /**
+     * Adds array elements from a property at the end
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return self
+     */
+    public function append($propertyName, $propertyValue)
+    {
+        return $this->push($propertyName, $propertyValue);
+    }
+    
+    /**
+     * Adds array elements from a property at the beginning
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return self
+     */
+    public function unshift($propertyName, $propertyValue)
+    {
+        $var = PicoStringUtil::camelize($propertyName);
+        if(!isset($this->$var))
+        {
+            $this->$var = array();
+        }
+        array_unshift($this->$var, $propertyValue);
+        return $this;
+    }
+    
+    /**
+     * Adds array elements from a property at the beginning
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return self
+     */
+    public function prepend($propertyName, $propertyValue)
+    {
+        return $this->unshift($propertyName, $propertyValue);
+    }
 
     /**
-     * Remove last array element of property
+     * Remove last array element of property and return it
      *
      * @param string $propertyName
      * @return mixed
@@ -802,6 +844,22 @@ class MagicObject extends stdClass // NOSONAR
         if(isset($this->$var) && is_array($this->$var))
         {
             return array_pop($this->$var);
+        }
+        return null;
+    }
+    
+    /**
+     * Remove first array element of property and return it
+     *
+     * @param string $propertyName
+     * @return mixed
+     */
+    public function shift($propertyName)
+    {
+        $var = PicoStringUtil::camelize($propertyName);
+        if(isset($this->$var) && is_array($this->$var))
+        {
+            return array_shift($this->$var);
         }
         return null;
     }
@@ -1850,39 +1908,42 @@ class MagicObject extends stdClass // NOSONAR
 
     /**
      * Magic method called when user call any undefined method. __call method will check the prefix of called method and call appropriated method according to its name and its parameters.
-     * hasValue &raquo; check if property has value. This method not require database connection.
-     * isset &raquo; gcheck if property has value. String will be convert to number first. This method not require database connection.
-     * is &raquo; get property value as boolean. Number will true if it's value is 1. String will be convert to number first. This method not require database connection.
-     * equals &raquo; check if property value is equals to given value. This method not require database connection.
-     * get &raquo; get property value. This method not require database connection.
-     * set &raquo; set property value. This method not require database connection.
-     * unset &raquo; unset property value. This method not require database connection.
-     * push &raquo; add new array element of property. This method not require database connection.
-     * pop &raquo; remove last element of property. This method not require database connection.
-     * findOneBy &raquo; search data from database and return one record. This method require database connection.
-     * findOneIfExistsBy &raquo; search data from database by any column values and return one record. This method require database connection.
-     * deleteOneBy &raquo; delete data from database by any column values and return one record. This method require database connection.
-     * findFirstBy &raquo; search data from database by any column values and return first record. This method require database connection.
-     * findFirstIfExistsBy &raquo; search data from database by any column values and return first record. This method require database connection.
-     * findLastBy &raquo; search data from database by any column values and return last record. This method require database connection.
-     * findLastIfExistsBy &raquo; search data from database by any column values and return last record. This method require database connection.
-     * findBy &raquo; search multiple record data from database by any column values. This method require database connection.
-     * findAscBy &raquo; search multiple record data from database order by primary keys ascending. This method require database connection.
-     * findDescBy &raquo; search multiple record data from database order by primary keys descending. This method require database connection.
-     * listBy &raquo; search multiple record data from database. Similar to findBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
-     * listAscBy &raquo; search multiple record data from database order by primary keys ascending. Similar to findAscBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
-     * listDescBy &raquo; search multiple record data from database order by primary keys descending. Similar to findDescBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
-     * listAllAsc &raquo; search multiple record data from database without filter order by primary keys ascending. Similar to findAllAsc but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
-     * listAllDesc &raquo; search multiple record data from database without filter order by primary keys descending. Similar to findAllDesc but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * hasValue &raquo; check if property has value. This method does not require a database connection.
+     * isset &raquo; gcheck if property has value. String will be convert to number first. This method does not require a database connection.
+     * is &raquo; get property value as boolean. Number will true if it's value is 1. String will be convert to number first. This method does not require a database connection.
+     * equals &raquo; check if property value is equals to given value. This method does not require a database connection.
+     * get &raquo; get property value. This method does not require a database connection.
+     * set &raquo; set property value. This method does not require a database connection.
+     * unset &raquo; unset property value. This method does not require a database connection.
+     * push &raquo; adds array elements from a property at the end. This method does not require a database connection.
+     * append &raquo; adds array elements from a property at the end. This method does not require a database connection.
+     * unshift &raquo; adds array elements from a property at the beginning. This method does not require a database connection.
+     * prepend &raquo; adds array elements from a property at the beginning. This method does not require a database connection.
+     * pop &raquo; remove last element of property. This method does not require a database connection.
+     * shift &raquo; remove first element of property. This method does not require a database connection.
+     * findOneBy &raquo; search data from database and return one record. This method require a database connection.
+     * findOneIfExistsBy &raquo; search data from database by any column values and return one record. This method require a database connection.
+     * deleteOneBy &raquo; delete data from database by any column values and return one record. This method require a database connection.
+     * findFirstBy &raquo; search data from database by any column values and return first record. This method require a database connection.
+     * findFirstIfExistsBy &raquo; search data from database by any column values and return first record. This method require a database connection.
+     * findLastBy &raquo; search data from database by any column values and return last record. This method require a database connection.
+     * findLastIfExistsBy &raquo; search data from database by any column values and return last record. This method require a database connection.
+     * findBy &raquo; search multiple record data from database by any column values. This method require a database connection.
+     * findAscBy &raquo; search multiple record data from database order by primary keys ascending. This method require a database connection.
+     * findDescBy &raquo; search multiple record data from database order by primary keys descending. This method require a database connection.
+     * listBy &raquo; search multiple record data from database. Similar to findBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require a database connection.
+     * listAscBy &raquo; search multiple record data from database order by primary keys ascending. Similar to findAscBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require a database connection.
+     * listDescBy &raquo; search multiple record data from database order by primary keys descending. Similar to findDescBy but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require a database connection.
+     * listAllAsc &raquo; search multiple record data from database without filter order by primary keys ascending. Similar to findAllAsc but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require a database connection.
+     * listAllDesc &raquo; search multiple record data from database without filter order by primary keys descending. Similar to findAllDesc but return object does not contain a connection to the database so objects cannot be saved directly to the database. This method require a database connection.
      * countBy &raquo; count data from database.
-     * countBy &raquo; count data from database.
-     * existsBy &raquo; check data from database. This method require database connection.
-     * deleteBy &raquo; delete data from database without read it first. This method require database connection.
-     * booleanToTextBy &raquo; convert boolean value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No". This method not require database connection.
-     * booleanToSelectedBy &raquo; Create attribute selected="selected" for form. This method not require database connection.
-     * booleanToCheckedBy &raquo; Create attribute checked="checked" for form. This method not require database connection.
-     * startsWith &raquo; Check that value starts with any string. This method not require database connection.
-     * endsWith &raquo; Check that value ends with any string. This method not require database connection.
+     * existsBy &raquo; check data from database. This method require a database connection.
+     * deleteBy &raquo; delete data from database without read it first. This method require a database connection.
+     * booleanToTextBy &raquo; convert boolean value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No". This method does not require a database connection.
+     * booleanToSelectedBy &raquo; Create attribute selected="selected" for form. This method does not require a database connection.
+     * booleanToCheckedBy &raquo; Create attribute checked="checked" for form. This method does not require a database connection.
+     * startsWith &raquo; Check that value starts with any string. This method does not require a database connection.
+     * endsWith &raquo; Check that value ends with any string. This method does not require a database connection.
      *
      * @param string $method Method name
      * @param mixed $params Parameters
@@ -1923,23 +1984,27 @@ class MagicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "push", 4) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
             $var = lcfirst(substr($method, 4));
-            if(!isset($this->$var))
-            {
-                $this->$var = array();
-            }
-            if(is_array($this->$var))
-            {
-                array_push($this->$var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
-            }
-            return $this;
+            return $this->push($var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
+        }
+        else if (strncasecmp($method, "append", 6) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
+            $var = lcfirst(substr($method, 6));
+            return $this->append($var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
+        }
+        else if (strncasecmp($method, "unshift", 7) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
+            $var = lcfirst(substr($method, 7));
+            return $this->unshift($var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
+        }
+        else if (strncasecmp($method, "prepend", 7) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
+            $var = lcfirst(substr($method, 7));
+            return $this->prepend($var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
             $var = lcfirst(substr($method, 3));
-            if(isset($this->$var) && is_array($this->$var))
-            {
-                return array_pop($this->$var);
-            }
-            return null;
+            return $this->pop($var);
+        }
+        else if (strncasecmp($method, "shift", 5) === 0) {
+            $var = lcfirst(substr($method, 5));
+            return $this->shift($var);
         }
         else if (strncasecmp($method, "findOneBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));
@@ -2070,23 +2135,18 @@ class MagicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "createSelected", 14) === 0) {
             $var = lcfirst(substr($method, 14));
-            if(isset($params) && isset($params[0]))
-            {
+            if(isset($params) && isset($params[0])) {
                 return isset($this->$var) && $this->$var == $params[0] ? self::ATTR_SELECTED : '';
             }
-            else
-            {
+            else {
                 return isset($this->$var) && $this->$var == 1 ? self::ATTR_SELECTED : '';
             }
         }
         else if (strncasecmp($method, "createChecked", 13) === 0) {
             $var = lcfirst(substr($method, 13));
-            if(isset($params) && isset($params[0]))
-            {
+            if(isset($params) && isset($params[0])) {
                 return isset($this->$var) && $this->$var == $params[0] ? self::ATTR_CHECKED : '';
-            }
-            else
-            {
+            } else {
                 return isset($this->$var) && $this->$var == 1 ? self::ATTR_CHECKED : '';
             }
         }
