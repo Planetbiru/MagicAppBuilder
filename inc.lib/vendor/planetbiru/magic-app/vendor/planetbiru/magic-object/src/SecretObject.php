@@ -712,18 +712,6 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Unset property
-     *
-     * @param string $propertyName
-     * @return self
-     */
-    public function unset($propertyName)
-    {
-        $this->__unset($propertyName);
-        return $this;
-    }
-
-    /**
      * Add array element of property
      *
      * @param string $propertyName

@@ -14,7 +14,7 @@ class PicoSession
     const SESSION_NOT_STARTED = false;
     const SAME_SITE_LAX = "Lax";
     const SAME_SITE_STRICT = "Strict";
-    const SAME_SIZE_NONE = "None";
+    const SAME_SITE_NONE = "None";
 
     /**
      * The state of the session
@@ -183,7 +183,7 @@ class PicoSession
      * @param string $samesite
      * @return self
      */
-    public function setSessionCookieParams($maxlifetime, $secure, $httponly, $samesite = self::SAME_SIZE_NONE)
+    public function setSessionCookieParams($maxlifetime, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
     {
         if (PHP_VERSION_ID < 70300) {
             session_set_cookie_params($maxlifetime, '/; samesite=' . $samesite, $_SERVER['HTTP_HOST'], $secure, $httponly);
@@ -216,7 +216,7 @@ class PicoSession
      * @param string $samesite
      * @return self
      */
-    function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SIZE_NONE) //NOSONAR
+    function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT) //NOSONAR
     {
         if (PHP_VERSION_ID < 70300) {
             setcookie($name, $value, $expire, $path . '; samesite=' . $samesite, $domain, $secure, $httponly);

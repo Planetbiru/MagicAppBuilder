@@ -761,18 +761,6 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Unset property
-     *
-     * @param string $propertyName
-     * @return self
-     */
-    public function unset($propertyName)
-    {
-        $this->__unset($propertyName);
-        return $this;
-    }
-
-    /**
      * Adds array elements from a property at the end
      *
      * @param string $propertyName
