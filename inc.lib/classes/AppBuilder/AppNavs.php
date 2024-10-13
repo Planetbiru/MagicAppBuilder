@@ -5,17 +5,19 @@ namespace AppBuilder;
 class AppNavs
 {
     /**
-     * Navs
+     * Collection of navigation items.
      *
      * @var AppNav[]
      */
     private $navs = array();
 
     /**
-     * Add nav
+     * Add a navigation item to the collection.
      *
-     * @param AppNav $appNav
-     * @return self
+     * This method appends the given AppNav instance to the navs array.
+     *
+     * @param AppNav $appNav The AppNav instance to add.
+     * @return self Returns the current instance for method chaining.
      */
     public function add($appNav)
     {
@@ -24,20 +26,24 @@ class AppNavs
     }
 
     /**
-     * Get item
+     * Get a navigation item by its index.
      *
-     * @param integer $index
-     * @return AppNav
+     * This method retrieves the AppNav instance at the specified index.
+     *
+     * @param integer $index The index of the navigation item to retrieve.
+     * @return AppNav|null Returns the AppNav instance at the specified index, or null if the index is out of bounds.
      */
     public function item($index)
     {
-        return $this->navs[$index];
+        return isset($this->navs[$index]) ? $this->navs[$index] : null;
     }
 
     /**
-     * Get navs
+     * Get all navigation items.
      *
-     * @return  AppNav[]
+     * This method returns the entire collection of AppNav instances.
+     *
+     * @return AppNav[] An array of AppNav instances.
      */ 
     public function getNavs()
     {

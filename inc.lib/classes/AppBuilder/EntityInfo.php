@@ -7,96 +7,98 @@ use MagicObject\SecretObject;
 class EntityInfo extends SecretObject
 {
     /**
-     * Sort order
+     * Sort order for the entity.
      *
-     * @var integer
+     * @var int
      */
     protected $sortOrder;
+
     /**
-     * Active key
+     * Key indicating if the entity is active.
      *
      * @var string
      */
     protected $active;
+
     /**
-     * Draft key
+     * Key indicating if the entity is in draft status.
      *
      * @var string
      */
     protected $draft;
-    
+
     /**
-     * Admin create
+     * Admin user who created the entity.
      *
      * @var string
      */
     protected $adminCreate;
-    
+
     /**
-     * Admin edit
+     * Admin user who last edited the entity.
      *
      * @var string
      */
     protected $adminEdit;
-    
+
     /**
-     * Admin ask edit
+     * Admin user who requested the edit of the entity.
      *
      * @var string
      */
     protected $adminAskEdit;
-    
+
     /**
-     * IP create
+     * IP address of the user who created the entity.
      *
      * @var string
      */
     protected $ipCreate;
-    
+
     /**
-     * IP edit
+     * IP address of the user who last edited the entity.
      *
      * @var string
      */
     protected $ipEdit;
-    
+
     /**
-     * IP ask edit
+     * IP address of the user who requested the edit of the entity.
      *
      * @var string
      */
     protected $ipAskEdit;
-    
+
     /**
-     * Time create
+     * Timestamp of when the entity was created.
      *
      * @var string
      */
     protected $timeCreate;
-    
+
     /**
-     * Time edit
+     * Timestamp of when the entity was last edited.
      *
      * @var string
      */
     protected $timeEdit;
-    
+
     /**
-     * Time ask edit
+     * Timestamp of when the edit was requested.
      *
      * @var string
      */
     protected $timeAskEdit;
-    
+
     /**
-     * Waiting for key
+     * Key indicating who the entity is waiting for approval from.
      *
      * @var string
      */
     protected $waitingFor;
-    
+
     /**
-     * Approval ID key
+     * Approval ID for the entity.
      *
      * @var string
      */

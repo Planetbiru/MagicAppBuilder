@@ -5,29 +5,34 @@ namespace AppBuilder;
 class AppNav
 {
     /**
-     * Key
+     * Unique identifier for the navigation item.
      *
      * @var string
      */
     private $key = "";
+
     /**
-     * Caption
+     * Display caption for the navigation item.
      *
      * @var string
      */
     private $caption = "";
+
     /**
-     * ACtive
+     * Indicates whether the navigation item is active.
      *
      * @var boolean
      */
     private $active = false;
 
     /**
-     * Cunstructor
+     * Constructor for the AppNav class.
      *
-     * @param string $key
-     * @param string $caption
+     * Initializes the navigation item with a key, caption, and active state.
+     *
+     * @param string $key The unique identifier for the navigation item.
+     * @param string $caption The display text for the navigation item.
+     * @param boolean $active (optional) Indicates if the navigation item is active. Default is false.
      */
     public function __construct($key, $caption, $active = false)
     {
@@ -37,7 +42,9 @@ class AppNav
     }
 
     /**
-     * Get the value of key
+     * Get the value of the key.
+     *
+     * @return string The unique identifier for the navigation item.
      */ 
     public function getKey()
     {
@@ -45,9 +52,10 @@ class AppNav
     }
 
     /**
-     * Set the value of key
+     * Set the value of the key.
      *
-     * @return  self
+     * @param string $key The new unique identifier for the navigation item.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setKey($key)
     {
@@ -57,7 +65,9 @@ class AppNav
     }
 
     /**
-     * Get the value of caption
+     * Get the value of the caption.
+     *
+     * @return string The display text for the navigation item.
      */ 
     public function getCaption()
     {
@@ -65,9 +75,10 @@ class AppNav
     }
 
     /**
-     * Set the value of caption
+     * Set the value of the caption.
      *
-     * @return  self
+     * @param string $caption The new display text for the navigation item.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setCaption($caption)
     {
@@ -77,7 +88,9 @@ class AppNav
     }
 
     /**
-     * Get the value of active
+     * Get the value of the active state.
+     *
+     * @return boolean True if the navigation item is active, false otherwise.
      */ 
     public function getActive()
     {
@@ -85,9 +98,10 @@ class AppNav
     }
 
     /**
-     * Set the value of active
+     * Set the value of the active state.
      *
-     * @return  self
+     * @param boolean $active Indicates if the navigation item should be active.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setActive($active)
     {
