@@ -3988,7 +3988,7 @@ $subqueryMap = '.$referece.';
      */
     public function generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData)
     {
-        $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
+        $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();
@@ -4013,7 +4013,7 @@ $subqueryMap = '.$referece.';
     public function generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData)
     {
 
-        $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
+        $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();
@@ -4036,7 +4036,7 @@ $subqueryMap = '.$referece.';
      */
     public function generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData)
     {
-        $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
+        $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
         $entityName = $entityMain->getentityName();
         $tableName = $entityMain->getTableName();
         $baseDir = $appConf->getBaseEntityDirectory();

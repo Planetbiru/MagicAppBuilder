@@ -584,7 +584,7 @@ class ScriptGenerator
                 if(!file_exists($path))
                 {
                     $gen = new PicoEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
-                    $nonupdatables = AppField::getNonupdatetableColumns($entityInfo);
+                    $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
                     $gen->generate($nonupdatables);
                 }
                 $checked[] = $entityName;
