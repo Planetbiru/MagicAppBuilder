@@ -7,114 +7,98 @@ use MagicObject\Exceptions\InvalidPolygonException;
 class Polygon
 {
     /**
-     * Points
+     * Points that make up the polygon.
      *
      * @var Point[]
      */
-    private $points = array();
+    private $points = [];
 
     /**
-     * Constructor
+     * Constructor to initialize the Polygon with an array of Points.
      *
-     * @param Point[] $points Points
+     * @param Point[] $points Initial points for the polygon.
      */
-    public function __construct($points = null)
+    public function __construct(array $points = [])
     {
-        if(isset($points) && is_array($points))
-        {
-            $this->points = $points;
-        }
+        $this->points = $points;
     }
 
     /**
-     * Add point
+     * Add a point to the polygon.
      *
-     * @param Point $point Point
+     * @param Point $point Point to add.
      * @return self
      */
-    public function addPoint($point)
+    public function addPoint(Point $point): self
     {
         $this->points[] = $point;
         return $this;
     }
 
     /**
-     * Clear polygon
+     * Clear all points from the polygon.
      *
      * @return self
      */
-    public function clearPolygon()
+    public function clearPolygon(): self
     {
-        $this->points = array();
+        $this->points = [];
         return $this;
     }
 
     /**
-     * Function to calculate the area of a polygon using the Shoelace formula
+     * Calculate the area of the polygon using the Shoelace formula.
      *
-     * @return double
+     * @return float
      * @throws InvalidPolygonException
      */
-    public function getArea() {
-        $cnt = count($this->points);
-        if($cnt < 3)
-        {
-            throw new InvalidPolygonException("Invalid polygon. Polygon at least has 3 points. $cnt given.");
-        }
-        // Initialize variables for the sum and the origin point
-        $sum = 0;
-        $o = $this->points[0];
-
-        // Loop through the points to calculate the area of the polygon
-        for ($i = 1; $i < count($this->points) - 1; $i++) {
-            $p1 = $this->points[$i];
-            $p2 = $this->points[$i+1];
-
-            // Create a Triangle object using the origin and two consecutive points
-            $t = new Triangle($o, $p1, $p2);
-
-            // Add the area of the triangle to the total sum
-            $sum += $t->getArea();
-        }
-        return $sum;
-    }
-
-    /**
-     * Get circumference
-     *
-     * @return double
-     * @throws InvalidPolygonException
-     */
-    public function getCircumference()
+    public function getArea(): float
     {
         $cnt = count($this->points);
-        if($cnt < 2)
-        {
-            throw new InvalidPolygonException("Invalid polygon. Polygon at least has 3 points. $cnt given.");
+        if ($cnt < 3) {
+            throw new InvalidPolygonException("Invalid polygon. A polygon must have at least 3 points. $cnt given.");
         }
-        // Initialize variables for the sum and the origin point
+
         $sum = 0;
-
-        // Loop through the points to calculate the area of the polygon
-        for ($i = 0; $i < count($this->points) - 1; $i++) {
+        for ($i = 0; $i < $cnt; $i++) {
             $p1 = $this->points[$i];
-            $p2 = $this->points[$i+1];
+            $p2 = $this->points[($i + 1) % $cnt]; // Wrap around to the first point
+            $sum += ($p1->x * $p2->y) - ($p2->x * $p1->y);
+        }
 
-            // Create a Triangle object using the origin and two consecutive points
+        return abs($sum) / 2;
+    }
+
+    /**
+     * Calculate the circumference of the polygon.
+     *
+     * @return float
+     * @throws InvalidPolygonException
+     */
+    public function getCircumference(): float
+    {
+        $cnt = count($this->points);
+        if ($cnt < 2) {
+            throw new InvalidPolygonException("Invalid polygon. A polygon must have at least 2 points. $cnt given.");
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < $cnt; $i++) {
+            $p1 = $this->points[$i];
+            $p2 = $this->points[($i + 1) % $cnt]; // Wrap around to the first point
             $l = new Line($p1, $p2);
-
-            // Add the area of the triangle to the total sum
             $sum += $l->getLength();
         }
+
         return $sum;
     }
 
     /**
-     * Get points
+     * Get the points of the polygon.
      *
      * @return Point[]
      */
-    public function getPoints()
+    public function getPoints(): array
     {
         return $this->points;
     }

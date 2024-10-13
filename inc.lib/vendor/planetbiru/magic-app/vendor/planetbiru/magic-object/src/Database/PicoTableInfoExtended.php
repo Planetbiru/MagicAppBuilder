@@ -3,19 +3,24 @@
 namespace MagicObject\Database;
 
 /**
- * Table info extended
+ * Class representing extended information about a database table.
+ *
+ * This class extends the functionality of PicoTableInfo by providing methods
+ * for managing unique columns, join columns, primary keys, auto-increment keys,
+ * default values, and not-null columns.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoTableInfoExtended extends PicoTableInfo
 {
-    const NAME      = "name";
-    const PREV_NAME = "prevColumnName";
-    const ELEMENT   = "element";
+    const NAME      = "name"; // Key for the column name
+    const PREV_NAME = "prevColumnName"; // Key for the previous column name
+    const ELEMENT   = "element"; // Key for the element
 
     /**
-     * Get instance
+     * Gets an instance of PicoTableInfoExtended.
      *
-     * @return self
+     * @return self A new instance of the class.
      */
     public static function getInstance()
     {
@@ -23,18 +28,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique column
+     * Removes duplicate columns based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniqueColumns()
     {
         $tmp = array();
         $test = array();
-        foreach($this->columns as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->columns as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -44,18 +47,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique join column
+     * Removes duplicate join columns based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniqueJoinColumns()
     {
         $tmp = array();
         $test = array();
-        foreach($this->joinColumns as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->joinColumns as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -65,18 +66,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique primary key
+     * Removes duplicate primary keys based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniquePrimaryKeys()
     {
         $tmp = array();
         $test = array();
-        foreach($this->primaryKeys as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->primaryKeys as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -86,18 +85,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique auto increment
+     * Removes duplicate auto-increment keys based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniqueAutoIncrementKeys()
     {
         $tmp = array();
         $test = array();
-        foreach($this->autoIncrementKeys as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->autoIncrementKeys as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -107,18 +104,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique default value
+     * Removes duplicate default value keys based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniqueDefaultValue()
     {
         $tmp = array();
         $test = array();
-        foreach($this->defaultValue as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->defaultValue as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -128,18 +123,16 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique not null column
+     * Removes duplicate not-null columns based on their names.
      *
-     * @return self
+     * @return self The current instance for method chaining.
      */
     public function uniqueNotNullColumns()
     {
         $tmp = array();
         $test = array();
-        foreach($this->notNullColumns as $elem)
-        {
-            if(!in_array($elem[self::NAME], $test))
-            {
+        foreach ($this->notNullColumns as $elem) {
+            if (!in_array($elem[self::NAME], $test)) {
                 $tmp[] = $elem;
                 $test[] = $elem[self::NAME];
             }
@@ -149,45 +142,37 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Merge list
+     * Merges a new list of items into an existing temporary list.
      *
-     * @param array $tmp Temporary list
-     * @param array $oldListCheck Old list
-     * @param array $newList New list
-     * @return array
+     * @param array $tmp The temporary list.
+     * @param array $oldListCheck The old list to check against.
+     * @param array $newList The new list to merge.
+     * @return array The updated temporary list.
      */
     private function mergeList($tmp, $oldListCheck, $newList)
     {
         $prevColumName = "";
         $listToInsert = array();
-        foreach($newList as $prop=>$elem)
-        {
-            if(!in_array($elem[self::NAME], $oldListCheck))
-            {
-                $listToInsert[$prop] = array(self::ELEMENT=>$elem, self::PREV_NAME=>$prevColumName);
+        foreach ($newList as $prop => $elem) {
+            if (!in_array($elem[self::NAME], $oldListCheck)) {
+                $listToInsert[$prop] = array(self::ELEMENT => $elem, self::PREV_NAME => $prevColumName);
             }
             $prevColumName = $elem[self::NAME];
         }
-        foreach($listToInsert as $prop=>$toInsert)
-        {
-            if(empty($toInsert[self::PREV_NAME]))
-            {
-                // insert to the end of table
+        foreach ($listToInsert as $prop => $toInsert) {
+            if (empty($toInsert[self::PREV_NAME])) {
+                // Insert to the end of the list
                 $tmp[$prop] = $toInsert[self::ELEMENT];
-            }
-            else
-            {
+            } else {
                 $tmp2 = array();
-                foreach($tmp as $prop2=>$elem2)
-                {
+                foreach ($tmp as $prop2 => $elem2) {
                     $tmp2[$prop2] = $elem2;
-                    if($elem2[self::NAME] == $toInsert[self::PREV_NAME])
-                    {
-                        // insert after prevColumnName
+                    if ($elem2[self::NAME] == $toInsert[self::PREV_NAME]) {
+                        // Insert after prevColumnName
                         $tmp2[$prop] = $toInsert[self::ELEMENT];
                     }
                 }
-                // update temporary list
+                // Update temporary list
                 $tmp = $tmp2;
             }
         }
@@ -195,26 +180,25 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Get oldlist check
+     * Retrieves the old list for checking against.
      *
-     * @param array $oldList Old list
-     * @return array
+     * @param array $oldList The old list to retrieve.
+     * @return array An array of column names from the old list.
      */
     private function getOldListCheck($oldList)
     {
         $oldListCheck = array();
-        foreach($oldList as $elem)
-        {
+        foreach ($oldList as $elem) {
             $oldListCheck[] = $elem[self::NAME];
         }
         return $oldListCheck;
     }
 
     /**
-     * Unique column
+     * Merges a new list of columns into the existing columns, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of columns to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergeColumns($newList)
     {
@@ -226,10 +210,10 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique join column
+     * Merges a new list of join columns into the existing join columns, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of join columns to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergeJoinColumns($newList)
     {
@@ -241,10 +225,10 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique primary key
+     * Merges a new list of primary keys into the existing primary keys, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of primary keys to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergePrimaryKeys($newList)
     {
@@ -256,10 +240,10 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique auto increment
+     * Merges a new list of auto-increment keys into the existing auto-increment keys, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of auto-increment keys to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergeAutoIncrementKeys($newList)
     {
@@ -271,10 +255,10 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique default value
+     * Merges a new list of default value keys into the existing default value keys, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of default value keys to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergeDefaultValue($newList)
     {
@@ -286,10 +270,10 @@ class PicoTableInfoExtended extends PicoTableInfo
     }
 
     /**
-     * Unique not null column
+     * Merges a new list of not-null columns into the existing not-null columns, ensuring uniqueness.
      *
-     * @param array $newList New list
-     * @return self
+     * @param array $newList The new list of not-null columns to merge.
+     * @return self The current instance for method chaining.
      */
     public function mergeNotNullColumns($newList)
     {
@@ -297,14 +281,13 @@ class PicoTableInfoExtended extends PicoTableInfo
         $oldListCheck = $this->getOldListCheck($this->notNullColumns);
         $prevColumName = "";
         $listToInsert = array();
-        foreach($newList as $elem)
-        {
-            if(!in_array($elem[self::NAME], $oldListCheck))
-            {
-                $listToInsert[] = array(self::ELEMENT=>$elem, self::PREV_NAME=>$prevColumName);
+        foreach ($newList as $elem) {
+            if (!in_array($elem[self::NAME], $oldListCheck)) {
+                $listToInsert[] = array(self::ELEMENT => $elem, self::PREV_NAME => $prevColumName);
             }
             $prevColumName = $elem[self::NAME];
         }
+        // Merging logic for not-null columns can be added here
         $this->notNullColumns = $tmp;
         return $this;
     }

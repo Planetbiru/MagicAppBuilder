@@ -8,9 +8,10 @@ use stdClass;
 class EntityUtil
 {
     /**
-     * Table property column
+     * Get the property column names from the entity.
+     *
      * @param MagicObject $entity Input entity
-     * @return string[]|array
+     * @return array<string>
      */
     public static function getPropertyColumn($entity)
     {
@@ -29,9 +30,10 @@ class EntityUtil
     }
 
     /**
-     * Table property join column
+     * Get the property join column names from the entity.
+     *
      * @param MagicObject $entity Input entity
-     * @return string[]|array
+     * @return array<string>
      */
     public static function getPropertyJoinColumn($entity)
     {
@@ -50,9 +52,10 @@ class EntityUtil
     }
 
     /**
-     * Get entity data
-     * @param array|stdClass|MagicObject $data Data
-     * @param string[] $map Map
+     * Get entity data mapped to new keys.
+     *
+     * @param array|stdClass|MagicObject $data Data to be mapped
+     * @param array<string> $map Mapping of keys
      * @return array
      */
     public static function getEntityData($data, $map)
@@ -77,9 +80,10 @@ class EntityUtil
     }
 
     /**
-     * From array
-     * @param array $data Data
-     * @param string[] $map Map
+     * Map data from an array.
+     *
+     * @param array $data Data to map
+     * @param array<string> $map Mapping of keys
      * @return array
      */
     private static function fromArray($data, $map)
@@ -96,9 +100,10 @@ class EntityUtil
     }
 
     /**
-     * From stdClass
-     * @param stdClass $data Data
-     * @param string[] $map Map
+     * Map data from a stdClass.
+     *
+     * @param stdClass $data Data to map
+     * @param array<string> $map Mapping of keys
      * @return array
      */
     private static function fromStdClass($data, $map)
@@ -115,9 +120,10 @@ class EntityUtil
     }
 
     /**
-     * From MagicObject
+     * Map data from a MagicObject.
+     *
      * @param MagicObject $data Input entity
-     * @param string[] $map Map
+     * @param array<string> $map Mapping of keys
      * @return array
      */
     private static function fromMagicObject($data, $map)

@@ -3,54 +3,57 @@
 namespace MagicObject\Database;
 
 /**
- * Join map
+ * Class representing a join mapping in a database.
+ *
+ * Contains information about how an entity is joined with another table.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoJoinMap
 {
     /**
-     * Property name name
+     * The property name in the entity.
      *
      * @var string
      */
     private $propertyName;
 
     /**
-     * Column name
+     * The column name in the join table.
      *
      * @var string
      */
     private $columnName;
 
     /**
-     * Entity name
+     * The name of the entity being joined.
      *
      * @var string
      */
     private $entity;
 
     /**
-     * Table name
+     * The name of the join table.
      *
      * @var string
      */
     private $joinTable;
 
     /**
-     * Table alias
+     * The alias for the join table.
      *
      * @var string
      */
     private $joinTableAlias;
 
     /**
-     * Constructor
+     * Constructor for PicoJoinMap.
      *
-     * @param string $propertyName Property name
-     * @param string $columnName Column name
-     * @param string $entity Entity name
-     * @param string $joinTable Join table name
-     * @param string $joinTableAlias Join table alias
+     * @param string $propertyName The property name.
+     * @param string $columnName The column name.
+     * @param string $entity The entity name.
+     * @param string $joinTable The join table name.
+     * @param string $joinTableAlias The join table alias.
      */
     public function __construct($propertyName, $columnName, $entity, $joinTable, $joinTableAlias)
     {
@@ -62,9 +65,9 @@ class PicoJoinMap
     }
 
     /**
-     * Get property name name
+     * Get the property name.
      *
-     * @return string
+     * @return string The property name.
      */
     public function getPropertyName()
     {
@@ -72,9 +75,9 @@ class PicoJoinMap
     }
 
     /**
-     * Get column name
+     * Get the column name.
      *
-     * @return string
+     * @return string The column name.
      */
     public function getColumnName()
     {
@@ -82,9 +85,9 @@ class PicoJoinMap
     }
 
     /**
-     * Get entity name
+     * Get the entity name.
      *
-     * @return string
+     * @return string The entity name.
      */
     public function getEntity()
     {
@@ -92,9 +95,9 @@ class PicoJoinMap
     }
 
     /**
-     * Get table name
+     * Get the join table name.
      *
-     * @return string
+     * @return string The join table name.
      */
     public function getJoinTable()
     {
@@ -102,9 +105,9 @@ class PicoJoinMap
     }
 
     /**
-     * Get table alias
+     * Get the join table alias.
      *
-     * @return string
+     * @return string The join table alias.
      */
     public function getJoinTableAlias()
     {
@@ -112,20 +115,18 @@ class PicoJoinMap
     }
 
     /**
-     * Magic method to debug object
+     * Magic method to return a JSON representation of the object.
      *
-     * @return string
+     * @return string JSON representation of the join map.
      */
     public function __toString()
     {
-        return json_encode(
-            array(
-                'propertyName'   => $this->propertyName,
-                'columnName'     => $this->columnName,
-                'entity'         => $this->entity,
-                'joinTable'      => $this->joinTable,
-                'joinTableAlias' => $this->joinTableAlias
-                )
-            );
+        return json_encode([
+            'propertyName'   => $this->propertyName,
+            'columnName'     => $this->columnName,
+            'entity'         => $this->entity,
+            'joinTable'      => $this->joinTable,
+            'joinTableAlias' => $this->joinTableAlias,
+        ]);
     }
 }

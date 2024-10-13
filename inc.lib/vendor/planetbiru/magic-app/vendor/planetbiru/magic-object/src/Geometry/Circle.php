@@ -3,46 +3,47 @@
 namespace MagicObject\Geometry;
 
 /**
- * Class representing a Circle with center Point and radius
+ * Class representing a Circle with a center Point and radius.
  */
-class Circle {
-
+class Circle
+{
     /**
-     * Center
+     * Center point of the circle.
      *
      * @var Point
      */
     public $center;
 
     /**
-     * x coordinate
+     * x coordinate of the circle's center.
      *
-     * @var double
+     * @var float
      */
     public $x = 0.0;
 
     /**
-     * y coordinate
+     * y coordinate of the circle's center.
      *
-     * @var double
+     * @var float
      */
     public $y = 0.0;
 
     /**
-     * r coordinate
+     * Radius of the circle.
      *
-     * @var double
+     * @var float
      */
     public $r = 0.0;
 
     /**
-     * Constructor to initialize the Circle with x, y and r
+     * Constructor to initialize the Circle with x, y, and r.
      *
-     * @param double $x x coordinate
-     * @param double $y y Coordinate
-     * @param double $r Radius
+     * @param float $x x coordinate of the center
+     * @param float $y y coordinate of the center
+     * @param float $r Radius of the circle
      */
-    public function __construct($x, $y, $r) {
+    public function __construct($x, $y, $r)
+    {
         $this->x = $x;
         $this->y = $y;
         $this->r = $r;
@@ -50,19 +51,19 @@ class Circle {
     }
 
     /**
-     * Get circumference
+     * Get the circumference of the circle.
      *
-     * @return double
+     * @return float Circumference of the circle
      */
     public function getCircumference()
     {
-        return acos(-1) * 2 * $this->r;
+        return 2 * acos(-1) * $this->r;
     }
 
     /**
-     * Get area
+     * Get the area of the circle.
      *
-     * @return double
+     * @return float Area of the circle
      */
     public function getArea()
     {

@@ -3,27 +3,31 @@
 namespace MagicObject\Response;
 
 use MagicObject\Constants\PicoHttpStatus;
-use MagicObject\Constants\PicoMime;
 use \stdClass;
 
 /**
- * Response
+ * Class PicoResponse
+ * Handles sending HTTP responses with various content types and status codes.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoResponse
 {
+    const APPLICATION_JSON = "application/json";
+
     /**
-     * Send response headers and response body to client
+     * Send a JSON response to the client.
      *
-     * @param mixed $data Data to sent to client
-     * @param boolean $prettify Flag to prettify JSON
-     * @param array $headers Response headers
+     * @param mixed $data Data to send to the client
+     * @param bool $prettify Flag to prettify JSON
+     * @param array|null $headers Response headers
+     * @param int $httpStatusCode HTTP status code (default: 200)
      * @return void
      */
     public static function sendJSON($data, $prettify = false, $headers = null, $httpStatusCode = PicoHttpStatus::HTTP_OK)
     {
         $body = null;
-        if ($data != null) {
+        if ($data !== null) {
             if (is_string($data)) {
                 $body = $data;
             } else {
@@ -34,16 +38,17 @@ class PicoResponse
                 }
             }
         }
-        self::sendResponse($body, PicoMime::APPLICATION_JSON, $headers, $httpStatusCode);
+        self::sendResponse($body, self::APPLICATION_JSON, $headers, $httpStatusCode);
     }
 
     /**
-     * Send response headers and response body to client
+     * Send the response headers and body to the client.
      *
-     * @param string $body Response body
-     * @param string $contentType Content type
-     * @param array $headers Response headers
-     * @param boolean $async Send response asynchronously
+     * @param string|null $body Response body
+     * @param string|null $contentType Content type
+     * @param array|null $headers Response headers
+     * @param int $httpStatusCode HTTP status code (default: 200)
+     * @param bool $async Send response asynchronously
      * @return void
      */
     public static function sendResponse($body, $contentType = null, $headers = null, $httpStatusCode = PicoHttpStatus::HTTP_OK, $async = false)
@@ -58,11 +63,12 @@ class PicoResponse
     }
 
     /**
-     * Send response headers and response body as JSON to client
+     * Send response as JSON to the client.
      *
-     * @param stdClass|object|array|string $body Response body
-     * @param array $headers Response headers
-     * @param boolean $async Send response asynchronously
+     * @param stdClass|object|array|string|null $body Response body
+     * @param array|null $headers Response headers
+     * @param int $httpStatusCode HTTP status code (default: 200)
+     * @param bool $async Send response asynchronously
      * @return void
      */
     public static function sendResponseJSON($body, $headers = null, $httpStatusCode = PicoHttpStatus::HTTP_OK, $async = false)
@@ -98,7 +104,7 @@ class PicoResponse
                 $bodyToSent = null;
             }
         }
-        $contentType = PicoMime::APPLICATION_JSON;
+        $contentType = self::APPLICATION_JSON;
         $contentLength = $bodyToSent == null ? 0 : strlen($bodyToSent);
         $headers = self::getDefaultHeaders($headers, $contentType, $contentLength);
         if ($httpStatusCode != 200) {
@@ -109,7 +115,7 @@ class PicoResponse
     }
 
     /**
-     * Send response headers
+     * Send response headers to the client.
      *
      * @param array $headers Response headers
      * @return void
@@ -124,10 +130,10 @@ class PicoResponse
     }
 
     /**
-     * Send response body
+     * Send response body to the client.
      *
-     * @param string $body Response body
-     * @param boolean $async Send response asynchronously
+     * @param string|null $body Response body
+     * @param bool $async Send response asynchronously
      * @return void
      */
     public static function sendBody($body, $async = false)
@@ -136,30 +142,38 @@ class PicoResponse
             if (function_exists('ignore_user_abort')) {
                 ignore_user_abort(true);
             }
-            ob_start();
-
-            if ($body != null) {
-                echo $body;
-            }
+            ob_start(); // Mulai output buffering
         }
+
+        // Jika body tidak null, kirimkan
+        if ($body !== null) {
+            echo $body; // Tampilkan body
+        }
+
+        // Mengatur header koneksi
         header("Connection: close");
 
+        // Jika dalam mode asinkron, lakukan flush
         if ($async) {
-            ob_end_flush();
-            ob_flush();
-            flush();
+            ob_end_flush(); // Selesaikan buffer
+            header("Content-Length: " . strlen($body)); // Tentukan panjang konten
+            flush(); // Kirim output ke klien
             if (function_exists('fastcgi_finish_request')) {
-                fastcgi_finish_request();
+                fastcgi_finish_request(); // Selesaikan permintaan FastCGI
             }
-        } else if ($body != null) {
-            echo $body;
+        } else {
+            // Jika tidak asinkron, atur Content-Length
+            if ($body !== null) {
+                header("Content-Length: " . strlen($body)); // Tentukan panjang konten
+                echo $body; // Tampilkan body
+            }
         }
     }
 
     /**
-     * Get default content type with key given
+     * Get default content type based on the provided content type.
      *
-     * @param string $contentType Content type
+     * @param string|null $contentType Content type
      * @return string Fixed content type
      */
     public static function getDefaultContentType($contentType)
@@ -168,17 +182,17 @@ class PicoResponse
             return 'text/html';
         }
         if (stripos($contentType, 'json') !== false) {
-            return PicoMime::APPLICATION_JSON;
+            return self::APPLICATION_JSON;
         }
         return $contentType;
     }
 
     /**
-     * Get default response headers
+     * Get default response headers.
      *
-     * @param array $headers Response headers
-     * @param string $contentType Content type
-     * @param integer $contentLength Content length
+     * @param array|null $headers Response headers
+     * @param string|null $contentType Content type
+     * @param int $contentLength Content length
      * @return array Fixed response headers
      */
     public static function getDefaultHeaders($headers, $contentType, $contentLength = 0)
@@ -193,13 +207,12 @@ class PicoResponse
         return $headers;
     }
 
-
     /**
      * Send http status
      *
-     * @param integer $code HTTP status code
+     * @param int $code HTTP status code
      * @param string $text HTTP status text
-     * @return integer
+     * @return int
      */
     public static function sendHttpStatus($code = 0, $text = null)
     {
@@ -223,10 +236,10 @@ class PicoResponse
     }
 
     /**
-     * Get HTTP response code
+     * Get HTTP response code text.
      *
-     * @param integer $code HTTP status code
-     * @return string
+     * @param int $code HTTP status code
+     * @return string|null
      */
     public static function getHttpResponseCode($code)
     {
@@ -234,13 +247,14 @@ class PicoResponse
     }
 
     /**
-     * Redirect browser to current URL.
+     * Redirect the browser to the current URL.
      * WARNING! Use this only if there is a POST input that will control the process to prevent an endless loop that causes damage to the server. Modern browsers may prevent undesirable things from happening but other browsers may not have this feature.
      *
      * @return void
      */
-    public function redirectToItself()
+    public static function redirectToItself()
     {
         header("Location: ".$_SERVER['REQUEST_URI']);
+        exit(); // Ensures no further code execution after redirection
     }
 }

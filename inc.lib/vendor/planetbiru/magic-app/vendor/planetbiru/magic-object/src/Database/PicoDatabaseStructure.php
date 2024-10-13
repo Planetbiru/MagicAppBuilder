@@ -1,15 +1,14 @@
 <?php
-
 namespace MagicObject\Database;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\MandatoryTableNameException;
-use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 
 /**
- * Database stucture
+ * Represents the structure of a database table.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseStructure
@@ -27,23 +26,23 @@ class PicoDatabaseStructure
     const DATABASE_TYPE_MARIADB = "mariadb";
 
     /**
-     * Object
+     * The associated MagicObject instance.
      *
      * @var MagicObject
      */
     private $object;
 
     /**
-     * Class name
+     * The name of the class representing the table.
      *
      * @var string
      */
     private $className = "";
 
     /**
-     * Constructor
+     * Constructor to initialize the PicoDatabaseStructure with a MagicObject.
      *
-     * @param MagicObject $object
+     * @param MagicObject $object The MagicObject representing the database structure.
      */
     public function __construct($object)
     {
@@ -51,59 +50,52 @@ class PicoDatabaseStructure
         $this->object = $object;
     }
 
-
     /**
-     * Show create table
+     * Generates a CREATE TABLE statement based on the object's metadata.
      *
-     * @param string $databaseType Database type. See PicoDatabaseType class
-     * @param string $tableName Table name
-     * @return string
+     * @param string $databaseType The type of database (e.g., MySQL, MariaDB).
+     * @param string|null $tableName Optional name of the table. If not provided, it will be inferred.
+     * @return string The SQL CREATE TABLE statement.
+     * @throws MandatoryTableNameException If no table name is provided and cannot be inferred.
      */
     public function showCreateTable($databaseType, $tableName = null)
     {
         $info = $this->getObjectInfo();
-        if (!isset($tableName) || $info->getTableName() != null)
-        {
+        if (!isset($tableName) || $info->getTableName() == null) {
             throw new MandatoryTableNameException("Table name is mandatory");
-        }
-        else
-        {
+        } else {
             $tableName = $info->getTableName();
         }
         $createStrArr = array();
-        $createStrArr[] = "CREATE TABLE IF NOT EXISTS $tableName(";
+        $createStrArr[] = "CREATE TABLE IF NOT EXISTS $tableName (";
         $createStrArr[] = $this->showCreateTableByType($databaseType, $info);
         $createStrArr[] = ");";
         return implode("\r\n", $createStrArr);
     }
 
     /**
-     * Show create table
+     * Generates the CREATE TABLE syntax based on the database type and table information.
      *
-     * @param string $databaseType Database type. See PicoDatabaseType class
-     * @param PicoTableInfo $info Table information
-     * @return string
+     * @param string $databaseType The type of database (e.g., MySQL).
+     * @param PicoTableInfo $info The table information containing column definitions.
+     * @return string The SQL column definitions for the CREATE TABLE statement.
      */
     private function showCreateTableByType($databaseType, $info)
     {
         $createStrArr = array();
         $pk = array();
-        if($databaseType == self::DATABASE_TYPE_MYSQL)
-        {
-            foreach($info->getColumns() as $column)
-            {
-                $createStrArr[] = $column[self::KEY_NAME]." ".$column[self::KEY_TYPE]." ".$this->nullable($column[self::KEY_NULLABLE]);
+        
+        if ($databaseType == self::DATABASE_TYPE_MYSQL) {
+            foreach ($info->getColumns() as $column) {
+                $createStrArr[] = $column[self::KEY_NAME] . " " . $column[self::KEY_TYPE] . " " . $this->nullable($column[self::KEY_NULLABLE]);
             }
-            foreach($info->getColumns() as $column)
-            {
-                if(isset($column[self::KEY_PRIMARY]) && $column[self::KEY_PRIMARY] === true)
-                {
+            foreach ($info->getColumns() as $column) {
+                if (isset($column[self::KEY_PRIMARY]) && $column[self::KEY_PRIMARY] === true) {
                     $pk[] = $column[self::KEY_NAME];
                 }
             }
-            if(!empty($pk))
-            {
-                $createStrArr[] = "PRIMARY KEY (".implode(", ", $pk).")";
+            if (!empty($pk)) {
+                $createStrArr[] = "PRIMARY KEY (" . implode(", ", $pk) . ")";
             }
         }
 
@@ -111,47 +103,38 @@ class PicoDatabaseStructure
     }
 
     /**
-     * Create nullable
+     * Returns the NULL/NOT NULL declaration based on the nullable setting.
      *
-     * @param mixed $nullable Nullable
-     * @return string
+     * @param mixed $nullable Indicates if the column is nullable.
+     * @return string The corresponding NULL or NOT NULL declaration.
      */
     private function nullable($nullable)
     {
-        if($nullable === true || strtolower($nullable) == "true")
-        {
-            return "NULL";
-        }
-        else
-        {
-            return "NOT NULL";
-        }
+        return ($nullable === true || strtolower($nullable) == "true") ? "NULL" : "NOT NULL";
     }
 
     /**
-     * Parse key value string
+     * Parses a key-value string from an annotation.
      *
-     * @param PicoAnnotationParser $reflexClass Refection of class
-     * @param string $queryString String to be parsed
-     * @param string $parameter Parameter name
-     * @return array
+     * @param PicoAnnotationParser $reflexClass The reflection of the class containing the annotation.
+     * @param string $queryString The string to be parsed.
+     * @param string $parameter The parameter name for error reporting.
+     * @return array The parsed key-value pairs.
+     * @throws InvalidAnnotationException If the annotation is invalid.
      */
     private function parseKeyValue($reflexClass, $queryString, $parameter)
     {
-        try
-        {
+        try {
             return $reflexClass->parseKeyValue($queryString);
-        }
-        catch(InvalidQueryInputException $e)
-        {
-            throw new InvalidAnnotationException("Invalid annotation @".$parameter);
+        } catch (InvalidQueryInputException $e) {
+            throw new InvalidAnnotationException("Invalid annotation @" . $parameter);
         }
     }
 
     /**
-     * Get object information
+     * Retrieves metadata about the object, including table name and column definitions.
      *
-     * @return PicoTableInfo
+     * @return PicoTableInfo An instance containing the table name and column information.
      */
     public function getObjectInfo()
     {
@@ -167,29 +150,24 @@ class PicoDatabaseStructure
         $props = $reflexClass->getProperties();
         $defaultValue = array();
 
-        // iterate each properties of the class
-        foreach($props as $prop)
-        {
+        // Iterate through the properties of the class
+        foreach ($props as $prop) {
             $reflexProp = new PicoAnnotationParser($this->className, $prop->name, PicoAnnotationParser::PROPERTY);
             $parameters = $reflexProp->getParameters();
 
-            // get column name of each parameters
-            foreach($parameters as $param=>$val)
-            {
-                if(strcasecmp($param, self::ANNOTATION_COLUMN) == 0)
-                {
+            // Get column name from the parameters
+            foreach ($parameters as $param => $val) {
+                if (strcasecmp($param, self::ANNOTATION_COLUMN) == 0) {
                     $values = $this->parseKeyValue($reflexProp, $val, $param);
                     $columns[$prop->name] = $values;
                 }
             }
-            foreach($parameters as $param=>$val)
-            {
-                if(strcasecmp($param, self::ANNOTATION_ID) == 0 && isset($columns[$prop->name]))
-                {
+            foreach ($parameters as $param => $val) {
+                if (strcasecmp($param, self::ANNOTATION_ID) == 0 && isset($columns[$prop->name])) {
                     $columns[$prop->name][self::KEY_PRIMARY] = true;
                 }
             }
         }
-        return new PicoTableInfo($picoTableName, $columns, array(), $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns);
+        return new PicoTableInfo($picoTableName, $columns, [], $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns);
     }
 }

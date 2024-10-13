@@ -260,12 +260,44 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Magic method called when user call any undefined method
+     * Magic method called when invoking undefined methods.
      *
-     * @param string $method Called method
-     * @param string $params Parameters given
-     * @return mixed|null
+     * This method dynamically handles method calls for property management.
+     *
+     * Supported dynamic methods:
+     *
+     * - `isset<PropertyName>`: Checks if the specified property is set.
+     *   - Returns true if the property exists and is not null.
+     *   - Example: `$obj->issetFoo()` checks if the property `foo` is set.
+     *
+     * - `is<PropertyName>`: Checks if the specified property is set and equals 1 (truthy).
+     *   - Returns true if the property exists and its value is equal to 1.
+     *   - Example: `$obj->isFoo()` checks if `foo` is set to 1.
+     *
+     * - `get<PropertyName>`: Retrieves the value of the specified property.
+     *   - Returns the property value or null if it doesn't exist.
+     *   - Example: `$value = $obj->getFoo()` gets the value of property `foo`.
+     *
+     * - `set<PropertyName>`: Sets the value of the specified property.
+     *   - Accepts a single parameter which is the value to be assigned to the property.
+     *   - Example: `$obj->setFoo($value)` sets the property `foo` to `$value`.
+     *
+     * - `unset<PropertyName>`: Removes the specified property from the object.
+     *   - Example: `$obj->unsetFoo()` deletes the property `foo`.
+     *
+     * - `push<PropertyName>`: Pushes a value onto an array property.
+     *   - If the property is not already an array, it initializes it as an empty array.
+     *   - Example: `$obj->pushFoo($value)` adds `$value` to the array property `foo`.
+     *
+     * - `pop<PropertyName>`: Pops a value from an array property.
+     *   - Returns the last value from the array property or null if it doesn't exist.
+     *   - Example: `$value = $obj->popFoo()` removes and returns the last value from the array property `foo`.
+     *
+     * @param string $method Method name that was called.
+     * @param array $params Parameters passed to the method.
+     * @return mixed|null The result of the method call or null if the method does not return a value.
      */
+
     public function __call($method, $params) //NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0)
@@ -318,9 +350,9 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Check if JSON naming strategy is snake case or not
+     * Check if the JSON naming strategy is snake case.
      *
-     * @return boolean
+     * @return boolean True if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
@@ -331,9 +363,9 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Check if JSON naming strategy is camel case or not
+     * Check if the JSON naming strategy is camel case.
      *
-     * @return boolean
+     * @return boolean True if the naming strategy is camel case, false otherwise.
      */
     protected function isCamel()
     {
@@ -341,9 +373,9 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Check if JSON naming strategy is snake case or not
+     * Check if the JSON should be prettified.
      *
-     * @return boolean
+     * @return boolean True if prettification is enabled, false otherwise.
      */
     private function isPretty()
     {
@@ -354,9 +386,13 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Magic method to stringify object
+     * Convert the object to a JSON string representation.
      *
-     * @return string
+     * This method serializes the object to JSON format, with options for pretty printing
+     * based on the configuration. It uses the appropriate naming strategy for properties
+     * as specified in the class parameters.
+     *
+     * @return string The JSON string representation of the object.
      */
     public function __toString()
     {

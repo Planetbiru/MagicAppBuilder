@@ -68,8 +68,8 @@ class ImageUtil
     /**
      * Empty image
      *
-     * @param integer $width
-     * @param integer $height
+     * @param int $width
+     * @param int $height
      * @param ImageColor|null $color
      * @return self
      */
@@ -157,7 +157,7 @@ class ImageUtil
     /**
      * Get width
      *
-     * @return integer
+     * @return int
      */
     public function getWidth()
     {
@@ -167,7 +167,7 @@ class ImageUtil
     /**
      * Get width
      *
-     * @return integer
+     * @return int
      */
     public function getHeight()
     {

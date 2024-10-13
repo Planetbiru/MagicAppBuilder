@@ -3,60 +3,60 @@
 namespace MagicObject\Geometry;
 
 /**
- * Class representing a Triangle with three Point objects
+ * Class representing a triangle defined by three Point objects.
  */
 class Triangle {
 
     /**
-     * Point a
+     * Vertex A of the triangle.
      *
      * @var Point
      */
     public $a;
 
     /**
-     * Point b
+     * Vertex B of the triangle.
      *
      * @var Point
      */
     public $b;
 
     /**
-     * Point c
+     * Vertex C of the triangle.
      *
      * @var Point
      */
     public $c;
 
     /**
-     * Point sa
+     * Length of side opposite to vertex A.
      *
-     * @var double
+     * @var float
      */
     public $sa;
 
     /**
-     * Point sb
+     * Length of side opposite to vertex B.
      *
-     * @var double
+     * @var float
      */
     public $sb;
 
     /**
-     * Point sc
+     * Length of side opposite to vertex C.
      *
-     * @var double
+     * @var float
      */
     public $sc;
 
     /**
-     * Constructor to initialize the Triangle with three Point objects
+     * Constructor to initialize the Triangle with three Point objects.
      *
-     * @param Point $a Point a
-     * @param Point $b Point b
-     * @param Point $c Point c
+     * @param Point $a The first vertex of the triangle.
+     * @param Point $b The second vertex of the triangle.
+     * @param Point $c The third vertex of the triangle.
      */
-    public function __construct(Point $a, Point $b, Point $c) {
+    public function __construct($a, $b, $c) {
         $this->a = $a;
         $this->b = $b;
         $this->c = $c;
@@ -68,9 +68,9 @@ class Triangle {
     }
 
     /**
-     * Method to calculate the area of the triangle using Heron's formula
+     * Calculate the area of the triangle using Heron's formula.
      *
-     * @return double
+     * @return float The area of the triangle.
      */
     public function getArea() {
         $z = ($this->sa + $this->sb + $this->sc) / 2;

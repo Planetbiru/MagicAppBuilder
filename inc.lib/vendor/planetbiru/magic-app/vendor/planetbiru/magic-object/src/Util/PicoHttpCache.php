@@ -16,7 +16,7 @@ class PicoHttpCache
     /**
      * Send header to browser to cache current URL
      *
-     * @param integer $lifetime Cache life time
+     * @param int $lifetime Cache life time
      * @return void
      */
     public static function cacheLifetime($lifetime)

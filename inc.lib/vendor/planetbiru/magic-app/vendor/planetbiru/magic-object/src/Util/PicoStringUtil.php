@@ -177,7 +177,7 @@ class PicoStringUtil
      *
      * @param string $haystack Haystack
      * @param string $substring Substring
-     * @param integer $count Count
+     * @param int $count Count
      * @return string
      */
     public static function lTrim($haystack, $substring, $count = -1)
@@ -206,7 +206,7 @@ class PicoStringUtil
      *
      * @param string $haystack Haystack
      * @param string $substring Substring
-     * @param integer $count Count
+     * @param int $count Count
      * @return string
      */
     public static function rTrim($haystack, $substring, $count = -1)

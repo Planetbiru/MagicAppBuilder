@@ -31,24 +31,25 @@ use ReflectionClass;
 class ExtendedReflectionClass extends ReflectionClass {
 
 	/**
-	 * Array of use statements for class.
-	 *
-	 * @var array
-	 */
-	protected $useStatements = array();
+     * Array of use statements for the class.
+     *
+     * @var array
+     */
+    protected $useStatements = [];
 
-	/**
-	 * Check if use statements have been parsed.
-	 *
-	 * @var boolean
-	 */
-	protected $useStatementsParsed = false;
+    /**
+     * Check if use statements have been parsed.
+     *
+     * @var bool
+     */
+    protected $useStatementsParsed = false;
 
-	/**
-	 * Parse class file and get use statements from current namespace.
-	 *
-	 * @return array
-	 */
+    /**
+     * Parse class file and get use statements from the current namespace.
+     *
+     * @return array
+     * @throws InvalidClassException
+     */
 	protected function parseUseStatements() {
 
 		if ($this->useStatementsParsed) {
@@ -67,10 +68,10 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-	 * Read file source up to the line where our class is defined.
-	 *
-	 * @return string
-	 */
+     * Read file source up to the line where our class is defined.
+     *
+     * @return string
+     */
 	private function readFileSource() {
 
 		$file = fopen($this->getFileName(), 'r');
@@ -93,13 +94,12 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-	 * Parse the use statements from read source by
-	 * tokenizing and reading the tokens. Returns
-	 * an array of use statements and aliases.
-	 *
-	 * @param string $source Source
-	 * @return array
-	 */
+     * Parse the use statements from the read source by tokenizing and reading the tokens.
+     * Returns an array of use statements and aliases.
+     *
+     * @param string $source Source code
+     * @return array
+     */
 	private function tokenizeSource($source) //NOSONAR
 	{
 		$tokens = token_get_all($source);
@@ -213,21 +213,21 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-	 * Return array of use statements from class.
-	 *
-	 * @return array
-	 */
+     * Return array of use statements from the class.
+     *
+     * @return array
+     */
 	public function getUseStatements() {
 
 		return $this->parseUseStatements();
 	}
 
 	/**
-	 * Base name of class
-	 *
-	 * @param string $className Class name
-	 * @return string
-	 */
+     * Base name of class.
+     *
+     * @param string $className Class name
+     * @return string
+     */
 	private function baseName($className)
 	{
 		$className = str_replace("/", "\\", $className);
@@ -240,11 +240,11 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-	 * Check if class is using a class or an alias of a class.
-	 *
-	 * @param string $class Class name
-	 * @return boolean
-	 */
+     * Check if the class is using a class or an alias of a class.
+     *
+     * @param string $class Class name
+     * @return bool
+     */
 	public function hasUseStatement($class) {
 
 		$useStatements = $this->parseUseStatements();

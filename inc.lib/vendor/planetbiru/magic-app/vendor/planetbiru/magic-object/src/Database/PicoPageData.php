@@ -9,7 +9,18 @@ use PDOStatement;
 use stdClass;
 
 /**
- * Page data
+ * Class representing paginated data for database queries.
+ *
+ * The `PicoPageData` class encapsulates the results of a database query along with pagination details,
+ * execution timing, and other metadata. It provides methods to manage and retrieve paginated results
+ * effectively, allowing for easy integration into applications that require data manipulation and display.
+ *
+ * ## Key Features
+ * - Encapsulates query results in a paginated format.
+ * - Supports execution time tracking for performance monitoring.
+ * - Provides easy access to pagination controls and metadata.
+ * - Facilitates fetching and processing of data with subquery mapping.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPageData
@@ -18,243 +29,249 @@ class PicoPageData
     const PAGEABLE = 'pageable';
 
     /**
-     * Result
+     * Result data from the query.
      *
      * @var MagicObject[]
      */
     private $result = array();
 
     /**
-     * Pageable
+     * Pageable object that defines pagination settings.
      *
      * @var PicoPageable
      */
     private $pageable;
 
     /**
-     * Total match
+     * Total number of matching results from the query.
      *
-     * @var integer
+     * @var int
      */
     private $totalResult = 0;
 
     /**
-     * Total page
+     * Total number of pages based on pagination settings.
      *
-     * @var integer
+     * @var int
      */
     private $totalPage = 0;
-    
-    /**
-     * Page number
-     * @var integer
-     */
-    private $pageNumber = 0;
 
     /**
-     * Page size
-     * @var integer
+     * Current page number in the pagination context.
+     *
+     * @var int
+     */
+    private $pageNumber = 1;
+
+    /**
+     * Number of results per page.
+     *
+     * @var int
      */
     private $pageSize = 0;
 
     /**
-     * Data offset
+     * Offset for retrieving data in the current pagination context.
      *
-     * @var integer
+     * @var int
      */
     private $dataOffset = 0;
 
     /**
-     * Start time
+     * Start time of the query execution.
      *
      * @var float
      */
     private $startTime = 0.0;
 
     /**
-     * End time
+     * End time of the query execution.
      *
      * @var float
      */
     private $endTime = 0.0;
 
     /**
-     * Execution time
+     * Total execution time for the query in seconds.
      *
      * @var float
      */
     private $executionTime = 0.0;
 
     /**
-     * Pagination
+     * Array holding pagination details for display.
      *
      * @var array
      */
     private $pagination = array();
 
     /**
-     * PDO statement
+     * PDO statement associated with the query execution.
      *
      * @var PDOStatement
      */
     private $stmt = null;
 
     /**
-     * Class name
+     * Class name of the entity being managed.
      *
      * @var string
      */
     private $className;
 
     /**
-     * Subquery info
+     * Mapping information for subqueries.
      *
      * @var array
      */
     private $subqueryMap;
 
     /**
-     * By count result
+     * Flag indicating whether the result was derived from a count query.
      *
-     * @var boolean
+     * @var bool
      */
     private $byCountResult = false;
 
     /**
-     * Entity
+     * Entity associated with the results.
      *
      * @var MagicObject
      */
     private $entity;
 
     /**
-     * Find option
+     * Flags for controlling find options in the query.
      *
-     * @var integer
+     * @var int
      */
     private $findOption = 0;
 
     /**
-     * Constructor
+     * Constructor for the PicoPageData class.
      *
-     * @param MagicObject[] $result Array of MagicObject or null
-     * @param integer $startTime Timestamp when query is sent
-     * @param integer $totalResult Total result of 0 for no result
-     * @param PicoPageable $pageable Pageable
-     * @param PDOStatement $stmt PDO statement
-     * @param MagicObject $entity Entity
-     * @param array $subqueryMap Subquery map
+     * Initializes a new instance of the class with the specified parameters.
+     *
+     * @param MagicObject[]|null $result Array of MagicObject instances or null.
+     * @param float $startTime Timestamp when the query was initiated.
+     * @param int $totalResult Total count of results, defaults to 0.
+     * @param PicoPageable|null $pageable Pageable object for pagination settings.
+     * @param PDOStatement|null $stmt PDO statement associated with the query.
+     * @param MagicObject|null $entity Entity associated with the query results.
+     * @param array|null $subqueryMap Mapping for subquery results.
      */
-    public function __construct($result, $startTime, $totalResult = 0, $pageable = null, $stmt = null, $entity = null, $subqueryMap = null)
-    {
-        $this->startTime = $startTime;
-        $this->result = $result;
-        $countResult = $this->countData($result);
-        if($totalResult != 0)
-        {
-            $this->totalResult = $totalResult;
+    public function __construct(
+        $result = null,
+        $startTime = null,
+        $totalResult = 0,
+        PicoPageable $pageable = null,
+        PDOStatement $stmt = null,
+        MagicObject $entity = null,
+        $subqueryMap = null
+    ) {
+        // Set the start time
+        if (isset($startTime)) {
+            $this->startTime = $startTime;
+        } else {
+            $this->startTime = time();
         }
-        else
-        {
-            $this->byCountResult = true;
-            $this->totalResult = $countResult;
-        }
-        if($pageable != null && $pageable instanceof PicoPageable)
-        {
+
+        // Initialize result data
+        $this->result = $result === null ? [] : $result;
+
+        // Calculate total results
+        $this->totalResult = $totalResult === 0 ? $this->countData($this->result) : $totalResult;
+        $this->byCountResult = $totalResult === 0;
+
+        // Handle pageable settings
+        if ($pageable instanceof PicoPageable) {
             $this->pageable = $pageable;
             $this->calculateContent();
+        } else {
+            $this->initializeDefaultPagination($this->totalResult);
         }
-        else
-        {
-            $this->pageNumber = 1;
-            $this->totalPage = 1;
-            $this->pageSize = $countResult;
-            $this->dataOffset = 0;
-        }
+
+        // Set execution timing
         $this->endTime = microtime(true);
         $this->executionTime = $this->endTime - $this->startTime;
-        if($stmt != null)
-        {
-            $this->stmt = $stmt;
-        }
-        if($entity != null)
-        {
-            $this->entity = $entity;
-            $this->className = get_class($entity);
-        }
-        if($subqueryMap != null)
-        {
-            $this->subqueryMap = $subqueryMap;
-        }
+
+        // Store additional parameters
+        $this->stmt = $stmt;
+        $this->entity = $entity;
+        $this->className = $entity !== null ? get_class($entity) : null;
+        $this->subqueryMap = $subqueryMap !== null ? $subqueryMap : [];
     }
 
     /**
-     * Count data
+     * Count the number of items in the result set.
      *
-     * @param array $result Result
-     * @return integer
+     * @param array $result Result set to count.
+     * @return int Count of items in the result.
      */
     private function countData($result)
     {
-        if(isset($result) && is_array($result))
-        {
-            return count($result);
-        }
-        return 0;
+        return is_array($result) ? count($result) : 0;
     }
 
     /**
-     * Calculate content
+     * Calculate pagination content based on the pageable settings.
      *
      * @return self
      */
     public function calculateContent()
     {
+        // Extract pagination details
         $this->pageNumber = $this->pageable->getPage()->getPageNumber();
-        $this->totalPage = ceil($this->totalResult / $this->pageable->getPage()->getPageSize());
-
         $this->pageSize = $this->pageable->getPage()->getPageSize();
+        $this->totalPage = (int) ceil($this->totalResult / $this->pageSize);
         $this->dataOffset = ($this->pageNumber - 1) * $this->pageSize;
         $this->generatePagination(3);
         return $this;
     }
 
     /**
-     * Generate pagination
-     * @param integer $margin Minimum page number before current page and maximum page number after current page
+     * Initialize default pagination settings.
+     *
+     * This method is called when no pageable object is provided.
+     *
+     * @param int $countResult Total count of results.
+     */
+    private function initializeDefaultPagination($countResult)
+    {
+        $this->pageNumber = 1;
+        $this->totalPage = 1;
+        $this->pageSize = $countResult;
+        $this->dataOffset = 0;
+    }
+
+    /**
+     * Generate pagination details for display.
+     *
+     * This method constructs an array of pagination controls based on the current page number and total pages.
+     *
+     * @param int $margin Number of pages to show before and after the current page.
      * @return self
      */
     public function generatePagination($margin = 3)
     {
-        if($margin < 1)
-        {
-            $margin = 1;
-        }
+        $margin = max(1, $margin);
         $curPage = $this->pageNumber;
         $totalPage = $this->totalPage;
 
-        $minPage = $curPage - $margin;
-        if($minPage < 1)
-        {
-            $minPage = 1;
-        }
-        $maxPage = $curPage + $margin;
-        if(!$this->byCountResult && $maxPage > $totalPage)
-        {
-            $maxPage = $totalPage;
-        }
+        $minPage = max(1, $curPage - $margin);
+        $maxPage = $this->byCountResult ? $totalPage : min($curPage + $margin, $totalPage);
+
         $this->pagination = array();
-        for($i = $minPage; $i <= $maxPage; $i++)
-        {
-            $this->pagination[] = array('page'=>$i, 'selected'=>$i == $curPage);
+        for ($i = $minPage; $i <= $maxPage; $i++) {
+            $this->pagination[] = ['page' => $i, 'selected' => $i === $curPage];
         }
         return $this;
     }
 
     /**
-     * Get result
+     * Get result data from the query.
      *
-     * @return MagicObject[]
+     * @return MagicObject[] Array of MagicObject instances.
      */
     public function getResult()
     {
@@ -262,9 +279,9 @@ class PicoPageData
     }
 
     /**
-     * Get page number
+     * Get the current page number in the pagination context.
      *
-     * @return integer
+     * @return int Current page number.
      */
     public function getPageNumber()
     {
@@ -272,9 +289,9 @@ class PicoPageData
     }
 
     /**
-     * Get total page
+     * Get the total number of pages based on pagination settings.
      *
-     * @return integer
+     * @return int Total page count.
      */
     public function getTotalPage()
     {
@@ -282,9 +299,9 @@ class PicoPageData
     }
 
     /**
-     * Get page size
+     * Get the size of each page (number of results per page).
      *
-     * @return integer
+     * @return int Page size.
      */
     public function getPageSize()
     {
@@ -292,14 +309,14 @@ class PicoPageData
     }
 
     /**
-     * Magic method to debug object
+     * Magic method to represent the object as a JSON string.
      *
-     * @return string
+     * @return string JSON representation of the object.
      */
     public function __toString()
     {
         $obj = new stdClass;
-        $exposedProps = array(
+        $exposedProps = [
             "pageable",
             "totalResult",
             "totalPage",
@@ -310,25 +327,26 @@ class PicoPageData
             "endTime",
             "executionTime",
             "pagination"
-        );
-        foreach($this as $key=>$value)
-        {
-            if($key != self::RESULT && $key != self::PAGEABLE && in_array($key, $exposedProps))
-            {
-                $obj->{$key} = $value;
+        ];
+        
+        foreach ($exposedProps as $key) {
+            if (property_exists($this, $key)) {
+                $obj->{$key} = $this->{$key};
             }
         }
-        $obj->findOption = array(
-            "FIND_OPTION_NO_COUNT_DATA"=>$this->findOption & MagicObject::FIND_OPTION_NO_COUNT_DATA,
-            "FIND_OPTION_NO_FETCH_DATA"=>$this->findOption & MagicObject::FIND_OPTION_NO_FETCH_DATA
-        );
+
+        $obj->findOption = [
+            "FIND_OPTION_NO_COUNT_DATA" => $this->findOption & MagicObject::FIND_OPTION_NO_COUNT_DATA,
+            "FIND_OPTION_NO_FETCH_DATA" => $this->findOption & MagicObject::FIND_OPTION_NO_FETCH_DATA,
+        ];
+
         return json_encode($obj);
     }
 
     /**
-     * Get execution time
+     * Get the execution time of the query in seconds.
      *
-     * @return float
+     * @return float Execution time.
      */
     public function getExecutionTime()
     {
@@ -336,7 +354,9 @@ class PicoPageData
     }
 
     /**
-     * Get the value of pagination
+     * Get the pagination details for the current query.
+     *
+     * @return array Pagination details.
      */
     public function getPagination()
     {
@@ -344,11 +364,11 @@ class PicoPageData
     }
 
     /**
-     * Get page control
+     * Get the pagination control object for managing page navigation.
      *
-     * @param string $parameterName Parameter name for page
-     * @param string $path Link path
-     * @return PicoPageControl
+     * @param string $parameterName Parameter name for the page.
+     * @param string|null $path Optional link path.
+     * @return PicoPageControl Pagination control object.
      */
     public function getPageControl($parameterName = 'page', $path = null)
     {
@@ -356,9 +376,9 @@ class PicoPageData
     }
 
     /**
-     * Get total match
+     * Get the total result count from the query.
      *
-     * @return integer
+     * @return int Total result count.
      */
     public function getTotalResult()
     {
@@ -366,9 +386,9 @@ class PicoPageData
     }
 
     /**
-     * Get pageable
+     * Get the pageable object associated with this data.
      *
-     * @return PicoPageable
+     * @return PicoPageable|null Pageable object or null if not set.
      */
     public function getPageable()
     {
@@ -376,9 +396,9 @@ class PicoPageData
     }
 
     /**
-     * Get data offset
+     * Get the data offset for the current pagination context.
      *
-     * @return integer
+     * @return int Data offset.
      */
     public function getDataOffset()
     {
@@ -386,80 +406,70 @@ class PicoPageData
     }
 
     /**
-     * Get PDO statement
+     * Get the PDO statement associated with the query.
      *
      * @return PDOStatement
+     * @throws FindOptionException if the statement is null.
      */
     public function getPDOStatement()
     {
-        if($this->stmt == null)
-        {
-            throw new FindOptionException("Statement is null. See MagicObject::FIND_OPTION_NO_FETCH_DATA option");
+        if ($this->stmt === null) {
+            throw new FindOptionException("Statement is null. See MagicObject::FIND_OPTION_NO_FETCH_DATA option.");
         }
         return $this->stmt;
     }
 
     /**
-     * Fetch data
+     * Fetch the next row from the result set.
      *
-     * @return MagicObject|mixed
+     * @return MagicObject|mixed Next row data as a MagicObject or false on failure.
+     * @throws FindOptionException if the statement is null.
      */
     public function fetch()
     {
-        if($this->stmt == null)
-        {
-            throw new FindOptionException("Statement is null. See MagicObject::FIND_OPTION_NO_FETCH_DATA option");
+        if ($this->stmt === null) {
+            throw new FindOptionException("Statement is null. See MagicObject::FIND_OPTION_NO_FETCH_DATA option.");
         }
+        
         $result = $this->stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
-        if($result === false)
-        {
-            return false;
-        }
-        return $this->applySubqueryResult($result);
+        return $result !== false ? $this->applySubqueryResult($result) : false;
     }
 
     /**
-     * Apply subquery result
+     * Apply subquery results to the row data.
      *
-     * @param array $row Data row
-     * @return MagicObject
+     * This method processes the row data and integrates results from subqueries as defined by the mapping.
+     *
+     * @param array $row Data row from the query result.
+     * @return MagicObject Processed MagicObject instance containing the merged data.
      */
     public function applySubqueryResult($row)
     {
         $data = $row;
-        if(isset($this->subqueryMap) && is_array($this->subqueryMap))
-        {
-            foreach($this->subqueryMap as $info)
-            {
+
+        if (!empty($this->subqueryMap) && is_array($this->subqueryMap)) {
+            foreach ($this->subqueryMap as $info) {
                 $objectName = $info['objectName'];
                 $objectNameSub = $info['objectName'];
-                if(isset($row[$objectNameSub]))
-                {
-                    $data[$objectName] = (new MagicObject())
-                        ->set($info['primaryKey'], $row[$info['columnName']])
-                        ->set($info['propertyName'], $row[$objectNameSub])
-                    ;
-                }
-                else
-                {
-                    $data[$objectName] = new MagicObject();
-                }
+
+                $data[$objectName] = isset($row[$objectNameSub])
+                    ? (new MagicObject())->set($info['primaryKey'], $row[$info['columnName']])->set($info['propertyName'], $row[$objectNameSub])
+                    : new MagicObject();
             }
-        }
-        else
-        {
+        } else {
             $persist = new PicoDatabasePersistence($this->entity->currentDatabase(), $this->entity);
             $info = $this->entity->tableInfo();
             $data = $persist->fixDataType($row, $info);
             $data = $persist->join($data, $row, $info);
         }
+
         return new $this->className($data);
     }
 
     /**
-     * Get find option
+     * Get find option flags indicating query behavior.
      *
-     * @return integer
+     * @return int Find option flags.
      */
     public function getFindOption()
     {
@@ -467,16 +477,14 @@ class PicoPageData
     }
 
     /**
-     * Set find option
+     * Set find option flags to control query behavior.
      *
-     * @param integer $findOption Find option
-     *
+     * @param int $findOption Flags indicating the desired query options.
      * @return self
      */
     public function setFindOption($findOption)
     {
         $this->findOption = $findOption;
-
         return $this;
     }
 }

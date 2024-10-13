@@ -5,79 +5,76 @@ namespace MagicObject\Geometry;
 use MagicObject\Exceptions\InvalidPolygonException;
 
 /**
- * Class representing a Line with two Point objects
+ * Class representing a rectangle defined by two Point objects.
  */
 class Rectangle {
 
     /**
-     * Point a
+     * Bottom-left corner point of the rectangle.
      *
      * @var Point
      */
     public $a;
 
     /**
-     * Point b
+     * Top-right corner point of the rectangle.
      *
      * @var Point
      */
     public $b;
 
     /**
-     * Polygon
+     * Polygon representation of the rectangle.
      *
      * @var Polygon
      */
     public $polygon;
 
     /**
-     * Constructor to initialize the Rectangle with two Point objects
+     * Constructor to initialize the Rectangle with two Point objects.
      *
-     * @param Point $a Point a
-     * @param Point $b Point b
+     * @param Point $a Bottom-left corner point.
+     * @param Point $b Top-right corner point.
      */
-    public function __construct(Point $a, Point $b) {
+    public function __construct($a, $b) {
+        // Initialize the polygon
+        $this->polygon = new Polygon();
 
-        if(!isset($this->polygon))
-        {
-            $this->polygon = new Polygon();
-        }
-
+        // Assign the points
         $this->a = $a;
         $this->b = $b;
 
+        // Define the rectangle's corners
         $point1 = new Point($this->a->x, $this->a->y);
         $point2 = new Point($this->b->x, $this->a->y);
         $point3 = new Point($this->b->x, $this->b->y);
         $point4 = new Point($this->a->x, $this->b->y);
 
+        // Add the points to the polygon
         $this->polygon
             ->addPoint($point1)
             ->addPoint($point2)
             ->addPoint($point3)
-            ->addPoint($point4)
-            ;
+            ->addPoint($point4);
     }
 
     /**
-     * Function to calculate the area of a polygon using the Shoelace formula
+     * Calculate the area of the rectangle.
      *
-     * @return double
-     * @throws InvalidPolygonException
+     * @return float The area of the rectangle.
+     * @throws InvalidPolygonException If the polygon is invalid.
      */
-    public function getArea()
-    {
+    public function getArea() {
         return $this->polygon->getArea();
     }
 
     /**
-     * Get circumference
+     * Get the circumference (perimeter) of the rectangle.
      *
-     * @return double
-     * @throws InvalidPolygonException
+     * @return float The circumference of the rectangle.
+     * @throws InvalidPolygonException If the polygon is invalid.
      */
-    public function getCircumference()
-    {
+    public function getCircumference() {
         return $this->polygon->getCircumference();
     }
 }

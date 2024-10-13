@@ -12,7 +12,7 @@ use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
 
-class PicoDatabaseUtilMySql //NOSONAR
+class PicoDatabaseUtilPostgreSql //NOSONAR
 {
     const KEY_NAME = "name";
 
@@ -25,7 +25,14 @@ class PicoDatabaseUtilMySql //NOSONAR
      */
     public static function getColumnList($database, $picoTableName)
     {
-        $sql = "SHOW COLUMNS FROM $picoTableName";
+        $schema = $database->getDatabaseCredentials()->getDatabaseSchema();
+        if(!isset($schema) || empty($schema))
+        {
+            $schema = "public";
+        }
+        $sql = "SELECT column_name, data_type, is_nullable, column_default 
+                FROM information_schema.columns 
+                WHERE table_schema = '$schema' AND table_name = '$picoTableName'";
         return $database->fetchAll($sql);
     }
 
@@ -59,58 +66,39 @@ class PicoDatabaseUtilMySql //NOSONAR
      * @param string $picoTableName Table name.
      * @param bool $createIfNotExists Whether to add "IF NOT EXISTS" in the create statement.
      * @param bool $dropIfExists Whether to add "DROP TABLE IF EXISTS" before the create statement.
-     * @param string $engine Storage engine (default is 'InnoDB').
-     * @param string $charset Character set (default is 'utf8mb4').
      * @return string SQL statement to create the table.
      */
-    public static function dumpStructure($tableInfo, $picoTableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
+    public static function dumpStructure($tableInfo, $picoTableName, $createIfNotExists = false, $dropIfExists = false)
     {
-        $query = array();
-        $columns = array();
-        if($dropIfExists)
-        {
-            $query[] = "-- DROP TABLE IF EXISTS `$picoTableName`;";
+        $query = [];
+        if ($dropIfExists) {
+            $query[] = "-- DROP TABLE IF EXISTS \"$picoTableName\";";
             $query[] = "";
         }
-        $createStatement = "";
 
         $createStatement = "CREATE TABLE";
-        if($createIfNotExists)
-        {
+        if ($createIfNotExists) {
             $createStatement .= " IF NOT EXISTS";
         }
 
         $autoIncrementKeys = self::getAutoIncrementKey($tableInfo);
 
-        $query[] = "$createStatement `$picoTableName` (";
+        $query[] = "$createStatement \"$picoTableName\" (";
 
-        foreach($tableInfo->getColumns() as $column)
-        {
-            $columns[] = self::createColumn($column);
+        foreach ($tableInfo->getColumns() as $column) {
+            $query[] = self::createColumn($column);
         }
-        $query[] = implode(",\r\n", $columns);
-        $query[] = ") ENGINE=$engine DEFAULT CHARSET=$charset;";
+        $query[] = implode(",\r\n", $query);
+        $query[] = ");";
 
         $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
+        if (isset($pk) && is_array($pk) && !empty($pk)) {
             $query[] = "";
-            $query[] = "ALTER TABLE `$picoTableName`";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY (`$primaryKey[name]`)";
+            $query[] = "ALTER TABLE \"$picoTableName\"";
+            foreach ($pk as $primaryKey) {
+                $query[] = "\tADD PRIMARY KEY (\"$primaryKey[name]\")";
             }
             $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[self::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE `$picoTableName` \r\n\tMODIFY ".trim(self::createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
         }
 
         return implode("\r\n", $query);
@@ -124,24 +112,23 @@ class PicoDatabaseUtilMySql //NOSONAR
      */
     public static function createColumn($column)
     {
-        $col = array();
+        $col = [];
         $col[] = "\t";
-        $col[] = "`".$column[self::KEY_NAME]."`";
+        $col[] = "\"" . $column[self::KEY_NAME] . "\"";
         $col[] = $column['type'];
-        if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
-        {
+
+        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
             $col[] = "NULL";
-        }
-        else
-        {
+        } else {
             $col[] = "NOT NULL";
         }
-        if(isset($column['default_value']))
-        {
+
+        if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
             $defaultValue = self::fixDefaultValue($defaultValue, $column['type']);
             $col[] = "DEFAULT $defaultValue";
         }
+
         return implode(" ", $col);
     }
 
@@ -154,14 +141,14 @@ class PicoDatabaseUtilMySql //NOSONAR
      */
     public static function fixDefaultValue($defaultValue, $type)
     {
-        if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
-        {
+        if (strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null') {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false || stripos($type, 'int') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
-        {
-            return "'".$defaultValue."'";
+
+        if (stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
+            return "'" . addslashes($defaultValue) . "'";
         }
+
         return $defaultValue;
     }
 
@@ -175,16 +162,11 @@ class PicoDatabaseUtilMySql //NOSONAR
      */
     public static function dumpData($columns, $picoTableName, $data) //NOSONAR
     {
-        if($data instanceof PicoPageData && isset($data->getResult()[0]))
-        {
+        if ($data instanceof PicoPageData && isset($data->getResult()[0])) {
             return self::dumpRecords($columns, $picoTableName, $data->getResult());
-        }
-        else if($data instanceof MagicObject)
-        {
-            return self::dumpRecords($columns, $picoTableName, array($data));
-        }
-        else if(is_array($data) && isset($data[0]) && $data[0] instanceof MagicObject)
-        {
+        } else if ($data instanceof MagicObject) {
+            return self::dumpRecords($columns, $picoTableName, [$data]);
+        } else if (is_array($data) && isset($data[0]) && $data[0] instanceof MagicObject) {
             return self::dumpRecords($columns, $picoTableName, $data);
         }
         return null;
@@ -201,9 +183,8 @@ class PicoDatabaseUtilMySql //NOSONAR
     public static function dumpRecords($columns, $picoTableName, $data)
     {
         $result = "";
-        foreach($data as $record)
-        {
-            $result .= self::dumpRecord($columns, $picoTableName, $record).";\r\n";
+        foreach ($data as $record) {
+            $result .= self::dumpRecord($columns, $picoTableName, $record) . ";\r\n";
         }
         return $result;
     }
@@ -219,15 +200,14 @@ class PicoDatabaseUtilMySql //NOSONAR
     public static function dumpRecord($columns, $picoTableName, $record)
     {
         $value = $record->valueArray();
-        $rec = array();
-        foreach($value as $key=>$val)
-        {
-            if(isset($columns[$key]))
-            {
+        $rec = [];
+        foreach ($value as $key => $val) {
+            if (isset($columns[$key])) {
                 $rec[$columns[$key][self::KEY_NAME]] = $val;
             }
         }
-        $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_MYSQL);
+
+        $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_POSTGRESQL);
         $queryBuilder->newQuery()
             ->insert()
             ->into($picoTableName)
@@ -246,13 +226,19 @@ class PicoDatabaseUtilMySql //NOSONAR
      */
     public static function showColumns($database, $tableName)
     {
-        $sql = "SHOW COLUMNS FROM $tableName";
+        $schema = $database->getDatabaseCredentials()->getDatabaseSchema();
+        if(!isset($schema) || empty($schema))
+        {
+            $schema = "public";
+        }
+        $sql = "SELECT column_name, data_type 
+                FROM information_schema.columns 
+                WHERE table_schema = '$schema' AND table_name = '$tableName'";
         $result = $database->fetchAll($sql, PDO::FETCH_ASSOC);
 
-        $columns = array();
-        foreach($result as $row)
-        {
-            $columns[$row['Field']] = $row['Type'];
+        $columns = [];
+        foreach ($result as $row) {
+            $columns[$row['column_name']] = $row['data_type'];
         }
         return $columns;
     }
@@ -270,35 +256,40 @@ class PicoDatabaseUtilMySql //NOSONAR
 
         $databaseSource = new PicoDatabase($databaseConfigSource);
         $databaseTarget = new PicoDatabase($databaseConfigTarget);
-        try
+
+        $schemaSource = $databaseConfigSource->getDatabaseSchema();
+        if(!isset($schemaSource) || empty($schemaSource))
         {
+            $schemaSource = "public";
+        }
+        $schemaTarget = $databaseConfigTarget->getDatabaseSchema();
+        if(!isset($schemaTarget) || empty($schemaTarget))
+        {
+            $schemaTarget = "public";
+        }
+        try {
             $databaseSource->connect();
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = array();
-            foreach($tables as $tb)
-            {
+            $existingTables = [];
+            foreach ($tables as $tb) {
                 $existingTables[] = $tb->getTarget();
             }
 
-            $sourceTableList = $databaseSource->fetchAll("SHOW TABLES", PDO::FETCH_NUM);
-            $targetTableList = $databaseTarget->fetchAll("SHOW TABLES", PDO::FETCH_NUM);
+            $sourceTableList = $databaseSource->fetchAll("SELECT table_name FROM information_schema.tables WHERE table_schema='$schemaSource'", PDO::FETCH_NUM);
+            $targetTableList = $databaseTarget->fetchAll("SELECT table_name FROM information_schema.tables WHERE table_schema='$schemaTarget'", PDO::FETCH_NUM);
 
-            $sourceTables = call_user_func_array('array_merge', $sourceTableList);
-            $targetTables = call_user_func_array('array_merge', $targetTableList);
-
-            foreach($targetTables as $target)
-            {
-                $tables = self::updateConfigTable($databaseSource, $databaseTarget, $tables, $sourceTables, $target, $existingTables);
+            foreach ($sourceTableList as $sourceTable) {
+                if (!in_array($sourceTable[0], $existingTables) && in_array($sourceTable[0], $targetTableList)) {
+                    $config->addTable($sourceTable[0], $sourceTable[0]);
+                }
             }
-            $config->setTable($tables);
+
+            return $config;
+        } catch (Exception $e) {
+            throw new Exception("Error during database connection: " . $e->getMessage());
         }
-        catch(Exception $e)
-        {
-            error_log($e->getMessage());
-        }
-        return $config;
     }
 
     /**

@@ -70,7 +70,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone
@@ -189,7 +189,7 @@ class SecretGenerator extends SecretObject
 	 * @EncryptOut
 	 * @var string
 	 */
-	protected $databseSchema;
+	protected $databaseSchema;
 
 	/**
 	 * Application time zone
@@ -364,7 +364,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone
@@ -594,7 +594,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone

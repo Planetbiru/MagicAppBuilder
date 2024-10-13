@@ -10,7 +10,11 @@ use ReflectionClass;
 use stdClass;
 
 /**
- * Entity language
+ * Entity Language Class
+ *
+ * This class manages entity language configurations, including loading 
+ * labels and handling different language options.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityLanguage
@@ -21,41 +25,42 @@ class PicoEntityLanguage
     private $_defaultColumnName = "key"; //NOSONAR
 
     /**
-     * Current language
+     * Current language code.
      *
      * @var string
      */
     private $_currentLanguage; //NOSONAR
+
     /**
-     * Language
+     * Array of PicoLanguage objects.
      *
      * @var PicoLanguage[]
      */
     private $_lableLanguage = array(); //NOSONAR
 
     /**
-     * Table identity
+     * Table identity object.
      *
      * @var PicoGenericObject
      */
     private $_tableIdentity; //NOSONAR
 
     /**
-     * Labels
+     * Labels for the entity.
      *
      * @var array
      */
     private $_labels = array(); //NOSONAR
 
     /**
-     * Entity class name
+     * Entity class name.
      *
      * @var string
      */
     private $_entityClassName = ""; //NOSONAR
 
     /**
-     * Entity language
+     * Entity language code.
      *
      * @var string
      */
@@ -64,19 +69,19 @@ class PicoEntityLanguage
     /**
      * Constructor
      *
-     * @param MagicObject $data
+     * @param MagicObject|null $entity The entity to load.
      */
     public function __construct($entity = null)
     {
-        if(isset($entity))
-        {
+        if (isset($entity)) {
             $this->loadEntityLabel($entity);
         }
     }
 
     /**
-     * Load data to object
-     * @param MagicObject $entity ENtity
+     * Load data into the object from the given entity.
+     *
+     * @param MagicObject $entity The entity to load.
      * @return self
      */
     public function loadEntityLabel($entity)
@@ -84,73 +89,67 @@ class PicoEntityLanguage
         $this->_entityClassName = get_class($entity);
         $reflexClass = new PicoAnnotationParser($this->_entityClassName);
         $lang = $reflexClass->getFirstParameter(self::ANNOTATION_LANGUAGE);
-        if($lang != null)
-        {
+        
+        if ($lang !== null) {
             $prefLanguage = $reflexClass->parseKeyValueAsObject($lang);
-            if($prefLanguage->issetContent())
-            {
+            if ($prefLanguage->issetContent()) {
                 $this->_entityLanguage = trim($prefLanguage->getContent());
                 $this->_currentLanguage = $this->_entityLanguage;
             }
-        }
-        else
-        {
+        } else {
             $this->_entityLanguage = "__default";
             $this->_currentLanguage = $this->_entityLanguage;
         }
+
         $this->_tableIdentity = $reflexClass->parseKeyValueAsObject($reflexClass->getFirstParameter(self::ANNOTATION_TABLE));
         $propertyList = $this->propertyList(true);
-        $defualtLanguage = array();
-        foreach($propertyList as $prop)
-        {
+        $defaultLanguage = array();
+        
+        foreach ($propertyList as $prop) {
             $reflexProp = new PicoAnnotationParser($this->_entityClassName, $prop, PicoAnnotationParser::PROPERTY);
-            if($reflexProp != null)
-            {
+            if ($reflexProp !== null) {
                 $parameters = $reflexProp->getParametersAsObject();
-                if($parameters->issetLabel())
-                {
+                if ($parameters->issetLabel()) {
                     $property = PicoStringUtil::camelize($prop);
                     $label = $this->label($reflexProp, $parameters, PicoStringUtil::camelToTitle($property));
-                    $defualtLanguage[$property] = $label;
+                    $defaultLanguage[$property] = $label;
                 }
             }
         }
-        $this->addLanguage($this->_entityLanguage, $defualtLanguage, true);
+
+        $this->addLanguage($this->_entityLanguage, $defaultLanguage, true);
         return $this;
     }
 
     /**
-     * Add language
+     * Add a language to the entity.
      *
-     * @param string $code Language code
-     * @param object|stdClass|array $reference Reference
-     * @param boolean $use Flag to use language
+     * @param string $code Language code.
+     * @param object|stdClass|array $reference Reference data for the language.
+     * @param boolean $use Flag to indicate whether to use this language immediately.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
     {
         $this->_lableLanguage[$code] = new PicoLanguage($reference);
-        if($use)
-        {
+        if ($use) {
             $this->selectLanguage($code);
         }
         return $this;
     }
 
     /**
-     * Remove language
+     * Remove a language from the entity.
      *
-     * GoPro Rechargeable Battery for MAX 360
+     * @param string $code Language code to remove.
      * @return self
      */
     public function removeLanguage($code)
     {
-        if(isset($this->_lableLanguage[$code]))
-        {
+        if (isset($this->_lableLanguage[$code])) {
             unset($this->_lableLanguage[$code]);
         }
-        if(!empty($this->_lableLanguage))
-        {
+        if (!empty($this->_lableLanguage)) {
             $keys = array_keys($this->_lableLanguage);
             $this->selectLanguage($keys[0]);
         }
@@ -158,9 +157,9 @@ class PicoEntityLanguage
     }
 
     /**
-     * Set current language
+     * Set the current language.
      *
-     * GoPro Rechargeable Battery for MAX 360
+     * @param string $code Language code to set as current.
      * @return self
      */
     public function selectLanguage($code)
@@ -170,56 +169,46 @@ class PicoEntityLanguage
     }
 
     /**
-     * Property list
-     * @var boolean $asArrayProps Flag
-     * @return array
+     * Get the list of properties of the entity.
+     *
+     * @param boolean $asArrayProps Flag to determine if result should be returned as an array.
+     * @return array List of properties.
      */
     public function propertyList($asArrayProps = false)
     {
         $class = new ReflectionClass($this->_entityClassName);
 
-        // filter only the calling class properties
-        // skip parent properties
+        // Filter only the properties declared in the calling class
         $properties = array_filter(
             $class->getProperties(),
-            function($property) use($class) {
+            function ($property) use ($class) {
                 return $property->getDeclaringClass()->getName() == $class->getName();
             }
         );
-        if($asArrayProps)
-        {
-            $result = array();
-            $index = 0;
-            foreach ($properties as $key) {
-                $prop = $key->name;
-                $result[$index] = $prop;
 
-                $index++;
-            }
-            return $result;
-        }
-        else
-        {
+        if ($asArrayProps) {
+            return array_map(function ($prop) {
+                return $prop->name;
+            }, $properties);
+        } else {
             return $properties;
         }
     }
 
     /**
-     * Annotation content
+     * Get the content of a specific annotation.
      *
-     * @param PicoAnnotationParser $reflexProp Property reflection
-     * @param PicoGenericObject $parameters Parameters
-     * @param string $annotation Annotation
-     * @param string $attribute Attribute
+     * @param PicoAnnotationParser $reflexProp Property reflection object.
+     * @param PicoGenericObject $parameters Parameters associated with the property.
+     * @param string $annotation Annotation name to search for.
+     * @param string $attribute Attribute name to retrieve.
      * @return mixed|null
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
     {
-        if($parameters->get($annotation) != null)
-        {
+        if ($parameters->get($annotation) !== null) {
             $attrs = $reflexProp->parseKeyValueAsObject($parameters->get($annotation));
-            if($attrs->get($attribute) != null)
-            {
+            if ($attrs->get($attribute) !== null) {
                 return $attrs->get($attribute);
             }
         }
@@ -227,12 +216,12 @@ class PicoEntityLanguage
     }
 
     /**
-     * Define label
+     * Define the label for a property.
      *
-     * @param PicoAnnotationParser $reflexProp Property reflection
-     * @param PicoGenericObject $parameters Parameters
-     * @param string $defaultLabel Default label
-     * @return string
+     * @param PicoAnnotationParser $reflexProp Property reflection object.
+     * @param PicoGenericObject $parameters Parameters associated with the property.
+     * @param string $defaultLabel Default label to use if no annotation is found.
+     * @return string The defined label.
      */
     private function label($reflexProp, $parameters, $defaultLabel)
     {
@@ -241,10 +230,10 @@ class PicoEntityLanguage
     }
 
     /**
-     * Set property value
+     * Set a property value.
      *
-     * @param string $propertyName Property name
-     * @param mixed|null $propertyValue Property value
+     * @param string $propertyName Name of the property to set.
+     * @param mixed|null $propertyValue Value to set for the property.
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -255,70 +244,80 @@ class PicoEntityLanguage
     }
 
     /**
-     * Get property value
+     * Get a property value.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null
+     * @param string $propertyName Name of the property to get.
+     * @return mixed|null The value of the property or null if not set.
      */
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if($this->_lableLanguage[$this->_currentLanguage] != null  && $this->_lableLanguage[$this->_currentLanguage]->get($var) != null)
-        {
+        if (isset($this->_lableLanguage[$this->_currentLanguage]) && $this->_lableLanguage[$this->_currentLanguage]->get($var) !== null) {
             return $this->_lableLanguage[$this->_currentLanguage]->get($var);
-        }
-        else
-        {
+        } else {
             return PicoStringUtil::camelToTitle($var);
         }
     }
 
     /**
-     * Gets datas from the property.
+     * Magic method to get property values.
+     *
      * Example: echo $instance->foo;
      *
      * @param string $name Name of the property to get.
-     * @return mixed Datas stored in property.
-     **/
+     * @return mixed Value of the property if set, otherwise null.
+     */
     public function __get($name)
     {
-        if($this->__isset($name))
-        {
+        if ($this->__isset($name)) {
             return $this->get($name);
         }
     }
 
     /**
-     * Check if property has been set or not or has null value
+     * Check if a property is set or not.
      *
-     * @param string $name Property name
-     * @return boolean
+     * @param string $name Name of the property to check.
+     * @return boolean True if the property is set, false otherwise.
      */
     public function __isset($name)
     {
-        return isset($this->$name) ? $this->$name : null;
+        return isset($this->$name);
     }
 
     /**
-     * Magic method to handle undefined methods
+     * Magic method to handle undefined methods.
      *
-     * @param string $method Method
-     * @param array $args Arguments
-     * @return mixed
+     * This method allows for the dynamic handling of method calls that are not explicitly defined
+     * in the class. Specifically, it processes calls to getter methods that start with the prefix "get".
+     * 
+     * When a method starting with "get" is invoked, this method extracts the property name
+     * from the method name and calls the `get` method to retrieve the corresponding value.
+     * 
+     * Supported dynamic getter methods:
+     * - `get<PropertyName>`: 
+     *   This will call the `get` method with the property name derived from the method call.
+     *   For example, calling `$obj->getAge()` would result in a call to `$this->get('age')`.
+     * 
+     * If the method name does not start with "get" or does not correspond to a valid property,
+     * this method will return `null`.
+     *
+     * @param string $method Name of the method being called, expected to start with "get".
+     * @param array $args Arguments passed to the method; typically unused in this context.
+     * @return mixed|null The value of the requested property if it exists; otherwise, null.
      */
     public function __call($method, $args) //NOSONAR
     {
-        if(stripos($method, "get") === 0 && strlen($method) > 3)
-        {
+        if (stripos($method, "get") === 0 && strlen($method) > 3) {
             $prop = lcfirst(substr($method, 3));
             return $this->get($prop);
         }
     }
 
     /**
-     * Get table identity
+     * Get the table identity.
      *
-     * @return PicoGenericObject
+     * @return PicoGenericObject The table identity object.
      */
     public function getTableIdentity()
     {
@@ -326,9 +325,9 @@ class PicoEntityLanguage
     }
 
     /**
-     * Get entity language
+     * Get the entity language code.
      *
-     * @return string
+     * @return string The entity language code.
      */
     public function getEntityLanguage()
     {
@@ -336,9 +335,9 @@ class PicoEntityLanguage
     }
 
     /**
-     * Get entity class name
+     * Get the entity class name.
      *
-     * @return string
+     * @return string The entity class name.
      */
     public function getEntityClassName()
     {

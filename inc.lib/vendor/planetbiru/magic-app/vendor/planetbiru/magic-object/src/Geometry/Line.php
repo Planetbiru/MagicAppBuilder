@@ -3,41 +3,45 @@
 namespace MagicObject\Geometry;
 
 /**
- * Class representing a Line with two Point objects
+ * Class representing a Line with two Point objects.
  */
 class Line {
 
     /**
-     * Point a
+     * Point A.
      *
      * @var Point
      */
     public $a;
 
     /**
-     * Point b
+     * Point B.
      *
      * @var Point
      */
     public $b;
 
     /**
-     * Constructor to initialize the Line with two Point objects
+     * Constructor to initialize the Line with two Point objects.
      *
-     * @param Point $a Point a
-     * @param Point $b Point b
+     * @param Point $a Point A.
+     * @param Point $b Point B.
+     * @throws \InvalidArgumentException If the parameters are not instances of Point.
      */
-    public function __construct(Point $a, Point $b) {
+    public function __construct($a, $b) {
+        if (!$a instanceof Point || !$b instanceof Point) {
+            throw new \InvalidArgumentException('Both parameters must be instances of Point.');
+        }
         $this->a = $a;
         $this->b = $b;
     }
 
     /**
-     * Method to calculate the length of the line
+     * Method to calculate the length of the line.
      *
-     * @return double
+     * @return float The length of the line between Point A and Point B.
      */
     public function getLength() {
-        return $this->a->distanceFrom($this->a);
+        return $this->a->distanceFrom($this->b);
     }
 }

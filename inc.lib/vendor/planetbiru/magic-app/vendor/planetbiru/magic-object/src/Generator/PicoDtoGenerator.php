@@ -6,80 +6,93 @@ use MagicObject\Database\PicoDatabase;
 use MagicObject\Util\PicoStringUtil;
 
 /**
- * DTO generator
+ * DTO generator for creating Data Transfer Objects (DTOs) from database tables.
+ * 
+ * This class helps in generating DTOs that can be used for transferring data 
+ * via APIs or for serialization into files or databases.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDtoGenerator
 {
     /**
-     * Database
+     * Database connection instance.
      *
      * @var PicoDatabase
      */
     protected $database;
+
     /**
-     * Base directory
+     * Base directory for saving generated DTO files.
      *
      * @var string
      */
     protected $baseDir = "";
 
     /**
-     * Base namespace
+     * Base namespace for the generated DTOs.
      *
      * @var string
      */
     protected $baseNamespaceDto = "";
 
     /**
-     * Table name
+     * Table name to generate DTO for.
      *
      * @var string
      */
     protected $tableName = "";
 
     /**
-     * Entity name
+     * Name of the entity associated with the DTO.
      *
-     * @var string
+     * @var string|null
      */
     protected $entityName = null;
 
     /**
-     * DTO name
+     * Name of the DTO being generated.
      *
-     * @var string
+     * @var string|null
      */
     protected $dtoName = null;
 
     /**
-     * Base name entity
+     * Base namespace for the entity.
      *
-     * @var string
+     * @var string|null
      */
     protected $baseNamespaceEntity = null;
 
     /**
-     * Prettify
+     * Flag to indicate whether to prettify the output.
      *
-     * @var boolean
+     * @var bool
      */
     protected $prettify = false;
 
     /**
-     * Constructor
+     * Constructor for the DTO generator.
      *
      * @param PicoDatabase $database Database connection
-     * @param string $baseDir Base directory
-     * @param string $tableName Table name
-     * @param string $baseNamespaceDto DTO base namespace
-     * @param string $dtoName DTO name
-     * @param string $baseNamespaceEntity Entity base namespace
-     * @param string $entityName Entity name
-     * @param boolean $prettify Flag to prettify
+     * @param string $baseDir Base directory for generated files
+     * @param string $tableName Table name for DTO generation
+     * @param string $baseNamespaceDto Base namespace for DTOs
+     * @param string $dtoName Name of the DTO
+     * @param string $baseNamespaceEntity Base namespace for the entity
+     * @param string|null $entityName Name of the entity (optional)
+     * @param bool $prettify Flag to prettify output (default: false)
      */
-    public function __construct($database, $baseDir, $tableName, $baseNamespaceDto, $dtoName, $baseNamespaceEntity, $entityName = null, $prettify = false) // NOSONAR
-    {
+    public function __construct(
+        $database,
+        $baseDir,
+        $tableName,
+        $baseNamespaceDto,
+        $dtoName,
+        $baseNamespaceEntity,
+        $entityName = null,
+        $prettify = false
+    ) {
         $this->database = $database;
         $this->baseDir = $baseDir;
         $this->tableName = $tableName;
@@ -91,17 +104,17 @@ class PicoDtoGenerator
     }
 
     /**
-     * Create property
+     * Create a property with appropriate documentation.
      *
-     * @param array $typeMap Type map
-     * @param string $columnName Column name
-     * @param string $columnType Column type
-     * @return string
+     * @param array $typeMap Mapping of database types to PHP types
+     * @param string $columnName Name of the column
+     * @param string $columnType Type of the column
+     * @return string PHP code for the property with docblock
      */
     protected function createProperty($typeMap, $columnName, $columnType)
     {
         $propertyName = PicoStringUtil::camelize($columnName);
-        $docs = array();
+        $docs = [];
         $docStart = "\t/**";
         $docEnd = "\t */";
 
@@ -109,113 +122,92 @@ class PicoDtoGenerator
         $type = $this->getDataType($typeMap, $columnType);
 
         $docs[] = $docStart;
-        $docs[] = "\t * ".$description;
+        $docs[] = "\t * $description";
         $docs[] = "\t * ";
         $docs[] = "\t * @Label(content=\"$description\")";
         $docs[] = "\t * @var $type";
         $docs[] = $docEnd;
         $prop = "\tprotected \$$propertyName;";
-        return implode("\r\n", $docs)."\r\n".$prop."\r\n";
+
+        return implode("\r\n", $docs) . "\r\n" . $prop . "\r\n";
     }
 
     /**
-     * Get property name
+     * Get a descriptive name for the property from the column name.
      *
-     * @param string $name Column name
-     * @return string
+     * @param string $name Original column name
+     * @return string Formatted property name
      */
     protected function getPropertyName($name)
     {
         $arr = explode("_", $name);
-        foreach($arr as $k => $v)
-        {
+        foreach ($arr as $k => $v) {
             $arr[$k] = ucfirst($v);
-            $arr[$k] = str_replace("Id","ID", $arr[$k]);
-            $arr[$k] = str_replace("Ip","IP", $arr[$k]);
+            $arr[$k] = str_replace("Id", "ID", $arr[$k]);
+            $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
         }
         return implode(" ", $arr);
     }
 
     /**
-     * Get data type
+     * Determine the PHP data type corresponding to the column type.
      *
-     * @param array $typeMap Type map
-     * @param string $columnType Column type
-     * @return string
+     * @param array $typeMap Mapping of database types to PHP types
+     * @param string $columnType Database column type
+     * @return string Corresponding PHP data type
      */
     protected function getDataType($typeMap, $columnType)
     {
         $type = "";
-        foreach($typeMap as $key=>$val)
-        {
-            if(stripos($columnType, $key) === 0)
-            {
+        foreach ($typeMap as $key => $val) {
+            if (stripos($columnType, $key) === 0) {
                 $type = $val;
                 break;
             }
         }
-        if(empty($type))
-        {
-            $type = "string";
-        }
-        return $type;
+        return empty($type) ? "string" : $type;
     }
 
     /**
-     * Value of
+     * Create a static method to construct the DTO from the entity.
      *
      * @param string $picoTableName Table name
-     * @param array $rows Data rows
-     * @return string
+     * @param array $rows Data rows from the database
+     * @return string PHP code for the valueOf method
      */
     protected function createValueOf($picoTableName, $rows)
     {
-        if($this->entityName != null)
-        {
-            $className = $this->entityName;
-        }
-        else
-        {
-            $className = ucfirst(PicoStringUtil::camelize($picoTableName))."";
-        }
-        if($this->dtoName != null)
-        {
-            $dtoName = $this->dtoName;
-        }
-        else
-        {
-            $dtoName = ucfirst(PicoStringUtil::camelize($picoTableName))."Dto";
-        }
+        $className = $this->entityName ?? ucfirst(PicoStringUtil::camelize($picoTableName));
+        $dtoName = $this->dtoName ?? ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
 
         $str = "";
-        $str .="    /**\r\n";
-        $str .="     * Construct $dtoName"." from $className and not copy other properties\r\n";
-        $str .="     * \r\n";
-        $str .="     * @param $className \$input\r\n";
-        $str .="     * @return self\r\n";
-        $str .="     */\r\n";
-        $str .="    public static function valueOf(\$input)\r\n";
-        $str .="    {\r\n";
-        $str .="        \$output = new $dtoName"."();\r\n";
+        $str .= "    /**\r\n";
+        $str .= "     * Construct $dtoName from $className and not copy other properties\r\n";
+        $str .= "     * \r\n";
+        $str .= "     * @param $className \$input\r\n";
+        $str .= "     * @return self\r\n";
+        $str .= "     */\r\n";
+        $str .= "    public static function valueOf(\$input)\r\n";
+        $str .= "    {\r\n";
+        $str .= "        \$output = new $dtoName();\r\n";
 
-        foreach($rows as $row)
-        {
+        foreach ($rows as $row) {
             $columnName = $row['Field'];
-            $str .="        \$output->set".ucfirst(PicoStringUtil::camelize($columnName))."(\$input->get".ucfirst(PicoStringUtil::camelize($columnName))."());\r\n";
+            $str .= "        \$output->set" . ucfirst(PicoStringUtil::camelize($columnName)) . "(\$input->get" . ucfirst(PicoStringUtil::camelize($columnName)) . "());\r\n";
         }
-        $str .="        return \$output;\r\n";
-        $str .="    }\r\n";
+        $str .= "        return \$output;\r\n";
+        $str .= "    }\r\n";
         return $str;
     }
 
     /**
-     * Get type map
+     * Get a mapping of database types to PHP types.
      *
-     * @return array
+     * @return array Associative array of type mappings
      */
     protected function getTypeMap()
     {
-        return array(
+        return [
             "double" => "double",
             "float" => "double",
             "bigint" => "integer",
@@ -235,47 +227,36 @@ class PicoDtoGenerator
             "timestamp" => "string",
             "datetime" => "string",
             "date" => "string",
-            "time" => "string"
-        );
+            "time" => "string",
+        ];
     }
 
     /**
-     * Generate DTO
+     * Generate the DTO and save it to a file.
      *
-     * @return string
+     * @return int Result of file write operation (number of bytes written or false on failure)
      */
     public function generate()
     {
         $typeMap = $this->getTypeMap();
         $picoTableName = $this->tableName;
-        if($this->dtoName != null)
-        {
-            $classNameDto = $this->dtoName;
-        }
-        else
-        {
-            $classNameDto = ucfirst(PicoStringUtil::camelize($picoTableName))."Dto";
-        }
-        $fileName = $this->baseNamespaceDto."/".$classNameDto;
-        $path = $this->baseDir."/".$fileName.".php";
+        $classNameDto = $this->dtoName ?? ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
+        $fileName = $this->baseNamespaceDto . "/" . $classNameDto;
+        $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);
 
         $dir = dirname($path);
-        if(!file_exists($dir))
-        {
+        if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = array();
-        if(is_array($rows))
-        {
-            foreach($rows as $row)
-            {
+        $attrs = [];
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
                 $columnName = $row['Field'];
                 $columnType = $row['Type'];
-
                 $prop = $this->createProperty($typeMap, $columnName, $columnType);
                 $attrs[] = $prop;
             }
@@ -285,27 +266,26 @@ class PicoDtoGenerator
 
         $prettify = $this->prettify ? 'true' : 'false';
         $entityName = $this->entityName;
-        $uses[] = "";
-
-        $used = "use ".$this->baseNamespaceEntity."\\".$this->entityName.";";
+        $used = "use " . $this->baseNamespaceEntity . "\\" . $this->entityName . ";";
 
         $classStr = '<?php
 
-namespace '.$this->baseNamespaceDto.';
+namespace ' . $this->baseNamespaceDto . ';
 
 use MagicObject\\SetterGetter;
-'.$used.'
+' . $used . '
 
 /**
- * '.$classNameDto.' is Data Transfer Object to be transfer '.$entityName.' via API or to be serializes into file or database.
+ * ' . $classNameDto . ' is a Data Transfer Object used to transfer ' . $entityName . ' via API or to serialize into files or databases.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md
  *
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=' . $prettify . ')
  */
-class '.$classNameDto.' extends SetterGetter
+class ' . $classNameDto . ' extends SetterGetter
 {
-'.implode("\r\n", $attrs).'
+' . implode("\r\n", $attrs) . '
 }';
+        
         return file_put_contents($path, $classStr);
     }
 }

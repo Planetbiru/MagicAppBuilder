@@ -81,7 +81,7 @@ class PicoPageControl
     /**
      * Set margin to pagination
      *
-     * @param integer $margin Margin (previous and next) from current page
+     * @param int $margin Margin (previous and next) from current page
      * @return self
      */
     public function setMargin($margin)
