@@ -24,12 +24,14 @@ class PicoAnnotationParser
 
     /**
      * Raw docblock
+     *
      * @var string
      */
     private $rawDocBlock;
 
     /**
      * Parameters
+     *
      * @var array
      */
     private $parameters;
@@ -49,20 +51,23 @@ class PicoAnnotationParser
     private $endPattern = "[ ]*(?:@|\r\n|\n)";
 
     /**
-     * Parsed
+     * Parsed state
      *
-     * @var boolean
+     * @var bool
      */
     private $parsedAll = false;
 
     /**
      * Reflection object
+     *
      * @var ReflectionClass|ReflectionMethod|ReflectionProperty
      */
     private $reflection;
 
     /**
      * Constructor
+     *
+     * @param mixed ...$args
      * @throws ZeroArgumentException|InvalidParameterException
      */
     public function __construct()
@@ -94,7 +99,7 @@ class PicoAnnotationParser
     /**
      * Get properties
      *
-     * @return array
+     * @return ReflectionProperty[]
      */
     public function getProperties()
     {
@@ -156,7 +161,7 @@ class PicoAnnotationParser
     }
 
     /**
-     * Parse annotation
+     * Parse all annotations
      *
      * @return void
      */
@@ -190,8 +195,7 @@ class PicoAnnotationParser
     }
 
     /**
-     * fixing duplicated annotation
-     * if any duplication, use last one instead
+     * Fix duplicated annotations
      *
      * @return void
      */
@@ -265,7 +269,7 @@ class PicoAnnotationParser
      * Parse value
      *
      * @param string $originalValue Original value
-     * @return array
+     * @return mixed
      */
     private function parseValue($originalValue)
     {
@@ -345,7 +349,7 @@ class PicoAnnotationParser
     }
 
     /**
-     * Combine and merge array
+     * Combine and merge arrays
      *
      * @param array $matches Matched
      * @param array $pair Pair
@@ -366,7 +370,7 @@ class PicoAnnotationParser
     }
 
     /**
-     * Parse parameters. Note that all numeric attributes will be started with underscore (_). Do not use it as is
+     * Parse key-value pairs from a query string. Note that all numeric attributes will be started with underscore (_). Do not use it as is
      *
      * @param string $queryString Query string
      * @return string[]
@@ -436,6 +440,7 @@ class PicoAnnotationParser
     {
         return stripos($val, '=') === false && stripos($val, '"') === false && stripos($val, "'") === false && !in_array($val, $keys);
     }
+    
     /**
      * Parse parameters as object. Note that all numeric attributes will be started with underscore (_). Do not use it as is
      *

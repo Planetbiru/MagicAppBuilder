@@ -6,31 +6,32 @@ use MagicObject\Request\PicoRequestBase;
 use MagicObject\Util\PicoStringUtil;
 
 /**
- * Sortable
+ * Class representing sortable criteria for database queries.
+ *
+ * This class provides functionality to manage sorting criteria,
+ * allowing the specification of fields to sort by and their sort types.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSortable
 {
     /**
-     * Sortable
+     * Array of sortable criteria.
      *
      * @var PicoSort[]
      */
     private $sortable = array();
 
     /**
-     * Constructor
+     * Constructor to initialize sortable criteria based on provided arguments.
      */
     public function __construct()
     {
         $argc = func_num_args();
-        if($argc > 0)
-        {
+        if ($argc > 0) {
             $params = array();
-            if($argc > 1)
-            {
-                for($i = 0; $i < $argc; $i++)
-                {
+            if ($argc > 1) {
+                for ($i = 0; $i < $argc; $i++) {
                     $params[] = func_get_arg($i);
                 }
             }
@@ -39,10 +40,10 @@ class PicoSortable
     }
 
     /**
-     * Initialize sortable
+     * Initialize sortable criteria.
      *
-     * @param integer $argc Argument count
-     * @param array $params Parameters
+     * @param int $argc Number of arguments passed to the constructor.
+     * @param array $params Parameters for sorting.
      * @return self
      */
     private function initSortable($argc, $params)
@@ -51,23 +52,18 @@ class PicoSortable
 
         $index = 0;
         $sortBy = null;
-        foreach($params as $idx=>$value)
-        {
+        foreach ($params as $idx => $value) {
             $sortType = null;
-            if($idx % 2 == 0)
-            {
+            if ($idx % 2 == 0) {
                 $index = (int) ($idx / 2);
                 $sortBy = $value;
-            }
-            else
-            {
+            } else {
                 $sortType = $value;
                 $this->sortable[$index] = $this->createSortable($sortBy, $sortType);
             }
         }
-        if($argc % 2 == 1)
-        {
-            // set order type ASC
+        if ($argc % 2 == 1) {
+            // Set order type to ASC if an odd number of arguments is passed
             $sortType = PicoSort::ORDER_TYPE_ASC;
             $lastOrder = $this->createSortable($sortBy, $sortType);
             $this->sortable[count($this->sortable) - 1] = $lastOrder;
@@ -77,9 +73,9 @@ class PicoSortable
     }
 
     /**
-     * Add sortable
+     * Add a sortable criterion.
      *
-     * @param PicoSort|array $sort Sort
+     * @param PicoSort|array $sort The sorting criterion to add.
      * @return self
      */
     public function add($sort)
@@ -88,21 +84,17 @@ class PicoSortable
     }
 
     /**
-     * Add sortable
+     * Add a sortable criterion.
      *
-     * @param PicoSort|array $sort Sort
+     * @param PicoSort|array $sort The sorting criterion to add.
      * @return self
      */
     public function addSortable($sort)
     {
-        if($sort != null)
-        {
-            if($sort instanceof PicoSort)
-            {
+        if ($sort != null) {
+            if ($sort instanceof PicoSort) {
                 $this->sortable[count($this->sortable)] = $sort;
-            }
-            else if(is_array($sort))
-            {
+            } else if (is_array($sort)) {
                 $sortable = $this->createSortable($sort[0], $sort[1]);
                 $this->sortable[count($this->sortable)] = $sortable;
             }
@@ -111,10 +103,10 @@ class PicoSortable
     }
 
     /**
-     * Create sortable
+     * Create a sortable criterion.
      *
-     * @param string $sortBy Sort by
-     * @param string $sortType Sort type
+     * @param string $sortBy The field to sort by.
+     * @param string $sortType The type of sorting (ASC or DESC).
      * @return PicoSort
      */
     public function createSortable($sortBy, $sortType)
@@ -123,61 +115,53 @@ class PicoSortable
     }
 
     /**
-     * Create sort by
+     * Create an ORDER BY clause based on the sortable criteria.
      *
-     * @param PicoTableInfo $tableInfo Table information
-     * @return string
+     * @param PicoTableInfo|null $tableInfo Information about the table for mapping.
+     * @return string|null The ORDER BY clause, or null if there are no sortable criteria.
      */
     public function createOrderBy($tableInfo = null)
     {
-        if($this->sortable == null || !is_array($this->sortable) || empty($this->sortable))
-        {
+        if ($this->sortable == null || !is_array($this->sortable) || empty($this->sortable)) {
             return null;
         }
         $ret = null;
-        if($tableInfo == null)
-        {
+        if ($tableInfo == null) {
             $ret = $this->createWithoutMapping();
-        }
-        else
-        {
+        } else {
             $ret = $this->createWithMapping($tableInfo);
         }
         return $ret;
     }
 
     /**
-     * Create sort without mapping
+     * Create an ORDER BY clause without mapping to table columns.
      *
-     * @return string
+     * @return string The ORDER BY clause.
      */
     private function createWithoutMapping()
     {
         $ret = "";
-        if(empty($this->sortable))
-        {
+        if (empty($this->sortable)) {
             return "";
         }
         $sorts = array();
-        foreach($this->sortable as $sortable)
-        {
+        foreach ($this->sortable as $sortable) {
             $columnName = $sortable->getSortBy();
             $sortType = $sortable->getSortType();
-            $sortBy = $columnName;
-            $sorts[] = $sortBy . " " . $sortType;
+            $sorts[] = $columnName . " " . $sortType;
         }
-        if(!empty($sorts))
-        {
+        if (!empty($sorts)) {
             $ret = implode(", ", $sorts);
         }
         return $ret;
     }
 
     /**
-     * Create sort with mapping
+     * Create an ORDER BY clause with mapping based on table information.
      *
-     * @param PicoTableInfo $tableInfo Table information
-     * @return string
+     * @param PicoTableInfo $tableInfo Information about the table for mapping.
+     * @return string The ORDER BY clause.
      */
     private function createWithMapping($tableInfo)
     {
@@ -186,36 +170,30 @@ class PicoSortable
         $joinColumns = $tableInfo->getJoinColumns();
         $columnList = array_merge($columns, $joinColumns);
         $columnNames = array();
-        foreach($columnList as $column)
-        {
+        foreach ($columnList as $column) {
             $columnNames[] = $column['name'];
         }
         $sorts = array();
-        foreach($this->sortable as $sortable)
-        {
+        foreach ($this->sortable as $sortable) {
             $propertyName = $sortable->getSortBy();
             $sortType = $sortable->getSortType();
-            if(isset($columnList[$propertyName]))
-            {
+            if (isset($columnList[$propertyName])) {
                 $sortBy = $columnList[$propertyName]['name'];
                 $sorts[] = $sortBy . " " . $sortType;
-            }
-            else if(in_array($propertyName, $columnNames))
-            {
+            } else if (in_array($propertyName, $columnNames)) {
                 $sorts[] = $propertyName . " " . $sortType;
             }
         }
-        if(!empty($sorts))
-        {
+        if (!empty($sorts)) {
             $ret = implode(", ", $sorts);
         }
         return $ret;
     }
 
     /**
-     * Check id specification is empty or not
+     * Check if there are no sortable criteria.
      *
-     * @return boolean
+     * @return boolean True if there are no sortable criteria, false otherwise.
      */
     public function isEmpty()
     {
@@ -223,9 +201,9 @@ class PicoSortable
     }
 
     /**
-     * Get sortable
+     * Get the array of sortable criteria.
      *
-     * @return PicoSort[]
+     * @return PicoSort[] Array of sortable criteria.
      */
     public function getSortable()
     {
@@ -233,9 +211,9 @@ class PicoSortable
     }
 
     /**
-     * Get instance of PicoSortable
+     * Get an instance of PicoSortable.
      *
-     * @return self
+     * @return self A new instance of PicoSortable.
      */
     public static function getInstance()
     {
@@ -243,9 +221,9 @@ class PicoSortable
     }
 
     /**
-     * Magic method to debug object. This method is for debug purpose only.
+     * Convert the object to a string representation for debugging purposes.
      *
-     * @return string
+     * @return string The string representation of the sortable criteria.
      */
     public function __toString()
     {
@@ -253,33 +231,27 @@ class PicoSortable
     }
 
     /**
-     * Get sortable from user input
+     * Create a PicoSortable instance from user input.
      *
-     * @param PicoRequestBase $request Request
-     * @param string[]|null $map Map
-     * @param array|null $defaultSortable Default sortable
-     * @return self
+     * @param PicoRequestBase $request The request containing sorting information.
+     * @param string[]|null $map Mapping of request parameters to sorting fields.
+     * @param array|null $defaultSortable Default sorting criteria if no user input is provided.
+     * @return self A new instance of PicoSortable with the specified criteria.
      */
     public static function fromUserInput($request, $map = null, $defaultSortable = null)
     {
         $sortable = new self;
-        if(self::isArray($map))
-        {
-            foreach($map as $key=>$value)
-            {
-                if(PicoStringUtil::camelize($request->getOrderby()) == PicoStringUtil::camelize(str_replace("-", "_", $key)))
-                {
+        if (self::isArray($map)) {
+            foreach ($map as $key => $value) {
+                if (PicoStringUtil::camelize($request->getOrderby()) == PicoStringUtil::camelize(str_replace("-", "_", $key))) {
                     $sortable->add(new PicoSort($value, PicoSort::fixSortType($request->getOrdertype())));
                 }
             }
         }
-        if($sortable->isEmpty() && self::isArray($defaultSortable))
-        {
-            // no filter from user input
-            foreach($defaultSortable as $filter)
-            {
-                if(isset($filter['sortBy']) && isset($filter['sortType']))
-                {
+        if ($sortable->isEmpty() && self::isArray($defaultSortable)) {
+            // No sorting criteria from user input; use defaults
+            foreach ($defaultSortable as $filter) {
+                if (isset($filter['sortBy']) && isset($filter['sortType'])) {
                     $sortable->add(new PicoSort($filter['sortBy'], $filter['sortType']));
                 }
             }
@@ -288,10 +260,10 @@ class PicoSortable
     }
 
     /**
-     * Check if input is array
+     * Check if the given input is an array.
      *
-     * @param mixed $array Array to be checked
-     * @return boolean
+     * @param mixed $array The input to check.
+     * @return boolean True if the input is an array, false otherwise.
      */
     public static function isArray($array)
     {

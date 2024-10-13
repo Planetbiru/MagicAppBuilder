@@ -6,184 +6,155 @@ use MagicObject\Exceptions\NullPointerException;
 use MagicObject\Util\PicoStringUtil;
 
 /**
- * Pagination
+ * Class for handling pagination functionality.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPagination
 {
     /**
-     * Current page
+     * Current page number.
      *
      * @var integer
      */
     private $currentPage = 0;
 
     /**
-     * Page size
+     * Number of items per page.
      *
      * @var integer
      */
     private $pageSize = 0;
 
     /**
-     * Offset
+     * Offset for the current page.
      *
      * @var integer
      */
     private $offset = 0;
 
     /**
-     * Order by
+     * Column name to order by.
      *
-     * @var string
+     * @var string|null
      */
     private $orderBy = null;
 
     /**
-     * Order type
+     * Type of order (ASC or DESC).
      *
      * @var string
      */
     private $orderType = "";
 
     /**
-     * Constructor
+     * Constructor for initializing pagination parameters.
      *
-     * @param integer $pageSize Page suze
-     * @param string $orderby Order by
-     * @param string $ordertype Order type
+     * @param int $pageSize Number of items per page (default is 20).
+     * @param string $orderby Name of the parameter used to retrieve the ordering value (default is 'orderby').
+     * @param string $ordertype Name of the parameter used to retrieve the order type (ASC or DESC, default is 'ordertype').
      */
     public function __construct($pageSize = 20, $orderby = 'orderby', $ordertype = 'ordertype')
     {
         $this->pageSize = $pageSize;
         $this->currentPage = $this->parseCurrentPage();
         $this->offset = $this->pageSize * ($this->currentPage - 1);
-        if(isset($_GET[$orderby]))
-        {
+        if (isset($_GET[$orderby])) {
             $this->orderBy = @$_GET[$orderby];
         }
-        if(isset($_GET[$ordertype]))
-        {
+        if (isset($_GET[$ordertype])) {
             $this->orderType = @$_GET[$ordertype];
         }
     }
 
     /**
-     * Parse offset
+     * Parse the current page from the request parameters.
      *
-     * @param string $parameterName Parameter name
-     * @return integer
+     * @param string $parameterName Name of the parameter used for the page (default is 'page').
+     * @return int Current page number, at least 1.
      */
     private function parseCurrentPage($parameterName = 'page')
     {
-        if(isset($_GET[$parameterName]))
-        {
+        if (isset($_GET[$parameterName])) {
             $pageStr = preg_replace("/\D/", "", $_GET[$parameterName]);
-            if($pageStr == "")
-            {
-                $page = 0;
-            }
-            else
-            {
-                $page = abs(intval($pageStr));
-            }
-            if($page < 1)
-            {
-                $page = 1;
-            }
-            return $page;
+            $page = ($pageStr === "") ? 0 : abs(intval($pageStr));
+            return max($page, 1); // Ensure page number is at least 1
         }
-        return 1;
+        return 1; // Default to first page
     }
 
     /**
-     * Create order
+     * Create an ORDER BY clause based on the provided parameters.
      *
-     * @param array $map ORDER BY map
-     * @param array $filter ORDER BY filter
-     * @param string $defaultOrderBy Default ORDER BY
-     * @return string
+     * @param array|null $map Mapping of order by columns
+     * @param array|null $filter Filter for order by
+     * @param string|null $defaultOrderBy Default column name to order by
+     * @return string The generated ORDER BY clause
+     * @throws NullPointerException if order by is null
      */
     public function createOrder($map = null, $filter = null, $defaultOrderBy = null)
     {
         $orderBy = $this->getOrderBy($filter, $defaultOrderBy);
         $orderByFixed = $orderBy;
-        // mapping if any
-        if($map != null && is_array($map) && isset($map[$orderBy]))
-        {
+        
+        // Map if provided
+        if ($map !== null && is_array($map) && isset($map[$orderBy])) {
             $orderByFixed = $map[$orderBy];
         }
-        if($orderByFixed == null)
-        {
-            throw new NullPointerException("ORDER BY can not be null");
+
+        if ($orderByFixed === null) {
+            throw new NullPointerException("ORDER BY cannot be null");
         }
-        return $orderByFixed." ".$this->getOrderType();
+        
+        return $orderByFixed . " " . $this->getOrderType();
     }
 
     /**
-     * Get order by
+     * Get the order by column name.
      *
-     * @var array $filter ORDER BY filter
-     * @var string $defaultOrderBy Default ORDER BY
-     * @return string
+     * @param array|null $filter Filter for order by
+     * @param string|null $defaultOrderBy Default column name to order by
+     * @return string|null The order by column name
      */
     public function getOrderBy($filter = null, $defaultOrderBy = null)
     {
         $orderBy = PicoStringUtil::camelize($this->orderBy);
-        if($filter != null && is_array($filter))
-        {
-            if(isset($filter[$orderBy]))
-            {
-                $orderBy = $filter[$orderBy];
-            }
-            else
-            {
-                $orderBy = null;
-            }
+        if ($filter !== null && is_array($filter)) {
+            $orderBy = isset($filter[$orderBy]) ? $filter[$orderBy] : null;
         }
-        if(($orderBy == null || empty($this->orderBy)) && $defaultOrderBy != null)
-        {
+        
+        if (($orderBy === null || empty($this->orderBy)) && $defaultOrderBy !== null) {
             $orderBy = PicoStringUtil::camelize($defaultOrderBy);
         }
-        if(empty($orderBy))
-        {
-            $orderBy = null;
-        }
-        return $orderBy;
+
+        return empty($orderBy) ? null : $orderBy;
     }
 
     /**
-     * Get order type
+     * Get the order type.
      *
-     * @var string $defaultOrderType Default order type
-     * @return string
+     * @param string|null $defaultOrderType Default order type (ASC or DESC)
+     * @return string|null The order type
      */
     public function getOrderType($defaultOrderType = null)
     {
         $orderType = $this->orderType;
-        if(strcasecmp($orderType, PicoSort::ORDER_TYPE_DESC) == 0)
-        {
+
+        if (strcasecmp($orderType, PicoSort::ORDER_TYPE_DESC) === 0) {
             $orderType = PicoSort::ORDER_TYPE_DESC;
-        }
-        else if(strcasecmp($orderType, PicoSort::ORDER_TYPE_ASC) == 0)
-        {
+        } elseif (strcasecmp($orderType, PicoSort::ORDER_TYPE_ASC) === 0) {
             $orderType = PicoSort::ORDER_TYPE_ASC;
-        }
-        else
-        {
+        } else {
             $orderType = null;
         }
-        if($orderType == null && $defaultOrderType != null)
-        {
-            $orderType = $defaultOrderType;
-        }
-        return $orderType;
+
+        return $orderType === null && $defaultOrderType !== null ? $defaultOrderType : $orderType;
     }
 
     /**
-     * Get current page
+     * Get the current page number.
      *
-     * @return integer
+     * @return int The current page number
      */
     public function getCurrentPage()
     {
@@ -191,9 +162,9 @@ class PicoPagination
     }
 
     /**
-     * Get page size
+     * Get the page size.
      *
-     * @return integer
+     * @return int The number of items per page
      */
     public function getPageSize()
     {
@@ -201,9 +172,9 @@ class PicoPagination
     }
 
     /**
-     * Get offset
+     * Get the offset for the current page.
      *
-     * @return integer
+     * @return int The offset for pagination
      */
     public function getOffset()
     {
@@ -211,36 +182,28 @@ class PicoPagination
     }
 
     /**
-     * Get page URL
+     * Generate a URL for a specific page.
      *
-     * @param integer $page Page number
-     * @param string $parameterName Parameter name for page number
-     * @param string $path Path
-     * @return string
+     * @param int $page The page number to generate the URL for
+     * @param string $parameterName The name of the parameter for the page number
+     * @param string|null $path The base path for the URL
+     * @return string The generated URL
      */
     public static function getPageUrl($page, $parameterName = 'page', $path = null)
     {
-        $urls = array();
+        $urls = [];
         $paths = explode("?", $_SERVER['REQUEST_URI']);
-        if($path === null)
-        {
-            $path = trim($paths[0]);
-        }
+        $path = $path === null ? trim($paths[0]) : $path;
         $urls[] = $path;
-        $urlParameters = isset($_GET) ? $_GET : array();
-        foreach($urlParameters as $paramName=>$paramValue)
-        {
-            if($paramName == $parameterName)
-            {
-                $urlParameters[$paramName] = $page;
-            }
-        }
-        // replace value
-        $urlParameters[$parameterName] = $page;
-        if(!empty($urlParameters))
-        {
+
+        $urlParameters = isset($_GET) ? $_GET : [];
+        $urlParameters[$parameterName] = $page; // Replace the page parameter
+        
+        // Build the query string
+        if (!empty($urlParameters)) {
             $urls[] = http_build_query($urlParameters);
         }
+
         return implode("?", $urls);
     }
 }

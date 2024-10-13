@@ -5,6 +5,7 @@ use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Constants\PicoHttpStatus;
+use MagicObject\Constants\PicoMime;
 use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -162,7 +163,7 @@ $newApp->setGlobalVariableDatabase('database');
 
 file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());
 
-PicoResponse::sendResponse(new stdClass, false, null, PicoHttpStatus::HTTP_OK, true);
+PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
 $scriptGenerator = new ScriptGenerator();
 

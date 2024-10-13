@@ -5,18 +5,21 @@ namespace MagicObject\Util;
 use stdClass;
 
 /**
- * Environment variable
+ * Class PicoEnvironmentVariable
+ *
+ * A utility class for handling environment variable replacements within strings and data structures.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEnvironmentVariable
 {
     /**
-     * Replace all values from other properties
+     * Replace all values in a collection with other properties.
      *
-     * @param array $values Values
-     * @param array $collection Collection
-     * @param boolean $recursive Flag that process is recursive
-     * @return array
+     * @param array|object $values Values to process.
+     * @param array $collection Collection of replacement values.
+     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @return array|object Processed values with replacements applied.
      */
     public static function replaceValueAll($values, $collection, $recursive = false)
     {
@@ -32,12 +35,12 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace all values from other properties as array
+     * Replace all values in an array with other properties.
      *
-     * @param array $values Values
-     * @param array $collection Collection
-     * @param boolean $recursive Flag that process is recursive
-     * @return array
+     * @param array $values Values to process.
+     * @param array $collection Collection of replacement values.
+     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @return array Processed array with replacements applied.
      */
     public static function replaceValueAllArray($values, $collection, $recursive = false)
     {
@@ -64,12 +67,12 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace all values from other properties as object
+     * Replace all values in an object with other properties.
      *
-     * @param stdClass|object $values
-     * @param array $collection Collection
-     * @param boolean $recursive Flag that process is recursive
-     * @return array|stdClass|object
+     * @param stdClass|object $values Values to process.
+     * @param array $collection Collection of replacement values.
+     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @return stdClass|object Processed object with replacements applied.
      */
     public static function replaceValueAllObject($values, $collection, $recursive = false)
     {
@@ -96,11 +99,11 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace string with environment variable nane from a string
+     * Replace strings with environment variable names from a string.
      *
-     * @param string $value Value
-     * @param array $collection Collection
-     * @return mixed
+     * @param string $value Value to process.
+     * @param array $collection Collection of replacement values.
+     * @return mixed Processed value with replacements applied.
      */
     public static function replaceWithOtherProperties($value, $collection)
     {
@@ -133,11 +136,11 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Get other value
+     * Retrieve a value from the collection by its key.
      *
-     * @param string $key Key name
-     * @param array $collection Collection
-     * @return mixed
+     * @param string $key Key name to retrieve.
+     * @param array $collection Collection to search in.
+     * @return mixed|null Retrieved value or null if not found.
      */
     public static function getOtherValue($key, $collection)
     {
@@ -163,11 +166,11 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace all values with environment variable
+     * Replace all values in an array with environment variable names.
      *
-     * @param array $values Values
-     * @param boolean $recursive Flag that process is recursive
-     * @return array
+     * @param array $values Values to process.
+     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @return array Processed values with replacements applied.
      */
     public static function replaceSysEnvAll($values, $recursive = false)
     {
@@ -194,10 +197,10 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace string with environment variable nane from a string
+     * Replace strings with environment variable names from a string.
      *
-     * @param string $value Value
-     * @return string
+     * @param string $value Value to process.
+     * @return string Processed value with replacements applied.
      */
     public static function replaceWithEnvironmentVariable($value)
     {
@@ -225,10 +228,10 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Replace value with environment variable
+     * Replace a value with its corresponding environment variable.
      *
-     * @param string $value Value
-     * @return string
+     * @param string $value Value to process.
+     * @return string Processed value with replacements applied.
      */
     public static function replaceSysEnv($value)
     {
@@ -246,10 +249,10 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Get environment variable name from a string
+     * Extract environment variable names from a string.
      *
-     * @param string $value Value
-     * @return array
+     * @param string $value Value to process.
+     * @return array List of variable names extracted.
      */
     public static function getVariables($value)
     {

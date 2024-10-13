@@ -8,7 +8,7 @@ use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Object parser
+ * Object parser for SecretObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSecretParser
@@ -42,7 +42,8 @@ class PicoSecretParser
     }
 
     /**
-     * Parse Object
+     * Parse an object or array
+     *
      * @param stdClass|array $data
      * @return SecretObject
      */
@@ -64,17 +65,18 @@ class PicoSecretParser
     }
 
     /**
-     * Check if input is associated array
+     * Check if input is an associative array
      *
-     * @param array $array Array
-     * @return boolean
+     * @param array $array
+     * @return bool
      */
     private static function hasStringKeys($array) {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
 
     /**
-     * Parse recursive
+     * Recursively parse data into a SecretObject
+     *
      * @param mixed $data
      * @return mixed
      */
@@ -104,7 +106,7 @@ class PicoSecretParser
     }
 
     /**
-     * Update object
+     * Update a SecretObject with a key-value pair
      *
      * @param SecretObject $obj Secret object
      * @param string $key Property name
@@ -136,10 +138,10 @@ class PicoSecretParser
     }
 
     /**
-     * Check if value is object
+     * Check if a value is an object
      *
-     * @param mixed $value Value to be checked
-     * @return boolean
+     * @param mixed $value
+     * @return bool
      */
     private static function isObject($value)
     {
@@ -151,8 +153,10 @@ class PicoSecretParser
     }
 
     /**
-     * Parse recursive
-     * @param array $data Data to be parsed
+     * Recursively parse an array
+     *
+     * @param array $data
+     * @return array
      */
     public static function parseRecursiveArray($data)
     {
@@ -186,7 +190,10 @@ class PicoSecretParser
     }
 
     /**
-     * Parse from Yaml recursively
+     * Parse from YAML recursively
+     *
+     * @param string $yamlString
+     * @return SecretObject|null
      */
     public static function parseYamlRecursive($yamlString)
     {
@@ -202,6 +209,9 @@ class PicoSecretParser
 
     /**
      * Parse from JSON recursively
+     *
+     * @param string $jsonString
+     * @return SecretObject|null
      */
     public static function parseJsonRecursive($jsonString)
     {

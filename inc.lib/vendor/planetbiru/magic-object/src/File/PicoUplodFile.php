@@ -5,23 +5,32 @@ namespace MagicObject\File;
 use MagicObject\Util\PicoStringUtil;
 
 /**
- * Upload file tool
- * All atribute in this class is readonly
+ * Class representing an upload file tool.
+ *
+ * This class is designed to handle uploaded files. All attributes in this class are read-only.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoUplodFile
+class PicoUploadFile
 {
+    /**
+     * Mapping of uploaded file names to their keys.
+     *
+     * @var array
+     */
     private $map = array();
 
     /**
-     * Uploaded file
+     * Array of uploaded file containers.
      *
      * @var PicoUploadFileContainer[]
      */
     private $values = array();
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * Initializes the mapping of uploaded file names and populates the values.
      */
     public function __construct()
     {
@@ -29,27 +38,44 @@ class PicoUplodFile
     }
 
     /**
-     * Magic method
+     * Magic method to handle dynamic getter calls.
      *
-     * @param string $method Method
-     * @param array $arguments Arguments
-     * @return mixed
+     * This method enables the retrieval of property values through dynamically named getter methods.
+     * It specifically handles methods that start with the prefix "get". When a getter method is called,
+     * the method extracts the property name from the method name, converts it to camel case, and 
+     * retrieves the corresponding value from an internal storage.
+     * 
+     * If the requested property exists, its value is returned. If it does not exist,
+     * an instance of `PicoUploadFileContainer` is returned as an empty container.
+     *
+     * Supported dynamic getter:
+     *
+     * - `get<FieldName>`:
+     *   Retrieves the value associated with the specified field.
+     *   For example, calling `$obj->getFile()` would:
+     *   - Extract the field name `file` from the method name.
+     *   - Look up the camel-cased key in the internal storage.
+     *   - Return the associated value or a new `PicoUploadFileContainer` if the value is not found.
+     *
+     * @param string $method The name of the method being called, expected to start with "get".
+     * @param array $arguments The arguments passed to the method; typically unused in getter methods.
+     * @return mixed The value of the requested property if it exists; otherwise, an instance of `PicoUploadFileContainer`.
      */
     public function __call($method, $arguments) //NOSONAR
     {
         if (strncasecmp($method, "get", 3) === 0) {
             $var = substr($method, 3);
             $camel = PicoStringUtil::camelize($var);
-            $key = $this->map[$camel];
+            $key = $this->map[$camel] ?? null;
             return isset($this->values[$key]) ? $this->values[$key] : new PicoUploadFileContainer();
         }
     }
     
     /**
-     * Get uploaded file
+     * Get an uploaded file by parameter name.
      *
-     * @param string $name Parameter name
-     * @return PicoUploadFileContainer|mixed
+     * @param string $name The parameter name.
+     * @return PicoUploadFileContainer An instance of the uploaded file container or an empty container.
      */
     public function get($name)
     {
@@ -57,28 +83,26 @@ class PicoUplodFile
     }
 
     /**
-     * Get uploaded file by key
+     * Magic method to handle dynamic property access.
      *
-     * @param string $name Parameter name
-     * @return PicoUploadFileContainer|mixed
+     * @param string $name The name of the property being accessed.
+     * @return PicoUploadFileContainer An instance of the uploaded file container or an empty container.
      */
     public function __get($name)
     {
         $camel = PicoStringUtil::camelize($name);
         if (isset($this->map[$camel])) {
             $key = $this->map[$camel];
-            if (isset($this->values[$key])) {
-                return $this->values[$key];
-            }
+            return $this->values[$key] ?? new PicoUploadFileContainer();
         }
         return new PicoUploadFileContainer();
     }
 
     /**
-     * Check if file is exists
+     * Check if an uploaded file exists for the given parameter name.
      *
-     * @param string $name Parameter name
-     * @return boolean
+     * @param string $name The parameter name.
+     * @return boolean True if the file exists; otherwise, false.
      */
     public function __isset($name)
     {
@@ -87,7 +111,7 @@ class PicoUplodFile
     }
 
     /**
-     * Init map
+     * Initialize the mapping of uploaded file names to their keys.
      *
      * @return void
      */
@@ -102,16 +126,15 @@ class PicoUplodFile
     }
 
     /**
-     * Method to debug object
+     * Convert the object to a string representation for debugging.
      *
-     * @return string
+     * @return string JSON-encoded string of the uploaded file data.
      */
     public function __toString()
     {
         $arr = array();
-        foreach($this->values as $key=>$value)
-        {
-            $arr[$key] = json_decode($value);
+        foreach ($this->values as $key => $value) {
+            $arr[$key] = json_decode($value); // Assuming PicoUploadFileContainer has a valid __toString() method
         }
         return json_encode($arr);
     }

@@ -14,7 +14,8 @@ use Symfony\Component\Yaml\Yaml;
 class PicoObjectParser
 {
     /**
-     * Parse MagicObject
+     * Parse a MagicObject
+     *
      * @param MagicObject $data Data
      * @return MagicObject
      */
@@ -37,7 +38,8 @@ class PicoObjectParser
     }
 
     /**
-     * Parse Object
+     * Parse an object or array
+     *
      * @param stdClass|array $data Data
      * @return MagicObject
      */
@@ -59,17 +61,18 @@ class PicoObjectParser
     }
 
     /**
-     * Check if input is associated array
+     * Check if input is an associative array
      *
      * @param array $array Array
-     * @return boolean
+     * @return bool
      */
     private static function hasStringKeys($array) {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
 
     /**
-     * Parse recursive
+     * Recursively parse data into a MagicObject
+     *
      * @param mixed $data Data
      * @return mixed
      */
@@ -99,7 +102,7 @@ class PicoObjectParser
     }
 
     /**
-     * Update object
+     * Update a MagicObject with a key-value pair
      *
      * @param MagicObject $obj Magic object
      * @param string $key Property name
@@ -131,10 +134,10 @@ class PicoObjectParser
     }
 
     /**
-     * Check if value is object
+     * Check if a value is an object
      *
      * @param mixed $value Value to be checked
-     * @return boolean
+     * @return bool
      */
     private static function isObject($value)
     {
@@ -146,8 +149,10 @@ class PicoObjectParser
     }
 
     /**
-     * Parse recursive
+     * Recursively parse an array
+     *
      * @param array $data Data to be parsed
+     * @return array
      */
     public static function parseRecursiveArray($data)
     {
@@ -181,8 +186,10 @@ class PicoObjectParser
     }
 
     /**
-     * Parse from Yaml recursively
+     * Parse from YAML recursively
+     *
      * @param string $yamlString YAML string
+     * @return MagicObject|null
      */
     public static function parseYamlRecursive($yamlString)
     {
@@ -198,7 +205,9 @@ class PicoObjectParser
 
     /**
      * Parse from JSON recursively
+     *
      * @param mixed $data Data to be parsed
+     * @return MagicObject|null
      */
     public static function parseJsonRecursive($data) //NOSONAR
     {
@@ -210,17 +219,15 @@ class PicoObjectParser
         {
             return self::parseObject(json_decode($data));
         }
-        else if (is_array($data) || is_object($data)) {
+        if (is_array($data) || is_object($data)) {
             return self::parseObject($data);
         }
-        else
-        {
-            return $data;
-        }
+        return $data;// Return the data as is if it's not an object or array
+        
     }
 
     /**
-     * Parse string
+     * Parse a string
      *
      * @param string $data Data
      * @return mixed

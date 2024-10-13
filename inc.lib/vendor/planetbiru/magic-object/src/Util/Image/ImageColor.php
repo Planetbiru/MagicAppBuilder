@@ -30,9 +30,9 @@ class ImageColor
     /**
      * Constructor
      *
-     * @param integer $red Red component
-     * @param integer $green Green component
-     * @param integer $blue Blue component
+     * @param int $red Red component
+     * @param int $green Green component
+     * @param int $blue Blue component
      */
     public function __construct($red, $green, $blue)
     {
@@ -46,7 +46,7 @@ class ImageColor
      * Allocate image
      *
      * @param GdImage $image
-     * @return integer
+     * @return int
      */
     public function allocate($image)
     {
@@ -76,7 +76,7 @@ class ImageColor
     /**
      * Get red component
      *
-     * @return integer
+     * @return int
      */
     public function getRed()
     {
@@ -86,7 +86,7 @@ class ImageColor
     /**
      * Set red component
      *
-     * @param integer  $red  Red component
+     * @param int  $red  Red component
      *
      * @return self
      */
@@ -100,7 +100,7 @@ class ImageColor
     /**
      * Get green component
      *
-     * @return integer
+     * @return int
      */
     public function getGreen()
     {
@@ -110,7 +110,7 @@ class ImageColor
     /**
      * Set green component
      *
-     * @param integer  $green  Green component
+     * @param int  $green  Green component
      *
      * @return self
      */
@@ -124,7 +124,7 @@ class ImageColor
     /**
      * Get blue component
      *
-     * @return integer
+     * @return int
      */
     public function getBlue()
     {
@@ -134,7 +134,7 @@ class ImageColor
     /**
      * Set blue component
      *
-     * @param integer  $blue  Blue component
+     * @param int  $blue  Blue component
      *
      * @return self
      */

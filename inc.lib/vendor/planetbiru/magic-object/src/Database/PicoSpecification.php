@@ -6,7 +6,11 @@ use MagicObject\Request\PicoRequestBase;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 /**
- * Specification
+ * Class PicoSpecification
+ *
+ * This class is responsible for building complex database query specifications,
+ * allowing for the combination of predicates using logical operators (AND, OR).
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSpecification //NOSONAR
@@ -15,37 +19,37 @@ class PicoSpecification //NOSONAR
     const LOGIC_OR  = "or";
 
     /**
-     * Parent filter logic
+     * Parent filter logic (AND/OR) for nested specifications.
      *
      * @var string
      */
     private $parentFilterLogic = null;
 
     /**
-     * PicoPredicate[]
+     * Array of PicoPredicate objects representing individual conditions.
      *
-     * @var array
+     * @var PicoPredicate[]
      */
     private $specifications = array();
 
     /**
-     * Check if require real join table
+     * Indicates whether a real join table is required in the database query.
      *
-     * @var boolean
+     * @var bool
      */
     private $requireJoin = false;
 
     /**
-     * Default logic
+     * Default logic for combining predicates (AND/OR).
      *
      * @var string
      */
     private $defaultLogic = self::LOGIC_AND;
 
     /**
-     * Return true if require real join table
+     * Checks if a real join table is required based on the specifications.
      *
-     * @return boolean
+     * @return bool True if a join is required, false otherwise.
      */
     public function isRequireJoin()
     {
@@ -53,10 +57,10 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Add AND specification
+     * Adds a specification with default AND logic.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate Filter
-     * @return self
+     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * @return self The current instance for method chaining.
      */
     public function add($predicate)
     {
@@ -65,103 +69,83 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Add AND specification
+     * Adds an AND specification.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate Filter
-     * @return self
+     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * @return self The current instance for method chaining.
      */
     public function addAnd($predicate)
     {
-        if($predicate instanceof PicoPredicate)
-        {
+        if ($predicate instanceof PicoPredicate) {
             $this->addFilter($predicate, self::LOGIC_AND);
-        }
-        else if($predicate instanceof PicoSpecification)
-        {
+        } elseif ($predicate instanceof PicoSpecification) {
             $this->addSubfilter($predicate, self::LOGIC_AND);
-        }
-        else if(is_array($predicate) && count($predicate) > 1 && is_string($predicate[0]))
-        {
+        } elseif (is_array($predicate) && count($predicate) > 1 && is_string($predicate[0])) {
             $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_AND);
         }
         return $this;
     }
 
     /**
-     * Add OR specification
+     * Adds an OR specification.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate Filter
-     * @return self
+     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * @return self The current instance for method chaining.
      */
     public function addOr($predicate)
     {
-        if($predicate instanceof PicoPredicate)
-        {
+        if ($predicate instanceof PicoPredicate) {
             $this->addFilter($predicate, self::LOGIC_OR);
-        }
-        else if($predicate instanceof PicoSpecification)
-        {
+        } elseif ($predicate instanceof PicoSpecification) {
             $this->addSubfilter($predicate, self::LOGIC_OR);
-        }
-        else if(is_array($predicate) && count($predicate) > 1 && is_string($predicate[0]))
-        {
+        } elseif (is_array($predicate) && count($predicate) > 1 && is_string($predicate[0])) {
             $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_OR);
         }
         return $this;
     }
 
     /**
-     * Add filter
+     * Adds a filter specification.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate Filter
-     * @param string $logic Filter logic
-     * @return self
+     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * @param string $logic The logical operator (AND/OR) to use with this filter.
+     * @return self The current instance for method chaining.
      */
     private function addFilter($predicate, $logic)
     {
-        if($predicate instanceof PicoPredicate)
-        {
+        if ($predicate instanceof PicoPredicate) {
             $predicate->setFilterLogic($logic);
             $this->specifications[count($this->specifications)] = $predicate;
-            if($predicate->isRequireJoin())
-            {
+            if ($predicate->isRequireJoin()) {
                 $this->requireJoin = true;
             }
-        }
-        else if($predicate instanceof PicoSpecification)
-        {
+        } elseif ($predicate instanceof PicoSpecification) {
             $specs = $predicate->getSpecifications();
-            if(!empty($specs))
-            {
-                foreach($specs as $spec)
-                {
+            if (!empty($specs)) {
+                foreach ($specs as $spec) {
                     $this->addFilter($spec, $spec->getParentFilterLogic());
                 }
             }
-        }
-        else if(is_array($predicate))
-        {
+        } elseif (is_array($predicate)) {
             $this->addFilterByArray($predicate, $logic);
         }
         return $this;
     }
 
     /**
-     * Add filter by array
+     * Adds a filter specification from an array.
      *
-     * @param array $predicate Filter
-     * @param string $logic Filter logic
-     * @return self
+     * @param array $predicate The filter data represented as an associative array.
+     * @param string $logic The logical operator (AND/OR) to use with these filters.
+     * @return self The current instance for method chaining.
      */
     private function addFilterByArray($predicate, $logic)
     {
-        foreach($predicate as $key=>$value)
-        {
+        foreach ($predicate as $key => $value) {
             $pred = new PicoPredicate($key, $value);
             $pred->setFilterLogic($logic);
             $this->specifications[count($this->specifications)] = $pred;
-            if($pred->isRequireJoin())
-            {
+            if ($pred->isRequireJoin()) {
                 $this->requireJoin = true;
             }
         }
@@ -169,31 +153,25 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Add subfilter
+     * Adds a subfilter specification.
      *
-     * @param PicoSpecification|array $predicate Filter
-     * @param string $logic Filter logic
-     * @return self
+     * @param PicoSpecification|array $predicate The subfilter to be added.
+     * @param string $logic The logical operator (AND/OR) to use with this subfilter.
+     * @return self The current instance for method chaining.
      */
     private function addSubFilter($predicate, $logic)
     {
-        if($predicate instanceof PicoSpecification)
-        {
+        if ($predicate instanceof PicoSpecification) {
             $specification = new self;
             $specification->setParentFilterLogic($logic);
             $specifications = $predicate->getSpecifications();
-            foreach($specifications as $pred)
-            {
-                if($pred instanceof PicoPredicate)
-                {
+            foreach ($specifications as $pred) {
+                if ($pred instanceof PicoPredicate) {
                     $specification->addFilter($pred, $pred->getFilterLogic());
-                    if($specification->isRequireJoin())
-                    {
+                    if ($specification->isRequireJoin()) {
                         $this->requireJoin = true;
                     }
-                }
-                else if($pred instanceof PicoSpecification)
-                {
+                } elseif ($pred instanceof PicoSpecification) {
                     $specification->addSubFilter($pred, $pred->getParentFilterLogic());
                 }
             }
@@ -203,9 +181,9 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Check id specification is empty or not
+     * Checks if the specifications collection is empty.
      *
-     * @return boolean
+     * @return bool True if there are no specifications, false otherwise.
      */
     public function isEmpty()
     {
@@ -213,24 +191,20 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Check if value is empty or not
+     * Checks if the given value is considered empty.
      *
-     * @param mixed $value Value to be checked
-     * @return boolean
+     * @param mixed $value The value to check.
+     * @return bool True if the value is empty, false otherwise.
      */
     public static function isValueEmpty($value)
     {
-        if(!isset($value) && is_string($value))
-        {
-            return empty(trim($value));
-        }
-        return false;
+        return !isset($value) || (is_string($value) && empty(trim($value)));
     }
 
     /**
-     * Get predicate
+     * Retrieves the array of specifications.
      *
-     * @return array
+     * @return PicoPredicate[] The array of PicoPredicate objects.
      */
     public function getSpecifications()
     {
@@ -238,9 +212,9 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Get parent filter logic
+     * Gets the parent filter logic for this specification.
      *
-     * @return string
+     * @return string|null The parent filter logic, or null if not set.
      */
     public function getParentFilterLogic()
     {
@@ -248,11 +222,10 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Set parent filter logic
+     * Sets the parent filter logic for this specification.
      *
-     * @param string $parentFilterLogic Parent filter logic
-     *
-     * @return self
+     * @param string $parentFilterLogic The logical operator (AND/OR) for this specification.
+     * @return self The current instance for method chaining.
      */
     public function setParentFilterLogic($parentFilterLogic)
     {
@@ -261,31 +234,26 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Create where
+     * Creates a WHERE clause based on the current specifications.
      *
-     * @param PicoSpecification[] $specifications Specifications
-     * @return string[]
+     * @param PicoSpecification[] $specifications The specifications to create the WHERE clause from.
+     * @return string[] An array of strings representing the WHERE clause conditions.
      */
     private function getWhere($specifications)
     {
         $arr = array();
-        foreach($specifications as $spec)
-        {
-            if(isset($spec) && $spec instanceof PicoPredicate)
-            {
+        foreach ($specifications as $spec) {
+            if (isset($spec) && $spec instanceof PicoPredicate) {
                 $entityField = new PicoEntityField($spec->getField());
                 $field = $entityField->getField();
                 $parentField = $entityField->getParentField();
-                $column = ($parentField == null) ? $field : $parentField.".".$field;
-                if($spec->getComparation() != null)
-                {
+                $column = ($parentField === null) ? $field : $parentField . "." . $field;
+                if ($spec->getComparation() !== null) {
                     $where = $spec->getFilterLogic() . " " . $column . " " . $spec->getComparation()->getComparison() . " " . PicoDatabaseUtil::escapeValue($spec->getValue());
                     $arr[] = $where;
                 }
-            }
-            else if($spec instanceof PicoSpecification)
-            {
-                // nested
+            } elseif ($spec instanceof PicoSpecification) {
+                // Nested specification
                 $arr[] = $spec->getParentFilterLogic() . " (" . $this->createWhereFromSpecification($spec) . ")";
             }
         }
@@ -293,43 +261,27 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Create WHERE from specification
+     * Creates a WHERE clause from the given specification.
      *
-     * @param PicoSpecification $specification Filter
-     * @return string
+     * @param PicoSpecification $specification The filter specification to create the WHERE clause from.
+     * @return string The constructed WHERE clause as a string.
      */
     private function createWhereFromSpecification($specification)
     {
         $arr = array();
         $arr[] = "(1=1)";
-        if($this->hasValue($specification))
-        {
-            $specifications = $specification->getSpecifications();
-            foreach($specifications as $spec)
-            {
-                if($spec instanceof PicoPredicate)
-                {
+        if ($this->hasValue($specification)) {
+            foreach ($specification->getSpecifications() as $spec) {
+                if ($spec instanceof PicoPredicate) {
                     $entityField = new PicoEntityField($spec->getField());
                     $field = $entityField->getField();
-                    $functionFormat = $entityField->getFunctionFormat();
-
-                    $entityName = $entityField->getParentField();
-                    $column = ($entityName == null) ? $field : $entityName.".".$field;
-                    $columnFinal = $this->formatColumn($column, $functionFormat);
-
-                    if($spec->getComparation() != null)
-                    {
-                        $arr[] = sprintf("%s %s %s %s", 
-                            $spec->getFilterLogic(), 
-                            $columnFinal, 
-                            $spec->getComparation()->getComparison(), 
-                            PicoDatabaseUtil::escapeValue($spec->getValue())
-                        );
+                    $parentField = $entityField->getParentField();
+                    $column = ($parentField === null) ? $field : $parentField . "." . $field;
+                    if ($spec->getComparation() !== null) {
+                        $arr[] = $spec->getFilterLogic() . " " . $column . " " . $spec->getComparation()->getComparison() . " " . PicoDatabaseUtil::escapeValue($spec->getValue());
                     }
-                }
-                else
-                {
-                    $arr[] = $spec->getParentFilterLogic()." (".$this->createWhereFromSpecification($spec).")";
+                } elseif ($spec instanceof PicoSpecification) {
+                    $arr[] = $spec->getParentFilterLogic() . " (" . $this->createWhereFromSpecification($spec) . ")";
                 }
             }
         }
@@ -337,35 +289,35 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Check if specification is not numm and not empty
-     * @param mixed $specification Specification to be checked
-     * @return boolean
+     * Checks if the specification is not null and not empty.
+     *
+     * @param mixed $specification The specification to check.
+     * @return bool True if the specification is valid, false otherwise.
      */
     private function hasValue($specification)
     {
-        return $specification != null && !$specification->isEmpty();
+        return $specification !== null && !$specification->isEmpty();
     }
 
     /**
-     * Format column
+     * Formats a column name based on the provided format.
      *
-     * @param string $column Column name
-     * @param string $format Format
-     * @return string
+     * @param string $column The column name.
+     * @param string|null $format The format string, or null if no formatting is needed.
+     * @return string The formatted column name.
      */
     private function formatColumn($column, $format)
     {
-        if($format == null || strpos($format, "%s") === false)
-        {
+        if ($format === null || strpos($format, "%s") === false) {
             return $column;
         }
         return sprintf($format, $column);
     }
 
     /**
-     * Get instance of PicoSpecification
+     * Gets an instance of PicoSpecification.
      *
-     * @return PicoSpecification
+     * @return PicoSpecification A new instance of PicoSpecification.
      */
     public static function getInstance()
     {
@@ -373,11 +325,27 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Magic method to handle undefined method
+     * Magic method to handle undefined method calls dynamically.
      *
-     * @param string $method Method called
-     * @param array $params Parameters given
-     * @return self|mixed|null
+     * This method allows for dynamic handling of method calls that are not explicitly defined in the class.
+     * Specifically, it enables the setting of properties through methods prefixed with "set".
+     * When such a method is called, the method extracts the property name from the method name,
+     * and then it calls the `addPredicate` method to set the corresponding value.
+     *
+     * Supported dynamic method:
+     *
+     * - `set<FieldName>(value)`: 
+     *   Sets a predicate for the specified field.
+     *   For example, calling `$obj->setAge(30)` would:
+     *   - Extract the field name `age` from the method name.
+     *   - Call `addPredicate('age', 30)` to set the value.
+     *
+     * If the method name does not start with "set" or if the parameters are not provided,
+     * the method returns null.
+     *
+     * @param string $method The name of the method being called, expected to start with "set".
+     * @param array $params The parameters passed to the method; expected to contain the value to set.
+     * @return self|null Returns the current instance for method chaining if the method is valid, or null otherwise.
      */
     public function __call($method, $params)
     {
@@ -387,13 +355,14 @@ class PicoSpecification //NOSONAR
             $this->addPredicate($field, $value);
             return $this;
         }
+        return null;
     }
 
     /**
-     * Magic object to set value
+     * Magic method to set values dynamically using property assignment.
      *
-     * @param string $field Field name
-     * @param mixed|mixed[] $value Field value
+     * @param string $field The field name to set.
+     * @param mixed|mixed[] $value The value(s) to set for the field.
      */
     public function __set($field, $value)
     {
@@ -401,66 +370,55 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Add predicate
+     * Adds a predicate to the specifications based on the field and value.
      *
-     * @param string $field Field name
-     * @param mixed|mixed[] $value Field value
-     * @return self
+     * @param string $field The field name to which the value is assigned.
+     * @param mixed|mixed[] $value The value(s) to set for the field.
+     * @return self The current instance for method chaining.
      */
     private function addPredicate($field, $value)
     {
-        if($this->defaultLogic == self::LOGIC_OR)
-        {
+        if ($this->defaultLogic === self::LOGIC_OR) {
             $this->addOr(new PicoPredicate($field, $value));
-        }
-        else
-        {
+        } else {
             $this->addAnd(new PicoPredicate($field, $value));
         }
+        return $this;
     }
 
     /**
-     * Magic method to debug object. This method is for debug purpose only.
+     * Magic method for debugging the object.
      *
-     * @return string
+     * @return string A string representation of the current specifications.
      */
     public function __toString()
     {
         $specification = implode(" ", $this->getWhere($this->specifications));
-        if(stripos($specification, "and ") === 0)
-        {
+        if (stripos($specification, "and ") === 0) {
             $specification = substr($specification, 4);
         }
         return $specification;
     }
 
     /**
-     * Get specification from user input
+     * Gets a specification based on user input.
      *
-     * @param PicoRequestBase $request Request
-     * @param PicoSpecificationFilter[]|null $map Filter map
-     * @return PicoSpecification
+     * @param PicoRequestBase $request The request object containing user input.
+     * @param PicoSpecificationFilter[]|null $map The filter map defining expected filters.
+     * @return PicoSpecification The constructed specification based on user input.
      */
     public static function fromUserInput($request, $map = null)
     {
         $specification = new self;
-        if(isset($map) && is_array($map))
-        {
-            foreach($map as $key=>$filter)
-            {
+        if (isset($map) && is_array($map)) {
+            foreach ($map as $key => $filter) {
                 $filterValue = $request->get($key);
-                if($filterValue != null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter)
-                {
-                    if($filter->isNumber() || $filter->isBoolean() || $filter->isArrayNumber() || $filter->isArrayBoolean() || $filter->isArrayString())
-                    {
+                if ($filterValue !== null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter) {
+                    if ($filter->isNumber() || $filter->isBoolean() || $filter->isArrayNumber() || $filter->isArrayBoolean() || $filter->isArrayString()) {
                         $specification->addAnd(PicoPredicate::getInstance()->equals($filter->getColumnName(), $filter->valueOf($filterValue)));
-                    }
-                    else if($filter->isFulltext())
-                    {
+                    } elseif ($filter->isFulltext()) {
                         $specification->addAnd(self::fullTextSearch($filter->getColumnName(), $filterValue));
-                    }
-                    else
-                    {
+                    } else {
                         $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateLikeContains(strtolower($filterValue))));
                     }
                 }
@@ -470,20 +428,18 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Create full text search
+     * Creates a full text search specification based on keywords.
      *
-     * @param string $columnName Column name
-     * @param string $keywords Keywords
-     * @return self
+     * @param string $columnName The column name to search within.
+     * @param string $keywords The keywords to search for.
+     * @return self A new specification containing the full text search predicates.
      */
     public static function fullTextSearch($columnName, $keywords)
     {
         $specification = new self;
         $arr = explode(" ", $keywords);
-        foreach($arr as $word)
-        {
-            if(!empty($word))
-            {
+        foreach ($arr as $word) {
+            if (!empty($word)) {
                 $specification->addAnd(
                     PicoPredicate::getInstance()
                         ->like(PicoPredicate::functionLower($columnName), PicoPredicate::generateLikeContains(strtolower($word)))
@@ -494,11 +450,11 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Filter
+     * Creates a filter object based on column name and data type.
      *
-     * @param string $columnName Column name
-     * @param string $dataType Data type
-     * @return PicoSpecificationFilter
+     * @param string $columnName The column name to filter by.
+     * @param string $dataType The data type of the column (e.g., string, integer).
+     * @return PicoSpecificationFilter A new instance of PicoSpecificationFilter.
      */
     public static function filter($columnName, $dataType)
     {
@@ -506,9 +462,9 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Get default logic
+     * Gets the default logic used for combining predicates.
      *
-     * @return  string
+     * @return string The default logic (AND/OR).
      */
     public function getDefaultLogic()
     {
@@ -516,47 +472,43 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Set default logic
+     * Sets the default logic used for combining predicates.
      *
-     * @param  string  $defaultLogic  Default logic
-     *
-     * @return  self
+     * @param string $defaultLogic The default logic (AND/OR) to set.
+     * @return self The current instance for method chaining.
      */
     public function setDefaultLogic($defaultLogic)
     {
         $this->defaultLogic = $defaultLogic;
-
         return $this;
     }
 
     /**
-     * Set default logic AND
+     * Sets the default logic to AND.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */
     public function setDefaultLogicAnd()
     {
         $this->defaultLogic = self::LOGIC_AND;
-
         return $this;
     }
 
     /**
-     * Set default logic OR
+     * Sets the default logic to OR.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */
     public function setDefaultLogicOr()
     {
         $this->defaultLogic = self::LOGIC_OR;
-
         return $this;
     }
 
     /**
-     * Get check if require real join table
+     * Checks if a real join table is required based on the specifications.
      *
-     * @return boolean
+     * @return bool True if a join is required, false otherwise.
      */ 
     public function getRequireJoin()
     {

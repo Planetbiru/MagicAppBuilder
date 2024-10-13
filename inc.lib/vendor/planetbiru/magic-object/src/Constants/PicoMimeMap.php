@@ -3,18 +3,24 @@
 namespace MagicObject\Constants;
 
 /**
- * MIME Map
+ * Class PicoMimeMap
+ *
+ * This class defines a mapping of file extensions to their corresponding MIME types.
+ * It can be used to determine the appropriate content type for files based on their extensions.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoMimeMap
 {
 
     /**
+     * An associative array mapping file extensions to their MIME types.
+     *
      * @var array<string, string>
      *
      * @internal
      */
-    public const MIME_TYPES_FOR_EXTENSIONS = array(
+    const MIME_TYPES_FOR_EXTENSIONS = array(
         '1km' => 'application/vnd.1000minds.decision-model+xml',
         '3dml' => 'text/vnd.in3d.3dml',
         '3ds' => 'image/x-3ds',

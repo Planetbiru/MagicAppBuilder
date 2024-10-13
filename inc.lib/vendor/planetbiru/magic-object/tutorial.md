@@ -782,7 +782,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone
@@ -901,7 +901,7 @@ class SecretGenerator extends SecretObject
 	 * @EncryptOut
 	 * @var string
 	 */
-	protected $databseSchema;
+	protected $databaseSchema;
 
 	/**
 	 * Application time zone
@@ -1076,7 +1076,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone
@@ -1306,7 +1306,7 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @DecryptOut
 	 * @var string
 	 */
-	protected $databseSchema = "public";
+	protected $databaseSchema = "public";
 
 	/**
 	 * Application time zone
@@ -9748,7 +9748,7 @@ database_target:
   username: root
   password: Jenglotsaurus
   database_name: sipro
-  databseSchema: public
+  databaseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
@@ -9757,7 +9757,7 @@ database_source:
   username: root
   password: Jenglotsaurus
   database_name: sipro_ori
-  databseSchema: public
+  databaseSchema: public
   timeZone: Asia/Jakarta
 maximum_record: 100
 table:
@@ -9864,7 +9864,7 @@ database_target:
   username: root
   password: Jenglotsaurus
   database_name: sipro
-  databseSchema: public
+  databaseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
@@ -9873,7 +9873,7 @@ database_source:
   username: root
   password: Jenglotsaurus
   database_name: sipro_ori
-  databseSchema: public
+  databaseSchema: public
   timeZone: Asia/Jakarta
 maximum_record: 100
 ```

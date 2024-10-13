@@ -36,7 +36,8 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get pageable from parameters
+     * Get pageable from parameters.
+     *
      * @param array $params Parameters
      * @return PicoPageable|null
      */
@@ -56,7 +57,8 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get sortable from parameters
+     * Get sortable from parameters.
+     *
      * @param array $params Parameters
      * @return PicoSortable|null
      */
@@ -76,7 +78,8 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get pageable from parameters
+     * Get values from parameters until a PicoPageable instance is found.
+     *
      * @param array $params Parameters
      * @return array
      */
@@ -98,7 +101,7 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Fix value
+     * Fix value based on its expected type.
      *
      * @param string $value Value
      * @param string $type Data type
@@ -129,11 +132,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if value is null
+     * Check if value is null.
      *
      * @param mixed $value Value
-     * @param boolean $importFromString Flag thai input is from string
-     * @return boolean
+     * @param bool $importFromString Flag indicating if input is from string
+     * @return bool
      */
     public static function isNull($value, $importFromString)
     {
@@ -141,11 +144,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if value is numeric
+     * Check if value is numeric.
      *
      * @param mixed $value Value
-     * @param boolean $importFromString Flag thai input is from string
-     * @return boolean
+     * @param bool $importFromString Flag indicating if input is from string
+     * @return bool
      */
     public static function isNumeric($value, $importFromString)
     {
@@ -153,11 +156,12 @@ class PicoDatabaseUtil
     }
 
     /**
-	 * Escape value
+     * Escape value for SQL.
+     *
      * @param mixed $value Value
-     * @param boolean $importFromString Flag thai input is from string
-	 * @return string
-	 */
+     * @param bool $importFromString Flag indicating if input is from string
+     * @return string
+     */
 	public static function escapeValue($value, $importFromString = false)
 	{
 		if(self::isNull($value, $importFromString))
@@ -219,7 +223,7 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Escape SQL
+     * Escape SQL value.
      *
      * @param string $value Value
      * @return string
@@ -230,9 +234,9 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Trim WHERE
+     * Trim WHERE clause.
      *
-     * @param string $where Raw WHERE
+     * @param string $where Raw WHERE clause
      * @return string
      */
     public static function trimWhere($where)
@@ -272,10 +276,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Split SQL
+     * Split SQL into queries.
      *
      * @param string $sqlText Raw SQL
-     * @return string[]
+     * @return array
      */
     public function splitSql($sqlText) //NOSONAR
     {
@@ -374,13 +378,30 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if parameter os array
+     * Check if parameter is an array.
      *
      * @param mixed $params Parameters
-     * @return boolean
+     * @return bool
      */
-    private static function isArray($params)
+    public static function isArray($params)
     {
         return isset($params) && is_array($params);
+    }
+
+    /**
+     * Find an instance of a specified class in an array.
+     *
+     * @param array $params Parameters
+     * @param string $className Class name
+     * @return object|null
+     */
+    public static function findInstanceInArray($params, $className)
+    {
+        foreach ($params as $param) {
+            if ($param instanceof $className) {
+                return $param;
+            }
+        }
+        return null;
     }
 }

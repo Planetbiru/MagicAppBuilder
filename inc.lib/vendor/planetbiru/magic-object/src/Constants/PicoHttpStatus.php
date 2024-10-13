@@ -2,7 +2,10 @@
 namespace MagicObject\Constants;
 
 /**
- * HTTP status
+ * Class PicoHttpStatus
+ *
+ * This class defines constants for standard HTTP status codes.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoHttpStatus
@@ -47,7 +50,10 @@ class PicoHttpStatus
 
 
     /**
-     * HTTP status
+     * HTTP status codes and their respective messages.
+     *
+     * This array holds the standard HTTP status codes along with their descriptions.
+     * It can be used to provide meaningful responses in HTTP communication.
      *
      * @var array
      */

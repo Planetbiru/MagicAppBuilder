@@ -3,7 +3,11 @@
 namespace MagicObject\Database;
 
 /**
- * Specification filter
+ * Class representing a specification filter.
+ *
+ * This class defines filters for columns, specifying the data type 
+ * and providing methods to convert values based on the defined type.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSpecificationFilter
@@ -17,24 +21,26 @@ class PicoSpecificationFilter
     const DATA_TYPE_FULLTEXT = "fulltext";
 
     /**
-     * Column name
+     * The name of the column this filter applies to.
      *
      * @var string
      */
     private $columnName;
 
     /**
-     * Data type
+     * The data type of the column (e.g., number, string, boolean).
      *
      * @var string
      */
     private $dataType;
 
     /**
-     * Constructor
+     * Constructor for PicoSpecificationFilter.
      *
-     * @param string $columnName Column name
-     * @param string $dataType Data type
+     * Initializes the column name and data type.
+     *
+     * @param string $columnName The name of the column.
+     * @param string $dataType The data type of the column.
      */
     public function __construct($columnName, $dataType)
     {
@@ -43,9 +49,9 @@ class PicoSpecificationFilter
     }
 
     /**
-     * Magic method to debug object
+     * Magic method to return a JSON representation of the object.
      *
-     * @return string
+     * @return string JSON encoded string of the object properties.
      */
     public function __toString()
     {
@@ -56,191 +62,169 @@ class PicoSpecificationFilter
     }
 
     /**
-     * Get value
+     * Converts a given value to the appropriate type based on the filter's data type.
      *
-     * @param mixed $stringValue Value given
-     * @return mixed
+     * @param mixed $stringValue The value to convert.
+     * @return mixed The converted value, typecasted as needed.
      */
     public function valueOf($stringValue)
     {
         $result = null;
-        if($this->isArrayNumber())
-        {
+        if ($this->isArrayNumber()) {
             $result = $this->getArrayNumber($stringValue);
-        }
-        else if($this->isArrayBoolean())
-        {
+        } elseif ($this->isArrayBoolean()) {
             $result = $this->getArrayBoolean($stringValue);
-        }
-        else if($this->isNumber())
-        {
+        } elseif ($this->isNumber()) {
             $result = $this->getNumber($stringValue);
-        }
-        else if($this->isBoolean())
-        {
+        } elseif ($this->isBoolean()) {
             $result = $this->getBoolean($stringValue);
-        }
-        else
-        {
-            $result = $stringValue;
+        } else {
+            $result = $stringValue; // Default to string
         }
         return $result;
     }
 
     /**
-     * Get number values
+     * Converts a value to an array of numbers.
      *
-     * @param mixed $stringValue Value given
-     * @return float[]|integer[]
+     * @param mixed $stringValue The value to convert.
+     * @return float[]|int[] An array of numeric values.
      */
     private function getArrayNumber($stringValue)
     {
-        if(is_array($stringValue))
-        {
+        if (is_array($stringValue)) {
             $values = array();
-            foreach($stringValue as $value)
-            {
+            foreach ($stringValue as $value) {
                 $values[] = $this->getNumber($value);
             }
             return $values;
-        }
-        else
-        {
-            return $stringValue;
+        } else {
+            return $stringValue; // Return as is if not an array
         }
     }
 
     /**
-     * Get boolean values
+     * Converts a value to an array of booleans.
      *
-     * @param mixed $stringValue Value given
-     * @return boolean[]
+     * @param mixed $stringValue The value to convert.
+     * @return bool[] An array of boolean values.
      */
     private function getArrayBoolean($stringValue)
     {
-        if(is_array($stringValue))
-        {
+        if (is_array($stringValue)) {
             $values = array();
-            foreach($stringValue as $value)
-            {
+            foreach ($stringValue as $value) {
                 $values[] = $this->getBoolean($value);
             }
             return $values;
-        }
-        else
-        {
-            return $stringValue;
+        } else {
+            return $stringValue; // Return as is if not an array
         }
     }
 
     /**
-     * Get number value
+     * Converts a value to a number.
      *
-     * @param mixed $stringValue Value given
-     * @return float|integer
+     * @param mixed $stringValue The value to convert.
+     * @return float|int The converted numeric value.
      */
     private function getNumber($stringValue)
     {
-        if(strpos($stringValue, ".") !== false)
-        {
+        if (strpos($stringValue, ".") !== false) {
             return floatval($stringValue);
-        }
-        else
-        {
+        } else {
             return intval($stringValue);
         }
     }
 
     /**
-     * Get boolean value
+     * Converts a value to a boolean.
      *
-     * @param mixed $stringValue Value given
-     * @return boolean
+     * @param mixed $stringValue The value to convert.
+     * @return bool The converted boolean value.
      */
     private function getBoolean($stringValue)
     {
         return strcasecmp($stringValue, "yes") === 0
-        || strcasecmp($stringValue, "true") === 0
-        || $stringValue === "1"
-        || $stringValue === 1
-        ;
+            || strcasecmp($stringValue, "true") === 0
+            || $stringValue === "1"
+            || $stringValue === 1;
     }
 
     /**
-     * Check if data type is a number
+     * Checks if the data type is a number.
      *
-     * @param mixed $stringValue Value given
-     * @return boolean
+     * @return bool True if the data type is a number, false otherwise.
      */
     public function isNumber()
     {
-        return $this->dataType == self::DATA_TYPE_NUMBER;
+        return $this->dataType === self::DATA_TYPE_NUMBER;
     }
 
     /**
-     * Check if data type is a string
+     * Checks if the data type is a string.
      *
-     * @return boolean
+     * @return bool True if the data type is a string, false otherwise.
      */
     public function isString()
     {
-        return $this->dataType == self::DATA_TYPE_STRING;
+        return $this->dataType === self::DATA_TYPE_STRING;
     }
 
     /**
-     * Check if data type is a boolean
+     * Checks if the data type is a boolean.
      *
-     * @return boolean
+     * @return bool True if the data type is a boolean, false otherwise.
      */
     public function isBoolean()
     {
-        return $this->dataType == self::DATA_TYPE_BOOLEAN;
+        return $this->dataType === self::DATA_TYPE_BOOLEAN;
     }
 
     /**
-     * Check if data type is an array of number
+     * Checks if the data type is an array of numbers.
      *
-     * @return boolean
+     * @return bool True if the data type is an array of numbers, false otherwise.
      */
     public function isArrayNumber()
     {
-        return $this->dataType == self::DATA_TYPE_ARRAY_NUMBER;
+        return $this->dataType === self::DATA_TYPE_ARRAY_NUMBER;
     }
 
     /**
-     * Check if data type is an array of string
+     * Checks if the data type is an array of strings.
      *
-     * @return boolean
+     * @return bool True if the data type is an array of strings, false otherwise.
      */
     public function isArrayString()
     {
-        return $this->dataType == self::DATA_TYPE_ARRAY_STRING;
+        return $this->dataType === self::DATA_TYPE_ARRAY_STRING;
     }
 
     /**
-     * Check if data type is an array of boolean
+     * Checks if the data type is an array of booleans.
      *
-     * @return boolean
+     * @return bool True if the data type is an array of booleans, false otherwise.
      */
     public function isArrayBoolean()
     {
-        return $this->dataType == self::DATA_TYPE_ARRAY_BOOLEAN;
+        return $this->dataType === self::DATA_TYPE_ARRAY_BOOLEAN;
     }
 
     /**
-     * Check if data type is full text
+     * Checks if the data type is full text.
      *
-     * @return boolean
+     * @return bool True if the data type is full text, false otherwise.
      */
     public function isFulltext()
     {
-        return $this->dataType == self::DATA_TYPE_FULLTEXT;
+        return $this->dataType === self::DATA_TYPE_FULLTEXT;
     }
 
     /**
-     * Get column name
+     * Gets the column name of this filter.
      *
-     * @return string
+     * @return string The name of the column.
      */
     public function getColumnName()
     {
@@ -248,9 +232,9 @@ class PicoSpecificationFilter
     }
 
     /**
-     * Get data type
+     * Gets the data type of this filter.
      *
-     * @return string
+     * @return string The data type of the column.
      */
     public function getDataType()
     {

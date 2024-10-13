@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5097e6c92457bbf2acba5e0588eb1c7b",
+    "content-hash": "8407a0d8000b986794892588775360c2",
     "packages": [
         {
             "name": "meyfa/php-svg",
@@ -181,16 +181,16 @@
         },
         {
             "name": "planetbiru/magic-object",
-            "version": "1.22.4",
+            "version": "1.23.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "6f030f33ff7c26c1503bf57b32195785dff009c7"
+                "reference": "9f25a72b94abe2a8e4fdecbed08f1d5c5d254585"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/6f030f33ff7c26c1503bf57b32195785dff009c7",
-                "reference": "6f030f33ff7c26c1503bf57b32195785dff009c7",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/9f25a72b94abe2a8e4fdecbed08f1d5c5d254585",
+                "reference": "9f25a72b94abe2a8e4fdecbed08f1d5c5d254585",
                 "shasum": ""
             },
             "require": {
@@ -214,9 +214,9 @@
             "description": "Magic object",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/1.22.4"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/1.23"
             },
-            "time": "2024-10-09T15:00:41+00:00"
+            "time": "2024-10-13T03:00:15+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -283,7 +283,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "planetbiru/magic-object": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

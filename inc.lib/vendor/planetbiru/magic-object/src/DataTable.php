@@ -15,7 +15,9 @@ use ReflectionClass;
 use stdClass;
 
 /**
- * Data table
+ * Class DataTable
+ * Represents a data table for managing and rendering structured data.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class DataTable extends SetterGetter
@@ -50,39 +52,36 @@ class DataTable extends SetterGetter
     const TD_LABEL = "td-label";
     const TD_VALUE = "td-value";
 
-    private $_attributes = array(); //NOSONAR
-    private $_classList = array(); //NOSONAR
-    private $_defaultColumnName = "key"; //NOSONAR
-
     /**
-     * Current language
+     * Current language code.
      *
      * @var string
      */
     private $_currentLanguage; //NOSONAR
+
     /**
-     * Language
+     * Language instances.
      *
      * @var PicoLanguage[]
      */
     private $_lableLanguage = array(); //NOSONAR
 
     /**
-     * Table identity
+     * Table identity.
      *
      * @var PicoGenericObject
      */
     private $_tableIdentity; //NOSONAR
 
     /**
-     * Table information
+     * Table information.
      *
      * @var PicoTableInfo
      */
     private $_tableInfo; //NOSONAR
 
     /**
-     * Labels
+     * Labels for the table.
      *
      * @var array
      */
@@ -91,7 +90,9 @@ class DataTable extends SetterGetter
     /**
      * Constructor
      *
-     * @param MagicObject|self|stdClass|array $data Data to be loaded
+     * Initializes the data table and loads data if provided.
+     *
+     * @param MagicObject|self|stdClass|array|null $data Data to be loaded
      */
     public function __construct($data = null)
     {
@@ -103,8 +104,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Load data to object
-     * @param mixed $data Reference
+     * Loads data into the object.
+     *
+     * @param mixed $data Reference to the data to load.
      * @return self
      */
     public function loadData($data)
@@ -139,11 +141,11 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Add language
+     * Adds a language to the table.
      *
-     * @param string $code Language code
-     * @param object|stdClass|array $reference Reference
-     * @param boolean $use Flag to use language
+     * @param string $code Language code.
+     * @param object|stdClass|array $reference Reference for language.
+     * @param boolean $use Flag to indicate whether to use this language.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
@@ -157,10 +159,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Remove language
+     * Removes a language from the table.
      *
-     * @param string $code Language code
-     * @param stdClass|array $reference Reference
+     * @param string $code Language code.
      * @return self
      */
     public function removeLanguage($code)
@@ -178,9 +179,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Set current language
+     * Sets the current language.
      *
-     * @param string $code Language code
+     * @param string $code Language code.
      * @return self
      */
     public function selectLanguage($code)
@@ -190,7 +191,7 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Initialize table
+     * Initializes the table's attributes and configurations.
      *
      * @return self
      */
@@ -220,9 +221,10 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Property list
-     * @var boolean $reflectSelf Reflection
-     * @var boolean $asArrayProps Properties
+     * Retrieves the list of properties for the table.
+     *
+     * @param boolean $reflectSelf Whether to reflect on the current class.
+     * @param boolean $asArrayProps Whether to return properties as an array.
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -257,12 +259,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Annotation content
+     * Retrieves the content of an annotation.
      *
-     * @param PicoAnnotationParser $reflexProp Class reflection
-     * @param PicoGenericObject $parameters Parameters
-     * @param string $key Key
-     * @param string $defaultLabel Default label
+     * @param PicoAnnotationParser $reflexProp Class reflection.
+     * @param PicoGenericObject $parameters Parameters.
+     * @param string $annotation Annotation key.
+     * @param string $attribute Attribute key.
      * @return mixed|null
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
@@ -279,12 +281,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Define label
+     * Defines the label for a property based on annotations.
      *
-     * @param PicoAnnotationParser $reflexProp Class reflection
-     * @param PicoGenericObject $parameters Parameters
-     * @param string $key Key
-     * @param string $defaultLabel Default label
+     * @param PicoAnnotationParser $reflexProp Class reflection.
+     * @param PicoGenericObject $parameters Parameters.
+     * @param string $key Property key.
+     * @param string $defaultLabel Default label.
      * @return string
      */
     private function label($reflexProp, $parameters, $key, $defaultLabel)
@@ -314,12 +316,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Append table by properties
+     * Appends table rows based on properties.
      *
-     * @param DOMDocument $doc DOM Document
-     * @param DOMNode $tbody DOM Node
-     * @param array $props Properties
-     * @param string $className Class name
+     * @param DOMDocument $doc DOM Document.
+     * @param DOMNode $tbody DOM Node for the tbody.
+     * @param array $props Properties to append.
+     * @param string $className Class name for reflection.
      * @return void
      */
     private function appendByProp($doc, $tbody, $props, $className)
@@ -356,11 +358,11 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Append table by values
+     * Appends table rows based on values.
      *
-     * @param DOMDocument $doc DOM Document
-     * @param DOMNode $tbody DOM Node
-     * @param stdClass $values Data
+     * @param DOMDocument $doc DOM Document.
+     * @param DOMNode $tbody DOM Node for the tbody.
+     * @param stdClass $values Data to append as rows.
      * @return void
      */
     private function appendByValues($doc, $tbody, $values)
@@ -384,9 +386,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Get label
+     * Gets the label for a specified property.
      *
-     * @param string $propertyName Property name
+     * @param string $propertyName Property name.
      * @return string
      */
     private function getLabel($propertyName)
@@ -414,9 +416,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Add class to table
+     * Adds a class to the table.
      *
-     * @param string $className Class name
+     * @param string $className Class name to add.
      * @return self
      */
     public function addClass($className)
@@ -431,9 +433,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Remove class from table
+     * Removes a class from the table.
      *
-     * @param string $className Class name
+     * @param string $className Class name to remove.
      * @return self
      */
     public function removeClass($className)
@@ -454,10 +456,10 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Replace class of the table
+     * Replaces a class in the table with a new class name.
      *
-     * @param string $search Text to search
-     * @param string $replace Text to replace
+     * @param string $search Class name to search for.
+     * @param string $replace Class name to replace with.
      * @return self
      */
     public function replaceClass($search, $replace)
@@ -468,9 +470,9 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Magic method to string
+     * Converts the object to a string representation (HTML).
      *
-     * @return string
+     * @return string HTML representation of the data table.
      */
     public function __toString()
     {
@@ -499,7 +501,7 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Get table info
+     * Gets table information.
      *
      * @return PicoTableInfo
      */

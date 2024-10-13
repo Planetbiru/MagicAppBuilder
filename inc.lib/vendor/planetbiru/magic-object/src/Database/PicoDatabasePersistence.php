@@ -712,7 +712,7 @@ class PicoDatabasePersistence // NOSONAR
     private function getNullCols($info)
     {
         $nullCols = array();
-        $nullList = $this->object->nullPropertiyList();
+        $nullList = $this->object->nullPropertyList();
         if($this->isArray($nullList))
         {
             foreach($nullList as $key=>$val)
@@ -1455,7 +1455,7 @@ class PicoDatabasePersistence // NOSONAR
      * Join array string with maximum length. If max is reached, it will create new line
      *
      * @param string[] $arr Array string to be joined
-     * @param integer $max Threshold to split line
+     * @param int $max Threshold to split line
      * @param string $normalSplit Normal splitter
      * @param string $maxSplit Overflow splitter
      * @return string
@@ -1487,7 +1487,7 @@ class PicoDatabasePersistence // NOSONAR
      * Split chunk query
      *
      * @param string[] $arr Array string to be joined
-     * @param integer $max Threshold to split line
+     * @param int $max Threshold to split line
      * @param string $normalSplit Normal splitter
      * @return array
      */
@@ -2574,7 +2574,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoSpecification|null $specification Specification
      * @param PicoPageable $pageable Pagable
      * @param PicoSortable $sortable Sortable
-     * @return integer
+     * @return int
      * @throws EntityException|EmptyResultException
      */
     public function countAll($specification = null, $pageable = null, $sortable = null)
@@ -2625,7 +2625,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return integer
+     * @return int
      * @throws EntityException|InvalidFilterException|PDOException|EmptyResultException
      */
     public function countBy($propertyName, $propertyValue)
@@ -2673,7 +2673,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return integer
+     * @return int
      * @throws EntityException|InvalidFilterException|PDOException|EmptyResultException
      */
     public function deleteBy($propertyName, $propertyValue)

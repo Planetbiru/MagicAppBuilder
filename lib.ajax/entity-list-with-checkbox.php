@@ -30,8 +30,6 @@ try
     $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox entity-checkbox-query" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox entity-checkbox-query" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
     
-    
-    
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');

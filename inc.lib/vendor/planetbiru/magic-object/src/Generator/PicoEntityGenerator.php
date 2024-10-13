@@ -7,63 +7,64 @@ use MagicObject\Util\PicoStringUtil;
 
 /**
  * PicoEntityGenerator is an entity generator for automatically generating PHP code.
- * This class is optimized on the MariaDB database.
+ * This class is optimized for the MariaDB database.
  * Users must provide appropriate parameters so that the entity class can be directly used in the application.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityGenerator
 {
     /**
-     * Database
+     * Database connection instance.
      *
      * @var PicoDatabase
      */
     protected $database;
 
     /**
-     * Base directory
+     * Base directory for generated files.
      *
      * @var string
      */
     protected $baseDir = "";
 
     /**
-     * Base namespace
+     * Base namespace for the entity classes.
      *
      * @var string
      */
     protected $baseNamespace = "";
 
     /**
-     * Table name
+     * Table name for which the entity is generated.
      *
      * @var string
      */
     protected $tableName = "";
 
     /**
-     * Entity name
+     * Name of the entity being generated.
      *
-     * @var string
+     * @var string|null
      */
     protected $entityName = null;
 
     /**
-     * Prettify
+     * Flag indicating whether to prettify the output.
      *
      * @var boolean
      */
     protected $prettify = false;
 
     /**
-     * Constructor
+     * Constructor for the PicoEntityGenerator class.
      *
-     * @param PicoDatabase $database
-     * @param string $baseDir Base directory
-     * @param string $tableName Table name
-     * @param string $baseNamespace Base namespace
-     * @param string $entityName Entity name
-     * @param boolean $prettify Flag to prettify
+     * @param PicoDatabase $database Database connection
+     * @param string $baseDir Base directory for generated files
+     * @param string $tableName Table name for entity generation
+     * @param string $baseNamespace Base namespace for the entity classes
+     * @param string|null $entityName Name of the entity (optional)
+     * @param boolean $prettify Flag to prettify output (default: false)
      */
     public function __construct($database, $baseDir, $tableName, $baseNamespace, $entityName = null, $prettify = false)
     {
@@ -76,12 +77,12 @@ class PicoEntityGenerator
     }
 
     /**
-     * Create property
+     * Create a property with appropriate documentation.
      *
-     * @param array $typeMap Type map
-     * @param string $row Data row
-     * @param string[] $nonupdatables Nonupdateable columns
-     * @return string
+     * @param array $typeMap Mapping of database types to PHP types
+     * @param array $row Data row from the database
+     * @param string[]|null $nonupdatables Non-updateable columns
+     * @return string PHP code for the property with docblock
      */
     protected function createProperty($typeMap, $row, $nonupdatables = null)
     {
@@ -96,138 +97,115 @@ class PicoEntityGenerator
         $description = $this->getPropertyName($columnName);
         $type = $this->getDataType($typeMap, $columnType);
 
-        $docs = array();
+        $docs = [];
         $docStart = "\t/**";
         $docEnd = "\t */";
 
         $docs[] = $docStart;
-        $docs[] = "\t * ".$description;
+        $docs[] = "\t * $description";
         $docs[] = "\t * ";
 
-        if(!empty($columnKey) && stripos($columnKey, "PRI") === 0)
-        {
+        if (!empty($columnKey) && stripos($columnKey, "PRI") === 0) {
             $docs[] = "\t * @Id";
-            if(stripos("auto_increment", $columnExtra) === false)
-            {
+            if (stripos($columnExtra, "auto_increment") === false) {
                 $docs[] = "\t * @GeneratedValue(strategy=GenerationType.UUID)";
             }
         }
 
-        if(stripos("auto_increment", $columnExtra) !== false)
-        {
+        if (stripos($columnExtra, "auto_increment") !== false) {
             $docs[] = "\t * @GeneratedValue(strategy=GenerationType.IDENTITY)";
         }
 
-        if(strcasecmp($columnNull, 'No') == 0)
-        {
+        if (strcasecmp($columnNull, 'No') == 0) {
             $docs[] = "\t * @NotNull";
         }
 
-        $attrs = array();
+        $attrs = [];
         $attrs[] = "name=\"$columnName\"";
         $attrs[] = "type=\"$columnType\"";
         $length = $this->getDataLength($columnType);
-        if($length > 0)
-        {
+        if ($length > 0) {
             $attrs[] = "length=$length";
         }
 
-        if(!empty($columnDefault))
-        {
-            $attrs[] = "default_value=\"".$columnDefault."\"";
+        if (!empty($columnDefault)) {
+            $attrs[] = "default_value=\"" . $columnDefault . "\"";
         }
-        if(!empty($columnNull))
-        {
+        if (!empty($columnNull)) {
             $val = stripos($columnNull, "YES") === 0 ? "true" : "false";
             $attrs[] = "nullable=$val";
         }
 
-        if(is_array($nonupdatables) && in_array($columnName, $nonupdatables))
-        {
+        if (is_array($nonupdatables) && in_array($columnName, $nonupdatables)) {
             $attrs[] = "updatable=false";
         }
 
-        if(!empty($columnExtra))
-        {
-            $attrs[] = "extra=\"".$columnExtra."\"";
+        if (!empty($columnExtra)) {
+            $attrs[] = "extra=\"" . $columnExtra . "\"";
         }
 
-        $docs[] = "\t * @Column(".implode(", ", $attrs).")";
-        if(!empty($columnDefault))
-        {
-            $docs[] = "\t * @DefaultColumn(value=\"".$columnDefault."\")";
+        $docs[] = "\t * @Column(" . implode(", ", $attrs) . ")";
+        if (!empty($columnDefault)) {
+            $docs[] = "\t * @DefaultColumn(value=\"" . $columnDefault . "\")";
         }
 
         $docs[] = "\t * @Label(content=\"$description\")";
         $docs[] = "\t * @var $type";
         $docs[] = $docEnd;
         $prop = "\tprotected \$$propertyName;";
-        return implode("\r\n", $docs)."\r\n".$prop."\r\n";
+        return implode("\r\n", $docs) . "\r\n" . $prop . "\r\n";
     }
 
     /**
-     * Get property name
+     * Get a descriptive name for the property based on the column name.
      *
-     * @param string $name Column name
-     * @return string
+     * @param string $name Original column name
+     * @return string Formatted property name
      */
     protected function getPropertyName($name)
     {
         $arr = explode("_", $name);
-        foreach($arr as $k => $v)
-        {
+        foreach ($arr as $k => $v) {
             $arr[$k] = ucfirst($v);
-            $arr[$k] = str_replace("Id","ID", $arr[$k]);
-            $arr[$k] = str_replace("Ip","IP", $arr[$k]);
+            $arr[$k] = str_replace("Id", "ID", $arr[$k]);
+            $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
         }
         return implode(" ", $arr);
     }
 
     /**
-     * Get data type
+     * Get the corresponding PHP data type based on the column type.
      *
-     * @param array $typeMap Type map
-     * @param string $columnType Column type
-     * @return string
+     * @param array $typeMap Mapping of database types to PHP types
+     * @param string $columnType Database column type
+     * @return string Corresponding PHP data type
      */
     protected function getDataType($typeMap, $columnType)
     {
         $type = "";
-        foreach($typeMap as $key=>$val)
-        {
-            if(stripos($columnType, $key) === 0)
-            {
+        foreach ($typeMap as $key => $val) {
+            if (stripos($columnType, $key) === 0) {
                 $type = $val;
                 break;
             }
         }
-        if(empty($type))
-        {
-            $type = "string";
-        }
-        return $type;
+        return empty($type) ? "string" : $type;
     }
 
     /**
-     * Get column length
+     * Get the length of the column based on its definition.
      *
-     * @param string $str String contains column length
-     * @return integer
+     * @param string $str Column definition containing length
+     * @return int Length of the column
      */
     protected function getDataLength($str)
     {
         $str2 = preg_replace('~\D~', '', $str);
-        if(empty($str2))
-        {
-            $str2 = "0";
-        }
-        $length = $str2 * 1;
+        $length = empty($str2) ? 0 : (int)$str2;
 
-        if(stripos($str, "datetime") !== false || stripos($str, "timestamp") !== false)
-        {
+        if (stripos($str, "datetime") !== false || stripos($str, "timestamp") !== false) {
             $length += 20;
-            if($length == 20)
-            {
+            if ($length == 20) {
                 $length = 19;
             }
         }
@@ -235,13 +213,13 @@ class PicoEntityGenerator
     }
 
     /**
-     * Get type map
+     * Get a mapping of database types to PHP types.
      *
-     * @return array
+     * @return array Associative array of type mappings
      */
     protected function getTypeMap()
     {
-        return array(
+        return [
             "double" => "double",
             "float" => "double",
             "bigint" => "integer",
@@ -262,44 +240,34 @@ class PicoEntityGenerator
             "datetime" => "string",
             "date" => "string",
             "time" => "string"
-        );
+        ];
     }
 
     /**
-     * Generate entity
+     * Generate the entity class and save it to a file.
      *
-     * @param string[] $nonupdatables Nonupdatetable columns
-     * @return string
+     * @param string[]|null $nonupdatables Non-updateable columns
+     * @return int Number of bytes written to the file, or false on failure
      */
     public function generate($nonupdatables = null)
     {
         $typeMap = $this->getTypeMap();
         $picoTableName = $this->tableName;
-        if($this->entityName != null)
-        {
-            $className = $this->entityName;
-        }
-        else
-        {
-            $className = ucfirst(PicoStringUtil::camelize($picoTableName));
-        }
-        $fileName = $this->baseNamespace."/".$className;
-        $path = $this->baseDir."/".$fileName.".php";
+        $className = $this->entityName ?? ucfirst(PicoStringUtil::camelize($picoTableName));
+        $fileName = $this->baseNamespace . "/" . $className;
+        $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);
 
         $dir = dirname($path);
-        if(!file_exists($dir))
-        {
+        if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = array();
-        if(is_array($rows))
-        {
-            foreach($rows as $row)
-            {
+        $attrs = [];
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
                 $prop = $this->createProperty($typeMap, $row, $nonupdatables);
                 $attrs[] = $prop;
             }
@@ -307,27 +275,26 @@ class PicoEntityGenerator
 
         $prettify = $this->prettify ? 'true' : 'false';
 
-        $uses = array();
-        $uses[] = "";
-
         $classStr = '<?php
 
-namespace '.$this->baseNamespace.';
+namespace ' . $this->baseNamespace . ';
 
-use MagicObject\MagicObject;'.implode("\r\n", $uses).'
+use MagicObject\MagicObject;
 
 /**
- * '.$className.' is entity of table '.$picoTableName.'. You can join this entity to other entity using annotation JoinColumn.
- * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
- *
+ * ' . $className . ' represents the entity for the table ' . $picoTableName . '.
+ * You can join this entity to other entities using the @JoinColumn annotation.
+ * 
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
- * @Table(name="'.$picoTableName.'")
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=' . $prettify . ')
+ * @Table(name="' . $picoTableName . '")
  */
-class '.$className.' extends MagicObject
+class ' . $className . ' extends MagicObject
 {
-'.implode("\r\n", $attrs).'
+' . implode("\r\n", $attrs) . '
 }';
+
         return file_put_contents($path, $classStr);
     }
 }

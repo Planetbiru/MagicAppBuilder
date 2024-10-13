@@ -3,7 +3,11 @@
 namespace MagicObject\Database;
 
 /**
- * Sort
+ * Class for sorting database queries.
+ *
+ * This class allows you to define sorting criteria for database queries,
+ * including the field to sort by and the direction of sorting.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSort
@@ -13,23 +17,24 @@ class PicoSort
     const SORT_BY         = "sortBy";
 
     /**
-     * Sort by
+     * The field to sort by.
      *
      * @var string
      */
     private $sortBy = "";
 
     /**
-     * Sort type
+     * The type of sorting (ascending or descending).
      *
      * @var string
      */
     private $sortType = "";
 
     /**
-     * Constructor
-     * @param string $sortBy Sort by
-     * @param string $sortType Sort type
+     * Constructor to initialize sorting criteria.
+     *
+     * @param string|null $sortBy The field to sort by.
+     * @param string|null $sortType The type of sorting.
      */
     public function __construct($sortBy = null, $sortType = null)
     {
@@ -38,9 +43,9 @@ class PicoSort
     }
 
     /**
-     * Get sort by
+     * Get the field to sort by.
      *
-     * @return string
+     * @return string The field to sort by.
      */
     public function getSortBy()
     {
@@ -48,23 +53,22 @@ class PicoSort
     }
 
     /**
-     * Set sort by
+     * Set the field to sort by.
      *
-     * @param string $sortBy Sort by
+     * @param string $sortBy The field to sort by.
      *
      * @return self
      */
     public function setSortBy($sortBy)
     {
         $this->sortBy = $sortBy;
-
         return $this;
     }
 
     /**
-     * Get sort type
+     * Get the type of sorting.
      *
-     * @return string
+     * @return string The type of sorting.
      */
     public function getSortType()
     {
@@ -72,41 +76,57 @@ class PicoSort
     }
 
     /**
-     * Set sort type
+     * Set the type of sorting.
      *
-     * @param string $sortType Sort type
+     * @param string $sortType The type of sorting.
      *
      * @return self
      */
     public function setSortType($sortType)
     {
         $this->sortType = $sortType;
-
         return $this;
     }
 
     /**
-     * Magic method
+     * Magic method for dynamic method calls related to sorting criteria.
      *
-     * @param string $method Method name
-     * @param array $params Parameters
-     * @return self|mixed|null
+     * This method enables the dynamic setting of sorting criteria by allowing
+     * the invocation of methods prefixed with "sortBy". When such a method is called,
+     * it extracts the sorting field from the method name and assigns a sorting type
+     * based on the provided parameters.
+     *
+     * Supported dynamic method:
+     *
+     * - `sortBy<FieldName>(sortType)`: 
+     *   Sets the field to sort by and the type of sorting.
+     *   - For example, calling `$obj->sortByName('asc')` would:
+     *     - Set the sorting field to `name`.
+     *     - Set the sorting type to `asc`.
+     *
+     * If the method name does not start with "sortBy" or if no parameters are provided,
+     * the method returns null.
+     *
+     * @param string $method The name of the method being called, expected to start with "sortBy".
+     * @param array $params The parameters passed to the method; expected to contain the sorting type.
+     * @return self|null Returns the current instance for method chaining or null if the method call is not handled.
      */
     public function __call($method, $params)
     {
-        if (strncasecmp($method, self::SORT_BY, 6) === 0 && isset($params) && isset($params[0])){
+        if (strncasecmp($method, 'sortBy', 6) === 0 && isset($params[0])) {
             $field = lcfirst(substr($method, 6));
             $value = $params[0];
             $this->setSortBy($field);
             $this->setSortType($value);
             return $this;
         }
+        return null; // Added return for undefined methods
     }
 
     /**
-     * Get instance of PicoSort
+     * Get an instance of PicoSort.
      *
-     * @return self
+     * @return self A new instance of PicoSort.
      */
     public static function getInstance()
     {
@@ -114,10 +134,10 @@ class PicoSort
     }
 
     /**
-     * Fix sort type
+     * Normalize the sort type to either ascending or descending.
      *
-     * @param string $type Sort type
-     * @return string
+     * @param string $type The desired sort type.
+     * @return string The normalized sort type.
      */
     public static function fixSortType($type)
     {
@@ -125,9 +145,11 @@ class PicoSort
     }
 
     /**
-     * Magic method to debug object.This method is for debug purpose only.
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string
+     * This method is intended for debugging purposes only.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {

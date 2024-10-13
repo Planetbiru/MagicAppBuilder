@@ -3,51 +3,43 @@
 namespace MagicObject\Database;
 
 /**
- * Limit and offset select database records
+ * Class for limiting and offsetting select database records.
+ *
+ * This class provides functionality to manage pagination in database queries
+ * by setting limits and offsets.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoLimit
 {
     /**
-     * Limit
+     * Limit of records to retrieve.
      *
-     * @var integer
+     * @var int
      */
     private $limit = 0;
 
     /**
-     * Offset
+     * Offset for records to skip.
      *
-     * @var integer
+     * @var int
      */
     private $offset = 0;
 
     /**
      * Constructor
      *
-     * @param integer $offset Offset
-     * @param integer $limit Limit
+     * @param int $offset Offset
+     * @param int $limit Limit
      */
     public function __construct($offset = 0, $limit = 0)
     {
-        if($offset < 0)
-        {
-            $offset = 0;
-        }
-        if($limit < 1)
-        {
-            $limit = 1;
-        }
-
-        $offset = intval($offset);
-        $limit = intval($limit);
-
-        $this->setOffset($offset);
-        $this->setLimit($limit);
+        $this->setOffset(max(0, intval($offset)));
+        $this->setLimit(max(1, intval($limit)));
     }
 
     /**
-     * Increase page number
+     * Increase the offset for the next page.
      *
      * @return self
      */
@@ -58,27 +50,20 @@ class PicoLimit
     }
 
     /**
-     * Decrease page number
+     * Decrease the offset for the previous page.
      *
      * @return self
      */
     public function previousPage()
     {
-        if($this->offset > 1)
-        {
-            $this->offset -= $this->limit;
-        }
-        if($this->offset < 0)
-        {
-            $this->offset = 0;
-        }
+        $this->offset = max(0, $this->offset - $this->limit);
         return $this;
     }
 
     /**
-     * Get the value of limit
+     * Get the limit value.
      *
-     * @return integer
+     * @return int
      */
     public function getLimit()
     {
@@ -86,25 +71,21 @@ class PicoLimit
     }
 
     /**
-     * Set the value of limit
+     * Set the limit value.
      *
-     * @param integer $limit Limit
+     * @param int $limit Limit
      * @return self
      */
     public function setLimit($limit)
     {
-        if($limit < 0)
-        {
-            $limit = 0;
-        }
-        $this->limit = $limit;
+        $this->limit = max(1, intval($limit));
         return $this;
     }
 
     /**
-     * Get the value of offset
+     * Get the offset value.
      *
-     * @return integer
+     * @return int
      */
     public function getOffset()
     {
@@ -112,61 +93,40 @@ class PicoLimit
     }
 
     /**
-     * Set the value of offset
+     * Set the offset value.
      *
-     * @param integer $offset Offset
+     * @param int $offset Offset
      * @return self
      */
     public function setOffset($offset)
     {
-        if($offset < 0)
-        {
-            $offset = 0;
-        }
-        $this->offset = $offset;
+        $this->offset = max(0, intval($offset));
         return $this;
     }
 
     /**
-     * Get page
+     * Get the current page information.
      *
      * @return PicoPage
      */
     public function getPage()
     {
-        $limit = $this->limit;
-        $offset = $this->offset;
-        if($limit <= 0)
-        {
-            $limit = 1;
-        }
-        if($limit > 0)
-        {
-            $pageNumber = round(($offset + $limit) / $limit);
-            if($pageNumber < 1)
-            {
-                $pageNumber = 1;
-            }
-        }
-        else
-        {
-            $pageNumber = 1;
-        }
+        $limit = $this->limit > 0 ? $this->limit : 1;
+        $pageNumber = max(1, round(($this->offset + $limit) / $limit));
+        
         return new PicoPage($pageNumber, $limit);
     }
 
     /**
-     * Magic method to debug object
+     * Magic method to return a string representation of the object.
      *
      * @return string
      */
     public function __toString()
     {
-        return json_encode(
-            array(
-                'limit' => $this->limit,
-                'offset' => $this->offset
-            )
-        );
+        return json_encode([
+            'limit' => $this->limit,
+            'offset' => $this->offset
+        ]);
     }
 }

@@ -44,4 +44,4 @@ $data = array(
     'magic_app_versions' => $magicAppList
 );
 
-ResponseUtil::sendJSON($data);
+ResponseUtil::sendJSON($data, false, true);

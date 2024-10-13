@@ -3,35 +3,40 @@
 namespace MagicObject\File;
 
 /**
- * Upload file container
+ * Class representing a container for uploaded files.
+ *
+ * This class manages the uploaded file information and provides methods
+ * to handle single or multiple file uploads.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoUploadFileContainer
 {
     /**
-     * Array to store uploaded file information
+     * Array to store information about uploaded files.
      *
      * @var array
      */
     private $values = array();
     
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param array $file
+     * Initializes the container with uploaded file data.
+     *
+     * @param array|null $file An associative array containing file upload information.
      */
     public function __construct($file = null)
     {
-        if($file != null)
-        {
+        if ($file !== null) {
             $this->values = $file;
         }
     }
     
     /**
-     * Check if file is multiple upload or not
+     * Checks if multiple files were uploaded.
      *
-     * @return boolean
+     * @return boolean True if multiple files were uploaded; otherwise, false.
      */
     public function isMultiple()
     {
@@ -39,10 +44,10 @@ class PicoUploadFileContainer
     }
     
     /**
-     * Check if file is multiple upload or not
+     * Checks if a specific file exists in the upload.
      *
-     * @param integer $index Uploaded file index
-     * @return boolean
+     * @param int $index The index of the uploaded file.
+     * @return boolean True if the file exists; otherwise, false.
      */
     public function isExists($index)
     {
@@ -50,41 +55,35 @@ class PicoUploadFileContainer
     }
     
     /**
-     * Get total file with similar key
+     * Gets the total number of uploaded files.
      *
-     * @return integer
+     * @return int The number of files uploaded.
      */
     public function getFileCount()
     {
-        if(empty($this->values))
-        {
+        if (empty($this->values)) {
             return 0;
         }
         return $this->isMultiple() ? count($this->values['tmp_name']) : 1;
     }
     
     /**
-     * Get all file
+     * Retrieves all uploaded files.
      *
-     * @return PicoUploadFileItem[]
+     * @return PicoUploadFileItem[] An array of PicoUploadFileItem objects representing uploaded files.
      */
     public function getAll()
     {
         $result = array();
-        if(!empty($this->values))
-        {
-            if($this->isMultiple())
-            {
-                // multiple file
+        if (!empty($this->values)) {
+            if ($this->isMultiple()) {
+                // Handle multiple files
                 $count = $this->getFileCount();
-                for($i = 0; $i < $count; $i++)
-                {
+                for ($i = 0; $i < $count; $i++) {
                     $result[] = new PicoUploadFileItem($this->getItem($i));
                 }
-            }
-            else
-            {
-                // single file
+            } else {
+                // Handle single file
                 $result[] = new PicoUploadFileItem($this->values);
             }
         }
@@ -92,10 +91,10 @@ class PicoUploadFileContainer
     }
     
     /**
-     * Get one file
+     * Gets information about a specific uploaded file.
      *
-     * @param integer $index Uploade file index
-     * @return array
+     * @param int $index The index of the uploaded file.
+     * @return array An associative array containing information about the uploaded file.
      */
     public function getItem($index)
     {
@@ -104,22 +103,18 @@ class PicoUploadFileContainer
             'name' => $this->values['name'][$index]
         );
         
-        if(isset($this->values['error'][$index]))
-        {
+        if (isset($this->values['error'][$index])) {
             $file['error'] = $this->values['error'][$index];
         }
-        if(isset($this->values['type'][$index]))
-        {
+        if (isset($this->values['type'][$index])) {
             $file['type'] = $this->values['type'][$index];
         }
-        if(isset($this->values['size'][$index]))
-        {
+        if (isset($this->values['size'][$index])) {
             $file['size'] = $this->values['size'][$index];
         }
 
         // PHP 8
-        if(isset($this->values['full_path'][$index]))
-        {
+        if (isset($this->values['full_path'][$index])) {
             $file['full_path'] = $this->values['full_path'][$index];
         }
         
@@ -127,9 +122,9 @@ class PicoUploadFileContainer
     }
     
     /**
-     * Magic object to convert object to string
+     * Converts the object to a string representation.
      *
-     * @return string
+     * @return string A JSON-encoded string of the uploaded file information.
      */
     public function __toString()
     {

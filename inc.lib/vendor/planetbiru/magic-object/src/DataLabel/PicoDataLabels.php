@@ -5,23 +5,26 @@ namespace MagicObject\PicoDataLabel;
 use MagicObject\DataLabel\PicoDataLabel;
 
 /**
- * Data labels
+ * Class representing a collection of data labels.
+ *
+ * This class allows for the storage and management of multiple data labels.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDataLabels
 {
     /**
-     * Data
+     * Collection of data labels.
      *
      * @var PicoDataLabel[]
      */
     private $data = array();
 
     /**
-     * Append data
+     * Appends a new data label to the collection.
      *
-     * @param PicoDataLabel $data New data
-     * @return self
+     * @param PicoDataLabel $data The data label to be added.
+     * @return self The current instance for method chaining.
      */
     public function append($data)
     {
@@ -29,11 +32,15 @@ class PicoDataLabels
         return $this;
     }
 
+    /**
+     * Generates output based on the collected data labels.
+     *
+     * This method processes each data label in the collection.
+     */
     public function generate()
     {
-        foreach($this->data as $data)
-        {
-
+        foreach ($this->data as $data) {
+            // Implementation for processing each data label goes here
         }
     }
 }

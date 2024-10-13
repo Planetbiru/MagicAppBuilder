@@ -6,7 +6,10 @@ use MagicObject\MagicObject;
 use stdClass;
 
 /**
- * Generic object
+ * Class PicoGenericObject
+ *
+ * A generic object that allows dynamic property management.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoGenericObject extends stdClass
@@ -14,7 +17,7 @@ class PicoGenericObject extends stdClass
     /**
      * Constructor
      *
-     * @param MagicObject|self|stdClass|array $data
+     * @param MagicObject|self|stdClass|array|null $data Initial data to load into the object.
      */
     public function __construct($data = null)
     {
@@ -25,8 +28,9 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Load data to object
-     * @param stdClass|array $data Data
+     * Load data into the object.
+     *
+     * @param stdClass|array $data Data to be loaded.
      * @return self
      */
     public function loadData($data)
@@ -42,10 +46,10 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Set property value
+     * Set a property value.
      *
-     * @param string $propertyName Property name
-     * @param mixed|null
+     * @param string $propertyName Name of the property.
+     * @param mixed $propertyValue Value to set.
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -56,10 +60,10 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Get property value
+     * Get a property value.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null
+     * @param string $propertyName Name of the property.
+     * @return mixed|null The value of the property or null if not set.
      */
     public function get($propertyName)
     {
@@ -68,25 +72,23 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Stores datas in the property.
-     * Example: $instance->foo = 'bar';
+     * Magic method to set property values dynamically.
      *
-     * @param string $name Property name
-     * @param string $value Property value
+     * @param string $name Name of the property.
+     * @param mixed $value Value to set.
      * @return void
-     **/
+     */
     public function __set($name, $value)
     {
         $this->set($name, $value);
     }
 
     /**
-     * Gets datas from the property.
-     * Example: echo $instance->foo;
+     * Magic method to get property values dynamically.
      *
      * @param string $name Name of the property to get.
-     * @return mixed Datas stored in property.
-     **/
+     * @return mixed The value stored in the property or null if not set.
+     */
     public function __get($name)
     {
         if($this->__isset($name))
@@ -96,10 +98,10 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Check if property has been set or not or has null value
+     * Check if a property is set.
      *
-     * @param string $name Property name
-     * @return boolean
+     * @param string $name Name of the property.
+     * @return boolean True if the property is set, false otherwise.
      */
     public function __isset($name)
     {
@@ -107,22 +109,42 @@ class PicoGenericObject extends stdClass
     }
 
     /**
-     * Unset property value
+     * Unset a property value.
      *
-     * @param string $name Property name
-     * @return void
+     * @param string $name Name of the property.
+     * @return self
      */
     public function __unset($name)
     {
         unset($this->$name);
+        return $this;
     }
 
     /**
-     * Magic method called when user call any undefined method
+     * Magic method called when invoking undefined methods.
      *
-     * @param string $method Method
-     * @param string $params Parameters
-     * @return mixed|null
+     * This method handles dynamic method calls for property management.
+     *
+     * Supported methods:
+     * 
+     * - `isset<PropertyName>`: Checks if the property is set.
+     *   - Example: `$obj->issetFoo()` returns true if property `foo` is set.
+     * 
+     * - `is<PropertyName>`: Checks if the property is set and equals 1 (truthy).
+     *   - Example: `$obj->isFoo()` returns true if property `foo` is set and is equal to 1.
+     * 
+     * - `get<PropertyName>`: Retrieves the value of the property.
+     *   - Example: `$value = $obj->getFoo()` gets the value of property `foo`.
+     * 
+     * - `set<PropertyName>`: Sets the value of the property.
+     *   - Example: `$obj->setFoo($value)` sets the property `foo` to `$value`.
+     * 
+     * - `unset<PropertyName>`: Unsets the property.
+     *   - Example: `$obj->unsetFoo()` removes the property `foo`.
+     *
+     * @param string $method Method name.
+     * @param array $params Parameters for the method.
+     * @return mixed|null The result of the method call or null if not applicable.
      */
     public function __call($method, $params) //NOSONAR
     {

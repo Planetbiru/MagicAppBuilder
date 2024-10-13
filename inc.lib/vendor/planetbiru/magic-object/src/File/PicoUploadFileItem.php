@@ -6,117 +6,117 @@ use MagicObject\Exceptions\FileNotFoundException;
 use MagicObject\Exceptions\InvalidParameterException;
 
 /**
- * Upload file item
+ * Class representing an uploaded file item.
+ *
+ * This class manages the information of an uploaded file and provides methods
+ * to interact with the file, such as copying or moving it to a destination path.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoUploadFileItem
 {
     /**
-     * Variable to store uploade file information
+     * Array to store uploaded file information.
      *
      * @var array
      */
     private $value = array();
     
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param array $file Files
+     * Initializes the PicoUploadFileItem with file data.
+     *
+     * @param array $file An associative array containing file upload information.
+     * @throws InvalidParameterException if the provided file data is invalid.
      */
     public function __construct($file)
     {
-        if(!isset($file) || !is_array($file) || empty($file))
-        {
-            throw new InvalidParameterException("Invalid constructor");
+        if (!isset($file) || !is_array($file) || empty($file)) {
+            throw new InvalidParameterException("Invalid constructor: file data must be a non-empty array.");
         }
         $this->value = $file;
     }
     
     /**
-     * Copy file to destination path
+     * Copies the uploaded file to a specified destination path.
      *
-     * @param string $path Target path
-     * @return boolean
-     * @throws FileNotFoundException
+     * @param string $path The target path where the file will be copied.
+     * @return boolean True on success; otherwise, false.
+     * @throws FileNotFoundException if the temporary file is not found.
      */
     public function copyTo($path)
     {
-        if(isset($this->value['tmp_name']))
-        {
+        if (isset($this->value['tmp_name'])) {
             return copy($this->value['tmp_name'], $path);
-        }
-        else
-        {
-            throw new FileNotFoundException("Temporary file not found");
+        } else {
+            throw new FileNotFoundException("Temporary file not found.");
         }
     }
     
     /**
-     * Move uploaded file to destination path
+     * Moves the uploaded file to a specified destination path.
      *
-     * @param string $path Target path
-     * @return boolean
-     * @throws FileNotFoundException
+     * @param string $path The target path where the file will be moved.
+     * @return boolean True on success; otherwise, false.
+     * @throws FileNotFoundException if the temporary file is not found.
      */
     public function moveTo($path)
     {
-        if(isset($this->value['tmp_name']))
-        {
+        if (isset($this->value['tmp_name'])) {
             return move_uploaded_file($this->value['tmp_name'], $path);
-        }
-        else
-        {
-            throw new FileNotFoundException("Temporary file not found");
+        } else {
+            throw new FileNotFoundException("Temporary file not found.");
         }
     }
     
     /**
-     * Get temporary name
+     * Gets the temporary file name.
      *
-     * @return string
+     * @return string|null The temporary file name or null if not set.
      */
     public function getTmpName()
     {
-        return !isset($this->value['tmp_name']) ? null : $this->value['tmp_name'];
+        return isset($this->value['tmp_name']) ? $this->value['tmp_name'] : null;
     }
     
     /**
-     * Get file name
+     * Gets the original file name.
      *
-     * @return string
+     * @return string|null The original file name or null if not set.
      */
     public function getName()
     {
-        return !isset($this->value['name']) ? null : $this->value['name'];
+        return isset($this->value['name']) ? $this->value['name'] : null;
     }
     
     /**
-     * Get error
+     * Gets the error associated with the file upload.
      *
-     * @return mixed
+     * @return mixed The error code or null if not set.
      */
     public function getError()
     {
-        return !isset($this->value['error']) ? null : $this->value['error'];
+        return isset($this->value['error']) ? $this->value['error'] : null;
     }
     
     /**
-     * Get file size
+     * Gets the size of the uploaded file.
      *
-     * @return integer
+     * @return int The file size in bytes; returns 0 if not set.
      */
     public function getSize()
     {
-        return !isset($this->value['size']) ? 0 : $this->value['size'];
+        return isset($this->value['size']) ? $this->value['size'] : 0;
     }
     
     /**
-     * Get file type
+     * Gets the MIME type of the uploaded file.
      *
-     * @return string
+     * @return string|null The MIME type or null if not set.
      */
     public function getType()
     {
-        return !isset($this->value['type']) ? null : $this->value['type'];
+        return isset($this->value['type']) ? $this->value['type'] : null;
     }
 }

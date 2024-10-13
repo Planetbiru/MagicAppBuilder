@@ -3,7 +3,10 @@
 namespace MagicObject\Constants;
 
 /**
- * MIME
+ * Class PicoMime
+ *
+ * This class contains constants representing various MIME types.
+ * 
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoMime

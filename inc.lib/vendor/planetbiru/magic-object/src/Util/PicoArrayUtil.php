@@ -5,31 +5,31 @@ namespace MagicObject\Util;
 use stdClass;
 
 /**
- * Array util
+ * Class PicoArrayUtil
+ *
+ * Utility class for array operations, including key transformations between camelCase and snake_case.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoArrayUtil
 {
     private function __construct()
     {
-        // prevent object construction from outside the class
+        // Prevent object construction from outside the class
     }
-    
+
     /**
-     * Camelize array keys
+     * Converts array or object keys to camelCase.
      *
-     * @param array|object|stdClass $array Array contains data to be processed
-     * @return array
+     * @param array|object|stdClass $input Array or object containing data to be processed.
+     * @return array Processed array with camelCase keys.
      */
     public static function camelize($input)
     {
-        if(is_array($input))
-        {
+        if (is_array($input)) {
             self::_camelize($input);
             return $input;
-        }
-        else
-        {
+        } else {
             $array = json_decode(json_encode($input), true);
             self::_camelize($array);
             return $array;
@@ -37,20 +37,17 @@ class PicoArrayUtil
     }
 
     /**
-     * Snakeize array keys
+     * Converts array or object keys to snake_case.
      *
-     * @param array|object|stdClass $array Array contains data to be processed
-     * @return array
+     * @param array|object|stdClass $input Array or object containing data to be processed.
+     * @return array Processed array with snake_case keys.
      */
     public static function snakeize($input)
     {
-        if(is_array($input))
-        {
+        if (is_array($input)) {
             self::_snakeize($input);
             return $input;
-        }
-        else
-        {
+        } else {
             $array = json_decode(json_encode($input), true);
             self::_snakeize($array);
             return $array;
@@ -58,67 +55,59 @@ class PicoArrayUtil
     }
 
     /**
-     * Camelize array keys
+     * Recursively converts array keys to camelCase.
      *
-     * @param array $array Array contains data to be processed
+     * @param array &$array Array containing data to be processed by reference.
      * @return array|null
      */
     private static function _camelize(&$array) //NOSONAR
     {
-        foreach (array_keys($array) as $key)
-        {
-            # Working with references here to avoid copying the value,
-            # since you said your data is quite large.
+        foreach (array_keys($array) as $key) {
+            // Working with references to avoid copying the value.
             $value = &$array[$key];
             unset($array[$key]);
-            # This is what you actually want to do with your keys:
-            #  - remove exclamation marks at the front
-            #  - camelCase to snake_case
-            # $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
 
+            // Transform key to camelCase
             $transformedKey = PicoStringUtil::camelize(str_replace("-", "_", $key));
 
-            # Work recursively
-            if (is_array($value))
-            {
+            // Work recursively
+            if (is_array($value)) {
                 self::_camelize($value);
             }
-            # Store with new key
+
+            // Store with new key
             $array[$transformedKey] = $value;
-            # Do not forget to unset references!
+
+            // Unset reference
             unset($value);
         }
     }
 
     /**
-     * Snakeize array keys
+     * Recursively converts array keys to snake_case.
      *
-     * @param array $array Array contains data to be processed
+     * @param array &$array Array containing data to be processed by reference.
      * @return array|null
      */
     private static function _snakeize(&$array) //NOSONAR
     {
-        foreach (array_keys($array) as $key)
-        {
-            # Working with references here to avoid copying the value,
-            # since you said your data is quite large.
+        foreach (array_keys($array) as $key) {
+            // Working with references to avoid copying the value.
             $value = &$array[$key];
             unset($array[$key]);
-            # This is what you actually want to do with your keys:
-            #  - remove exclamation marks at the front
-            #  - camelCase to snake_case
-            # $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
 
+            // Transform key to snake_case
             $transformedKey = PicoStringUtil::snakeize($key);
 
-            # Work recursively
-            if (is_array($value))
-            {
+            // Work recursively
+            if (is_array($value)) {
                 self::_snakeize($value);
             }
-            # Store with new key
+
+            // Store with new key
             $array[$transformedKey] = $value;
-            # Do not forget to unset references!
+
+            // Unset reference
             unset($value);
         }
     }

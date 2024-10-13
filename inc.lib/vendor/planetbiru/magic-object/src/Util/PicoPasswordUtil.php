@@ -169,7 +169,7 @@ class PicoPasswordUtil{
     /**
      * Get minimum length of the password
      *
-     * @return integer
+     * @return int
      */
     public function getMinLength()
     {
@@ -179,7 +179,7 @@ class PicoPasswordUtil{
     /**
      * Set minimum length of the password
      *
-     * @param integer $minLength Minimum length of the password
+     * @param int $minLength Minimum length of the password
      *
      * @return self
      */
