@@ -4,34 +4,48 @@ namespace AppBuilder\Util\Composer;
 
 use AppBuilder\Exception\ConnectionException;
 use DOMDocument;
+use DOMNamedNodeMap;
 use DOMNodeList;
 use DOMXPath;
 use Exception;
 
+/**
+ * Class ComposerUtil
+ *
+ * Utility class for interacting with Composer packages. 
+ * This class provides methods to retrieve version information for the MagicApp package from Packagist.
+ */
 class ComposerUtil
 {
+    /**
+     * The URL of the MagicApp package on Packagist.
+     *
+     * @var string
+     */
     const PACKAGE_URL = "https://packagist.org/packages/planetbiru/magic-app";
 
     /**
-     * Check if DOMNodeList is valid
+     * Check if a DOMNodeList is valid.
      *
-     * @param DOMNodeList $path
-     * @return boolean
+     * @param DOMNodeList $path The DOMNodeList to check.
+     * @return boolean True if the DOMNodeList is valid, false otherwise.
      */
     public static function isValidDomPath($path)
     {
-        return $path != null && $path->item(0) != null;
+        return $path !== null && $path->item(0) !== null;
     }
 
     /**
-     * Get MagicApp Version List
+     * Get the list of available versions for the MagicApp package.
      *
-     * @return string[]
+     * @return array An array of version information, each containing 'key', 'value', and 'latest' status.
+     * @throws ConnectionException If there is a problem retrieving the package information.
      */
     public static function getMagicAppVersionList()
     {
         $url = self::PACKAGE_URL;
         $html = "";
+
         try 
         {
             $html = @file_get_contents($url);
@@ -46,20 +60,21 @@ class ComposerUtil
             $versionPath = new DOMXPath($doc);
             $versionList = $versionPath->query("//*[contains(@class, 'versions')]/ul");
             $versions = array();
-            if(self::isValidDomPath($versionList))
+
+            if (self::isValidDomPath($versionList)) 
             {
-                foreach($versionList->item(0)->childNodes as $child)
+                foreach ($versionList->item(0)->childNodes as $child) 
                 {
-                    if(isset($child))
+                    if (isset($child)) 
                     {
                         $attributes = $child->attributes;
                         $version = trim($child->textContent);
-                        if(!empty($version) && stripos($version, 'dev-') === false)
+                        if (!empty($version) && stripos($version, 'dev-') === false) 
                         {
                             $versions[] = array(
-                                "key"=>$version, 
-                                "value"=>$version,
-                                "latest"=>self::hasClass($attributes, "open")
+                                "key" => $version, 
+                                "value" => $version,
+                                "latest" => self::hasClass($attributes, "open")
                             );
                         }
                     }
@@ -71,18 +86,24 @@ class ComposerUtil
         {
             throw new ConnectionException("Failed to retrieve content from URL: $url");
         }
-
     }
     
+    /**
+     * Check if a specific class is present in the DOMNode's attributes.
+     *
+     * @param Countable<DOMNamedNodeMap> $attributes The attributes of the DOMNode.
+     * @param string $className The class name to check for.
+     * @return boolean True if the class is present, false otherwise.
+     */
     public static function hasClass($attributes, $className)
     {
-        for($i = 0; $i < $attributes->length; $i++)
+        for ($i = 0; $i < $attributes->length; $i++) 
         {
-            if($attributes->item($i)->name == "class")
+            if ($attributes->item($i)->name === "class") 
             {
                 $classes = $attributes->item($i)->value;
                 $arr = explode(" ", $classes);
-                if(in_array($className, $arr))
+                if (in_array($className, $arr)) 
                 {
                     return true;
                 }
