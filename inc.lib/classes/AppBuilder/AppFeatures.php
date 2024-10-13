@@ -10,83 +10,86 @@ class AppFeatures
     const AFTER_DATA = 'after-data';
     
     /**
-     * Activate/deactivate
+     * Activate/deactivate feature
      *
-     * @var boolean
+     * @var bool
      */
     private $activateDeactivate = false;
-    
+
     /**
-     * Sort order
+     * Sort order feature
      *
-     * @var boolean
+     * @var bool
      */
     private $sortOrder = false;
-    
+
     /**
-     * Approval required
+     * Approval required feature
      *
-     * @var boolean
+     * @var bool
      */
     private $approvalRequired = false;
-    
+
     /**
-     * Approval note
+     * Approval note feature
      *
-     * @var boolean
+     * @var bool
      */
     private $approvalNote = false;
-    
+
     /**
-     * Trash required
+     * Trash required feature
      *
-     * @var boolean
+     * @var bool
      */
     private $trashRequired = false;
-    
+
     /**
-     * Approval type
+     * Approval type (1 or 2)
      *
-     * @var integer
+     * @var int
      */
     private $approvalType = 1;
 
     /**
-     * Approval position
+     * Approval position (before or after data)
      *
      * @var string
      */
     private $approvalPosition = '';
-    
+
     /**
-     * Subquery
-     * @var boolean
+     * Subquery feature
+     *
+     * @var bool
      */
     private $subquery = false;
 
     /**
-     * Export to Excel
-     * @var boolean
+     * Export to Excel feature
+     *
+     * @var bool
      */
     private $exportToExcel = false;
 
     /**
-     * Export to CSV
-     * @var boolean
+     * Export to CSV feature
+     *
+     * @var bool
      */
     private $exportToCsv = false;
-    
+
     /**
-     * Export use temporary
+     * Use temporary for export feature
      *
-     * @var boolean
+     * @var bool
      */
     private $exportUseTemporary = false;
-    
+
     /**
      * Constructor
      *
-     * @param MagicObject $features
+     * @param MagicObject $features An object containing feature settings.
      */
     public function __construct($features)
     {
@@ -107,11 +110,10 @@ class AppFeatures
     }
     
     /**
-     * Check if value is true
+     * Check if the provided value represents true.
      *
-     * @param mixed $value
-     * 
-     * @return boolean
+     * @param mixed $value The value to check.
+     * @return bool Returns true if the value is equivalent to true.
      */
     private function isTrue($value)
     {
@@ -119,39 +121,39 @@ class AppFeatures
     }
 
     /**
-     * Get the value of activateDeactivate
-     * 
-     * @return boolean
-     */ 
+     * Get the status of the activate/deactivate feature.
+     *
+     * @return bool Returns true if the feature is activated.
+     */
     public function isActivateDeactivate()
     {
         return $this->activateDeactivate == 1;
     }
 
     /**
-     * Get the value of sortOrder
-     * 
-     * @return boolean
-     */ 
+     * Get the status of the sort order feature.
+     *
+     * @return bool Returns true if sort order is enabled.
+     */
     public function isSortOrder()
     {
         return $this->sortOrder == 1;
     }
 
     /**
-     * Get the value of approvalRequired
-     * 
-     * @return boolean
-     */ 
+     * Get the status of the approval required feature.
+     *
+     * @return bool Returns true if approval is required.
+     */
     public function isApprovalRequired()
     {
         return $this->approvalRequired == 1;
     }
 
     /**
-     * Get the value of approvalNote
-     * 
-     * @return boolean
+     * Get the status of the approval note feature.
+     *
+     * @return bool Returns true if approval note is enabled.
      */ 
     public function isApprovalNote()
     {
@@ -159,50 +161,51 @@ class AppFeatures
     }
 
     /**
-     * Get the value of trashRequired
-     * 
-     * @return boolean
-     */ 
+     * Get the status of the trash required feature.
+     *
+     * @return bool Returns true if trash is required.
+     */
     public function isTrashRequired()
     {
         return $this->trashRequired == 1;
     }
 
     /**
-     * Get approval position
+     * Get the approval position.
      *
-     * @return  string
-     */ 
+     * @return string Returns the approval position.
+     */
     public function getApprovalPosition()
     {
         return $this->approvalPosition;
     }
 
     /**
-     * Get the value of subquery
-     */ 
+     * Get the status of the subquery feature.
+     *
+     * @return bool Returns true if subquery is enabled.
+     */
     public function getSubquery()
     {
         return $this->subquery == 1;
     }
 
     /**
-     * Get approval type
+     * Get the approval type.
      *
-     * @return  integer
-     */ 
+     * @return int Returns the approval type (1 or 2).
+     */
     public function getApprovalType()
     {
         return $this->approvalType;
     }
 
     /**
-     * Set approval type
+     * Set the approval type.
      *
-     * @param  integer $approvalType Approval type
-     *
-     * @return  self
-     */ 
+     * @param int $approvalType The approval type (1 or 2).
+     * @return self Returns the current instance for method chaining.
+     */
     public function setApprovalType($approvalType)
     {
         $this->approvalType = $approvalType;
@@ -211,22 +214,21 @@ class AppFeatures
     }
 
     /**
-     * Get export to Excel
+     * Get the status of the export to Excel feature.
      *
-     * @return  boolean
-     */ 
+     * @return bool Returns true if export to Excel is enabled.
+     */
     public function isExportToExcel()
     {
         return $this->exportToExcel;
     }
 
     /**
-     * Set export to Excel
+     * Set the export to Excel feature.
      *
-     * @param  boolean $exportToExcel Export to Excel
-     *
-     * @return  self
-     */ 
+     * @param bool $exportToExcel Indicates whether to enable export to Excel.
+     * @return self Returns the current instance for method chaining.
+     */
     public function setExportToExcel($exportToExcel)
     {
         $this->exportToExcel = $exportToExcel;
@@ -235,22 +237,21 @@ class AppFeatures
     }
 
     /**
-     * Get export to CSV
+     * Get the status of the export to CSV feature.
      *
-     * @return  boolean
-     */ 
+     * @return bool Returns true if export to CSV is enabled.
+     */
     public function isExportToCsv()
     {
         return $this->exportToCsv;
     }
 
     /**
-     * Set export to CSV
+     * Set the export to CSV feature.
      *
-     * @param  boolean $exportToCsv Export to CSV
-     *
-     * @return  self
-     */ 
+     * @param bool $exportToCsv Indicates whether to enable export to CSV.
+     * @return self Returns the current instance for method chaining.
+     */
     public function setExportToCsv($exportToCsv)
     {
         $this->exportToCsv = $exportToCsv;
@@ -259,9 +260,9 @@ class AppFeatures
     }
 
     /**
-     * Get export use temporary
+     * Get the status of using temporary export.
      *
-     * @return  boolean
+     * @return bool Returns true if temporary export is used.
      */ 
     public function getExportUseTemporary()
     {
@@ -269,12 +270,11 @@ class AppFeatures
     }
 
     /**
-     * Set export use temporary
+     * Set the use of temporary export.
      *
-     * @param  boolean $exportUseTemporary Export use temporary
-     *
-     * @return  self
-     */ 
+     * @param bool $exportUseTemporary Indicates whether to use temporary export.
+     * @return self Returns the current instance for method chaining.
+     */
     public function setExportUseTemporary($exportUseTemporary)
     {
         $this->exportUseTemporary = $exportUseTemporary;

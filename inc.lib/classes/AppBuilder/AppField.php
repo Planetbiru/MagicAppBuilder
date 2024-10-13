@@ -7,120 +7,123 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 
 class AppField
 {
-
     /**
-     * Field name
+     * The name of the field.
      *
      * @var string
      */
     private $fieldName;
 
     /**
-     * Field label
+     * The label for the field, used for display purposes.
      *
      * @var string
      */
     private $fieldLabel;
 
     /**
-     * Include insert
+     * Indicates whether the field should be included in insert operations.
      *
-     * @var boolean
+     * @var bool
      */
     private $includeInsert;
 
     /**
-     * Include edit
+     * Indicates whether the field should be included in edit operations.
      *
-     * @var boolean
+     * @var bool
      */
     private $includeEdit;
 
     /**
-     * Include detail
+     * Indicates whether the field should be included in detail views.
      *
-     * @var boolean
+     * @var bool
      */
     private $includeDetail;
 
     /**
-     * Include list
+     * Indicates whether the field should be included in list views.
      *
-     * @var boolean
+     * @var bool
      */
     private $includeList;
 
     /**
-     * Include export
+     * Indicates whether the field should be included in export operations.
      *
-     * @var boolean
+     * @var bool
      */
     private $includeExport;
 
     /**
-     * Key
+     * Indicates if this field is a key field (e.g., primary key).
      *
-     * @var boolean
+     * @var bool
      */
     private $key;
 
     /**
-     * Required
+     * Indicates whether this field is required for input.
      *
-     * @var boolean
+     * @var bool
      */
     private $required;
 
     /**
-     * Element type
+     * The type of element associated with this field (e.g., text, number).
      *
      * @var string
      */
     private $elementType;
 
     /**
-     * Filter element type
+     * The type of element to use for filtering data associated with this field.
      *
      * @var string
      */
     private $filterElementType;
 
     /**
-     * Data type
+     * The data type of the field (e.g., string, integer).
      *
      * @var string
      */
     private $dataType;
 
     /**
-     * Input filter
+     * A filter applied to the input data for this field.
      *
      * @var string
      */
     private $inputFilter;
-    
+
     /**
-     * Reference data
+     * Data associated with this field from a reference (e.g., lookup data).
      *
      * @var MagicObject
      */
-    private $referenceData = array();
-
+    private $referenceData;
 
     /**
-     * Reference filter
+     * Filters to be applied to reference data.
      *
      * @var MagicObject
      */
-    private $referenceFilter = array();
+    private $referenceFilter;
 
     /**
-     * Additional output
+     * Additional output data associated with this field, which may be used in various contexts.
      *
      * @var array
      */
-    private $additionalOutput = array();
+    private $additionalOutput;
 
+    /**
+     * Constructor that initializes the AppField object based on the provided MagicObject.
+     *
+     * @param MagicObject $value A MagicObject containing field properties to initialize the instance.
+     */
     public function __construct($value)
     {
         $this->fieldName = $value->getFieldName();
@@ -132,220 +135,217 @@ class AppField
         $this->includeExport = $this->isTrue($value->getIncludeExport());
         $this->key = $this->isTrue($value->getIsKey());
         $this->required = $this->isTrue($value->getIsInputRequired());
-        $this->elementType = $value->getelementType();
-        $this->dataType = $value->getdataType();
+        $this->elementType = $value->getElementType();
+        $this->dataType = $value->getDataType();
         $this->filterElementType = $value->getFilterElementType();
         $this->inputFilter = $value->getInputFilter();
-        $this->referenceData = PicoObjectParser::parseJsonRecursive($value->getreferenceData());
-        $this->referenceFilter = PicoObjectParser::parseJsonRecursive($value->getreferenceFilter());
+        $this->referenceData = PicoObjectParser::parseJsonRecursive($value->getReferenceData());
+        $this->referenceFilter = PicoObjectParser::parseJsonRecursive($value->getReferenceFilter());
         $this->additionalOutput = $value->getAdditionalOutput();
     }
 
     /**
-     * Get nonupdateable columns
+     * Retrieves non-updateable columns for the specified entity.
      *
-     * @param EntityInfo $entityInfo
-     * @return string[]
+     * This method provides a list of fields that cannot be updated after creation, 
+     * often for auditing purposes (e.g., timestamps, admin info).
+     *
+     * @param EntityInfo $entityInfo An EntityInfo instance containing metadata about the entity.
+     * @return string[] An array of column names that are non-updateable.
      */
-    public static function getNonupdatetableColumns($entityInfo)
+    public static function getNonupdatableColumns($entityInfo)
     {
-        $columns = array();
-        $columns[] = $entityInfo->getTimeCreate();
-        $columns[] = $entityInfo->getAdminCreate();
-        $columns[] = $entityInfo->getIpCreate();
-        return $columns;
+        return [
+            $entityInfo->getTimeCreate(),
+            $entityInfo->getAdminCreate(),
+            $entityInfo->getIpCreate()
+        ];
     }
 
     /**
-     * Check if value is true
+     * Determines if a given value represents a "true" state.
      *
-     * @param mixed $value
-     * @return boolean
+     * This method checks various representations of true (like '1', true, etc.) 
+     * and returns a boolean result.
+     *
+     * @param mixed $value The value to check for truthiness.
+     * @return bool Returns true if the value is considered true, otherwise false.
      */
     private function isTrue($value)
     {
-        if(is_string($value))
-        {
-            $val = $value == '1' || strtolower($value) == 'true';
-        }
-        else
-        {
-            $val = $value === 1 || $value === true;
-        }
-        return $val;
+        return (is_string($value) && ($value == '1' || strtolower($value) == 'true')) || 
+               ($value === 1 || $value === true);
     }
 
     /**
-     * Get field name
+     * Retrieves the name of the field.
      *
-     * @return  string
-     */ 
+     * @return string The name of the field.
+     */
     public function getFieldName()
     {
         return $this->fieldName;
     }
 
     /**
-     * Get field label
+     * Retrieves the label for the field.
      *
-     * @return  string
-     */ 
+     * @return string The field label, suitable for display to users.
+     */
     public function getFieldLabel()
     {
         return $this->fieldLabel;
     }
 
     /**
-     * Get include insert
+     * Checks if the field should be included in insert operations.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is included in insert operations, otherwise false.
+     */
     public function getIncludeInsert()
     {
         return $this->includeInsert;
     }
 
     /**
-     * Get include edit
+     * Checks if the field should be included in edit operations.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is included in edit operations, otherwise false.
+     */
     public function getIncludeEdit()
     {
         return $this->includeEdit;
     }
 
     /**
-     * Get include detail
+     * Checks if the field should be included in detail views.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is included in detail views, otherwise false.
+     */
     public function getIncludeDetail()
     {
         return $this->includeDetail;
     }
 
     /**
-     * Get include list
+     * Checks if the field should be included in list views.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is included in list views, otherwise false.
+     */
     public function getIncludeList()
     {
         return $this->includeList;
     }
 
     /**
-     * Get key
+     * Checks if this field is a key field.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if this field is a key field, otherwise false.
+     */
     public function getKey()
     {
         return $this->key;
     }
 
     /**
-     * Get required
+     * Checks if the field is required for input.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is required, otherwise false.
+     */
     public function getRequired()
     {
         return $this->required;
     }
 
     /**
-     * Get element type
+     * Retrieves the type of element associated with this field.
      *
-     * @return  string
-     */ 
+     * @return string The element type (e.g., text, number).
+     */
     public function getElementType()
     {
         return $this->elementType;
     }
 
     /**
-     * Get filter element type
+     * Retrieves the filter element type used for filtering data related to this field.
      *
-     * @return  string
-     */ 
+     * @return string The filter element type.
+     */
     public function getFilterElementType()
     {
         return $this->filterElementType;
     }
 
     /**
-     * Get data type
+     * Retrieves the data type of the field.
      *
-     * @return  string
-     */ 
+     * @return string The data type (e.g., string, integer).
+     */
     public function getDataType()
     {
         return $this->dataType;
     }
 
     /**
-     * Get input filter
+     * Retrieves the input filter applied to this field's data.
      *
-     * @return  string
-     */ 
+     * @return string The input filter.
+     */
     public function getInputFilter()
     {
         return $this->inputFilter;
     }
 
     /**
-     * Get reference data
+     * Retrieves the reference data associated with this field.
      *
-     * @return MagicObject
-     */ 
+     * @return MagicObject The reference data for lookups or related fields.
+     */
     public function getReferenceData()
     {
         return $this->referenceData;
     }
 
     /**
-     * Get reference filter
+     * Retrieves the reference filter applied to the reference data.
      *
-     * @return MagicObject
-     */ 
+     * @return MagicObject The filter applied to reference data.
+     */
     public function getReferenceFilter()
     {
         return $this->referenceFilter;
     }
 
     /**
-     * Get additional output
+     * Retrieves any additional output data associated with this field.
      *
-     * @return  array
-     */ 
+     * @return array Additional output data, used for various purposes.
+     */
     public function getAdditionalOutput()
     {
         return $this->additionalOutput;
     }
 
     /**
-     * Get include export
+     * Checks if the field should be included in export operations.
      *
-     * @return  boolean
-     */ 
+     * @return bool True if the field is included in export operations, otherwise false.
+     */
     public function getIncludeExport()
     {
         return $this->includeExport;
     }
 
     /**
-     * Set include export
+     * Sets whether the field should be included in export operations.
      *
-     * @param  boolean  $includeExport  Include export
-     *
-     * @return  self
-     */ 
+     * @param bool $includeExport Indicates if the field should be included in exports.
+     * @return self Returns the current instance for method chaining.
+     */
     public function setIncludeExport($includeExport)
     {
         $this->includeExport = $includeExport;
-
         return $this;
     }
 }

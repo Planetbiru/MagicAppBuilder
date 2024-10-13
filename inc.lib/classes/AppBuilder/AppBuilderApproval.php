@@ -9,13 +9,13 @@ use MagicObject\Util\PicoStringUtil;
 class AppBuilderApproval extends AppBuilderBase
 {
     /**
-     * Create INSERT section without approval and trash
+     * Create INSERT section with approval and trash.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be inserted.
+     * @param AppField[] $appFields The fields to set for the entity.
+     * @param bool $approvalRequired Indicates if approval is required.
+     * @param MagicObject $approvalEntity The entity related to approval.
+     * @return string The generated code for the insert approval section.
      */
     public function createInsertApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity)
     {
@@ -85,13 +85,13 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section without approval and trash
+     * Create UPDATE section with approval and trash.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be updated.
+     * @param AppField[] $appFields The fields to set for the entity.
+     * @param bool $approvalRequired Indicates if approval is required.
+     * @param MagicObject $approvalEntity The entity related to approval.
+     * @return string The generated code for the update approval section.
      */
     public function createUpdateApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity)    
     {
@@ -159,13 +159,14 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section without approval and trash
+     * Create UPDATE section with approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param string $entityName
-     * @param string $pkName
-     * @param mixed $pkValue
-     * @return string
+     * @param string $entityName The name of the entity to be deleted.
+     * @param string $pkName The primary key name of the entity.
+     * @param mixed $userAction The user action type (e.g., delete).
+     * @param string $waitingForKey The key for the waiting state.
+     * @param mixed $waitingForValue The value for the waiting state.
+     * @return string The generated code for the delete approval section.
      */
     public function createDeleteApprovalSectionBase($entityName, $pkName, $userAction, $waitingForKey, $waitingForFalue)
     {
@@ -191,10 +192,10 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create delete approval section
+     * Create delete approval section.
      *
-     * @param MagicObject $entityName
-     * @return string
+     * @param MagicObject $mainEntity The main entity for which the delete approval section is created.
+     * @return string The generated delete approval section code.
      */
     public function createDeleteApprovalSection($mainEntity)
     {
@@ -206,14 +207,13 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create ACTIVATION section without approval and trash
+     * Create a waiting for section based on the specified parameters.
      *
-     * @param AppField[] $appFields
-     * @param string $entityName
-     * @param string $pkName
-     * @param string $userAction
-     * @param boolean $waitingForValue
-     * @return string
+     * @param string $entityName Name of the entity.
+     * @param string $pkName Primary key name of the entity.
+     * @param string $userAction User action type (e.g., DELETE, UPDATE).
+     * @param mixed $waitingForValue Value indicating the waiting state.
+     * @return string The generated code for the waiting for section.
      */
     public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue)
     {
@@ -280,14 +280,10 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create ACTIVATION section without approval and trash
+     * Create an activation approval section.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param string $pkName
-     * @param string $activationKey
-     * @param boolean $activationValue
-     * @return string
+     * @param MagicObject $mainEntity The main entity for activation.
+     * @return string The generated code for the activation approval section.
      */
     public function createActivationApprovalSection($mainEntity)
     {
@@ -299,13 +295,10 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create DEACTIVATION section without approval and trash
+     * Create a deactivation approval section.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param string $activationKey
-     * @param boolean $activationValue
-     * @return string
+     * @param MagicObject $mainEntity The main entity for deactivation.
+     * @return string The generated code for the deactivation approval section.
      */
     public function createDeactivationApprovalSection($mainEntity)
     {
@@ -317,15 +310,15 @@ class AppBuilderApproval extends AppBuilderBase
     }
 
     /**
-     * Undocumented function
+     * Create an approval section for the specified entity.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $editFields
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @param boolean $trashRequired
-     * @param MagicObject $trashEntity
-     * @return string
+     * @param MagicObject $mainEntity The main entity for approval.
+     * @param AppField[] $editFields The fields to edit.
+     * @param boolean $approvalRequired Whether approval is required.
+     * @param MagicObject $approvalEntity The entity that holds approval information.
+     * @param boolean $trashRequired Whether trash functionality is required.
+     * @param MagicObject $trashEntity The entity used for trash operations.
+     * @return string The generated approval section code.
      */
     public function createApprovalSection($mainEntity, $editFields, $approvalRequired, $approvalEntity, $trashRequired, $trashEntity)
     {
@@ -474,12 +467,12 @@ class AppBuilderApproval extends AppBuilderBase
 
     
     /**
-     * Undocumented function
+     * Create a rejection section for the specified entity.
      *
-     * @param MagicObject $mainEntity
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * @param MagicObject $mainEntity The main entity for rejection.
+     * @param boolean $approvalRequired Whether approval is required.
+     * @param MagicObject $approvalEntity The entity that holds approval information.
+     * @return string The generated rejection section code.
      */
     public function createRejectionSection($mainEntity, $approvalRequired, $approvalEntity)
     {
@@ -545,6 +538,16 @@ class AppBuilderApproval extends AppBuilderBase
         return implode(parent::NEW_LINE, $lines);
     }
 
+    /**
+     * Construct the approval logic for an entity.
+     *
+     * @param string $objectName The name of the object to be approved.
+     * @param string $entityInfoName The name of the entity info.
+     * @param string $entityApvInfoName The name of the approval entity.
+     * @param boolean $trashRequired Indicates if trash handling is required.
+     * @param MagicObject|null $trashEntity The trash entity, if applicable.
+     * @return string The generated approval construction code.
+     */
     protected function constructApproval($objectName, $entityInfoName, $entityApvInfoName, $trashRequired = false, $trashEntity = null)
     {
         $result = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval = new PicoApproval(".parent::NEW_LINE 

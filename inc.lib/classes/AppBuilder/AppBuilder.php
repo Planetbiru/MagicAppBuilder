@@ -9,11 +9,13 @@ use MagicObject\Util\PicoStringUtil;
 class AppBuilder extends AppBuilderBase
 {
     /**
-     * Create INSERT section without approval and trash
+     * Create INSERT section without approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @return string
+     * This method generates code for inserting a new entity based on the provided fields and main entity.
+     *
+     * @param MagicObject $mainEntity The main entity to be inserted.
+     * @param AppField[] $appFields The fields to be included in the insert operation.
+     * @return string The generated code for the insert section.
      */
     public function createInsertSection($mainEntity, $appFields)
     {
@@ -67,11 +69,13 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section without approval and trash
+     * Create UPDATE section without approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @return string
+     * This method generates code for updating an existing entity based on the provided fields and main entity.
+     *
+     * @param MagicObject $mainEntity The main entity to be updated.
+     * @param AppField[] $appFields The fields to be included in the update operation.
+     * @return string The generated code for the update section.
      */
     public function createUpdateSection($mainEntity, $appFields)
     {
@@ -145,12 +149,12 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section without approval and trash
+     * Create DELETE section without approval and trash.
      *
-     * @param MagicObject $mainEntity
-     * @param mixed $withTrash
-     * @param MagicObject $trashEntity
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be deleted.
+     * @param bool $withTrash Indicates if the deletion is soft (to trash).
+     * @param MagicObject|null $trashEntity The trash entity if using soft delete.
+     * @return string The generated code for the delete section.
      */
     public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null)
     {
@@ -208,13 +212,13 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create ACTIVATION section without approval and trash
+     * Create ACTIVATION section without approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param string $activationKey
-     * @param boolean $activationValue
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be activated.
+     * @param string $activationKey The key used for activation.
+     * @param string $userAction The user action for activation.
+     * @param bool $activationValue The value indicating activation status.
+     * @return string The generated code for the activation section.
      */
     public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue)
     {
@@ -258,9 +262,6 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).")";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).")";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).")";
-
-
-        
         
         if($activationValue)
         {
@@ -286,13 +287,11 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create ACTIVATION section without approval and trash
+     * Create ACTIVATION section without approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param string $activationKey
-     * @param boolean $activationValue
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be activated.
+     * @param string $activationKey The key used for activation.
+     * @return string The generated code for the activation section.
      */
     public function createActivationSection($mainEntity, $activationKey)
     {
@@ -300,13 +299,11 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create DEACTIVATION section without approval and trash
+     * Create DEACTIVATION section without approval and trash.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param string $activationKey
-     * @param boolean $activationValue
-     * @return string
+     * @param MagicObject $mainEntity The main entity to be deactivated.
+     * @param string $activationKey The key used for deactivation.
+     * @return string The generated code for the deactivation section.
      */
     public function createDeactivationSection($mainEntity, $activationKey)
     {
