@@ -135,7 +135,7 @@ jQuery(function(){
         }
       });
     }
-    if (value != "") {
+    if (value.length > 20) {
       let obj = parseJsonData(value);
       if (typeof obj != 'object') {
         obj = {};
@@ -169,7 +169,7 @@ jQuery(function(){
         }
       });
     }
-    if (value != "") {
+    if (value.length > 20) {
       let obj = parseJsonData(value);
       if (typeof obj != 'object') {
         obj = {};
