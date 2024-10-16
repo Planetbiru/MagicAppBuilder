@@ -982,14 +982,14 @@ class PicoDatabasePersistence // NOSONAR
     {
         if(strcasecmp($strategy, "GenerationType.UUID") == 0)
         {
-            $generatedValue = $this->database->generateNewId();
-            $this->object->set($prop, $generatedValue);
-            if($firstCall)
+            if($firstCall && ($this->object->get($prop) == null || $this->object->get($prop) == "") && !$this->generatedValue)
             {
+                $generatedValue = $this->database->generateNewId();
+                $this->object->set($prop, $generatedValue);
                 $this->generatedValue = true;
             }
         }
-        if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
+        else if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
         {
             if($firstCall)
             {
@@ -1119,13 +1119,14 @@ class PicoDatabasePersistence // NOSONAR
         
         if($info->getAutoIncrementKeys() != null)
         {
-            foreach($info->getAutoIncrementKeys() as $name=>$col)
+            foreach($info->getAutoIncrementKeys() as $propertyName=>$col)
             {
-                if(strcasecmp($col[self::KEY_STRATEGY], "GenerationType.UUID") == 0 && !$this->generatedValue)
+                if($this->isRequireGenerateValue($col[self::KEY_STRATEGY], $propertyName))
                 {
                     $value = $this->database->generateNewId();
                     $values[$col[self::KEY_NAME]] = $value;
-                    $this->object->set($name, $value);
+                    $this->object->set($propertyName, $value);
+                    $this->generatedValue = true;
                 }
             }
         }        
@@ -1134,6 +1135,20 @@ class PicoDatabasePersistence // NOSONAR
             throw new NoInsertableColumnException("No insertable column");
         }
         return $fixedValues;
+    }
+    
+    /**
+     * Check if data require a generated value
+     *
+     * @param string $strategy
+     * @param string $propertyName
+     * @return boolean
+     */
+    private function isRequireGenerateValue($strategy, $propertyName)
+    {
+        return strcasecmp($strategy, "GenerationType.UUID") == 0 
+                && ($this->object->get($propertyName) == null || $this->object->get($propertyName) == "") 
+                && !$this->generatedValue;
     }
 
     /**

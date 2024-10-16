@@ -4,6 +4,9 @@ namespace MagicObject\Geometry;
 
 /**
  * Class representing a triangle defined by three Point objects.
+ *
+ * This class represents a triangle in a 2D space using three vertices.
+ * It provides methods to calculate the lengths of the sides and the area using Heron's formula.
  */
 class Triangle {
 

@@ -2,6 +2,8 @@
 
 namespace AppBuilder\Util\Cache;
 
+use MagicObject\Util\File\FileUtil;
+
 /**
  * Class ErrorCacheUtil
  *
@@ -31,6 +33,7 @@ class ErrorCacheUtil
      */
     public static function saveCacheError($path, $ft, $err)
     {
+        $path = FileUtil::fixFilePath($path);
         $dir = dirname($path);
         // Create the directory if it doesn't exist
         if (!file_exists($dir)) {

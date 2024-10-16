@@ -2,6 +2,7 @@
 
 namespace MagicObject;
 
+use DateTime;
 use Exception;
 use PDOException;
 use PDOStatement;
@@ -15,6 +16,7 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
+use MagicObject\DataLabel\PicoDataLabel;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
@@ -27,7 +29,9 @@ use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoEnvironmentVariable;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
+use PDO;
 use ReflectionClass;
+use ReflectionMethod;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
@@ -116,7 +120,6 @@ class MagicObject extends stdClass // NOSONAR
     {
         return $this->_nullProperties;
     }
-
 
     /**
      * Constructor
@@ -599,6 +602,240 @@ class MagicObject extends stdClass // NOSONAR
             throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
+
+    /**
+     * Executes a database query based on the parameters and annotations from the caller function.
+     *
+     * This method uses reflection to retrieve the query string from the caller's docblock,
+     * bind the parameters, and execute the query against the database.
+     *
+     * It analyzes the parameters and return type of the caller function, enabling dynamic query
+     * execution tailored to the specified return type. Supported return types include:
+     * - `void`: Returns null.
+     * - `int` or `integer`: Returns the number of affected rows.
+     * - `object` or `stdClass`: Returns a single result as an object.
+     * - `stdClass[]`: Returns all results as an array of stdClass objects.
+     * - `array`: Returns all results as an associative array.
+     * - `string`: Returns the JSON-encoded results.
+     * - `PDOStatement`: Returns the prepared statement for further operations if needed.
+     * - `MagicObject` and its derived classes: If the return type is a class name or an array of class names,
+     *   instances of that class will be created for each row fetched.
+     *
+     * @return mixed Returns the result based on the return type of the caller function:
+     *               - null if the return type is void.
+     *               - integer for the number of affected rows if the return type is int.
+     *               - object for a single result if the return type is object.
+     *               - an array of associative arrays for multiple results if the return type is array.
+     *               - a JSON string if the return type is string.
+     *               - instances of a specified class if the return type matches a class name.
+     * 
+     * @throws PDOException If there is an error executing the database query.
+     * @throws InvalidQueryInputException If there is no query to be executed on the database query.
+     */
+    protected function executeNativeQuery() //NOSONAR
+    {
+        // Retrieve caller trace information
+        $trace = debug_backtrace();
+
+        // Get parameters from the caller function
+        $callerParamValues = isset($trace[1]['args']) ? $trace[1]['args'] : [];
+        
+        // Get the name of the caller function and class
+        $callerFunctionName = $trace[1]['function'];
+        $callerClassName = $trace[1]['class'];
+
+        // Use reflection to get annotations from the caller function
+        $reflection = new ReflectionMethod($callerClassName, $callerFunctionName);
+        $docComment = $reflection->getDocComment();
+
+        // Get the query from the @query annotation
+        preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
+        $queryString = $matches ? $matches[1] : '';
+        
+        $queryString = trim($queryString, " \r\n\t ");
+        if(empty($queryString))
+        {
+            throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+        }
+
+        // Get parameter information from the caller function
+        $callerParams = $reflection->getParameters();
+
+        // Get return type from the caller function
+        $returnTypeObj = $reflection->getReturnType();
+
+        if($returnTypeObj == null)
+        {
+            // PHP 5
+            preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
+            $returnType = $matches ? $matches[1] : '';
+        }
+        else
+        {
+            // PHP 7 or above
+            $returnType = $returnTypeObj."";
+        }
+        
+        // Trim return type
+        $returnType = trim($returnType);
+        
+        // Change self to callerClassName
+        if($returnType == "self[]")
+        {
+            $returnType = $callerClassName."[]";
+        }
+        else if($returnType == "self")
+        {
+            $returnType = $callerClassName;
+        }
+
+        $params = [];
+
+        try {
+            // Get database connection
+            $pdo = $this->_database->getDatabaseConnection();
+            
+            // Replace array
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(is_array($paramValue))
+                    {
+                        $queryString = str_replace(":".$paramName, PicoDatabaseUtil::toList($paramValue, true, true), $queryString);
+                    }
+                }
+            }
+
+            $stmt = $pdo->prepare($queryString);
+
+            // Automatically bind each parameter
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(!is_array($paramValue))
+                    {
+                        $maped = $this->mapToPdoParamType($paramValue);
+                        $paramType = $maped->type;
+                        $paramValue = $maped->value;
+                        $params[$paramName] = $paramValue;
+                        $stmt->bindValue(":".$paramName, $paramValue, $paramType);
+                    }
+                }
+            }
+            
+            // Send query to logger
+            $debugFunction = $this->_database->getCallbackDebugQuery();
+            if(isset($debugFunction) && is_callable($debugFunction))
+            {
+                call_user_func($debugFunction, PicoDatabaseUtil::getFinalQuery($stmt, $params));
+            }
+
+            // Execute the query
+            $stmt->execute();
+
+            if ($returnType == "void") {
+                // Return null if the return type is void
+                return null;
+            }
+            if ($returnType == "PDOStatement") {
+                // Return the PDOStatement object
+                return $stmt;
+            } else if ($returnType == "int" || $returnType == "integer") {
+                // Return the affected row count
+                return $stmt->rowCount();
+            } else if ($returnType == "object" || $returnType == "stdClass") {
+                // Return one row as an object
+                return $stmt->fetch(PDO::FETCH_OBJ);
+            } else if ($returnType == "array") {
+                // Return all rows as an associative array
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else if ($returnType == "string") {
+                // Return the result as a JSON string
+                return json_encode($stmt->fetchAll(PDO::FETCH_OBJ));
+            } else {
+                try {
+                    // Check for array-type hinting in the return type
+                    if (stripos($returnType, "[") !== false) {
+                        $className = trim(explode("[", $returnType)[0]);
+                        if (class_exists($className)) {
+                            $ret = [];
+                            if ($className == "stdClass") {
+                                // Return all rows as stdClass objects
+                                return $stmt->fetchAll(PDO::FETCH_OBJ);
+                            } else {
+                                // Map result rows to the specified class
+                                $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+                                foreach ($result as $row) {
+                                    $ret[] = new $className($row);
+                                }
+                                return $ret;
+                            }
+                        }
+                    } else {
+                        // Return a single object of the specified class
+                        $className = trim($returnType);
+                        if (class_exists($className)) {
+                            $row = $stmt->fetch(PDO::FETCH_OBJ);
+                            return new $className($row);
+                        }
+                    }
+                } catch (Exception $e) {
+                    // Log the exception if the class is not found
+                    error_log('Class not found: ' . $e->getMessage());
+                    return null;
+                }
+            }            
+        } 
+        catch (PDOException $e) 
+        {
+            // Handle database errors with logging
+            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+        }
+        return null;
+    }
+
+    /**
+     * Maps PHP types to PDO parameter types.
+     *
+     * This function determines the appropriate PDO parameter type based on the given value.
+     * It handles various PHP data types and converts them to the corresponding PDO parameter types
+     * required for executing prepared statements in PDO.
+     *
+     * @param mixed $value The value to determine the type for. This can be of any type, including
+     *                     null, boolean, integer, string, DateTime, or other types.
+     * @return stdClass An object containing:
+     *                  - type: The PDO parameter type (PDO::PARAM_STR, PDO::PARAM_NULL, 
+     *                          PDO::PARAM_BOOL, PDO::PARAM_INT).
+     *                  - value: The corresponding value formatted as needed for the PDO parameter.
+     */
+    private function mapToPdoParamType($value)
+    {
+        $type = PDO::PARAM_STR; // Default type is string
+        $finalValue = $value; // Initialize final value to the original value
+
+        if ($value instanceof DateTime) {
+            $type = PDO::PARAM_STR; // DateTime should be treated as a string
+            $finalValue = $value->format("Y-m-d H:i:s");
+        } else if (is_null($value)) {
+            $type = PDO::PARAM_NULL; // NULL type
+            $finalValue = null; // Set final value to null
+        } else if (is_bool($value)) {
+            $type = PDO::PARAM_BOOL; // Boolean type
+            $finalValue = $value; // Keep the boolean value
+        } else if (is_int($value)) {
+            $type = PDO::PARAM_INT; // Integer type
+            $finalValue = $value; // Keep the integer value
+        }
+
+        // Create and return an object with the type and value
+        $result = new stdClass();
+        $result->type = $type;
+        $result->value = $finalValue;
+        return $result;
+    }
+
 
     /**
      * Insert into the database.
@@ -1923,56 +2160,128 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Magic method called when a user calls any undefined method. The __call method checks the prefix of the called method and calls the appropriate method according to its name and parameters.
-     * hasValue &raquo; Checks if the property has a value. 
-     * isset &raquo; Checks if the property has a value.
-     * is &raquo; Retrieves the property value as a boolean. A number will return true if its value is 1. The string will be converted to a number first. 
-     * equals &raquo; Checks if the property value is equal to the given value. 
-     * get &raquo; Retrieves the property value. 
-     * set &raquo; Sets the property value. 
-     * unset &raquo; Unsets the property value. 
-     * push &raquo; Adds array elements to a property at the end. 
-     * append &raquo; Appends array elements to a property at the end. 
-     * unshift &raquo; Adds array elements to a property at the beginning. 
-     * prepend &raquo; Prepends array elements to a property at the beginning. 
-     * pop &raquo; Removes the last element from the property. 
-     * shift &raquo; Removes the first element from the property. 
-     * findOneBy &raquo; Searches for data in the database and returns one record. This method requires a database connection.
-     * findOneIfExistsBy &raquo; Searches for data in the database by any column values and returns one record. This method requires a database connection.
-     * deleteOneBy &raquo; Deletes data from the database by any column values and returns one record. This method requires a database connection.
-     * findFirstBy &raquo; Searches for data in the database by any column values and returns the first record. This method requires a database connection.
-     * findFirstIfExistsBy &raquo; Searches for data in the database by any column values and returns the first record. This method requires a database connection.
-     * findLastBy &raquo; Searches for data in the database by any column values and returns the last record. This method requires a database connection.
-     * findLastIfExistsBy &raquo; Searches for data in the database by any column values and returns the last record. This method requires a database connection.
-     * findBy &raquo; Searches for multiple records in the database by any column values. This method requires a database connection.
-     * findAscBy &raquo; Searches for multiple records in the database, ordered by primary keys in ascending order. This method requires a database connection.
-     * findDescBy &raquo; Searches for multiple records in the database, ordered by primary keys in descending order. This method requires a database connection.
-     * listBy &raquo; Searches for multiple records in the database. Similar to findBy, but the returned object does not contain a connection to the database, so objects cannot be saved directly to the database. This method requires a database connection.
-     * listAscBy &raquo; Searches for multiple records in the database, ordered by primary keys in ascending order. Similar to findAscBy, but the returned object does not contain a connection to the database, so objects cannot be saved directly to the database. This method requires a database connection.
-     * listDescBy &raquo; Searches for multiple records in the database, ordered by primary keys in descending order. Similar to findDescBy, but the returned object does not contain a connection to the database, so objects cannot be saved directly to the database. This method requires a database connection.
-     * listAllAsc &raquo; Searches for multiple records in the database without filtering, ordered by primary keys in ascending order. Similar to findAllAsc, but the returned object does not contain a connection to the database, so objects cannot be saved directly to the database. This method requires a database connection.
-     * listAllDesc &raquo; Searches for multiple records in the database without filtering, ordered by primary keys in descending order. Similar to findAllDesc, but the returned object does not contain a connection to the database, so objects cannot be saved directly to the database. This method requires a database connection.
-     * countBy &raquo; Counts data from the database.
-     * existsBy &raquo; Checks for data in the database. This method requires a database connection.
-     * deleteBy &raquo; Deletes data from the database without reading it first. This method requires a database connection.
-     * booleanToTextBy &raquo; Converts a boolean value to yes/no or true/false depending on the parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes"; otherwise, it will be "No". 
-     * booleanToSelectedBy &raquo; Creates the attribute selected="selected" for a form. 
-     * booleanToCheckedBy &raquo; Creates the attribute checked="checked" for a form. 
-     * startsWith &raquo; Checks if the value starts with a given string. 
-     * endsWith &raquo; Checks if the value ends with a given string. 
-     * createSelected &raquo; Creates the selected="selected" attribute if the property is true.
-     * createChecked &raquo; Creates the checked="checked" attribute if the property is true.
-     * label &raquo; Retrieves the label of a property defined in the Label annotation.
-     * option &raquo; Takes the first parameter if the property is true and the second parameter if the property is false.
-     * notNull &raquo; Returns true if the property is not null.
-     * notEmpty &raquo; Returns true if the property is not empty.
-     * notZero &raquo; Returns true if the property is not zero.
-     * notEquals &raquo; Returns true if the property is not equal to the one given in the parameter.
+     * Magic method called when a user calls any undefined method. 
+     * The __call method checks the prefix of the called method and 
+     * invokes the appropriate method according to its name and parameters.
+     *
+     * Method Descriptions:
+     *
+     * - **hasValue**: Checks if the property has a value.
+     *   - Example: `$object->hasValuePropertyName();`
+     *
+     * - **isset**: Checks if the property is set.
+     *   - Example: `$object->issetPropertyName();`
+     *
+     * - **is**: Retrieves the property value as a boolean.
+     *   - Example: `$isActive = $object->isActive();`
+     *
+     * - **equals**: Checks if the property value equals the given value.
+     *   - Example: `$isEqual = $object->equalsPropertyName($value);`
+     *
+     * - **get**: Retrieves the property value.
+     *   - Example: `$value = $object->getPropertyName();`
+     *
+     * - **set**: Sets the property value.
+     *   - Example: `$object->setPropertyName($value);`
+     *
+     * - **unset**: Unsets the property value.
+     *   - Example: `$object->unsetPropertyName();`
+     *
+     * - **push**: Adds array elements to a property at the end.
+     *   - Example: `$object->pushPropertyName($newElement);`
+     *
+     * - **append**: Appends array elements to a property at the end.
+     *   - Example: `$object->appendPropertyName($newElement);`
+     *
+     * - **unshift**: Adds array elements to a property at the beginning.
+     *   - Example: `$object->unshiftPropertyName($newElement);`
+     *
+     * - **prepend**: Prepends array elements to a property at the beginning.
+     *   - Example: `$object->prependPropertyName($newElement);`
+     *
+     * - **pop**: Removes the last element from the property.
+     *   - Example: `$removedElement = $object->popPropertyName();`
+     *
+     * - **shift**: Removes the first element from the property.
+     *   - Example: `$removedElement = $object->shiftPropertyName();`
+     *
+     * - **findOneBy**: Searches for data in the database and returns one record.
+     *   - Example: `$record = $object->findOneByPropertyName($value);`
+     *   - *Requires a database connection.*
+     *
+     * - **findOneIfExistsBy**: Searches for data in the database by any column values and returns one record.
+     *   - Example: `$record = $object->findOneIfExistsByPropertyName($value, $sortable);`
+     *   - *Requires a database connection.*
+     *
+     * - **deleteOneBy**: Deletes data from the database by any column values and returns one record.
+     *   - Example: `$deletedRecord = $object->deleteOneByPropertyName($value, $sortable);`
+     *   - *Requires a database connection.*
+     *
+     * - **findFirstBy**: Searches for data in the database by any column values and returns the first record.
+     *   - Example: `$firstRecord = $object->findFirstByColumnName($value);`
+     *   - *Requires a database connection.*
+     *
+     * - **findFirstIfExistsBy**: Similar to `findFirstBy`, but returns the first record if it exists.
+     *   - Example: `$firstRecord = $object->findFirstIfExistsByPropertyName($value, $sortable);`
+     *   - *Requires a database connection.*
+     *
+     * - **findLastBy**: Searches for data in the database by any column values and returns the last record.
+     *   - Example: `$lastRecord = $object->findLastByColumnName($value);`
+     *   - *Requires a database connection.*
+     *
+     * - **findLastIfExistsBy**: Similar to `findLastBy`, but returns the last record if it exists.
+     *   - Example: `$lastRecord = $object->findLastIfExistsByPropertyName($value, $sortable);`
+     *   - *Requires a database connection.*
+     *
+     * - **findBy**: Searches for multiple records in the database by any column values.
+     *   - Example: `$records = $object->findByColumnName($value);`
+     *   - *Requires a database connection.*
+     *
+     * - **countBy**: Counts data from the database.
+     *   - Example: `$count = $object->countByColumnName();`
+     *
+     * - **existsBy**: Checks for data in the database.
+     *   - Example: `$exists = $object->existsByColumn($column);`
+     *   - *Requires a database connection.*
+     *
+     * - **deleteBy**: Deletes data from the database without reading it first.
+     *   - Example: `$object->deleteByPropertyName($value);`
+     *   - *Requires a database connection.*
+     *
+     * - **booleanToTextBy**: Converts a boolean value to "yes/no" or "true/false" based on given parameters.
+     *   - Example: `$result = $object->booleanToTextByActive("Yes", "No");`
+     *   - *If $obj->active is true, $result will be "Yes"; otherwise, it will be "No".*
+     *
+     * - **startsWith**: Checks if the value starts with a given string.
+     *   - Example: `$startsWith = $object->startsWithPropertyName("prefix");`
+     *
+     * - **endsWith**: Checks if the value ends with a given string.
+     *   - Example: `$endsWith = $object->endsWithPropertyName("suffix");`
+     *
+     * - **label**: Retrieves the label associated with the given property.
+     *   - If the label is not set, it attempts to fetch it from annotations.
+     *   - Example: `$label = $object->labelPropertyName();`
+     *
+     * - **option**: Returns the first parameter if the property is set to `true` or equals `1`; otherwise returns the second parameter.
+     *   - Example: `$option = $object->optionPropertyName("Yes", "No");`
+     *
+     * - **notNull**: Checks if the specified property is set (not null).
+     *   - Example: `$isNotNull = $object->notNullPropertyName();`
+     *
+     * - **notEmpty**: Checks if the specified property is set and not empty.
+     *   - Example: `$isNotEmpty = $object->notEmptyPropertyName();`
+     *
+     * - **notZero**: Checks if the specified property is set and not equal to zero.
+     *   - Example: `$isNotZero = $object->notZeroPropertyName();`
+     *
+     * - **notEquals**: Checks if the specified property is set and does not equal the given value.
+     *   - Example: `$isNotEqual = $object->notEqualsPropertyName($value);`
      *
      * @param string $method Method name
-     * @param mixed $params Parameters
-     * @return mixed|null
+     * @param mixed $params Parameters for the method
+     * @return mixed|null The result of the called method, or null if not applicable
      */
+
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "hasValue", 8) === 0) {

@@ -16,7 +16,14 @@ use stdClass;
 
 /**
  * Class DataTable
- * Represents a data table for managing and rendering structured data.
+ * 
+ * Represents a data table for managing and rendering structured data. 
+ * This class supports dynamic loading of data, multi-language support, and 
+ * provides methods for manipulating the table's structure and appearance.
+ *
+ * The DataTable class can be used to create HTML tables dynamically based 
+ * on the provided data, with support for property annotations to manage 
+ * labels and attributes.
  *
  * @link https://github.com/Planetbiru/MagicObject
  */

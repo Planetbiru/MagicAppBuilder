@@ -3,7 +3,12 @@
 namespace MagicObject\Geometry;
 
 /**
- * Class representing a Circle with a center Point and radius.
+ * Class Circle
+ *
+ * Represents a circle defined by a center point and a radius.
+ * This class provides methods to calculate the circle's circumference 
+ * and area, based on its radius. The circle is defined by its center 
+ * coordinates (x, y) and its radius (r).
  */
 class Circle
 {
@@ -57,7 +62,7 @@ class Circle
      */
     public function getCircumference()
     {
-        return 2 * acos(-1) * $this->r;
+        return 2 * pi() * $this->r;
     }
 
     /**
@@ -67,6 +72,6 @@ class Circle
      */
     public function getArea()
     {
-        return acos(-1) * $this->r * $this->r;
+        return pi() * $this->r * $this->r;
     }
 }

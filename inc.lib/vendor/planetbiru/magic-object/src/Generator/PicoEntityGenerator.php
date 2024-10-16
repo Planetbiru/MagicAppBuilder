@@ -253,7 +253,7 @@ class PicoEntityGenerator
     {
         $typeMap = $this->getTypeMap();
         $picoTableName = $this->tableName;
-        $className = $this->entityName ?? ucfirst(PicoStringUtil::camelize($picoTableName));
+        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
         $fileName = $this->baseNamespace . "/" . $className;
         $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);

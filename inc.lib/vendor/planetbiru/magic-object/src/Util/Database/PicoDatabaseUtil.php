@@ -2,9 +2,11 @@
 
 namespace MagicObject\Util\Database;
 
+use DateTime;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
+use PDOStatement;
 
 class PicoDatabaseUtil
 {
@@ -16,9 +18,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get specification from parameters
-     * @param array $params Parameters
-     * @return PicoSpecification|null
+     * Retrieve a PicoSpecification instance from the given parameters.
+     *
+     * @param array $params An array of parameters.
+     * @return PicoSpecification|null Returns the PicoSpecification instance or null if not found.
      */
     public static function specificationFromParams($params)
     {
@@ -36,10 +39,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get pageable from parameters.
+     * Retrieve a PicoPageable instance from the given parameters.
      *
-     * @param array $params Parameters
-     * @return PicoPageable|null
+     * @param array $params An array of parameters.
+     * @return PicoPageable|null Returns the PicoPageable instance or null if not found.
      */
     public static function pageableFromParams($params)
     {
@@ -57,10 +60,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get sortable from parameters.
+     * Retrieve a PicoSortable instance from the given parameters.
      *
-     * @param array $params Parameters
-     * @return PicoSortable|null
+     * @param array $params An array of parameters.
+     * @return PicoSortable|null Returns the PicoSortable instance or null if not found.
      */
     public static function sortableFromParams($params)
     {
@@ -78,10 +81,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Get values from parameters until a PicoPageable instance is found.
+     * Retrieve values from the parameters until a PicoPageable instance is found.
      *
-     * @param array $params Parameters
-     * @return array
+     * @param array $params An array of parameters.
+     * @return array An array of values up to the first PicoPageable instance.
      */
     public static function valuesFromParams($params)
     {
@@ -101,11 +104,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Fix value based on its expected type.
+     * Fix a value based on its expected type.
      *
-     * @param string $value Value
-     * @param string $type Data type
-     * @return mixed
+     * @param string $value The value to fix.
+     * @param string $type The expected data type.
+     * @return mixed The fixed value.
      */
     public static function fixValue($value, $type) // NOSONAR
     {
@@ -132,11 +135,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if value is null.
+     * Check if a value is null.
      *
-     * @param mixed $value Value
-     * @param bool $importFromString Flag indicating if input is from string
-     * @return bool
+     * @param mixed $value The value to check.
+     * @param bool $importFromString Indicates if the input is from a string.
+     * @return bool Returns true if the value is null or the string "null".
      */
     public static function isNull($value, $importFromString)
     {
@@ -144,11 +147,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if value is numeric.
+     * Check if a value is numeric.
      *
-     * @param mixed $value Value
-     * @param bool $importFromString Flag indicating if input is from string
-     * @return bool
+     * @param mixed $value The value to check.
+     * @param bool $importFromString Indicates if the input is from a string.
+     * @return bool Returns true if the value is a numeric string and input is from a string.
      */
     public static function isNumeric($value, $importFromString)
     {
@@ -156,11 +159,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Escape value for SQL.
+     * Escape a value for SQL.
      *
-     * @param mixed $value Value
-     * @param bool $importFromString Flag indicating if input is from string
-     * @return string
+     * @param mixed $value The value to escape.
+     * @param bool $importFromString Indicates if the input is from a string.
+     * @return string The escaped value for SQL.
      */
 	public static function escapeValue($value, $importFromString = false)
 	{
@@ -191,7 +194,7 @@ class PicoDatabaseUtil
 		else if(is_array($value))
 		{
 			// encode to JSON and escapethe value
-			$ret = "(".self::toList($value).")";
+			$ret = self::toList($value, true);
 		}
         else if(is_object($value))
 		{
@@ -207,26 +210,50 @@ class PicoDatabaseUtil
 	}
 
     /**
-     * Convert array to list
+     * Convert an array to a list format.
      *
-     * @param array $array Array
-     * @return string
+     * @param array $array The array to convert.
+     * @param bool $bracket Indicates if the result should be enclosed in parentheses.
+     * @return string The list representation of the array.
      */
-    public static function toList($array)
+    public static function toList($array, $bracket = false, $escape = false)
     {
         foreach($array as $key=>$value)
         {
             $type = gettype($value);
-            $array[$key] = self::fixValue($value, $type);
+            if($value instanceof DateTime)
+            {
+                $array[$key] = "'".$value->format('Y-m-d H:i:s')."'";
+            }
+            else if(is_string($value))
+            {
+                if($escape)
+                {
+                    $array[$key] = "'".self::escapeSQL(self::fixValue($value, $type))."'";
+                }
+                else
+                {
+                    $array[$key] = "'".self::fixValue($value, $type)."'";
+                }
+                
+            }
+            else
+            {
+                $array[$key] = self::fixValue($value, $type);
+            }
+        }
+        if($bracket)
+        {
+            return "(".implode(", ", $array).")";
         }
         return implode(", ", $array);
     }
 
     /**
-     * Escape SQL value.
+     * Escape a SQL value.
      *
-     * @param string $value Value
-     * @return string
+     * @param string $value The value to escape.
+     * @return string The escaped value.
      */
     public static function escapeSQL($value)
     {
@@ -234,10 +261,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Trim WHERE clause.
+     * Trim a WHERE clause by removing unnecessary characters.
      *
-     * @param string $where Raw WHERE clause
-     * @return string
+     * @param string $where The raw WHERE clause.
+     * @return string The trimmed WHERE clause.
      */
     public static function trimWhere($where)
     {
@@ -261,9 +288,9 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Generate UUID
+     * Generate a UUID.
      *
-     * @return string
+     * @return string A generated UUID.
      */
     public static function uuid()
     {
@@ -276,10 +303,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Split SQL into queries.
+     * Split a SQL string into separate queries.
      *
-     * @param string $sqlText Raw SQL
-     * @return array
+     * @param string $sqlText The raw SQL string.
+     * @return array An array of queries with their respective delimiters.
      */
     public function splitSql($sqlText) //NOSONAR
     {
@@ -378,10 +405,10 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Check if parameter is an array.
+     * Check if a parameter is an array.
      *
-     * @param mixed $params Parameters
-     * @return bool
+     * @param mixed $params The parameter to check.
+     * @return bool Returns true if the parameter is an array.
      */
     public static function isArray($params)
     {
@@ -389,11 +416,11 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Find an instance of a specified class in an array.
+     * Find an instance of a specified class in an array of parameters.
      *
-     * @param array $params Parameters
-     * @param string $className Class name
-     * @return object|null
+     * @param array $params An array of parameters.
+     * @param string $className The name of the class to find.
+     * @return object|null Returns the instance of the specified class or null if not found.
      */
     public static function findInstanceInArray($params, $className)
     {
@@ -404,4 +431,23 @@ class PicoDatabaseUtil
         }
         return null;
     }
+    
+    /**
+     * Retrieves the final query to be executed by the PDOStatement.
+     *
+     * This function replaces the placeholders in the query with the bound parameter values.
+     *
+     * @param PDOStatement $stmt The PDOStatement containing the original query.
+     * @param array $params An array of parameter values to replace the placeholders.
+     * @return string The final query with parameter values substituted.
+     */
+    public static function getFinalQuery($stmt, $params) {
+        $query = $stmt->queryString; // Get the original query
+        foreach ($params as $key => $value) {
+            // Replace placeholder with parameter value
+            $query = str_replace(":$key", self::escapeValue($value), $query);
+        }
+        return $query;
+    }
+
 }

@@ -457,49 +457,6 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	}
 
 	/**
-	 * Escape a value for SQL queries.
-	 *
-	 * @param mixed $value The value to be escaped.
-	 * @return string The escaped value.
-	 */
-	public function escapeValue($value)
-	{
-		if ($value === null) {
-			// Null value
-			return 'NULL';
-		} elseif (is_string($value)) {
-			// Escape the string value
-			return "'" . $this->escapeSQL($value) . "'";
-		} elseif (is_bool($value)) {
-			// Boolean value
-			return $value ? 'TRUE' : 'FALSE';
-		} elseif (is_numeric($value)) {
-			// Numeric value
-			return (string)$value;
-		} elseif (is_array($value) || is_object($value)) {
-			// Convert array or object to JSON and escape
-			return $this->implodeValues($value);
-		} else {
-			// Force convert to string and escape
-			return "'" . $this->escapeSQL((string)$value) . "'";
-		}
-	}
-
-	/**
-	 * Convert an array to a comma-separated list of escaped values.
-	 *
-	 * @param array $values The array of values.
-	 * @return string The comma-separated list.
-	 */
-	private function implodeValues($values)
-	{
-		foreach ($values as $key => $value) {
-			$values[$key] = $this->escapeValue($value);
-		}
-		return implode(", ", $values);
-	}
-
-	/**
 	 * Create a HAVING statement for filtering aggregated results.
 	 *
 	 * @param string $query The condition(s) for the HAVING clause.
@@ -640,6 +597,87 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		}
 		return null;
 	}
+	
+	/**
+	 * Escape special characters in a SQL string.
+	 *
+	 * This method escapes special characters in a SQL query string to prevent SQL 
+	 * injection and ensure proper execution in different database systems. It handles 
+	 * MySQL, MariaDB, and PostgreSQL by applying appropriate escaping techniques. 
+	 * The method replaces newline characters and uses `addslashes` for other special 
+	 * characters in MySQL/MariaDB, while using a specific quote replacement for PostgreSQL.
+	 *
+	 * @param string $query The SQL query string to escape. This should be a 
+	 *                      valid SQL statement that may contain special characters 
+	 *                      needing to be escaped.
+	 * @return string The escaped SQL query. This string can be safely used in 
+	 *                database queries to avoid syntax errors and SQL injection 
+	 *                vulnerabilities.
+	 */
+	public function escapeSQL($query)
+	{
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false ||
+			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false) {
+			return str_replace(["\r", "\n"], ["\\r", "\\n"], addslashes($query));
+		}
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) !== false) {
+			return str_replace(["\r", "\n"], ["\\r", "\\n"], $this->replaceQuote($query));
+		}
+		return $query;
+	}
+	
+	/**
+	 * Escape a value for SQL queries.
+	 *
+	 * This method safely escapes different types of values (null, strings, booleans, 
+	 * numeric values, arrays, and objects) to ensure that they can be safely used in 
+	 * SQL queries. It prevents SQL injection by escaping potentially dangerous 
+	 * characters in string values and converts arrays or objects to their JSON 
+	 * representation.
+	 *
+	 * @param mixed $value The value to be escaped. Can be null, string, boolean, 
+	 *                     numeric, array, or object.
+	 * @return string The escaped value. This will be a string representation 
+	 *                of the value, properly formatted for SQL usage.
+	 */
+	public function escapeValue($value)
+	{
+		$result = null;
+		if ($value === null) {
+			// Null value
+			$result = 'NULL';
+		} elseif (is_string($value)) {
+			// Escape the string value
+			$result = "'" . $this->escapeSQL($value) . "'";
+		} elseif (is_bool($value)) {
+			// Boolean value
+			$result = $value ? 'TRUE' : 'FALSE';
+		} elseif (is_numeric($value)) {
+			// Numeric value
+			$result = (string)$value;
+		} elseif (is_array($value) || is_object($value)) {
+			// Convert array or object to JSON and escape
+			return $this->implodeValues($value);
+		} else {
+			// Force convert to string and escape
+			$result = "'" . $this->escapeSQL((string)$value) . "'";
+		}
+		return $result;
+	}
+
+	/**
+	 * Convert an array to a comma-separated list of escaped values.
+	 *
+	 * @param array $values The array of values.
+	 * @return string The comma-separated list.
+	 */
+	private function implodeValues($values)
+	{
+		foreach ($values as $key => $value) {
+			$values[$key] = $this->escapeValue($value);
+		}
+		return implode(", ", $values);
+	}
 
 	/**
 	 * Create a statement to execute a function.
@@ -741,24 +779,6 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			$precision = 6;
 		}
 		return $precision > 0 ? "NOW($precision)" : "NOW()";
-	}
-
-	/**
-	 * Escape special characters in a SQL string.
-	 *
-	 * @param string $query The SQL query string to escape.
-	 * @return string The escaped SQL query.
-	 */
-	public function escapeSQL($query)
-	{
-		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false ||
-			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false) {
-			return str_replace(["\r", "\n"], ["\\r", "\\n"], addslashes($query));
-		}
-		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) !== false) {
-			return str_replace(["\r", "\n"], ["\\r", "\\n"], $this->replaceQuote($query));
-		}
-		return $query;
 	}
 
 	/**

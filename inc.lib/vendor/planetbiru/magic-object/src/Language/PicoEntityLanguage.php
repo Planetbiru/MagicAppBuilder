@@ -343,4 +343,24 @@ class PicoEntityLanguage
     {
         return $this->_entityClassName;
     }
+
+    /**
+     * Converts the object to its string representation.
+     *
+     * This method checks if the label language and current language
+     * are set. If they are, it returns the JSON-encoded string of
+     * the label corresponding to the current language. If not, it
+     * returns an empty JSON object.
+     *
+     * @return string A JSON-encoded string of the label for the current language,
+     *                or an empty JSON object if the current language is not set.
+     */
+    public function __toString()
+    {
+        if (isset($this->_lableLanguage) && isset($this->_currentLanguage) && isset($this->_lableLanguage[$this->_currentLanguage])) {
+            return json_encode($this->_lableLanguage[$this->_currentLanguage]);
+        } else {
+            return "{}";
+        }
+    }
 }

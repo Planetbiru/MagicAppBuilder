@@ -23,7 +23,7 @@ use stdClass;
  *
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoPageData
+class PicoPageData //NOSONAR
 {
     const RESULT = 'result';
     const PAGEABLE = 'pageable';

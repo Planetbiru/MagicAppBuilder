@@ -7,6 +7,11 @@ use MagicObject\MagicObject;
 
 /**
  * Database persistence extended
+ *
+ * This class extends the functionality of the PicoDatabasePersistence
+ * by adding dynamic property setting through magic methods and enhanced
+ * record selection capabilities.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
@@ -44,9 +49,13 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     }
 
     /**
-     * Select one record
+     * Select one record.
      *
-     * @return MagicObject
+     * This method retrieves a single record from the database.
+     * If no record is found, a NoRecordFoundException is thrown.
+     *
+     * @return MagicObject The selected record as an instance of MagicObject.
+     * @throws NoRecordFoundException If no record is found.
      */
     public function select()
     {
@@ -61,9 +70,13 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     }
 
     /**
-     * Select all record
+     * Select all records.
      *
-     * @return MagicObject[]
+     * This method retrieves all records from the database.
+     * If no records are found, a NoRecordFoundException is thrown.
+     *
+     * @return MagicObject[] An array of MagicObject instances representing all records.
+     * @throws NoRecordFoundException If no records are found.
      */
     public function selectAll()
     {

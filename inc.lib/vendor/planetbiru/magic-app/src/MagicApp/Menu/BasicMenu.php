@@ -6,6 +6,14 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 
+/**
+ * Class BasicMenu
+ *
+ * A class that provides basic functionalities for managing and rendering menus
+ * based on a specified entity, specification, and sorting options. It allows
+ * for loading data from the database and rendering it using a user-defined
+ * callback function.
+ */
 class BasicMenu
 {
     /**
@@ -28,24 +36,33 @@ class BasicMenu
      * @var PicoSortable
      */
     protected $sortable;
+
     /**
      * Constructor
      *
-     * @param MagicObject $entity
-     * @param PicoSpecification $specification
-     * @param PicoSortable $sortable
+     * Initializes the BasicMenu with the specified entity, specification,
+     * and sortable options.
+     *
+     * @param MagicObject $entity The entity to be used for data loading.
+     * @param PicoSpecification|null $specification Optional. The specification
+     *        for filtering data.
+     * @param PicoSortable|null $sortable Optional. The sortable options for
+     *        ordering the data.
      */
     public function __construct($entity, $specification = null, $sortable = null)
     {
-       $this->entity = $entity;
-       $this->specification = $specification;
-       $this->sortable = $sortable;    
+        $this->entity = $entity;
+        $this->specification = $specification;
+        $this->sortable = $sortable;    
     }
     
     /**
      * Load data
      *
-     * @return PicoPageData
+     * Loads data from the entity based on the provided specification and
+     * sorting options.
+     *
+     * @return PicoPageData The loaded data.
      */
     public function load()
     {
@@ -55,14 +72,15 @@ class BasicMenu
     /**
      * Render menu
      *
-     * @param PicoPageData $data
-     * @param callable $callbackFunction
-     * @return string
+     * Renders the menu using the provided callback function on the given data.
+     *
+     * @param PicoPageData $data The data to be rendered.
+     * @param callable $callbackFunction The function to be called for rendering.
+     * @return string|null The rendered output, or null if the callback is not callable.
      */
     public function render($data, $callbackFunction)
     {
-        if(is_callable($callbackFunction))
-        {
+        if (is_callable($callbackFunction)) {
             return call_user_func($callbackFunction, $data);
         }
         return null;
@@ -71,8 +89,10 @@ class BasicMenu
     /**
      * Load and render menu
      *
-     * @param callable $callbackFunction
-     * @return string
+     * Combines loading and rendering the menu in a single method call.
+     *
+     * @param callable $callbackFunction The function to be called for rendering.
+     * @return string|null The rendered output from the callback function.
      */
     public function loadAndRender($callbackFunction)
     {

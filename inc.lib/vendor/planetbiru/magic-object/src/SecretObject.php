@@ -225,6 +225,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param array $params Parameters for the method.
      * @return mixed|null The result of the method call or null if not applicable.
      */
+
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0) {

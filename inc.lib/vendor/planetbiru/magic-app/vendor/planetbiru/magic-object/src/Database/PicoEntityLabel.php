@@ -25,7 +25,7 @@ class PicoEntityLabel
     const ANNOTATION_ID               = "Id";
     const ANNOTATION_GENERATED_VALUE  = "GeneratedValue";
     const ANNOTATION_NOT_NULL         = "NotNull";
-    const ANNOTATION_DEFAULT_COLUMN    = "DefaultColumn";
+    const ANNOTATION_DEFAULT_COLUMN   = "DefaultColumn";
 
     const KEY_NAME                    = "name";
     const KEY_NULL                    = "null";

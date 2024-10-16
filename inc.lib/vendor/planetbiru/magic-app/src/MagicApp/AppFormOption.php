@@ -5,73 +5,79 @@ namespace MagicApp;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
+/**
+ * Class AppFormOption
+ *
+ * Represents an option within a form element, encapsulating the necessary attributes
+ * and behaviors associated with that option, including its display text, value,
+ * selection state, and any additional data attributes.
+ */
 class AppFormOption
 {
-
     /**
-     * Text node
+     * Text node for the option.
      *
      * @var string
      */
     private $textNode;
 
     /**
-     * Value
+     * Value associated with the option.
      *
      * @var string
      */
     private $value;
 
     /**
-     * Selected
+     * Indicates whether the option is selected.
      *
      * @var boolean
      */
     private $selected;
 
     /**
-     * Format
+     * Format for the text node, allowing dynamic content.
      *
      * @var string
      */
     private $format;
 
     /**
-     * Params
+     * Parameters for dynamic formatting of the text node.
      *
      * @var string[]
      */
     private $params;
 
     /**
-     * Data
+     * Data associated with the option, typically from a MagicObject.
      *
      * @var MagicObject
      */
     private $data;
 
     /**
-     * Attributes
+     * Additional attributes for the option.
      *
      * @var string[]
      */
     private $attributes;
 
     /**
-     * Pad
+     * Padding to format the output, e.g., for nested options.
      *
      * @var string
      */
     private $pad = "";
 
     /**
-     * Undocumented function
+     * Constructor to initialize the option with text, value, selected state, attributes, and data.
      *
-     * @param string $textNode
-     * @param string $value
-     * @param boolean $selected
-     * @param string[] $attributes
-     * @param MagicObject $data
+     * @param string $textNode The display text for the option
+     * @param string|null $value The value of the option
+     * @param boolean $selected Indicates if the option is selected
+     * @param string[]|null $attributes Additional HTML attributes for the option
+     * @param MagicObject|null $data Associated data for dynamic value retrieval
      */
     public function __construct($textNode, $value = null, $selected = false, $attributes = null, $data = null)
     {
@@ -83,29 +89,27 @@ class AppFormOption
     }
 
     /**
-     * Create attributes
+     * Create HTML data attributes for the option.
      *
-     * @return string
+     * @return string Formatted string of data attributes for HTML
      */
     public function createAttributes()
     {
         $attrs = array();
-        if(isset($this->attributes) && is_array($this->attributes))
-        {
-            foreach($this->attributes as $attr=>$val)
-            {
-                $attrs[] = 'data-'.str_replace('_', '-', PicoStringUtil::snakeize($attr)).'="'.htmlspecialchars($val).'"';
+        if (isset($this->attributes) && is_array($this->attributes)) {
+            foreach ($this->attributes as $attr => $val) {
+                $attrs[] = 'data-' . str_replace('_', '-', PicoStringUtil::snakeize($attr)) . '="' . htmlspecialchars($val) . '"';
             }
-            return ' '.implode(' ', $attrs);
+            return ' ' . implode(' ', $attrs);
         }
         return '';
     }
 
     /**
-     * Add format to text node
+     * Set a format for the text node with parameters for dynamic content.
      *
-     * @param string $format
-     * @param string[] $params
+     * @param string $format The format string
+     * @param string[] $params The parameters for the format
      * @return self
      */
     public function textNodeFormat($format, $params)
@@ -116,17 +120,15 @@ class AppFormOption
     }
 
     /**
-     * Get values from parameters
+     * Retrieve the values of the parameters used in the format.
      *
-     * @return string[]
+     * @return string[] Array of parameter values
      */
     public function getValues()
     {
         $values = array();
-        if(isset($this->params) && is_array($this->params))
-        {
-            foreach($this->params as $param)
-            {
+        if (isset($this->params) && is_array($this->params)) {
+            foreach ($this->params as $param) {
                 $values[] = $this->getValue($param);
             }
         }
@@ -134,39 +136,34 @@ class AppFormOption
     }
 
     /**
-     * Get value of parameter
+     * Get the value associated with a given parameter.
      *
-     * @param string $param
-     * @return string
+     * @param string $param The parameter name
+     * @return string|null The value associated with the parameter, or null if not found
      */
     public function getValue($param)
     {
-        if($this->data == null)
-        {
+        if ($this->data == null) {
             return null;
         }
         $param = trim($param);
         $value = null;
-        if(stripos($param, '.') !== false)
-        {
+        if (stripos($param, '.') !== false) {
             $param = str_replace(' ', '', $param);
             $arr = explode(".", $param, 2);
-            if($this->data->get($arr[0]) != null && $this->data->get($arr[0]) instanceof MagicObject)
-            {
+            if ($this->data->get($arr[0]) != null && $this->data->get($arr[0]) instanceof MagicObject) {
                 $value = $this->data->get($arr[0])->get($arr[1]);
             }
-        }
-        else
-        {
+        } else {
             $value = $this->data->get($param);
         }
         return $value;
     }
 
     /**
-     * Set pad
+     * Set padding for the option, typically for nested structures.
      *
-     * @param string $pad
+     * @param string $pad The padding string (default is a tab character)
      * @return self
      */
     public function setPad($pad = "\t")
@@ -176,40 +173,37 @@ class AppFormOption
     }
 
     /**
-     * Get object as tring
+     * Get the HTML representation of the option as a string.
      *
-     * @return string
+     * @return string The HTML option element
      */
-    public function __tostring()
+    public function __toString()
     {
         $selected = $this->selected ? ' selected' : '';
         $attrs = $this->createAttributes();
-        if(isset($this->format) && isset($this->params))
-        {
+        if (isset($this->format) && isset($this->params)) {
             $values = $this->getValues();
             $textNode = vsprintf($this->format, $values);
-            return $this->pad.'<option value="'.$this->value.'"'.$attrs.$selected.'>'.$textNode.'</option>';
-        }
-        else
-        {
-            return $this->pad.'<option value="'.$this->value.'"'.$attrs.$selected.'>'.$this->textNode.'</option>';
+            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . $textNode . '</option>';
+        } else {
+            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . htmlspecialchars($this->textNode) . '</option>';
         }
     }
 
     /**
-     * Alias toString
+     * Alias for the __toString() method.
      *
-     * @return string
+     * @return string The HTML option element
      */
     public function toString()
     {
-        return $this->__tostring();
+        return $this->__toString();
     }
 
     /**
-     * Get text node
+     * Get the text node for the option.
      *
-     * @return string
+     * @return string The text node
      */ 
     public function getTextNode()
     {
@@ -217,23 +211,21 @@ class AppFormOption
     }
 
     /**
-     * Set text node
+     * Set the text node for the option.
      *
-     * @param string  $textNode  Text node
-     *
+     * @param string $textNode The text node to set
      * @return self
      */ 
     public function setTextNode($textNode)
     {
         $this->textNode = $textNode;
-
         return $this;
     }
 
     /**
-     * Get data
+     * Get the associated data for the option.
      *
-     * @return MagicObject
+     * @return MagicObject|null The associated data object, or null if not set
      */ 
     public function getData()
     {

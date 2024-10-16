@@ -2,6 +2,16 @@
 
 namespace MagicObject\Geometry;
 
+/**
+ * Class Area
+ *
+ * Represents a geometric area defined by various shapes such as 
+ * rectangles, triangles, polygons, and circles. This class encapsulates 
+ * properties related to the shape, its coordinates, and any associated 
+ * attributes or hyperlinks. It also provides methods to calculate 
+ * coordinates based on the shape type, apply zoom factors, and generate 
+ * an HTML representation for use in maps or similar applications.
+ */
 class Area
 {
     /**

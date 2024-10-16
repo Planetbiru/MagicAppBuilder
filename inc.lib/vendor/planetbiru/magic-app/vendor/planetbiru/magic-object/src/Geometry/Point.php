@@ -4,6 +4,9 @@ namespace MagicObject\Geometry;
 
 /**
  * Class representing a Point with x and y coordinates.
+ *
+ * This class defines a Point in a 2D Cartesian coordinate system,
+ * allowing for the representation of its position and the calculation of distances to other Points.
  */
 class Point
 {
@@ -36,8 +39,12 @@ class Point
     /**
      * Calculate the distance between this Point and another Point.
      *
+     * This method computes the Euclidean distance between the current Point
+     * and another Point provided as an argument.
+     *
      * @param Point $p Another Point.
      * @return float The distance between the two Points.
+     * @throws \InvalidArgumentException If the argument is not of type Point.
      */
     public function distanceFrom($p)
     {
@@ -53,6 +60,8 @@ class Point
 
     /**
      * Calculate the distance between this Point and another Point.
+     *
+     * This method serves as an alias to distanceFrom for better readability.
      *
      * @param Point $p Another Point.
      * @return float The distance between the two Points.

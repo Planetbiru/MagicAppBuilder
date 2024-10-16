@@ -2,6 +2,7 @@
 
 namespace MagicObject;
 
+use DateTime;
 use Exception;
 use PDOException;
 use PDOStatement;
@@ -15,6 +16,7 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
+use MagicObject\DataLabel\PicoDataLabel;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
@@ -27,7 +29,9 @@ use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoEnvironmentVariable;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
+use PDO;
 use ReflectionClass;
+use ReflectionMethod;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
@@ -116,7 +120,6 @@ class MagicObject extends stdClass // NOSONAR
     {
         return $this->_nullProperties;
     }
-
 
     /**
      * Constructor
@@ -599,6 +602,240 @@ class MagicObject extends stdClass // NOSONAR
             throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
+
+    /**
+     * Executes a database query based on the parameters and annotations from the caller function.
+     *
+     * This method uses reflection to retrieve the query string from the caller's docblock,
+     * bind the parameters, and execute the query against the database.
+     *
+     * It analyzes the parameters and return type of the caller function, enabling dynamic query
+     * execution tailored to the specified return type. Supported return types include:
+     * - `void`: Returns null.
+     * - `int` or `integer`: Returns the number of affected rows.
+     * - `object` or `stdClass`: Returns a single result as an object.
+     * - `stdClass[]`: Returns all results as an array of stdClass objects.
+     * - `array`: Returns all results as an associative array.
+     * - `string`: Returns the JSON-encoded results.
+     * - `PDOStatement`: Returns the prepared statement for further operations if needed.
+     * - `MagicObject` and its derived classes: If the return type is a class name or an array of class names,
+     *   instances of that class will be created for each row fetched.
+     *
+     * @return mixed Returns the result based on the return type of the caller function:
+     *               - null if the return type is void.
+     *               - integer for the number of affected rows if the return type is int.
+     *               - object for a single result if the return type is object.
+     *               - an array of associative arrays for multiple results if the return type is array.
+     *               - a JSON string if the return type is string.
+     *               - instances of a specified class if the return type matches a class name.
+     * 
+     * @throws PDOException If there is an error executing the database query.
+     * @throws InvalidQueryInputException If there is no query to be executed on the database query.
+     */
+    protected function executeNativeQuery() //NOSONAR
+    {
+        // Retrieve caller trace information
+        $trace = debug_backtrace();
+
+        // Get parameters from the caller function
+        $callerParamValues = isset($trace[1]['args']) ? $trace[1]['args'] : [];
+        
+        // Get the name of the caller function and class
+        $callerFunctionName = $trace[1]['function'];
+        $callerClassName = $trace[1]['class'];
+
+        // Use reflection to get annotations from the caller function
+        $reflection = new ReflectionMethod($callerClassName, $callerFunctionName);
+        $docComment = $reflection->getDocComment();
+
+        // Get the query from the @query annotation
+        preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
+        $queryString = $matches ? $matches[1] : '';
+        
+        $queryString = trim($queryString, " \r\n\t ");
+        if(empty($queryString))
+        {
+            throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+        }
+
+        // Get parameter information from the caller function
+        $callerParams = $reflection->getParameters();
+
+        // Get return type from the caller function
+        $returnTypeObj = $reflection->getReturnType();
+
+        if($returnTypeObj == null)
+        {
+            // PHP 5
+            preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
+            $returnType = $matches ? $matches[1] : '';
+        }
+        else
+        {
+            // PHP 7 or above
+            $returnType = $returnTypeObj."";
+        }
+        
+        // Trim return type
+        $returnType = trim($returnType);
+        
+        // Change self to callerClassName
+        if($returnType == "self[]")
+        {
+            $returnType = $callerClassName."[]";
+        }
+        else if($returnType == "self")
+        {
+            $returnType = $callerClassName;
+        }
+
+        $params = [];
+
+        try {
+            // Get database connection
+            $pdo = $this->_database->getDatabaseConnection();
+            
+            // Replace array
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(is_array($paramValue))
+                    {
+                        $queryString = str_replace(":".$paramName, PicoDatabaseUtil::toList($paramValue, true, true), $queryString);
+                    }
+                }
+            }
+
+            $stmt = $pdo->prepare($queryString);
+
+            // Automatically bind each parameter
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(!is_array($paramValue))
+                    {
+                        $maped = $this->mapToPdoParamType($paramValue);
+                        $paramType = $maped->type;
+                        $paramValue = $maped->value;
+                        $params[$paramName] = $paramValue;
+                        $stmt->bindValue(":".$paramName, $paramValue, $paramType);
+                    }
+                }
+            }
+            
+            // Send query to logger
+            $debugFunction = $this->_database->getCallbackDebugQuery();
+            if(isset($debugFunction) && is_callable($debugFunction))
+            {
+                call_user_func($debugFunction, PicoDatabaseUtil::getFinalQuery($stmt, $params));
+            }
+
+            // Execute the query
+            $stmt->execute();
+
+            if ($returnType == "void") {
+                // Return null if the return type is void
+                return null;
+            }
+            if ($returnType == "PDOStatement") {
+                // Return the PDOStatement object
+                return $stmt;
+            } else if ($returnType == "int" || $returnType == "integer") {
+                // Return the affected row count
+                return $stmt->rowCount();
+            } else if ($returnType == "object" || $returnType == "stdClass") {
+                // Return one row as an object
+                return $stmt->fetch(PDO::FETCH_OBJ);
+            } else if ($returnType == "array") {
+                // Return all rows as an associative array
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else if ($returnType == "string") {
+                // Return the result as a JSON string
+                return json_encode($stmt->fetchAll(PDO::FETCH_OBJ));
+            } else {
+                try {
+                    // Check for array-type hinting in the return type
+                    if (stripos($returnType, "[") !== false) {
+                        $className = trim(explode("[", $returnType)[0]);
+                        if (class_exists($className)) {
+                            $ret = [];
+                            if ($className == "stdClass") {
+                                // Return all rows as stdClass objects
+                                return $stmt->fetchAll(PDO::FETCH_OBJ);
+                            } else {
+                                // Map result rows to the specified class
+                                $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+                                foreach ($result as $row) {
+                                    $ret[] = new $className($row);
+                                }
+                                return $ret;
+                            }
+                        }
+                    } else {
+                        // Return a single object of the specified class
+                        $className = trim($returnType);
+                        if (class_exists($className)) {
+                            $row = $stmt->fetch(PDO::FETCH_OBJ);
+                            return new $className($row);
+                        }
+                    }
+                } catch (Exception $e) {
+                    // Log the exception if the class is not found
+                    error_log('Class not found: ' . $e->getMessage());
+                    return null;
+                }
+            }            
+        } 
+        catch (PDOException $e) 
+        {
+            // Handle database errors with logging
+            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+        }
+        return null;
+    }
+
+    /**
+     * Maps PHP types to PDO parameter types.
+     *
+     * This function determines the appropriate PDO parameter type based on the given value.
+     * It handles various PHP data types and converts them to the corresponding PDO parameter types
+     * required for executing prepared statements in PDO.
+     *
+     * @param mixed $value The value to determine the type for. This can be of any type, including
+     *                     null, boolean, integer, string, DateTime, or other types.
+     * @return stdClass An object containing:
+     *                  - type: The PDO parameter type (PDO::PARAM_STR, PDO::PARAM_NULL, 
+     *                          PDO::PARAM_BOOL, PDO::PARAM_INT).
+     *                  - value: The corresponding value formatted as needed for the PDO parameter.
+     */
+    private function mapToPdoParamType($value)
+    {
+        $type = PDO::PARAM_STR; // Default type is string
+        $finalValue = $value; // Initialize final value to the original value
+
+        if ($value instanceof DateTime) {
+            $type = PDO::PARAM_STR; // DateTime should be treated as a string
+            $finalValue = $value->format("Y-m-d H:i:s");
+        } else if (is_null($value)) {
+            $type = PDO::PARAM_NULL; // NULL type
+            $finalValue = null; // Set final value to null
+        } else if (is_bool($value)) {
+            $type = PDO::PARAM_BOOL; // Boolean type
+            $finalValue = $value; // Keep the boolean value
+        } else if (is_int($value)) {
+            $type = PDO::PARAM_INT; // Integer type
+            $finalValue = $value; // Keep the integer value
+        }
+
+        // Create and return an object with the type and value
+        $result = new stdClass();
+        $result->type = $type;
+        $result->value = $finalValue;
+        return $result;
+    }
+
 
     /**
      * Insert into the database.

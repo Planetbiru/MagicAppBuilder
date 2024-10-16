@@ -6,6 +6,7 @@ use ByJG\ImageUtil\ImageColorAlpha;
 use GdImage;
 use MagicObject\Exceptions\FileNotFoundException;
 use MagicObject\Exceptions\InvalidParameterException;
+use MagicObject\Util\File\FileUtil;
 
 /**
  * A Wrapper for GD library in PHP. GD must be installed in your system for this to work.
@@ -140,6 +141,7 @@ class ImageUtil
      */
     protected function createFromFilename($imageFile)
     {
+        $imageFile = FileUtil::fixFilePath($imageFile);
         if (!file_exists($imageFile) || !is_readable($imageFile)) {
             throw new FileNotFoundException("File is not found or not is readable. Cannot continue.");
         }

@@ -297,6 +297,7 @@ class SetterGetter extends stdClass
      * @param array $params Parameters passed to the method.
      * @return mixed|null The result of the method call or null if the method does not return a value.
      */
+
     public function __call($method, $params) //NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0)

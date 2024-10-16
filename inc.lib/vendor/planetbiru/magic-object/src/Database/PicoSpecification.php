@@ -45,6 +45,16 @@ class PicoSpecification //NOSONAR
      * @var string
      */
     private $defaultLogic = self::LOGIC_AND;
+    
+    /**
+     * Gets an instance of PicoSpecification.
+     *
+     * @return PicoSpecification A new instance of PicoSpecification.
+     */
+    public static function getInstance()
+    {
+        return new self;
+    }
 
     /**
      * Checks if a real join table is required based on the specifications.
@@ -297,31 +307,6 @@ class PicoSpecification //NOSONAR
     private function hasValue($specification)
     {
         return $specification !== null && !$specification->isEmpty();
-    }
-
-    /**
-     * Formats a column name based on the provided format.
-     *
-     * @param string $column The column name.
-     * @param string|null $format The format string, or null if no formatting is needed.
-     * @return string The formatted column name.
-     */
-    private function formatColumn($column, $format)
-    {
-        if ($format === null || strpos($format, "%s") === false) {
-            return $column;
-        }
-        return sprintf($format, $column);
-    }
-
-    /**
-     * Gets an instance of PicoSpecification.
-     *
-     * @return PicoSpecification A new instance of PicoSpecification.
-     */
-    public static function getInstance()
-    {
-        return new self;
     }
 
     /**

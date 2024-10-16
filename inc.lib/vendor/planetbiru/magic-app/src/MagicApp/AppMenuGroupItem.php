@@ -2,30 +2,36 @@
 
 namespace MagicApp;
 
+/**
+ * Class AppMenuGroupItem
+ *
+ * Represents a group of menu items, including a label, a CSS class, and the menu items themselves.
+ */
 class AppMenuGroupItem
 {
     /**
-     * Label
+     * Label for the menu group.
      *
      * @var string
      */
     private $label;
-    
+
     /**
-     * Class name
+     * CSS class name associated with the menu group.
      *
      * @var string
      */
     private $class;
+
     /**
-     * Menu item
+     * Array of menu items in this group.
      *
      * @var AppMenuItem[]
      */
-    private $menuItem;
+    private $menuItems = [];
 
     /**
-     * Get label
+     * Get the label of the menu group.
      *
      * @return string
      */ 
@@ -35,9 +41,9 @@ class AppMenuGroupItem
     }
 
     /**
-     * Set label
+     * Set the label for the menu group.
      *
-     * @param string  $label  Label
+     * @param string $label The label for the menu group.
      *
      * @return self
      */ 
@@ -49,7 +55,7 @@ class AppMenuGroupItem
     }
 
     /**
-     * Get class name
+     * Get the CSS class name of the menu group.
      *
      * @return string
      */ 
@@ -59,9 +65,9 @@ class AppMenuGroupItem
     }
 
     /**
-     * Set class name
+     * Set the CSS class name for the menu group.
      *
-     * @param string  $class  Class name
+     * @param string $class The CSS class name.
      *
      * @return self
      */ 
@@ -73,25 +79,25 @@ class AppMenuGroupItem
     }
 
     /**
-     * Get menu item
+     * Get the menu items in this group.
      *
-     * @return AppMenuItem[]
+     * @return AppMenuItem[] Array of menu items.
      */ 
-    public function getMenuItem()
+    public function getMenuItems()
     {
-        return $this->menuItem;
+        return $this->menuItems;
     }
 
     /**
-     * Set menu item
+     * Set the menu items for this group.
      *
-     * @param AppMenuItem[]  $menuItem  Menu item
+     * @param AppMenuItem[] $menuItems Array of menu items.
      *
      * @return self
      */ 
-    public function setMenuItem($menuItem)
+    public function setMenuItems(array $menuItems)
     {
-        $this->menuItem = $menuItem;
+        $this->menuItems = $menuItems;
 
         return $this;
     }

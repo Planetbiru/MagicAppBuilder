@@ -21,7 +21,7 @@ class PicoDataComparation
     const LESS_THAN              = "<";
     const GREATER_THAN           = ">";
     const LESS_THAN_OR_EQUALS    = "<=";
-    const GREATER_THAN_OR_EQUALS  = ">=";
+    const GREATER_THAN_OR_EQUALS = ">=";
     const TYPE_STRING            = "string";
     const TYPE_BOOLEAN           = "boolean";
     const TYPE_NUMERIC           = "numeric";

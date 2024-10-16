@@ -2,6 +2,15 @@
 
 namespace MagicApp\XLSX;
 
+/**
+ * Class XLSXDataType
+ *
+ * This class defines various data types that can be used in an XLSX file.
+ * It maps database column types to Excel data types, handling conversions 
+ * and precision for numeric values. The class provides methods for 
+ * determining the appropriate Excel format based on the column type and 
+ * allows for customized number formatting.
+ */
 class XLSXDataType
 {
     const TYPE_DOUBLE    = "double";
@@ -23,32 +32,32 @@ class XLSXDataType
      *
      * @var string[]
      */
-    private $map = array(
-        "double" => self::TYPE_DOUBLE,
-        "float" => self::TYPE_DOUBLE,
-        "bigint" => self::TYPE_INTEGER,
-        "smallint" => self::TYPE_INTEGER,
-        "tinyint(1)" => self::TYPE_STRING,
-        "tinyint" => self::TYPE_INTEGER,
-        "int" => self::TYPE_INTEGER,
-        "varchar" => self::TYPE_STRING,
-        "char" => self::TYPE_STRING,
-        "tinytext" => self::TYPE_STRING,
-        "mediumtext" => self::TYPE_STRING,
-        "longtext" => self::TYPE_STRING,
-        "text" => self::TYPE_STRING,   
-        "string" => self::TYPE_STRING,   
-        "enum" => self::TYPE_STRING,   
-        "bool" => self::TYPE_STRING,
-        "boolean" => self::TYPE_STRING,
-        "timestamp" => self::TYPE_DATETIME,
-        "datetime" => self::TYPE_DATETIME,
-        "date" => self::TYPE_DATE,
-        "time" => self::TYPE_TIME
-    );
+    private $map = [
+        "double"        => self::TYPE_DOUBLE,
+        "float"         => self::TYPE_DOUBLE,
+        "bigint"        => self::TYPE_INTEGER,
+        "smallint"      => self::TYPE_INTEGER,
+        "tinyint(1)"    => self::TYPE_STRING,
+        "tinyint"       => self::TYPE_INTEGER,
+        "int"           => self::TYPE_INTEGER,
+        "varchar"       => self::TYPE_STRING,
+        "char"          => self::TYPE_STRING,
+        "tinytext"      => self::TYPE_STRING,
+        "mediumtext"    => self::TYPE_STRING,
+        "longtext"      => self::TYPE_STRING,
+        "text"          => self::TYPE_STRING,   
+        "string"        => self::TYPE_STRING,   
+        "enum"          => self::TYPE_STRING,   
+        "bool"          => self::TYPE_STRING,
+        "boolean"       => self::TYPE_STRING,
+        "timestamp"     => self::TYPE_DATETIME,
+        "datetime"      => self::TYPE_DATETIME,
+        "date"          => self::TYPE_DATE,
+        "time"          => self::TYPE_TIME,
+    ];
 
     /**
-     * Precission
+     * Precision
      * @var integer
      */
     private $precision;
@@ -57,34 +66,28 @@ class XLSXDataType
      * Constructor
      *
      * @param string $columnType Column type
-     * @param integer $precision Precision
+     * @param integer|null $precision Precision
      */
     public function __construct($columnType, $precision = null)
     {
         $this->columnType = $columnType;
-        if(isset($precision))
-        {
+        if (isset($precision)) {
             $this->precision = $precision;
         }
     }
     
     /**
-     * Convert to Excel
+     * Convert to Excel type
      *
      * @return string
      */
     public function convertToExcel()
     {
-        foreach($this->map as $key=>$value)
-        {
-            if(stripos($this->columnType, $key) !== false)
-            {
-                if(isset($this->precision) && $value == self::TYPE_DOUBLE)
-                {
+        foreach ($this->map as $key => $value) {
+            if (stripos($this->columnType, $key) !== false) {
+                if (isset($this->precision) && $value == self::TYPE_DOUBLE) {
                     return $this->getNumberFormat($this->precision);
-                }
-                else
-                {
+                } else {
                     return $value;
                 }
             }
@@ -93,7 +96,8 @@ class XLSXDataType
     }
 
     /**
-     * Get number format
+     * Get number format based on precision
+     * 
      * @param mixed $precision Precision
      * @return string
      */
@@ -104,7 +108,7 @@ class XLSXDataType
     }
     
     /**
-     * Convert to string
+     * Convert to string representation
      *
      * @return string
      */
@@ -114,7 +118,7 @@ class XLSXDataType
     }
     
     /**
-     * Convert to string
+     * Convert to string representation
      *
      * @return string
      */
@@ -123,5 +127,3 @@ class XLSXDataType
         return $this->convertToExcel();
     }
 }
-
-    

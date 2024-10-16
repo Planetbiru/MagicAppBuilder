@@ -6,6 +6,14 @@ use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
+/**
+ * Class AppEntityLanguage
+ *
+ * This class extends PicoEntityLanguage to manage language-specific
+ * configurations for application entities. It handles loading language
+ * data from INI files based on the current language setting and the
+ * application's configuration.
+ */
 class AppEntityLanguage extends PicoEntityLanguage
 {
     /**
@@ -23,21 +31,21 @@ class AppEntityLanguage extends PicoEntityLanguage
     private $currentLanguage;
 
     /**
-     * Full class name
+     * Full class name of the entity
      *
      * @var string
      */
     private $fullClassName;
     
     /**
-     * Base class name
+     * Base class name of the entity
      *
      * @var string
      */
     private $baseClassName;
 
     /**
-     * Base language directory
+     * Base language directory path
      *
      * @var string
      */
@@ -46,29 +54,31 @@ class AppEntityLanguage extends PicoEntityLanguage
     /**
      * Constructor
      *
-     * @param MagicObject $entity
-     * @param SecretObject $appConfig
-     * @param string $currentLanguage
+     * Initializes the AppEntityLanguage with the entity, app configuration,
+     * and the current language. It loads the corresponding language values.
+     *
+     * @param MagicObject $entity The entity whose language needs to be loaded
+     * @param SecretObject $appConfig The application configuration
+     * @param string $currentLanguage The current language code
      */
     public function __construct($entity, $appConfig, $currentLanguage)
     {
         parent::__construct($entity);
 
         $langs = $this->loadEntityLanguage($entity, $appConfig, $currentLanguage);
-
-        if(!$langs->empty())
-        {
-            $this->addLanguage($currentLanguage, $langs->value(), true);
+        $values = $langs->valueArray();
+        if (!empty($values)) {
+            $this->addLanguage($currentLanguage, $values, true);
         }
     }
 
     /**
-     * Load entity language
+     * Load entity language from an INI file based on the entity and config.
      *
-     * @param MagicObject $entity
-     * @param SecretObject $appConfig
-     * @param string $currentLanguage
-     * @return MagicObject
+     * @param MagicObject $entity The entity to load language for
+     * @param SecretObject $appConfig The application configuration
+     * @param string $currentLanguage The current language code
+     * @return MagicObject The loaded language values as a MagicObject
      */
     public function loadEntityLanguage($entity, $appConfig, $currentLanguage)
     {
@@ -79,58 +89,50 @@ class AppEntityLanguage extends PicoEntityLanguage
         $this->currentLanguage = $currentLanguage;
         $this->baseLanguageDirectory = $appConfig->getApplication()->getBaseLanguageDirectory();
         
-        // add language
-        $languageFilePath = $this->baseLanguageDirectory."/".$currentLanguage."/Entity/".$this->fullClassName.".ini";
-        if(file_exists($languageFilePath))
-        {
+        // Construct the language file path
+        $languageFilePath = $this->baseLanguageDirectory . "/" . $currentLanguage . "/Entity/" . $this->fullClassName . ".ini";
+        $languageFilePath = str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $languageFilePath);
+        
+        // Load the language file if it exists
+        if (file_exists($languageFilePath)) {
             $langs->loadIniFile($languageFilePath);
         }
         return $langs;
     }
     
     /**
-     * Get base class name
+     * Extracts the base class name from a full class name,
+     * optionally using a prefix and accounting for parent classes.
      *
-     * @param string $className
-     * @return string
+     * @param string $className The full class name
+     * @param string|null $prefix An optional prefix to remove
+     * @param int $parent Number of parent classes to consider
+     * @return string The base class name
      */
     private function baseClassName($className, $prefix, $parent = 0)
     {
         $result = null;
-        if(!isset($prefix))
-        {
-            if(strpos($className, "\\") === false)
-            {
+        if (!isset($prefix)) {
+            if (strpos($className, "\\") === false) {
                 $result = $className;
-            }
-            else
-            {
+            } else {
                 $arr = explode("\\", trim($className, "\\"));
-                if($parent > 0)
-                {
+                if ($parent > 0) {
                     $arr2 = array();
-                    for($i = count($arr) - 1, $j = 0; $i >= 0 && $j <= $parent; $i--, $j++)
-                    {
+                    for ($i = count($arr) - 1, $j = 0; $i >= 0 && $j <= $parent; $i--, $j++) {
                         $arr2[] = $arr[$i];
                     }
                     $result = implode("\\", array_reverse($arr2));
-                }
-                else
-                {
+                } else {
                     $result = end($arr);
                 }
             }
-        }
-        else
-        {
+        } else {
             $className = trim(str_replace("/", "\\", $className));
             $prefix = trim(str_replace("/", "\\", $prefix));
-            if(strlen($className) > strlen($prefix) && strpos($className, $prefix) === 0)
-            {
+            if (strlen($className) > strlen($prefix) && strpos($className, $prefix) === 0) {
                 $result = substr($className, strlen($prefix) + 1);
-            }
-            else
-            {
+            } else {
                 $result = $className;
             }
         }
@@ -138,9 +140,9 @@ class AppEntityLanguage extends PicoEntityLanguage
     }
 
     /**
-     * Get app config
+     * Get the application configuration.
      *
-     * @return SecretObject
+     * @return SecretObject The application configuration object
      */ 
     public function getAppConfig()
     {
@@ -148,9 +150,9 @@ class AppEntityLanguage extends PicoEntityLanguage
     }
 
     /**
-     * Get current language
+     * Get the current language code.
      *
-     * @return string
+     * @return string The current language code
      */ 
     public function getCurrentLanguage()
     {
