@@ -2,10 +2,12 @@
 
 namespace MagicObject;
 
+use DateTime;
 use Exception;
 use PDOException;
 use PDOStatement;
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseEntity;
 use MagicObject\Database\PicoDatabasePersistence;
 use MagicObject\Database\PicoDatabasePersistenceExtended;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
@@ -15,6 +17,7 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
+use MagicObject\DataLabel\PicoDataLabel;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
@@ -25,9 +28,12 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoEnvironmentVariable;
+use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
+use PDO;
 use ReflectionClass;
+use ReflectionMethod;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
@@ -71,6 +77,13 @@ class MagicObject extends stdClass // NOSONAR
      * @var PicoDatabase
      */
     private $_database; // NOSONAR
+    
+    /**
+     * Class containing a database entity
+     *
+     * @var PicoDatabaseEntity|null
+     */
+    private $_databaseEntity; // NOSONAR
 
     /**
      * Class parameters.
@@ -110,19 +123,20 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Retrieves the list of null properties.
      *
-     * @return array The list of null properties.
+     * @return array The list of properties that are currently null.
      */
     public function nullPropertyList()
     {
         return $this->_nullProperties;
     }
 
-
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param self|array|stdClass|object $data Initial data
-     * @param PicoDatabase $database Database connection
+     * Initializes the object with provided data and database connection.
+     *
+     * @param self|array|stdClass|object|null $data Initial data to populate the object.
+     * @param PicoDatabase|null $database Database connection instance.
      */
     public function __construct($data = null, $database = null)
     {
@@ -155,10 +169,10 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Load data into the object.
+     * Loads data into the object.
      *
-     * @param mixed $data Data to load
-     * @return self
+     * @param mixed $data Data to load, which can be another MagicObject, an array, or an object.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -192,7 +206,7 @@ class MagicObject extends stdClass // NOSONAR
     public function loadIniString($rawData, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_string($rawData);
+        $data = PicoIniUtil::parseIniString($rawData);
         $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
         if($systemEnv)
         {
@@ -213,7 +227,7 @@ class MagicObject extends stdClass // NOSONAR
     public function loadIniFile($path, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_file($path);
+        $data = PicoIniUtil::parseIniFile($path);
         $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
         if($systemEnv)
         {
@@ -452,6 +466,36 @@ class MagicObject extends stdClass // NOSONAR
         }
         return $this->_database;
     }
+    
+    /**
+     * Set or get the database entity.
+     *
+     * If a database entity is provided, it will be set; otherwise, the current database entity will be returned.
+     *
+     * @param MagicObject|PicoDatabaseEntity|null $databaseEntity The database entity to set or null to get the current entity.
+     * @return self|PicoDatabaseEntity Returns the current instance for method chaining, or the current database entity if no parameter is provided.
+     */
+    public function databaseEntity($databaseEntity = null)
+    {
+        if ($databaseEntity !== null) {
+            if ($databaseEntity instanceof PicoDatabaseEntity) {
+                $this->_databaseEntity = $databaseEntity;
+            } elseif ($databaseEntity instanceof MagicObject) {
+                $db = $databaseEntity->currentDatabase();
+                if (isset($db) && $db->isConnected()) {
+                    if (!isset($this->_databaseEntity)) {
+                        $this->_databaseEntity = new PicoDatabaseEntity();
+                        // Set default database connection
+                        $this->_databaseEntity->setDefaultDatabase($this->_database);
+                    }
+                    $this->_databaseEntity->add($databaseEntity, $db);
+                }
+            }
+            return $this; // Returning self for method chaining
+        } else {
+            return $this->_databaseEntity; // Returning the current database entity
+        }
+    }
 
     /**
      * Remove properties except for the specified ones.
@@ -598,6 +642,239 @@ class MagicObject extends stdClass // NOSONAR
         {
             throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
+    }
+
+    /**
+     * Executes a database query based on the parameters and annotations from the caller function.
+     *
+     * This method uses reflection to retrieve the query string from the caller's docblock,
+     * bind the parameters, and execute the query against the database.
+     *
+     * It analyzes the parameters and return type of the caller function, enabling dynamic query
+     * execution tailored to the specified return type. Supported return types include:
+     * - `void`: Returns null.
+     * - `int` or `integer`: Returns the number of affected rows.
+     * - `object` or `stdClass`: Returns a single result as an object.
+     * - `stdClass[]`: Returns all results as an array of stdClass objects.
+     * - `array`: Returns all results as an associative array.
+     * - `string`: Returns the JSON-encoded results.
+     * - `PDOStatement`: Returns the prepared statement for further operations if needed.
+     * - `MagicObject` and its derived classes: If the return type is a class name or an array of class names,
+     *   instances of that class will be created for each row fetched.
+     *
+     * @return mixed Returns the result based on the return type of the caller function:
+     *               - null if the return type is void.
+     *               - integer for the number of affected rows if the return type is int.
+     *               - object for a single result if the return type is object.
+     *               - an array of associative arrays for multiple results if the return type is array.
+     *               - a JSON string if the return type is string.
+     *               - instances of a specified class if the return type matches a class name.
+     * 
+     * @throws PDOException If there is an error executing the database query.
+     * @throws InvalidQueryInputException If there is no query to be executed on the database query.
+     */
+    protected function executeNativeQuery() //NOSONAR
+    {
+        // Retrieve caller trace information
+        $trace = debug_backtrace();
+
+        // Get parameters from the caller function
+        $callerParamValues = isset($trace[1]['args']) ? $trace[1]['args'] : [];
+        
+        // Get the name of the caller function and class
+        $callerFunctionName = $trace[1]['function'];
+        $callerClassName = $trace[1]['class'];
+
+        // Use reflection to get annotations from the caller function
+        $reflection = new ReflectionMethod($callerClassName, $callerFunctionName);
+        $docComment = $reflection->getDocComment();
+
+        // Get the query from the @query annotation
+        preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
+        $queryString = $matches ? $matches[1] : '';
+        
+        $queryString = trim($queryString, " \r\n\t ");
+        if(empty($queryString))
+        {
+            throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+        }
+
+        // Get parameter information from the caller function
+        $callerParams = $reflection->getParameters();
+
+        // Get return type from the caller function
+        $returnTypeObj = $reflection->getReturnType();
+
+        if($returnTypeObj == null)
+        {
+            // PHP 5
+            preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
+            $returnType = $matches ? $matches[1] : '';
+        }
+        else
+        {
+            // PHP 7 or above
+            $returnType = $returnTypeObj."";
+        }
+        
+        // Trim return type
+        $returnType = trim($returnType);
+        
+        // Change self to callerClassName
+        if($returnType == "self[]")
+        {
+            $returnType = $callerClassName."[]";
+        }
+        else if($returnType == "self")
+        {
+            $returnType = $callerClassName;
+        }
+
+        $params = [];
+
+        try {
+            // Get database connection
+            $pdo = $this->_database->getDatabaseConnection();
+            
+            // Replace array
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(is_array($paramValue))
+                    {
+                        $queryString = str_replace(":".$paramName, PicoDatabaseUtil::toList($paramValue, true, true), $queryString);
+                    }
+                }
+            }
+
+            $stmt = $pdo->prepare($queryString);
+
+            // Automatically bind each parameter
+            foreach ($callerParamValues as $index => $paramValue) {
+                if (isset($callerParams[$index])) {
+                    // Format parameter name according to the query
+                    $paramName = $callerParams[$index]->getName();
+                    if(!is_array($paramValue))
+                    {
+                        $maped = $this->mapToPdoParamType($paramValue);
+                        $paramType = $maped->type;
+                        $paramValue = $maped->value;
+                        $params[$paramName] = $paramValue;
+                        $stmt->bindValue(":".$paramName, $paramValue, $paramType);
+                    }
+                }
+            }
+            
+            // Send query to logger
+            $debugFunction = $this->_database->getCallbackDebugQuery();
+            if(isset($debugFunction) && is_callable($debugFunction))
+            {
+                call_user_func($debugFunction, PicoDatabaseUtil::getFinalQuery($stmt, $params));
+            }
+
+            // Execute the query
+            $stmt->execute();
+
+            if ($returnType == "void") {
+                // Return null if the return type is void
+                return null;
+            }
+            if ($returnType == "PDOStatement") {
+                // Return the PDOStatement object
+                return $stmt;
+            } else if ($returnType == "int" || $returnType == "integer") {
+                // Return the affected row count
+                return $stmt->rowCount();
+            } else if ($returnType == "object" || $returnType == "stdClass") {
+                // Return one row as an object
+                return $stmt->fetch(PDO::FETCH_OBJ);
+            } else if ($returnType == "array") {
+                // Return all rows as an associative array
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else if ($returnType == "string") {
+                // Return the result as a JSON string
+                return json_encode($stmt->fetchAll(PDO::FETCH_OBJ));
+            } else {
+                try {
+                    // Check for array-type hinting in the return type
+                    if (stripos($returnType, "[") !== false) {
+                        $className = trim(explode("[", $returnType)[0]);
+                        if (class_exists($className)) {
+                            $ret = [];
+                            if ($className == "stdClass") {
+                                // Return all rows as stdClass objects
+                                return $stmt->fetchAll(PDO::FETCH_OBJ);
+                            } else {
+                                // Map result rows to the specified class
+                                $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+                                foreach ($result as $row) {
+                                    $ret[] = new $className($row);
+                                }
+                                return $ret;
+                            }
+                        }
+                    } else {
+                        // Return a single object of the specified class
+                        $className = trim($returnType);
+                        if (class_exists($className)) {
+                            $row = $stmt->fetch(PDO::FETCH_OBJ);
+                            return new $className($row);
+                        }
+                    }
+                } catch (Exception $e) {
+                    // Log the exception if the class is not found
+                    error_log('Class not found: ' . $e->getMessage());
+                    return null;
+                }
+            }            
+        } 
+        catch (PDOException $e) 
+        {
+            // Handle database errors with logging
+            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+        }
+        return null;
+    }
+
+    /**
+     * Maps PHP types to PDO parameter types.
+     *
+     * This function determines the appropriate PDO parameter type based on the given value.
+     * It handles various PHP data types and converts them to the corresponding PDO parameter types
+     * required for executing prepared statements in PDO.
+     *
+     * @param mixed $value The value to determine the type for. This can be of any type, including
+     *                     null, boolean, integer, string, DateTime, or other types.
+     * @return stdClass An object containing:
+     *                  - type: The PDO parameter type (PDO::PARAM_STR, PDO::PARAM_NULL, 
+     *                          PDO::PARAM_BOOL, PDO::PARAM_INT).
+     *                  - value: The corresponding value formatted as needed for the PDO parameter.
+     */
+    private function mapToPdoParamType($value)
+    {
+        $type = PDO::PARAM_STR; // Default type is string
+        $finalValue = $value; // Initialize final value to the original value
+
+        if ($value instanceof DateTime) {
+            $type = PDO::PARAM_STR; // DateTime should be treated as a string
+            $finalValue = $value->format("Y-m-d H:i:s");
+        } else if (is_null($value)) {
+            $type = PDO::PARAM_NULL; // NULL type
+            $finalValue = null; // Set final value to null
+        } else if (is_bool($value)) {
+            $type = PDO::PARAM_BOOL; // Boolean type
+            $finalValue = $value; // Keep the boolean value
+        } else if (is_int($value)) {
+            $type = PDO::PARAM_INT; // Integer type
+            $finalValue = $value; // Keep the integer value
+        }
+
+        // Create and return an object with the type and value
+        $result = new stdClass();
+        $result->type = $type;
+        $result->value = $finalValue;
+        return $result;
     }
 
     /**
@@ -1007,7 +1284,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get default values for properties
      *
-     * @param boolean $snakeCase Flag indicating whether to convert property names to snake case
+     * @param bool $snakeCase Flag indicating whether to convert property names to snake case
      * @return stdClass An object containing default values
      */
     public function defaultValue($snakeCase = false)
@@ -1039,7 +1316,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get the object values
      *
-     * @param boolean $snakeCase Flag indicating whether to convert property names to snake case
+     * @param bool $snakeCase Flag indicating whether to convert property names to snake case
      * @return stdClass An object containing the values of the properties
      */
     public function value($snakeCase = false)
@@ -1103,7 +1380,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get the object value as an associative array
      *
-     * @param boolean $snakeCase Flag indicating whether to convert property names to snake case
+     * @param bool $snakeCase Flag indicating whether to convert property names to snake case
      * @return array An associative array representing the object values
      */
     public function valueArray($snakeCase = false)
@@ -1136,7 +1413,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is snake case
      *
-     * @return boolean True if the naming strategy is snake case; otherwise, false
+     * @return bool True if the naming strategy is snake case; otherwise, false
      */
     protected function _snakeJson()
     {
@@ -1149,7 +1426,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the YAML naming strategy is snake case
      *
-     * @return boolean True if the naming strategy is snake case; otherwise, false
+     * @return bool True if the naming strategy is snake case; otherwise, false
      */
     protected function _snakeYaml()
     {
@@ -1162,7 +1439,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is upper camel case
      *
-     * @return boolean True if the naming strategy is upper camel case; otherwise, false
+     * @return bool True if the naming strategy is upper camel case; otherwise, false
      */
     protected function isUpperCamel()
     {
@@ -1175,7 +1452,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is camel case
      *
-     * @return boolean True if the naming strategy is camel case; otherwise, false
+     * @return bool True if the naming strategy is camel case; otherwise, false
      */
     protected function _camel()
     {
@@ -1185,7 +1462,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON output should be prettified
      *
-     * @return boolean True if JSON output is set to be prettified; otherwise, false
+     * @return bool True if JSON output is set to be prettified; otherwise, false
      */
     protected function _pretty()
     {
@@ -1199,7 +1476,7 @@ class MagicObject extends stdClass // NOSONAR
      * Check if a value is not null and not empty
      *
      * @param mixed $value The value to check
-     * @return boolean True if the value is not null and not empty; otherwise, false
+     * @return bool True if the value is not null and not empty; otherwise, false
      */
     private function _notNullAndNotEmpty($value)
     {
@@ -1209,8 +1486,8 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get a list of properties
      *
-     * @param boolean $reflectSelf Flag indicating whether to reflect properties of the current class
-     * @param boolean $asArrayProps Flag indicating whether to return properties as an array
+     * @param bool $reflectSelf Flag indicating whether to reflect properties of the current class
+     * @param bool $asArrayProps Flag indicating whether to return properties as an array
      * @return array An array of property names or ReflectionProperty objects
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -1250,7 +1527,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoPageable|string|null $pageable The pagination information
      * @param PicoSortable|string|null $sortable The sorting criteria
-     * @param boolean $passive Flag indicating whether the object is passive
+     * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @return PicoPageData The paginated data
      * @throws NoRecordFoundException if no records are found
@@ -1264,7 +1541,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if database is connected or not
      *
-     * @return boolean
+     * @return bool
      */
     private function _databaseConnected()
     {
@@ -1355,7 +1632,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoPageable|string|null $pageable The pagination information
      * @param PicoSortable|string|null $sortable The sorting criteria
-     * @param boolean $passive Flag indicating whether the object is passive
+     * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @param int $findOption The find option
      * @return PicoPageData The paginated data
@@ -1446,7 +1723,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoPageable|string|null $pageable The pagination information
      * @param PicoSortable|string|null $sortable The sorting criteria
-     * @param boolean $passive Flag indicating whether the object is passive
+     * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @param int $findOption The find option
      * @return PicoPageData The paginated data
@@ -1637,7 +1914,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoPageable|string|null $pageable The pagination information
      * @param PicoSortable|string|null $sortable The sorting criteria
-     * @param boolean $passive Flag indicating whether the object is passive
+     * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @param int $findOption The find option
      * @return PicoPageData The paginated data
@@ -1815,7 +2092,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the deletion.
-     * @return boolean True on success; otherwise, false.
+     * @return bool True on success; otherwise, false.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
     private function deleteOneBy($method, $params)
@@ -1844,7 +2121,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the search.
-     * @return boolean True if the record exists; otherwise, false.
+     * @return bool True if the record exists; otherwise, false.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
     private function existsBy($method, $params)
@@ -1885,10 +2162,10 @@ class MagicObject extends stdClass // NOSONAR
      * Convert the result to an array of objects.
      *
      * @param array $result The result set to convert.
-     * @param boolean $passive Flag indicating whether the objects are passive.
+     * @param bool $passive Flag indicating whether the objects are passive.
      * @return array An array of objects.
      */
-    private function toArrayObject($result, $passive = false)
+    private function toArrayObject($result, $passive = false) // NOSONAR
     {
         $instance = array();
         $index = 0;
@@ -1897,7 +2174,23 @@ class MagicObject extends stdClass // NOSONAR
             foreach($result as $value)
             {
                 $className = get_class($this);
-                $instance[$index] = new $className($value, $passive ? null : $this->_database);
+                $obj = new $className($value);
+                if(!$passive)
+                {
+                    $dbEnt = $this->databaseEntity();
+                    $db = null;
+                    if(isset($dbEnt))
+                    {
+                        $db = $dbEnt->getDatabase(get_class($obj));
+                    }
+                    if(!isset($db) || !$db->isConnected())
+                    {
+                        $db = $this->_database;
+                    }
+                    $obj->currentDatabase($db);                  
+                    $obj->databaseEntity($dbEnt);              
+                }
+                $instance[$index] = $obj;
                 $index++;
             }
         }
@@ -2339,7 +2632,7 @@ class MagicObject extends stdClass // NOSONAR
      * Recursively stringify an object or array of objects.
      *
      * @param self $value The object to stringify.
-     * @param boolean $snake Flag to indicate whether to convert property names to snake_case.
+     * @param bool $snake Flag to indicate whether to convert property names to snake_case.
      * @return mixed The stringified object or array.
      */
     private function stringifyObject($value, $snake)

@@ -4,6 +4,24 @@ namespace MagicObject\Util;
 
 use MagicObject\Exceptions\InvalidInputFormatException;
 
+/**
+ * Class PicoPasswordUtil
+ *
+ * A utility class for handling password management tasks, including validation, hashing, and enforcing security policies.
+ *
+ * This class provides methods to validate passwords based on customizable rules, including minimum length and complexity requirements.
+ * It also offers functionality to hash passwords using various cryptographic algorithms to ensure secure storage.
+ *
+ * Passwords can be validated against a regular expression that enforces specific character types (uppercase, lowercase, numbers, and special characters).
+ * Users can configure the minimum length and the hashing algorithm used to generate password hashes.
+ *
+ * Example usage:
+ * ```
+ * $passwordUtil = new PicoPasswordUtil();
+ * $passwordUtil->validate('YourSecureP@ssw0rd!');
+ * $hashedPassword = $passwordUtil->getHash('YourSecureP@ssw0rd!');
+ * ```
+ */
 class PicoPasswordUtil{
     const ALG_MD2          = "md2";
     const ALG_MD4          = "md4";
@@ -60,21 +78,42 @@ class PicoPasswordUtil{
     const ALG_HAVAL256_5   = "haval256,5";
 
     /**
-     * Regular expression format
+     * Regular expression format for password validation.
+     *
+     * This regex is used to enforce complexity rules for passwords,
+     * including the presence of uppercase letters, lowercase letters,
+     * numbers, and special characters.
      *
      * @var string
      */
     private $regex = '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{%d,}$/';
 
     /**
-     * Minimum length of the password
+     * Minimum length of the password.
      *
-     * @var integer
+     * This sets the minimum number of characters required for a valid password.
+     *
+     * @var int
      */
     private $minLength = 8;
 
+    /**
+     * Hash algorithm to be used for password hashing.
+     *
+     * This determines which hashing algorithm will be applied when generating
+     * password hashes.
+     *
+     * @var string
+     */
     private $hashAlgorithm = self::ALG_SHA1;
 
+    /**
+     * Constructor to initialize password utility settings.
+     *
+     * @param string|null $hashAlgorithm Optional hashing algorithm to use.
+     * @param int $minLength Minimum length of the password. Default is 8.
+     * @param string|null $regex Optional regex pattern for password validation.
+     */
     public function __construct($hashAlgorithm = null, $minLength = 8, $regex = null)
     {
         if(isset($hashAlgorithm))
@@ -91,10 +130,13 @@ class PicoPasswordUtil{
         }
     }
 
-    /**
-     * Get regular expression
+   /**
+     * Get the regular expression string used for password validation.
      *
-     * @return string
+     * The method replaces the placeholder '%d' with the minimum length
+     * defined for the password.
+     *
+     * @return string The regex string with the minimum length.
      */
     private function getRegexString()
     {
@@ -106,11 +148,15 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Validate password
+     * Validate the given password against the set rules.
      *
-     * @param string $password Password to be validated
-     * @return true
-     * @throws InvalidInputFormatException
+     * This method checks if the password meets the length requirement
+     * and matches the defined complexity rules. Throws an exception
+     * if the password is invalid.
+     *
+     * @param string $password Password to be validated.
+     * @return bool True if the password is valid.
+     * @throws InvalidInputFormatException If the password is invalid.
      */
     public function validate($password)
     {
@@ -126,12 +172,16 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Get password hash
+     * Get the hash of the given plain text password.
      *
-     * @param string $password Plain text
-     * @param boolean $binary Flag that result is binary
-     * @param boolean $validate Flag to validate password
-     * @return string
+     * This method hashes the password using the specified hashing algorithm.
+     * Optionally validates the password before hashing.
+     *
+     * @param string $password Plain text password to be hashed.
+     * @param bool $binary Optional. If true, returns the binary representation of the hash.
+     * @param bool $validate Optional. If true, validates the password before hashing.
+     * @return string The resulting hashed password.
+     * @throws InvalidInputFormatException If the password is invalid and validation is enabled.
      */
     public function getHash($password, $binary = false, $validate = true)
     {
@@ -143,9 +193,9 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Get regular expression format
+     * Get the current regular expression format used for password validation.
      *
-     * @return string
+     * @return string The current regex format.
      */
     public function getRegex()
     {
@@ -153,11 +203,10 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Set regular expression format
+     * Set a new regular expression format for password validation.
      *
-     * @param string  $regex  Regular expression format
-     *
-     * @return self
+     * @param string $regex New regular expression format.
+     * @return self Returns the current instance for method chaining.
      */
     public function setRegex($regex)
     {
@@ -167,9 +216,9 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Get minimum length of the password
+     * Get the minimum length required for passwords.
      *
-     * @return int
+     * @return int The minimum length for passwords.
      */
     public function getMinLength()
     {
@@ -177,11 +226,10 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Set minimum length of the password
+     * Set a new minimum length requirement for passwords.
      *
-     * @param int $minLength Minimum length of the password
-     *
-     * @return self
+     * @param int $minLength New minimum length for passwords.
+     * @return self Returns the current instance for method chaining.
      */
     public function setMinLength($minLength)
     {
@@ -191,7 +239,9 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Get the value of hashAlgorithm
+     * Get the currently set hash algorithm.
+     *
+     * @return string The hashing algorithm in use.
      */
     public function getHashAlgorithm()
     {
@@ -199,9 +249,10 @@ class PicoPasswordUtil{
     }
 
     /**
-     * Set the value of hashAlgorithm
+     * Set a new hash algorithm to be used for password hashing.
      *
-     * @return self
+     * @param string $hashAlgorithm New hashing algorithm.
+     * @return self Returns the current instance for method chaining.
      */
     public function setHashAlgorithm($hashAlgorithm)
     {

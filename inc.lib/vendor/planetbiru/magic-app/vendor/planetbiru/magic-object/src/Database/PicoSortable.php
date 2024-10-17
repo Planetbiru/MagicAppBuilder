@@ -193,7 +193,7 @@ class PicoSortable
     /**
      * Check if there are no sortable criteria.
      *
-     * @return boolean True if there are no sortable criteria, false otherwise.
+     * @return bool True if there are no sortable criteria, false otherwise.
      */
     public function isEmpty()
     {
@@ -263,7 +263,7 @@ class PicoSortable
      * Check if the given input is an array.
      *
      * @param mixed $array The input to check.
-     * @return boolean True if the input is an array, false otherwise.
+     * @return bool True if the input is an array, false otherwise.
      */
     public static function isArray($array)
     {

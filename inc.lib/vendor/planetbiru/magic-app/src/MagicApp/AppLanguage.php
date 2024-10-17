@@ -7,90 +7,94 @@ use MagicObject\SecretObject;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 
+/**
+ * Class AppLanguage
+ *
+ * Extends PicoLanguage to manage application-specific language data.
+ * Loads language strings from an INI file based on the current language setting.
+ */
 class AppLanguage extends PicoLanguage
 {
     /**
-     * App Config
+     * Application configuration.
      *
      * @var SecretObject
      */
     private $appConfig;
 
     /**
-     * Current language
+     * Current language being used.
      *
      * @var string
      */
     private $currentLanguage;
 
     /**
-     * Callback
+     * Callback function for handling missing properties.
      *
-     * @var callable
+     * @var callable|null
      */
     private $callback;
-    
+
     /**
-     * Constructor
+     * Constructor for AppLanguage.
      *
-     * @param SecretObject $appConfig
-     * @param string $currentLanguage
-     * @param callable $callback
+     * @param SecretObject|null $appConfig The application configuration object.
+     * @param string|null $currentLanguage The current language to load.
+     * @param callable|null $callback A callback function for missing properties.
      */
     public function __construct($appConfig = null, $currentLanguage = null, $callback = null)
     {
         $this->appConfig = $appConfig;
         $this->currentLanguage = $currentLanguage;
-        $this->loadData($this->loadLaguageData());
-        if(isset($callback) && is_callable($callback))
-        {
+        $this->loadData($this->loadLanguageData());
+
+        if (isset($callback) && is_callable($callback)) {
             $this->callback = $callback;
         }
     }
 
     /**
-     * Load data
+     * Load language data from the INI file.
      *
-     * @return array
+     * @return array The parsed language data.
      */
-    private function loadLaguageData()
+    private function loadLanguageData()
     {
-        $langFile = $this->appConfig->getBaseDirectoryLanguage()."/".$this->currentLanguage."/app.ini";
+        $langFile = $this->appConfig->getBaseDirectoryLanguage() . "/" . $this->currentLanguage . "/app.ini";
 
-        if(!file_exists(dirname($langFile)))
-        {
+        // Create the directory if it does not exist
+        if (!file_exists(dirname($langFile))) {
             mkdir(dirname($langFile), 0755, true);
         }
-        if(!file_exists($langFile))
-        {
+
+        // Create the language file if it does not exist
+        if (!file_exists($langFile)) {
             file_put_contents($langFile, "");
         }
+
         $data = PicoIniUtil::parseIniFile($langFile);
-        if(!isset($data) || !is_array($data))
-        {
-            $data = array();
-        }
-        return $data;
+        
+        return isset($data) && is_array($data) ? $data : [];
     }
-    
+
     /**
-     * Get property value
+     * Get the value of a specified property.
      *
-     * @param string $propertyName
-     * @return mixed|null
+     * If the property does not exist, the callback (if set) is called.
+     *
+     * @param string $propertyName The name of the property to retrieve.
+     * @return mixed|null The property value or null if not found.
      */
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(isset($this->$var))
-        {
+
+        if (isset($this->$var)) {
             return $this->$var;
-        }
-        else
-        {
+        } else {
             $value = PicoStringUtil::camelToTitle($var);
-            if(isset($this->callback) && is_callable($this->callback))
-            {
+            if (isset($this->callback) && is_callable($this->callback)) {
                 call_user_func($this->callback, $var, $value);
             }
             return $value;

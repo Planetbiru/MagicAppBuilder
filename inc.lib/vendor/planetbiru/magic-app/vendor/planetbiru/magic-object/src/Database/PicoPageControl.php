@@ -4,7 +4,14 @@ namespace MagicObject\Database;
 use MagicObject\Pagination\PicoPagination;
 
 /**
- * Page control
+ * Class PicoPageControl
+ *
+ * This class manages pagination controls for displaying pages of data. 
+ * It generates navigation elements such as previous, next, first, and last 
+ * page buttons, allowing users to navigate through pages seamlessly. 
+ * The pagination links are generated based on the provided page data and 
+ * can be customized with parameter names and paths.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPageControl

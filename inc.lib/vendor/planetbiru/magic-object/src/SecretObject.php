@@ -225,6 +225,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param array $params Parameters for the method.
      * @return mixed|null The result of the method call or null if not applicable.
      */
+
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0) {
@@ -336,7 +337,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if the given data is an instance of MagicObject or PicoGenericObject.
      *
      * @param mixed $data The data to check.
-     * @return boolean True if the data is an instance, otherwise false.
+     * @return bool True if the data is an instance, otherwise false.
      */
     private function typeObject($data)
     {
@@ -351,7 +352,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if the given data is an instance of self or stdClass.
      *
      * @param mixed $data The data to check.
-     * @return boolean True if the data is an instance, otherwise false.
+     * @return bool True if the data is an instance, otherwise false.
      */
     private function typeStdClass($data)
     {
@@ -503,7 +504,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if value is required to be encrypted before stored
      *
      * @param string $var Variable
-     * @return boolean
+     * @return bool
      */
     private function needInputEncryption($var)
     {
@@ -514,7 +515,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if value is required to be decrypted after read
      *
      * @param string $var Variable
-     * @return boolean
+     * @return bool
      */
     private function needOutputDecryption($var)
     {
@@ -525,7 +526,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if value is required to be encrypted after read
      *
      * @param string $var Variable
-     * @return boolean
+     * @return bool
      */
     private function needOutputEncryption($var)
     {
@@ -536,7 +537,7 @@ class SecretObject extends stdClass //NOSONAR
      * Check if value is required to be decrypted before stored
      *
      * @param string $var Variable
-     * @return boolean
+     * @return bool
      */
     private function needInputDecryption($var)
     {
@@ -574,7 +575,7 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from INI string
      *
      * @param string $rawData Raw data
-     * @param boolean $systemEnv Flag to use environment variable
+     * @param bool $systemEnv Flag to use environment variable
      * @return self
      */
     public function loadIniString($rawData, $systemEnv = false)
@@ -595,7 +596,7 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from INI file
      *
      * @param string $path File path
-     * @param boolean $systemEnv Flag to use environment variable
+     * @param bool $systemEnv Flag to use environment variable
      * @return self
      */
     public function loadIniFile($path, $systemEnv = false)
@@ -616,9 +617,9 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from Yaml string
      *
      * @param string $rawData String of Yaml
-     * @param boolean $systemEnv Replace all environment variable value
-     * @param boolean $asObject Result is object instead of array
-     * @param boolean $recursive Convert all object to MagicObject
+     * @param bool $systemEnv Replace all environment variable value
+     * @param bool $asObject Result is object instead of array
+     * @param bool $recursive Convert all object to MagicObject
      * @return self
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
@@ -647,9 +648,9 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from Yaml file
      *
      * @param string $path File path
-     * @param boolean $systemEnv Replace all environment variable value
-     * @param boolean $asObject Result is object instead of array
-     * @param boolean $recursive Convert all object to MagicObject
+     * @param bool $systemEnv Replace all environment variable value
+     * @param bool $asObject Result is object instead of array
+     * @param bool $recursive Convert all object to MagicObject
      * @return self
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
@@ -678,8 +679,8 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from JSON string
      *
      * @param string $rawData Raw data
-     * @param boolean $systemEnv Flag to use environment variable
-     * @param boolean $recursive Flag to create recursive object
+     * @param bool $systemEnv Flag to use environment variable
+     * @param bool $recursive Flag to create recursive object
      * @return self
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
@@ -708,8 +709,8 @@ class SecretObject extends stdClass //NOSONAR
      * Load data from JSON file
      *
      * @param string $path File path
-     * @param boolean $systemEnv Flag to use environment variable
-     * @param boolean $recursive Flag to create recursive object
+     * @param bool $systemEnv Flag to use environment variable
+     * @param bool $recursive Flag to create recursive object
      * @return self
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
@@ -737,7 +738,7 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Set readonly. When object is set to readonly, setter will not change value of its properties but loadData still works fine
      *
-     * @param boolean $readonly Flag to set object to be readonly
+     * @param bool $readonly Flag to set object to be readonly
      * @return self
      */
     protected function readOnly($readonly)
@@ -820,7 +821,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param self|mixed $source Source
      * @param array $filter Filter
-     * @param boolean $includeNull Flag to include null
+     * @param bool $includeNull Flag to include null
      * @return void
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
@@ -852,7 +853,7 @@ class SecretObject extends stdClass //NOSONAR
 
     /**
      * Get object value
-     * @param boolean $snakeCase Flag to snake case property
+     * @param bool $snakeCase Flag to snake case property
      * @return stdClass
      */
     public function value($snakeCase = false)
@@ -881,7 +882,7 @@ class SecretObject extends stdClass //NOSONAR
 
     /**
      * Get object value
-     * @param boolean $snakeCase Flag to snake case property
+     * @param bool $snakeCase Flag to snake case property
      * @return stdClass
      */
     public function valueObject($snakeCase = false)
@@ -891,7 +892,7 @@ class SecretObject extends stdClass //NOSONAR
 
     /**
      * Get object value as associative array
-     * @param boolean $snakeCase Flag to snake case property
+     * @param bool $snakeCase Flag to snake case property
      * @return array
      */
     public function valueArray($snakeCase = false)
@@ -924,7 +925,7 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Check if JSON naming strategy is snake case or not
      *
-     * @return boolean
+     * @return bool
      */
     protected function _snakeJson()
     {
@@ -937,7 +938,7 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Check if Yaml naming strategy is snake case or not
      *
-     * @return boolean
+     * @return bool
      */
     protected function _snakeYaml()
     {
@@ -950,7 +951,7 @@ class SecretObject extends stdClass //NOSONAR
     /**
      *  Check if JSON naming strategy is upper camel case or not
      *
-     * @return boolean
+     * @return bool
      */
     protected function isUpperCamel()
     {
@@ -963,7 +964,7 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Check if JSON naming strategy is camel case or not
      *
-     * @return boolean
+     * @return bool
      */
     protected function _camel()
     {

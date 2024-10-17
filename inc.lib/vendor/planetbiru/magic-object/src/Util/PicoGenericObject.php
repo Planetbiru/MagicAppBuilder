@@ -101,7 +101,7 @@ class PicoGenericObject extends stdClass
      * Check if a property is set.
      *
      * @param string $name Name of the property.
-     * @return boolean True if the property is set, false otherwise.
+     * @return bool True if the property is set, false otherwise.
      */
     public function __isset($name)
     {

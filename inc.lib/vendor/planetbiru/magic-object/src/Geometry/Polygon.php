@@ -4,6 +4,12 @@ namespace MagicObject\Geometry;
 
 use MagicObject\Exceptions\InvalidPolygonException;
 
+/**
+ * Class representing a polygon defined by a series of points.
+ *
+ * This class allows for the creation and manipulation of polygons, including
+ * adding points, clearing the polygon, and calculating its area and circumference.
+ */
 class Polygon
 {
     /**
@@ -38,6 +44,8 @@ class Polygon
     /**
      * Clear all points from the polygon.
      *
+     * This method removes all points currently defined for the polygon.
+     *
      * @return self
      */
     public function clearPolygon(): self
@@ -49,8 +57,8 @@ class Polygon
     /**
      * Calculate the area of the polygon using the Shoelace formula.
      *
-     * @return float
-     * @throws InvalidPolygonException
+     * @return float The area of the polygon.
+     * @throws InvalidPolygonException If the polygon has fewer than 3 points.
      */
     public function getArea(): float
     {
@@ -72,8 +80,10 @@ class Polygon
     /**
      * Calculate the circumference of the polygon.
      *
-     * @return float
-     * @throws InvalidPolygonException
+     * This method computes the total length of the polygon's edges.
+     *
+     * @return float The circumference of the polygon.
+     * @throws InvalidPolygonException If the polygon has fewer than 2 points.
      */
     public function getCircumference(): float
     {
@@ -96,7 +106,7 @@ class Polygon
     /**
      * Get the points of the polygon.
      *
-     * @return Point[]
+     * @return Point[] An array of Point objects that define the polygon.
      */
     public function getPoints(): array
     {

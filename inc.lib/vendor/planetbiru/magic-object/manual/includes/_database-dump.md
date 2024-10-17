@@ -2,6 +2,14 @@
 
 We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.
 
+### Database Dump Overview
+
+1. Dumping Database Structure
+
+You can dump the structure of a database without needing to connect to a real database. Specify the target database type when calling the dump method.
+
+**Code Example:**
+
 ```php
 <?php
 
@@ -480,3 +488,9 @@ $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong->dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);
 ```
 
+### Summary
+
+- **Structure Dumping**: Use `dumpStructure` to get the schema of the database without a real connection.
+- **Data Dumping**: Use `dumpData` to extract data from an actual database connection.
+
+This approach allows developers to quickly switch between database types and manage their database schemas and data efficiently. The use of dedicated instances of PicoDatabaseDump for multiple tables ensures clarity and organization in your database operations.

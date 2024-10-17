@@ -12,7 +12,25 @@ use MagicObject\SecretObject;
 use stdClass;
 
 /**
- * Database connection for MagicObject.
+ * PicoDatabase provides an interface for database interactions using PDO.
+ * 
+ * This class manages database connections, query execution, and transactions.
+ * It supports callbacks for query execution and debugging, allowing developers 
+ * to handle SQL commands and responses effectively.
+ * 
+ * Features include:
+ * - Establishing and managing a database connection.
+ * - Executing various SQL commands (INSERT, UPDATE, DELETE, etc.).
+ * - Transaction management with commit and rollback functionality.
+ * - Fetching results in different formats (array, object, etc.).
+ * - Generating unique IDs and retrieving the last inserted ID.
+ * 
+ * Example usage:
+ * ```php
+ * $db = new PicoDatabase($credentials);
+ * $db->connect();
+ * $result = $db->fetch("SELECT * FROM users WHERE id = 1");
+ * ```
  * 
  * Developer: Kamshory
  * @link https://github.com/Planetbiru/MagicObject
@@ -541,5 +559,25 @@ class PicoDatabase //NOSONAR
         $val->autocommit = $this->autocommit;
         $val->connected = $this->connected;
         return json_encode($val);
+    }
+
+    /**
+     * Get callback function when executing any query.
+     *
+     * @return  callable|null
+     */ 
+    public function getCallbackDebugQuery()
+    {
+        return $this->callbackDebugQuery;
+    }
+
+    /**
+     * Get callback function when executing queries that modify data.
+     *
+     * @return  callable|null
+     */ 
+    public function getCallbackExecuteQuery()
+    {
+        return $this->callbackExecuteQuery;
     }
 }

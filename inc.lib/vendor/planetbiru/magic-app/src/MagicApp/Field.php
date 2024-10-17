@@ -2,11 +2,15 @@
 
 namespace MagicApp;
 
+/**
+ * Class Field
+ *
+ * Represents a field with dynamic retrieval of values.
+ */
 class Field
 {
-
     /**
-     * Get instance
+     * Get an instance of Field.
      *
      * @return Field
      */
@@ -16,7 +20,7 @@ class Field
     }
 
     /**
-     * Get string from method
+     * Get a value dynamically using property access.
      *
      * @param string $value
      * @return string

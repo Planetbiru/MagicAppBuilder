@@ -61,7 +61,7 @@ class PicoDataLabel extends SetterGetter
      * Loads data into the object from a provided array, object, or self instance.
      *
      * @param mixed $data The data to load into the object.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {

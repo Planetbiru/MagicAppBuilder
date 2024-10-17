@@ -3,7 +3,11 @@
 namespace MagicObject\Util;
 
 /**
- * Ini utility
+ * Utility class for handling INI file operations.
+ *
+ * This class provides methods for reading from and writing to INI files, 
+ * as well as parsing INI strings into arrays and vice versa.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoIniUtil
@@ -14,17 +18,17 @@ class PicoIniUtil
     }
     
     /**
-     * Write INI file
+     * Write an array to an INI file.
      *
-     * @param array $array Array
-     * @param string $path File path
-     * @return boolean
+     * @param array $array The array to write to the INI file.
+     * @param string $path The file path where the INI file will be saved.
+     * @return bool True on success, false on failure.
      */
     public static function writeIniFile($array, $path)
     {
         $arrayMulti = false;
 
-        # See if the array input is multidimensional.
+        // Check if the input array is multidimensional.
         foreach ($array as $arrayTest) {
             if (is_array($arrayTest)) {
                 $arrayMulti = true;
@@ -46,11 +50,11 @@ class PicoIniUtil
     }
 
     /**
-     * Get INI content
+     * Generate INI content from a simple array.
      *
-     * @param string $content Content
-     * @param array $array Array
-     * @return string
+     * @param string $content The existing content (usually empty).
+     * @param array $array The array to convert to INI format.
+     * @return string The formatted INI content.
      */
     private static function getContent($content, $array)
     {
@@ -69,11 +73,11 @@ class PicoIniUtil
     }
 
     /**
-     * Get INI content from multiple
+     * Generate INI content from a multidimensional array.
      *
-     * @param string $content Content
-     * @param array $array Array
-     * @return string
+     * @param string $content The existing content (usually empty).
+     * @param array $array The multidimensional array to convert to INI format.
+     * @return string The formatted INI content.
      */
     private static function getContentMulti($content, $array)
     {
@@ -95,10 +99,10 @@ class PicoIniUtil
     }
 
     /**
-     * Parse ini file
+     * Parse an INI file from the specified path.
      *
-     * @param string $path File path
-     * @return array|false
+     * @param string $path The file path of the INI file to parse.
+     * @return array|false The parsed INI data as an array, or false on failure.
      */
     public static function parseIniFile($path)
     {
@@ -114,10 +118,10 @@ class PicoIniUtil
     }
 
     /**
-     * Parse INI string
+     * Parse an INI string into an array.
      *
-     * @param string $str String to be parsed
-     * @return array|false
+     * @param string $str The INI string to parse.
+     * @return array|false The parsed INI data as an array, or false on failure.
      */
     public static function parseIniString($str)
     {
@@ -168,9 +172,10 @@ class PicoIniUtil
     }
 
     /**
-     * check if match
-     * @param array $matches Mathes
-     * @return bool
+     * Check if the line is invalid (empty or a comment).
+     *
+     * @param string $line The line to check.
+     * @return bool True if the line is invalid, false otherwise.
      */
     public static function matchValue($matches)
     {
@@ -178,10 +183,12 @@ class PicoIniUtil
     }
 
     /**
-     * Check if line is invalid
+     * Check if a line is invalid.
      *
-     * @param string $line Line
-     * @return boolean
+     * A line is considered invalid if it is empty or starts with a comment character (# or ;).
+     *
+     * @param string $line The line to check.
+     * @return bool True if the line is invalid, false otherwise.
      */
     public static function invalidLine($line)
     {
@@ -189,10 +196,13 @@ class PicoIniUtil
     }
 
     /**
-     * Fix value
+     * Remove surrounding quotes from a value.
      *
-     * @param string $value Value
-     * @return string
+     * This method checks if the value is surrounded by double or single quotes 
+     * and removes them if present.
+     *
+     * @param string $value The value to fix.
+     * @return string The cleaned value without surrounding quotes.
      */
     public static function fixValue1($value)
     {
@@ -206,10 +216,13 @@ class PicoIniUtil
     }
 
     /**
-     * Fix value
+     * Remove surrounding quotes from a value using regex.
      *
-     * @param string $value Value
-     * @return string
+     * This method checks if the value matches the pattern of being surrounded by 
+     * double or single quotes and removes them if so.
+     *
+     * @param string $value The value to fix.
+     * @return string The cleaned value without surrounding quotes.
      */
     public static function fixValue2($value)
     {
@@ -220,14 +233,17 @@ class PicoIniUtil
     }
 
     /**
-     * Fix value
+     * Fix and organize the value in the parsed result.
      *
-     * @param array $ret Return value from previous process
-     * @param string $inside_section Inside section
-     * @param string $arr_name Array name
-     * @param array $matches Matches
-     * @param mixed $value Value
-     * @return array
+     * This method ensures that the given array is correctly formatted 
+     * based on the provided parameters, handling nested structures.
+     *
+     * @param array $ret The parsed result array to update.
+     * @param string $inside_section The current section name.
+     * @param string $arr_name The name of the array key.
+     * @param array $matches Matches found during parsing.
+     * @param mixed $value The value to assign.
+     * @return array The updated parsed result array.
      */
     public static function fixValue3($ret, $inside_section, $arr_name, $matches, $value)
     {

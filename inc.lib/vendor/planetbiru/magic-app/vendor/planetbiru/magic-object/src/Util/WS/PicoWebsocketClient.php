@@ -67,8 +67,8 @@ class PicoWebsocketClient
    * @param array $headers
    * @param string $error_string
    * @param int $timeout
-   * @param boolean $ssl
-   * @param boolean $persistant
+   * @param bool $ssl
+   * @param bool $persistant
    * @param string $path
    * @param resource $context
    * @return resource|false

@@ -4,10 +4,17 @@ namespace MagicApp\Menu;
 
 use MagicObject\MagicObject;
 
+/**
+ * Class MainMenu
+ *
+ * Extends the BasicMenu class to provide functionalities specific to managing
+ * a hierarchical menu structure. It organizes menu items into groups based
+ * on specified column names, allowing for structured retrieval of menu data.
+ */
 class MainMenu extends BasicMenu
 {
     /**
-     * Menu
+     * Menu structure
      *
      * @var array
      */
@@ -30,20 +37,22 @@ class MainMenu extends BasicMenu
     /**
      * Construct menu
      *
-     * @param MagicObject[] $menu
-     * @param string $columnName
-     * @param string $joinColumnName
+     * Initializes the MainMenu with a list of menu items, organizing them
+     * into groups based on the specified column names.
+     *
+     * @param MagicObject[] $menu An array of menu items (MagicObject instances).
+     * @param string $columnName The column name used to group the menu items.
+     * @param string $joinColumnName The column name used for joining menu groups.
      */
     public function __construct($menu, $columnName, $joinColumnName)
     {
         $this->columnName = $columnName;
         $this->joinColumnName = $joinColumnName;
         $this->menu = array();
-        foreach($menu as $menuItem)
-        {
+        
+        foreach ($menu as $menuItem) {
             $menuGroupId = $menuItem->get($columnName);
-            if(!isset($this->menu[$menuGroupId]))
-            {
+            if (!isset($this->menu[$menuGroupId])) {
                 $this->menu[$menuGroupId] = array();
                 $this->menu[$menuGroupId]['menuGroup'] = $menuItem->get($joinColumnName);
                 $this->menu[$menuGroupId]['menuItem'] = array();
@@ -55,7 +64,9 @@ class MainMenu extends BasicMenu
     /**
      * Get menu
      *
-     * @return array
+     * Returns the organized menu structure.
+     *
+     * @return array The organized menu structure grouped by specified column.
      */ 
     public function getMenu()
     {

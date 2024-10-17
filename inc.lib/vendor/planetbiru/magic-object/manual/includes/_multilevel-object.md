@@ -1,5 +1,7 @@
 ## Multilevel Object
 
+In the first code snippet, you are creating a multilevel object structure to represent a car with its components, specifically the tire and body.
+
 ```php
 <?php
 use MagicObject\MagicObject;
@@ -33,7 +35,17 @@ echo $car->getBody()->getColor();
 
 ```
 
+**Explanation**
+
+1. **Creating Objects**: Instances of `MagicObject` are created for the car, tire, and body.
+2. **Setting Properties**: You set properties on the tire (diameter and pressure) and the body (length, width, height, and color) using the `set` methods.
+3. **Nested Objects**: The tire and body are associated with the car using `setTire()` and `setBody()`.
+4. **JSON Output**: When you output `$car`, it returns a JSON representation of the object structure.
+5. **Accessing Properties**: You can retrieve the color of the car's body through the method chaining `getBody()->getColor()`.
+
 ### Parse Yaml
+
+The second code snippet demonstrates how to load and manipulate structured data from a YAML string.
 
 ```php
 
@@ -86,3 +98,14 @@ foreach($song->getVocalist()->getAgency()->getCompany()->getPic() as $pic)
 	echo "\r\n----\r\n";
 }
 ```
+
+**Explanation**
+
+1. **Loading YAML**: The `loadYamlString()` method is used to load a YAML string into the `MagicObject`. This creates a structured object based on the YAML data.
+2. **Accessing Nested Data**: You can navigate through the object hierarchy to retrieve values, like getting the company name with `getVocalist()->getAgency()->getCompany()->getName()`.
+3. **Adding Properties**: You can also set additional properties, like the company address.
+4. **Iterating Over Arrays**: The `pic` property is an array of objects, so you can loop through it to access individual picture details.
+
+### Conclusion
+
+Both examples demonstrate how MagicObject allows you to create complex object structures and manage nested data efficiently. The use of YAML for configuration or data storage makes it easier to define complex structures in a human-readable format. The ability to set and get properties through method chaining enhances the flexibility and readability of your code.

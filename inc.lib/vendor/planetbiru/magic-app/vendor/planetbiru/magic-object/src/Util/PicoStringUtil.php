@@ -3,6 +3,23 @@ namespace MagicObject\Util;
 
 use stdClass;
 
+/**
+ * Class PicoStringUtil
+ *
+ * A utility class for performing various string manipulations and transformations.
+ *
+ * This class provides static methods for converting between different string case formats (snake case, camel case, kebab case),
+ * validating string contents, and manipulating strings (trimming, checking for null/empty values, etc.).
+ *
+ * The methods are designed to be used statically, allowing for convenient access without needing to instantiate the class.
+ *
+ * Example usage:
+ * ```
+ * $camelCase = PicoStringUtil::camelize('example_string');
+ * $kebabCase = PicoStringUtil::kebapize('exampleString');
+ * $isNotEmpty = PicoStringUtil::isNotNullAndNotEmpty('Some Value');
+ * ```
+ */
 class PicoStringUtil
 {
     private function __construct()
@@ -13,9 +30,9 @@ class PicoStringUtil
     /**
      * Convert snake case to camel case
      *
-     * @param string $input Input string
-     * @param string $glue Glue
-     * @return string
+     * @param string $input Input string in snake case format.
+     * @param string $glue Optional. The glue character used in the input string (default is '_').
+     * @return string Converted string in camel case format.
      */
     public static function camelize($input, $glue = '_')
     {
@@ -26,9 +43,9 @@ class PicoStringUtil
     /**
      * Convert snake case to upper camel case
      *
-     * @param string $input Input string
-     * @param string $glue Glue
-     * @return string
+     * @param string $input Input string in snake case format.
+     * @param string $glue Optional. The glue character used in the input string (default is '_').
+     * @return string Converted string in upper camel case format.
      */
     public static function upperCamelize($input, $glue = '_')
     {
@@ -39,9 +56,11 @@ class PicoStringUtil
     /**
      * Convert camel case to snake case
      *
-     * @param string $input Input string
-     * @param string $glue Glue
-     * @return string
+     * Converts a string from camel case (e.g., exampleString) to snake case (e.g., example_string).
+     *
+     * @param string $input Input string in camel case format.
+     * @param string $glue Optional. The glue character used in the input string (default is '_').
+     * @return string Converted string in snake case format.
      */
     public static function snakeize($input, $glue = '_') {
         return ltrim(
@@ -55,8 +74,11 @@ class PicoStringUtil
     /**
      * Snakeize object
      *
-     * @param mixed $object Object
-     * @return mixed
+     * Converts all keys of an object or an array to snake case.
+     * This is useful for normalizing data structures when working with APIs or databases.
+     *
+     * @param mixed $object Object or array to be converted.
+     * @return mixed The input object/array with keys converted to snake case.
      */
     public static function snakeizeObject($object)
     {
@@ -85,11 +107,14 @@ class PicoStringUtil
     }
 
     /**
-     * Convert snake case to title
+     * Convert snake case to title case
      *
-     * @param string $input Input
-     * @param string $glue Glue
-     * @return string
+     * Converts a snake case string (e.g., example_string) to title case (e.g., Example String).
+     * Words are separated by spaces, and the first letter of each word is capitalized.
+     *
+     * @param string $input Input string in snake case format.
+     * @param string $glue Optional. The glue character used in the input string (default is '_').
+     * @return string Converted string in title case format.
      */
     public static function snakeToTitle($input, $glue = '_')
     {
@@ -98,10 +123,12 @@ class PicoStringUtil
     }
 
     /**
-     * Convert camel case to title
+     * Convert camel case to title case
      *
-     * @param string $input Input string
-     * @return string
+     * Converts a camel case string (e.g., exampleString) to title case (e.g., Example String).
+     *
+     * @param string $input Input string in camel case format.
+     * @return string Converted string in title case format.
      */
     public static function camelToTitle($input)
     {
@@ -110,10 +137,13 @@ class PicoStringUtil
     }
 
     /**
-     * Convert to kebap case
+     * Convert to kebab case
      *
-     * @param string $input Input string
-     * @return string
+     * Converts a string to kebab case (e.g., example_string becomes example-string).
+     * Useful for URL slugs or CSS class names.
+     *
+     * @param string $input Input string in any case format.
+     * @return string Converted string in kebab case format.
      */
     public static function kebapize($input)
     {
@@ -124,8 +154,10 @@ class PicoStringUtil
     /**
      * Create constant key
      *
-     * @param string $input Input string
-     * @return string
+     * Converts a string to a constant key format (e.g., example_string becomes EXAMPLE_STRING).
+     *
+     * @param string $input Input string in snake case format.
+     * @return string Converted string in uppercase snake case format.
      */
     public function constantKey($input)
     {
@@ -133,12 +165,15 @@ class PicoStringUtil
     }
 
     /**
-     * Check if string is starts with substring
+     * Check if string starts with a substring
      *
-     * @param string $haystack Haystack
-     * @param string $value Value
-     * @param boolean $caseSensitive Flag that comparation is case sensitive
-     * @return boolean
+     * Determines if the given string starts with the specified substring.
+     * Comparison can be case-sensitive or case-insensitive.
+     *
+     * @param string $haystack The string to check.
+     * @param string $value The substring to look for at the start.
+     * @param bool $caseSensitive Optional. Flag to indicate if the comparison is case-sensitive (default is false).
+     * @return bool True if the string starts with the substring, false otherwise.
      */
     public static function startsWith($haystack, $value, $caseSensitive = false)
     {
@@ -153,12 +188,15 @@ class PicoStringUtil
     }
 
     /**
-     * Check if string is ends with substring
+     * Check if string ends with a substring
      *
-     * @param string $haystack Haystack
-     * @param string $value Value
-     * @param boolean $caseSensitive Flag that comparation is case sensitive
-     * @return boolean
+     * Determines if the given string ends with the specified substring.
+     * Comparison can be case-sensitive or case-insensitive.
+     *
+     * @param string $haystack The string to check.
+     * @param string $value The substring to look for at the end.
+     * @param bool $caseSensitive Optional. Flag to indicate if the comparison is case-sensitive (default is false).
+     * @return bool True if the string ends with the substring, false otherwise.
      */
     public static function endsWith($haystack, $value, $caseSensitive = false)
     {
@@ -175,10 +213,13 @@ class PicoStringUtil
     /**
      * Left trim a string
      *
-     * @param string $haystack Haystack
-     * @param string $substring Substring
-     * @param int $count Count
-     * @return string
+     * Trims the specified substring from the start of the string for a defined number of times.
+     * If count is -1, it trims until the substring no longer occurs at the start.
+     *
+     * @param string $haystack The string to trim.
+     * @param string $substring The substring to trim from the start.
+     * @param int $count Optional. Number of times to trim (default is -1).
+     * @return string The trimmed string.
      */
     public static function lTrim($haystack, $substring, $count = -1)
     {
@@ -204,10 +245,13 @@ class PicoStringUtil
     /**
      * Right trim a string
      *
-     * @param string $haystack Haystack
-     * @param string $substring Substring
-     * @param int $count Count
-     * @return string
+     * Trims the specified substring from the end of the string for a defined number of times.
+     * If count is -1, it trims until the substring no longer occurs at the end.
+     *
+     * @param string $haystack The string to trim.
+     * @param string $substring The substring to trim from the end.
+     * @param int $count Optional. Number of times to trim (default is -1).
+     * @return string The trimmed string.
      */
     public static function rTrim($haystack, $substring, $count = -1)
     {
@@ -233,8 +277,10 @@ class PicoStringUtil
     /**
      * Check if string is not null and not empty
      *
-     * @param string $value Value
-     * @return boolean
+     * Determines if the given string is neither null nor empty.
+     *
+     * @param string $value The string to check.
+     * @return bool True if the string is not null and not empty, false otherwise.
      */
     public static function isNotNullAndNotEmpty($value)
     {
@@ -244,8 +290,10 @@ class PicoStringUtil
     /**
      * Check if string is null or empty
      *
-     * @param string $value Value
-     * @return boolean
+     * Determines if the given string is either null or empty.
+     *
+     * @param string $value The string to check.
+     * @return bool True if the string is null or empty, false otherwise.
      */
     public static function isNullOrEmpty($value)
     {
@@ -255,9 +303,11 @@ class PicoStringUtil
     /**
      * Select not null value
      *
-     * @param mixed $value1 Value 1
-     * @param mixed $value2 Value 2
-     * @return mixed
+     * Returns the first value that is not null from the two provided values.
+     *
+     * @param mixed $value1 The first value to check.
+     * @param mixed $value2 The second value to check.
+     * @return mixed The first non-null value.
      */
     public static function selectNotNull($value1, $value2)
     {
@@ -265,10 +315,12 @@ class PicoStringUtil
     }
 
     /**
-     * Fix cariage return
+     * Fix carriage returns in a string
      *
-     * @param string $input Input string
-     * @return string
+     * Normalizes line endings in a string to Windows-style carriage return line feed (CRLF).
+     *
+     * @param string $input The input string to fix.
+     * @return string The modified string with normalized line endings.
      */
     public static function windowsCariageReturn($input)
     {

@@ -18,7 +18,7 @@ class PicoEnvironmentVariable
      *
      * @param array|object $values Values to process.
      * @param array $collection Collection of replacement values.
-     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @param bool $recursive Flag indicating if the process should be recursive.
      * @return array|object Processed values with replacements applied.
      */
     public static function replaceValueAll($values, $collection, $recursive = false)
@@ -39,7 +39,7 @@ class PicoEnvironmentVariable
      *
      * @param array $values Values to process.
      * @param array $collection Collection of replacement values.
-     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @param bool $recursive Flag indicating if the process should be recursive.
      * @return array Processed array with replacements applied.
      */
     public static function replaceValueAllArray($values, $collection, $recursive = false)
@@ -71,7 +71,7 @@ class PicoEnvironmentVariable
      *
      * @param stdClass|object $values Values to process.
      * @param array $collection Collection of replacement values.
-     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @param bool $recursive Flag indicating if the process should be recursive.
      * @return stdClass|object Processed object with replacements applied.
      */
     public static function replaceValueAllObject($values, $collection, $recursive = false)
@@ -169,7 +169,7 @@ class PicoEnvironmentVariable
      * Replace all values in an array with environment variable names.
      *
      * @param array $values Values to process.
-     * @param boolean $recursive Flag indicating if the process should be recursive.
+     * @param bool $recursive Flag indicating if the process should be recursive.
      * @return array Processed values with replacements applied.
      */
     public static function replaceSysEnvAll($values, $recursive = false)

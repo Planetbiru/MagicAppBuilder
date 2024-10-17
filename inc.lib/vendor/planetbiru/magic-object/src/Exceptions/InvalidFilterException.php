@@ -4,25 +4,43 @@ namespace MagicObject\Exceptions;
 use Exception;
 use Throwable;
 
+/**
+ * Class InvalidFilterException
+ *
+ * Custom exception class for handling errors related to invalid filters.
+ * This exception can be thrown when a filter is improperly defined, fails 
+ * validation, or cannot be applied in contexts such as data querying, 
+ * processing, or any operation relying on filters to refine results.
+ */
 class InvalidFilterException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var Throwable
+     * @var Throwable|null
      */
     private $previous;
 
     /**
-     * @param string $message Exception message
-     * @param mixed $code Exception code
-     * @param Throwable $previous Previous exception
+     * Constructor for InvalidFilterException.
+     *
+     * @param string $message  Exception message
+     * @param int $code        Exception code
+     * @param Throwable|null $previous Previous exception
      */
-    public function __construct($message, $code = 0, $previous = null)
+    public function __construct($message, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        if (!is_null($previous)) {
-            $this->previous = $previous;
-        }
+        $this->previous = $previous;
+    }
+
+    /**
+     * Get the previous exception.
+     *
+     * @return Throwable|null
+     */
+    public function getPreviousException()
+    {
+        return $this->previous;
     }
 }

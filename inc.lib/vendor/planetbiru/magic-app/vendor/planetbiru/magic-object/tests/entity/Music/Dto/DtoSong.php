@@ -2,6 +2,10 @@
 
 namespace Music\Dto;
 
+use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
+use MagicObject\SecretObject;
 use MagicObject\SetterGetter;
 use Music\Entity\EntitySong;
 
@@ -458,3 +462,4 @@ class DtoSong extends SetterGetter
     }
 
 }
+

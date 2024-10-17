@@ -64,7 +64,7 @@ class PicoEntityGenerator
      * @param string $tableName Table name for entity generation
      * @param string $baseNamespace Base namespace for the entity classes
      * @param string|null $entityName Name of the entity (optional)
-     * @param boolean $prettify Flag to prettify output (default: false)
+     * @param bool $prettify Flag to prettify output (default: false)
      */
     public function __construct($database, $baseDir, $tableName, $baseNamespace, $entityName = null, $prettify = false)
     {
@@ -253,7 +253,7 @@ class PicoEntityGenerator
     {
         $typeMap = $this->getTypeMap();
         $picoTableName = $this->tableName;
-        $className = $this->entityName ?? ucfirst(PicoStringUtil::camelize($picoTableName));
+        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
         $fileName = $this->baseNamespace . "/" . $className;
         $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);

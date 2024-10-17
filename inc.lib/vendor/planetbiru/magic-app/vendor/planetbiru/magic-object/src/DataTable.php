@@ -16,7 +16,14 @@ use stdClass;
 
 /**
  * Class DataTable
- * Represents a data table for managing and rendering structured data.
+ * 
+ * Represents a data table for managing and rendering structured data. 
+ * This class supports dynamic loading of data, multi-language support, and 
+ * provides methods for manipulating the table's structure and appearance.
+ *
+ * The DataTable class can be used to create HTML tables dynamically based 
+ * on the provided data, with support for property annotations to manage 
+ * labels and attributes.
  *
  * @link https://github.com/Planetbiru/MagicObject
  */
@@ -138,7 +145,7 @@ class DataTable extends SetterGetter
      *
      * @param string $code Language code.
      * @param object|stdClass|array $reference Reference for language.
-     * @param boolean $use Flag to indicate whether to use this language.
+     * @param bool $use Flag to indicate whether to use this language.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
@@ -211,8 +218,8 @@ class DataTable extends SetterGetter
     /**
      * Retrieves the list of properties for the table.
      *
-     * @param boolean $reflectSelf Whether to reflect on the current class.
-     * @param boolean $asArrayProps Whether to return properties as an array.
+     * @param bool $reflectSelf Whether to reflect on the current class.
+     * @param bool $asArrayProps Whether to return properties as an array.
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)

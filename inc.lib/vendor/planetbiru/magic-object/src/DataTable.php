@@ -16,7 +16,14 @@ use stdClass;
 
 /**
  * Class DataTable
- * Represents a data table for managing and rendering structured data.
+ * 
+ * Represents a data table for managing and rendering structured data. 
+ * This class supports dynamic loading of data, multi-language support, and 
+ * provides methods for manipulating the table's structure and appearance.
+ *
+ * The DataTable class can be used to create HTML tables dynamically based 
+ * on the provided data, with support for property annotations to manage 
+ * labels and attributes.
  *
  * @link https://github.com/Planetbiru/MagicObject
  */
@@ -96,8 +103,7 @@ class DataTable extends SetterGetter
      */
     public function __construct($data = null)
     {
-        if(isset($data))
-        {
+        if (isset($data)) {
             $this->loadData($data);
         }
         $this->init();
@@ -111,17 +117,12 @@ class DataTable extends SetterGetter
      */
     public function loadData($data)
     {
-        if($data != null)
-        {
-            if($data instanceof MagicObject)
-            {
+        if ($data != null) {
+            if ($data instanceof MagicObject) {
                 $values = $data->value();
-                try
-                {
+                try {
                     $this->_tableInfo = $data->tableInfo();
-                }
-                catch(Exception $e)
-                {
+                } catch (Exception $e) {
                     $this->_tableInfo = null;
                 }
                 foreach ($values as $key => $value) {
@@ -129,8 +130,7 @@ class DataTable extends SetterGetter
                     $this->set($key2, $value);
                     $this->_labels[$key2] = $data->label($key2);
                 }
-            }
-            else if (is_array($data) || is_object($data)) {
+            } elseif (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
                     $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
@@ -145,14 +145,13 @@ class DataTable extends SetterGetter
      *
      * @param string $code Language code.
      * @param object|stdClass|array $reference Reference for language.
-     * @param boolean $use Flag to indicate whether to use this language.
+     * @param bool $use Flag to indicate whether to use this language.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
     {
         $this->_lableLanguage[$code] = new PicoLanguage($reference);
-        if($use)
-        {
+        if ($use) {
             $this->selectLanguage($code);
         }
         return $this;
@@ -166,12 +165,10 @@ class DataTable extends SetterGetter
      */
     public function removeLanguage($code)
     {
-        if(isset($this->_lableLanguage[$code]))
-        {
+        if (isset($this->_lableLanguage[$code])) {
             unset($this->_lableLanguage[$code]);
         }
-        if(!empty($this->_lableLanguage))
-        {
+        if (!empty($this->_lableLanguage)) {
             $keys = array_keys($this->_lableLanguage);
             $this->selectLanguage($keys[0]);
         }
@@ -203,17 +200,15 @@ class DataTable extends SetterGetter
         $classList = $reflexClass->parseKeyValueAsObject($reflexClass->getFirstParameter(self::CLASS_LIST));
         $prefLanguage = $reflexClass->parseKeyValueAsObject($reflexClass->getFirstParameter(self::ANNOTATION_LANGUAGE));
         $defaultColumnName = $reflexClass->parseKeyValueAsObject($reflexClass->getFirstParameter(self::ANNOTATION_DEFAULT_COLUMN_LABEL));
-        if($defaultColumnName->issetContent())
-        {
+        
+        if ($defaultColumnName->issetContent()) {
             $this->_defaultColumnName = $defaultColumnName->getContent();
         }
-        if($classList->issetContent())
-        {
+        if ($classList->issetContent()) {
             $this->_classList = explode(" ", preg_replace('/\s+/', " ", $classList->getContent()));
             $this->_classList = array_unique($this->_classList);
         }
-        if($prefLanguage->issetContent())
-        {
+        if ($prefLanguage->issetContent()) {
             $this->_currentLanguage = $prefLanguage->getContent();
         }
         $this->_tableIdentity = $reflexClass->parseKeyValueAsObject($reflexClass->getFirstParameter(self::ANNOTATION_TABLE));
@@ -223,8 +218,8 @@ class DataTable extends SetterGetter
     /**
      * Retrieves the list of properties for the table.
      *
-     * @param boolean $reflectSelf Whether to reflect on the current class.
-     * @param boolean $asArrayProps Whether to return properties as an array.
+     * @param bool $reflectSelf Whether to reflect on the current class.
+     * @param bool $asArrayProps Whether to return properties as an array.
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -232,28 +227,25 @@ class DataTable extends SetterGetter
         $reflectionClass = $reflectSelf ? self::class : get_called_class();
         $class = new ReflectionClass($reflectionClass);
 
-        // filter only the calling class properties
-        // skip parent properties
+        // Filter only the calling class properties
+        // Skip parent properties
         $properties = array_filter(
             $class->getProperties(),
-            function($property) use($class) {
+            function ($property) use ($class) {
                 return $property->getDeclaringClass()->getName() == $class->getName();
             }
         );
-        if($asArrayProps)
-        {
+        
+        if ($asArrayProps) {
             $result = array();
             $index = 0;
             foreach ($properties as $key) {
                 $prop = $key->name;
                 $result[$index] = $prop;
-
                 $index++;
             }
             return $result;
-        }
-        else
-        {
+        } else {
             return $properties;
         }
     }
@@ -269,11 +261,9 @@ class DataTable extends SetterGetter
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
     {
-        if($parameters->get($annotation) != null)
-        {
+        if ($parameters->get($annotation) != null) {
             $attrs = $reflexProp->parseKeyValueAsObject($parameters->get($annotation));
-            if($attrs->get($attribute) != null)
-            {
+            if ($attrs->get($attribute) != null) {
                 return $attrs->get($attribute);
             }
         }
@@ -292,25 +282,17 @@ class DataTable extends SetterGetter
     private function label($reflexProp, $parameters, $key, $defaultLabel)
     {
         $label = $defaultLabel;
-        if(stripos($this->_defaultColumnName, "->"))
-        {
+        if (stripos($this->_defaultColumnName, "->")) {
             $cn = explode("->", $this->_defaultColumnName);
             $lbl = $this->annotationContent($reflexProp, $parameters, trim($cn[0]), trim($cn[1]));
             $label = PicoStringUtil::selectNotNull($lbl, $defaultLabel);
-
-        }
-        else if($this->_defaultColumnName == self::ANNOTATION_LANGUAGE)
-        {
-            if(isset($this->_lableLanguage) && isset($this->_lableLanguage[$this->_currentLanguage]))
-            {
+        } elseif ($this->_defaultColumnName == self::ANNOTATION_LANGUAGE) {
+            if (isset($this->_lableLanguage) && isset($this->_lableLanguage[$this->_currentLanguage])) {
                 $label = $this->_lableLanguage[$this->_currentLanguage]->isset($key) ? $this->_lableLanguage[$this->_currentLanguage]->get($key) : $defaultLabel;
-            }
-            else
-            {
+            } else {
                 $lbl = $this->annotationContent($reflexProp, $parameters, "Label", "content");
                 $label = PicoStringUtil::selectNotNull($lbl, $defaultLabel);
             }
-
         }
         return $label;
     }
@@ -326,22 +308,18 @@ class DataTable extends SetterGetter
      */
     private function appendByProp($doc, $tbody, $props, $className)
     {
-        foreach($props as $prop)
-        {
+        foreach ($props as $prop) {
             $key = $prop->name;
             $label = $key;
             $value = $this->get($key);
-            if(is_scalar($value))
-            {
+            if (is_scalar($value)) {
                 $tr = $tbody->appendChild($doc->createElement(self::TAG_TR));
 
                 $reflexProp = new PicoAnnotationParser($className, $key, PicoAnnotationParser::PROPERTY);
 
-                if($reflexProp != null)
-                {
+                if ($reflexProp != null) {
                     $parameters = $reflexProp->getParametersAsObject();
-                    if($parameters->issetLabel())
-                    {
+                    if ($parameters->issetLabel()) {
                         $label = $this->label($reflexProp, $parameters, $key, $label);
                     }
                 }
@@ -367,10 +345,8 @@ class DataTable extends SetterGetter
      */
     private function appendByValues($doc, $tbody, $values)
     {
-        foreach($values as $propertyName=>$value)
-        {
-            if(is_scalar($value))
-            {
+        foreach ($values as $propertyName => $value) {
+            if (is_scalar($value)) {
                 $tr = $tbody->appendChild($doc->createElement(self::TAG_TR));
                 $label = $this->getLabel($propertyName);
 
@@ -394,22 +370,15 @@ class DataTable extends SetterGetter
     private function getLabel($propertyName)
     {
         $label = "";
-        if(isset($this->_lableLanguage[$this->_currentLanguage]))
-        {
+        if (isset($this->_lableLanguage[$this->_currentLanguage])) {
             $language = $this->_lableLanguage[$this->_currentLanguage];
-
             $label = $language->get($propertyName);
-
-        }
-        else
-        {
-            if(isset($this->_labels[$propertyName]))
-            {
+        } else {
+            if (isset($this->_labels[$propertyName])) {
                 $label = $this->_labels[$propertyName];
             }
         }
-        if(empty($label))
-        {
+        if (empty($label)) {
             $label = PicoStringUtil::camelToTitle($propertyName);
         }
         return $label;
@@ -423,10 +392,9 @@ class DataTable extends SetterGetter
      */
     public function addClass($className)
     {
-        if(PicoTableUtil::isValidClassName($className))
-        {
+        if (PicoTableUtil::isValidClassName($className)) {
             $this->_classList[] = $className;
-            // fix duplicated class
+            // Fix duplicated class
             $this->_classList = array_unique($this->_classList);
         }
         return $this;
@@ -440,17 +408,10 @@ class DataTable extends SetterGetter
      */
     public function removeClass($className)
     {
-        if(PicoTableUtil::isValidClassName($className))
-        {
-            $tmp = array();
-            foreach($this->_classList as $cls)
-            {
-                if($cls != $className)
-                {
-                    $tmp[] = $cls;
-                }
-            }
-            $this->_classList = $tmp;
+        if (PicoTableUtil::isValidClassName($className)) {
+            $this->_classList = array_filter($this->_classList, function ($cls) use ($className) {
+                return $cls != $className;
+            });
         }
         return $this;
     }
@@ -488,16 +449,13 @@ class DataTable extends SetterGetter
         $doc->formatOutput = true;
 
         $props = $this->propertyList();
-        if(!empty($props))
-        {
+        if (!empty($props)) {
             $this->appendByProp($doc, $tbody, $props, $className);
-        }
-        else
-        {
+        } else {
             $values = $this->value();
             $this->appendByValues($doc, $tbody, $values);
         }
-         return $doc->saveHTML();
+        return $doc->saveHTML();
     }
 
     /**

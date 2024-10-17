@@ -4,6 +4,120 @@ let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
 
+// A comma-separated string of SQL keywords.
+let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,view,when,whenever,where,with,without,work,write,year,zone";
+
+/**
+ * Compares two strings for equality, ignoring case differences.
+ *
+ * @param {string} str - The string to compare against the calling string.
+ * @returns {boolean} True if the strings are equal (ignoring case), false otherwise.
+ */
+String.prototype.equalIgnoreCase = function (str) {
+  let str1 = this;
+  if (str1.toLowerCase() == str.toLowerCase()) return true;
+  return false;
+};
+
+/**
+ * Replaces all occurrences of a specified substring (str1) with another substring (str2) in the calling string.
+ *
+ * This function uses a regular expression to ensure that all matches are replaced. 
+ * Special characters in the search string are escaped, and the replacement string is processed 
+ * to handle any dollar signs correctly.
+ *
+ * @param {string} str1 - The substring to be replaced.
+ * @param {string} str2 - The substring to replace with.
+ * @param {boolean} [ignore=false] - If true, the replacement is case insensitive.
+ * @returns {string} The modified string with all occurrences replaced.
+ */
+String.prototype.replaceAll = function (str1, str2, ignore) {
+  return this.replace(
+    new RegExp(
+      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"),
+      ignore ? "gi" : "g"
+    ),
+    typeof str2 == "string" ? str2.replace(/\$/g, "$$$$") : str2
+  );
+};
+
+/**
+ * Replaces all occurrences of a specified substring (str1) with another substring (str2) in the calling string.
+ *
+ * This function uses a regular expression to ensure that all matches are replaced. 
+ * Special characters in the search string are escaped, and the replacement string is processed 
+ * to handle any dollar signs correctly.
+ *
+ * @param {string} str1 - The substring to be replaced.
+ * @param {string} str2 - The substring to replace with.
+ * @param {boolean} [ignore=false] - If true, the replacement is case insensitive.
+ * @returns {string} The modified string with all occurrences replaced.
+ */
+String.prototype.replaceAll = function (str1, str2, ignore) {
+  return this.replace(
+    new RegExp(
+      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"),
+      ignore ? "gi" : "g"
+    ),
+    typeof str2 == "string" ? str2.replace(/\$/g, "$$$$") : str2
+  );
+};
+
+/**
+ * Capitalizes the first letter of each word in the calling string.
+ *
+ * This method transforms the string so that each word starts with an uppercase letter,
+ * while the rest of the letters in the word are converted to lowercase.
+ *
+ * @returns {string} The modified string with each word capitalized.
+ */
+String.prototype.capitalize = function () {
+  return this.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+};
+
+/**
+ * Prettifies the calling string by performing specific transformations on certain words.
+ *
+ * - The word "Id" is removed from the string.
+ * - The word "Ip" is transformed to "IP".
+ *
+ * @returns {string} The modified string after applying the transformations.
+ */
+String.prototype.prettify = function () {
+  let i, j, k;
+  let str = this;
+  let arr = str.split(" ");
+  for (i in arr) {
+    j = arr[i];
+    switch (j) {
+      case "Id":
+        arr[i] = "";
+        break;
+      case "Ip":
+        arr[i] = "IP";
+        break;
+    }
+  }
+  return arr.join(" ");
+};
+
+/**
+ * Replaces all occurrences of a specified substring within a string.
+ *
+ * This method extends the String prototype to allow for replacing
+ * multiple instances of a given substring with a specified replacement string.
+ *
+ * @param {string} search - The substring to search for in the string.
+ * @param {string} replacement - The string to replace each occurrence of the search substring.
+ * @returns {string} A new string with all occurrences of the search substring replaced by the replacement string.
+ *
+ * @example
+ * const str = "Hello, world! Hello again!";
+ * const result = str.replaceAll("Hello", "Hi");
+ * console.log(result); // Output: "Hi, world! Hi again!"
+ */
 String.prototype.replaceAll = function (search, replacement) {
   let target = this;
   return target.replace(new RegExp(search, "g"), replacement);
@@ -875,6 +989,22 @@ jQuery(function(){
   updateModuleFile();
 });
 
+/**
+ * Reloads the application and path lists via AJAX requests.
+ *
+ * This function performs two AJAX GET requests:
+ * 1. It fetches the application list from `lib.ajax/application-list.php`
+ *    and updates the content of elements with the class `application-card`.
+ * 2. It retrieves the path list from `lib.ajax/path-list.php`, expecting
+ *    a JSON response, and populates a select element named
+ *    `current_module_location` with options based on the retrieved data.
+ *
+ * Each option displays the module name and its corresponding path,
+ * with the ability to set the active state of the options based on the
+ * `active` property in the JSON response.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function reloadApplicationList()
 {
   $.ajax({
@@ -899,6 +1029,19 @@ function reloadApplicationList()
   });
 }
 
+/**
+ * Reloads translations based on the specified context.
+ *
+ * This function determines the appropriate translation function to call
+ * based on the provided `translateFor` argument. It supports two contexts:
+ * 
+ * - "module": Calls the `translateModule` function to handle module translations.
+ * - "entity": Calls the `translateEntity` function to handle entity translations.
+ *
+ * @param {string} translateFor - The context for translation, which can be
+ *                                either "module" or "entity".
+ * @returns {void} This function does not return a value.
+ */
 function reloadTranslate(translateFor)
 {
   if(translateFor == "module")
@@ -911,6 +1054,21 @@ function reloadTranslate(translateFor)
   }
 }
 
+/**
+ * Translates the specified entity and updates the UI with the results.
+ *
+ * This function retrieves translations for the current entity using an
+ * AJAX POST request to `lib.ajax/entity-translate.php`. It collects the
+ * original text, translated text, and property names from the response
+ * and updates the relevant UI elements accordingly.
+ *
+ * If a callback function is provided, it is invoked after the translation
+ * process is completed.
+ *
+ * @param {function} [clbk] - An optional callback function to be called
+ *                            after the translation process is complete.
+ * @returns {void} This function does not return a value.
+ */
 function translateEntity(clbk)
 {
   entityName = currentEntity2Translated;
@@ -949,6 +1107,19 @@ function translateEntity(clbk)
   }
 }
 
+/**
+ * Translates selected modules and updates the UI with the results.
+ *
+ * This function collects checked modules from the UI and sends them
+ * to the server via an AJAX POST request to `lib.ajax/module-translate.php`.
+ * It retrieves the original and translated texts and updates the relevant
+ * UI elements accordingly.
+ *
+ * The translations are displayed in designated text editors, and the
+ * corresponding property names are also set in the input fields.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function translateModule()
 {
   let translated = null;
@@ -990,6 +1161,16 @@ function translateModule()
   });
 }
 
+/**
+ * Converts a string from snake_case to UpperCamelCase.
+ *
+ * This function takes an input string, replaces underscores with spaces,
+ * capitalizes the first letter, formats it for prettiness, removes
+ * any spaces, and trims any leading or trailing whitespace.
+ *
+ * @param {string} input - The input string in snake_case format.
+ * @returns {string} The transformed string in UpperCamelCase format.
+ */
 function upperCamelize(input) {
   return input
     .replaceAll("_", " ")
@@ -999,6 +1180,17 @@ function upperCamelize(input) {
     .trim();
 }
 
+/**
+ * Checks if a given key exists in an array of objects.
+ *
+ * This function iterates through an array of objects, each expected to
+ * have a `value` property. It returns true if any object's `value`
+ * matches the specified key; otherwise, it returns false.
+ *
+ * @param {Array<Object>} defdata - The array of objects to be searched.
+ * @param {string} key - The key to search for in the array.
+ * @returns {boolean} True if the key exists in the array, false otherwise.
+ */
 function hasKey(defdata, key) {
   let len = defdata.length;
   let i;
@@ -1010,6 +1202,23 @@ function hasKey(defdata, key) {
   return false;
 }
 
+/**
+ * Loads the state of a form based on provided data.
+ *
+ * This function populates the inputs of a form (frm2) based on the
+ * definitions provided in the defdata array. It checks for each field
+ * and updates the corresponding input elements (radio buttons, checkboxes,
+ * and select elements) based on their names and values.
+ *
+ * Additionally, it resets any checkbox inputs in frm2 that correspond
+ * to fields present in defdata but are not checked.
+ *
+ * @param {Array<Object>} defdata - An array of objects containing field
+ *                                   names and values to load into the form.
+ * @param {jQuery} frm1 - The first form (not used in this implementation).
+ * @param {jQuery} frm2 - The second form that will be populated with data.
+ * @returns {void} This function does not return a value.
+ */
 function loadState(defdata, frm1, frm2) {
   let i;
   frm2.find("tbody tr").each(function (index, e) {
@@ -1044,6 +1253,21 @@ function loadState(defdata, frm1, frm2) {
   }
 }
 
+/**
+ * Fixes the names of input fields in a path management table.
+ *
+ * This function iterates over each row of a table with the class
+ * `path-manager` and updates the names of the input fields within
+ * each row. The names are set to reflect their index in the format
+ * `name[index]`, `path[index]`, and `checked[index]`, where `index`
+ * is the row number.
+ *
+ * This ensures that when the form is submitted, the input values
+ * are grouped correctly in an array format based on their respective
+ * indices.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function fixPathForm()
 {
   let index = 0;
@@ -1056,6 +1280,21 @@ function fixPathForm()
   });
 }
 
+/**
+ * Fixes the names of input fields in a language management table.
+ *
+ * This function iterates over each row of a table with the class
+ * `language-manager` and updates the names of the input fields within
+ * each row. The names are set to reflect their index in the format
+ * `language_name[index]`, `language_code[index]`, and `checked[index]`,
+ * where `index` is the row number.
+ *
+ * This ensures that when the form is submitted, the input values
+ * are grouped correctly in an array format based on their respective
+ * indices.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function fixLanguageForm()
 {
   let index = 0;
@@ -1068,6 +1307,17 @@ function fixLanguageForm()
   });
 }
 
+/**
+ * Adds diagram options to the provided parameters array.
+ *
+ * This function collects values from various input fields related to diagram
+ * settings and appends them as key-value pairs to the given parameters array.
+ * The parameters include settings for maximum levels, maximum columns, margins,
+ * and zoom level.
+ *
+ * @param {Array<string>} params - An array to which the diagram options will be added.
+ * @returns {Array<string>} The updated parameters array containing the added options.
+ */
 function addDiagramOption(params)
 {
   params.push('maximum_level='+$('[name="maximum_level"]').val());
@@ -1080,6 +1330,24 @@ function addDiagramOption(params)
   return params;
 }
 
+/**
+ * Loads and displays a relationship diagram based on selected entities.
+ *
+ * This function gathers parameters for the diagram configuration, including
+ * selected entities, and sends requests to generate the diagram and its map.
+ * It then appends the generated diagram image to the UI and loads the corresponding
+ * map for interactivity.
+ *
+ * The following parameters are collected:
+ * - Maximum levels
+ * - Maximum columns
+ * - Margins
+ * - Zoom level
+ * - Selected entities
+ * - A random timestamp to prevent caching
+ *
+ * @returns {void} This function does not return a value.
+ */
 function loadDiagramMultiple()
 {
   let params = [];
@@ -1128,6 +1396,20 @@ function downloadPNG()
   img.src = url;
 }
 
+/**
+ * Handles changes to a map key input and validates its value.
+ *
+ * This function checks the value of the provided input element (obj).
+ * If the value is 'label', 'value', or 'default' (case-insensitive),
+ * it marks the input as invalid and updates its value to 'data-{value}' 
+ * after a short delay. This process will repeat if the new value 
+ * is still invalid. If the input value is valid, any invalid class
+ * is removed.
+ *
+ * @param {jQuery} obj - The jQuery object representing the input element
+ *                       whose value is being changed.
+ * @returns {void} This function does not return a value.
+ */
 function onChangeMapKey(obj)
 {
   let val = obj.val();
@@ -1151,15 +1433,45 @@ function onChangeMapKey(obj)
   }
 }
 
+/**
+ * Displays an alert dialog with a specified title and message.
+ *
+ * This function sets the title and message of a Bootstrap modal dialog
+ * with the ID `alert-dialog`, and then shows the modal to the user.
+ *
+ * @param {string} title - The title to display in the modal.
+ * @param {string} message - The message to display in the modal body.
+ * @returns {void} This function does not return a value.
+ */
 function showAlertUI(title, message) {
   $('#alert-dialog .modal-title').text(title);
   $('#alert-dialog .modal-body').html(message);
   $('#alert-dialog').modal('show');
 }
+
+/**
+ * Closes the alert dialog.
+ *
+ * This function hides the Bootstrap modal dialog with the ID `alert-dialog`.
+ * It can be used to dismiss the alert displayed to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function closeAlertUI() {
   $('#alert-dialog').modal('hide');
 }
 
+/**
+ * Saves the current module to the server.
+ *
+ * This function checks if a module is currently open. If so, it disables the
+ * save button and retrieves the content from the editor. It then sends an AJAX
+ * POST request to update the module's content on the server. Once the request
+ * is complete, it re-enables the save button. If no module is open, it shows
+ * an alert to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function saveModule() {
   if (currentModule != "") {
     $("#button_save_module_file").attr("disabled", "disabled");
@@ -1178,6 +1490,17 @@ function saveModule() {
   }
 }
 
+/**
+ * Saves the current entity to the server.
+ *
+ * This function checks if an entity is currently open. If so, it disables the
+ * save button and retrieves the content from the editor. It then sends an AJAX
+ * POST request to update the entity's content on the server. Upon successful 
+ * completion, it re-enables the save button, updates various UI components,
+ * and highlights any error lines. If no entity is open, it shows an alert to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function saveEntity() {
   if (currentEntity != "") {
     $("#button_save_entity_file").attr("disabled", "disabled");
@@ -1206,7 +1529,15 @@ function saveEntity() {
   }
 }
 
-
+/**
+ * Highlights a specific line in the editor to indicate an error.
+ *
+ * This function adds a highlight class to the specified line number
+ * if it is not -1. It also updates the lastErrorLine variable.
+ *
+ * @param {number} lineNumber - The line number to highlight.
+ * @returns {void} This function does not return a value.
+ */
 function addHilightLineError(lineNumber) {
   if(lineNumber != -1)
   {
@@ -1215,6 +1546,14 @@ function addHilightLineError(lineNumber) {
   lastErrorLine = lineNumber;
 }
 
+/**
+ * Removes the highlight from the last error line in the editor.
+ *
+ * This function checks if there is a lastErrorLine set and removes
+ * the highlight class from that line if it is not -1.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function removeHilightLineError() {
   if(lastErrorLine != -1)
   {
@@ -1222,7 +1561,15 @@ function removeHilightLineError() {
   }
 }
 
-
+/**
+ * Saves the current SQL query as a .sql file.
+ *
+ * This function retrieves the content from the SQL editor, creates a
+ * Blob object, and prompts the user to download the file with a
+ * filename based on the current application and the current timestamp.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function saveQuery() {
   let blob = new Blob([cmEditorSQL.getDoc().getValue()], {
     type: "application/x-sql;charset=utf-8",
@@ -1231,6 +1578,14 @@ function saveQuery() {
   saveAs(blob, appId + "-" + new Date().getTime() + ".sql");
 }
 
+/**
+ * Retrieves selected entity checkboxes.
+ *
+ * This function collects and returns the values of all checked
+ * checkboxes with the class 'entity-checkbox'.
+ *
+ * @returns {Array<string>} An array of selected entity values.
+ */
 function getEntitySelection() {
   let ents = [];
   $(".entity-checkbox").each(function () {
@@ -1241,6 +1596,16 @@ function getEntitySelection() {
   return ents;
 }
 
+/**
+ * Fetches the query for a specific entity and updates the SQL editor.
+ *
+ * This function sends an AJAX request to get the query for the specified
+ * entity, and then updates the SQL editor with the received data.
+ *
+ * @param {string} entity - The entity for which to retrieve the query.
+ * @param {boolean} merged - Indicates whether to merge the entities.
+ * @returns {void} This function does not return a value.
+ */
 function getEntityQuery(entity, merged) {
   $.ajax({
     type: "POST",
@@ -1257,6 +1622,17 @@ function getEntityQuery(entity, merged) {
   });
 }
 
+/**
+ * Fetches the content of an entity file and updates the editor.
+ *
+ * This function sends an AJAX request to retrieve the content of the
+ * specified entity file and sets it in the editor. It also calls a
+ * callback function if provided.
+ *
+ * @param {string} entity - The entity to load.
+ * @param {function} [clbk] - Optional callback function to call after loading.
+ * @returns {void} This function does not return a value.
+ */
 function getEntityFile(entity, clbk) {
   $.ajax({
     type: "POST",
@@ -1277,6 +1653,17 @@ function getEntityFile(entity, clbk) {
   });
 }
 
+/**
+ * Fetches the content of a module file and updates the editor.
+ *
+ * This function sends a GET request to retrieve the content of the
+ * specified module file and updates the editor with the response.
+ * It also calls a callback function if provided.
+ *
+ * @param {string} module - The module to load.
+ * @param {function} [clbk] - Optional callback function to call after loading.
+ * @returns {void} This function does not return a value.
+ */
 function getModuleFile(module, clbk) {
   $.ajax({
     type: "GET",
@@ -1297,6 +1684,15 @@ function getModuleFile(module, clbk) {
   });
 }
 
+/**
+ * Updates the entity query based on the current selection.
+ *
+ * This function retrieves the entity list with checkboxes and updates
+ * the query in the SQL editor if autoload is true.
+ *
+ * @param {boolean} [autoload=false] - Whether to auto-load the query.
+ * @returns {void} This function does not return a value.
+ */
 function updateEntityQuery(autoload) {
   autoload = autoload || false;
   $.ajax({
@@ -1318,6 +1714,14 @@ function updateEntityQuery(autoload) {
   });
 }
 
+/**
+ * Updates the entity relationship diagram based on the current entities.
+ *
+ * This function retrieves the list of entities for the diagram and updates
+ * the UI accordingly.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function updateEntityRelationshipDiagram() {
   $.ajax({
     type: "GET",
@@ -1333,6 +1737,14 @@ function updateEntityRelationshipDiagram() {
   });
 }
 
+/**
+ * Updates the entity file list in the UI.
+ *
+ * This function retrieves the list of entity files and updates the corresponding
+ * sections in the UI.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function updateEntityFile() {
   $.ajax({
     type: "GET",
@@ -1347,6 +1759,15 @@ function updateEntityFile() {
     },
   });
 }
+
+/**
+ * Updates the module file list in the UI.
+ *
+ * This function retrieves the list of module files and updates the UI
+ * accordingly, including the translation list.
+ *
+ * @returns {void} This function does not return a value.
+ */
 function updateModuleFile() {
   $.ajax({
     type: "GET",
@@ -1370,6 +1791,17 @@ function updateModuleFile() {
   });
 }
 
+/**
+ * Saves a reference value to the server.
+ *
+ * This function sends a POST request to save a reference value associated
+ * with a specific field name and key.
+ *
+ * @param {string} fieldName - The name of the field for the reference.
+ * @param {string} key - The key of the reference to save.
+ * @param {string} value - The value to save for the reference.
+ * @returns {void} This function does not return a value.
+ */
 function saveReference(fieldName, key, value) {
   $.ajax({
     type: "POST",
@@ -1379,6 +1811,19 @@ function saveReference(fieldName, key, value) {
     success: function (data) { },
   });
 }
+
+/**
+ * Loads a reference value from the server.
+ *
+ * This function sends a GET request to load a reference value associated
+ * with a specific field name and key, and then calls a callback function
+ * with the retrieved data.
+ *
+ * @param {string} fieldName - The name of the field for the reference.
+ * @param {string} key - The key of the reference to load.
+ * @param {function} clbk - The callback function to call with the loaded data.
+ * @returns {void} This function does not return a value.
+ */
 function loadReference(fieldName, key, clbk) {
   $.ajax({
     type: "GET",
@@ -1391,6 +1836,19 @@ function loadReference(fieldName, key, clbk) {
   });
 }
 
+/**
+ * Updates various module-related attributes and values in the UI.
+ *
+ * This function formats the module file name, code, and name,
+ * and updates the associated input fields with the given parameters.
+ *
+ * @param {string} moduleFileName - The name of the module file.
+ * @param {string} moduleCode - The code for the module.
+ * @param {string} moduleName - The display name of the module.
+ * @param {string} masterTableName - The name of the master table.
+ * @param {string} masterPrimaryKeyName - The primary key name for the master table.
+ * @returns {void} This function does not return a value.
+ */
 function updateTableName(
   moduleFileName,
   moduleCode,
@@ -1424,6 +1882,16 @@ function updateTableName(
   $('[name="module_name"]').val(moduleName);
 }
 
+
+/**
+ * Capitalizes the first letter of each word in a string.
+ *
+ * This function converts the input string to lowercase and then capitalizes
+ * the first letter of each word, returning the formatted string.
+ *
+ * @param {string} str - The input string to format.
+ * @returns {string} The formatted string with capitalized words.
+ */
 function ucWord(str) {
   str = str.toLowerCase();
   return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function (s) {
@@ -1431,6 +1899,16 @@ function ucWord(str) {
   });
 }
 
+/**
+ * Prepares the UI for reference data based on the selected value.
+ *
+ * This function shows or hides the reference button in the UI based
+ * on whether the checked value is "select".
+ *
+ * @param {string} checkedValue - The value of the checkbox.
+ * @param {jQuery} ctrl - The jQuery object of the checkbox control.
+ * @returns {void} This function does not return a value.
+ */
 function prepareReferenceData(checkedValue, ctrl) {
   let tr = ctrl.closest("tr");
   if (checkedValue == "select") {
@@ -1439,6 +1917,17 @@ function prepareReferenceData(checkedValue, ctrl) {
     tr.find(".reference_button_data").css("display", "none");
   }
 }
+
+/**
+ * Prepares the UI for reference filter options based on the selected value.
+ *
+ * This function shows or hides the reference filter button in the UI
+ * based on whether the checked value is "select".
+ *
+ * @param {string} checkedValue - The value of the checkbox.
+ * @param {jQuery} ctrl - The jQuery object of the checkbox control.
+ * @returns {void} This function does not return a value.
+ */
 function prepareReferenceFilter(checkedValue, ctrl) {
   let tr = ctrl.closest("tr");
   if (checkedValue == "select") {
@@ -1448,6 +1937,15 @@ function prepareReferenceFilter(checkedValue, ctrl) {
   }
 }
 
+/**
+ * Switches the current application and reloads the page.
+ *
+ * This function sends a POST request to change the current application
+ * and then reloads the page upon success.
+ *
+ * @param {string} currentApplication - The name of the application to switch to.
+ * @returns {void} This function does not return a value.
+ */
 function switchApplication(currentApplication) {
   $.ajax({
     type: "post",
@@ -1460,6 +1958,16 @@ function switchApplication(currentApplication) {
   });
 }
 
+/**
+ * Generates a script based on the selected fields in the table.
+ *
+ * This function collects field details from the specified selector,
+ * constructs a data structure for the entity, and calls a function
+ * to generate code based on that data.
+ *
+ * @param {string} selector - The jQuery selector for the table containing fields.
+ * @returns {void} This function does not return a value.
+ */
 function generateScript(selector) {
   let fields = [];
   $(selector)
@@ -1578,6 +2086,16 @@ function generateScript(selector) {
   generateAllCode(dataToPost);
 }
 
+/**
+ * Retrieves specification data from the filter table.
+ *
+ * This function collects column names and their corresponding values
+ * from the specified filter table, returning an array of objects
+ * containing the column-value pairs.
+ *
+ * @returns {Array<{column: string, value: string}>} An array of objects
+ *          representing the column names and their values.
+ */
 function getSpecificationModule() {
   let result = [];
   let selector = ".table-data-filter";
@@ -1605,6 +2123,16 @@ function getSpecificationModule() {
   return result;
 }
 
+/**
+ * Retrieves sorting specifications from the order table.
+ *
+ * This function collects the column names and their sorting types
+ * from the specified order table, returning an array of objects
+ * that represent the sorting configurations.
+ *
+ * @returns {Array<{sortBy: string, sortType: string}>} An array of objects
+ *          representing the column names and their sorting types.
+ */
 function getSortableModule() {
   let result = [];
   let selector = ".table-data-order";
@@ -1632,6 +2160,18 @@ function getSortableModule() {
   return result;
 }
 
+/**
+ * Parses a JSON string and returns the corresponding JavaScript object.
+ *
+ * This function takes a string input, attempts to parse it as JSON,
+ * and returns the resulting object. If the input is not a string,
+ * or if parsing fails, it returns null.
+ *
+ * @param {string} text - The JSON string to be parsed.
+ * @returns {object|null} The parsed JavaScript object, or null if
+ *                        the input is not a valid JSON string or 
+ *                        if parsing fails.
+ */
 function parseJsonData(text) {
   if (typeof text !== "string") {
     return null;
@@ -1647,6 +2187,41 @@ function parseJsonData(text) {
   return null;
 }
 
+/**
+ * Parses a JSON string into an object.
+ *
+ * This function attempts to parse the provided text as JSON.
+ * If the parsing is successful and the result is an object,
+ * it returns the object. If the input is not a string or
+ * parsing fails, it returns null.
+ *
+ * @param {string} text - The JSON string to be parsed.
+ * @returns {Object|null} The parsed JSON object, or null if parsing fails.
+ */
+function parseJsonData(text) {
+  if (typeof text !== "string") {
+    return null;
+  }
+  try {
+    let json = JSON.parse(text);
+    if (typeof json === "object") {
+      return json;
+    }
+  } catch (error) {
+    // do nothing
+  }
+  return null;
+}
+
+/**
+ * Generates code by sending data to the server and updating UI components.
+ *
+ * This function sends the provided data to a server endpoint
+ * for code generation. Upon success, it updates the entity file,
+ * entity query, and entity relationship diagram.
+ *
+ * @param {Object} dataToPost - The data to send to the server for code generation.
+ */
 function generateAllCode(dataToPost) {
   $.ajax({
     type: "post",
@@ -1665,6 +2240,16 @@ function generateAllCode(dataToPost) {
   });
 }
 
+
+/**
+ * Updates the current application by fetching and populating source tables.
+ *
+ * This function sends the provided data to the server to update
+ * the application context. It then clears and repopulates the source
+ * table selection based on the response.
+ *
+ * @param {Object} dataToPost - The data used to update the application.
+ */
 function updateCurrentApplivation(dataToPost) {
   $.ajax({
     type: "POST",
@@ -1686,6 +2271,13 @@ function updateCurrentApplivation(dataToPost) {
   });
 }
 
+/**
+ * Loads the list of tables from the database into a select element.
+ *
+ * This function requests the list of database tables and populates
+ * the source table dropdown. It also sets data attributes for primary keys
+ * on the options if available.
+ */
 function loadTable() {
   $.ajax({
     type: "post",
@@ -1723,6 +2315,16 @@ function loadTable() {
     },
   });
 }
+
+/**
+ * Loads the columns of a specified table into a selector.
+ *
+ * This function fetches the column information for the given table name
+ * and populates the specified selector with rows representing each column.
+ *
+ * @param {string} tableName - The name of the table whose columns are to be loaded.
+ * @param {string} selector - The jQuery selector where the column rows will be appended.
+ */
 function loadColumn(tableName, selector) {
   $.ajax({
     type: "post",
@@ -1763,6 +2365,29 @@ function loadColumn(tableName, selector) {
   });
 }
 
+/**
+ * Restores the form data from a given object.
+ *
+ * This function takes a data object containing configuration settings
+ * for a form and restores the values in the form fields accordingly.
+ * It handles fields related to columns, filters, sorting, and features.
+ *
+ * @param {Object} data - The data object containing the form values to restore.
+ * @param {Array} data.fields - An array of field configurations, where each 
+ *        configuration includes properties like fieldName, includeInsert, 
+ *        includeEdit, and more.
+ * @param {Array} data.specification - An array of filter specifications 
+ *        for the modal filter data, containing column names and values.
+ * @param {Array} data.sortable - An array of sorting specifications for the 
+ *        modal order data, containing sort columns and their order types.
+ * @param {Object} data.features - An object containing feature flags for the 
+ *        module, such as subquery, export options, and approval settings.
+ *
+ * This function:
+ * - Iterates through the fields and updates corresponding form elements
+ * - Clears existing rows in filter and order modals before restoring new values
+ * - Sets the state of feature toggles based on the provided data
+ */
 function restoreForm(data) {
   // restore column
   if (typeof data.fields != 'undefined') {
@@ -1910,6 +2535,19 @@ function restoreForm(data) {
   }
 }
 
+/**
+ * Loads saved module data from a specified module file and restores it into the form.
+ *
+ * This function performs an AJAX GET request to retrieve the module data 
+ * based on the provided module file and target. Upon successful retrieval, 
+ * it calls the `restoreForm` function to populate the form with the data 
+ * and then executes a callback function.
+ *
+ * @param {string} moduleFile - The name of the module file from which to load data.
+ * @param {string} target - The target location for which to load the module data.
+ * @param {Function} clbk - A callback function to be executed after the data is loaded.
+ *        This function is called whether the request is successful or fails.
+ */
 function loadSavedModuleData(moduleFile, target, clbk) {
   $.ajax({
     type: "GET",
@@ -1926,6 +2564,16 @@ function loadSavedModuleData(moduleFile, target, clbk) {
   });
 }
 
+/**
+ * Retrieves a list of skipped columns based on predefined entity information fields.
+ *
+ * This function collects the values from various entity information fields 
+ * that are considered skipped and returns them in an array. These fields 
+ * are typically related to administrative and timestamp information that 
+ * may not need to be included in certain operations.
+ *
+ * @returns {Array} An array of values from the skipped columns.
+ */
 function getSkipedCol() {
   let skiped = [];
 
@@ -1945,6 +2593,20 @@ function getSkipedCol() {
   return skiped;
 }
 
+/**
+ * Generates a select dropdown for filter types based on the provided field and column type.
+ *
+ * This function creates a `<select>` element populated with various filter options. 
+ * It determines the default filter type based on the provided column type and sanitization 
+ * rules. The generated select element allows users to choose the appropriate filter type 
+ * for the specified field.
+ *
+ * @param {string} field - The name of the field for which the filter is being generated.
+ * @param {Object} [args] - An optional object containing additional arguments.
+ *        - {string} [args.column_type] - The type of the column, which helps determine the default filter.
+ *
+ * @returns {string} The outer HTML of the generated select element, including options.
+ */
 function generateSelectFilter(field, args) {
   let virtualDOM;
 
@@ -2044,6 +2706,19 @@ function generateSelectFilter(field, args) {
   return virtualDOM[0].outerHTML;
 }
 
+/**
+ * Generates a select dropdown for input types based on the provided field and data type.
+ *
+ * This function creates a `<select>` element populated with various input type options. 
+ * It determines the default input type based on the provided data type and predefined mappings. 
+ * The generated select element allows users to choose the appropriate input type for the specified field.
+ *
+ * @param {string} field - The name of the field for which the input type is being generated.
+ * @param {Object} [args] - An optional object containing additional arguments.
+ *        - {string} [args.data_type] - The data type of the field, which helps determine the default input type.
+ *
+ * @returns {string} The outer HTML of the generated select element, including options.
+ */
 function generateSelectType(field, args) {
   let virtualDOM;
   args = args || {};
@@ -2136,6 +2811,12 @@ function generateSelectType(field, args) {
   return virtualDOM[0].outerHTML;
 }
 
+/**
+ * Returns a new array containing only unique elements from the provided array.
+ *
+ * @param {Array} arr1 - The input array from which to filter out duplicates.
+ * @returns {Array} A new array containing only unique elements.
+ */
 function arrayUnique(arr1) {
   let i;
   let arr2 = [];
@@ -2147,11 +2828,12 @@ function arrayUnique(arr1) {
   return arr2;
 }
 
-String.prototype.equalIgnoreCase = function (str) {
-  let str1 = this;
-  if (str1.toLowerCase() == str.toLowerCase()) return true;
-  return false;
-};
+/**
+ * Checks if the provided string is a SQL keyword.
+ *
+ * @param {string} str - The string to check against the list of SQL keywords.
+ * @returns {boolean} True if the string is a keyword, false otherwise.
+ */
 function isKeyWord(str) {
   str = str.toString();
   let i, j;
@@ -2163,41 +2845,22 @@ function isKeyWord(str) {
   }
   return false;
 }
-let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,view,when,whenever,where,with,without,work,write,year,zone";
 
-String.prototype.replaceAll = function (str1, str2, ignore) {
-  return this.replace(
-    new RegExp(
-      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"),
-      ignore ? "gi" : "g"
-    ),
-    typeof str2 == "string" ? str2.replace(/\$/g, "$$$$") : str2
-  );
-};
-String.prototype.capitalize = function () {
-  return this.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-};
-String.prototype.prettify = function () {
-  let i, j, k;
-  let str = this;
-  let arr = str.split(" ");
-  for (i in arr) {
-    j = arr[i];
-    switch (j) {
-      case "Id":
-        arr[i] = "";
-        break;
-      case "Ip":
-        arr[i] = "IP";
-        break;
-    }
-  }
-  return arr.join(" ");
-};
-
+/**
+ * Generates an HTML table row for a specified field, including various input elements 
+ * for configuration such as inclusion in inserts, edits, and lists, as well as type selection.
+ *
+ * The function takes into account whether the field is a reserved keyword and skips 
+ * certain checkboxes if specified. It constructs the row with appropriate classes, 
+ * input fields, and other HTML elements necessary for the configuration interface.
+ *
+ * @param {string} field - The name of the field for which the row is generated.
+ * @param {object} args - Additional arguments that may influence the row's configuration.
+ * @param {Array} skipedOnInsertEdit - An array of field names to be skipped for insert/edit checkboxes.
+ * @returns {string} The HTML string representing a table row with input elements.
+ */
 function generateRow(field, args, skipedOnInsertEdit) {
+  // Check if the field is a reserved keyword
   let isKW = isKeyWord(field);
   let classes = [];
   let cls = "";
@@ -2290,6 +2953,22 @@ function generateRow(field, args, skipedOnInsertEdit) {
   return rowHTML;
 }
 
+/**
+ * Serializes form data into an object structure for processing or submission.
+ *
+ * The function retrieves the selected reference type, multiple selection values, 
+ * and additional entity and mapping data. It then compiles this information into 
+ * an object which is returned for further use.
+ *
+ * @returns {Object} An object containing serialized form data including:
+ *   - type: The selected reference type.
+ *   - entity: The entity data retrieved from the form.
+ *   - map: The mapping data retrieved from the form.
+ *   - yesno: Placeholder for yes/no data (currently null).
+ *   - truefalse: Placeholder for true/false data (currently null).
+ *   - onezero: Placeholder for one/zero data (currently null).
+ *   - multipleSelection: The value from the multiple selection dropdown.
+ */
 function serializeForm() {
   let type = null;
   $(".reference_type").each(function (e) {
@@ -2315,6 +2994,15 @@ function serializeForm() {
   return all;
 }
 
+/**
+ * Deserializes an object of data into a modal form for editing or viewing.
+ *
+ * The function empties the current modal body and populates it with the reference 
+ * resource layout. It then selects the reference type and sets entity and mapping 
+ * data based on the provided data object.
+ *
+ * @param {Object} data - The object containing data to populate the modal form.
+ */
 function deserializeForm(data) {
   $("#modal-create-reference-data").find(".modal-body").empty();
   $("#modal-create-reference-data")
@@ -2325,11 +3013,21 @@ function deserializeForm(data) {
   setMapData(data);
 }
 
+/**
+ * Adds a new row to the end of the specified table by duplicating the last row in the tbody.
+ *
+ * @param {jQuery} table - The jQuery object representing the table to which a row should be added.
+ */
 function addRow(table) {
   let lastRow = table.find("tbody").find("tr:last-child").prop("outerHTML");
   table.find("tbody").append(lastRow);
 }
 
+/**
+ * Adds a new column to the specified table, including input fields in the header and body.
+ *
+ * @param {jQuery} table - The jQuery object representing the table to which a column should be added.
+ */
 function addColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let pos = ncol - parseInt(table.attr("data-offset")) - 2;
@@ -2355,6 +3053,11 @@ function addColumn(table) {
     .attr("colspan", table.find("thead").find("tr").find("td").length);
 }
 
+/**
+ * Removes the last column from the specified table, ensuring that a minimum number of columns is maintained.
+ *
+ * @param {jQuery} table - The jQuery object representing the table from which a column should be removed.
+ */
 function removeLastColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let offset = parseInt(table.attr("data-offset"));
@@ -2381,6 +3084,11 @@ function removeLastColumn(table) {
   }
 }
 
+/**
+ * Selects the appropriate reference type based on the provided data and adjusts modal layout accordingly.
+ *
+ * @param {Object} data - The object containing reference type data.
+ */
 function selectReferenceType(data) {
   let referenceType = data.type ? data.type : "entity";
   let obj = $('#modal-create-reference-data .modal-dialog');
@@ -2412,6 +3120,11 @@ function selectReferenceType(data) {
   }
 }
 
+/**
+ * Sets entity data into the form based on the provided data object.
+ *
+ * @param {Object} data - The object containing entity data to populate the form.
+ */
 function setEntityData(data) {
   data.entity = data && data.entity ? data.entity : {};
   let entity = data.entity;
@@ -2445,6 +3158,11 @@ function setEntityData(data) {
   setAdditionalOutputData(data);
 }
 
+/**
+ * Retrieves entity data from the form and compiles it into an object.
+ *
+ * @returns {Object} An object containing the entity data retrieved from the form.
+ */
 function getEntityData() {
   let selector = '[data-name="entity"]';
   let entity = {
@@ -2463,6 +3181,11 @@ function getEntityData() {
   return entity;
 }
 
+/**
+ * Sets specification data into the form based on the provided data object.
+ *
+ * @param {Object} data - The object containing specification data to populate the form.
+ */
 function setSpecificationData(data) {
   let selector = '[data-name="specification"]';
   let table = $(selector);
@@ -2484,6 +3207,11 @@ function setSpecificationData(data) {
   }
 }
 
+/**
+ * Retrieves specification data from the form and compiles it into an array of objects.
+ *
+ * @returns {Array} An array of objects containing the specification data retrieved from the form.
+ */
 function getSpecificationData() {
   let result = [];
   let selector = '[data-name="specification"]';
@@ -2504,6 +3232,11 @@ function getSpecificationData() {
   return result;
 }
 
+/**
+ * Sets sortable data into the form based on the provided data object.
+ *
+ * @param {Object} data - The object containing sortable data to populate the form.
+ */
 function setSortableData(data) {
   let selector = '[data-name="sortable"]';
   let table = $(selector);
@@ -2525,6 +3258,11 @@ function setSortableData(data) {
   }
 }
 
+/**
+ * Retrieves sortable data from the form and compiles it into an array of objects.
+ *
+ * @returns {Array} An array of objects containing the sortable data retrieved from the form.
+ */
 function getSortableData() {
   let result = [];
   let selector = '[data-name="sortable"]';
@@ -2545,6 +3283,11 @@ function getSortableData() {
   return result;
 }
 
+/**
+ * Sets additional output data into the form based on the provided data object.
+ *
+ * @param {Object} data - The object containing additional output data to populate the form.
+ */
 function setAdditionalOutputData(data) {
   let selector = '[data-name="additional-output"]';
   let table = $(selector);
@@ -2565,6 +3308,11 @@ function setAdditionalOutputData(data) {
   }
 }
 
+/**
+ * Retrieves additional output data from the form and compiles it into an array of objects.
+ *
+ * @returns {Array} An array of objects containing the additional output data retrieved from the form.
+ */
 function getAdditionalOutputData() {
   let result = [];
   let selector = '[data-name="additional-output"]';
@@ -2583,6 +3331,11 @@ function getAdditionalOutputData() {
   return result;
 }
 
+/**
+ * Sets map data into the form based on the provided data object.
+ *
+ * @param {Object} data - The object containing map data to populate the form.
+ */
 function setMapData(data) {
   let selector = '[data-name="map"]';
   let table = $(selector);
@@ -2644,6 +3397,11 @@ function setMapData(data) {
   }
 }
 
+/**
+ * Retrieves map data from the form and compiles it into an array of objects.
+ *
+ * @returns {Array} An array of objects containing the map data retrieved from the form.
+ */
 function getMapData() {
   let result = [];
   let selector = '[data-name="map"]';
@@ -2685,6 +3443,13 @@ function getMapData() {
   return result;
 }
 
+
+/**
+ * Fixes the value by converting it to appropriate types (boolean, null, number, or string).
+ *
+ * @param {string} value - The value to be fixed.
+ * @returns {boolean|null|number|string} The fixed value.
+ */
 function fixValue(value) {
   if (value == "true") {
     return true;
@@ -2699,6 +3464,12 @@ function fixValue(value) {
   }
 }
 
+/**
+ * Parses a string into a number, returning either an integer or a float.
+ *
+ * @param {string} str - The string to be parsed.
+ * @returns {number} The parsed number.
+ */
 function parseNumber(str) {
   if (str.indexOf(".") !== -1) {
     return parseFloat(str);
@@ -2707,11 +3478,22 @@ function parseNumber(str) {
   }
 }
 
+/**
+ * Checks if a string is numeric.
+ *
+ * @param {string} str - The string to be checked.
+ * @returns {boolean} True if the string is numeric, false otherwise.
+ */
 function isNumeric(str) {
   if (typeof str != "string") return false;
   return !isNaN(str) && !isNaN(parseFloat(str));
 }
 
+/**
+ * Sets the language options in the target language selects based on the provided languages array.
+ *
+ * @param {Array} languages - An array of language objects containing name and code.
+ */
 function setLanguage(languages)
 {
   $('select.target-language').each(function(){
@@ -2724,6 +3506,24 @@ function setLanguage(languages)
   });
 }
 
+/**
+ * Generates the HTML structure for a reference configuration form.
+ *
+ * The form includes options for selecting different reference types such as:
+ * - Entity
+ * - Map
+ * - Yes/No
+ * - True/False
+ * - 1/0
+ *
+ * Each reference type section is designed with input fields and tables for:
+ * - Entity details (name, table name, primary key, etc.)
+ * - Map details (value, label, additional attributes)
+ * - Specification, sortable, and additional output configurations.
+ * - Selection method (single or multiple) for both entity and map sections.
+ *
+ * @returns {string} The HTML string for the reference configuration form.
+ */
 function getReferenceResource() {
   return `
 <form action="">

@@ -2,9 +2,19 @@
 
 namespace MagicApp\Utility;
 
+/**
+ * Class CloudflareUtil
+ *
+ * A utility class for handling Cloudflare-related operations, specifically
+ * for managing IP addresses. This class provides methods to retrieve the
+ * client's real IP address when using Cloudflare and to validate IP addresses
+ * against known Cloudflare IP ranges.
+ */
 class CloudflareUtil
 {
-    //IP ranges belonging to Cloudflare.
+    /**
+     * @var array IP ranges belonging to Cloudflare.
+     */
     public static $cloudflareIpRanges = array(
         '204.93.240.0/24',
         '204.93.177.0/24',
@@ -22,21 +32,33 @@ class CloudflareUtil
         '162.158.0.0/15'
     );
 
+    /**
+     * Get the client's real IP address.
+     *
+     * This method retrieves the real IP address of the client using the
+     * CF-Connecting-IP header provided by Cloudflare. If the header is not
+     * present or the request is not validated, it falls back to using the
+     * REMOTE_ADDR server variable.
+     *
+     * @param bool $validateRequest Optional. If true, validates that the
+     *                              request is coming from a Cloudflare IP.
+     * @return string The client's IP address.
+     */
     public static function getClientIp($validateRequest = false)
     {
-        //NA by default.
+        // NA by default.
         $ipAddress = 'NA';
 
-        //Check to see if the CF-Connecting-IP header exists.
+        // Check to see if the CF-Connecting-IP header exists.
         if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-            //Assume that the request is invalid unless proven otherwise.
+            // Assume that the request is invalid unless proven otherwise.
             $validCFRequest = false;
             if ($validateRequest) {
-                //Make sure that the request came via Cloudflare.
+                // Make sure that the request came via Cloudflare.
                 foreach (self::$cloudflareIpRanges as $range) {
-                    //Use the ip_in_range function from Joomla.
+                    // Use the ip_in_range function from Joomla.
                     if (self::ipInRange($_SERVER['REMOTE_ADDR'], $range)) {
-                        //IP is valid. Belongs to Cloudflare.
+                        // IP is valid. Belongs to Cloudflare.
                         $validCFRequest = true;
                         break;
                     }
@@ -45,22 +67,31 @@ class CloudflareUtil
                 $validCFRequest = true;
             }
 
-            //If it's a valid Cloudflare request
+            // If it's a valid Cloudflare request
             if ($validCFRequest) {
-                //Use the CF-Connecting-IP header.
+                // Use the CF-Connecting-IP header.
                 $ipAddress = $_SERVER["HTTP_CF_CONNECTING_IP"];
             } else {
-                //If it isn't valid, then use REMOTE_ADDR.
+                // If it isn't valid, then use REMOTE_ADDR.
                 $ipAddress = $_SERVER['REMOTE_ADDR'];
             }
         } else if (isset($_SERVER['REMOTE_ADDR'])) {
-            //Otherwise, use REMOTE_ADDR.
+            // Otherwise, use REMOTE_ADDR.
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
         return $ipAddress;
     }
 
-
+    /**
+     * Check if an IP address is within a specified range.
+     *
+     * This method determines whether a given IP address falls within a
+     * specified IP range, which can be in CIDR format or a custom range.
+     *
+     * @param string $ip The IP address to check.
+     * @param string $range The IP range in CIDR or custom format.
+     * @return bool True if the IP is in the range, false otherwise.
+     */
     public static function ipInRange($ip, $range)
     {
         if (strpos($range, '/') !== false) {
@@ -70,6 +101,13 @@ class CloudflareUtil
         }
     }
 
+    /**
+     * Determine if an IP address is within a CIDR range.
+     *
+     * @param string $ip The IP address to check.
+     * @param string $range The CIDR range (e.g., '192.168.1.0/24').
+     * @return bool True if the IP is in the CIDR range, false otherwise.
+     */
     public static function withRage1($ip, $range)
     {
         // $range is in IP/NETMASK format
@@ -91,9 +129,6 @@ class CloudflareUtil
             $range_dec = ip2long($range);
             $ip_dec = ip2long($ip);
 
-            # Strategy 1 - Create the netmask with 'netmask' 1s and then fill it to 32 with 0s
-            #$netmask_dec = bindec(str_pad('', $netmask, '1') . str_pad('', 32-$netmask, '0'));
-
             # Strategy 2 - Use math to create it
             $wildcard_dec = pow(2, (32 - $netmask)) - 1;
             $netmask_dec = ~$wildcard_dec;
@@ -102,6 +137,13 @@ class CloudflareUtil
         }
     }
 
+    /**
+     * Determine if an IP address is within a non-CIDR range.
+     *
+     * @param string $ip The IP address to check.
+     * @param string $range The range in custom format (e.g., '192.168.1.*' or '192.168.1.0-192.168.1.255').
+     * @return bool True if the IP is in the range, false otherwise.
+     */
     public static function withRange2($ip, $range)
     {
         // range might be 255.255.*.* or 1.2.3.0-1.2.3.255

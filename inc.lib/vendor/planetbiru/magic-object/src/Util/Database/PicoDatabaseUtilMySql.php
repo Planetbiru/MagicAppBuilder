@@ -435,7 +435,7 @@ class PicoDatabaseUtilMySql //NOSONAR
      * Check if array is not empty
      *
      * @param array $array Array to be checked
-     * @return boolean
+     * @return bool
      */
     public static function isNotEmpty($array)
     {
@@ -451,7 +451,7 @@ class PicoDatabaseUtilMySql //NOSONAR
      * @param SecretObject $tableInfo Table information
      * @param int $maxRecord Maximum record per query
      * @param callable $callbackFunction Callback function
-     * @return boolean
+     * @return bool
      */
     public static function importDataTable($databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget, $tableInfo, $maxRecord, $callbackFunction)
     {

@@ -20,6 +20,9 @@ When the developer decides to change the form from single file to multiple files
 </form>
 ```
 
+- For single uploads, the input field is named `myupload`.
+- For multiple uploads, the input field name is `myupload[]`, which allows multiple files to be uploaded at once.
+
 ```php
 <?php
 
@@ -46,6 +49,11 @@ foreach($file1->getAll() as $fileItem)
 
 ```
 
+- The `PicoUplodFile` class simplifies file handling. The developer can retrieve the uploaded files easily using the get method.
+- The `getAll` method retrieves all files, regardless of whether they were uploaded via single or multiple file forms.
+
+### Checking Upload Type
+
 Developers simply retrieve data using the `getAll` method and developers will get all files uploaded by users either via single file or multiple file forms. If necessary, the developer can check whether the file was uploaded using a single file or multiple file form with the `isMultiple()` method
 
 ```php
@@ -59,3 +67,7 @@ else
 	// do something here
 }
 ```
+
+### Summary
+
+This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like getAll() and isMultiple(), developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.

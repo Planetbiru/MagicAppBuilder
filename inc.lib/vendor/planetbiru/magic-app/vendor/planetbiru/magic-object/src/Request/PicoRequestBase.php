@@ -40,7 +40,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Constructor
      *
-     * @param boolean $forceScalar Indicates whether to only accept scalar values.
+     * @param bool $forceScalar Indicates whether to only accept scalar values.
      */
     public function __construct($forceScalar = false)
     {
@@ -62,7 +62,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * Load data into the object.
      *
      * @param mixed $data Data to be loaded.
-     * @param boolean $tolower Flag to transform keys to lowercase.
+     * @param bool $tolower Flag to transform keys to lowercase.
      */
     public function loadData($data, $tolower = false)
     {
@@ -129,7 +129,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get the value of the object.
      *
-     * @param boolean $snakeCase Flag to define naming strategy.
+     * @param bool $snakeCase Flag to define naming strategy.
      * @return stdClass
      */
     public function value($snakeCase = false)
@@ -159,8 +159,8 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Get a list of properties.
      *
-     * @param boolean $reflectSelf Flag to indicate if class reflection should be used.
-     * @param boolean $asArrayProps Flag to return properties as an array.
+     * @param bool $reflectSelf Flag to indicate if class reflection should be used.
+     * @param bool $asArrayProps Flag to return properties as an array.
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -199,7 +199,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * @param int $type Request type.
      * @param string $variableName Name of the variable.
      * @param int $filter Filter type.
-     * @param boolean $escapeSQL Flag to escape SQL.
+     * @param bool $escapeSQL Flag to escape SQL.
      * @return mixed
      */
     public function filterInput($type, $variableName, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
@@ -232,9 +232,9 @@ class PicoRequestBase extends stdClass //NOSONAR
      *
      * @param mixed $val The value to be filtered.
      * @param int $filter The filter type.
-     * @param boolean $escapeSQL Flag to escape SQL.
-     * @param boolean $nullIfEmpty Flag to return null if the value is empty.
-     * @param boolean $requireScalar Flag to require scalar values only.
+     * @param bool $escapeSQL Flag to escape SQL.
+     * @param bool $nullIfEmpty Flag to return null if the value is empty.
+     * @param bool $requireScalar Flag to require scalar values only.
      * @return mixed|null
      */
     public function filterValue($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false, $requireScalar = false)
@@ -275,8 +275,8 @@ class PicoRequestBase extends stdClass //NOSONAR
      *
      * @param mixed $val The value to be filtered.
      * @param int $filter The filter type.
-     * @param boolean $escapeSQL Flag to escape SQL.
-     * @param boolean $nullIfEmpty Flag to return null if the value is empty.
+     * @param bool $escapeSQL Flag to escape SQL.
+     * @param bool $nullIfEmpty Flag to return null if the value is empty.
      * @return mixed
      */
     public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) //NOSONAR
@@ -466,7 +466,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is a GET request.
      *
-     * @return boolean
+     * @return bool
      */
     public function isGet()
     {
@@ -476,7 +476,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is a POST request.
      *
-     * @return boolean
+     * @return bool
      */
     public function isPost()
     {
@@ -486,7 +486,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is an AJAX request.
      *
-     * @return boolean
+     * @return bool
      */
     public function isAjax()
     {
@@ -710,7 +710,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * This method determines if the property naming strategy for JSON serialization
      * is using snake case by checking the relevant configuration in class parameters.
      *
-     * @return boolean True if the naming strategy is snake case, false otherwise.
+     * @return bool True if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
@@ -726,7 +726,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * This method returns true if the JSON naming strategy is not snake case,
      * indicating that camel case is used instead.
      *
-     * @return boolean True if the naming strategy is camel case, false otherwise.
+     * @return bool True if the naming strategy is camel case, false otherwise.
      */
     protected function isCamel()
     {
@@ -739,7 +739,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * This method determines if the prettification option is enabled in the JSON configuration,
      * indicating whether the output should be formatted for readability.
      *
-     * @return boolean True if the prettify option is enabled, false otherwise.
+     * @return bool True if the prettify option is enabled, false otherwise.
      */
     private function isPretty()
     {
@@ -755,7 +755,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * This method checks whether the current request has no values set,
      * indicating that it is considered empty.
      *
-     * @return boolean True if the request is empty, false otherwise.
+     * @return bool True if the request is empty, false otherwise.
      */
     public function isEmpty()
     {

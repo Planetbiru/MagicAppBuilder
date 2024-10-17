@@ -4,25 +4,45 @@ namespace MagicObject\Exceptions;
 use Exception;
 use Throwable;
 
+/**
+ * Class NoDatabaseConnectionException
+ *
+ * Custom exception class for handling errors related to the absence of 
+ * a database connection. This exception can be thrown when an application 
+ * attempts to execute a database operation but fails to establish a 
+ * connection to the database, possibly due to misconfiguration, 
+ * network issues, or the database server being down. It is essential 
+ * for managing connection-related errors in database-driven applications.
+ */
 class NoDatabaseConnectionException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var Throwable
+     * @var Throwable|null
      */
     private $previous;
 
     /**
-     * @param string $message Exception message
-     * @param mixed $code Exception code
-     * @param Throwable $previous Previous exception
+     * Constructor for NoDatabaseConnectionException.
+     *
+     * @param string $message  Exception message
+     * @param int $code        Exception code
+     * @param Throwable|null $previous Previous exception
      */
-    public function __construct($message, $code = 0, $previous = null)
+    public function __construct($message, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        if (!is_null($previous)) {
-            $this->previous = $previous;
-        }
+        $this->previous = $previous;
+    }
+
+    /**
+     * Get the previous exception.
+     *
+     * @return Throwable|null
+     */
+    public function getPreviousException()
+    {
+        return $this->previous;
     }
 }

@@ -4,25 +4,43 @@ namespace MagicObject\Exceptions;
 use Exception;
 use Throwable;
 
-class InvalidClassExceptio extends Exception
+/**
+ * Class InvalidClassException
+ *
+ * Custom exception class for handling errors related to invalid class definitions.
+ * This exception can be thrown when a class cannot be instantiated or when
+ * a class is found to be improperly defined, potentially during reflection or
+ * dynamic class loading operations.
+ */
+class InvalidClassException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var Throwable
+     * @var Throwable|null
      */
     private $previous;
 
     /**
-     * @param string $message Exception message
-     * @param mixed $code Exception code
-     * @param Throwable $previous Previous exception
+     * Constructor for InvalidClassException.
+     *
+     * @param string $message  Exception message
+     * @param int $code        Exception code
+     * @param Throwable|null $previous Previous exception
      */
     public function __construct($message, $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        if (!is_null($previous)) {
-            $this->previous = $previous;
-        }
+        $this->previous = $previous;
+    }
+
+    /**
+     * Get the previous exception.
+     *
+     * @return Throwable|null
+     */
+    public function getPreviousException()
+    {
+        return $this->previous;
     }
 }

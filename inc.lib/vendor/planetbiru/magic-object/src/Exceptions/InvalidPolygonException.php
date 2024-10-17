@@ -4,25 +4,44 @@ namespace MagicObject\Exceptions;
 use Exception;
 use Throwable;
 
+/**
+ * Class InvalidPolygonException
+ *
+ * Custom exception class for handling errors related to invalid polygon definitions.
+ * This exception can be thrown when a polygon fails validation criteria, such as 
+ * having an insufficient number of vertices, improper angle measurements, or 
+ * invalid geometric configurations. It is useful in applications involving 
+ * geometric computations, shape processing, or graphical representations.
+ */
 class InvalidPolygonException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var Throwable
+     * @var Throwable|null
      */
     private $previous;
 
     /**
-     * @param string $message Exception message
-     * @param mixed $code Exception code
-     * @param Throwable $previous Previous exception
+     * Constructor for InvalidPolygonException.
+     *
+     * @param string $message  Exception message
+     * @param int $code        Exception code
+     * @param Throwable|null $previous Previous exception
      */
-    public function __construct($message, $code = 0, $previous = null)
+    public function __construct($message, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        if (!is_null($previous)) {
-            $this->previous = $previous;
-        }
+        $this->previous = $previous;
+    }
+
+    /**
+     * Get the previous exception.
+     *
+     * @return Throwable|null
+     */
+    public function getPreviousException()
+    {
+        return $this->previous;
     }
 }

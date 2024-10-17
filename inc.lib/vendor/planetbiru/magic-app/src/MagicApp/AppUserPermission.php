@@ -8,24 +8,29 @@ use MagicObject\MagicObject;
 use MagicObject\Request\PicoRequestBase;
 use MagicObject\SecretObject;
 
+/**
+ * Class AppUserPermission
+ *
+ * Manages user permissions for various actions within the application.
+ */
 class AppUserPermission
 {
     /**
-     * Application config
+     * Application configuration
      *
      * @var SecretObject
      */
     private $appConfig;
     
     /**
-     * Entity
+     * Entity representing user roles.
      *
      * @var MagicObject
      */
     private $entity;
     
     /**
-     * Module
+     * Current module context.
      *
      * @var PicoModule
      */
@@ -88,7 +93,7 @@ class AppUserPermission
     private $allowedBatchAction;
     
     /**
-     * Check if object has been initialize
+     * Indicates if permissions have been initialized.
      *
      * @var boolean
      */

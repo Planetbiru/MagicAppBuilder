@@ -126,7 +126,7 @@ class PicoEntityLanguage
      *
      * @param string $code Language code.
      * @param object|stdClass|array $reference Reference data for the language.
-     * @param boolean $use Flag to indicate whether to use this language immediately.
+     * @param bool $use Flag to indicate whether to use this language immediately.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
@@ -171,7 +171,7 @@ class PicoEntityLanguage
     /**
      * Get the list of properties of the entity.
      *
-     * @param boolean $asArrayProps Flag to determine if result should be returned as an array.
+     * @param bool $asArrayProps Flag to determine if result should be returned as an array.
      * @return array List of properties.
      */
     public function propertyList($asArrayProps = false)
@@ -278,7 +278,7 @@ class PicoEntityLanguage
      * Check if a property is set or not.
      *
      * @param string $name Name of the property to check.
-     * @return boolean True if the property is set, false otherwise.
+     * @return bool True if the property is set, false otherwise.
      */
     public function __isset($name)
     {
@@ -342,5 +342,25 @@ class PicoEntityLanguage
     public function getEntityClassName()
     {
         return $this->_entityClassName;
+    }
+
+    /**
+     * Converts the object to its string representation.
+     *
+     * This method checks if the label language and current language
+     * are set. If they are, it returns the JSON-encoded string of
+     * the label corresponding to the current language. If not, it
+     * returns an empty JSON object.
+     *
+     * @return string A JSON-encoded string of the label for the current language,
+     *                or an empty JSON object if the current language is not set.
+     */
+    public function __toString()
+    {
+        if (isset($this->_lableLanguage) && isset($this->_currentLanguage) && isset($this->_lableLanguage[$this->_currentLanguage])) {
+            return json_encode($this->_lableLanguage[$this->_currentLanguage]);
+        } else {
+            return "{}";
+        }
     }
 }

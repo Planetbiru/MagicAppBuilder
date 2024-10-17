@@ -4,6 +4,9 @@ namespace MagicObject\Geometry;
 
 /**
  * Class representing a Line with two Point objects.
+ *
+ * This class defines a Line in a 2D space represented by two endpoints, Point A and Point B.
+ * It provides methods to calculate the length of the line and ensure the endpoints are valid Point instances.
  */
 class Line {
 
@@ -38,6 +41,8 @@ class Line {
 
     /**
      * Method to calculate the length of the line.
+     *
+     * This method calculates the Euclidean distance between Point A and Point B.
      *
      * @return float The length of the line between Point A and Point B.
      */

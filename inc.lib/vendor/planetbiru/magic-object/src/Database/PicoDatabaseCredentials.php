@@ -7,8 +7,22 @@ use MagicObject\SecretObject;
 /**
  * PicoDatabaseCredentials class
  * 
- * This class encapsulates database credentials and uses the SecretObject to encrypt all attributes 
- * to prevent unauthorized access to the database configuration.
+ * This class encapsulates database credentials and utilizes the SecretObject to encrypt all attributes,
+ * ensuring the security of database configuration details from unauthorized access.
+ * 
+ * It provides getter methods to retrieve database connection parameters such as driver, host, port,
+ * username, password, database name, schema, and application time zone.
+ * 
+ * Example usage:
+ * ```php
+ * $credentials = new PicoDatabaseCredentials();
+ * $credentials->setHost('localhost');
+ * $credentials->setUsername('user');
+ * $credentials->setPassword('password');
+ * ```
+ * 
+ * The attributes are automatically encrypted when set, providing a secure way to handle sensitive
+ * information within your application.
  * 
  * @link https://github.com/Planetbiru/MagicObject
  */

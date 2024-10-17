@@ -27,6 +27,8 @@ includes:
   - specification
   - pagable
   - pagination
+  - native-query
+  - multiple-database
   - database-dump
   - object-label
   - database-query-builder

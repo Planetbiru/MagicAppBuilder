@@ -4,25 +4,45 @@ namespace MagicObject\Exceptions;
 use Exception;
 use Throwable;
 
+/**
+ * Class NoColumnUpdatedException
+ *
+ * Custom exception class for handling errors when no columns have been 
+ * updated during a database operation. This exception can be thrown 
+ * when an update query executes successfully but does not modify any 
+ * records, indicating that the specified criteria did not match any 
+ * existing entries. It is particularly useful in scenarios where 
+ * data integrity and confirmation of changes are critical.
+ */
 class NoColumnUpdatedException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var Throwable
+     * @var Throwable|null
      */
     private $previous;
 
     /**
-     * @param string $message Exception message
-     * @param mixed $code Exception code
-     * @param Throwable $previous Previous exception
+     * Constructor for NoColumnUpdatedException.
+     *
+     * @param string $message  Exception message
+     * @param int $code        Exception code
+     * @param Throwable|null $previous Previous exception
      */
-    public function __construct($message, $code = 0, $previous = null)
+    public function __construct($message, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        if (!is_null($previous)) {
-            $this->previous = $previous;
-        }
+        $this->previous = $previous;
+    }
+
+    /**
+     * Get the previous exception.
+     *
+     * @return Throwable|null
+     */
+    public function getPreviousException()
+    {
+        return $this->previous;
     }
 }

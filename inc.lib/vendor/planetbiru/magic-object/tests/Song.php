@@ -1,8 +1,12 @@
 <?php
 
+use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\MagicObject;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -493,6 +497,8 @@ timeEdit: 2024-03-03 13:13:13
 false, true, true
 );
 
+/*
+
 // to get company name
 echo $song->getVocalist()->getAgency()->getCompany()->getName();
 echo "\r\n";
@@ -509,3 +515,22 @@ foreach($song->getVocalist()->getAgency()->getCompany()->getPic() as $pic)
 	echo "\r\n----\r\n";
 }
 
+*/
+
+
+
+$databaseCredential = new SecretObject();
+$databaseCredential->loadYamlFile(dirname(dirname(__DIR__)) . "/test.yml", false, true, true);
+$databaseCredential->getDatabase()->setDatabaseName();
+$database = new PicoDatabase($databaseCredential->getDatabase(), null, function($sql){
+    echo $sql.";\r\n\r\n";
+});
+$database->connect();
+
+$specs = PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->in('name', ["Lagu 0005"]));
+	
+
+$song = new Song(null, $database);
+
+$song->findAll($specs);
