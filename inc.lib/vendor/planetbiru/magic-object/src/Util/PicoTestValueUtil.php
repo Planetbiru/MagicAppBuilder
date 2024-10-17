@@ -127,7 +127,7 @@ class PicoTestValueUtil
     /**
      * When
      *
-     * @param boolean $condition Contition
+     * @param bool $condition Contition
      * @return self|mixed
      */
     public function when($condition)

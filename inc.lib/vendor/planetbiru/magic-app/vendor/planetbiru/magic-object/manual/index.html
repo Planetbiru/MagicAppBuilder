@@ -340,6 +340,7 @@ class MyObject extends MagicObject
 
 <article class="article" id="part5">
 <h2>Multilevel Object</h2>
+<p>In the first code snippet, you are creating a multilevel object structure to represent a car with its components, specifically the tire and body.</p>
 <pre><code class="language-php">&lt;?php
 use MagicObject\MagicObject;
 
@@ -370,7 +371,16 @@ echo $car;
 
 echo $car-&gt;getBody()-&gt;getColor();
 </code></pre>
+<p><strong>Explanation</strong></p>
+<ol>
+<li><strong>Creating Objects</strong>: Instances of <code>MagicObject</code> are created for the car, tire, and body.</li>
+<li><strong>Setting Properties</strong>: You set properties on the tire (diameter and pressure) and the body (length, width, height, and color) using the <code>set</code> methods.</li>
+<li><strong>Nested Objects</strong>: The tire and body are associated with the car using <code>setTire()</code> and <code>setBody()</code>.</li>
+<li><strong>JSON Output</strong>: When you output <code>$car</code>, it returns a JSON representation of the object structure.</li>
+<li><strong>Accessing Properties</strong>: You can retrieve the color of the car's body through the method chaining <code>getBody()-&gt;getColor()</code>.</li>
+</ol>
 <h3>Parse Yaml</h3>
+<p>The second code snippet demonstrates how to load and manipulate structured data from a YAML string.</p>
 <pre><code class="language-php">
 $song = new MagicObject();
 $song-&gt;loadYamlString(
@@ -420,6 +430,15 @@ foreach($song-&gt;getVocalist()-&gt;getAgency()-&gt;getCompany()-&gt;getPic() as
     echo $pic;
     echo "\r\n----\r\n";
 }</code></pre>
+<p><strong>Explanation</strong></p>
+<ol>
+<li><strong>Loading YAML</strong>: The <code>loadYamlString()</code> method is used to load a YAML string into the <code>MagicObject</code>. This creates a structured object based on the YAML data.</li>
+<li><strong>Accessing Nested Data</strong>: You can navigate through the object hierarchy to retrieve values, like getting the company name with <code>getVocalist()-&gt;getAgency()-&gt;getCompany()-&gt;getName()</code>.</li>
+<li><strong>Adding Properties</strong>: You can also set additional properties, like the company address.</li>
+<li><strong>Iterating Over Arrays</strong>: The <code>pic</code> property is an array of objects, so you can loop through it to access individual picture details.</li>
+</ol>
+<h3>Conclusion</h3>
+<p>Both examples demonstrate how MagicObject allows you to create complex object structures and manage nested data efficiently. The use of YAML for configuration or data storage makes it easier to define complex structures in a human-readable format. The ability to set and get properties through method chaining enhances the flexibility and readability of your code.</p>
 </article>
 
 <article class="article" id="part6">
@@ -1205,7 +1224,9 @@ catch(Exception $e)
 
 <article class="article" id="part10">
 <h2>Input POST/GET/COOKIE/REQUEST/SERVER</h2>
+<p>In PHP, handling user input can be done through various superglobals, such as $_POST, $_GET, $_COOKIE, $_REQUEST, and $_SERVER. Each of these superglobals serves a specific purpose for gathering data from different types of requests.</p>
 <h3>Input POST</h3>
+<p>The <code>$_POST</code> superglobal is used to collect data sent via HTTP POST requests. In the provided code snippet:</p>
 <pre><code class="language-php">
 use MagicObject\Request\InputPost;
 
@@ -1217,7 +1238,9 @@ $name = $inputPost-&gt;getRealName();
 // equivalen to 
 $name = $_POST['real_name'];
 </code></pre>
+<p>This snippet utilizes a class called <code>InputPost</code> to retrieve the value associated with the key <code>'real_name'</code> from the <code>POST</code> request.</p>
 <h3>Input GET</h3>
+<p>The <code>$_GET</code> superglobal retrieves data sent via URL parameters in a GET request. The corresponding code is:</p>
 <pre><code class="language-php">
 use MagicObject\Request\InputGet;
 
@@ -1229,7 +1252,9 @@ $name = $inputGet-&gt;getRealName();
 // equivalen to 
 $name = $_GET['real_name'];
 </code></pre>
+<p>Here, the <code>InputGet</code> class is used similarly to fetch the <code>'real_name'</code> from the <code>GET</code> request.</p>
 <h3>Input COOKIE</h3>
+<p>The <code>$_COOKIE</code> superglobal accesses cookies sent by the client. The code example is:</p>
 <pre><code class="language-php">
 use MagicObject\Request\InputCookie;
 
@@ -1242,6 +1267,7 @@ $name = $inputCookie-&gt;getRealName();
 $name = $_COOKIE['real_name'];
 </code></pre>
 <h3>Input REQUEST</h3>
+<p>The <code>$_REQUEST</code> superglobal can collect data from both POST and GET requests, as well as cookies. The example is:</p>
 <pre><code class="language-php">
 use MagicObject\Request\InputRequest;
 
@@ -1253,6 +1279,7 @@ $name = $inputRequest-&gt;getRealName();
 // equivalen to 
 $name = $_REQUEST['real_name'];
 </code></pre>
+<p>This allows for a unified approach to retrieve the <code>'real_name'</code> regardless of its source.</p>
 <h3>Input SERVER</h3>
 <pre><code class="language-php">
 use MagicObject\Request\InputServer;
@@ -1265,8 +1292,9 @@ $remoteAddress = $inputServer-&gt;getRemoteAddr();
 // equivalen to 
 $remoteAddress = $_SERVER_['REMOTE_ADDR'];
 </code></pre>
+<p>This retrieves the remote address of the client making the request.</p>
 <h3>Filter Input</h3>
-<p>Filter input from InputGet, InputPost, InputRequest and InputCookie</p>
+<p>Filtering user input is crucial for security, as it helps prevent malicious data from affecting your application. The code snippet for filtering input looks like this:</p>
 <pre><code class="language-php">
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
@@ -1290,31 +1318,35 @@ $inputGet-&gt;filterRealName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 // so you can use it later
 $name = $inputGet-&gt;getRealName();
 </code></pre>
+<p>In this example, the getRealName method can take a filtering constant to sanitize the input value. The filter <code>FILTER_SANITIZE_SPECIAL_CHARS</code> is used to escape special characters, preventing XSS (Cross-Site Scripting) attacks.</p>
 <p>List of filter</p>
-<pre><code>FILTER_SANITIZE_NO_DOUBLE_SPACE = 512;
-FILTER_SANITIZE_PASSWORD = 511;
-FILTER_SANITIZE_ALPHA = 510;
-FILTER_SANITIZE_ALPHANUMERIC = 509;
-FILTER_SANITIZE_ALPHANUMERICPUNC = 506;
-FILTER_SANITIZE_NUMBER_UINT = 508;
-FILTER_SANITIZE_NUMBER_INT = 519;
-FILTER_SANITIZE_URL = 518;
-FILTER_SANITIZE_NUMBER_FLOAT = 520;
-FILTER_SANITIZE_STRING_NEW = 513;
-FILTER_SANITIZE_ENCODED = 514;
-FILTER_SANITIZE_STRING_INLINE = 507;
-FILTER_SANITIZE_STRING_BASE64 = 505;
-FILTER_SANITIZE_IP = 504;
-FILTER_SANITIZE_NUMBER_OCTAL = 503;
-FILTER_SANITIZE_NUMBER_HEXADECIMAL = 502;
-FILTER_SANITIZE_COLOR = 501;
-FILTER_SANITIZE_POINT = 500;
-FILTER_SANITIZE_BOOL = 600;
-FILTER_VALIDATE_URL = 273;
-FILTER_VALIDATE_EMAIL = 274;
-FILTER_SANITIZE_EMAIL = 517;
-FILTER_SANITIZE_SPECIAL_CHARS = 515;
-FILTER_SANITIZE_ASCII = 601;</code></pre>
+<pre><code>PicoFilterConstant::FILTER_DEFAULT                      = 516;
+PicoFilterConstant::FILTER_SANITIZE_NO_DOUBLE_SPACE     = 512;
+PicoFilterConstant::FILTER_SANITIZE_PASSWORD            = 511;
+PicoFilterConstant::FILTER_SANITIZE_ALPHA               = 510;
+PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC        = 509;
+PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERICPUNC    = 506;
+PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT         = 508;
+PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT          = 519;
+PicoFilterConstant::FILTER_SANITIZE_URL                 = 518;
+PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT        = 520;
+PicoFilterConstant::FILTER_SANITIZE_STRING_NEW          = 513;
+PicoFilterConstant::FILTER_SANITIZE_ENCODED             = 514;
+PicoFilterConstant::FILTER_SANITIZE_STRING_INLINE       = 507;
+PicoFilterConstant::FILTER_SANITIZE_STRING_BASE64       = 505;
+PicoFilterConstant::FILTER_SANITIZE_IP                  = 504;
+PicoFilterConstant::FILTER_SANITIZE_NUMBER_OCTAL        = 503;
+PicoFilterConstant::FILTER_SANITIZE_NUMBER_HEXADECIMAL  = 502;
+PicoFilterConstant::FILTER_SANITIZE_COLOR               = 501;
+PicoFilterConstant::FILTER_SANITIZE_POINT               = 500;
+PicoFilterConstant::FILTER_SANITIZE_BOOL                = 600;
+PicoFilterConstant::FILTER_VALIDATE_URL                 = 273;
+PicoFilterConstant::FILTER_VALIDATE_EMAIL               = 274;
+PicoFilterConstant::FILTER_SANITIZE_EMAIL               = 517;
+PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS       = 515;
+PicoFilterConstant::FILTER_SANITIZE_ASCII               = 601;</code></pre>
+<h3>Conclusion</h3>
+<p>In summary, handling input in PHP through superglobals is straightforward but requires careful filtering to ensure security. Using classes like <code>InputPost</code>, <code>InputGet</code>, <code>InputCookie</code>, <code>InputRequest</code>, and <code>InputServer</code> can abstract the underlying superglobal accesses, making the code cleaner and potentially more secure by enforcing consistent input handling and sanitization practices.</p>
 </article>
 
 <article class="article" id="part11">
@@ -1327,6 +1359,12 @@ FILTER_SANITIZE_ASCII = 601;</code></pre>
   max_life_time: 86400
   save_handler: files
   save_path: /tmp/sessions</code></pre>
+<ul>
+<li><code>name</code>: Name of the session.</li>
+<li><code>max_life_time</code>: Maximum lifetime of the session in seconds (e.g., 86400 seconds = 24 hours).</li>
+<li><code>save_handler</code>: Specifies the session storage mechanism (in this case, files).</li>
+<li><code>save_path</code>: Directory where session files are stored.</li>
+</ul>
 <p><strong>PHP Script</strong></p>
 <pre><code class="language-php">&lt;?php
 
@@ -1407,6 +1445,9 @@ $sessConf = new SessionSecureConfig($cfg-&gt;getSession());
 $sessions = new PicoSession($sessConf);
 
 $sessions-&gt;startSession();</code></pre>
+<p>This setup ensures that the session save path is securely managed and decrypted at runtime.</p>
+<h3>Conclusion</h3>
+<p>This implementation provides a robust framework for session management in a PHP application, allowing flexibility in storage options (files or Redis) while emphasizing security through encryption. The use of YAML for configuration keeps the setup clean and easily adjustable. By encapsulating session configuration in dedicated classes, you enhance maintainability and security.</p>
 </article>
 
 <article class="article" id="part12">
@@ -1432,6 +1473,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="album")
+ * @Cache(enable="true")
  */
 class Album extends MagicObject
 {
@@ -1605,6 +1647,7 @@ class Album extends MagicObject
 <li>@Entity</li>
 <li>@JSON(property-naming-strategy=SNAKE_CASE)</li>
 <li>@Table(name=&quot;album&quot;)</li>
+<li>@Cache(enable=&quot;true&quot;)</li>
 </ul>
 <h3>Class Parameters</h3>
 <p><strong>@Entity</strong></p>
@@ -1621,7 +1664,7 @@ class Album extends MagicObject
 <li><code>CAMEL_CASE</code> all properties will be camel case when <code>__toString()</code> method called.</li>
 <li><code>UPPER_CAMEL_CASE</code> all properties will be camel case with capitalize first character when <code>__toString()</code> method called.</li>
 </ul>
-<p>Default value: <code>CAMEL_CASE</code></p>
+<p>Default: <code>CAMEL_CASE</code></p>
 <ol start="2">
 <li><code>prettify</code></li>
 </ol>
@@ -1630,12 +1673,23 @@ class Album extends MagicObject
 <li><code>true</code> JSON string will be prettified</li>
 <li><code>false</code> JSON string will not be prettified</li>
 </ul>
-<p>Default value: <code>false</code></p>
+<p>Default: <code>false</code></p>
 <p><strong>@Table</strong></p>
 <p><code>@Table</code> is parameter contains table information.</p>
 <p>Attributes:
 <code>name</code></p>
 <p><code>name</code> is the table name of the entity.</p>
+<p><strong>@Cache</strong></p>
+<p><code>@Cache</code> is parameter contains cache information.</p>
+<p>Attributes:
+<code>enable</code></p>
+<p><code>enable</code> is option to enable or disable cache.</p>
+<p>Allowed value:</p>
+<ul>
+<li><code>true</code> Cache is enabled</li>
+<li><code>false</code> Cache is disabled</li>
+</ul>
+<p>Default: <code>false</code></p>
 <h3>Property Parameters</h3>
 <ul>
 <li>@Id</li>
@@ -7561,6 +7615,7 @@ require_once "inc/footer.php";
 <li>calling functions</li>
 <li>calling procedures and stored procedures</li>
 </ol>
+<p>Native queries do not support multiple database connections. This means that all operations performed using native queries must be executed within a single, active database connection. This design choice ensures data consistency and integrity by preventing potential conflicts that may arise from attempting to manage multiple connections simultaneously. Users should ensure that their application logic accommodates this limitation, potentially leveraging connection pooling or other techniques to optimize database interaction when needed.</p>
 <h3>Parameters</h3>
 <p>The parameters accepted by the native query function are as follows:</p>
 <ol>
@@ -7570,7 +7625,7 @@ require_once "inc/footer.php";
 <li>bool or boolean</li>
 <li>null</li>
 <li>DateTime</li>
-<li>array of string, int, float, bool and DateTime</li>
+<li>array of string, int, bool and DateTime</li>
 </ol>
 <p>For columns with data type <code>DATETIME</code> and <code>TIMESTAMP</code>, users can use either <code>string</code> or <code>DateTime</code> parameters. <code>DateTime</code> will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the <code>in</code> and <code>=</code> criteria.</p>
 <h3>Return Type</h3>
@@ -8165,11 +8220,191 @@ while($row = $stmt-&gt;fetch(PDO::FETCH_ASSOC))
     generateData($fp, $map, $row, $iteration);
 }
 fclose($fp);</code></pre>
+<h3>Best Practices</h3>
+<ol>
+<li><strong>Utilize Prepared Statements</strong>: Always prefer using prepared statements for security against SQL injection.</li>
+<li><strong>Error Handling</strong>: Wrap database calls in try-catch blocks to handle exceptions gracefully.</li>
+<li><strong>Efficient Data Retrieval</strong>: Use PDOStatement for large datasets to process rows one by one.</li>
+<li><strong>Debugging</strong>: Implement logging for SQL queries to troubleshoot issues more effectively.</li>
+<li><strong>Keep Queries Simple</strong>: Break down complex queries into simpler components if possible, making them easier to maintain and debug.</li>
+</ol>
+<p>By leveraging the native query feature in MagicObject, you can create efficient and maintainable database interactions, enhancing your application's performance and security.</p>
 </article>
 
 <article class="article" id="part17">
+<h2>Multiple Database Connections</h2>
+<p>MagicObject version 2 introduces support for multiple database connections, enabling users to manage entities stored across different databases seamlessly. When performing operations such as JOINs with entities from multiple databases, it is essential to define a database connection for each entity involved.</p>
+<h3>Example Scenario</h3>
+<p>In this example, we will illustrate how to manage entities stored in different databases:</p>
+<ul>
+<li><strong>Album</strong>, <strong>Producer</strong> and <strong>Song</strong> entities are stored in <strong>Database 1</strong>.</li>
+<li><strong>Artist</strong> entity is stored in <strong>Database 2</strong>.</li>
+</ul>
+<h3>Entity Definitions</h3>
+<p>Here are the definitions for the Album, Artist, and Song classes:</p>
+<p><strong>Album Class</strong></p>
+<pre><code class="language-php">class Album
+{
+    /**
+     * @Id
+     * @Column(name="album_id")
+     * @var string
+     */
+    private $albumId;
+
+    /**
+     * @Column(name="name")
+     * @var string
+     */
+    private $name;
+
+    // add property and annotation here
+}</code></pre>
+<p><strong>Artist Class</strong></p>
+<pre><code class="language-php">class Artist
+{
+    /**
+     * @Id
+     * @Column(name="artist_id")
+     * @var string
+     */
+    private $artistId;
+
+    /**
+     * @Column(name="name")
+     * @var string
+     */
+    private $name;
+
+    // add property and annotation here
+}</code></pre>
+<p><strong>Producer Class</strong></p>
+<pre><code class="language-php">class Producer
+{
+    /**
+     * @Id
+     * @Column(name="producer_id")
+     * @var string
+     */
+    private $producerId;
+
+    /**
+     * @Column(name="name")
+     * @var string
+     */
+    private $name;
+
+    // add property and annotation here
+}</code></pre>
+<p><strong>Song Class</strong></p>
+<pre><code class="language-php">class Song
+{
+    /**
+     * @Id
+     * @Column(name="song_id")
+     * @var string
+     */
+    private $songId;
+
+    /**
+     * @Column(name="name")
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @Column(name="album_id")
+     * @var string
+     */
+    private $albumId;
+
+    /**
+     * @JoinColumn(name="album_id")
+     * @var Album
+     */
+    private $album;
+
+    /**
+     * @Column(name="producer_id")
+     * @var string
+     */
+    private $producerId;
+
+    /**
+     * @JoinColumn(name="producer_id")
+     * @var Producer
+     */
+    private $producer;
+
+    /**
+     * @Column(name="artist_id")
+     * @var string
+     */
+    private $artistId;
+
+    /**
+     * @JoinColumn(name="album_id")
+     * @var Artist
+     */
+    private $artist;
+
+    // add property and annotation here
+}</code></pre>
+<h3>Creating Instances</h3>
+<p>To demonstrate how to create instances of these entities and associate them with their respective databases:</p>
+<pre><code class="language-php">$song = new Song(null, $database1);
+$album = new Album(null, $database1);
+$producer = new Producer(null, $database1);
+$artist = new Artist(null, $database2);</code></pre>
+<h3>Setting Database Entities</h3>
+<p>You can set the database entities for Album and Artist associated with a Song instance in several ways:</p>
+<p><strong>Method 1: Chaining Method Calls</strong></p>
+<pre><code class="language-php">$song-&gt;databaseEntity($album)-&gt;-&gt;databaseEntity($producer)-&gt;databaseEntity($artist);</code></pre>
+<p><strong>Method 2: Using a DatabaseEntity Instance</strong></p>
+<pre><code class="language-php">$databaseEntity = new DatabaseEntity();
+$databaseEntity-&gt;add($album, $database1);
+$databaseEntity-&gt;add($producer, $database1);
+$databaseEntity-&gt;add($artist, $database2);
+$song-&gt;databaseEntity($databaseEntity);</code></pre>
+<p><strong>Method 3: Automatic Database Association</strong></p>
+<pre><code class="language-php">$databaseEntity = new DatabaseEntity();
+$databaseEntity-&gt;add($album); // Automatically uses $database1 for $album
+$databaseEntity-&gt;add($producer); // Automatically uses $database1 for $producer
+$databaseEntity-&gt;add($artist); // Automatically uses $database2 for $artist
+$song-&gt;databaseEntity($databaseEntity);</code></pre>
+<p>Since <code>$album</code> and <code>$producer</code> are stored in the same database as <code>$song</code>, user can skip to set <code>DatabaseEntity</code> for <code>$album</code> and <code>$producer</code>. MagicObject will use <code>$database1</code> as the default database connection. Thus, we can write a shorter code as follows:</p>
+<pre><code class="language-php">$song = new Song(null, $database1);
+$artist = new Artist(null, $database2);</code></pre>
+<p><strong>Method 1: Chaining Method Calls</strong></p>
+<pre><code class="language-php">$song-&gt;databaseEntity($artist);</code></pre>
+<p><strong>Method 2: Using a DatabaseEntity Instance</strong></p>
+<pre><code class="language-php">$databaseEntity = new DatabaseEntity();
+$databaseEntity-&gt;add($artist, $database2);
+$song-&gt;databaseEntity($databaseEntity);</code></pre>
+<p><strong>Method 3: Automatic Database Association</strong></p>
+<pre><code class="language-php">$databaseEntity = new DatabaseEntity();
+$databaseEntity-&gt;add($artist); // Automatically uses $database2 for $artist
+$song-&gt;databaseEntity($databaseEntity);</code></pre>
+<h3>Using the Song Object</h3>
+<p>Once the entities are set up, you can perform operations on the Song object. For example, to retrieve all songs:</p>
+<pre><code class="language-php">try {
+    $pageData = $song-&gt;findAll();
+} catch (Exception $e) {
+    // Handle exception here (e.g., logging or displaying an error message)
+}</code></pre>
+<h3>Conclusion</h3>
+<p>With MagicObject version 2, managing entities across multiple database connections is straightforward. By defining the correct associations and utilizing the provided methods, users can effectively work with complex data structures that span multiple databases. Make sure to handle exceptions properly to ensure robustness in your application.</p>
+</article>
+
+<article class="article" id="part18">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
+<h3>Database Dump Overview</h3>
+<ol>
+<li>Dumping Database Structure</li>
+</ol>
+<p>You can dump the structure of a database without needing to connect to a real database. Specify the target database type when calling the dump method.</p>
+<p><strong>Code Example:</strong></p>
 <pre><code class="language-php">&lt;?php
 
 use MagicObject\Database\PicoDatabaseType;
@@ -8634,9 +8869,15 @@ echo $dumpForSong-&gt;dumpStructure($song, PicoDatabaseType::DATABASE_TYPE_MYSQL
 $pageData = $song-&gt;findAll();
 $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);</code></pre>
+<h3>Summary</h3>
+<ul>
+<li><strong>Structure Dumping</strong>: Use <code>dumpStructure</code> to get the schema of the database without a real connection.</li>
+<li><strong>Data Dumping</strong>: Use <code>dumpData</code> to extract data from an actual database connection.</li>
+</ul>
+<p>This approach allows developers to quickly switch between database types and manage their database schemas and data efficiently. The use of dedicated instances of PicoDatabaseDump for multiple tables ensures clarity and organization in your database operations.</p>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part19">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -8761,7 +9002,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part19">
+<article class="article" id="part20">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -9028,7 +9269,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part20">
+<article class="article" id="part21">
 <h2>Upload File</h2>
 <p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
 <p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
@@ -9042,6 +9283,10 @@ where song.active = true
      &lt;input name="myupload[]" type="file" webkitdirectory multiple /&gt;
      &lt;input type="submit" /&gt;
 &lt;/form&gt;</code></pre>
+<ul>
+<li>For single uploads, the input field is named <code>myupload</code>.</li>
+<li>For multiple uploads, the input field name is <code>myupload[]</code>, which allows multiple files to be uploaded at once.</li>
+</ul>
 <pre><code class="language-php">&lt;?php
 
 use MagicObject\File\PicoUplodFile;
@@ -9065,6 +9310,11 @@ foreach($file1-&gt;getAll() as $fileItem)
     move_uploaded_file($temporaryName, $targetDir."/".$name);
 }
 </code></pre>
+<ul>
+<li>The <code>PicoUplodFile</code> class simplifies file handling. The developer can retrieve the uploaded files easily using the get method.</li>
+<li>The <code>getAll</code> method retrieves all files, regardless of whether they were uploaded via single or multiple file forms.</li>
+</ul>
+<h3>Checking Upload Type</h3>
 <p>Developers simply retrieve data using the <code>getAll</code> method and developers will get all files uploaded by users either via single file or multiple file forms. If necessary, the developer can check whether the file was uploaded using a single file or multiple file form with the <code>isMultiple()</code> method</p>
 <pre><code class="language-php">
 if($file1-&gt;isMultiple())
@@ -9075,9 +9325,11 @@ else
 {
     // do something here
 }</code></pre>
+<h3>Summary</h3>
+<p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like getAll() and isMultiple(), developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
 </article>
 
-<article class="article" id="part21">
+<article class="article" id="part22">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>
@@ -9297,7 +9549,7 @@ $apa = $rumah;
 echo $apa;</code></pre>
 </article>
 
-<article class="article" id="part22">
+<article class="article" id="part23">
 <h2>Database Migration</h2>
 <p>MagicObject allows users to import data from a database with different table names and column names between the source database and the destination database. This feature is used by developers who develop applications that are already used in production environments.</p>
 <p>On the one hand, the application requires a new database structure according to what is defined by the developer. On the other hand, users want to use existing data.</p>

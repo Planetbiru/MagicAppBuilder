@@ -81,7 +81,7 @@ class PicoSession
     /**
      * (Re)starts the session.
      *
-     * @return boolean true if the session has been initialized, else false.
+     * @return bool true if the session has been initialized, else false.
      */
     public function startSession()
     {
@@ -94,7 +94,7 @@ class PicoSession
     /**
      * Checks if the session has been started.
      *
-     * @return boolean
+     * @return bool
      */
     public function isSessionStarted()
     {
@@ -130,7 +130,7 @@ class PicoSession
      * Checks if a value is set in the session.
      *
      * @param string $name Name of the data.
-     * @return boolean
+     * @return bool
      */
     public function __isset($name)
     {
@@ -151,7 +151,7 @@ class PicoSession
     /**
      * Destroys the current session.
      *
-     * @return boolean true if the session has been deleted, else false.
+     * @return bool true if the session has been deleted, else false.
      */
     public function destroy()
     {
@@ -167,8 +167,8 @@ class PicoSession
      * Sets cookie parameters for the session.
      *
      * @param int $maxlifetime Maximum lifetime of the session cookie.
-     * @param boolean $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
-     * @param boolean $httponly Indicates if the cookie is accessible only through the HTTP protocol.
+     * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
+     * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
      * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
      * @return self
      */
@@ -197,8 +197,8 @@ class PicoSession
      * @param int $expire The expiration time of the cookie.
      * @param string $path The path on the server in which the cookie will be available.
      * @param string $domain The domain that the cookie is available to.
-     * @param boolean $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
-     * @param boolean $httponly Indicates if the cookie is accessible only through the HTTP protocol.
+     * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
+     * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
      * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
      * @return self
      */

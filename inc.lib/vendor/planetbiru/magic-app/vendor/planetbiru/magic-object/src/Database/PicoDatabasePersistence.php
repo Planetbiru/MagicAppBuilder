@@ -30,6 +30,7 @@ use ReflectionProperty;
 class PicoDatabasePersistence // NOSONAR
 {
     const ANNOTATION_TABLE = "Table";
+    const ANNOTATION_CACHE = "Cache";
     const ANNOTATION_COLUMN = "Column";
     const ANNOTATION_JOIN_COLUMN = "JoinColumn";
     const ANNOTATION_VAR = "var";
@@ -51,6 +52,7 @@ class PicoDatabasePersistence // NOSONAR
     const KEY_GENERATOR = "generator";
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_VALUE = "value";
+    const KEY_ENABLE = "enable";
     const KEY_ENTITY_OBJECT = "entityObject";
     
     const VALUE_TRUE = "true";
@@ -82,7 +84,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Object
      *
-     * @var mixed
+     * @var MagicObject
      */
     protected $object;
 
@@ -271,7 +273,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Set flag to skip null column
      *
-     * @param boolean $skip Skip null
+     * @param bool $skip Skip null
      * @return self
      */
     public function includeNull($skip)
@@ -511,11 +513,18 @@ class PicoDatabasePersistence // NOSONAR
     {
         if(!isset($this->tableInfoProp))
         {
+            $noCache = false;
             $reflexClass = new PicoAnnotationParser($this->className);
             $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);
+            $cache = $reflexClass->getParameter(self::ANNOTATION_CACHE);
             if(!isset($table))
             {
                 throw new EntityException($this->className . " is not valid entity");
+            }
+            
+            if(isset($cache))
+            {
+                $noCache = self::VALUE_FALSE == strtolower($cache[self::KEY_ENABLE]);
             }
 
             $values = $this->parseKeyValue($reflexClass, $table, self::ANNOTATION_TABLE);
@@ -568,7 +577,7 @@ class PicoDatabasePersistence // NOSONAR
                 
             }
             // bring it together
-            $this->tableInfoProp = new PicoTableInfo($picoTableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns);
+            $this->tableInfoProp = new PicoTableInfo($picoTableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache);
         }
         return $this->tableInfoProp;
     }
@@ -577,7 +586,7 @@ class PicoDatabasePersistence // NOSONAR
      * Get match row
      *
      * @param PDOStatement $stmt PDO statement
-     * @return boolean
+     * @return bool
      */
     public function matchRow($stmt)
     {
@@ -592,7 +601,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Save data to database
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PDOStatement|EntityException
      */
     public function save($includeNull = false)
@@ -637,7 +646,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Query of save data
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PicoDatabaseQueryBuilder
      * @throws EntityException
      */
@@ -915,7 +924,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $columnName Column name
      * @param array $primaryKeys Primary keys
-     * @return boolean
+     * @return bool
      */
     public function isPrimaryKeys($columnName, $primaryKeys)
     {
@@ -949,7 +958,7 @@ class PicoDatabasePersistence // NOSONAR
      * Add generated value
      *
      * @param PicoTableInfo $info Table information
-     * @param boolean $firstCall First call
+     * @param bool $firstCall First call
      * @return void
      */
     private function addGeneratedValue($info, $firstCall)
@@ -1007,7 +1016,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Insert data
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PDOStatement|EntityException
      */
     public function insert($includeNull = false)
@@ -1021,7 +1030,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Query of insert data
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PicoDatabaseQueryBuilder|EntityException
      */
     public function insertQuery($includeNull = false)
@@ -1142,7 +1151,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $strategy
      * @param string $propertyName
-     * @return boolean
+     * @return bool
      */
     private function isRequireGenerateValue($strategy, $propertyName)
     {
@@ -1805,7 +1814,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string[] $primaryKeys Primary keys
      * @param array $propertyValues Property values
-     * @return boolean
+     * @return bool
      */
     private function isValidPrimaryKeyValues($primaryKeys, $propertyValues)
     {
@@ -2086,7 +2095,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
-     * @return boolean
+     * @return bool
      */
     protected function isRequireJoin($specification, $pageable, $sortable, $info)
     {
@@ -2107,7 +2116,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable Pageable
      * @param PicoSortable|string|null $sortable Sortable
      * @param PicoTableInfo $info Table information
-     * @return boolean
+     * @return bool
      */
     private function isRequireJoinFromPageableAndSortable($pageable, $sortable, $info)
     {
@@ -2138,7 +2147,7 @@ class PicoDatabasePersistence // NOSONAR
      * Require join from specification
      *
      * @param PicoSpecification $specification Specification
-     * @return boolean
+     * @return bool
      */
     private function isRequireJoinFromSpecification($specification)
     {
@@ -2576,7 +2585,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return boolean
+     * @return bool
      */
     public function existsBy($propertyName, $propertyValue)
     {
@@ -2866,22 +2875,52 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Get join data
+     * Retrieves joined data based on the specified class name and key value.
      *
-     * @param string $classNameJoin Join class name
-     * @param string $referenceColumName Join key
-     * @param mixed $joinKeyValue Join key
-     * @return MagicObject|null
+     * This method checks the join cache for previously retrieved data. If the data is not found in the cache,
+     * it creates a new instance of the specified class, sets the appropriate database connection,
+     * and retrieves the data using the specified join key.
+     *
+     * @param string $classNameJoin The name of the class to join with.
+     * @param string $referenceColumnName The name of the column used as the join key.
+     * @param mixed $joinKeyValue The value of the join key to search for.
+     * @return MagicObject|null Returns the retrieved MagicObject if found, or null if not found.
      */
     private function getJoinData($classNameJoin, $referenceColumName, $joinKeyValue)
     {
-        if(!isset($this->joinCache[$classNameJoin]) || !isset($this->joinCache[$classNameJoin][$joinKeyValue]))
+        $persist = new self(null, new $classNameJoin());
+        $info = $persist->getTableInfo();
+        $noCache = isset($info) ? $info->getNoCache() : false;
+        
+        // Check if caching is disabled or if the data is not already cached
+        if($noCache || !isset($this->joinCache[$classNameJoin]) || !isset($this->joinCache[$classNameJoin][$joinKeyValue]))
         {      
             $className = $this->getRealClassName($classNameJoin);
-            $obj = new $className(null, $this->database);
-            $method = 'findOneBy'.ucfirst($referenceColumName);
-            $obj->{$method}($joinKeyValue);           
-            $this->joinCache[$classNameJoin][$joinKeyValue] = $obj;
+            $obj = new $className(null);      
+            
+            $dbEnt = $this->object->databaseEntity();
+            // Determine the database connection to use
+            if($dbEnt != null)
+            {
+                // Using multiple database connection
+                $obj->databaseEntity($dbEnt);
+                $obj->currentDatabase($dbEnt->getDatabase($obj));
+            }
+            else
+            {
+                // Using master database connection
+                $obj->currentDatabase($this->object->currentDatabase());
+            }
+            
+            // Dynamically call the method to find the object by the join key
+            $method = 'findOneBy' . ucfirst($referenceColumName);
+            $obj->{$method}($joinKeyValue);   
+            
+            // Cache the result for future retrievals if caching is enabled
+            if(!$noCache)        
+            {
+                $this->joinCache[$classNameJoin][$joinKeyValue] = $obj;
+            }
             return $obj;
         }
         else if(isset($this->joinCache[$classNameJoin]) && isset($this->joinCache[$classNameJoin][$joinKeyValue]))
@@ -2890,7 +2929,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         else
         {
-            return null;
+            return null; // Return null if no data is found
         }
     }
     
@@ -2959,7 +2998,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if filter is valid or not
      *
      * @param string $filter Filter
-     * @return boolean
+     * @return bool
      */
     private function isValidFilter($filter)
     {
@@ -2970,7 +3009,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if data is not null and not empty and not a space
      *
      * @param string $value Value to be checked
-     * @return boolean
+     * @return bool
      */
     private function notNullAndNotEmptyAndNotSpace($value)
     {
@@ -3066,7 +3105,7 @@ class PicoDatabasePersistence // NOSONAR
      * Boolean value
      *
      * @param mixed $value Input value
-     * @return boolean
+     * @return bool
      */
     private function boolval($value)
     {
@@ -3137,7 +3176,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Check if date time is NULL
      * @param string $value Value to be checked
-     * @return boolean
+     * @return bool
      */
     private function isDateTimeNull($value)
     {
@@ -3379,7 +3418,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Update data
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PDOStatement
      * @throws EntityException
      */
@@ -3395,7 +3434,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Query of update data
      *
-     * @param boolean $includeNull Flag include NULL
+     * @param bool $includeNull Flag include NULL
      * @return PicoDatabaseQueryBuilder
      * @throws EntityException
      */
@@ -3569,7 +3608,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if parameter is array
      *
      * @param mixed $value Value to be checked
-     * @return boolean
+     * @return bool
      */
     public function isArray($value)
     {

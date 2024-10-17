@@ -149,7 +149,7 @@ class PicoEntityLabel
      *
      * @return stdClass An object containing entity metadata.
      */
-    public function getObjectInfo()
+    public function getObjectInfo() // NOSONAR
     {
         $reflexClass = new PicoAnnotationParser($this->className);
         $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);
@@ -229,22 +229,20 @@ class PicoEntityLabel
             // List auto-generated columns
             foreach ($parameters as $param => $val) {
                 // Check for the generated value annotation in a case-insensitive manner
-                if (strcasecmp($param, self::ANNOTATION_GENERATED_VALUE) === 0) {
+                // Ensure the column exists before proceeding
+                if (strcasecmp($param, self::ANNOTATION_GENERATED_VALUE) === 0 && isset($columns[$prop->name])) {
                     // Ensure the column exists before proceeding
-                    if (isset($columns[$prop->name])) {
-                        // Parse the key-value pair for additional details
-                        $vals = $this->parseKeyValue($reflexProp, $val, $param);
-            
-                        // Store the parsed values in the auto-increment keys array
-                        $autoIncrementKeys[$prop->name] = array(
-                            self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
-                            self::KEY_STRATEGY => isset($vals[self::KEY_STRATEGY]) ? $vals[self::KEY_STRATEGY] : null,
-                            self::KEY_GENERATOR => isset($vals[self::KEY_GENERATOR]) ? $vals[self::KEY_GENERATOR] : null,
-                        );
-                    }
-                }
-            }
-            
+                    // Parse the key-value pair for additional details
+                    $vals = $this->parseKeyValue($reflexProp, $val, $param);
+        
+                    // Store the parsed values in the auto-increment keys array
+                    $autoIncrementKeys[$prop->name] = array(
+                        self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
+                        self::KEY_STRATEGY => isset($vals[self::KEY_STRATEGY]) ? $vals[self::KEY_STRATEGY] : null,
+                        self::KEY_GENERATOR => isset($vals[self::KEY_GENERATOR]) ? $vals[self::KEY_GENERATOR] : null,
+                    );
+                }  
+            } 
 
             // Define default column values
             foreach ($parameters as $param => $val) {

@@ -13,7 +13,7 @@ use stdClass;
  * 
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoTableInfo
+class PicoTableInfo // NOSONAR
 {
     /**
      * The name of the table.
@@ -70,6 +70,13 @@ class PicoTableInfo
      * @var string
      */
     protected $columnType;
+    
+    /**
+     * Flag to disable cache when any entities join with this entity
+     *
+     * @var boolean
+     */
+    protected $noCache = false;
 
     /**
      * Gets an instance of PicoTableInfo.
@@ -93,8 +100,9 @@ class PicoTableInfo
      * @param array $autoIncrementKeys The auto-increment keys of the table.
      * @param array $defaultValue The columns with default values.
      * @param array $notNullColumns The columns that cannot be null.
+     * @param bool $noCache Flag to disable cache when any entities join with this entity
      */
-    public function __construct($tableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns)
+    public function __construct($tableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache = false) // NOSONAR
     {
         $this->tableName = $tableName;
         $this->columns = $columns;
@@ -103,6 +111,7 @@ class PicoTableInfo
         $this->autoIncrementKeys = $autoIncrementKeys;
         $this->defaultValue = $defaultValue;
         $this->notNullColumns = $notNullColumns;
+        $this->noCache = $noCache;
     }
 
     /**
@@ -169,7 +178,7 @@ class PicoTableInfo
      *
      * @param string $tableName The name of the table.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setTableName($tableName)
     {
@@ -192,7 +201,7 @@ class PicoTableInfo
      *
      * @param array $columns The columns to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setColumns($columns)
     {
@@ -215,7 +224,7 @@ class PicoTableInfo
      *
      * @param array $joinColumns The join columns to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setJoinColumns($joinColumns)
     {
@@ -238,7 +247,7 @@ class PicoTableInfo
      *
      * @param array $primaryKeys The primary keys to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKeys($primaryKeys)
     {
@@ -261,7 +270,7 @@ class PicoTableInfo
      *
      * @param array $autoIncrementKeys The auto-increment keys to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setAutoIncrementKeys($autoIncrementKeys)
     {
@@ -284,7 +293,7 @@ class PicoTableInfo
      *
      * @param array $defaultValue The default value keys to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDefaultValue($defaultValue)
     {
@@ -307,11 +316,35 @@ class PicoTableInfo
      *
      * @param array $notNullColumns The not-null columns to set.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setNotNullColumns($notNullColumns)
     {
         $this->notNullColumns = $notNullColumns;
+        return $this;
+    }
+
+    /**
+     * Get flag to disable cache when any entities join with this entity
+     *
+     * @return  boolean
+     */ 
+    public function getNoCache()
+    {
+        return $this->noCache;
+    }
+
+    /**
+     * Set flag to disable cache when any entities join with this entity
+     *
+     * @param  boolean  $noCache  Flag to disable cache when any entities join with this entity
+     *
+     * @return  self
+     */ 
+    public function setNoCache($noCache)
+    {
+        $this->noCache = $noCache;
+
         return $this;
     }
 }

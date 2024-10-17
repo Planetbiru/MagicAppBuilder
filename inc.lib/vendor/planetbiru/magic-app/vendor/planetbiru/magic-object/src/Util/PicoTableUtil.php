@@ -5,6 +5,16 @@ use DOMDocument;
 use DOMElement;
 use MagicObject\Exceptions\InvalidParameterException;
 
+/**
+ * Utility class for handling DOM element operations related to tables.
+ *
+ * This class provides methods for setting attributes, class names,
+ * and identity properties on DOM elements, as well as parsing attribute strings
+ * into associative arrays. It is designed to facilitate the management of
+ * table-related DOM elements within the MagicObject framework.
+ *
+ * @link https://github.com/Planetbiru/MagicObject
+ */
 class PicoTableUtil
 {
     private function __construct()
@@ -13,11 +23,11 @@ class PicoTableUtil
     }
     
     /**
-     * Set class
+     * Set the class list for a DOMElement.
      *
-     * @param DOMElement $node DOM node
-     * @param array $classList Class list
-     * @return DOMElement
+     * @param DOMElement $node The DOM node to modify.
+     * @param array $classList An array of class names to set.
+     * @return DOMElement The modified DOM node.
      */
     public static function setClassList($node, $classList)
     {
@@ -29,11 +39,11 @@ class PicoTableUtil
     }
 
     /**
-     * Set attributes
+     * Set attributes for a DOMElement.
      *
-     * @param DOMElement $node DOM node
-     * @param array $annotationClass Annotation class
-     * @return DOMElement
+     * @param DOMElement $node The DOM node to modify.
+     * @param array $annotationAttributes An associative array of attributes to set.
+     * @return DOMElement The modified DOM node.
      */
     public static function setAttributes($node, $annotationAttributes)
     {
@@ -48,11 +58,11 @@ class PicoTableUtil
     }
 
     /**
-     * Set identity
+     * Set the identity for a DOMElement.
      *
-     * @param DOMElement $node DOM node
-     * @param PicoGenericObject $identity Identity
-     * @return DOMElement
+     * @param DOMElement $node The DOM node to modify.
+     * @param PicoGenericObject $identity The identity object.
+     * @return DOMElement The modified DOM node.
      */
     public static function setIdentity($node, $identity)
     {
@@ -64,10 +74,11 @@ class PicoTableUtil
     }
 
     /**
-     * Parse attribute
+     * Parse attributes from a string representation.
      *
-     * @param string $attributes Attributes
-     * @return array
+     * @param string $attributes The string containing attributes.
+     * @return array An associative array of parsed attributes.
+     * @throws InvalidParameterException If the provided attributes is an array.
      */
     public static function parseElementAttributes($attributes)
     {
@@ -96,10 +107,10 @@ class PicoTableUtil
     }
 
     /**
-     * Validate class name of DOMElement
+     * Validate the class name of a DOMElement.
      *
-     * @param string $className Class name
-     * @return boolean
+     * @param string $className The class name to validate.
+     * @return bool True if the class name is valid, false otherwise.
      */
     public static function isValidClassName($className)
     {

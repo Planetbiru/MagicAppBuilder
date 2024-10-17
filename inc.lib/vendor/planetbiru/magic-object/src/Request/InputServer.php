@@ -85,7 +85,7 @@ class InputServer extends PicoRequestBase {
     /**
      * Get the user's preferred language.
      *
-     * @param boolean $general Flag to return the general language (default is false).
+     * @param bool $general Flag to return the general language (default is false).
      * @return string|null Returns the user's preferred language or null if not set.
      */
     public function userLanguage($general = false)

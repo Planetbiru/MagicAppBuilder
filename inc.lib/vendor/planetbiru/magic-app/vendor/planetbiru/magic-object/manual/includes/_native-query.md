@@ -13,6 +13,8 @@ Native queries can perform several tasks such as:
 6. calling functions
 7. calling procedures and stored procedures
 
+Native queries do not support multiple database connections. This means that all operations performed using native queries must be executed within a single, active database connection. This design choice ensures data consistency and integrity by preventing potential conflicts that may arise from attempting to manage multiple connections simultaneously. Users should ensure that their application logic accommodates this limitation, potentially leveraging connection pooling or other techniques to optimize database interaction when needed.
+
 ### Parameters
 
 The parameters accepted by the native query function are as follows:
@@ -23,7 +25,7 @@ The parameters accepted by the native query function are as follows:
 4. bool or boolean
 5. null
 6. DateTime
-7. array of string, int, float, bool and DateTime
+7. array of string, int, bool and DateTime
 
 For columns with data type `DATETIME` and `TIMESTAMP`, users can use either `string` or `DateTime` parameters. `DateTime` will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the `in` and `=` criteria.
 
@@ -654,3 +656,13 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC))
 }
 fclose($fp);
 ```
+
+### Best Practices
+
+1. **Utilize Prepared Statements**: Always prefer using prepared statements for security against SQL injection.
+2. **Error Handling**: Wrap database calls in try-catch blocks to handle exceptions gracefully.
+3. **Efficient Data Retrieval**: Use PDOStatement for large datasets to process rows one by one.
+4. **Debugging**: Implement logging for SQL queries to troubleshoot issues more effectively.
+5. **Keep Queries Simple**: Break down complex queries into simpler components if possible, making them easier to maintain and debug.
+
+By leveraging the native query feature in MagicObject, you can create efficient and maintainable database interactions, enhancing your application's performance and security.

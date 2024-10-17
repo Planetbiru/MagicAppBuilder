@@ -10,21 +10,34 @@ use ReflectionClass;
 use stdClass;
 
 /**
- * Getter
- * @link https://github.com/Planetbiru/MagicObject
+ * Class Getter
+ *
+ * This class provides dynamic property access and management for instances of 
+ * the MagicObject framework. It allows for loading data into an object from 
+ * various formats and supports retrieving property values, including handling 
+ * naming conventions and formatting for JSON output.
+ *
+ * Key Features:
+ * - Dynamically load data from associative arrays or objects.
+ * - Retrieve property values using both explicit getter methods and dynamic method calls.
+ * - Convert object properties into a structured representation suitable for JSON encoding.
+ * - Support for property naming strategies (snake case and pretty formatting) for JSON output.
+ *
+ * @link https://github.com/Planetbiru/MagicObject Documentation for further details and usage.
  */
 class Getter extends stdClass
 {
     const JSON = 'JSON';
+    
     /**
-     * Class parameter
+     * Class parameters that configure behavior such as JSON output formatting.
      *
      * @var array
      */
     private $_classParams = array(); //NOSONAR
 
     /**
-     * Constructor
+     * Constructor that initializes class parameters based on annotations.
      */
     public function __construct()
     {
@@ -45,8 +58,9 @@ class Getter extends stdClass
     }
     
     /**
-     * Load data to object
-     * @param stdClass|array $data Data
+     * Load data into the object.
+     *
+     * @param stdClass|array $data Data to load, which can be an associative array or object.
      */
     public function loadData($data)
     {
@@ -59,10 +73,10 @@ class Getter extends stdClass
     }
 
     /**
-     * Get property value
+     * Get the value of a specified property.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null
+     * @param string $propertyName Name of the property to retrieve.
+     * @return mixed|null The value of the property, or null if not set.
      */
     public function get($propertyName)
     {
@@ -71,8 +85,10 @@ class Getter extends stdClass
     }
 
     /**
-     * Get value
-     * @param boolean $snakeCase Flag to snake case property
+     * Retrieve all properties as a structured object or array.
+     *
+     * @param bool $snakeCase If true, convert property names to snake case.
+     * @return stdClass|array The object containing property values, or an array if snakeCase is true.
      */
     public function value($snakeCase = false)
     {
@@ -97,10 +113,11 @@ class Getter extends stdClass
     }
 
     /**
-     * Property list
-     * @var boolean $reflectSelf Flag to reflect self
-     * @var boolean $asArrayProps Flag to convert properties as array
-     * @return array
+     * List properties of the current object.
+     *
+     * @param bool $reflectSelf If true, include properties declared in this class.
+     * @param bool $asArrayProps If true, return properties as an array of strings.
+     * @return array|ReflectionProperty[] List of properties or an array of property names.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -131,11 +148,11 @@ class Getter extends stdClass
     }
 
     /**
-     * Magic method called when user call any undefined method
+     * Magic method for handling calls to undefined methods.
      *
-     * @param string $method Method
-     * @param string $params Parameters
-     * @return mixed|null
+     * @param string $method Name of the called method.
+     * @param array $params Parameters passed to the method.
+     * @return mixed|null The result of the method call, if applicable.
      */
     public function __call($method, $params) // NOSONAR
     {
@@ -151,9 +168,9 @@ class Getter extends stdClass
     }
 
     /**
-     * Check if JSON naming strategy is snake case or not
+     * Determine if JSON naming strategy is snake case.
      *
-     * @return boolean
+     * @return bool True if snake case is used, false otherwise.
      */
     private function isSnake()
     {
@@ -164,9 +181,9 @@ class Getter extends stdClass
     }
 
     /**
-     * Check if JSON naming strategy is snake case or not
+     * Determine if JSON output should be prettified.
      *
-     * @return boolean
+     * @return bool True if prettification is enabled, false otherwise.
      */
     private function isPretty()
     {
@@ -177,9 +194,9 @@ class Getter extends stdClass
     }
 
     /**
-     * Magic method to convert the object to a string.
+     * Convert the object to a JSON string representation.
      *
-     * @return string A JSON representation of the object.
+     * @return string A JSON representation of the object, formatted based on the naming strategy.
      */
     public function __toString()
     {

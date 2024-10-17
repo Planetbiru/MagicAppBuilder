@@ -97,7 +97,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     /**
      * Initialize a new SQL query by resetting the buffer, limit, and offset.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function newQuery()
     {
@@ -110,7 +110,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     /**
      * Create an insert statement.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function insert()
     {
@@ -122,7 +122,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Specify the table to insert into.
      *
      * @param string $query The name of the table.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function into($query)
     {
@@ -134,7 +134,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Specify the fields to insert values into.
      *
      * @param mixed $query The field names (string or array).
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function fields($query)
     {
@@ -150,7 +150,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Specify the values to be inserted.
      *
      * @param mixed $query The values to insert (string, array, or multiple parameters).
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function values($query)
     {
@@ -187,7 +187,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create a select statement.
      *
      * @param string $query The fields to select (optional).
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function select($query = "")
     {
@@ -199,7 +199,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create an alias for a field or table.
      *
      * @param string $query The alias to use.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function alias($query)
     {
@@ -210,7 +210,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     /**
      * Create a delete statement.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function delete()
     {
@@ -222,7 +222,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Specify the source table for the query.
      *
      * @param string $query The name of the table.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function from($query)
     {
@@ -234,7 +234,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create a join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function join($query)
     {
@@ -246,7 +246,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create an inner join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function innerJoin($query)
     {
@@ -258,7 +258,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create an outer join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function outerJoin($query)
     {
@@ -270,7 +270,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create a left outer join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function leftOuterJoin($query)
     {
@@ -282,7 +282,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create a left join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function leftJoin($query)
     {
@@ -294,7 +294,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      * Create a right join statement.
      *
      * @param string $query The join details.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function rightJoin($query)
     {
@@ -306,7 +306,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create an ON statement for JOIN operations.
 	 *
 	 * @param mixed $query The join condition(s).
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function on($query)
 	{
@@ -328,7 +328,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create an UPDATE statement for a specified table.
 	 *
 	 * @param string $query The name of the table to update.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function update($query)
 	{
@@ -340,7 +340,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Specify the fields and values to set in the UPDATE statement.
 	 *
 	 * @param mixed $query The field(s) and value(s) to set.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function set($query)
 	{
@@ -362,7 +362,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create a WHERE statement for filtering results.
 	 *
 	 * @param string $query The condition(s) for the WHERE clause.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function where($query)
 	{
@@ -460,7 +460,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create a HAVING statement for filtering aggregated results.
 	 *
 	 * @param string $query The condition(s) for the HAVING clause.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function having($query)
 	{
@@ -482,7 +482,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create an ORDER BY statement for sorting results.
 	 *
 	 * @param string $query The field(s) to order by.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function orderBy($query)
 	{
@@ -496,7 +496,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Create a GROUP BY statement for grouping results.
 	 *
 	 * @param string $query The field(s) to group by.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function groupBy($query)
 	{
@@ -510,7 +510,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Set a limit on the number of results returned.
 	 *
 	 * @param int $limit The maximum number of results.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function limit($limit)
 	{
@@ -523,7 +523,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * Set an offset for the results returned.
 	 *
 	 * @param int $offset The offset from the start of the result set.
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function offset($offset)
 	{
@@ -715,7 +715,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
 	 * Create a statement to retrieve the last inserted ID.
 	 *
-	 * @return self The current instance for method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function lastID()
 	{

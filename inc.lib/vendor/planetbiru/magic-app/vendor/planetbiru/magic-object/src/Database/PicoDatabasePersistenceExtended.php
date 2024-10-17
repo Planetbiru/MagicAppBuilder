@@ -47,6 +47,32 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
             return $this;
         }
     }
+    
+    /**
+     * Get the current database for the specified entity.
+     *
+     * This method retrieves the database connection associated with the 
+     * provided entity. If the entity does not have an associated database 
+     * or if the connection is not valid, it defaults to the object's 
+     * primary database connection.
+     *
+     * @param MagicObject $entity The entity for which to get the database.
+     * @return PicoDatabase The database connection for the entity.
+     */
+    private function currentDatabase($entity)
+    {
+        $dbEnt = $this->object->databaseEntity($entity);
+        $db = null;
+        if(isset($dbEnt))
+        {
+            $db = $dbEnt->getDatabase(get_class($entity));
+        }
+        if(!isset($db) || !$db->isConnected())
+        {
+            $db = $this->object->_database;
+        }
+        return $db;
+    }
 
     /**
      * Select one record.
@@ -59,13 +85,14 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
      */
     public function select()
     {
-        $result = parent::select();
-        if($result == null)
+        $data = parent::select();
+        if($data == null)
         {
             throw new NoRecordFoundException(parent::MESSAGE_NO_RECORD_FOUND);
         }
-        $entity = new $this->className(null, $this->database);
-        $entity->loadData($result);
+        $entity = new $this->className($data);
+        $entity->currentDatabase($this->currentDatabase($entity));
+        $entity->databaseEntity($this->object->databaseEntity());
         return $entity;
     }
 
@@ -89,8 +116,8 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
         }
         foreach($result as $data)
         {
-            $entity = new $this->className(null, $this->database);
-            $entity->loadData($data);
+            $entity = new $this->className($data);
+            $entity->databaseEntity($this->object->databaseEntity());
             $collection[] = $entity;
         }
         return $collection;

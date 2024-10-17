@@ -126,7 +126,7 @@ class PicoEntityLanguage
      *
      * @param string $code Language code.
      * @param object|stdClass|array $reference Reference data for the language.
-     * @param boolean $use Flag to indicate whether to use this language immediately.
+     * @param bool $use Flag to indicate whether to use this language immediately.
      * @return self
      */
     public function addLanguage($code, $reference, $use = false)
@@ -171,7 +171,7 @@ class PicoEntityLanguage
     /**
      * Get the list of properties of the entity.
      *
-     * @param boolean $asArrayProps Flag to determine if result should be returned as an array.
+     * @param bool $asArrayProps Flag to determine if result should be returned as an array.
      * @return array List of properties.
      */
     public function propertyList($asArrayProps = false)
@@ -278,7 +278,7 @@ class PicoEntityLanguage
      * Check if a property is set or not.
      *
      * @param string $name Name of the property to check.
-     * @return boolean True if the property is set, false otherwise.
+     * @return bool True if the property is set, false otherwise.
      */
     public function __isset($name)
     {

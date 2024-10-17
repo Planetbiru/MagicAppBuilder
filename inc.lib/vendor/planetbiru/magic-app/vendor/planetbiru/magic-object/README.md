@@ -12,19 +12,20 @@ MagicObject is a powerful library for creating applications in PHP with ease. It
 4. **Entity Access**: Streamline interactions with entities.
 5. **Filtering and Pagination**: Built-in methods for managing data display.
 6. **Native Query**: Defining native queries for a function will increase flexibility and resource efficiency in accessing the database.
-7. **Database Dumping**: Export database contents efficiently.
-8. **Serialization/Deserialization**: Handle JSON and YAML formats seamlessly.
-9. **Data Importing**: Import data even if source and destination schemas differ.
-10. **File Reading**: Read INI, YAML, and JSON configuration files.
-11. **Environment Variable Access**: Easily fetch environment variable values.
-12. **Configuration Encryption**: Secure application settings.
-13. **HTTP Data Handling**: Create objects from global request variables (POST, GET, etc.).
-14. **Session Management**: Integrate with PHP sessions.
-15. **Object Labeling**: Enhance object identification.
-16. **Multi-Language Support**: Facilitate localization.
-17. **File Uploads**: Handle file uploads efficiently.
-18. **Annotations**: Add metadata to objects for better structure.
-19. **Debugging**: Tools to debug and inspect objects.
+7. **Multiple Database Connection**: MagicObject supports the configuration of multiple database connections, allowing applications to interact with different databases simultaneously.
+8. **Database Dumping**: Export database contents efficiently.
+9. **Serialization/Deserialization**: Handle JSON and YAML formats seamlessly.
+10. **Data Importing**: Import data even if source and destination schemas differ.
+11. **File Reading**: Read INI, YAML, and JSON configuration files.
+12. **Environment Variable Access**: Easily fetch environment variable values.
+13. **Configuration Encryption**: Secure application settings.
+14. **HTTP Data Handling**: Create objects from global request variables (POST, GET, etc.).
+15. **Session Management**: Integrate with PHP sessions.
+16. **Object Labeling**: Enhance object identification.
+17. **Multi-Language Support**: Facilitate localization.
+18. **File Uploads**: Handle file uploads efficiently.
+19. **Annotations**: Add metadata to objects for better structure.
+20. **Debugging**: Tools to debug and inspect objects.
 
 This library provides a versatile toolkit for building robust PHP applications!
 
@@ -73,6 +74,37 @@ For large applications, users can scale the database and storage. So that a user
 # Stable Version
 
 Stable version of MagicObject is `1.17.2` or above. Please don't install versions bellow it.
+
+
+# MagicObject Version 2
+
+## What is New
+
+1.  **Native Query**
+    
+    -   Introduced support for native SQL queries, allowing users to execute raw SQL statements directly within the framework. This feature enhances flexibility and provides greater control over complex queries that may not be easily constructed using the ORM layer.
+2.  **Multiple Database Connection**
+    
+    -   Added the ability to configure and manage multiple database connections. This allows developers to connect to different databases within the same application seamlessly, facilitating multi-database architectures and more complex application requirements.
+3.  **Enable or Disable Entity Cache on Join**
+    
+    -   Introduced a feature to enable or disable entity caching specifically for join operations. This gives developers fine-tuned control over caching strategies, improving performance while also allowing for fresh data retrieval when necessary.
+4.  **Enhanced Documentation**
+    
+    -   Comprehensive updates to the documentation for classes, properties, functions, and annotations. This includes clearer explanations, examples, and usage guidelines, making it easier for developers to understand and utilize the framework effectively.
+5.  **Bug Fixes on Previous Version**
+    
+    -   Addressed various bugs and issues reported in earlier versions. This includes performance improvements, stability enhancements, and corrections of minor errors that could affect the functionality of the framework.
+
+## Additional Features
+
+-   **Improved Error Handling**: Enhanced mechanisms for error detection and handling, providing more informative messages to assist developers in troubleshooting.
+-   **Performance Optimizations**: Various internal optimizations that improve the overall performance of the framework, particularly in database interactions.
+-   **Backward Compatibility**: Ensured backward compatibility with version 1, allowing for a smooth transition for existing users to upgrade without significant changes to their codebase.
+
+## Migration Notes
+
+-   When upgrading from version 1 to version 2, please review the migration notes for any breaking changes or required adjustments to your codebase. Detailed guidelines are provided to facilitate a smooth upgrade process.
 
 # Tutorial
 
@@ -130,7 +162,7 @@ class ConfigApp extends MagicObject
      * Constructor
      *
      * @param mixed $data Initial data
-     * @param boolean $readonly Readonly flag
+     * @param bool $readonly Readonly flag
      */
     public function __construct($data = null, $readonly = false)
     {
@@ -169,5 +201,9 @@ Applications that uses **MagicObjects** are :
 4. **Toserba Online** https://toserba-online.top/
 
 # Credit
+
+1. Kamshory - https://github.com/kamshory/
+
+# Contributors
 
 1. Kamshory - https://github.com/kamshory/

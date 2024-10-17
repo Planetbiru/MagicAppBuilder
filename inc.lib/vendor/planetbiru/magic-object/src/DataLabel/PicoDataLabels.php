@@ -24,7 +24,7 @@ class PicoDataLabels
      * Appends a new data label to the collection.
      *
      * @param PicoDataLabel $data The data label to be added.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function append($data)
     {

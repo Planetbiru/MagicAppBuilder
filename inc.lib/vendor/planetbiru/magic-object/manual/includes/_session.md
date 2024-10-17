@@ -14,6 +14,11 @@ session:
   save_path: /tmp/sessions
 ```
 
+- `name`: Name of the session.
+- `max_life_time`: Maximum lifetime of the session in seconds (e.g., 86400 seconds = 24 hours).
+- `save_handler`: Specifies the session storage mechanism (in this case, files).
+- `save_path`: Directory where session files are stored.
+
 **PHP Script**
 
 ```php
@@ -122,3 +127,9 @@ $sessions = new PicoSession($sessConf);
 
 $sessions->startSession();
 ```
+
+This setup ensures that the session save path is securely managed and decrypted at runtime.
+
+### Conclusion
+
+This implementation provides a robust framework for session management in a PHP application, allowing flexibility in storage options (files or Redis) while emphasizing security through encryption. The use of YAML for configuration keeps the setup clean and easily adjustable. By encapsulating session configuration in dedicated classes, you enhance maintainability and security.

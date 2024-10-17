@@ -121,7 +121,7 @@ class PicoEntityLabel
 
         $filtered = array();
         foreach ($merged as $prop => $val) {
-            $filtered[$prop] = $val[$lang] ?? null;
+            $filtered[$prop] = isset($val[$lang]) ? $val[$lang] : null;
         }
         return $filtered;
     }
@@ -149,7 +149,7 @@ class PicoEntityLabel
      *
      * @return stdClass An object containing entity metadata.
      */
-    public function getObjectInfo()
+    public function getObjectInfo() // NOSONAR
     {
         $reflexClass = new PicoAnnotationParser($this->className);
         $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);
@@ -228,29 +228,35 @@ class PicoEntityLabel
 
             // List auto-generated columns
             foreach ($parameters as $param => $val) {
+                // Check for the generated value annotation in a case-insensitive manner
+                // Ensure the column exists before proceeding
                 if (strcasecmp($param, self::ANNOTATION_GENERATED_VALUE) === 0 && isset($columns[$prop->name])) {
+                    // Ensure the column exists before proceeding
+                    // Parse the key-value pair for additional details
                     $vals = $this->parseKeyValue($reflexProp, $val, $param);
-                    $autoIncrementKeys[$prop->name] = [
-                        self::KEY_NAME => $columns[$prop->name][self::KEY_NAME] ?? null,
-                        self::KEY_STRATEGY => $vals[self::KEY_STRATEGY] ?? null,
-                        self::KEY_GENERATOR => $vals[self::KEY_GENERATOR] ?? null,
-                    ];
-                }
-            }
+        
+                    // Store the parsed values in the auto-increment keys array
+                    $autoIncrementKeys[$prop->name] = array(
+                        self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
+                        self::KEY_STRATEGY => isset($vals[self::KEY_STRATEGY]) ? $vals[self::KEY_STRATEGY] : null,
+                        self::KEY_GENERATOR => isset($vals[self::KEY_GENERATOR]) ? $vals[self::KEY_GENERATOR] : null,
+                    );
+                }  
+            } 
 
             // Define default column values
             foreach ($parameters as $param => $val) {
                 if (strcasecmp($param, self::ANNOTATION_DEFAULT_COLUMN) === 0) {
                     $vals = $this->parseKeyValue($reflexProp, $val, $param);
                     if (isset($vals[self::KEY_VALUE])) {
-                        $defaultValue[$prop->name] = [
-                            self::KEY_NAME => $columns[$prop->name][self::KEY_NAME] ?? null,
+                        $defaultValue[$prop->name] = array(
+                            self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
                             self::KEY_VALUE => $vals[self::KEY_VALUE],
-                            self::KEY_PROPERTY_TYPE => $columns[$prop->name][self::KEY_PROPERTY_TYPE],
-                        ];
+                            self::KEY_PROPERTY_TYPE => isset($columns[$prop->name][self::KEY_PROPERTY_TYPE]) ? $columns[$prop->name][self::KEY_PROPERTY_TYPE] : null,
+                        );
                     }
                 }
-            }
+            }            
 
             // List not null columns
             foreach ($parameters as $param => $val) {

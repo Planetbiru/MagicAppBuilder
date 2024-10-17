@@ -132,7 +132,7 @@ class ComplexNumber {
      * Set the real part of the complex number.
      *
      * @param float $real The real part.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setReal($real) {
         $this->real = $real;
@@ -153,7 +153,7 @@ class ComplexNumber {
      * Set the imaginary part of the complex number.
      *
      * @param float $imaginary The imaginary part.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setImaginary($imaginary) {
         $this->imaginary = $imaginary;

@@ -30,7 +30,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate columns based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniqueColumns()
     {
@@ -49,7 +49,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate join columns based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniqueJoinColumns()
     {
@@ -68,7 +68,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate primary keys based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniquePrimaryKeys()
     {
@@ -87,7 +87,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate auto-increment keys based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniqueAutoIncrementKeys()
     {
@@ -106,7 +106,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate default value keys based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniqueDefaultValue()
     {
@@ -125,7 +125,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Removes duplicate not-null columns based on their names.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function uniqueNotNullColumns()
     {
@@ -198,7 +198,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of columns into the existing columns, ensuring uniqueness.
      *
      * @param array $newList The new list of columns to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergeColumns($newList)
     {
@@ -213,7 +213,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of join columns into the existing join columns, ensuring uniqueness.
      *
      * @param array $newList The new list of join columns to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergeJoinColumns($newList)
     {
@@ -228,7 +228,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of primary keys into the existing primary keys, ensuring uniqueness.
      *
      * @param array $newList The new list of primary keys to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergePrimaryKeys($newList)
     {
@@ -243,7 +243,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of auto-increment keys into the existing auto-increment keys, ensuring uniqueness.
      *
      * @param array $newList The new list of auto-increment keys to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergeAutoIncrementKeys($newList)
     {
@@ -258,7 +258,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of default value keys into the existing default value keys, ensuring uniqueness.
      *
      * @param array $newList The new list of default value keys to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergeDefaultValue($newList)
     {
@@ -273,7 +273,7 @@ class PicoTableInfoExtended extends PicoTableInfo
      * Merges a new list of not-null columns into the existing not-null columns, ensuring uniqueness.
      *
      * @param array $newList The new list of not-null columns to merge.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function mergeNotNullColumns($newList)
     {

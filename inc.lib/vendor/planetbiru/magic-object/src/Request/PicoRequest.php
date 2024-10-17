@@ -22,7 +22,7 @@ class PicoRequest extends PicoRequestBase
      * Initializes the request object based on the specified input type.
      *
      * @param int $inputType The type of input (GET, POST, COOKIE, ENV, SERVER).
-     * @param boolean $forceScalar Flag to get scalar values only.
+     * @param bool $forceScalar Flag to get scalar values only.
      */
     public function __construct($inputType = INPUT_GET, $forceScalar = false)
     {

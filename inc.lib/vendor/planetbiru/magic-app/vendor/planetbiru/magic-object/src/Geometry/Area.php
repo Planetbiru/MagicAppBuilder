@@ -52,15 +52,15 @@ class Area
     /**
      * Constructor for the Area class.
      *
-     * @param Rectangle|Triangle|Polygon|Circle $object One of Rectangle, Triangle, Polygon, or Circle
+     * @param mixed $object One of Rectangle, Triangle, Polygon, or Circle
      * @param float $zoom Zoom factor (default: 1)
      * @param string|null $href Hyperlink reference (optional)
      * @param string[]|null $attributes Additional attributes (optional)
      */
     public function __construct($object, $zoom = 1, $href = null, $attributes = null)
     {
-        $this->href = $href ?? null;
-        $this->attributes = $attributes ?? [];
+        $this->href = $href;
+        $this->attributes = is_array($attributes) ? $attributes : [];
         $this->zoom = $zoom;
 
         if ($object instanceof Rectangle) {
@@ -168,7 +168,7 @@ class Area
         $attrs[] = 'coords="' . implode(", ", $this->getCoords($this->zoom)) . '"';
 
         if (isset($this->href)) {
-            $attrs[] = 'href="' . $this->href . '"';
+            $attrs[] = 'href="' . htmlspecialchars($this->href) . '"';
         }
 
         if (isset($this->attributes) && is_array($this->attributes)) {

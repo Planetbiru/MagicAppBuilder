@@ -46,8 +46,8 @@ class PicoDatabaseDump
      *
      * @param MagicObject $entity Entity to be dumped
      * @param string $databaseType Target database type
-     * @param boolean $createIfNotExists Add DROP TABLE IF EXISTS before create table
-     * @param boolean $dropIfExists Add IF NOT EXISTS on create table
+     * @param bool $createIfNotExists Add DROP TABLE IF EXISTS before create table
+     * @param bool $dropIfExists Add IF NOT EXISTS on create table
      * @param string $engine Storage engine (for MariaDB and MySQL)
      * @param string $charset Default charset
      * @return string SQL statement for creating table structure
@@ -70,8 +70,8 @@ class PicoDatabaseDump
      *
      * @param PicoTableInfo $tableInfo Table information
      * @param string $databaseType Database type
-     * @param boolean $createIfNotExists Flag to add CREATE IF NOT EXISTS
-     * @param boolean $dropIfExists Flag to add DROP IF EXISTS
+     * @param bool $createIfNotExists Flag to add CREATE IF NOT EXISTS
+     * @param bool $dropIfExists Flag to add DROP IF EXISTS
      * @param string $engine Database engine
      * @param string $charset Charset
      * @return string SQL statement for creating table structure

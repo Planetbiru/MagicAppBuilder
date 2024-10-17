@@ -11,7 +11,12 @@ use ReflectionClass;
 use stdClass;
 
 /**
- * Setter getter
+ * Class SetterGetter
+ *
+ * A dynamic object that provides getter and setter methods for properties, 
+ * allowing flexible management of property values and array-like behavior. 
+ * Supports annotations for property configuration and JSON serialization.
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class SetterGetter extends stdClass
@@ -19,16 +24,20 @@ class SetterGetter extends stdClass
     const JSON = 'JSON';
 
     /**
-     * Class parameter
+     * Class parameter storage.
      *
      * @var array
      */
     private $classParams = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param self|array|stdClass|object $data Data
+     * Initializes the object with data and parses class annotations for 
+     * property configuration.
+     *
+     * @param self|array|stdClass|object|null $data Initial data for the object. 
+     * Can be an associative array, another SetterGetter instance, or a stdClass.
      */
     public function __construct($data = null)
     {
@@ -57,9 +66,14 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Load data to object
-     * @param mixed $data Data
-     * @return self
+     * Load data into the object.
+     *
+     * Maps the given data to the object's properties, automatically 
+     * camelizing keys.
+     *
+     * @param mixed $data Data to load, which can be another SetterGetter instance, 
+     * an array, or an object.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -84,11 +98,11 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Set property value
+     * Set a property value.
      *
-     * @param string $propertyName Property name
-     * @param mixed|null $propertyValue Property value
-     * @return self
+     * @param string $propertyName Name of the property to set.
+     * @param mixed|null $propertyValue Value to assign to the property.
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {
@@ -98,11 +112,13 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Add array element of property
+     * Add an element to an array property.
      *
-     * @param string $propertyName
-     * @param mixed $propertyValue
-     * @return self
+     * Initializes the property as an array if it is not already set.
+     *
+     * @param string $propertyName Name of the property to push to.
+     * @param mixed $propertyValue Value to add to the property array.
+     * @return self Returns the current instance for method chaining.
      */
     public function push($propertyName, $propertyValue)
     {
@@ -116,10 +132,10 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Remove last array element of property
+     * Remove the last element from an array property.
      *
-     * @param string $propertyName
-     * @return mixed
+     * @param string $propertyName Name of the property to pop from.
+     * @return mixed|null Returns the removed value or null if the property is not an array.
      */
     public function pop($propertyName)
     {
@@ -132,10 +148,10 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Get property value
+     * Get a property value.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null $propertyValue Property value
+     * @param string $propertyName Name of the property to retrieve.
+     * @return mixed|null Returns the property value or null if not set.
      */
     public function get($propertyName)
     {
@@ -144,13 +160,14 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Stores datas in the property.
-     * Example: $instance->foo = 'bar';
+     * Magic setter method.
      *
-     * @param string $name Property name
-     * @param string $value Property value
+     * Enables setting properties using object syntax, e.g., `$instance->foo = 'bar';`.
+     *
+     * @param string $name Name of the property to set.
+     * @param mixed $value Value to assign to the property.
      * @return void
-     **/
+     */
     public function __set($name, $value)
     {
         $this->set($name, $value);
@@ -158,12 +175,13 @@ class SetterGetter extends stdClass
 
 
     /**
-     * Gets datas from the property.
-     * Example: echo $instance->foo;
+     * Magic getter method.
      *
-     * @param string $name Property name
-     * @return mixed Data stored in property.
-     **/
+     * Enables retrieving properties using object syntax, e.g., `echo $instance->foo;`.
+     *
+     * @param string $name Name of the property to retrieve.
+     * @return mixed|null Returns the value of the property or null if not set.
+     */
     public function __get($name)
     {
         if($this->__isset($name))
@@ -173,10 +191,10 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Check if property has been set or not or has null value
+     * Check if a property is set.
      *
-     * @param string $name Property name
-     * @return boolean
+     * @param string $name Name of the property to check.
+     * @return bool Returns true if the property is set, false otherwise.
      */
     public function __isset($name)
     {
@@ -184,10 +202,12 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Unset property value
+     * Get values of the properties.
      *
-     * @param string $name Property name
-     * @return void
+     * Optionally converts property names to snake_case for the returned object.
+     *
+     * @param bool $snakeCase Flag to determine if property names should be converted to snake_case.
+     * @return stdClass Returns an object with property values.
      */
     public function __unset($name)
     {
@@ -195,9 +215,12 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Get value
+     * Get values of the properties.
      *
-     * @var boolean $snakeCase Flag to snake case property
+     * Optionally converts property names to snake_case for the returned object.
+     *
+     * @param bool $snakeCase Flag to determine if property names should be converted to snake_case.
+     * @return stdClass Returns an object with property values.
      */
     public function value($snakeCase = false)
     {
@@ -224,10 +247,11 @@ class SetterGetter extends stdClass
     }
 
     /**
-     * Property list
-     * @var boolean $reflectSelf Flag to reflect self
-     * @var boolean $asArrayProps Flag to convert properties as array
-     * @return array
+     * Get a list of properties.
+     *
+     * @param bool $reflectSelf Flag to determine if only properties of the current class should be included.
+     * @param bool $asArrayProps Flag to convert the properties to an array.
+     * @return array|ReflectionProperty[] Returns an array of ReflectionProperty objects or property names based on $asArrayProps.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -352,7 +376,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON naming strategy is snake case.
      *
-     * @return boolean True if the naming strategy is snake case, false otherwise.
+     * @return bool True if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
@@ -365,7 +389,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON naming strategy is camel case.
      *
-     * @return boolean True if the naming strategy is camel case, false otherwise.
+     * @return bool True if the naming strategy is camel case, false otherwise.
      */
     protected function isCamel()
     {
@@ -375,7 +399,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON should be prettified.
      *
-     * @return boolean True if prettification is enabled, false otherwise.
+     * @return bool True if prettification is enabled, false otherwise.
      */
     private function isPretty()
     {

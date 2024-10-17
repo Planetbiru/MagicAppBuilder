@@ -3,10 +3,11 @@
 namespace MagicObject\Database;
 
 /**
- * Class for sorting database queries.
+ * Class PicoSort
  *
- * This class allows you to define sorting criteria for database queries,
- * including the field to sort by and the direction of sorting.
+ * A class for defining sorting criteria for database queries.
+ * This class allows you to specify the field to sort by and the 
+ * direction of sorting (ascending or descending).
  *
  * @link https://github.com/Planetbiru/MagicObject
  */
@@ -34,7 +35,7 @@ class PicoSort
      * Constructor to initialize sorting criteria.
      *
      * @param string|null $sortBy The field to sort by.
-     * @param string|null $sortType The type of sorting.
+     * @param string|null $sortType The type of sorting (asc or desc).
      */
     public function __construct($sortBy = null, $sortType = null)
     {
@@ -56,8 +57,7 @@ class PicoSort
      * Set the field to sort by.
      *
      * @param string $sortBy The field to sort by.
-     *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setSortBy($sortBy)
     {
@@ -68,7 +68,7 @@ class PicoSort
     /**
      * Get the type of sorting.
      *
-     * @return string The type of sorting.
+     * @return string The type of sorting (asc or desc).
      */
     public function getSortType()
     {
@@ -78,9 +78,8 @@ class PicoSort
     /**
      * Set the type of sorting.
      *
-     * @param string $sortType The type of sorting.
-     *
-     * @return self
+     * @param string $sortType The type of sorting (asc or desc).
+     * @return self Returns the current instance for method chaining.
      */
     public function setSortType($sortType)
     {
@@ -136,8 +135,8 @@ class PicoSort
     /**
      * Normalize the sort type to either ascending or descending.
      *
-     * @param string $type The desired sort type.
-     * @return string The normalized sort type.
+     * @param string $type The desired sort type (asc or desc).
+     * @return string The normalized sort type (asc or desc).
      */
     public static function fixSortType($type)
     {
@@ -147,7 +146,8 @@ class PicoSort
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only.
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.
      */

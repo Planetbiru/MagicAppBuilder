@@ -70,7 +70,7 @@ class PicoSpecification //NOSONAR
      * Adds a specification with default AND logic.
      *
      * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function add($predicate)
     {
@@ -82,7 +82,7 @@ class PicoSpecification //NOSONAR
      * Adds an AND specification.
      *
      * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addAnd($predicate)
     {
@@ -100,7 +100,7 @@ class PicoSpecification //NOSONAR
      * Adds an OR specification.
      *
      * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addOr($predicate)
     {
@@ -119,7 +119,7 @@ class PicoSpecification //NOSONAR
      *
      * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
      * @param string $logic The logical operator (AND/OR) to use with this filter.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     private function addFilter($predicate, $logic)
     {
@@ -147,7 +147,7 @@ class PicoSpecification //NOSONAR
      *
      * @param array $predicate The filter data represented as an associative array.
      * @param string $logic The logical operator (AND/OR) to use with these filters.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     private function addFilterByArray($predicate, $logic)
     {
@@ -167,7 +167,7 @@ class PicoSpecification //NOSONAR
      *
      * @param PicoSpecification|array $predicate The subfilter to be added.
      * @param string $logic The logical operator (AND/OR) to use with this subfilter.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     private function addSubFilter($predicate, $logic)
     {
@@ -235,7 +235,7 @@ class PicoSpecification //NOSONAR
      * Sets the parent filter logic for this specification.
      *
      * @param string $parentFilterLogic The logical operator (AND/OR) for this specification.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setParentFilterLogic($parentFilterLogic)
     {
@@ -359,7 +359,7 @@ class PicoSpecification //NOSONAR
      *
      * @param string $field The field name to which the value is assigned.
      * @param mixed|mixed[] $value The value(s) to set for the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     private function addPredicate($field, $value)
     {
@@ -460,7 +460,7 @@ class PicoSpecification //NOSONAR
      * Sets the default logic used for combining predicates.
      *
      * @param string $defaultLogic The default logic (AND/OR) to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDefaultLogic($defaultLogic)
     {
@@ -471,7 +471,7 @@ class PicoSpecification //NOSONAR
     /**
      * Sets the default logic to AND.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDefaultLogicAnd()
     {
@@ -482,7 +482,7 @@ class PicoSpecification //NOSONAR
     /**
      * Sets the default logic to OR.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDefaultLogicOr()
     {

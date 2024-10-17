@@ -242,7 +242,7 @@ class PicoDataComparation
      *
      * @return string
      */
-    public function getComparison()
+    public function getComparison() // NOSONAR
     {
         switch ($this->comparison) {
             case self::NOT_EQUALS:
