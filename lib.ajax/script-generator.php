@@ -29,6 +29,7 @@ if (isset($_POST) && !empty($_POST)) {
         require_once dirname(__DIR__) . "/inc.app/database.php";
         $scriptGenerator = new ScriptGenerator();
         $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo);
+        
     }
 }
 

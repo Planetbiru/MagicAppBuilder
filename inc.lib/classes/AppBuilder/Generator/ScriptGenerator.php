@@ -252,6 +252,23 @@ class ScriptGenerator
         $referenceEntities = array();
         $referenceEntitiesUse = array();
         $allField = array();
+        
+        
+        $callbackCreateSuccess = null;
+        $callbackCreateFailed = null;
+        
+        error_log($appConfig->getApplication()->getType());
+        if($appConfig->getApplication()->getType() == 'api')
+        {
+            $callbackCreateSuccess = function($objectName, $primaryKeyName){
+                return "\t\t".'$apiResponse->sendSuccess(UserAction::CREATE, $'.$objectName.", $primaryKeyName);";
+            };
+            $callbackCreateFailed = function($objectName, $primaryKeyName, $exceptionObject){
+                return "\t\t".'$apiResponse->sendException(UserAction::CREATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
+            };
+        }
+        
+        
         foreach($request->getFields() as $value) {
             $field = new AppField($value);
             $allField[] = $field;
@@ -371,7 +388,7 @@ class ScriptGenerator
             $appBuilder->setTarget($request->getTarget());
 
             // CRUD
-            $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval);
+            $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval, $callbackCreateSuccess, $callbackCreateFailed);
             $updateSection = $appBuilder->createUpdateApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval);
             $activationSection = $appBuilder->createActivationApprovalSection($entityMain);
             $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain);     
@@ -391,7 +408,9 @@ class ScriptGenerator
             $appBuilder->setTarget($request->getTarget());
             
             // CRUD
-            $createSection = $appBuilder->createInsertSection($entityMain, $insertFields);
+            
+            $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
+
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields);
             $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey);
             $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey);           

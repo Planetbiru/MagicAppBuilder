@@ -3,6 +3,7 @@
 namespace AppBuilder;
 
 use AppBuilder\Base\AppBuilderBase;
+use Error;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
@@ -17,7 +18,7 @@ class AppBuilder extends AppBuilderBase
      * @param AppField[] $appFields The fields to be included in the insert operation.
      * @return string The generated code for the insert section.
      */
-    public function createInsertSection($mainEntity, $appFields)
+    public function createInsertSection($mainEntity, $appFields, $callbackSuccess = null, $callbackFailed = null)
     {
         $entityName = $mainEntity->getEntityName();
         $objectName = lcfirst($entityName);
@@ -57,11 +58,27 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+        if(isset($callbackSuccess) && is_callable($callbackSuccess))
+        {
+            
+            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+        }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        if(isset($callbackFailed) && is_callable($callbackFailed))
+        {
+            $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        }
+        
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::CURLY_BRACKET_CLOSE;
 
