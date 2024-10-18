@@ -1,4 +1,3 @@
-
 <?php
 
 use AppBuilder\Util\ResponseUtil;
