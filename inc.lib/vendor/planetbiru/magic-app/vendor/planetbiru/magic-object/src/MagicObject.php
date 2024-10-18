@@ -17,10 +17,10 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
-use MagicObject\DataLabel\PicoDataLabel;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
+use MagicObject\Exceptions\InvalidReturnTypeException;
 use MagicObject\Exceptions\NoDatabaseConnectionException;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
@@ -671,7 +671,8 @@ class MagicObject extends stdClass // NOSONAR
      *               - instances of a specified class if the return type matches a class name.
      * 
      * @throws PDOException If there is an error executing the database query.
-     * @throws InvalidQueryInputException If there is no query to be executed on the database query.
+     * @throws InvalidQueryInputException If there is no query to be executed.
+     * @throws InvalidReturnTypeException If the return type specified is invalid.
      */
     protected function executeNativeQuery() //NOSONAR
     {
@@ -696,26 +697,21 @@ class MagicObject extends stdClass // NOSONAR
         $queryString = trim($queryString, " \r\n\t ");
         if(empty($queryString))
         {
-            throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+            // Try reading the query in another way
+            preg_match('/@query\s*\(\s*"(.*?)"\s*\)/s', $docComment, $matches);
+            $queryString = $matches ? $matches[1] : '';
+            if(empty($queryString))
+            {
+                throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+            }
         }
 
         // Get parameter information from the caller function
         $callerParams = $reflection->getParameters();
 
         // Get return type from the caller function
-        $returnTypeObj = $reflection->getReturnType();
-
-        if($returnTypeObj == null)
-        {
-            // PHP 5
-            preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
-            $returnType = $matches ? $matches[1] : '';
-        }
-        else
-        {
-            // PHP 7 or above
-            $returnType = $returnTypeObj."";
-        }
+        preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
+        $returnType = $matches ? $matches[1] : 'void';
         
         // Trim return type
         $returnType = trim($returnType);
@@ -797,35 +793,52 @@ class MagicObject extends stdClass // NOSONAR
                 return json_encode($stmt->fetchAll(PDO::FETCH_OBJ));
             } else {
                 try {
-                    // Check for array-type hinting in the return type
+                    // Check for array-type hinting in the return type                  
                     if (stripos($returnType, "[") !== false) {
-                        $className = trim(explode("[", $returnType)[0]);
-                        if (class_exists($className)) {
+                        $className = trim(explode("[", $returnType)[0]);      
+                        if ($className == "stdClass") {
+                            // Return all rows as stdClass objects
+                            return $stmt->fetchAll(PDO::FETCH_OBJ);
+                        } 
+                        else if($className == 'MagicObject') {
+                            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
                             $ret = [];
-                            if ($className == "stdClass") {
-                                // Return all rows as stdClass objects
-                                return $stmt->fetchAll(PDO::FETCH_OBJ);
-                            } else {
-                                // Map result rows to the specified class
+                            foreach ($result as $row) {
+                                $ret[] = new MagicObject($row);
+                            }
+                            return $ret;                
+                        }
+                        else if (class_exists($className)) {
+                            // Map result rows to the specified class
+                            $obj = new $className();
+                            if($obj instanceof MagicObject) {
                                 $result = $stmt->fetchAll(PDO::FETCH_OBJ);
                                 foreach ($result as $row) {
                                     $ret[] = new $className($row);
                                 }
                                 return $ret;
-                            }
-                        }
+                            }                              
+                        }                    
+                        throw new InvalidReturnTypeException("Invalid return type for $className");
                     } else {
                         // Return a single object of the specified class
                         $className = trim($returnType);
-                        if (class_exists($className)) {
-                            $row = $stmt->fetch(PDO::FETCH_OBJ);
-                            return new $className($row);
+                        if($className == 'MagicObject') {
+                            $row = $stmt->fetch(PDO::FETCH_OBJ);       
+                            return new MagicObject($row);       
                         }
+                        else if (class_exists($className)) {
+                            $obj = new $className();
+                            if($obj instanceof MagicObject) {
+                                $row = $stmt->fetch(PDO::FETCH_OBJ);
+                                return $obj->loadData($row);
+                            }
+                        }
+                        throw new InvalidReturnTypeException("Invalid return type for $className");
                     }
                 } catch (Exception $e) {
                     // Log the exception if the class is not found
-                    error_log('Class not found: ' . $e->getMessage());
-                    return null;
+                    throw new InvalidReturnTypeException("Invalid return type for $className");
                 }
             }            
         } 
