@@ -2,6 +2,8 @@
 
 namespace AppBuilder\Util;
 
+use JsonException;
+
 class ResponseUtil
 {
     /**
@@ -13,28 +15,17 @@ class ResponseUtil
      * asynchronously.
      *
      * @param mixed $data Data to be encoded as JSON. Can be an array, object, or string.
-     * @param boolean $prettify Flag to determine if the JSON should be prettified (formatted with whitespace).
-     *                           Defaults to false.
-     * @param boolean $async Flag to indicate if the response should be sent asynchronously.
-     *                       Defaults to false. When true, the response is sent without waiting for further processing.
+     * @param bool $prettify Flag to determine if the JSON should be prettified (formatted with whitespace).
+     *                       Defaults to false.
+     * @param bool $async Flag to indicate if the response should be sent asynchronously.
+     *                    Defaults to false. When true, the response is sent without waiting for further processing.
      * @return void
      *
-     * @throws \JsonException If encoding the data to JSON fails.
+     * @throws JsonException If encoding the data to JSON fails.
      */
     public static function sendJSON($data, $prettify = false, $async = false)
     {
-        $body = null;
-        if ($data != null) {
-            if (is_string($data)) {
-                $body = $data;
-            } else {
-                if ($prettify) {
-                    $body = json_encode($data, JSON_PRETTY_PRINT);
-                } else {
-                    $body = json_encode($data);
-                }
-            }
-        }
+        $body = self::getBody($data, $prettify);
 
         header("Content-type: application/json");
 
@@ -64,5 +55,35 @@ class ResponseUtil
             header("Content-Length: " . strlen($body));
             echo $body;
         }
+    }
+    
+    /**
+     * Encodes the provided data into JSON format.
+     *
+     * This method converts the input data into a JSON string. If the data
+     * is a string, it returns it directly. If the data is an array or object,
+     * it uses json_encode to convert it to JSON. Optionally, the JSON can be
+     * prettified for better readability.
+     *
+     * @param mixed $data Data to be encoded as JSON. Can be an array, object, or string.
+     * @param bool $prettify Flag to determine if the JSON should be prettified (formatted with whitespace).
+     *                       Defaults to false.
+     * @return string|null Encoded JSON string or null if no data is provided.
+     */
+    private static function getBody($data, $prettify = false)
+    {
+        $body = null;
+        if ($data != null) {
+            if (is_string($data)) {
+                $body = $data;
+            } else {
+                if ($prettify) {
+                    $body = json_encode($data, JSON_PRETTY_PRINT);
+                } else {
+                    $body = json_encode($data);
+                }
+            }
+        }
+        return $body;
     }
 }
