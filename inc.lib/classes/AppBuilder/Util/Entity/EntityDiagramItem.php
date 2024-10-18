@@ -2,88 +2,103 @@
 
 namespace AppBuilder\Util\Entity;
 
+/**
+ * Class EntityDiagramItem
+ *
+ * Represents an entity item in an entity diagram, encapsulating its properties,
+ * including name, namespace, table name, dimensions, and associated columns.
+ */
 class EntityDiagramItem //NOSONAR
 {
     /**
-     * Entity name
+     * The name of the entity.
      *
      * @var string
      */
     private $entityName;
 
     /**
-     * Namespace
+     * The namespace of the entity.
      *
      * @var string
      */
     private $namespace;
     
     /**
-     * Table name
+     * The name of the database table associated with the entity.
      *
      * @var string
      */
     private $tableName;
     
     /**
-     * Entity ID
+     * The unique identifier for the entity.
      *
      * @var string
      */
     private $entityId;
     
     /**
-     * Width
+     * The width of the entity item in the diagram.
      *
      * @var integer
      */
     private $width = 1;
     
     /**
-     * Height
+     * The height of the entity item in the diagram.
      *
      * @var integer
      */
     private $height = 20;
     
     /**
-     * Header height
+     * The height of the header in the entity item.
      *
      * @var integer
      */
     private $headerHeight = 20;
     
     /**
-     * Column height
+     * The height of each column in the entity item.
      *
      * @var integer
      */
     private $columnHeight = 20;
     
     /**
-     * Coordinate X
+     * The X coordinate of the entity item in the diagram.
      *
      * @var integer
      */
     private $x = 0;
     
     /**
-     * Coordinate Y
+     * The Y coordinate of the entity item in the diagram.
      *
      * @var integer
      */
     private $y = 0;
-    
+
     /**
-     * Constructor
+     * Array of columns associated with the entity.
      *
-     * @param string $entityName
-     * @param string $namespace
-     * @param string $tableName
-     * @param string $entityId
-     * @param integer $x
-     * @param integer $y
-     * @param integer $width
+     * @var EntityDiagramColumn[]
+     */
+    private $columns = [];
+
+    /**
+     * Constructor for the EntityDiagramItem class.
+     *
+     * Initializes the entity item with the provided attributes.
+     *
+     * @param string $entityName The name of the entity.
+     * @param string $namespace The namespace of the entity.
+     * @param string $tableName The associated database table name.
+     * @param string $entityId The unique identifier for the entity.
+     * @param integer $x The X coordinate for the entity item.
+     * @param integer $y The Y coordinate for the entity item.
+     * @param integer $width The width of the entity item.
      */
     public function __construct($entityName, $namespace, $tableName, $entityId, $x = 0, $y = 0, $width = 160)
     {
@@ -97,17 +112,22 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Column
+     * Check if a column exists by its name.
      *
-     * @var EntityDiagramColumn[]
+     * @param string $columnName The name of the column to check.
+     * @return boolean True if the column exists, otherwise false.
      */
-    private $columns = array();
-    
     public function hasColumn($columnName)
     {
         return isset($this->columns[$columnName]);
     }
-    
+
+    /**
+     * Add a column to the entity item.
+     *
+     * @param array $column An associative array containing column attributes.
+     * @return self Returns the current instance for method chaining.
+     */
     public function addColumn($column)
     {
         $columnName = $column['name'];
@@ -119,10 +139,10 @@ class EntityDiagramItem //NOSONAR
     }
     
     /**
-     * Set primary key column
+     * Set the primary key column for the entity item.
      *
-     * @param string $columnName
-     * @return self
+     * @param string $columnName The name of the column to set as primary key.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKeyColumn($columnName)
     {
@@ -131,10 +151,10 @@ class EntityDiagramItem //NOSONAR
     }
     
     /**
-     * Set reference column
+     * Set a column as a reference column.
      *
-     * @param string $columnName
-     * @return self
+     * @param string $columnName The name of the column to set as reference.
+     * @return self Returns the current instance for method chaining.
      */
     public function setReferenceColumn($columnName)
     {
@@ -143,13 +163,13 @@ class EntityDiagramItem //NOSONAR
     }
     
     /**
-     * Set join column
+     * Set a join column with reference information.
      *
-     * @param string $columnName
-     * @param string $propertyType
-     * @param string $referenceTableName
-     * @param string $referenceColumnName
-     * @return self
+     * @param string $columnName The name of the join column.
+     * @param string $propertyType The property type of the join.
+     * @param string $referenceTableName The name of the referenced table.
+     * @param string $referenceColumnName The name of the referenced column.
+     * @return self Returns the current instance for method chaining.
      */
     public function setJoinColumn($columnName, $propertyType, $referenceTableName, $referenceColumnName)
     {
@@ -158,7 +178,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of entityName
+     * Get the name of the entity.
+     * 
+     * @return string The entity name.
      */ 
     public function getEntityName()
     {
@@ -166,9 +188,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of entityName
+     * Set the name of the entity.
      *
-     * @return  self
+     * @param string $entityName The entity name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setEntityName($entityName)
     {
@@ -178,7 +201,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of tableName
+     * Get the name of the associated table.
+     * 
+     * @return string The table name.
      */ 
     public function getTableName()
     {
@@ -186,9 +211,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of tableName
+     * Set the name of the associated table.
      *
-     * @return  self
+     * @param string $tableName The table name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setTableName($tableName)
     {
@@ -198,7 +224,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of width
+     * Get the width of the entity item.
+     * 
+     * @return integer The width.
      */ 
     public function getWidth()
     {
@@ -206,9 +234,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of width
+     * Set the width of the entity item.
      *
-     * @return  self
+     * @param integer $width The width.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setWidth($width)
     {
@@ -216,21 +245,31 @@ class EntityDiagramItem //NOSONAR
 
         return $this;
     }
-    
+
+    /**
+     * Get the maximum X coordinate of the entity item.
+     *
+     * @return integer The maximum X coordinate.
+     */
     public function getMaxX()
     {
         return $this->x + $this->width;
     }
     
+    /**
+     * Get the maximum Y coordinate of the entity item.
+     *
+     * @return integer The maximum Y coordinate.
+     */
     public function getMaxY()
     {
         return $this->y + $this->height;
     }
 
-    
-
     /**
-     * Get the value of x
+     * Get the X coordinate of the entity item.
+     * 
+     * @return integer The X coordinate.
      */ 
     public function getX()
     {
@@ -238,9 +277,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of x
+     * Set the X coordinate of the entity item.
      *
-     * @return  self
+     * @param integer $x The X coordinate.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setX($x)
     {
@@ -250,7 +290,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of y
+     * Get the Y coordinate of the entity item.
+     * 
+     * @return integer The Y coordinate.
      */ 
     public function getY()
     {
@@ -258,9 +300,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of y
+     * Set the Y coordinate of the entity item.
      *
-     * @return  self
+     * @param integer $y The Y coordinate.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setY($y)
     {
@@ -270,7 +313,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of height
+     * Get the height of the entity item.
+     * 
+     * @return integer The height.
      */ 
     public function getHeight()
     {
@@ -278,9 +323,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of height
+     * Set the height of the entity item.
      *
-     * @return  self
+     * @param integer $height The height.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setHeight($height)
     {
@@ -290,9 +336,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get column
-     *
-     * @return  EntityDiagramColumn[]
+     * Get the columns associated with the entity item.
+     * 
+     * @return EntityDiagramColumn[] The columns.
      */ 
     public function getColumns()
     {
@@ -300,7 +346,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of columnHeight
+     * Get the height of each column in the entity item.
+     * 
+     * @return integer The column height.
      */ 
     public function getColumnHeight()
     {
@@ -308,9 +356,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of columnHeight
+     * Set the height of each column in the entity item.
      *
-     * @return  self
+     * @param integer $columnHeight The column height.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setColumnHeight($columnHeight)
     {
@@ -320,7 +369,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of headerHeight
+     * Get the height of the header in the entity item.
+     * 
+     * @return integer The header height.
      */ 
     public function getHeaderHeight()
     {
@@ -328,9 +379,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of headerHeight
+     * Set the height of the header in the entity item.
      *
-     * @return  self
+     * @param integer $headerHeight The header height.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setHeaderHeight($headerHeight)
     {
@@ -340,7 +392,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get the value of entityId
+     * Get the entity ID.
+     * 
+     * @return string The entity ID.
      */ 
     public function getEntityId()
     {
@@ -348,9 +402,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set the value of entityId
+     * Set the entity ID.
      *
-     * @return  self
+     * @param string $entityId The entity ID.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setEntityId($entityId)
     {
@@ -360,9 +415,9 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Get namespace
-     *
-     * @return  string
+     * Get the namespace of the entity.
+     * 
+     * @return string The namespace.
      */ 
     public function getNamespace()
     {
@@ -370,11 +425,10 @@ class EntityDiagramItem //NOSONAR
     }
 
     /**
-     * Set namespace
+     * Set the namespace of the entity.
      *
-     * @param  string  $namespace  Namespace
-     *
-     * @return  self
+     * @param string $namespace The namespace.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setNamespace($namespace)
     {

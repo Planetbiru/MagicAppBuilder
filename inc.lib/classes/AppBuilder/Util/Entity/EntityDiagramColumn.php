@@ -2,46 +2,91 @@
 
 namespace AppBuilder\Util\Entity;
 
+/**
+ * Class EntityDiagramColumn
+ *
+ * Represents a column in an entity diagram, encapsulating its properties 
+ * such as name, data type, references, and positional attributes.
+ */
 class EntityDiagramColumn //NOSONAR
 {
+    /**
+     * The name of the column.
+     *
+     * @var string
+     */
     private $columnName;
+
+    /**
+     * The data type of the column.
+     *
+     * @var string
+     */
     private $dataType;
+
+    /**
+     * The length of the data in the column.
+     *
+     * @var int|null
+     */
     private $dataLength;
+
+    /**
+     * The name of the referenced entity, if applicable.
+     *
+     * @var string|null
+     */
     private $referenceEntityName;
+
+    /**
+     * The name of the referenced table, if applicable.
+     *
+     * @var string|null
+     */
     private $referenceTableName;
+
+    /**
+     * The name of the referenced column, if applicable.
+     *
+     * @var string|null
+     */
     private $referenceColumnName;
     
     /**
-     * Position X
+     * The X coordinate of the column's position in the diagram.
      *
-     * @var integer
+     * @var integer|null
      */
     private $x;
-    
+
     /**
-     * Position Y
+     * The Y coordinate of the column's position in the diagram.
      *
-     * @var integer
+     * @var integer|null
      */
     private $y;
-    
+
     /**
-     * Reference column
+     * Indicates whether this column is a reference column.
      *
      * @var boolean
      */
     private $referenceColumn = false;
-    
+
     /**
-     * Primary key
+     * Indicates whether this column is a primary key.
      *
      * @var boolean
      */
     private $primaryKey = false;
+
     /**
-     * Construuctor
+     * Constructor for the EntityDiagramColumn class.
      *
-     * @param array $column
+     * Initializes the column with the provided attributes.
+     *
+     * @param array $column An associative array containing column attributes
+     *                      (e.g., 'name', 'type', 'length').
      */
     public function __construct($column)
     {
@@ -49,9 +94,9 @@ class EntityDiagramColumn //NOSONAR
     }
     
     /**
-     * Set column
+     * Set the properties of the column from an associative array.
      *
-     * @param array $column
+     * @param array $column An associative array containing column attributes.
      * @return void
      */
     public function setColumn($column)
@@ -70,9 +115,11 @@ class EntityDiagramColumn //NOSONAR
     }
     
     /**
-     * Set join column
+     * Set the join column properties for references to other entities.
      *
-     * @param array $column
+     * @param string $referenceEntityName The name of the referenced entity.
+     * @param string $referenceTableName The name of the referenced table.
+     * @param string $referenceColumnName The name of the referenced column.
      * @return void
      */
     public function setJoinColumn($referenceEntityName, $referenceTableName, $referenceColumnName)
@@ -83,7 +130,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of columnName
+     * Get the name of the column.
+     * 
+     * @return string The column name.
      */ 
     public function getColumnName()
     {
@@ -91,9 +140,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set the value of columnName
+     * Set the name of the column.
      *
-     * @return  self
+     * @param string $columnName The column name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setColumnName($columnName)
     {
@@ -103,17 +153,20 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of dataType
-     */ 
+     * Get the data type of the column.
+     * 
+     * @return string The data type.
+     */  
     public function getDataType()
     {
         return $this->dataType;
     }
 
     /**
-     * Set the value of dataType
+     * Set the data type of the column.
      *
-     * @return  self
+     * @param string $dataType The data type.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setDataType($dataType)
     {
@@ -123,8 +176,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of dataLength
-     */ 
+     * Get the length of the data in the column.
+     * 
+     * @return int|null The data length or null if not set.
+     */  
     public function getDataLength()
     {
         return $this->dataLength;
@@ -143,7 +198,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of referenceEntityName
+     * Get the name of the referenced entity.
+     * 
+     * @return string|null The reference entity name or null if not set.
      */ 
     public function getReferenceEntityName()
     {
@@ -151,9 +208,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set the value of referenceEntityName
+     * Set the name of the referenced entity.
      *
-     * @return  self
+     * @param string $referenceEntityName The reference entity name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setReferenceEntityName($referenceEntityName)
     {
@@ -163,7 +221,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of referenceTableName
+     * Get the name of the referenced table.
+     * 
+     * @return string|null The reference table name or null if not set.
      */ 
     public function getReferenceTableName()
     {
@@ -171,9 +231,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set the value of referenceTableName
+     * Set the name of the referenced table.
      *
-     * @return  self
+     * @param string $referenceTableName The reference table name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setReferenceTableName($referenceTableName)
     {
@@ -183,7 +244,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get the value of referenceColumnName
+     * Get the name of the referenced column.
+     * 
+     * @return string|null The reference column name or null if not set.
      */ 
     public function getReferenceColumnName()
     {
@@ -191,9 +254,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set the value of referenceColumnName
+     * Set the name of the referenced column.
      *
-     * @return  self
+     * @param string $referenceColumnName The reference column name.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setReferenceColumnName($referenceColumnName)
     {
@@ -203,9 +267,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get primary key
+     * Get whether this column is a primary key.
      *
-     * @return  boolean
+     * @return boolean True if primary key, otherwise false.
      */ 
     public function getPrimaryKey()
     {
@@ -213,11 +277,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set primary key
+     * Set whether this column is a primary key.
      *
-     * @param  boolean  $primaryKey  Primary key
-     *
-     * @return  self
+     * @param boolean $primaryKey True if primary key, otherwise false.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setPrimaryKey($primaryKey)
     {
@@ -227,9 +290,9 @@ class EntityDiagramColumn //NOSONAR
     }
     
     /**
-     * Check if column has reference
+     * Check if the column has a reference to another entity.
      *
-     * @return boolean
+     * @return boolean True if a reference exists, otherwise false.
      */
     public function hasReference()
     {
@@ -237,9 +300,9 @@ class EntityDiagramColumn //NOSONAR
     }
     
     /**
-     * Check if column has reference
+     * Check if the column has a reference entity defined.
      *
-     * @return boolean
+     * @return boolean True if both reference table and column names are set, otherwise false.
      */
     public function hasReferenceEntity()
     {
@@ -247,9 +310,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get reference column
+     * Get whether this column is a reference column.
      *
-     * @return  boolean
+     * @return boolean True if this is a reference column, otherwise false.
      */ 
     public function getReferenceColumn()
     {
@@ -257,11 +320,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set reference column
+     * Set whether this column is a reference column.
      *
-     * @param  boolean  $referenceColumn  Reference column
-     *
-     * @return  self
+     * @param boolean $referenceColumn True if this is a reference column, otherwise false.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setReferenceColumn($referenceColumn)
     {
@@ -271,9 +333,9 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get position X
+     * Get the X coordinate of the column's position.
      *
-     * @return  integer
+     * @return integer|null The X position or null if not set.
      */ 
     public function getX()
     {
@@ -281,11 +343,10 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Set position X
+     * Set the X coordinate of the column's position.
      *
-     * @param  integer  $x  Position X
-     *
-     * @return  self
+     * @param integer $x The X position.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setX($x)
     {
@@ -295,22 +356,21 @@ class EntityDiagramColumn //NOSONAR
     }
 
     /**
-     * Get position Y
+     * Get the Y coordinate of the column's position.
      *
-     * @return  integer
-     */ 
+     * @return integer|null The Y position or null if not set.
+     */  
     public function getY()
     {
         return $this->y;
     }
 
     /**
-     * Set position Y
+     * Set the Y coordinate of the column's position.
      *
-     * @param  integer  $y  Position Y
-     *
-     * @return  self
-     */ 
+     * @param integer $y The Y position.
+     * @return self Returns the current instance for method chaining.
+     */  
     public function setY($y)
     {
         $this->y = $y;

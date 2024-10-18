@@ -6,20 +6,27 @@ use SVG\Nodes\Shapes\SVGPath;
 use SVG\Nodes\Structures\SVGDefs;
 use SVG\Nodes\Structures\SVGMarker;
 
-
+/**
+ * Class EntityDiagramMarker
+ *
+ * This class provides methods to create SVG markers for use in entity diagrams.
+ * The markers represent different cardinalities and include an arrow for miscellaneous use.
+ */
 class EntityDiagramMarker
 {
 
     /**
-     * Create marker
+     * Create SVG markers for various cardinalities.
      *
-     * 11 - One and only One
-     * 1M - One or Many
-     * M - Many
-     * 01 - Zero or One
-     * 0M - Zero or Many
-     * arrow - included for miscellaneous use
-     * @return SVGDefs
+     * Cardinalities:
+     *  - 11: One and only One
+     *  - 1M: One or Many
+     *  - M: Many
+     *  - 01: Zero or One
+     *  - 0M: Zero or Many
+     *  - arrow: included for miscellaneous use
+     *
+     * @return SVGDefs The SVG definitions containing the markers.
      */
     public static function createMarker()
     {

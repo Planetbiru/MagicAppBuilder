@@ -24,12 +24,12 @@ class AppBuilderApproval extends AppBuilderBase
         
         $entityApprovalName = $approvalEntity->getEntityName();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($mainEntity->getPrimaryKey());
-        $upperApprovalPkName = PicoStringUtil::upperCamelize($approvalEntity->getPrimaryKey());
-        $objectApprovalName = lcfirst($entityApprovalName);
+        $upperApprovalPkName = PicoStringUtil::upperCamelize($approvalEntity->getPrimaryKey()); //NOSONAR
+        $objectApprovalName = lcfirst($entityApprovalName); //NOSONAR
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
         $upperDraft = PicoStringUtil::upperCamelize($this->entityInfo->getDraft());
 
-        $approvalId = PicoStringUtil::upperCamelize($this->entityInfo->getApprovalId());
+        $approvalId = PicoStringUtil::upperCamelize($this->entityInfo->getApprovalId()); //NOSONAR
 
         $lines = array();
         

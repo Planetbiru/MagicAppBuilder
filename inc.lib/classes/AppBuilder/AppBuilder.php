@@ -65,10 +65,10 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);'; //NOSONAR
         }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
-        $lines[] = parent::TAB1."catch(Exception \$e)";
+        $lines[] = parent::TAB1."catch(Exception \$e)"; //NOSONAR
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if(isset($callbackFailed) && is_callable($callbackFailed))
         {
