@@ -4,6 +4,16 @@ namespace AppBuilder\Util;
 
 use JsonException;
 
+/**
+ * Class ResponseUtil
+ *
+ * A utility class for sending JSON responses to clients in a web application.
+ * This class provides methods to encode data into JSON format, set the appropriate
+ * HTTP headers, and handle both synchronous and asynchronous responses.
+ *
+ * It includes options for prettifying the JSON output for better readability
+ * and ensures that the response is properly formatted as UTF-8.
+ */
 class ResponseUtil
 {
     /**
