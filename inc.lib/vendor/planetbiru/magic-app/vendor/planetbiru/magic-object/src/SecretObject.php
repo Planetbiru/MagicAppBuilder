@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Yaml;
  * and decryption capabilities, using annotations to specify which properties
  * should be secured.
  * 
+ * @author Kamshory
+ * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class SecretObject extends stdClass //NOSONAR

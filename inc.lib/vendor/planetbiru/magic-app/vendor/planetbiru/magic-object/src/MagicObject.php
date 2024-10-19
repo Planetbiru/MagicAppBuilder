@@ -43,23 +43,34 @@ use Symfony\Component\Yaml\Yaml;
  * Users can create entities from database tables and perform insert, select, update, and delete operations on records in the database.
  * Users can also create properties from other entities using the full name of the class (namespace + class name).
  * 
+ * @author Kamshory
+ * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class MagicObject extends stdClass // NOSONAR
 {
+    // Message constants
     const MESSAGE_NO_DATABASE_CONNECTION = "No database connection provided";
     const MESSAGE_NO_RECORD_FOUND = "No record found";
+    
+    // Property naming strategy
     const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
+    
+    // Key constants
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_DEFAULT_VALUE = "default_value";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
+
+    // Format constants
     const JSON = 'JSON';
     const YAML = 'Yaml';
 
+    // Attribute constants
     const ATTR_CHECKED = ' checked="checked"';
     const ATTR_SELECTED = ' selected="selected"';
 
+    // Find option constants
     const FIND_OPTION_DEFAULT = 0;
     const FIND_OPTION_NO_COUNT_DATA = 1;
     const FIND_OPTION_NO_FETCH_DATA = 2;
@@ -201,7 +212,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $rawData Raw INI data
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadIniString($rawData, $systemEnv = false)
     {
@@ -222,7 +233,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $path File path to the INI file
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadIniFile($path, $systemEnv = false)
     {
@@ -245,7 +256,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -290,7 +301,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -335,7 +346,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -380,7 +391,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -425,7 +436,7 @@ class MagicObject extends stdClass // NOSONAR
      * but loadData will still function normally.
      *
      * @param bool $readonly Flag to set the object as read-only
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     protected function readOnly($readonly)
     {
@@ -437,7 +448,7 @@ class MagicObject extends stdClass // NOSONAR
      * Set the database connection.
      *
      * @param PicoDatabase $database Database connection
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function withDatabase($database)
     {
@@ -578,7 +589,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select data from the database.
      *
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function select()
@@ -603,7 +614,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select all data from the database.
      *
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function selectAll()
@@ -1052,7 +1063,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param string $propertyName Property name
      * @param mixed|null $propertyValue Property value
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function set($propertyName, $propertyValue, $skipModifyNullProperties = false)
     {
@@ -1070,7 +1081,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function push($propertyName, $propertyValue)
     {
@@ -1088,7 +1099,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function append($propertyName, $propertyValue)
     {
@@ -1100,7 +1111,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function unshift($propertyName, $propertyValue)
     {
@@ -1118,7 +1129,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function prepend($propertyName, $propertyValue)
     {
@@ -1272,7 +1283,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     private function removeValue($propertyName, $skipModifyNullProperties = false)
     {
@@ -1598,7 +1609,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoSortable|string|null $sortable The sorting criteria
      * @param array|null $subqueryMap An optional map of subqueries
-     * @return self The found instance
+     * @return self The found instance.
      * @throws NoRecordFoundException if no record is found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
@@ -1867,7 +1878,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find one record by primary key value
      *
      * @param mixed $params The parameters for the search
-     * @return self The found instance
+     * @return self The found instance.
      * @throws NoRecordFoundException if no record is found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
@@ -1897,7 +1908,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find one record if it exists by primary key value
      *
      * @param array $params The parameters for the search
-     * @return self The found instance or the current instance if not found
+     * @return self The found instance. or the current instance if not found
      */
     public function findIfExists($params)
     {

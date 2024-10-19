@@ -7,7 +7,9 @@ namespace MagicObject\Database;
  *
  * This class provides functionality to manage page numbers and sizes,
  * and to calculate offsets for database queries.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPage

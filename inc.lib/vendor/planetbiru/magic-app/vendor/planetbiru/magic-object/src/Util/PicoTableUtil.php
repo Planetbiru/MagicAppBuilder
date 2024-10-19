@@ -12,7 +12,9 @@ use MagicObject\Exceptions\InvalidParameterException;
  * and identity properties on DOM elements, as well as parsing attribute strings
  * into associative arrays. It is designed to facilitate the management of
  * table-related DOM elements within the MagicObject framework.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoTableUtil

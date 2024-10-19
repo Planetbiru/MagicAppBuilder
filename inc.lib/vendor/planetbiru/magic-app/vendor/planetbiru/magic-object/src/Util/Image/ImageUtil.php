@@ -9,9 +9,19 @@ use MagicObject\Exceptions\InvalidParameterException;
 use MagicObject\Util\File\FileUtil;
 
 /**
- * A Wrapper for GD library in PHP. GD must be installed in your system for this to work.
- * Example: $img = new Image('wheel.png');
- *          $img->flip(1)->resize(120, 0)->save('wheel.jpg');
+ * Class ImageUtil
+ *
+ * A wrapper for the GD library in PHP. GD must be installed in your system for this to work.
+ *
+ * Example:
+ * ```php
+ * $img = new Image('wheel.png');
+ * $img->flip(1)->resize(120, 0)->save('wheel.jpg');
+ * ```
+ *
+ * @author Kamshory
+ * @package MagicObject\Util\Image
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class ImageUtil
 {
@@ -67,11 +77,11 @@ class ImageUtil
     protected $height;
 
     /**
-     * Empty image
+     * Creates an empty image with specified dimensions and color.
      *
-     * @param int $width
-     * @param int $height
-     * @param ImageColor|null $color
+     * @param int $width The width of the new image.
+     * @param int $height The height of the new image.
+     * @param ImageColor|null $color Optional color to fill the image.
      * @return self
      */
     public static function empty($width, $height, $color = null)
@@ -86,11 +96,11 @@ class ImageUtil
     }
 
     /**
-     * Construct an Image Handler based on an image resource or file name
+     * Constructs an ImageUtil instance based on an image resource or file name.
      *
-     * @param string|resource $imageFile The path or URL to image or the image resource.
-     * @throws ImageUtilException
-     * @throws NotFoundException
+     * @param string|resource $imageFile The path or URL to the image, or the image resource.
+     * @throws ImageUtilException If the GD module is not installed or if the image file is invalid.
+     * @throws FileNotFoundException If the image file is not found or not readable.
      */
     public function __construct($imageFile)
     {
@@ -117,9 +127,11 @@ class ImageUtil
     }
 
     /**
-     * @param $resource
-     * @return array
-     * @throws ImageUtilException
+     * Creates an ImageUtil instance from a resource.
+     *
+     * @param resource $resource The image resource.
+     * @return array Information about the image.
+     * @throws ImageUtilException If the resource is invalid.
      */
     protected function createFromResource($resource)
     {
@@ -134,10 +146,12 @@ class ImageUtil
     }
 
     /**
-     * @param $imageFile
-     * @return array
-     * @throws NotFoundException
-     * @throws ImageUtilException
+     * Creates an ImageUtil instance from a file name.
+     *
+     * @param string $imageFile The path to the image file.
+     * @return array Information about the image.
+     * @throws FileNotFoundException If the file is not found or not readable.
+     * @throws ImageUtilException If the file is invalid.
      */
     protected function createFromFilename($imageFile)
     {
@@ -157,7 +171,7 @@ class ImageUtil
     }
 
     /**
-     * Get width
+     * Get the image width.
      *
      * @return int
      */
@@ -167,7 +181,7 @@ class ImageUtil
     }
 
     /**
-     * Get width
+     * Get the image height.
      *
      * @return int
      */
@@ -177,7 +191,7 @@ class ImageUtil
     }
 
     /**
-     * Get file name
+     * Get the file name of the image.
      *
      * @return string
      */
@@ -187,9 +201,9 @@ class ImageUtil
     }
 
     /**
-     * Retain transparency
+     * Retain transparency for the image.
      *
-     * @param GdImage $image
+     * @param GdImage|null $image The image resource to modify.
      * @return void
      */
     protected function retainTransparency($image = null)
@@ -202,7 +216,7 @@ class ImageUtil
     }
 
     /**
-     * Enter description here...
+     * Get the current image resource.
      *
      * @return GdImage
      */
@@ -213,12 +227,11 @@ class ImageUtil
 
     /**
      * Rotates the image to any direction using the given angle.
-     * Arguments: $angle - The rotation angle, in degrees.
-     * Example: $img = new Image("file.png"); $img->rotate(180); $img->show(); // Turn the image upside down.
      *
-     * @param float $angle
-     * @param int $background
+     * @param float $angle The rotation angle, in degrees.
+     * @param int $background The background color for the rotated area.
      * @return $this
+     * @throws InvalidParameterException If the angle is not numeric.
      */
     public function rotate($angle, $background = 0)
     {
@@ -234,11 +247,10 @@ class ImageUtil
 
     /**
      * Mirrors the given image in the desired way.
-     * Example: $img = new Image("file.png"); $img->flip(2); $img->show();
      *
-     * @param int $type Direction of mirroring. This can be 1(Horizondal Flip), 2(Vertical Flip) or 3(Both Horizondal
-     *     and Vertical Flip)
+     * @param int $type Direction of mirroring (1: Horizontal, 2: Vertical, 3: Both).
      * @return ImageUtil
+     * @throws InvalidParameterException If the flip type is invalid.
      */
     public function flip($type)
     {
@@ -288,13 +300,12 @@ class ImageUtil
     }
 
     /**
-     * Resize the image to an new size. Size can be specified in the arugments.
+     * Resize the image to a new size.
      *
-     * @param int $newWidth The width of the desired image. If 0, the function will automatically calculate the width
-     *     using the height ratio.
-     * @param int $newHeight The width of the desired image. If 0, the function will automatically calculate the value
-     *     using the width ratio.
+     * @param int|null $newWidth The new width of the image.
+     * @param int|null $newHeight The new height of the image.
      * @return ImageUtil
+     * @throws InvalidParameterException If neither width nor height is valid.
      */
     public function resize($newWidth = null, $newHeight = null)
     {
@@ -326,14 +337,12 @@ class ImageUtil
     }
 
     /**
-     * Resize the image in a square format and maintain the aspect ratio. The space are filled the RGB color provided.
+     * Resize the image in a square format and maintain the aspect ratio.
      *
-     * @param int $newSize The new size of desired image (width and height are equals)
-     * @param int $fillRed
-     * @param int $fillGreen
-     * @param int $fillBlue
+     * @param int $newSize The new size of the image (width and height are equal).
+     * @param ImageColor|null $color Optional color to fill the extra space.
      * @return ImageUtil
-     * @throws ImageUtilException
+     * @throws ImageUtilException If an error occurs during resizing.
      */
     public function resizeSquare($newSize, ImageColor $color = null)
     {
@@ -341,15 +350,13 @@ class ImageUtil
     }
 
     /**
-     * Resize the image but the aspect ratio is respected. The spaces left are filled with the RGB color provided.
+     * Resizes the image while maintaining the aspect ratio.
      *
-     * @param int $newX
-     * @param int $newY
-     * @param int $fillRed
-     * @param int $fillGreen
-     * @param int $fillBlue
-     * @return ImageUtil
-     * @throws ImageUtilException
+     * @param int $newX The new width.
+     * @param int $newY The new height.
+     * @param ImageColor|null $color Optional color to fill the extra space.
+     * @return self
+     * @throws ImageUtilException If an error occurs during resizing.
      */
     public function resizeAspectRatio($newX, $newY, ImageColor $color = null)
     {
@@ -400,15 +407,15 @@ class ImageUtil
     }
 
     /**
-     * Stamp an image in the current image.
+     * Stamps an image onto the current image.
      *
-     * @param ImageUtil|string $srcImage The image path or the image gd resource.
-     * @param int $position
-     * @param int $padding
-     * @param int $oppacity
-     * @return ImageUtil
-     * @throws ImageUtilException
-     * @throws NotFoundException
+     * @param ImageUtil|string $srcImage The image path or ImageUtil instance.
+     * @param int $position The position where the stamp will be placed.
+     * @param int $padding The padding between the stamp and the edges.
+     * @param int $opacity The opacity of the stamp (0-100).
+     * @return self
+     * @throws ImageUtilException If an error occurs during stamping.
+     * @throws FileNotFoundException If the source image is not found.
      */
     public function stampImage($srcImage, $position = self::STAMP_POSITION_BOTTOMRIGHT, $padding = 5, $oppacity = 100)
     {
@@ -488,17 +495,17 @@ class ImageUtil
     }
 
     /**
-     * Writes a text on the image.
+     * Writes text on the image.
      *
-     * @param string $text
-     * @param float[] $point
-     * @param float $size
-     * @param float $angle
-     * @param string $font
-     * @param int $maxwidth
-     * @param float[] $rgbAr
-     * @param int $textAlignment
-     * @throws ImageUtilException
+     * @param string $text The text to write.
+     * @param float[] $point The coordinates to place the text (x, y).
+     * @param float $size The font size.
+     * @param float $angle The angle of the text.
+     * @param string $font The path to the font file.
+     * @param int $maxwidth The maximum width of the text.
+     * @param float[]|null $rgbAr RGB array for text color.
+     * @param int $textAlignment The alignment of the text (left, center, right).
+     * @throws ImageUtilException If the specified font is not found or if an error occurs.
      */
     public function writeText($text, $point, $size, $angle, $font, $maxwidth = 0, $rgbAr = null, $textAlignment = 1) //NOSONAR
     {
@@ -557,14 +564,13 @@ class ImageUtil
     }
 
     /**
-     * Crops the given image from the ($from_x,$from_y) point to the ($to_x,$to_y) point.
-     * Example: $img -> crop(250,200,400,250);
+     * Crops the image from specified coordinates.
      *
-     * @param float $fromX X coordinate from where the crop should start
-     * @param float $fromY Y coordinate from where the crop should start
-     * @param float $toX X coordinate from where the crop should end
-     * @param float $toY Y coordinate from where the crop should end
-     * @return ImageUtil
+     * @param float $fromX The starting X coordinate.
+     * @param float $fromY The starting Y coordinate.
+     * @param float $toX The ending X coordinate.
+     * @param float $toY The ending Y coordinate.
+     * @return self
      */
     public function crop($fromX, $fromY, $toX, $toY)
     {
@@ -580,7 +586,9 @@ class ImageUtil
     }
 
     /**
-     * Discard any changes made to the image and restore the original state
+     * Discards changes and restores the original image state.
+     *
+     * @return self
      */
     public function restore()
     {
@@ -592,12 +600,11 @@ class ImageUtil
     }
 
     /**
-     * Make transparent the image. The transparent color must be provided
+     * Makes a color transparent in the image.
      *
-     * @param int $transpRed
-     * @param int $transpGreen
-     * @param int $transpBlue
-     * @return ImageUtil|GdImage|resource The image util object
+     * @param ImageColor|null $color The color to make transparent.
+     * @param GdImage|null $image The image resource to modify. If null, uses the current image.
+     * @return $this|GdImage The modified image or the current instance.
      */
     public function makeTransparent(ImageColor $color = null, $image = null)
     {

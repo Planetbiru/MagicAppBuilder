@@ -7,6 +7,10 @@ namespace MagicObject\Geometry;
  *
  * This class manages a collection of Area objects, allowing for the addition and retrieval of areas.
  * It can be initialized with an optional array of Area objects.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Map
 {

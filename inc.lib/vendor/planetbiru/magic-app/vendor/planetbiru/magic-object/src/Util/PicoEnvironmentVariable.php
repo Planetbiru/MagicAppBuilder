@@ -8,7 +8,9 @@ use stdClass;
  * Class PicoEnvironmentVariable
  *
  * A utility class for handling environment variable replacements within strings and data structures.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEnvironmentVariable

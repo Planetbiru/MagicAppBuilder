@@ -6,7 +6,9 @@ namespace MagicObject\Database;
  * Class representing different database types.
  *
  * This class provides constants for various database types supported by the MagicObject framework.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseType

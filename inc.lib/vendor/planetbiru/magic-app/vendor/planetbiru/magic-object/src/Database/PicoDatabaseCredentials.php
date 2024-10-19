@@ -24,6 +24,8 @@ use MagicObject\SecretObject;
  * The attributes are automatically encrypted when set, providing a secure way to handle sensitive
  * information within your application.
  * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseCredentials extends SecretObject

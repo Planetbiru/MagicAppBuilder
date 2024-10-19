@@ -12,7 +12,9 @@ use stdClass;
  * Class to manage entity labels and their annotations.
  * 
  * Provides methods to retrieve and filter entity metadata, including labels, columns, and other attributes.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityLabel

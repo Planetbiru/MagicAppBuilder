@@ -10,6 +10,8 @@ use MagicObject\Util\PicoStringUtil;
  * This class is optimized for the MariaDB database.
  * Users must provide appropriate parameters so that the entity class can be directly used in the application.
  * 
+ * @author Kamshory
+ * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityGenerator

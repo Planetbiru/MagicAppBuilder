@@ -9,6 +9,8 @@ use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 /**
  * Represents the structure of a database table.
  * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseStructure

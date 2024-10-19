@@ -7,6 +7,10 @@ namespace MagicObject\Geometry;
  *
  * This class defines a Line in a 2D space represented by two endpoints, Point A and Point B.
  * It provides methods to calculate the length of the line and ensure the endpoints are valid Point instances.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Line {
 

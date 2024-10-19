@@ -8,7 +8,9 @@ use \stdClass;
 /**
  * Class PicoResponse
  * Handles sending HTTP responses with various content types and status codes.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Response
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoResponse

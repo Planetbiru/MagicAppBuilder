@@ -11,7 +11,9 @@ use MagicObject\Pagination\PicoPagination;
  * page buttons, allowing users to navigate through pages seamlessly. 
  * The pagination links are generated based on the provided page data and 
  * can be customized with parameter names and paths.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPageControl

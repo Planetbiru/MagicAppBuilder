@@ -32,7 +32,8 @@ use stdClass;
  * $result = $db->fetch("SELECT * FROM users WHERE id = 1");
  * ```
  * 
- * Developer: Kamshory
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabase //NOSONAR

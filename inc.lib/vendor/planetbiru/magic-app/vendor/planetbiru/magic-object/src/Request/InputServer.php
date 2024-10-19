@@ -39,6 +39,8 @@ namespace MagicObject\Request;
  * - getPathInfo() returns $_SERVER['PATH_INFO']
  * - getOrigPathInfo() returns $_SERVER['ORIG_PATH_INFO']
  *
+ * @author Kamshory
+ * @package MagicObject\Request
  * @link https://www.php.net/manual/en/reserved.variables.server.php
  */
 class InputServer extends PicoRequestBase {

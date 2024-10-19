@@ -14,6 +14,10 @@ use Throwable;
  * allowed for insertion, possibly due to misconfiguration or 
  * constraints on the database schema. It is essential for ensuring 
  * that data integrity is maintained during insert operations.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NoInsertableColumnException extends Exception
 {

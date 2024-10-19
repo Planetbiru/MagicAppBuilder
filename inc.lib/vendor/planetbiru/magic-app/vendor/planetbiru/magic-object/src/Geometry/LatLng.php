@@ -8,8 +8,10 @@ namespace MagicObject\Geometry;
  * Represents a geographical point defined by latitude and longitude values.
  * This class provides methods to manage and manipulate geographic coordinates,
  * including equality checks and string representations.
- *
+ * 
+ * @author Kamshory
  * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class LatLng
 {

@@ -2,7 +2,7 @@
 
 namespace MagicObject\Util\ClassUtil;
 
-use MagicObject\Exceptions\InvalidClassExceptio;
+use MagicObject\Exceptions\InvalidClassException;
 use ReflectionClass;
 
 /**
@@ -27,6 +27,9 @@ use ReflectionClass;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package MagicObject\Util\ClassUtil
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class ExtendedReflectionClass extends ReflectionClass {
 
@@ -57,7 +60,7 @@ class ExtendedReflectionClass extends ReflectionClass {
 		}
 
 		if (!$this->isUserDefined()) {
-			throw new InvalidClassExceptio('Must parse use statements from user defined classes.');
+			throw new InvalidClassException('Must parse use statements from user defined classes.');
 		}
 
 		$source = $this->readFileSource();

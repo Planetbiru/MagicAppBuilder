@@ -8,7 +8,9 @@ namespace MagicObject\Database;
  * A class for defining sorting criteria for database queries.
  * This class allows you to specify the field to sort by and the 
  * direction of sorting (ascending or descending).
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSort

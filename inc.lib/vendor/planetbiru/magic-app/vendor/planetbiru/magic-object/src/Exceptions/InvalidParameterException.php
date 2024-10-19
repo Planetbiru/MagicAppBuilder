@@ -11,6 +11,10 @@ use Throwable;
  * This exception can be thrown when a function or method receives parameters 
  * that do not meet the expected criteria, such as invalid types, missing 
  * required values, or parameters that fall outside of acceptable ranges.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class InvalidParameterException extends Exception
 {

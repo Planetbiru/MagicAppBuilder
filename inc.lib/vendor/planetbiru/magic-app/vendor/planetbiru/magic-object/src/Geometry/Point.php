@@ -7,6 +7,10 @@ namespace MagicObject\Geometry;
  *
  * This class defines a Point in a 2D Cartesian coordinate system,
  * allowing for the representation of its position and the calculation of distances to other Points.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Point
 {
