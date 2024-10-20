@@ -4,6 +4,12 @@ namespace AppBuilder;
 
 use MagicObject\SecretObject;
 
+/**
+ * Class EntityInfo
+ *
+ * Represents metadata about an entity, including its status, administrative actions, and timestamps.
+ * This class extends SecretObject to inherit additional functionality related to secret management.
+ */
 class EntityInfo extends SecretObject
 {
     /**

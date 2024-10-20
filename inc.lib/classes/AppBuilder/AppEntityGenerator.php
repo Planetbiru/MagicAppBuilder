@@ -234,8 +234,7 @@ class AppEntityGenerator extends PicoEntityGenerator
         }
 
         $picoTableName = $this->getTableName($realTableName);
-        $reservedColumns = $this->getReservedColumns();
-        
+        $reservedColumns = $this->getReservedColumns();     
 
         $attrs = array();
         if(is_array($rows))
@@ -289,8 +288,9 @@ use MagicObject\MagicObject;'.implode("\r\n", $uses).'
 /**
  * '.$className.' is entity of table '.$picoTableName.'. You can join this entity to other entity using annotation JoinColumn. 
  * Don\'t forget to add "use" statement if the entity is outside the namespace.
- * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
+ * @package '.$this->baseNamespace.'
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
  * @Table(name="'.$picoTableName.'")

@@ -2,6 +2,13 @@
 
 namespace AppBuilder;
 
+/**
+ * Class AppNav
+ *
+ * Represents a navigation item in the application.
+ * This class provides properties for a unique identifier, 
+ * display caption, and active state of the navigation item.
+ */
 class AppNav
 {
     /**

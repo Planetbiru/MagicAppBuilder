@@ -2,6 +2,12 @@
 
 namespace AppBuilder;
 
+/**
+ * Class AppNavs
+ *
+ * Represents a collection of navigation items.
+ * This class provides methods to add, retrieve, and manage multiple AppNav instances.
+ */
 class AppNavs
 {
     /**

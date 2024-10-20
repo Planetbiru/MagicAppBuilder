@@ -2,6 +2,12 @@
 
 namespace AppBuilder;
 
+/**
+ * Class AppSection
+ *
+ * Represents a collection of sections that can be concatenated into a single string.
+ * This class provides methods to add, clear, and print sections, with customizable separators.
+ */
 class AppSection
 {
     /**

@@ -5,6 +5,15 @@ namespace AppBuilder;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoObjectParser;
 
+/**
+ * Class AppField
+ *
+ * Represents a field in an application with various properties that determine its behavior 
+ * in operations like insert, edit, detail views, listing, and exporting.
+ *
+ * This class encapsulates the metadata of fields including their names, labels, data types, 
+ * and various flags for operations they participate in (such as required fields and key fields).
+ */
 class AppField
 {
     /**

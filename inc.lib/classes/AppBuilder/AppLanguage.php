@@ -6,6 +6,15 @@ use MagicObject\Language\PicoLanguage;
 use MagicObject\Util\PicoStringUtil;
 use stdClass;
 
+/**
+ * Class AppLanguage
+ *
+ * Extends the PicoLanguage class to provide additional functionality for 
+ * handling language properties with optional custom processing via a callback.
+ *
+ * This class allows for the initialization of language properties from a data structure 
+ * (either an array or stdClass) and supports custom handling when retrieving properties.
+ */
 class AppLanguage extends PicoLanguage
 {
     /**

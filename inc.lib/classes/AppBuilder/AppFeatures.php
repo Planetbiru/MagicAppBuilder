@@ -4,6 +4,18 @@ namespace AppBuilder;
 
 use MagicObject\MagicObject;
 
+/**
+ * Class AppFeatures
+ *
+ * This class manages various application features related to activation, sorting, approval, and export options.
+ *
+ * Features include:
+ * - Activate/Deactivate
+ * - Sort Order
+ * - Approval Requirements
+ * - Export Options (Excel, CSV)
+ * - Temporary Exports
+ */
 class AppFeatures
 {
     const BEFORE_DATA = 'before-data';
@@ -88,6 +100,8 @@ class AppFeatures
 
     /**
      * Constructor
+     *
+     * Initializes the AppFeatures instance based on the provided feature settings.
      *
      * @param MagicObject $features An object containing feature settings.
      */
