@@ -62,7 +62,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-        if(isset($callbackSuccess) && is_callable($callbackSuccess))
+        if($this->isCallable($callbackSuccess))
         {
             
             $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
@@ -74,7 +74,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)"; //NOSONAR
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        if(isset($callbackFailed) && is_callable($callbackFailed))
+        if($this->isCallable($callbackFailed))
         {
             $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
@@ -156,7 +156,7 @@ class AppBuilder extends AppBuilderBase
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
 
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
-            if(isset($callbackSuccess) && is_callable($callbackSuccess))
+            if($this->isCallable($callbackSuccess))
             {
                 
                 $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
@@ -169,7 +169,7 @@ class AppBuilder extends AppBuilderBase
         else
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-            if(isset($callbackSuccess) && is_callable($callbackSuccess))
+            if($this->isCallable($callbackSuccess))
             {
                 
                 $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
@@ -183,7 +183,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        if(isset($callbackFailed) && is_callable($callbackFailed))
+        if($this->isCallable($callbackFailed))
         {
             $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
         }

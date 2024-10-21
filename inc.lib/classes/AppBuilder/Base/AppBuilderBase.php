@@ -4482,4 +4482,18 @@ $subqueryMap = '.$referece.';
 
         return $this;
     }
+    
+    /**
+     * Check if a given value is a callable function.
+     *
+     * This method verifies if the provided value is set and can be called
+     * as a function. It returns true if the value is callable, otherwise false.
+     *
+     * @param mixed $function The value to check for callable status.
+     * @return bool Returns true if the value is callable, false otherwise.
+     */
+    public function isCallable($function)
+    {
+        return isset($function) && is_callable($function);
+    }
 }
