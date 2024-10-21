@@ -407,9 +407,10 @@ class ScriptGenerator
             // CRUD
             
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
-
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields, $callbackUpdateSuccess, $callbackUpdateFailed);
+            
             $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+            error_log("FUNC = ".print_r($callbackUpdateStatusException, true));
             $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);           
             $deleteSection = $this->createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
 
@@ -493,7 +494,7 @@ class ScriptGenerator
             };
             
             $callbackUpdateStatusSuccess = function($objectName, $userAction, $primaryKeyName) {
-                return "\t".
+                return "\t\t\t".
                 '$apiResponse->sendSuccess('.
                 $userAction.
                 ', $'.$objectName.

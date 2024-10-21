@@ -263,7 +263,7 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'error_log($e->getMessage());';
         }
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;    
@@ -357,20 +357,20 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
         
-        if(isset($callbackException) && is_callable($callbackException))
+        if($this->isCallable($callbackException))
         {
             $lines[] = call_user_func($callbackException, $objectName, $userAction, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'error_log($e->getMessage());';
         }
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         
-        if(isset($callbackFinish) && is_callable($callbackFinish))
+        if($this->isCallable($callbackFinish))
         {
             $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $pkName);
         }

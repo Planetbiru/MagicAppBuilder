@@ -93,7 +93,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        if(isset($callbackFailed) && is_callable($callbackFailed))
+        if($this->isCallable($callbackFailed))
         {
             $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
@@ -190,7 +190,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        if(isset($callbackFailed) && is_callable($callbackFailed))
+        if($this->isCallable($callbackFailed))
         {
             $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
