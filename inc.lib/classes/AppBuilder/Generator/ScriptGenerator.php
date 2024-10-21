@@ -230,15 +230,22 @@ class ScriptGenerator
     }
 
     /**
-     * Generate
+     * Generates the application module based on the provided configuration and request data.
      *
-     * @param PicoDatabase $database
-     * @param MagicObject|InputPost $request
-     * @param AppSecretObject $builderConfig
-     * @param AppSecretObject $appConfig
-     * @param EntityInfo $entityInfo
-     * @param EntityApvInfo $entityApvInfo
-     * @return void
+     * This method handles the creation, update, activation, deactivation, and deletion of entities
+     * according to the specifications defined in the request. It constructs the necessary sections
+     * for CRUD operations and prepares the corresponding GUI elements while considering any approval 
+     * processes or trash management requirements.
+     *
+     * @param PicoDatabase $database The database connection object used for entity operations.
+     * @param MagicObject|InputPost $request The request object containing field definitions and specifications.
+     * @param AppSecretObject $builderConfig Configuration settings for building the application.
+     * @param AppSecretObject $appConfig Application-specific configuration, including feature flags.
+     * @param EntityInfo $entityInfo Information about the main entity being processed.
+     * @param EntityApvInfo $entityApvInfo Information about the approval process for the entity.
+     *
+     * @return void This method does not return a value. It generates and writes the application module script
+     * to the specified location, as defined in the request.
      */
     public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) 
     {
@@ -253,45 +260,14 @@ class ScriptGenerator
         $referenceEntitiesUse = array();
         $allField = array();
         
+        $clbk = $this->initializeCallbackFunctions($appConfig);
         
-        $callbackCreateSuccess = null;
-        $callbackCreateFailed = null;
-        
-        if($appConfig->getApplication()->getType() == 'api') {
-            $callbackCreateSuccess = function($objectName, $primaryKeyName) {
-                return "\t\t".'$apiResponse->sendSuccess(UserAction::CREATE, $'.$objectName.", $primaryKeyName);";
-            };
-            $callbackCreateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
-                return "\t\t".'$apiResponse->sendException(UserAction::CREATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
-            };
-            
-            $callbackUpdateSuccess = function($objectName, $primaryKeyName) {
-                return "\t\t".'$apiResponse->sendSuccess(UserAction::UPDATE, $'.$objectName.", $primaryKeyName);";
-            };
-            $callbackUpdateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
-                return "\t\t".'$apiResponse->sendException(UserAction::UPDATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
-            };
-            
-            $callbackUpdateStatusSuccess = function($objectName, $userAction, $primaryKeyName) {
-                return "\t".
-                '$apiResponse->sendSuccess('.
-                $userAction.
-                ', $'.$objectName.
-                ', Field::of()->'.$primaryKeyName.
-                ', $inputPost->getCheckedRowId()'.
-                ");";
-            };
-            $callbackUpdateStatusException = function($objectName, $userAction, $primaryKeyName, $exceptionObject) {
-                return "\t\t\t\t".
-                '$apiResponse->sendException('.
-                $userAction.
-                ', $'.$objectName.
-                ', Field::of()->'.$primaryKeyName.
-                ', $inputPost->getCheckedRowId()'.
-                ', '.$exceptionObject.
-                ");";
-            };
-        }
+        $callbackCreateSuccess = $clbk->callbackCreateSuccess;
+        $callbackCreateFailed = $clbk->callbackCreateFailed;
+        $callbackUpdateSuccess = $clbk->callbackUpdateSuccess;
+        $callbackUpdateFailed = $clbk->callbackUpdateFailed;
+        $callbackUpdateStatusSuccess = $clbk->callbackUpdateStatusSuccess;
+        $callbackUpdateStatusException = $clbk->callbackUpdateStatusException;
         
         foreach($request->getFields() as $value) {
             $field = new AppField($value);
@@ -497,6 +473,69 @@ class ScriptGenerator
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
+    }
+    
+    private function initializeCallbackFunctions($appConfig)
+    {
+        if($appConfig->getApplication()->getType() == 'api') {
+            $callbackCreateSuccess = function($objectName, $primaryKeyName) {
+                return "\t\t".'$apiResponse->sendSuccess(UserAction::CREATE, $'.$objectName.", $primaryKeyName);";
+            };
+            $callbackCreateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
+                return "\t\t".'$apiResponse->sendException(UserAction::CREATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
+            };
+            
+            $callbackUpdateSuccess = function($objectName, $primaryKeyName) {
+                return "\t\t".'$apiResponse->sendSuccess(UserAction::UPDATE, $'.$objectName.", $primaryKeyName);";
+            };
+            $callbackUpdateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
+                return "\t\t".'$apiResponse->sendException(UserAction::UPDATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
+            };
+            
+            $callbackUpdateStatusSuccess = function($objectName, $userAction, $primaryKeyName) {
+                return "\t".
+                '$apiResponse->sendSuccess('.
+                $userAction.
+                ', $'.$objectName.
+                ', Field::of()->'.$primaryKeyName.
+                ', $inputPost->getCheckedRowId()'.
+                ");";
+            };
+            $callbackUpdateStatusException = function($objectName, $userAction, $primaryKeyName, $exceptionObject) {
+                return "\t\t\t\t".
+                '$apiResponse->sendException('.
+                $userAction.
+                ', $'.$objectName.
+                ', Field::of()->'.$primaryKeyName.
+                ', $inputPost->getCheckedRowId()'.
+                ', '.$exceptionObject.
+                ");";
+            };
+        }
+        else
+        {
+            $callbackCreateSuccess = null;
+            $callbackCreateFailed = null;
+            
+            $callbackUpdateSuccess = null;
+            $callbackUpdateFailed = null;
+            
+            $callbackUpdateStatusSuccess = null;
+            $callbackUpdateStatusException = null;
+        }
+        
+        $stdClass = new stdClass;
+        
+        $stdClass->callbackCreateSuccess = $callbackCreateSuccess;
+        $stdClass->callbackCreateFailed = $callbackCreateFailed;
+        
+        $stdClass->callbackUpdateSuccess = $callbackUpdateSuccess;
+        $stdClass->callbackUpdateFailed = $callbackUpdateFailed;
+        
+        $stdClass->callbackUpdateStatusSuccess = $callbackUpdateStatusSuccess;
+        $stdClass->callbackUpdateStatusException = $callbackUpdateStatusException;
+        
+        return $stdClass;
     }
     
     /**
