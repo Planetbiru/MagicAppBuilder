@@ -29,15 +29,15 @@ class ScriptGenerator
      * @param MagicObject $entityTrash
      * @return string
      */
-    public function createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash)
+    public function createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException)
     {
         if($trashRequired)
         {
-            return $appBuilder->createDeleteSection($entityMain, true, $entityTrash);
+            return $appBuilder->createDeleteSection($entityMain, true, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
         }
         else
         {
-            return $appBuilder->createDeleteSection($entityMain);
+            return $appBuilder->createDeleteSection($entityMain, false, null, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
         }
     }
 
@@ -257,17 +257,41 @@ class ScriptGenerator
         $callbackCreateSuccess = null;
         $callbackCreateFailed = null;
         
-        error_log($appConfig->getApplication()->getType());
-        if($appConfig->getApplication()->getType() == 'api')
-        {
-            $callbackCreateSuccess = function($objectName, $primaryKeyName){
+        if($appConfig->getApplication()->getType() == 'api') {
+            $callbackCreateSuccess = function($objectName, $primaryKeyName) {
                 return "\t\t".'$apiResponse->sendSuccess(UserAction::CREATE, $'.$objectName.", $primaryKeyName);";
             };
-            $callbackCreateFailed = function($objectName, $primaryKeyName, $exceptionObject){
+            $callbackCreateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
                 return "\t\t".'$apiResponse->sendException(UserAction::CREATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
             };
+            
+            $callbackUpdateSuccess = function($objectName, $primaryKeyName) {
+                return "\t\t".'$apiResponse->sendSuccess(UserAction::UPDATE, $'.$objectName.", $primaryKeyName);";
+            };
+            $callbackUpdateFailed = function($objectName, $primaryKeyName, $exceptionObject) {
+                return "\t\t".'$apiResponse->sendException(UserAction::UPDATE, $'.$objectName.", $primaryKeyName, $exceptionObject);";
+            };
+            
+            $callbackUpdateStatusSuccess = function($objectName, $userAction, $primaryKeyName) {
+                return "\t\t".
+                '$apiResponse->sendSuccess('.
+                $userAction.
+                ', $'.$objectName.
+                ', '.$primaryKeyName.
+                ', $inputPost->getCheckedRowId()'.
+                ");";
+            };
+            $callbackUpdateStatusException = function($objectName, $userAction, $primaryKeyName, $exceptionObject) {
+                return "\t\t".
+                '$apiResponse->sendSuccess('.
+                $userAction.
+                ', $'.$objectName.
+                ', '.$primaryKeyName.
+                ', $inputPost->getCheckedRowId()'.
+                ', '.$exceptionObject.
+                ");";
+            };
         }
-        
         
         foreach($request->getFields() as $value) {
             $field = new AppField($value);
@@ -302,8 +326,7 @@ class ScriptGenerator
             if($this->hasReferenceData($field)){
                 $ent = $field->getReferenceData()->getEntity();
                 $referenceEntities[] = $ent;
-                if($create && $update)
-                {
+                if($create && $update) {
                     $referenceEntitiesUse[] = $ent;
                 }
             }
@@ -382,17 +405,17 @@ class ScriptGenerator
         $ajaxSupport = $request->getFeatures()->getAjaxSupport() == 'true' || $request->getFeatures()->getAjaxSupport() == 1;
 
         // prepare CRUD section begin
-        if($approvalRequired)
-        {
+        if($approvalRequired) {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
 
             // CRUD
             $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval, $callbackCreateSuccess, $callbackCreateFailed);
-            $updateSection = $appBuilder->createUpdateApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval);
-            $activationSection = $appBuilder->createActivationApprovalSection($entityMain);
-            $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain);     
-            $deleteSection = $appBuilder->createDeleteApprovalSection($entityMain);
+            $updateSection = $appBuilder->createUpdateApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval, $callbackUpdateSuccess, $callbackUpdateFailed);
+            
+            $activationSection = $appBuilder->createActivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+            $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);     
+            $deleteSection = $appBuilder->createDeleteApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
             $approvalSection = $appBuilder->createApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval, $trashRequired, $entityTrash);
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
 
@@ -401,9 +424,7 @@ class ScriptGenerator
             $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
             $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
             $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
-        }
-        else
-        {
+        } else {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
             
@@ -411,10 +432,10 @@ class ScriptGenerator
             
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
 
-            $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields);
-            $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey);
-            $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey);           
-            $deleteSection = $this->createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash);
+            $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields, $callbackUpdateSuccess, $callbackUpdateFailed);
+            $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+            $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);           
+            $deleteSection = $this->createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
 
             $approvalSection = "";
             $rejectionSection = "";
@@ -426,18 +447,9 @@ class ScriptGenerator
         
         // prepare CRUD section end
         
-        $crudSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))
-        ->add($createSection)
-        ->add($updateSection)
-        ->add($activationSection)
-        ->add($deactivationSection)
-        ->add($deleteSection)
-        ->add($approvalSection)
-        ->add($rejectionSection)
-        ;
+        $crudSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))->add($createSection)->add($updateSection)->add($activationSection)->add($deactivationSection)->add($deleteSection)->add($approvalSection)->add($rejectionSection);
 
-        if($appFeatures->isSortOrder())
-        {
+        if($appFeatures->isSortOrder()) {
             $primaryKey = $entityMain->getPrimaryKey();
             $entityName = $entityMain->getEntityName();
             $objectName = lcfirst($entityMainName);
@@ -445,20 +457,9 @@ class ScriptGenerator
             $crudSection->add($sortOrderSection);
         }
             
-        $guiSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))
-        ->add($guiInsert)
-        ->add($guiUpdate)
-        ->add($guiDetail)
-        ->add($guiList)
-        ;
+        $guiSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))->add($guiInsert)->add($guiUpdate)->add($guiDetail)->add($guiList);
 
-        $merged = (new AppSection(AppSection::SEPARATOR_NEW_LINE))
-        ->add($usesSection)
-        ->add($includeSection)
-        ->add($declarationSection)
-        ->add($crudSection)
-        ->add($guiSection)
-        ;
+        $merged = (new AppSection(AppSection::SEPARATOR_NEW_LINE))->add($usesSection)->add($includeSection)->add($declarationSection)->add($crudSection)->add($guiSection);
 
         $moduleFile = $request->getModuleFile();
 
@@ -468,21 +469,18 @@ class ScriptGenerator
 
 
         $target = trim($request->getTarget(), "/\\");
-        if(!empty($target))
-        {
+        if(!empty($target)) {
             $target = "/".$target;
         }
 
         $path = $baseDir."$target/".$moduleFile;
-        if(!file_exists(dirname($path)))
-        {
+        if(!file_exists(dirname($path))) {
             mkdir(dirname($path), 0755, true);
         }
 
         
         $finalScript = "<"."?php\r\n\r\n".$merged."\r\n\r\n";
-        if(substr_count($finalScript, 'AppFormBuilder') == 1)
-        {
+        if(substr_count($finalScript, 'AppFormBuilder') == 1) {
             $finalScript = str_replace("use MagicApp\AppFormBuilder;\r\n", '', $finalScript);
         }
         file_put_contents($path, $finalScript);
@@ -492,12 +490,10 @@ class ScriptGenerator
 
         $appBuilder->generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData);
 
-        if($approvalRequired)
-        {
+        if($approvalRequired) {
             $appBuilder->generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData);
         }
-        if($trashRequired)
-        {
+        if($trashRequired) {
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);

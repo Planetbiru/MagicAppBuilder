@@ -9,12 +9,17 @@ use MagicObject\Util\PicoStringUtil;
 class AppBuilder extends AppBuilderBase
 {
     /**
-     * Create INSERT section without approval and trash.
+     * Creates the INSERT section without approval and trash.
      *
-     * This method generates code for inserting a new entity based on the provided fields and main entity.
+     * This method generates code for inserting a new entity based on the provided fields and the main entity. 
+     * It handles setting various properties of the entity, including admin details, timestamps, and IP address. 
+     * In case of a successful operation, a success callback can be triggered; otherwise, it falls back to a default redirection. 
+     * In case of failure, a failure callback can be used or a default redirection is applied.
      *
      * @param MagicObject $mainEntity The main entity to be inserted.
      * @param AppField[] $appFields The fields to be included in the insert operation.
+     * @param callable|null $callbackSuccess Optional callback function to be executed on successful insert.
+     * @param callable|null $callbackFailed Optional callback function to be executed on failed insert.
      * @return string The generated code for the insert section.
      */
     public function createInsertSection($mainEntity, $appFields, $callbackSuccess = null, $callbackFailed = null)
@@ -85,15 +90,20 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section without approval and trash.
+     * Creates the UPDATE section without approval and trash functionality.
      *
-     * This method generates code for updating an existing entity based on the provided fields and main entity.
+     * This method generates code for updating an existing entity based on the provided fields 
+     * and the main entity. It checks if the primary key is being updated and sets various entity 
+     * properties including the admin user, timestamp, and IP address. 
+     * It handles both successful updates with optional callbacks and error handling.
      *
      * @param MagicObject $mainEntity The main entity to be updated.
      * @param AppField[] $appFields The fields to be included in the update operation.
+     * @param callable|null $callbackSuccess Optional callback function to be executed on successful update.
+     * @param callable|null $callbackFailed Optional callback function to be executed on failed update.
      * @return string The generated code for the update section.
      */
-    public function createUpdateSection($mainEntity, $appFields)
+    public function createUpdateSection($mainEntity, $appFields, $callbackSuccess, $callbackFailed)
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
@@ -146,18 +156,41 @@ class AppBuilder extends AppBuilderBase
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
 
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
+            if(isset($callbackSuccess) && is_callable($callbackSuccess))
+            {
+                
+                $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+            }
+            else
+            {
+                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+            }  
         }
         else
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';    
+            if(isset($callbackSuccess) && is_callable($callbackSuccess))
+            {
+                
+                $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+            }
+            else
+            {
+                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+            }
         }
         
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        if(isset($callbackFailed) && is_callable($callbackFailed))
+        {
+            $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::CURLY_BRACKET_CLOSE;
         
@@ -172,7 +205,7 @@ class AppBuilder extends AppBuilderBase
      * @param MagicObject|null $trashEntity The trash entity if using soft delete.
      * @return string The generated code for the delete section.
      */
-    public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null)
+    public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null, $callbackSuccess, $callbackUpdateStatusException)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
@@ -216,6 +249,17 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception \$e)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
+        
+        if(isset($callbackSuccess) && is_callable($callbackSuccess))
+        {
+            
+            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+        }
+        
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
@@ -236,7 +280,7 @@ class AppBuilder extends AppBuilderBase
      * @param bool $activationValue The value indicating activation status.
      * @return string The generated code for the activation section.
      */
-    public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue)
+    public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
@@ -293,6 +337,16 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
+        
+        if(isset($callbackException) && is_callable($callbackException))
+        {
+            $lines[] = call_user_func($callbackException, $objectName, $userAction, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        }
+        
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
@@ -309,9 +363,9 @@ class AppBuilder extends AppBuilderBase
      * @param string $activationKey The key used for activation.
      * @return string The generated code for the activation section.
      */
-    public function createActivationSection($mainEntity, $activationKey)
+    public function createActivationSection($mainEntity, $activationKey, $callbackFinish, $callbackException)
     {
-        return $this->createActivationSectionBase($mainEntity, $activationKey, 'UserAction::ACTIVATE', true);
+        return $this->createActivationSectionBase($mainEntity, $activationKey, 'UserAction::ACTIVATE', true, $callbackFinish, $callbackException);
     }
     
     /**
@@ -321,8 +375,8 @@ class AppBuilder extends AppBuilderBase
      * @param string $activationKey The key used for deactivation.
      * @return string The generated code for the deactivation section.
      */
-    public function createDeactivationSection($mainEntity, $activationKey)
+    public function createDeactivationSection($mainEntity, $activationKey, $callbackFinish, $callbackException)
     {
-        return $this->createActivationSectionBase($mainEntity, $activationKey, 'UserAction::DEACTIVATE', false);
+        return $this->createActivationSectionBase($mainEntity, $activationKey, 'UserAction::DEACTIVATE', false, $callbackFinish, $callbackException);
     }
 }

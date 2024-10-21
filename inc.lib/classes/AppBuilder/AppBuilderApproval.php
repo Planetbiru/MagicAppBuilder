@@ -9,15 +9,23 @@ use MagicObject\Util\PicoStringUtil;
 class AppBuilderApproval extends AppBuilderBase
 {
     /**
-     * Create INSERT section with approval and trash.
+     * Creates the INSERT section with approval and trash functionality.
+     *
+     * This method generates code for inserting a new entity, including setting fields and handling approval. 
+     * It sets the entity status to draft and specifies the approval state. 
+     * If approval is required, it manages the associated approval entity details.
+     * In case of a successful operation, a success callback can be triggered; otherwise, a default redirection is applied.
+     * In case of failure, a failure callback can be used or a default redirection is applied.
      *
      * @param MagicObject $mainEntity The main entity to be inserted.
      * @param AppField[] $appFields The fields to set for the entity.
-     * @param bool $approvalRequired Indicates if approval is required.
-     * @param MagicObject $approvalEntity The entity related to approval.
+     * @param bool $approvalRequired Indicates if approval is required for the insert operation.
+     * @param MagicObject $approvalEntity The entity related to the approval process.
+     * @param callable|null $callbackSuccess Optional callback function to be executed on successful insert.
+     * @param callable|null $callbackFailed Optional callback function to be executed on failed insert.
      * @return string The generated code for the insert approval section.
      */
-    public function createInsertApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity)
+    public function createInsertApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity, $callbackSuccess = null, $callbackFailed = null)
     {
         $entityName = $mainEntity->getEntityName();
         $objectName = lcfirst($entityName);
@@ -72,12 +80,27 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+        if(isset($callbackSuccess) && is_callable($callbackSuccess))
+        {
+            
+            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);'; //NOSONAR
+        }
 
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        if(isset($callbackFailed) && is_callable($callbackFailed))
+        {
+            $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1."\$currentModule->redirectToItself();";
+        }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::CURLY_BRACKET_CLOSE;
 
@@ -85,15 +108,23 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create UPDATE section with approval and trash.
+     * Creates the UPDATE section with approval and trash functionality.
+     *
+     * This method generates code for updating an existing entity, including setting fields and handling approval. 
+     * It manages the status of the entity being updated and records the necessary admin details, timestamps, and IP address. 
+     * If approval is required, it includes logic for the associated approval entity.
+     * In case of a successful operation, a success callback can be triggered; otherwise, a default redirection is applied.
+     * In case of failure, a failure callback can be used or a default redirection is applied.
      *
      * @param MagicObject $mainEntity The main entity to be updated.
      * @param AppField[] $appFields The fields to set for the entity.
-     * @param bool $approvalRequired Indicates if approval is required.
-     * @param MagicObject $approvalEntity The entity related to approval.
+     * @param bool $approvalRequired Indicates if approval is required for the update operation.
+     * @param MagicObject $approvalEntity The entity related to the approval process.
+     * @param callable $callbackSuccess Callback function to be executed on successful update.
+     * @param callable $callbackFailed Callback function to be executed on failed update.
      * @return string The generated code for the update approval section.
      */
-    public function createUpdateApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity)    
+    public function createUpdateApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity, $callbackSuccess, $callbackFailed)    
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
@@ -149,8 +180,7 @@ class AppBuilderApproval extends AppBuilderBase
         if(isset($callbackSuccess) && is_callable($callbackSuccess))
         {
             
-            $clbkResult = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
-            $lines[] = $clbkResult;
+            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
         }
         else
         {
@@ -208,30 +238,43 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create delete approval section.
+     * Creates a delete approval section for the specified entity.
+     *
+     * This method generates code for handling the approval of delete actions on a specified entity.
+     * It utilizes the `createWaitingForSectionBase` method to manage the waiting state and 
+     * includes optional callbacks for further processing upon completion or exception.
      *
      * @param MagicObject $mainEntity The main entity for which the delete approval section is created.
+     * @param callable|null $callbackFinish Optional callback function to execute upon successful processing.
+     * @param callable|null $callbackException Optional callback function to execute in case of an exception.
      * @return string The generated delete approval section code.
      */
-    public function createDeleteApprovalSection($mainEntity)
+    public function createDeleteApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
         $userAction = 'UserAction::DELETE';
         $waitingForFalue = WaitingFor::DELETE;
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue);
+        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
     
     /**
-     * Create a waiting for section based on the specified parameters.
+     * Creates a waiting for section based on the specified parameters.
      *
-     * @param string $entityName Name of the entity.
+     * This method generates code to handle the waiting state of an entity based on user actions.
+     * It checks if there are checked rows, constructs a query to update the waiting status of 
+     * the specified entities, and includes error handling. Optional callbacks are provided 
+     * for additional processing upon completion or exceptions.
+     *
+     * @param string $entityName Name of the entity to be processed.
      * @param string $pkName Primary key name of the entity.
      * @param string $userAction User action type (e.g., DELETE, UPDATE).
-     * @param mixed $waitingForValue Value indicating the waiting state.
+     * @param mixed $waitingForValue Value indicating the waiting state (e.g., WaitingFor::ACTIVATE).
+     * @param callable|null $callbackFinish Optional callback function to execute upon completion.
+     * @param callable|null $callbackException Optional callback function to execute on exception.
      * @return string The generated code for the waiting for section.
      */
-    public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue)
+    public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue, $callbackFinish, $callbackException)
     {
         $objectName = lcfirst($entityName);
         $lines = array();
@@ -283,12 +326,29 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here when record is not found";
+        
+        if(isset($callbackException) && is_callable($callbackException))
+        {
+            $lines[] = call_user_func($callbackException, $objectName, '$rowId', '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::TAB1."error_log(\$e);";
+        }
+        
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1."}";
 
 
-        $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        if(isset($callbackFinish) && is_callable($callbackFinish))
+        {
+            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, '.$this->getStringOf($mainEntity->getPrimaryKey()).', '$e');
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        }
 
         $lines[] = parent::CURLY_BRACKET_CLOSE;
         
@@ -296,33 +356,45 @@ class AppBuilderApproval extends AppBuilderBase
     }
     
     /**
-     * Create an activation approval section.
+     * Creates an activation approval section for the specified entity.
+     *
+     * This method generates code for handling the approval of activation actions on a specified entity.
+     * It utilizes the `createWaitingForSectionBase` method to manage the waiting state and 
+     * includes optional callbacks for further processing upon completion or exception.
      *
      * @param MagicObject $mainEntity The main entity for activation.
+     * @param callable|null $callbackFinish Optional callback function to execute upon successful processing.
+     * @param callable|null $callbackException Optional callback function to execute in case of an exception.
      * @return string The generated code for the activation approval section.
      */
-    public function createActivationApprovalSection($mainEntity)
+    public function createActivationApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
         $waitingForFalue = WaitingFor::ACTIVATE;
         $userAction = 'UserAction::ACTIVATE';
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue);
+        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
     
     /**
      * Create a deactivation approval section.
      *
+     * This method generates the code required for a deactivation approval section
+     * based on the provided main entity and associated callback functions for
+     * handling the completion and exceptions.
+     *
      * @param MagicObject $mainEntity The main entity for deactivation.
+     * @param callable $callbackFinish The callback to execute upon successful deactivation.
+     * @param callable $callbackException The callback to execute if an error occurs.
      * @return string The generated code for the deactivation approval section.
      */
-    public function createDeactivationApprovalSection($mainEntity)
+    public function createDeactivationApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
         $waitingForFalue = WaitingFor::DEACTIVATE;
         $userAction = 'UserAction::DEACTIVATE';
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue);
+        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
 
     /**
