@@ -274,7 +274,7 @@ class AppBuilderApproval extends AppBuilderBase
      * @param callable|null $callbackException Optional callback function to execute on exception.
      * @return string The generated code for the waiting for section.
      */
-    public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue, $callbackFinish, $callbackException)
+    public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue, $callbackFinish = null, $callbackException = null)
     {
         $objectName = lcfirst($entityName);
         $lines = array();
@@ -340,7 +340,6 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1."}";
-
 
         if(isset($callbackFinish) && is_callable($callbackFinish))
         {

@@ -198,14 +198,20 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create DELETE section without approval and trash.
+     * Create a DELETE section without approval and trash.
+     *
+     * This method generates code for deleting a specified entity, either 
+     * using a soft delete (moving to trash) or a hard delete. It supports 
+     * handling exceptions and executing callbacks upon completion.
      *
      * @param MagicObject $mainEntity The main entity to be deleted.
      * @param bool $withTrash Indicates if the deletion is soft (to trash).
-     * @param MagicObject|null $trashEntity The trash entity if using soft delete.
+     * @param MagicObject|null $trashEntity The trash entity to use for soft deletion, if applicable.
+     * @param callable|null $callbackFinish The callback to execute upon successful deletion.
+     * @param callable|null $callbackException The callback to execute if an error occurs during deletion.
      * @return string The generated code for the delete section.
      */
-    public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null, $callbackSuccess, $callbackUpdateStatusException)
+    public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null, $callbackFinish = null, $callbackException = null)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
@@ -250,10 +256,10 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here to handle exception";
         
-        if(isset($callbackSuccess) && is_callable($callbackSuccess))
+        if(isset($callbackException) && is_callable($callbackException))
         {
             
-            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+            $lines[] = call_user_func($callbackException, $objectName, 'UserAction::DELETE', $pkName, '$e');
         }
         else
         {
@@ -264,7 +270,14 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
-        $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        if(isset($callbackFinish) && is_callable($callbackFinish))
+        {
+            $lines[] = call_user_func($callbackFinish, $objectName, 'UserAction::DELETE', $pkName);
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        }
         
         $lines[] = parent::CURLY_BRACKET_CLOSE;
         
@@ -272,15 +285,21 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create ACTIVATION section without approval and trash.
+     * Create an ACTIVATION section without approval and trash.
+     *
+     * This method generates code for activating a specified entity based on 
+     * the provided activation key and value. It supports exception handling 
+     * and allows for executing callbacks upon completion.
      *
      * @param MagicObject $mainEntity The main entity to be activated.
      * @param string $activationKey The key used for activation.
-     * @param string $userAction The user action for activation.
-     * @param bool $activationValue The value indicating activation status.
+     * @param string $userAction The user action associated with activation.
+     * @param bool $activationValue The value indicating the desired activation status.
+     * @param callable|null $callbackFinish The callback to execute upon successful activation.
+     * @param callable|null $callbackException The callback to execute if an error occurs during activation.
      * @return string The generated code for the activation section.
      */
-    public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue, $callbackFinish, $callbackException)
+    public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue, $callbackFinish = null, $callbackException = null)
     {
         $entityName = $mainEntity->getEntityName();
         $pkName =  $mainEntity->getPrimaryKey();
@@ -350,17 +369,31 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
-        $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        
+        if(isset($callbackFinish) && is_callable($callbackFinish))
+        {
+            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $pkName);
+        }
+        else
+        {
+            $lines[] = parent::TAB1.parent::VAR.'currentModule->redirectToItself();';
+        }
         $lines[] = parent::CURLY_BRACKET_CLOSE;
         
         return implode(parent::NEW_LINE, $lines);
     }
     
     /**
-     * Create ACTIVATION section without approval and trash.
+     * Create an ACTIVATION section without approval and trash.
+     *
+     * This method generates an activation section for the specified entity 
+     * using the provided activation key. It automatically sets the user action 
+     * to 'ACTIVATE' and indicates that the activation is enabled.
      *
      * @param MagicObject $mainEntity The main entity to be activated.
      * @param string $activationKey The key used for activation.
+     * @param callable|null $callbackFinish The callback to execute upon successful activation.
+     * @param callable|null $callbackException The callback to execute if an error occurs during activation.
      * @return string The generated code for the activation section.
      */
     public function createActivationSection($mainEntity, $activationKey, $callbackFinish, $callbackException)
@@ -369,10 +402,16 @@ class AppBuilder extends AppBuilderBase
     }
     
     /**
-     * Create DEACTIVATION section without approval and trash.
+     * Create a DEACTIVATION section without approval and trash.
+     *
+     * This method generates a deactivation section for the specified entity 
+     * using the provided activation key. It automatically sets the user action 
+     * to 'DEACTIVATE' and indicates that the deactivation is disabled.
      *
      * @param MagicObject $mainEntity The main entity to be deactivated.
      * @param string $activationKey The key used for deactivation.
+     * @param callable|null $callbackFinish The callback to execute upon successful deactivation.
+     * @param callable|null $callbackException The callback to execute if an error occurs during deactivation.
      * @return string The generated code for the deactivation section.
      */
     public function createDeactivationSection($mainEntity, $activationKey, $callbackFinish, $callbackException)
