@@ -329,7 +329,8 @@ class AppBuilderApproval extends AppBuilderBase
         
         if(isset($callbackException) && is_callable($callbackException))
         {
-            $lines[] = call_user_func($callbackException, $objectName, '$rowId', '$e');
+            // $objectName, $userAction, $primaryKeyName, $exceptionObject
+            $lines[] = call_user_func($callbackException, $objectName, $userAction, $pkName, '$e');
         }
         else
         {
@@ -343,7 +344,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         if(isset($callbackFinish) && is_callable($callbackFinish))
         {
-            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, '.$this->getStringOf($mainEntity->getPrimaryKey()).', '$e');
+            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $pkName);
         }
         else
         {

@@ -273,20 +273,20 @@ class ScriptGenerator
             };
             
             $callbackUpdateStatusSuccess = function($objectName, $userAction, $primaryKeyName) {
-                return "\t\t".
+                return "\t".
                 '$apiResponse->sendSuccess('.
                 $userAction.
                 ', $'.$objectName.
-                ', '.$primaryKeyName.
+                ', Field::of()->'.$primaryKeyName.
                 ', $inputPost->getCheckedRowId()'.
                 ");";
             };
             $callbackUpdateStatusException = function($objectName, $userAction, $primaryKeyName, $exceptionObject) {
-                return "\t\t".
-                '$apiResponse->sendSuccess('.
+                return "\t\t\t\t".
+                '$apiResponse->sendException('.
                 $userAction.
                 ', $'.$objectName.
-                ', '.$primaryKeyName.
+                ', Field::of()->'.$primaryKeyName.
                 ', $inputPost->getCheckedRowId()'.
                 ', '.$exceptionObject.
                 ");";
