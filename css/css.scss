@@ -678,6 +678,7 @@ h3.entity-table-name {
 
             &::after {
                 content: '▶';
+				color: #555555;
             }
         }
 
@@ -688,6 +689,7 @@ h3.entity-table-name {
 
             .sortable-toggle-icon::after {
                 content: '▼';
+				color: #555555;
             }
         }
 
@@ -723,4 +725,3 @@ h3.entity-table-name {
 		}
     }
 }
-

@@ -579,12 +579,14 @@ h3.entity-table-name {
 }
 .sortable-menu .sortable-menu-item .sortable-toggle-icon::after {
   content: "▶";
+  color: #555555;
 }
 .sortable-menu .sortable-menu-item.expanded .sortable-submenu {
   display: block;
 }
 .sortable-menu .sortable-menu-item.expanded .sortable-toggle-icon::after {
   content: "▼";
+  color: #555555;
 }
 .sortable-menu .sortable-menu-item .sortable-submenu {
   list-style-type: none;
