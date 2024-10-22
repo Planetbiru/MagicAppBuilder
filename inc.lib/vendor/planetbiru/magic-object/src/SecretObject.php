@@ -615,8 +615,6 @@ class SecretObject extends stdClass //NOSONAR
     public function loadIniString($rawData, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_string($rawData);
-        if(!empty($data))
         $data = PicoIniUtil::parseIniString($rawData);
         if(isset($data) && !empty($data))
         {
@@ -643,8 +641,6 @@ class SecretObject extends stdClass //NOSONAR
     public function loadIniFile($path, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_file($path);
-        if(!empty($data))
         $data = PicoIniUtil::parseIniFile($path);
         if(isset($data) && !empty($data))
         {
@@ -673,7 +669,6 @@ class SecretObject extends stdClass //NOSONAR
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parse($rawData);
-        if(!empty($data))
         if(isset($data) && !empty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
@@ -709,7 +704,6 @@ class SecretObject extends stdClass //NOSONAR
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parseFile($path);
-        if(!empty($data))
         if(isset($data) && !empty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
