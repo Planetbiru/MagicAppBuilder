@@ -13,6 +13,10 @@ use Throwable;
  * records, indicating that the specified criteria did not match any 
  * existing entries. It is particularly useful in scenarios where 
  * data integrity and confirmation of changes are critical.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NoColumnUpdatedException extends Exception
 {

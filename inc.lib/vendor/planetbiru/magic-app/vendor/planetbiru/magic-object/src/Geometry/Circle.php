@@ -9,6 +9,10 @@ namespace MagicObject\Geometry;
  * This class provides methods to calculate the circle's circumference 
  * and area, based on its radius. The circle is defined by its center 
  * coordinates (x, y) and its radius (r).
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Circle
 {

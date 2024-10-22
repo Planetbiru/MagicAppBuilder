@@ -8,14 +8,22 @@ use stdClass;
 /**
  * Class PicoGenericObject
  *
- * A generic object that allows dynamic property management.
+ * A generic object that allows dynamic property management. 
+ * This class extends stdClass and provides methods to load, 
+ * set, get, unset, and check properties dynamically.
+ * 
+ * Properties can be accessed using camelCase naming conventions.
  *
+ * @package MagicObject\Util
+ * @author Kamshory
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoGenericObject extends stdClass
 {
     /**
      * Constructor
+     *
+     * Initializes the object with optional initial data.
      *
      * @param MagicObject|self|stdClass|array|null $data Initial data to load into the object.
      */
@@ -30,8 +38,18 @@ class PicoGenericObject extends stdClass
     /**
      * Load data into the object.
      *
+     * Accepts either an associative array or an object, 
+     * converting its keys to camelCase format before loading.
+     *
+     * Example:
+     * ```php
+     * $obj = new PicoGenericObject();
+     * $obj->loadData(['first_name' => 'John', 'last_name' => 'Doe']);
+     * echo $obj->get('firstName'); // Outputs: John
+     * ```
+     *
      * @param stdClass|array $data Data to be loaded.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -48,9 +66,18 @@ class PicoGenericObject extends stdClass
     /**
      * Set a property value.
      *
+     * Converts the property name to camelCase and assigns the value.
+     *
+     * Example:
+     * ```php
+     * $obj = new PicoGenericObject();
+     * $obj->set('first_name', 'John');
+     * echo $obj->get('firstName'); // Outputs: John
+     * ```
+     *
      * @param string $propertyName Name of the property.
      * @param mixed $propertyValue Value to set.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {
@@ -61,6 +88,13 @@ class PicoGenericObject extends stdClass
 
     /**
      * Get a property value.
+     *
+     * Retrieves the value of a property, returning null if not set.
+     *
+     * Example:
+     * ```php
+     * $value = $obj->get('firstName'); // Retrieves the value of 'firstName'
+     * ```
      *
      * @param string $propertyName Name of the property.
      * @return mixed|null The value of the property or null if not set.
@@ -74,6 +108,13 @@ class PicoGenericObject extends stdClass
     /**
      * Magic method to set property values dynamically.
      *
+     * This method allows setting properties without directly calling `set()`.
+     *
+     * Example:
+     * ```php
+     * $obj->firstName = 'John'; // Calls __set() internally
+     * ```
+     *
      * @param string $name Name of the property.
      * @param mixed $value Value to set.
      * @return void
@@ -86,8 +127,15 @@ class PicoGenericObject extends stdClass
     /**
      * Magic method to get property values dynamically.
      *
+     * This method allows getting properties without directly calling `get()`.
+     *
+     * Example:
+     * ```php
+     * $value = $obj->firstName; // Calls __get() internally
+     * ```
+     *
      * @param string $name Name of the property to get.
-     * @return mixed The value stored in the property or null if not set.
+     * @return mixed|null The value stored in the property or null if not set.
      */
     public function __get($name)
     {
@@ -100,6 +148,13 @@ class PicoGenericObject extends stdClass
     /**
      * Check if a property is set.
      *
+     * Example:
+     * ```php
+     * if ($obj->issetFirstName()) {
+     *     // Do something
+     * }
+     * ```
+     *
      * @param string $name Name of the property.
      * @return bool True if the property is set, false otherwise.
      */
@@ -111,8 +166,13 @@ class PicoGenericObject extends stdClass
     /**
      * Unset a property value.
      *
+     * Example:
+     * ```php
+     * $obj->unsetFirstName(); // Removes the property 'firstName'
+     * ```
+     *
      * @param string $name Name of the property.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function __unset($name)
     {

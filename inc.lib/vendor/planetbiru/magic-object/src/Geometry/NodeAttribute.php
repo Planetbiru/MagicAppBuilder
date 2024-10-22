@@ -8,6 +8,10 @@ namespace MagicObject\Geometry;
  * This class stores a collection of attribute values associated with a node.
  * It provides methods for initialization and converting the attributes to a string representation,
  * suitable for use in contexts such as HTML attributes.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NodeAttribute
 {

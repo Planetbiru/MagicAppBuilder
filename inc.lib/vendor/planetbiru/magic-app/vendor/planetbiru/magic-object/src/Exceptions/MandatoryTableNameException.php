@@ -12,6 +12,10 @@ use Throwable;
  * an operation requires a table name but none is provided, leading to 
  * failures in query execution or data manipulation. It is particularly 
  * useful in database abstraction layers or ORM implementations.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class MandatoryTableNameException extends Exception
 {

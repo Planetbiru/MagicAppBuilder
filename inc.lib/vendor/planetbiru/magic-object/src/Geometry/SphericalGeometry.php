@@ -16,8 +16,10 @@ namespace MagicObject\Geometry;
  * Static class SphericalGeometry
  *
  * Provides utility functions for computing geodesic angles, distances, areas, and other spherical geometry calculations.
- *
+ * 
+ * @author Kamshory
  * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class SphericalGeometry
 {

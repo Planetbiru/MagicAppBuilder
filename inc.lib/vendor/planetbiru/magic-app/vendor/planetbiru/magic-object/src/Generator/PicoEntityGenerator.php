@@ -10,6 +10,8 @@ use MagicObject\Util\PicoStringUtil;
  * This class is optimized for the MariaDB database.
  * Users must provide appropriate parameters so that the entity class can be directly used in the application.
  * 
+ * @author Kamshory
+ * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityGenerator
@@ -286,6 +288,7 @@ use MagicObject\MagicObject;
  * You can join this entity to other entities using the @JoinColumn annotation.
  * 
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @package ' . $this->baseNamespace . '
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=' . $prettify . ')
  * @Table(name="' . $picoTableName . '")

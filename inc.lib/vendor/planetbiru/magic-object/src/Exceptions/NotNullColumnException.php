@@ -14,6 +14,10 @@ use Throwable;
  * maintained. It is essential for catching issues that may arise 
  * from improper data handling or validation before attempting to 
  * store records in the database.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NotNullColumnException extends Exception
 {

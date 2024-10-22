@@ -11,8 +11,10 @@ use stdClass;
 
 /**
  * Base class for handling requests.
- *
- * @link https://github.com/Planetbiru/MagicObject
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
+ * @link https://github.com/Planetbiru/Request
  */
 class PicoRequestBase extends stdClass //NOSONAR
 {

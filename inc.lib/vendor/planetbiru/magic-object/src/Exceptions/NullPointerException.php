@@ -14,6 +14,10 @@ use Throwable;
  * an object or variable that has not been initialized. 
  * This exception helps in identifying issues related to null 
  * values, ensuring better debugging and error handling.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NullPointerException extends Exception
 {

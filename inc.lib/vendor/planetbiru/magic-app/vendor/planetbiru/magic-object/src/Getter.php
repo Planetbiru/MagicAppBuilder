@@ -23,7 +23,9 @@ use stdClass;
  * - Convert object properties into a structured representation suitable for JSON encoding.
  * - Support for property naming strategies (snake case and pretty formatting) for JSON output.
  *
- * @link https://github.com/Planetbiru/MagicObject Documentation for further details and usage.
+ * @author Kamshory
+ * @package MagicObject
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Getter extends stdClass
 {

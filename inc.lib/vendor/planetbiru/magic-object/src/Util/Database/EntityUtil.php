@@ -5,6 +5,17 @@ namespace MagicObject\Util\Database;
 use MagicObject\MagicObject;
 use stdClass;
 
+/**
+ * Class EntityUtil
+ *
+ * A utility class for managing database entities, providing methods to retrieve column names
+ * and map entity data to new keys. This class is designed to work with MagicObject instances
+ * and can handle various data formats, including arrays and stdClass objects.
+ *
+ * @author Kamshory
+ * @package MagicObject\Util\Database
+ * @link https://github.com/Planetbiru/MagicObject
+ */
 class EntityUtil
 {
     /**

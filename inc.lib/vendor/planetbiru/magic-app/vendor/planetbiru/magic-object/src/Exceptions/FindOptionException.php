@@ -11,6 +11,10 @@ use Throwable;
  * of finding or retrieving options. This exception can be thrown when
  * an expected option is not found, whether in configuration settings,
  * database queries, or other operational contexts.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class FindOptionException extends Exception
 {

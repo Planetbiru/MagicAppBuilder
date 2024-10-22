@@ -1696,6 +1696,7 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="album")
  * @Cache(enable="true")
+ * @package MusicProductionManager\Data\Entity
  */
 class Album extends MagicObject
 {
@@ -1876,11 +1877,11 @@ class Album extends MagicObject
 
 **@Entity**
 
-`@Entity` is parameter to validate that the object is an entity.
+`@Entity` Indicates that the class represents an entity.
 
 **@JSON**
 
-`@JSON` is parameter to inform how the object will be serialized.
+`@JSON` Configures how the object will be serialized.
 
 Attributes:
 1. `property-naming-strategy`
@@ -1904,7 +1905,7 @@ Default: `false`
 
 **@Table**
 
-`@Table` is parameter contains table information.
+`@Table` Provides caching configuration.
 
 Attributes:
 `name`
@@ -1913,7 +1914,7 @@ Attributes:
 
 **@Cache**
 
-`@Cache` is parameter contains cache information.
+`@Cache` Specifies the namespace of the class.
 
 Attributes:
 `enable`
@@ -1926,6 +1927,14 @@ Allowed value:
 - `false` Cache is disabled
 
 Default: `false`
+
+**@package**
+
+`@package` is parameter for namespace.
+
+PHP does not provide a native method to retrieve a class's namespace. Earlier versions of MagicObject attempted to obtain this information by reading the PHP script, a method that proved both unsafe and inefficient.
+
+With the addition of package annotations to each entity, MagicObject now offers a safer and more efficient way to join entities. However, if a package annotation is not available on an entity, version 2.1 will still revert to the old method.
 
 ### Property Parameters
 

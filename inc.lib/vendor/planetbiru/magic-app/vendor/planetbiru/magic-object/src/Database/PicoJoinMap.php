@@ -6,7 +6,9 @@ namespace MagicObject\Database;
  * Class representing a join mapping in a database.
  *
  * Contains information about how an entity is joined with another table.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoJoinMap

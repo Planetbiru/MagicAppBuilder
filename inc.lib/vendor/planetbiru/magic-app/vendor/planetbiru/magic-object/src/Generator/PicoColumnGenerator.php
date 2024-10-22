@@ -10,7 +10,9 @@ use MagicObject\Util\Database\PicoDatabaseUtilMySql;
  * Class for generating column information from a database.
  *
  * This class provides methods to retrieve a list of columns for a specified database table.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoColumnGenerator

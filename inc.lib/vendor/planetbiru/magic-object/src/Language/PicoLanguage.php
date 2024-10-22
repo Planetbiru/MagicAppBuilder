@@ -10,7 +10,9 @@ use stdClass;
  *
  * This class represents a language object, allowing for dynamic property
  * management and loading data from arrays or objects.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Language
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoLanguage

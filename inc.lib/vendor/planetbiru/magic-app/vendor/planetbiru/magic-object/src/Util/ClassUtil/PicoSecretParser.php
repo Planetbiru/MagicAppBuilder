@@ -8,7 +8,13 @@ use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Object parser for SecretObject
+ * Class PicoSecretParser
+ *
+ * This class provides methods to parse various data formats (YAML, JSON, etc.) into instances of SecretObject.
+ * It supports recursive parsing for nested objects and arrays, allowing for flexible handling of secret-related data structures.
+ *
+ * @author Kamshory
+ * @package MagicObject\Util\ClassUtil
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSecretParser
@@ -19,9 +25,13 @@ class PicoSecretParser
     }
     
     /**
-     * Parse SecretObject
-     * @param SecretObject $data
-     * @return SecretObject
+     * Parse a SecretObject from a given data structure.
+     *
+     * This method converts a SecretObject instance into a new SecretObject 
+     * by mapping scalar values and recursively parsing nested objects.
+     *
+     * @param SecretObject $data The SecretObject instance to parse.
+     * @return SecretObject The parsed SecretObject.
      */
     private static function parseSecretObject($data)
     {
@@ -42,10 +52,13 @@ class PicoSecretParser
     }
 
     /**
-     * Parse an object or array
+     * Parse an object or associative array into a SecretObject.
      *
-     * @param stdClass|array $data
-     * @return SecretObject
+     * This method iterates over the given data structure, converting keys to camel case 
+     * and mapping scalar values directly while handling nested structures recursively.
+     *
+     * @param stdClass|array $data The data to parse, which can be an object or an associative array.
+     * @return SecretObject The resulting SecretObject after parsing.
      */
     private static function parseObject($data)
     {
@@ -65,20 +78,25 @@ class PicoSecretParser
     }
 
     /**
-     * Check if input is an associative array
+     * Check if the input is an associative array.
      *
-     * @param array $array
-     * @return bool
+     * This method determines whether the provided array has string keys, indicating it is associative.
+     *
+     * @param array $array The array to check.
+     * @return bool True if the array has string keys, false otherwise.
      */
     private static function hasStringKeys($array) {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
 
     /**
-     * Recursively parse data into a SecretObject
+     * Recursively parse data into a SecretObject.
      *
-     * @param mixed $data
-     * @return mixed
+     * This method handles various data types, converting them into a SecretObject 
+     * or returning them as-is when appropriate.
+     *
+     * @param mixed $data The data to parse, which may be a SecretObject, array, object, or scalar.
+     * @return mixed The parsed SecretObject or original data.
      */
     public static function parseRecursiveObject($data)
     {
@@ -106,12 +124,15 @@ class PicoSecretParser
     }
 
     /**
-     * Update a SecretObject with a key-value pair
+     * Update a SecretObject with a key-value pair.
      *
-     * @param SecretObject $obj Secret object
-     * @param string $key Property name
-     * @param mixed $val Property value
-     * @return SecretObject
+     * This method determines if the value is an object or array and updates the SecretObject 
+     * accordingly, using recursion as necessary.
+     *
+     * @param SecretObject $obj The SecretObject to update.
+     * @param string $key The property name to set.
+     * @param mixed $val The property value to assign.
+     * @return SecretObject The updated SecretObject.
      */
     private static function updateObject($obj, $key, $val)
     {
@@ -138,10 +159,10 @@ class PicoSecretParser
     }
 
     /**
-     * Check if a value is an object
+     * Check if the given value is an object.
      *
-     * @param mixed $value
-     * @return bool
+     * @param mixed $value The value to check.
+     * @return bool True if the value is an object, false otherwise.
      */
     private static function isObject($value)
     {
@@ -152,11 +173,14 @@ class PicoSecretParser
         return false;
     }
 
-    /**
-     * Recursively parse an array
+     /**
+     * Recursively parse an array into a SecretObject.
      *
-     * @param array $data
-     * @return array
+     * This method processes each element of the array, converting nested objects or arrays 
+     * into SecretObject instances as needed.
+     *
+     * @param array $data The array to parse.
+     * @return array An array of parsed SecretObject instances or original values.
      */
     public static function parseRecursiveArray($data)
     {
@@ -190,10 +214,13 @@ class PicoSecretParser
     }
 
     /**
-     * Parse from YAML recursively
+     * Parse a YAML string recursively into a SecretObject.
      *
-     * @param string $yamlString
-     * @return SecretObject|null
+     * This method converts a YAML string into a structured SecretObject by first 
+     * parsing the string into an array or object, then processing it.
+     *
+     * @param string $yamlString The YAML string to parse.
+     * @return SecretObject|null The resulting SecretObject or null if parsing fails.
      */
     public static function parseYamlRecursive($yamlString)
     {
@@ -208,10 +235,13 @@ class PicoSecretParser
     }
 
     /**
-     * Parse from JSON recursively
+     * Parse JSON data recursively into a SecretObject.
      *
-     * @param string $jsonString
-     * @return SecretObject|null
+     * This method takes JSON-encoded strings or data structures and converts them into 
+     * SecretObject instances, handling various data types.
+     *
+     * @param string $jsonString The JSON string to parse.
+     * @return SecretObject|null The resulting SecretObject or null if the data is not valid.
      */
     public static function parseJsonRecursive($jsonString)
     {

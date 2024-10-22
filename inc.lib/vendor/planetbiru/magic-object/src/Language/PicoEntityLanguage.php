@@ -15,6 +15,8 @@ use stdClass;
  * This class manages entity language configurations, including loading 
  * labels and handling different language options.
  * 
+ * @author Kamshory
+ * @package MagicObject\Language
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityLanguage

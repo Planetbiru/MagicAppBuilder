@@ -8,8 +8,10 @@ namespace MagicObject\Geometry;
  * Represents a latitude bounding box defined by southwestern and northeastern latitude values.
  * This class provides functionality to manage and calculate properties of latitude bounds,
  * including checking for containment, intersections, and equality with other latitude bounds.
- *
+ * 
+ * @author Kamshory
  * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class LatBounds
 {

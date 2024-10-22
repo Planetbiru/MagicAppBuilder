@@ -7,7 +7,9 @@ use MagicObject\Util\PicoStringUtil;
 
 /**
  * Class for handling pagination functionality.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Pagination
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPagination

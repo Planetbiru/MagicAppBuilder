@@ -9,7 +9,9 @@ namespace MagicObject\Database;
  * This class allows you to define various query conditions 
  * (e.g., equality, inequality, inclusion, pattern matching, etc.)
  * to be used when constructing database queries.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPredicate //NOSONAR

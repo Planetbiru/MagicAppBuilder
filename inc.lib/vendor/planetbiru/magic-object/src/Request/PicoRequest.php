@@ -7,8 +7,10 @@ namespace MagicObject\Request;
  *
  * This class provides methods to manage and retrieve data from 
  * various types of HTTP requests (GET, POST, COOKIE, ENV, SERVER).
- *
- * @link https://github.com/Planetbiru/MagicObject
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
+ * @link https://github.com/Planetbiru/Request
  */
 class PicoRequest extends PicoRequestBase
 {

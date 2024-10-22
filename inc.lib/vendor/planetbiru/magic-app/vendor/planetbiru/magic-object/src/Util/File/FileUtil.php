@@ -8,6 +8,10 @@ namespace MagicObject\Util\File;
  * A utility class for handling file operations such as retrieving files
  * from a directory and fixing file paths. This class cannot be instantiated
  * due to its private constructor.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util\File
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class FileUtil
 {

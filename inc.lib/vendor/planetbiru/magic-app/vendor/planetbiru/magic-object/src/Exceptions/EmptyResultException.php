@@ -10,6 +10,10 @@ use Throwable;
  * Custom exception class for handling scenarios where a result is expected
  * but none is returned. This can be useful for database queries or API calls
  * where a missing result should be treated as an exceptional case.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class EmptyResultException extends Exception
 {

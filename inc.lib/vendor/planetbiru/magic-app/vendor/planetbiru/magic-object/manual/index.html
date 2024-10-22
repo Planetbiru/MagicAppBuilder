@@ -1474,6 +1474,7 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="album")
  * @Cache(enable="true")
+ * @package MusicProductionManager\Data\Entity
  */
 class Album extends MagicObject
 {
@@ -1651,9 +1652,9 @@ class Album extends MagicObject
 </ul>
 <h3>Class Parameters</h3>
 <p><strong>@Entity</strong></p>
-<p><code>@Entity</code> is parameter to validate that the object is an entity.</p>
+<p><code>@Entity</code> Indicates that the class represents an entity.</p>
 <p><strong>@JSON</strong></p>
-<p><code>@JSON</code> is parameter to inform how the object will be serialized.</p>
+<p><code>@JSON</code> Configures how the object will be serialized.</p>
 <p>Attributes:</p>
 <ol>
 <li><code>property-naming-strategy</code></li>
@@ -1675,12 +1676,12 @@ class Album extends MagicObject
 </ul>
 <p>Default: <code>false</code></p>
 <p><strong>@Table</strong></p>
-<p><code>@Table</code> is parameter contains table information.</p>
+<p><code>@Table</code> Provides caching configuration.</p>
 <p>Attributes:
 <code>name</code></p>
 <p><code>name</code> is the table name of the entity.</p>
 <p><strong>@Cache</strong></p>
-<p><code>@Cache</code> is parameter contains cache information.</p>
+<p><code>@Cache</code> Specifies the namespace of the class.</p>
 <p>Attributes:
 <code>enable</code></p>
 <p><code>enable</code> is option to enable or disable cache.</p>
@@ -1690,6 +1691,10 @@ class Album extends MagicObject
 <li><code>false</code> Cache is disabled</li>
 </ul>
 <p>Default: <code>false</code></p>
+<p><strong>@package</strong></p>
+<p><code>@package</code> is parameter for namespace.</p>
+<p>PHP does not provide a native method to retrieve a class's namespace. Earlier versions of MagicObject attempted to obtain this information by reading the PHP script, a method that proved both unsafe and inefficient.</p>
+<p>With the addition of package annotations to each entity, MagicObject now offers a safer and more efficient way to join entities. However, if a package annotation is not available on an entity, version 2.1 will still revert to the old method.</p>
 <h3>Property Parameters</h3>
 <ul>
 <li>@Id</li>

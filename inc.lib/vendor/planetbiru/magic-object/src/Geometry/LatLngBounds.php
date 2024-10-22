@@ -6,8 +6,10 @@ namespace MagicObject\Geometry;
  * Class LatLngBounds
  *
  * Represents a bounding box defined by southwest and northeast LatLng objects.
- *
+ * 
+ * @author Kamshory
  * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class LatLngBounds
 {

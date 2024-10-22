@@ -10,7 +10,9 @@ use MagicObject\Exceptions\InvalidParameterException;
  *
  * This class manages the information of an uploaded file and provides methods
  * to interact with the file, such as copying or moving it to a destination path.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\File
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoUploadFileItem

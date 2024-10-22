@@ -10,6 +10,10 @@ use MagicObject\Exceptions\InvalidPolygonException;
  * This class represents a rectangle using its bottom-left and top-right corner points.
  * It provides methods to calculate the area and circumference (perimeter) of the rectangle
  * by utilizing a Polygon representation of the rectangle's corners.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Rectangle {
 

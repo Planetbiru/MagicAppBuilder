@@ -7,7 +7,9 @@ namespace MagicObject\File;
  *
  * This class manages the uploaded file information and provides methods
  * to handle single or multiple file uploads.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\File
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoUploadFileContainer

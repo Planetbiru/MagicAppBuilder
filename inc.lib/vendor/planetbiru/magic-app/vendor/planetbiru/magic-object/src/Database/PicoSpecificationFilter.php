@@ -8,6 +8,8 @@ namespace MagicObject\Database;
  * This class defines filters for columns, specifying the data type 
  * and providing methods to convert values based on the defined type.
  * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSpecificationFilter

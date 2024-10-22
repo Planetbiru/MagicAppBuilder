@@ -10,6 +10,10 @@ use Throwable;
  * Custom exception class for handling file not found errors.
  * This can be used in scenarios where a required file is missing,
  * such as when attempting to read or access a file that does not exist.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class FileNotFoundException extends Exception
 {

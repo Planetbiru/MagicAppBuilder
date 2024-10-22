@@ -7,7 +7,9 @@ namespace MagicObject\Util;
  *
  * This class provides methods for reading from and writing to INI files, 
  * as well as parsing INI strings into arrays and vice versa.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoIniUtil
@@ -19,6 +21,8 @@ class PicoIniUtil
     
     /**
      * Write an array to an INI file.
+     *
+     * This method converts an array into an INI format and saves it to the specified file path.
      *
      * @param array $array The array to write to the INI file.
      * @param string $path The file path where the INI file will be saved.

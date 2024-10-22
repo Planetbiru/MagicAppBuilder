@@ -11,6 +11,10 @@ use Throwable;
  * This exception can be thrown when a filter is improperly defined, fails 
  * validation, or cannot be applied in contexts such as data querying, 
  * processing, or any operation relying on filters to refine results.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class InvalidFilterException extends Exception
 {

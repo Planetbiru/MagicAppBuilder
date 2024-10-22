@@ -6,8 +6,10 @@ namespace MagicObject\Geometry;
  * Class LngBounds
  *
  * Represents a longitudinal bounding range defined by southwest and northeast longitude values.
- *
+ * 
+ * @author Kamshory
  * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class LngBounds
 {

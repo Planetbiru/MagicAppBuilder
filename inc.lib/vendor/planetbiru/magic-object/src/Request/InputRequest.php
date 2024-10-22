@@ -6,7 +6,9 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 
 /**
  * Class for handling input from HTTP requests.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Request
  * @link https://github.com/Planetbiru/MagicObject
  */
 class InputRequest extends PicoRequestBase {
