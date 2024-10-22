@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sortable Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .menu {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .menu-item {
+            margin: 10px 0;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            position: relative; /* Untuk menempatkan ikon dengan baik */
+        }
+
+        .toggle-icon {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+
+        .submenu {
+            list-style-type: none;
+            padding-left: 20px;
+            display: none; /* Menyembunyikan submenu */
+        }
+
+        .submenu-item {
+            margin: 5px 0;
+            background-color: #e1e1e1;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: move; /* Pointer untuk drag */
+        }
+
+
+    </style>
+</head>
+<body>
+    <ul class="menu">
+        <li class="menu-item">
+            <a href="#">Menu 1</a>
+            <span class="toggle-icon">▶</span>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="#">Submenu 1</a></li>
+                <li class="submenu-item"><a href="#">Submenu 2</a></li>
+                <li class="submenu-item"><a href="#">Submenu 3</a></li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="#">Menu 2</a>
+            <span class="toggle-icon">▶</span>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="#">Submenu 4</a></li>
+                <li class="submenu-item"><a href="#">Submenu 5</a></li>
+                <li class="submenu-item"><a href="#">Submenu 6</a></li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="#">Menu 3</a>
+            <span class="toggle-icon">▶</span>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="#">Submenu 7</a></li>
+                <li class="submenu-item"><a href="#">Submenu 8</a></li>
+                <li class="submenu-item"><a href="#">Submenu 9</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <button id="serialize-button">Serialize Menu</button>
+    <pre id="json-output"></pre>
+
+    <script>
+
+        function initMenu()
+        {
+            document.querySelectorAll('.toggle-icon').forEach(icon => {
+                icon.addEventListener('click', function () {
+                    const submenu = this.nextElementSibling;
+                    if (submenu.style.display === "block") {
+                        submenu.style.display = "none";
+                        this.textContent = "▶"; // Ikon untuk expand
+                    } else {
+                        submenu.style.display = "block";
+                        this.textContent = "▼"; // Ikon untuk collapse
+                    }
+                });
+            });
+
+            document.querySelectorAll('.submenu-item').forEach(item => {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragover', dragOver);
+                item.addEventListener('drop', drop);
+            });
+            document.getElementById('serialize-button').addEventListener('click', function () {
+                const jsonOutput = serializeMenu();
+                document.getElementById('json-output').textContent = JSON.stringify(jsonOutput, null, 2);
+            });
+        }
+
+        
+
+        let draggedItem = null;
+
+        function dragStart(e) {
+            draggedItem = e.target;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragOver(e) {
+            e.preventDefault(); // Mencegah perilaku default
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            
+            // Jika target adalah submenu-item
+            if (e.target.classList.contains('submenu-item')) {
+                e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
+            } 
+            // Jika target adalah submenu
+            else if (e.target.classList.contains('submenu')) {
+                e.target.appendChild(draggedItem);
+            } 
+            // Jika target adalah menu-item
+            else if (e.target.classList.contains('menu-item')) {
+                e.target.querySelector('.submenu').insertBefore(draggedItem, e.target.querySelector('.submenu').firstChild);
+            }
+        }
+
+        function serializeMenu() {
+            const menu = [];
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(menuItem => {
+                const menuData = {
+                    title: menuItem.querySelector('a').textContent,
+                    submenus: []
+                };
+
+                const submenuItems = menuItem.querySelectorAll('.submenu-item');
+                submenuItems.forEach(submenuItem => {
+                    menuData.submenus.push({
+                        title: submenuItem.querySelector('a').textContent,
+                        link: submenuItem.querySelector('a').getAttribute('href')
+                    });
+                });
+
+                menu.push(menuData);
+            });
+
+            return menu;
+        }
+
+        document.addEventListener('DOMContentLoaded', function(e){
+            initMenu();
+        })
+        
+
+    </script>
+</body>
+</html>

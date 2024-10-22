@@ -582,13 +582,16 @@ class SecretObject extends stdClass //NOSONAR
     {
         // Parse without sections
         $data = parse_ini_string($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(!empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
@@ -603,13 +606,16 @@ class SecretObject extends stdClass //NOSONAR
     {
         // Parse without sections
         $data = parse_ini_file($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(!empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
@@ -625,22 +631,24 @@ class SecretObject extends stdClass //NOSONAR
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parse($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(!empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
-        else
-        {
-            $this->loadData($data);
-        }
-
         return $this;
     }
 
@@ -656,22 +664,24 @@ class SecretObject extends stdClass //NOSONAR
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parseFile($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(!empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
-        else
-        {
-            $this->loadData($data);
-        }
-
         return $this;
     }
 

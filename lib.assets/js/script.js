@@ -948,10 +948,11 @@ jQuery(function(){
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    
-    $('#modal-application-menu .modal-body').empty();
-    $('#modal-application-menu .modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
-    $('#modal-application-menu').modal('show');
+    let modal = $('#modal-application-menu');
+    modal.find('.modal-body').empty();
+    modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+    modal.attr('data-application-id', applicationId);
+    modal.modal('show');
   
     $.ajax({
       type:'GET',
@@ -962,6 +963,7 @@ jQuery(function(){
         $('#modal-application-menu .modal-body').empty().append(data);
         reloadApplicationList();
         updateBtn[0].disabled = false;
+        initMenu();
       }
     });
   });
@@ -1003,6 +1005,21 @@ jQuery(function(){
       }
     });
   });
+
+  $(document).on('click', '#modal-application-menu .button-save-menu', function(e){
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = modal.attr('data-application-id');
+    const jsonOutput = JSON.stringify(serializeMenu());
+    $.ajax({
+      type:'POST',
+      url:'lib.ajax/application-menu-update.php',
+      data: {applicationId:applicationId, data:jsonOutput},
+      success:function(data){
+        modal.modal('hide');
+      }
+    });
+  });
   
   reloadApplicationList();
   loadTable();
@@ -1011,6 +1028,144 @@ jQuery(function(){
   updateEntityFile();
   updateModuleFile();
 });
+
+/**
+* Initializes the sortable menu by setting up event listeners
+* for toggle icons, drag-and-drop functionality for both
+* submenu items and menu items, and a button for serialization.
+*/
+function initMenu() {
+  // Add click event to toggle the display of submenus
+  document.querySelectorAll('.sortable-toggle-icon').forEach(icon => {
+      icon.addEventListener('click', function () {
+          this.parentNode.classList.toggle('expanded')
+
+      });
+  });
+
+  // Set up drag and drop for submenu items
+  document.querySelectorAll('.sortable-submenu-item').forEach(item => {
+      item.setAttribute('draggable', true);
+      item.addEventListener('dragstart', dragStart);
+      item.addEventListener('dragover', dragOver);
+      item.addEventListener('drop', dropToSubmenu);
+  });
+
+  // Set up drag and drop for menu items
+  document.querySelectorAll('.sortable-menu-item').forEach(item => {
+      item.addEventListener('dragover', dragOver); // Added dragover event
+      item.addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
+  });
+
+  
+}
+
+let draggedItem = null;
+
+function dragStart(e) {
+  if(e.target.classList.contains('sortable-submenu-item'))
+  {
+      draggedItem = e.target;
+      e.dataTransfer.effectAllowed = 'move';
+  }
+  if(e.target.parentNode.classList.contains('sortable-submenu-item'))
+  {
+      draggedItem = e.target.parentNode;
+      e.dataTransfer.effectAllowed = 'move';
+  }
+}
+
+function dragOver(e) {
+  e.preventDefault();
+}
+
+function dropToMenu(e) {
+  e.preventDefault();
+  if (draggedItem) {
+      // Append dragged item to the menu item
+      if(e.target.classList.contains('sortable-menu-item'))
+      {
+          if(e.target.querySelector('.sortable-submenu') == null)
+          {
+              // Create a new submenu if it doesn't exist
+              let sm = document.createElement('ul');
+              sm.classList.add('sortable-submenu');
+              e.target.appendChild(sm);   
+          }
+          e.target.querySelector('.sortable-submenu').appendChild(draggedItem);
+
+
+          e.target.classList.remove('expanded');
+          e.target.classList.add('expanded');
+      }
+      if(e.target.classList.contains('sortable-submenu'))
+      {
+          // Append dragged item to an existing submenu
+          e.target.appendChild(draggedItem);
+          e.target.parentNode.classList.remove('expanded');
+          e.target.parentNode.classList.add('expanded');
+      }
+      draggedItem = null; // Clear the dragged item
+  }
+}
+
+/**
+* Handles dropping items into submenu items.
+* @param {Event} e - The drop event.
+*/
+function dropToSubmenu(e) {
+  e.preventDefault();
+  if (e.target.classList.contains('sortable-submenu-item')) {
+      const isAfter = e.offsetY > (e.target.offsetHeight / 2);
+      if (isAfter) {
+          e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
+      } else {
+          e.target.parentNode.insertBefore(draggedItem, e.target);
+      }
+  } else if (e.target.classList.contains('sortable-submenu')) {
+      e.target.appendChild(draggedItem);
+  }
+}
+
+/**
+* Serializes the current menu structure into a JSON format.
+* @returns {Array} - An array representing the menu structure.
+*/
+function serializeMenu() {
+  const menu = [];
+  const menuItems = document.querySelectorAll('.sortable-menu-item');
+  menuItems.forEach(menuItem => {
+      const menuData = {
+        label: menuItem.querySelector('a').textContent,
+          submenus: []
+      };
+      const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
+      submenuItems.forEach(submenuItem => {
+          menuData.submenus.push({
+            label: submenuItem.querySelector('a').textContent,
+              link: submenuItem.querySelector('a').getAttribute('href')
+          });
+      });
+      menu.push(menuData);
+  });
+  return menu; // Return the constructed menu array
+}
+
+function moveUp(element) {
+  const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
+  const prevItem = item.previousElementSibling;
+  if (prevItem) {
+      item.parentNode.insertBefore(item, prevItem);
+  }
+}
+
+function moveDown(element) {
+  const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
+  const nextItem = item.nextElementSibling;
+  if (nextItem) {
+      item.parentNode.insertBefore(nextItem, item);
+  }
+}
 
 /**
  * Reloads the application and path lists via AJAX requests.
