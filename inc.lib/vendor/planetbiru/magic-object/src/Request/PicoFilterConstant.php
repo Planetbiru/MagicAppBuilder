@@ -8,8 +8,10 @@ namespace MagicObject\Request;
  * This class defines a set of filter constants that can be used for 
  * sanitizing and validating input data. Each constant represents a 
  * specific filter operation.
- *
- * @link https://github.com/Planetbiru/MagicObject
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
+ * @link https://github.com/Planetbiru/Request
  */
 class PicoFilterConstant
 {

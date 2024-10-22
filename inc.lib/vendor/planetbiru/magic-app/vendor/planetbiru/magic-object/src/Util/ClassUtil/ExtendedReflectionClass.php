@@ -41,17 +41,21 @@ class ExtendedReflectionClass extends ReflectionClass {
     protected $useStatements = [];
 
     /**
-     * Check if use statements have been parsed.
+     * Flag indicating whether use statements have been parsed.
      *
      * @var bool
      */
     protected $useStatementsParsed = false;
 
     /**
-     * Parse class file and get use statements from the current namespace.
+     * Parses the class file and retrieves use statements from the current namespace.
      *
-     * @return array
-     * @throws InvalidClassException
+     * This method reads the source of the class file, tokenizes it, and extracts 
+     * the use statements. If the use statements have already been parsed, 
+     * it returns the cached results.
+     *
+     * @return array An array of use statements.
+     * @throws InvalidClassException If the class is not user-defined.
      */
 	protected function parseUseStatements() {
 
@@ -71,9 +75,9 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-     * Read file source up to the line where our class is defined.
+     * Reads the source code of the class file up to the line where the class is defined.
      *
-     * @return string
+     * @return string The source code of the class file up to the class definition.
      */
 	private function readFileSource() {
 
@@ -97,11 +101,13 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-     * Parse the use statements from the read source by tokenizing and reading the tokens.
-     * Returns an array of use statements and aliases.
+     * Tokenizes the source code and extracts use statements.
      *
-     * @param string $source Source code
-     * @return array
+     * This method parses the tokens in the source code to identify use statements
+     * and their aliases, returning an array of these statements.
+     *
+     * @param string $source The source code to be tokenized.
+     * @return array An array of use statements, including aliases.
      */
 	private function tokenizeSource($source) //NOSONAR
 	{
@@ -216,9 +222,9 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-     * Return array of use statements from the class.
+     * Returns the array of use statements for the class.
      *
-     * @return array
+     * @return array An array of use statements for the class.
      */
 	public function getUseStatements() {
 
@@ -226,10 +232,10 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-     * Base name of class.
+     * Extracts the base name of a class from its fully qualified name.
      *
-     * @param string $className Class name
-     * @return string
+     * @param string $className The fully qualified class name.
+     * @return string The base name of the class (i.e., the class name without namespace).
      */
 	private function baseName($className)
 	{
@@ -243,10 +249,10 @@ class ExtendedReflectionClass extends ReflectionClass {
 	}
 
 	/**
-     * Check if the class is using a class or an alias of a class.
+     * Checks if the class has a specific use statement or alias.
      *
-     * @param string $class Class name
-     * @return bool
+     * @param string $class The name of the class to check.
+     * @return bool True if the class or its alias is found in the use statements, false otherwise.
      */
 	public function hasUseStatement($class) {
 

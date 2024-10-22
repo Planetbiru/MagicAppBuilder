@@ -8,6 +8,8 @@ namespace MagicObject\Constants;
  * This class defines a mapping of file extensions to their corresponding MIME types.
  * It can be used to determine the appropriate content type for files based on their extensions.
  * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoMimeMap

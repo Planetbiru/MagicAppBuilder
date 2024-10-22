@@ -8,6 +8,17 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use PDOStatement;
 
+/**
+ * Class PicoDatabaseUtil
+ *
+ * A utility class for handling database operations and specifications within the framework.
+ * This class provides methods to retrieve specifications, handle SQL query formatting,
+ * and manage data types, ensuring safe and efficient interactions with the database.
+ *
+ * @author Kamshory
+ * @package MagicObject\Util\Database
+ * @link https://github.com/Planetbiru/MagicObject
+ */
 class PicoDatabaseUtil
 {
     const INLINE_TRIM = " \r\n\t ";
@@ -20,7 +31,10 @@ class PicoDatabaseUtil
     /**
      * Retrieve a PicoSpecification instance from the given parameters.
      *
-     * @param array $params An array of parameters.
+     * This method iterates through the provided parameters to find and return
+     * the first instance of PicoSpecification. If none is found, null is returned.
+     *
+     * @param array $params An array of parameters to search.
      * @return PicoSpecification|null Returns the PicoSpecification instance or null if not found.
      */
     public static function specificationFromParams($params)
@@ -41,7 +55,9 @@ class PicoDatabaseUtil
     /**
      * Retrieve a PicoPageable instance from the given parameters.
      *
-     * @param array $params An array of parameters.
+     * This method searches through the parameters for an instance of PicoPageable.
+     *
+     * @param array $params An array of parameters to search.
      * @return PicoPageable|null Returns the PicoPageable instance or null if not found.
      */
     public static function pageableFromParams($params)
@@ -62,7 +78,9 @@ class PicoDatabaseUtil
     /**
      * Retrieve a PicoSortable instance from the given parameters.
      *
-     * @param array $params An array of parameters.
+     * This method looks for the first instance of PicoSortable in the parameters.
+     *
+     * @param array $params An array of parameters to search.
      * @return PicoSortable|null Returns the PicoSortable instance or null if not found.
      */
     public static function sortableFromParams($params)
@@ -83,7 +101,10 @@ class PicoDatabaseUtil
     /**
      * Retrieve values from the parameters until a PicoPageable instance is found.
      *
-     * @param array $params An array of parameters.
+     * This method collects and returns all parameters up to the first
+     * PicoPageable instance, effectively filtering the parameters.
+     *
+     * @param array $params An array of parameters to process.
      * @return array An array of values up to the first PicoPageable instance.
      */
     public static function valuesFromParams($params)
@@ -106,9 +127,12 @@ class PicoDatabaseUtil
     /**
      * Fix a value based on its expected type.
      *
+     * This method normalizes various representations of values (e.g., "true", "false", "null")
+     * into their appropriate PHP types based on the expected type.
+     *
      * @param string $value The value to fix.
      * @param string $type The expected data type.
-     * @return mixed The fixed value.
+     * @return mixed The fixed value, converted to the appropriate type.
      */
     public static function fixValue($value, $type) // NOSONAR
     {
@@ -137,6 +161,8 @@ class PicoDatabaseUtil
     /**
      * Check if a value is null.
      *
+     * This method checks if the provided value is null or represents "null" as a string.
+     *
      * @param mixed $value The value to check.
      * @param bool $importFromString Indicates if the input is from a string.
      * @return bool Returns true if the value is null or the string "null".
@@ -148,6 +174,9 @@ class PicoDatabaseUtil
 
     /**
      * Check if a value is numeric.
+     *
+     * This method checks if the value is a numeric string, specifically when
+     * the input is treated as a string.
      *
      * @param mixed $value The value to check.
      * @param bool $importFromString Indicates if the input is from a string.
@@ -161,9 +190,12 @@ class PicoDatabaseUtil
     /**
      * Escape a value for SQL.
      *
+     * This method prepares a value for safe SQL insertion by escaping it,
+     * handling various types including nulls, booleans, strings, and arrays.
+     *
      * @param mixed $value The value to escape.
      * @param bool $importFromString Indicates if the input is from a string.
-     * @return string The escaped value for SQL.
+     * @return string The escaped value suitable for SQL.
      */
 	public static function escapeValue($value, $importFromString = false)
 	{
@@ -210,10 +242,14 @@ class PicoDatabaseUtil
 	}
 
     /**
-     * Convert an array to a list format.
+     * Convert an array to a list format for SQL queries.
+     *
+     * This method converts an array into a comma-separated string representation,
+     * optionally enclosing the result in parentheses.
      *
      * @param array $array The array to convert.
      * @param bool $bracket Indicates if the result should be enclosed in parentheses.
+     * @param bool $escape Indicates if the values should be escaped for SQL.
      * @return string The list representation of the array.
      */
     public static function toList($array, $bracket = false, $escape = false)
@@ -250,7 +286,9 @@ class PicoDatabaseUtil
     }
 
     /**
-     * Escape a SQL value.
+     * Escape a SQL value to prevent SQL injection.
+     *
+     * This method escapes special characters in a string to ensure safe SQL execution.
      *
      * @param string $value The value to escape.
      * @return string The escaped value.
@@ -260,11 +298,14 @@ class PicoDatabaseUtil
         return addslashes($value);
     }
 
-    /**
+   /**
      * Trim a WHERE clause by removing unnecessary characters.
      *
-     * @param string $where The raw WHERE clause.
-     * @return string The trimmed WHERE clause.
+     * This method cleans up a raw WHERE clause by trimming whitespace
+     * and removing common redundant patterns.
+     *
+     * @param string $where The raw WHERE clause to be trimmed.
+     * @return string The cleaned WHERE clause.
      */
     public static function trimWhere($where)
     {
@@ -305,7 +346,10 @@ class PicoDatabaseUtil
     /**
      * Split a SQL string into separate queries.
      *
-     * @param string $sqlText The raw SQL string.
+     * This method takes a raw SQL string and splits it into individual
+     * queries based on delimiters, handling comments and whitespace.
+     *
+     * @param string $sqlText The raw SQL string containing one or more queries.
      * @return array An array of queries with their respective delimiters.
      */
     public function splitSql($sqlText) //NOSONAR
@@ -407,8 +451,10 @@ class PicoDatabaseUtil
     /**
      * Check if a parameter is an array.
      *
+     * This method checks if the provided parameter is an array.
+     *
      * @param mixed $params The parameter to check.
-     * @return bool Returns true if the parameter is an array.
+     * @return bool Returns true if the parameter is an array, false otherwise.
      */
     public static function isArray($params)
     {
@@ -418,7 +464,10 @@ class PicoDatabaseUtil
     /**
      * Find an instance of a specified class in an array of parameters.
      *
-     * @param array $params An array of parameters.
+     * This method iterates through the parameters to find an instance
+     * of the specified class, returning it if found, or null otherwise.
+     *
+     * @param array $params An array of parameters to search.
      * @param string $className The name of the class to find.
      * @return object|null Returns the instance of the specified class or null if not found.
      */

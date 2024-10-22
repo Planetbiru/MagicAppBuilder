@@ -7,7 +7,9 @@ namespace MagicObject\Language;
  *
  * This class is designed to handle multi-language support within the application,
  * providing functionalities for managing different language translations.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Language
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoMultilanguage

@@ -8,7 +8,9 @@ namespace MagicObject\Util;
  * This class handles character mappings for special characters and provides functionality
  * for decoding HTML entities.
  *
- * @package Sipro\Util
+ * @author Kamshory
+ * @package MagicObject\Util
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class TextConverter
 {

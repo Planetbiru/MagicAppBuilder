@@ -23,7 +23,9 @@ use ReflectionProperty;
  *
  * The `PicoAnnotationParser` is particularly useful in frameworks or libraries
  * that rely on annotations for configuration, routing, or metadata purposes.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util\ClassUtil
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoAnnotationParser

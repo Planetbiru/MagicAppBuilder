@@ -10,7 +10,9 @@ use MagicObject\Util\PicoStringUtil;
  *
  * This class provides functionality to manage sorting criteria,
  * allowing the specification of fields to sort by and their sort types.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSortable

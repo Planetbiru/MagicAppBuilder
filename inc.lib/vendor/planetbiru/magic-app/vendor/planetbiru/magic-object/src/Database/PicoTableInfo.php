@@ -81,6 +81,13 @@ class PicoTableInfo // NOSONAR
     protected $noCache = false;
 
     /**
+     * The package name or namespace.
+     *
+     * @var string
+     */
+    protected $package;
+
+    /**
      * Gets an instance of PicoTableInfo.
      *
      * @return self A new instance of the class.
@@ -103,8 +110,9 @@ class PicoTableInfo // NOSONAR
      * @param array $defaultValue The columns with default values.
      * @param array $notNullColumns The columns that cannot be null.
      * @param bool $noCache Flag to disable cache when any entities join with this entity
+     * @param string $package The package name or namespace of the class
      */
-    public function __construct($tableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache = false) // NOSONAR
+    public function __construct($tableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache = false, $package = null) // NOSONAR
     {
         $this->tableName = $tableName;
         $this->columns = $columns;
@@ -114,6 +122,7 @@ class PicoTableInfo // NOSONAR
         $this->defaultValue = $defaultValue;
         $this->notNullColumns = $notNullColumns;
         $this->noCache = $noCache;
+        $this->package = $package;
     }
 
     /**
@@ -346,6 +355,32 @@ class PicoTableInfo // NOSONAR
     public function setNoCache($noCache)
     {
         $this->noCache = $noCache;
+
+        return $this;
+    }
+
+    
+
+    /**
+     * Get the package name or namespace.
+     *
+     * @return  string
+     */ 
+    public function getPackage()
+    {
+        return $this->package;
+    }
+
+    /**
+     * Set the package name or namespace.
+     *
+     * @param  string  $package  The package name or namespace.
+     *
+     * @return  self
+     */ 
+    public function setPackage(string $package)
+    {
+        $this->package = $package;
 
         return $this;
     }

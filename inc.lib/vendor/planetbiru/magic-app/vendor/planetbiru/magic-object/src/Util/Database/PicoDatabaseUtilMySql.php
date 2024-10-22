@@ -727,4 +727,64 @@ class PicoDatabaseUtilMySql //NOSONAR
         // Ganti tanda tanya dengan elemen array yang telah diformat
         return vsprintf(str_replace('?', '%s', $query), $formattedElements);
     }
+
+    /**
+     * Converts a MariaDB CREATE TABLE query to a PostgreSQL compatible query.
+     *
+     * This function takes a SQL CREATE TABLE statement written for MariaDB 
+     * and transforms it into a format compatible with PostgreSQL. It handles 
+     * common data types and syntax differences between the two databases.
+     *
+     * @param string $mariadbQuery The MariaDB CREATE TABLE query to be converted.
+     * @return string The converted PostgreSQL CREATE TABLE query.
+     */
+    public static function convertMariaDbToPostgreSql($mariadbQuery) {
+        // Remove comments
+        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery);
+        
+        // Replace MariaDB data types with PostgreSQL data types
+        $replacements = [
+            'int' => 'INTEGER',
+            'tinyint(1)' => 'BOOLEAN', // MariaDB TINYINT(1) as BOOLEAN
+            'tinyint' => 'SMALLINT',
+            'smallint' => 'SMALLINT',
+            'mediumint' => 'INTEGER', // No direct equivalent, use INTEGER
+            'bigint' => 'BIGINT',
+            'float' => 'REAL',
+            'double' => 'DOUBLE PRECISION',
+            'decimal' => 'NUMERIC', // Decimal types
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'datetime' => 'TIMESTAMP', // Use TIMESTAMP for datetime
+            'timestamp' => 'TIMESTAMP',
+            'varchar' => 'VARCHAR', // Variable-length string
+            'text' => 'TEXT',
+            'blob' => 'BYTEA', // Binary data
+            'mediumtext' => 'TEXT', // No direct equivalent
+            'longtext' => 'TEXT', // No direct equivalent
+            'json' => 'JSONB', // Use JSONB for better performance in PostgreSQL
+            // Add more type conversions as needed
+        ];
+
+        $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
+
+        // Handle AUTO_INCREMENT
+        $query = preg_replace('/AUTO_INCREMENT=\d+/', '', $query);
+        $query = preg_replace('/AUTO_INCREMENT/', '', $query);
+        
+        // Handle default values for strings and booleans
+        $query = preg_replace('/DEFAULT \'(.*?)\'/', 'DEFAULT \'\1\'', $query);
+        
+        // Handle "ENGINE=InnoDB" or other ENGINE specifications
+        $query = preg_replace('/ENGINE=\w+/', '', $query);
+        
+        // Remove unnecessary commas
+        $query = preg_replace('/,\s*$/', '', $query);
+        
+        // Trim whitespace
+        $query = trim($query);
+
+        return $query;
+    }
+
 }

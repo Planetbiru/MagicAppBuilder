@@ -7,7 +7,9 @@ namespace MagicObject\Database;
  *
  * This class encapsulates information about an entity field, including
  * its associated entity, field name, and any parent field relationships.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoEntityField

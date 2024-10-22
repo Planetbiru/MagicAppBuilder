@@ -2,178 +2,124 @@
 
 namespace MagicObject\Util;
 
+namespace MagicObject\Util;
+
+/**
+ * Class PicoTestValueUtil
+ *
+ * A utility class for managing return values based on specified conditions.
+ * This class allows you to set a return value and control whether it should
+ * be returned based on conditions. It is useful for testing and mocking
+ * scenarios where specific outputs are required based on input conditions.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util
+ * @link https://github.com/Planetbiru/MagicObject
+ */
 class PicoTestValueUtil
 {
-
     /**
-     * Value to be return
+     * Value to be returned.
      *
      * @var mixed
      */
     private $returnValue;
 
     /**
-     * Condition
+     * Condition for determining return value.
      *
-     * @var boolean
+     * @var bool
      */
     private $condition;
 
     /**
-     * Do return
+     * Set a return value.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @param mixed $returnValue The value to return based on the condition.
+     * @return self|mixed Returns the return value if the condition is true; otherwise, returns the instance.
      */
     public function doReturn($returnValue)
     {
         $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        $this->returnValue = $returnValue;
-        return $this;
+        return $this->condition ? $returnValue : $this;
     }
 
     /**
-     * Do return selected
+     * Set return value to 'selected'.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @return self|mixed Returns 'selected' if the condition is true; otherwise, returns the instance.
      */
     public function doReturnSelected()
     {
-        $returnValue = 'selected';
-        $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        $this->returnValue = $returnValue;
-        return $this;
+        return $this->doReturn('selected');
     }
 
     /**
-     * Do return selected=selected
+     * Set return value to ' selected=selected'.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @return self|mixed Returns ' selected=selected' if the condition is true; otherwise, returns the instance.
      */
     public function doReturnAttributeSelected()
     {
-        $returnValue = ' selected=selected';
-        $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        $this->returnValue = $returnValue;
-        return $this;
+        return $this->doReturn(' selected=selected');
     }
 
     /**
-     * Do return checked
+     * Set return value to 'checked'.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @return self|mixed Returns 'checked' if the condition is true; otherwise, returns the instance.
      */
     public function doReturnChecked()
     {
-        $returnValue = 'checked';
-        $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        $this->returnValue = $returnValue;
-        return $this;
+        return $this->doReturn('checked');
     }
 
     /**
-     * Do return checked=checked
+     * Set return value to ' checked=checked'.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @return self|mixed Returns ' checked=checked' if the condition is true; otherwise, returns the instance.
      */
     public function doReturnAttributeChecked()
     {
-        $returnValue = ' checked=checked';
-        $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        $this->returnValue = $returnValue;
-        return $this;
+        return $this->doReturn(' checked=checked');
     }
 
     /**
-     * Then return
+     * Set a return value and determine if it should be returned.
      *
-     * @param mixed $returnValue Return value
-     * @return self|mixed
+     * @param mixed $returnValue The value to return if the condition is true.
+     * @return mixed|null Returns the return value if the condition is true; otherwise, returns null.
      */
     public function thenReturn($returnValue)
     {
         $this->returnValue = $returnValue;
-        if(isset($this->condition) && $this->condition === true)
-        {
-            return $returnValue;
-        }
-        return null;
+        return $this->condition ? $returnValue : null;
     }
 
     /**
-     * When
+     * Set the condition for returning the value.
      *
-     * @param bool $condition Contition
-     * @return self|mixed
+     * @param bool $condition The condition that determines the return value.
+     * @return self|mixed Returns the return value if set and the condition is true; otherwise, returns the instance.
      */
     public function when($condition)
     {
-        if(isset($this->returnValue))
-        {
-            if($condition)
-            {
-                return $this->returnValue;
-            }
-            else
-            {
-                return null;
-            }
+        if (isset($this->returnValue)) {
+            return $condition ? $this->returnValue : null;
         }
-        else
-        {
-            $this->condition = $condition;
-            return $this;
-        }
+        $this->condition = $condition;
+        return $this;
     }
 
     /**
-     * When equals
+     * Set the condition based on equality of two parameters.
      *
-     * @param mixed $param1 Parameter 1
-     * @param mixed $param2 Parameter 2
-     * @return self|mixed
+     * @param mixed $param1 The first parameter to compare.
+     * @param mixed $param2 The second parameter to compare.
+     * @return self|mixed Returns the return value if set and the parameters are equal; otherwise, returns the instance.
      */
     public function whenEquals($param1, $param2)
     {
-        if(isset($this->returnValue))
-        {
-            if($param1 == $param2)
-            {
-                return $this->returnValue;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        else
-        {
-            $this->condition = $param1 == $param2;
-            return $this;
-        }
+        return $this->when($param1 == $param2);
     }
 }

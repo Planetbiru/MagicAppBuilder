@@ -12,6 +12,26 @@ use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
 
+/**
+ * Class PicoDatabaseUtilPostgreSql
+ *
+ * Utility class for managing PostgreSQL database operations in the framework.
+ * This class provides methods for retrieving table structures, generating SQL
+ * statements for creating tables, dumping data into SQL insert statements,
+ * and importing data from one database to another.
+ *
+ * Key Functionalities:
+ * - Retrieve and display column information for tables.
+ * - Generate SQL statements to create tables based on existing structures.
+ * - Dump data from various sources into SQL insert statements.
+ * - Facilitate the import of data between source and target databases, including
+ *   handling pre and post-import scripts.
+ * - Ensure data integrity by fixing types during the import process.
+ *
+ * @author Kamshory
+ * @package MagicObject\Util\Database
+ * @link https://github.com/Planetbiru/MagicObject
+ */
 class PicoDatabaseUtilPostgreSql //NOSONAR
 {
     const KEY_NAME = "name";
@@ -698,4 +718,62 @@ class PicoDatabaseUtilPostgreSql //NOSONAR
         // Ganti tanda tanya dengan elemen array yang telah diformat
         return vsprintf(str_replace('?', '%s', $query), $formattedElements);
     }
+
+
+    /**
+     * Converts a PostgreSQL CREATE TABLE query to a MySQL compatible query.
+     *
+     * This function takes a SQL CREATE TABLE statement written for PostgreSQL 
+     * and transforms it into a format compatible with MySQL. It handles common 
+     * data types and syntax differences between the two databases.
+     *
+     * @param string $postgresqlQuery The PostgreSQL CREATE TABLE query to be converted.
+     * @return string The converted MySQL CREATE TABLE query.
+     */ 
+    public static function convertPostgreSqlToMySql($postgresqlQuery) {
+        // Remove comments
+        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery);
+        
+        // Replace PostgreSQL data types with MySQL data types
+        $replacements = [
+            'bigserial' => 'BIGINT AUTO_INCREMENT',
+            'serial' => 'INT AUTO_INCREMENT',
+            'character varying' => 'VARCHAR', // Added handling for character varying
+            'text' => 'TEXT',
+            'varchar' => 'VARCHAR',
+            'bigint' => 'BIGINT',
+            'int' => 'INT',
+            'integer' => 'INT',
+            'smallint' => 'SMALLINT',
+            'real' => 'FLOAT', // Added handling for real
+            'double precision' => 'DOUBLE', // Added handling for double precision
+            'boolean' => 'TINYINT(1)',
+            'timestamp' => 'DATETIME',
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'json' => 'JSON',
+            'bytea' => 'BLOB', // Added handling for bytea
+            // Add more type conversions as needed
+        ];
+    
+        $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
+    
+        // Replace DEFAULT on columns with strings to NULL in MySQL
+        $query = preg_replace('/DEFAULT (\'[^\']*\')/', 'DEFAULT $1', $query);
+    
+        // Replace SERIAL with INT AUTO_INCREMENT
+        $query = preg_replace('/\bSERIAL\b/', 'INT AUTO_INCREMENT', $query);
+        
+        // Modify "IF NOT EXISTS" for MySQL
+        $query = preg_replace('/CREATE TABLE IF NOT EXISTS/', 'CREATE TABLE IF NOT EXISTS', $query);
+    
+        // Remove UNIQUE constraints if necessary (optional)
+        $query = preg_replace('/UNIQUE\s*\(.*?\),?\s*/i', '', $query);
+        
+        // Remove 'USING BTREE' if present
+        $query = preg_replace('/USING BTREE/', '', $query);
+    
+        return $query;
+    }
+    
 }

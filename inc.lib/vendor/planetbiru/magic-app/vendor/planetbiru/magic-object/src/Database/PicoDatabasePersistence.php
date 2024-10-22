@@ -42,6 +42,7 @@ class PicoDatabasePersistence // NOSONAR
     const ANNOTATION_NOT_NULL = "NotNull";
     const ANNOTATION_DEFAULT_COLUMN = "DefaultColumn";
     const ANNOTATION_JSON_FORMAT = "JsonFormat";
+    const ANNOTATION_PACKAGE = "package";
     const SQL_DATE_TIME_FORMAT = "SqlDateTimeFormat";
     
     const KEY_NAME = "name";
@@ -520,6 +521,7 @@ class PicoDatabasePersistence // NOSONAR
             $reflexClass = new PicoAnnotationParser($this->className);
             $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);
             $cache = $reflexClass->getParameter(self::ANNOTATION_CACHE);
+            $package = $reflexClass->getParameter(self::ANNOTATION_PACKAGE);
             if(!isset($table))
             {
                 throw new EntityException($this->className . " is not valid entity");
@@ -528,6 +530,10 @@ class PicoDatabasePersistence // NOSONAR
             if(isset($cache))
             {
                 $noCache = self::VALUE_FALSE == strtolower($cache[self::KEY_ENABLE]);
+            }
+            if(empty($package))
+            {
+                $package = null;
             }
 
             $values = $this->parseKeyValue($reflexClass, $table, self::ANNOTATION_TABLE);
@@ -580,7 +586,7 @@ class PicoDatabasePersistence // NOSONAR
                 
             }
             // bring it together
-            $this->tableInfoProp = new PicoTableInfo($picoTableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache);
+            $this->tableInfoProp = new PicoTableInfo($picoTableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache, $package);
         }
         return $this->tableInfoProp;
     }
@@ -1328,9 +1334,10 @@ class PicoDatabasePersistence // NOSONAR
      * Get table name
      *
      * @param string|null $entityName Entity name
+     * @param PicoTableInfo $info Table information
      * @return string|null
      */
-    private function getTableOf($entityName)
+    private function getTableOf($entityName, $info)
     {
         if($entityName == null || empty($entityName))
         {
@@ -1343,7 +1350,7 @@ class PicoDatabasePersistence // NOSONAR
         $tableName = $entityName;
         try
         {
-            $className = $this->getRealClassName($entityName);          
+            $className = $this->getRealClassName($entityName, $info);          
             $annotationParser = new PicoAnnotationParser($className);
             $parameters = $annotationParser->getParametersAsObject();
             if($parameters->getTable() != null)
@@ -1368,14 +1375,15 @@ class PicoDatabasePersistence // NOSONAR
      * Get entity primary key
      *
      * @param string $entityName Entity name
+     * @param PicoTableInfo $info Table information
      * @return string[]
      */
-    private function getPrimaryKeyOf($entityName)
+    private function getPrimaryKeyOf($entityName, $info)
     {
         $columns = array();
         try
         {
-            $className = $this->getRealClassName($entityName);
+            $className = $this->getRealClassName($entityName, $info);
             $annotationParser = new PicoAnnotationParser($className);
             $props = $annotationParser->getProperties();
             foreach($props as $prop)
@@ -1400,14 +1408,15 @@ class PicoDatabasePersistence // NOSONAR
      * Get column maps of the entity
      *
      * @param string $entityName Entity name
+     * @param PicoTableInfo $info Table information
      * @return array
      */
-    private function getColumnMapOf($entityName)
+    private function getColumnMapOf($entityName, $info)
     {
         $columns = array();
         try
         {
-            $className = $this->getRealClassName($entityName);
+            $className = $this->getRealClassName($entityName, $info);
             $annotationParser = new PicoAnnotationParser($className);
             $props = $annotationParser->getProperties();
             foreach($props as $prop)
@@ -1570,11 +1579,11 @@ class PicoDatabasePersistence // NOSONAR
             
             if($entityName != null)
             {
-                $entityTable = $this->getTableOf($entityName);
+                $entityTable = $this->getTableOf($entityName, $info);
                 
                 if($entityTable != null)
                 {
-                    $joinColumnmaps = $this->getColumnMapOf($entityName);                           
+                    $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
                     $maps = $joinColumnmaps;
                 }
                 else
@@ -1741,7 +1750,7 @@ class PicoDatabasePersistence // NOSONAR
             $entityField = new PicoEntityField($sortBy, $info);
             if($entityField->getEntity() != null)
             {
-                $tableName = $this->getTableOf($entityField->getEntity());
+                $tableName = $this->getTableOf($entityField->getEntity(), $info);
                 $sortBy = $tableName.".".$sortBy;
             }
             $sorts[] = $sortBy . " " . $sortType;           
@@ -1776,10 +1785,10 @@ class PicoDatabasePersistence // NOSONAR
             
             if($entityName != null)
             {
-                $entityTable = $this->getTableOf($entityName);
+                $entityTable = $this->getTableOf($entityName, $info);
                 if($entityTable != null)
                 {
-                    $joinColumnmaps = $this->getColumnMapOf($entityName);                           
+                    $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
                     $maps = $joinColumnmaps;
                 }
                 else
@@ -2058,7 +2067,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             $entity = $joinColumn[self::KEY_PROPERTY_TYPE];
             $columnName = $joinColumn[self::KEY_NAME];
-            $joinTable = $this->getTableOf($entity);
+            $joinTable = $this->getTableOf($entity, $info);
             if(!isset($tableAlias[$joinTable]))
             {
                 $tableAlias[$joinTable] = 0;
@@ -2069,9 +2078,9 @@ class PicoDatabasePersistence // NOSONAR
             
             $this->joinColumMaps[$propertyName] = new PicoJoinMap($propertyName, $columnName, $entity, $joinTable, $joinTableAlias);
             
-            $joinColumn = $this->getPrimaryKeyOf($entity);
+            $joinColumn = $this->getPrimaryKeyOf($entity, $info);
 
-            $joinPrimaryKeys = array_values($this->getPrimaryKeyOf($entity));
+            $joinPrimaryKeys = array_values($this->getPrimaryKeyOf($entity, $info));
 
             if(isset($joinColumn[self::KEY_REFERENCE_COLUMN_NAME]))
             {
@@ -2784,41 +2793,53 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Get real class name
+     * Retrieves the full class name based on the given class name and table information.
      *
-     * @param string $classNameJoin Join class name
-     * @return string
+     * @param string $classNameJoin The class name to join.
+     * @param PicoTableInfo $info Table information containing package details.
+     * @return string The fully qualified class name.
      */
-    private function getRealClassName($classNameJoin)
+    private function getRealClassName($classNameJoin, $info)
     {
         $result = $classNameJoin;
         if(stripos($classNameJoin, self::NAMESPACE_SEPARATOR) === false)
         {
-            if(!$this->processClassList)
+            // Class name does not include a namespace.
+            $package = $info->getPackage();
+            if(isset($package) && !empty($package))
             {
-                // processed once
-                $reflect = new ExtendedReflectionClass($this->className);
-                $useStatements = $reflect->getUseStatements(); 
-                $this->namespaceName = $reflect->getNamespaceName();
-                if($this->isArray($useStatements))
+                // Use the package annotation to construct the full class name.
+                $package = trim($package);
+                $result = $package . self::NAMESPACE_SEPARATOR . $classNameJoin;
+            }
+            else
+            {
+                if(!$this->processClassList)
                 {
-                    foreach($useStatements as $val)
+                    // Process the class list only once.
+                    $reflect = new ExtendedReflectionClass($this->className);
+                    $useStatements = $reflect->getUseStatements(); 
+                    $this->namespaceName = $reflect->getNamespaceName();
+                    if($this->isArray($useStatements))
                     {
-                        $as = $val['as'];
-                        $cls = $val['class'];
-                        $this->importedClassList[$as] = $cls;
+                        foreach($useStatements as $val)
+                        {
+                            $as = $val['as'];
+                            $cls = $val['class'];
+                            $this->importedClassList[$as] = $cls;
+                        }
                     }
                 }
-            }
-            if(isset($this->importedClassList[$classNameJoin]))
-            {
-                // get from map
-                $result = $this->importedClassList[$classNameJoin];
-            }
-            else if(stripos($classNameJoin, self::NAMESPACE_SEPARATOR) === false)
-            {
-                // assumpt has same namespace
-                $result = rtrim($this->namespaceName, self::NAMESPACE_SEPARATOR).self::NAMESPACE_SEPARATOR. $classNameJoin;
+                if(isset($this->importedClassList[$classNameJoin]))
+                {
+                    // Retrieve the class name from the imported list.
+                    $result = $this->importedClassList[$classNameJoin];
+                }
+                else if(stripos($classNameJoin, self::NAMESPACE_SEPARATOR) === false)
+                {
+                    // Assume it belongs to the same namespace.
+                    $result = rtrim($this->namespaceName, self::NAMESPACE_SEPARATOR).self::NAMESPACE_SEPARATOR. $classNameJoin;
+                }
             }
         }
         return $result;
@@ -2846,11 +2867,12 @@ class PicoDatabasePersistence // NOSONAR
      * Get property name
      * @param string $classNameJoin Class name join
      * @param string $referenceColumName Reference column name
+     * @param PicoTableInfo $info Table information
      * @return string|null
      */
-    private function getJoinKeyName($classNameJoin, $referenceColumName)
+    private function getJoinKeyName($classNameJoin, $referenceColumName, $info)
     {
-        $className = $this->getRealClassName($classNameJoin);
+        $className = $this->getRealClassName($classNameJoin, $info);
         $persist = new self(null, new $className());
         $info = $persist->getTableInfo();
         foreach($info->getColumns() as $prop => $col)
@@ -2887,18 +2909,19 @@ class PicoDatabasePersistence // NOSONAR
      * @param string $classNameJoin The name of the class to join with.
      * @param string $referenceColumnName The name of the column used as the join key.
      * @param mixed $joinKeyValue The value of the join key to search for.
+     * @param PicoTableInfo $info Table information
      * @return MagicObject|null Returns the retrieved MagicObject if found, or null if not found.
      */
-    private function getJoinData($classNameJoin, $referenceColumName, $joinKeyValue)
+    private function getJoinData($classNameJoin, $referenceColumName, $joinKeyValue, $info)
     {
-        $persist = new self(null, new $classNameJoin());
+        $className = $this->getRealClassName($classNameJoin, $info);
+        $persist = new self(null, new $className());
         $info = $persist->getTableInfo();
         $noCache = isset($info) ? $info->getNoCache() : false;
         
         // Check if caching is disabled or if the data is not already cached
         if($noCache || !isset($this->joinCache[$classNameJoin]) || !isset($this->joinCache[$classNameJoin][$joinKeyValue]))
-        {      
-            $className = $this->getRealClassName($classNameJoin);
+        {       
             $obj = new $className(null);      
             
             $dbEnt = $this->object->databaseEntity();
@@ -2953,13 +2976,13 @@ class PicoDatabasePersistence // NOSONAR
                 $referenceColumName = $this->getReferenceColumnName($join);
                 $classNameJoin = $join[self::KEY_PROPERTY_TYPE];
                 $columnName = $join[self::KEY_NAME];
-                $joinKeyName = $this->getJoinKeyName($classNameJoin, $referenceColumName);
+                $joinKeyName = $this->getJoinKeyName($classNameJoin, $referenceColumName, $info);
                 try
                 {
                     if(isset($row[$columnName]))
                     {
                         $this->prepareJoinCache($classNameJoin);
-                        $obj = $this->getJoinData($classNameJoin, $joinKeyName, $row[$columnName]);
+                        $obj = $this->getJoinData($classNameJoin, $joinKeyName, $row[$columnName], $info);
                         if($obj != null)
                         {
                             $data = $this->addProperty($data, $propName, $obj);

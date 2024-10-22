@@ -106,6 +106,18 @@ Stable version of MagicObject is `1.17.2` or above. Please don't install version
 
 -   When upgrading from version 1 to version 2, please review the migration notes for any breaking changes or required adjustments to your codebase. Detailed guidelines are provided to facilitate a smooth upgrade process.
 
+MagicObject 2.1 introduces package annotations for entities, enhancing the process of joining them. These annotations are essential, as the namespace is required to properly join entities. The join class should be referenced by its base name only, without the namespace; otherwise, MagicObject may fail to recognize the class.
+
+PHP does not provide a native method to retrieve a class's namespace. Earlier versions of MagicObject attempted to obtain this information by reading the PHP script, a method that proved both unsafe and inefficient.
+
+With the addition of package annotations to each entity, MagicObject now offers a safer and more efficient way to join entities. However, if a package annotation is not available on an entity, version 2.1 will still revert to the old method.
+
+MagicObject 2.1 introduces a suite of powerful database utilities aimed at enhancing database management and interoperability. One of the key features is the ability to seamlessly convert databases between PostgreSQL and MySQL, enabling developers to migrate their data and applications with ease. This conversion tool ensures that data types, constraints, and structures are accurately translated, reducing the potential for errors during migration.
+
+Additionally, MagicObject 2.1 allows users to parse table structures directly from SQL statements without the need to first dump them into a database. This functionality streamlines the process of understanding and manipulating database schemas, making it easier for developers to work with existing SQL code or to integrate with third-party systems.
+
+These utilities not only enhance efficiency but also provide a robust foundation for database development, allowing users to focus on building applications rather than wrestling with database compatibility issues. With MagicObject 2.1, database management becomes more intuitive and accessible, empowering developers to harness the full potential of their data.
+
 # Tutorial
 
 Tutorial is provided here https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md

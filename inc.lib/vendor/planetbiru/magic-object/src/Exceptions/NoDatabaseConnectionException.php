@@ -13,6 +13,10 @@ use Throwable;
  * connection to the database, possibly due to misconfiguration, 
  * network issues, or the database server being down. It is essential 
  * for managing connection-related errors in database-driven applications.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class NoDatabaseConnectionException extends Exception
 {

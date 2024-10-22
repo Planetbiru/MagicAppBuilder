@@ -19,6 +19,10 @@ use stdClass;
  * $kebabCase = PicoStringUtil::kebapize('exampleString');
  * $isNotEmpty = PicoStringUtil::isNotNullAndNotEmpty('Some Value');
  * ```
+ * 
+ * @author Kamshory
+ * @package MagicObject\Util
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoStringUtil
 {

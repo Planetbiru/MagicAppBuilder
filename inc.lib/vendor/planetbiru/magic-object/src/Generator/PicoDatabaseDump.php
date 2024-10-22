@@ -15,7 +15,9 @@ use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 /**
  * Database dump class for managing and generating SQL statements
  * for table structures.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseDump

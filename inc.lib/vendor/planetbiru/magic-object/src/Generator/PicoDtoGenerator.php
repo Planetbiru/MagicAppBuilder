@@ -11,6 +11,8 @@ use MagicObject\Util\PicoStringUtil;
  * This class helps in generating DTOs that can be used for transferring data 
  * via APIs or for serialization into files or databases.
  * 
+ * @author Kamshory
+ * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDtoGenerator

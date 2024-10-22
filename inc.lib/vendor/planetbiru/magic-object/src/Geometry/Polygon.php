@@ -9,6 +9,10 @@ use MagicObject\Exceptions\InvalidPolygonException;
  *
  * This class allows for the creation and manipulation of polygons, including
  * adding points, clearing the polygon, and calculating its area and circumference.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Geometry
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class Polygon
 {

@@ -12,6 +12,10 @@ use Throwable;
  * having an insufficient number of vertices, improper angle measurements, or 
  * invalid geometric configurations. It is useful in applications involving 
  * geometric computations, shape processing, or graphical representations.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Exceptions
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class InvalidPolygonException extends Exception
 {

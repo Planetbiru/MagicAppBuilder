@@ -7,7 +7,7 @@ use MagicObject\SecretObject;
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
 $databaseCredential = new SecretObject();
-$databaseCredential->loadYamlFile(dirname(dirname(__DIR__)) . "/test.yml", false, true, true);
+$databaseCredential->loadYamlFile(dirname(dirname(__DIR__)) . "/test.yml.txt", false, true, true);
 $databaseCredential->getDatabase()->setDatabaseName("sipro");
 $database = new PicoDatabase($databaseCredential->getDatabase(), null, function($sql){
     echo $sql.";\r\n\r\n";
@@ -254,9 +254,9 @@ class Supervisor extends MagicObject
      *
      * @param int $supervisorId The ID of the table to search for.
      * @param DateTime[] $timeCreate The date and time when data is created
-     * @return self[]
+     * @return MagicObject
      * @query("
-      SELECT supervisor.* 
+      SELECT supervisor.*
       FROM supervisor 
       WHERE supervisor.waktu_buat in :timeCreate 
       AND supervisor.aktif = :aktif
@@ -271,7 +271,7 @@ class Supervisor extends MagicObject
 
 $obj = new Supervisor(null, $database);
 
-
+/*
 $native1 = $obj->native1(1, true);
 
 $native2 = $obj->native2(1, true);
@@ -321,7 +321,15 @@ echo "Alamat: " . $native8->getTelepon() . "\r\n";
 echo "Alamat: " . $native9[0]->getTelepon() . "\r\n";
 echo "Alamat: " . $native10->getTelepon() . "\r\n";
 echo "Alamat: " . $native11[0]->getTelepon() . "\r\n";
+*/
 
-$native13 = $obj->native13([new DateTime('2023-03-27 15:23:47', new DateTimeZone($databaseCredential->getDatabase()->getTimeZone()))], true);
+try
+{
+$native13 = $obj->native13([new DateTime('2025-03-27 15:23:47', new DateTimeZone($databaseCredential->getDatabase()->getTimeZone()))], true);
 echo "\r\nnative13:\r\n";
-print_r($native13);
+echo ($native13);
+}
+catch(Exception $e)
+{
+    echo $e->getMessage();
+}

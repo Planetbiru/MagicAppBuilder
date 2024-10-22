@@ -25,6 +25,8 @@ use stdClass;
  * on the provided data, with support for property annotations to manage 
  * labels and attributes.
  *
+ * @author Kamshory
+ * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class DataTable extends SetterGetter
@@ -110,10 +112,13 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Loads data into the object.
+     * Loads data into the DataTable object.
      *
-     * @param mixed $data Reference to the data to load.
-     * @return self
+     * This method processes the provided data and populates the object's 
+     * properties accordingly. It supports MagicObject, arrays, and objects.
+     *
+     * @param mixed $data Data to load into the DataTable.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -141,12 +146,15 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Adds a language to the table.
+     * Adds a language to the table for multi-language support.
      *
-     * @param string $code Language code.
-     * @param object|stdClass|array $reference Reference for language.
-     * @param bool $use Flag to indicate whether to use this language.
-     * @return self
+     * This method registers a language instance, which can be used to 
+     * retrieve labels in the specified language.
+     *
+     * @param string $code Language code (e.g., 'en', 'fr').
+     * @param object|stdClass|array $reference Reference for language data.
+     * @param bool $use Indicates whether to set this language as the current one.
+     * @return self Returns the current instance for method chaining.
      */
     public function addLanguage($code, $reference, $use = false)
     {
@@ -158,10 +166,13 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Removes a language from the table.
+     * Removes a specified language from the table.
      *
-     * @param string $code Language code.
-     * @return self
+     * If the removed language was the current one, the first remaining 
+     * language will be selected as the new current language.
+     *
+     * @param string $code Language code to remove.
+     * @return self Returns the current instance for method chaining.
      */
     public function removeLanguage($code)
     {
@@ -176,10 +187,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Sets the current language.
+     * Sets the current language for label retrieval.
      *
-     * @param string $code Language code.
-     * @return self
+     * This method updates the language code used for displaying labels.
+     *
+     * @param string $code Language code to set as current.
+     * @return self Returns the current instance for method chaining.
      */
     public function selectLanguage($code)
     {
@@ -188,9 +201,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Initializes the table's attributes and configurations.
+     * Initializes the table's attributes and configurations based on annotations.
      *
-     * @return self
+     * This method parses the class annotations to set attributes, 
+     * class lists, and preferred language settings.
+     *
+     * @return self Returns the current instance for method chaining.
      */
     private function init()
     {
@@ -218,9 +234,12 @@ class DataTable extends SetterGetter
     /**
      * Retrieves the list of properties for the table.
      *
+     * Optionally filters the properties to include only those declared 
+     * in the current class and returns them as an array or Reflection objects.
+     *
      * @param bool $reflectSelf Whether to reflect on the current class.
      * @param bool $asArrayProps Whether to return properties as an array.
-     * @return array
+     * @return array Array of properties or Reflection objects.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -251,13 +270,16 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Retrieves the content of an annotation.
+     * Retrieves the content of a specified annotation.
      *
-     * @param PicoAnnotationParser $reflexProp Class reflection.
-     * @param PicoGenericObject $parameters Parameters.
-     * @param string $annotation Annotation key.
-     * @param string $attribute Attribute key.
-     * @return mixed|null
+     * This method checks for the existence of an annotation and retrieves 
+     * its attribute value if it exists.
+     *
+     * @param PicoAnnotationParser $reflexProp Class reflection for parsing annotations.
+     * @param PicoGenericObject $parameters Parameters for the annotation.
+     * @param string $annotation Annotation key to look up.
+     * @param string $attribute Attribute key for the annotation value.
+     * @return mixed|null The value of the annotation attribute or null if not found.
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
     {
@@ -271,13 +293,16 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Defines the label for a property based on annotations.
+     * Defines the label for a property based on its annotations.
      *
-     * @param PicoAnnotationParser $reflexProp Class reflection.
-     * @param PicoGenericObject $parameters Parameters.
-     * @param string $key Property key.
-     * @param string $defaultLabel Default label.
-     * @return string
+     * This method retrieves and selects the appropriate label for a given 
+     * property, falling back to default behavior if necessary.
+     *
+     * @param PicoAnnotationParser $reflexProp Class reflection for property.
+     * @param PicoGenericObject $parameters Parameters associated with the property.
+     * @param string $key Property key for which to retrieve the label.
+     * @param string $defaultLabel Default label to use if no annotation is found.
+     * @return string The determined label for the property.
      */
     private function label($reflexProp, $parameters, $key, $defaultLabel)
     {
@@ -298,12 +323,15 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Appends table rows based on properties.
+     * Appends table rows based on class properties.
      *
-     * @param DOMDocument $doc DOM Document.
-     * @param DOMNode $tbody DOM Node for the tbody.
-     * @param array $props Properties to append.
-     * @param string $className Class name for reflection.
+     * This method generates rows for the table based on the properties of the class 
+     * and appends them to the provided DOM node.
+     *
+     * @param DOMDocument $doc The DOM document used to create elements.
+     * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
+     * @param array $props Array of ReflectionProperty objects representing class properties.
+     * @param string $className Name of the class for reflection.
      * @return void
      */
     private function appendByProp($doc, $tbody, $props, $className)
@@ -335,11 +363,14 @@ class DataTable extends SetterGetter
         }
     }
 
-    /**
-     * Appends table rows based on values.
+     /**
+     * Appends table rows based on provided values.
      *
-     * @param DOMDocument $doc DOM Document.
-     * @param DOMNode $tbody DOM Node for the tbody.
+     * This method takes an array of values and creates rows in the table, 
+     * appending them to the provided DOM node.
+     *
+     * @param DOMDocument $doc The DOM document used to create elements.
+     * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
      * @param stdClass $values Data to append as rows.
      * @return void
      */
@@ -364,8 +395,11 @@ class DataTable extends SetterGetter
     /**
      * Gets the label for a specified property.
      *
-     * @param string $propertyName Property name.
-     * @return string
+     * This method retrieves the label associated with a property, checking 
+     * for language-specific labels before falling back to default labels.
+     *
+     * @param string $propertyName Name of the property for which to retrieve the label.
+     * @return string The label for the specified property.
      */
     private function getLabel($propertyName)
     {
@@ -385,10 +419,13 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Adds a class to the table.
+     * Adds a CSS class to the table.
      *
-     * @param string $className Class name to add.
-     * @return self
+     * This method appends a class to the table's class list, ensuring 
+     * that there are no duplicates.
+     *
+     * @param string $className Class name to add to the table.
+     * @return self Returns the current instance for method chaining.
      */
     public function addClass($className)
     {
@@ -401,10 +438,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Removes a class from the table.
+     * Removes a CSS class from the table.
      *
-     * @param string $className Class name to remove.
-     * @return self
+     * This method filters out the specified class from the table's class list.
+     *
+     * @param string $className Class name to remove from the table.
+     * @return self Returns the current instance for method chaining.
      */
     public function removeClass($className)
     {
@@ -421,7 +460,7 @@ class DataTable extends SetterGetter
      *
      * @param string $search Class name to search for.
      * @param string $replace Class name to replace with.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function replaceClass($search, $replace)
     {
@@ -431,9 +470,12 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Converts the object to a string representation (HTML).
+     * Converts the DataTable object to an HTML string representation.
      *
-     * @return string HTML representation of the data table.
+     * This method generates the full HTML structure for the table, including 
+     * headers and data rows, and returns it as a string.
+     *
+     * @return string HTML representation of the DataTable.
      */
     public function __toString()
     {

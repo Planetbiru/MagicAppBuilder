@@ -11,7 +11,9 @@ use MagicObject\MagicObject;
  * This class extends the functionality of the PicoDatabasePersistence
  * by adding dynamic property setting through magic methods and enhanced
  * record selection capabilities.
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabasePersistenceExtended extends PicoDatabasePersistence

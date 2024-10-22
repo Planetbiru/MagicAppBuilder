@@ -10,7 +10,9 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
  *
  * This class is responsible for building complex database query specifications,
  * allowing for the combination of predicates using logical operators (AND, OR).
- *
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSpecification //NOSONAR

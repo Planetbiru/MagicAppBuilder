@@ -17,10 +17,10 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
-use MagicObject\DataLabel\PicoDataLabel;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
+use MagicObject\Exceptions\InvalidReturnTypeException;
 use MagicObject\Exceptions\NoDatabaseConnectionException;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
@@ -43,23 +43,34 @@ use Symfony\Component\Yaml\Yaml;
  * Users can create entities from database tables and perform insert, select, update, and delete operations on records in the database.
  * Users can also create properties from other entities using the full name of the class (namespace + class name).
  * 
+ * @author Kamshory
+ * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class MagicObject extends stdClass // NOSONAR
 {
+    // Message constants
     const MESSAGE_NO_DATABASE_CONNECTION = "No database connection provided";
     const MESSAGE_NO_RECORD_FOUND = "No record found";
+    
+    // Property naming strategy
     const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
+    
+    // Key constants
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_DEFAULT_VALUE = "default_value";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
+
+    // Format constants
     const JSON = 'JSON';
     const YAML = 'Yaml';
 
+    // Attribute constants
     const ATTR_CHECKED = ' checked="checked"';
     const ATTR_SELECTED = ' selected="selected"';
 
+    // Find option constants
     const FIND_OPTION_DEFAULT = 0;
     const FIND_OPTION_NO_COUNT_DATA = 1;
     const FIND_OPTION_NO_FETCH_DATA = 2;
@@ -201,19 +212,22 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $rawData Raw INI data
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadIniString($rawData, $systemEnv = false)
     {
         // Parse without sections
         $data = PicoIniUtil::parseIniString($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
@@ -222,19 +236,22 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $path File path to the INI file
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadIniFile($path, $systemEnv = false)
     {
         // Parse without sections
         $data = PicoIniUtil::parseIniFile($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
@@ -245,39 +262,42 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parse($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
-        if($asObject)
-        {
-            // convert to object
-            $obj = json_decode(json_encode((object) $data), false);
-            if($recursive)
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
             {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            if($asObject)
+            {
+                // convert to object
+                $obj = json_decode(json_encode((object) $data), false);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                }
+                else
+                {
+                    $this->loadData($obj);
+                }
             }
             else
             {
-                $this->loadData($obj);
-            }
-        }
-        else
-        {
-            if($recursive)
-            {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($data));
-            }
-            else
-            {
-                $this->loadData($data);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($data));
+                }
+                else
+                {
+                    $this->loadData($data);
+                }
             }
         }
         return $this;
@@ -290,39 +310,42 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parseFile($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
-        if($asObject)
-        {
-            // convert to object
-            $obj = json_decode(json_encode((object) $data), false);
-            if($recursive)
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
             {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            if($asObject)
+            {
+                // convert to object
+                $obj = json_decode(json_encode((object) $data), false);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                }
+                else
+                {
+                    $this->loadData($obj);
+                }
             }
             else
             {
-                $this->loadData($obj);
-            }
-        }
-        else
-        {
-            if($recursive)
-            {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($data));
-            }
-            else
-            {
-                $this->loadData($data);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($data));
+                }
+                else
+                {
+                    $this->loadData($data);
+                }
             }
         }
         return $this;
@@ -335,39 +358,42 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = json_decode($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
-        if($asObject)
-        {
-            // convert to object
-            $obj = json_decode(json_encode((object) $data), false);
-            if($recursive)
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
             {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            if($asObject)
+            {
+                // convert to object
+                $obj = json_decode(json_encode((object) $data), false);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                }
+                else
+                {
+                    $this->loadData($obj);
+                }
             }
             else
             {
-                $this->loadData($obj);
-            }
-        }
-        else
-        {
-            if($recursive)
-            {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($data));
-            }
-            else
-            {
-                $this->loadData($data);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($data));
+                }
+                else
+                {
+                    $this->loadData($data);
+                }
             }
         }
         return $this;
@@ -380,39 +406,42 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = json_decode(file_get_contents($path));
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
-        if($asObject)
-        {
-            // convert to object
-            $obj = json_decode(json_encode((object) $data), false);
-            if($recursive)
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
             {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            if($asObject)
+            {
+                // convert to object
+                $obj = json_decode(json_encode((object) $data), false);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($obj));
+                }
+                else
+                {
+                    $this->loadData($obj);
+                }
             }
             else
             {
-                $this->loadData($obj);
-            }
-        }
-        else
-        {
-            if($recursive)
-            {
-                $this->loadData(PicoObjectParser::parseRecursiveObject($data));
-            }
-            else
-            {
-                $this->loadData($data);
+                if($recursive)
+                {
+                    $this->loadData(PicoObjectParser::parseRecursiveObject($data));
+                }
+                else
+                {
+                    $this->loadData($data);
+                }
             }
         }
         return $this;
@@ -425,7 +454,7 @@ class MagicObject extends stdClass // NOSONAR
      * but loadData will still function normally.
      *
      * @param bool $readonly Flag to set the object as read-only
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     protected function readOnly($readonly)
     {
@@ -437,7 +466,7 @@ class MagicObject extends stdClass // NOSONAR
      * Set the database connection.
      *
      * @param PicoDatabase $database Database connection
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function withDatabase($database)
     {
@@ -578,7 +607,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select data from the database.
      *
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function select()
@@ -603,7 +632,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select all data from the database.
      *
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function selectAll()
@@ -671,7 +700,8 @@ class MagicObject extends stdClass // NOSONAR
      *               - instances of a specified class if the return type matches a class name.
      * 
      * @throws PDOException If there is an error executing the database query.
-     * @throws InvalidQueryInputException If there is no query to be executed on the database query.
+     * @throws InvalidQueryInputException If there is no query to be executed.
+     * @throws InvalidReturnTypeException If the return type specified is invalid.
      */
     protected function executeNativeQuery() //NOSONAR
     {
@@ -696,26 +726,21 @@ class MagicObject extends stdClass // NOSONAR
         $queryString = trim($queryString, " \r\n\t ");
         if(empty($queryString))
         {
-            throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+            // Try reading the query in another way
+            preg_match('/@query\s*\(\s*"(.*?)"\s*\)/s', $docComment, $matches);
+            $queryString = $matches ? $matches[1] : '';
+            if(empty($queryString))
+            {
+                throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+            }
         }
 
         // Get parameter information from the caller function
         $callerParams = $reflection->getParameters();
 
         // Get return type from the caller function
-        $returnTypeObj = $reflection->getReturnType();
-
-        if($returnTypeObj == null)
-        {
-            // PHP 5
-            preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
-            $returnType = $matches ? $matches[1] : '';
-        }
-        else
-        {
-            // PHP 7 or above
-            $returnType = $returnTypeObj."";
-        }
+        preg_match('/@return\s+([^\s]+)/', $docComment, $matches);
+        $returnType = $matches ? $matches[1] : 'void';
         
         // Trim return type
         $returnType = trim($returnType);
@@ -797,35 +822,52 @@ class MagicObject extends stdClass // NOSONAR
                 return json_encode($stmt->fetchAll(PDO::FETCH_OBJ));
             } else {
                 try {
-                    // Check for array-type hinting in the return type
+                    // Check for array-type hinting in the return type                  
                     if (stripos($returnType, "[") !== false) {
-                        $className = trim(explode("[", $returnType)[0]);
-                        if (class_exists($className)) {
+                        $className = trim(explode("[", $returnType)[0]);      
+                        if ($className == "stdClass") {
+                            // Return all rows as stdClass objects
+                            return $stmt->fetchAll(PDO::FETCH_OBJ);
+                        } 
+                        else if($className == 'MagicObject') {
+                            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
                             $ret = [];
-                            if ($className == "stdClass") {
-                                // Return all rows as stdClass objects
-                                return $stmt->fetchAll(PDO::FETCH_OBJ);
-                            } else {
-                                // Map result rows to the specified class
+                            foreach ($result as $row) {
+                                $ret[] = new MagicObject($row);
+                            }
+                            return $ret;                
+                        }
+                        else if (class_exists($className)) {
+                            // Map result rows to the specified class
+                            $obj = new $className();
+                            if($obj instanceof MagicObject) {
                                 $result = $stmt->fetchAll(PDO::FETCH_OBJ);
                                 foreach ($result as $row) {
                                     $ret[] = new $className($row);
                                 }
                                 return $ret;
-                            }
-                        }
+                            }                              
+                        }                    
+                        throw new InvalidReturnTypeException("Invalid return type for $className");
                     } else {
                         // Return a single object of the specified class
                         $className = trim($returnType);
-                        if (class_exists($className)) {
-                            $row = $stmt->fetch(PDO::FETCH_OBJ);
-                            return new $className($row);
+                        if($className == 'MagicObject') {
+                            $row = $stmt->fetch(PDO::FETCH_OBJ);       
+                            return new MagicObject($row);       
                         }
+                        else if (class_exists($className)) {
+                            $obj = new $className();
+                            if($obj instanceof MagicObject) {
+                                $row = $stmt->fetch(PDO::FETCH_OBJ);
+                                return $obj->loadData($row);
+                            }
+                        }
+                        throw new InvalidReturnTypeException("Invalid return type for $className");
                     }
                 } catch (Exception $e) {
                     // Log the exception if the class is not found
-                    error_log('Class not found: ' . $e->getMessage());
-                    return null;
+                    throw new InvalidReturnTypeException("Invalid return type for $className");
                 }
             }            
         } 
@@ -1039,7 +1081,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param string $propertyName Property name
      * @param mixed|null $propertyValue Property value
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function set($propertyName, $propertyValue, $skipModifyNullProperties = false)
     {
@@ -1057,7 +1099,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function push($propertyName, $propertyValue)
     {
@@ -1075,7 +1117,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function append($propertyName, $propertyValue)
     {
@@ -1087,7 +1129,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function unshift($propertyName, $propertyValue)
     {
@@ -1105,7 +1147,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     public function prepend($propertyName, $propertyValue)
     {
@@ -1259,7 +1301,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self
+     * @return self Returns the instance of the current object for method chaining.
      */
     private function removeValue($propertyName, $skipModifyNullProperties = false)
     {
@@ -1585,7 +1627,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSpecification|null $specification The specification for filtering
      * @param PicoSortable|string|null $sortable The sorting criteria
      * @param array|null $subqueryMap An optional map of subqueries
-     * @return self The found instance
+     * @return self The found instance.
      * @throws NoRecordFoundException if no record is found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
@@ -1854,7 +1896,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find one record by primary key value
      *
      * @param mixed $params The parameters for the search
-     * @return self The found instance
+     * @return self The found instance.
      * @throws NoRecordFoundException if no record is found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
@@ -1884,7 +1926,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find one record if it exists by primary key value
      *
      * @param array $params The parameters for the search
-     * @return self The found instance or the current instance if not found
+     * @return self The found instance. or the current instance if not found
      */
     public function findIfExists($params)
     {

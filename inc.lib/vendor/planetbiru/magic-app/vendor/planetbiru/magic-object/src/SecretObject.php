@@ -10,6 +10,7 @@ use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\ClassUtil\PicoSecretParser;
 use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoGenericObject;
+use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 use ReflectionClass;
@@ -31,9 +32,9 @@ class SecretObject extends stdClass //NOSONAR
 {
     const JSON = 'JSON';
     const YAML = 'Yaml';
+    const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
-    const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_DEFAULT_VALUE = "default_value";
     const ANNOTATION_ENCRYPT_IN = "EncryptIn";
@@ -98,10 +99,16 @@ class SecretObject extends stdClass //NOSONAR
     private $_secureFunction = null; //NOSONAR
 
     /**
-     * Constructor
+     * Constructor for initializing the object with data.
      *
-     * @param self|array|object $data The initial data for the object.
-     * @param callable|null $secureCallback A callback function for secure key generation.
+     * This constructor accepts initial data in various formats (array or object) and 
+     * allows the optional specification of a callback function for secure key generation. 
+     * The data is processed and loaded into the object upon instantiation.
+     *
+     * @param self|array|object|null $data The initial data for the object. Can be an 
+     *                                     associative array, an object, or null.
+     * @param callable|null $secureCallback An optional callback function for generating 
+     *                                       secure keys. If provided, it must be callable.
      */
     public function __construct($data = null, $secureCallback = null)
     {
@@ -122,12 +129,17 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Process object information.
+     * Processes object information to determine encryption and decryption requirements.
      *
-     * This method retrieves and processes class parameters and properties 
-     * to determine which need to be encrypted or decrypted.
+     * This method retrieves the class parameters and properties using reflection, 
+     * parsing annotations to identify which properties should be encrypted or 
+     * decrypted. It populates the respective lists of properties based on the 
+     * annotations found.
      *
      * @return void
+     *
+     * @throws InvalidAnnotationException If an invalid annotation is encountered 
+     *                                    while processing class parameters.
      */
     private function _objectInfo()
     {
@@ -179,7 +191,11 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Secure key generation.
+     * Generates a secure key for encryption and decryption.
+     *
+     * This method checks for a user-defined secure key generation function. If a valid
+     * function is provided, it calls that function to generate the key. Otherwise, it 
+     * returns a concatenation of predefined random keys.
      *
      * @return string The secure key for encryption/decryption.
      */
@@ -368,7 +384,10 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Encrypt data recursively.
      *
-     * @param MagicObject|PicoGenericObject|self|array|stdClass|string|number $data The data to encrypt, which can be an object, array, or scalar value.
+     * This method encrypts the provided data, which can be an object, array, or scalar value.
+     * It handles nested structures by encrypting each value individually.
+     *
+     * @param MagicObject|PicoGenericObject|self|array|stdClass|string|number $data The data to encrypt.
      * @param string|null $hexKey The encryption key in hexadecimal format. If null, a secure key will be generated.
      * @return mixed The encrypted data.
      */
@@ -409,7 +428,9 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Encrypt a string
+     * Encrypt a string.
+     *
+     * This method encrypts a plain text string using a specified or generated secure key.
      *
      * @param string $plaintext The plain text to be encrypted.
      * @param string|null $hexKey The key in hexadecimal format. If null, a secure key will be generated.
@@ -430,7 +451,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Decrypt data recursive
+     * Decrypt data recursively.
+     *
+     * This method decrypts the provided ciphertext, which can be an object, array, or scalar value.
+     * It handles nested structures by decrypting each value individually.
      *
      * @param MagicObject|PicoGenericObject|self|array|stdClass|string $data The ciphertext to decrypt.
      * @param string|null $hexKey The key in hexadecimal format. If null, a secure key will be generated.
@@ -473,11 +497,13 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Decrypt string
+     * Decrypt a string.
      *
-     * @param string $data Data
-     * @param string $hexKey Key in hexadecimal format
-     * @return string
+     * This method decrypts a given ciphertext string using a specified or generated secure key.
+     *
+     * @param string $ciphertext The encrypted data to be decrypted.
+     * @param string|null $hexKey The key in hexadecimal format. If null, a secure key will be generated.
+     * @return string|null The decrypted string or null if decryption fails.
      */
     public function decryptString($ciphertext, $hexKey = null)
     {
@@ -503,10 +529,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if value is required to be encrypted before stored
+     * Check if a value requires encryption before being stored.
      *
-     * @param string $var Variable
-     * @return bool
+     * @param string $var The variable name.
+     * @return bool True if the value needs to be encrypted, otherwise false.
      */
     private function needInputEncryption($var)
     {
@@ -514,10 +540,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if value is required to be decrypted after read
+     * Check if a value requires decryption after being read.
      *
-     * @param string $var Variable
-     * @return bool
+     * @param string $var The variable name.
+     * @return bool True if the value needs to be decrypted, otherwise false.
      */
     private function needOutputDecryption($var)
     {
@@ -525,10 +551,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if value is required to be encrypted after read
+     * Check if a value requires encryption after being read.
      *
-     * @param string $var Variable
-     * @return bool
+     * @param string $var The variable name.
+     * @return bool True if the value needs to be encrypted, otherwise false.
      */
     private function needOutputEncryption($var)
     {
@@ -536,10 +562,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if value is required to be decrypted before stored
+     * Check if a value requires decryption before being stored.
      *
-     * @param string $var Variable
-     * @return bool
+     * @param string $var The variable name.
+     * @return bool True if the value needs to be decrypted, otherwise false.
      */
     private function needInputDecryption($var)
     {
@@ -547,9 +573,13 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Load data to object
-     * @param mixed $data Data
-     * @return self
+     * Load data into the object.
+     *
+     * This method populates the object's properties from the provided data, which can be an object, 
+     * array, or scalar value.
+     *
+     * @param mixed $data The data to load.
+     * @return self Returns the current object instance.
      */
     public function loadData($data)
     {
@@ -574,174 +604,204 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Load data from INI string
+     * Load data from an INI string.
      *
-     * @param string $rawData Raw data
-     * @param bool $systemEnv Flag to use environment variable
-     * @return self
+     * This method parses an INI formatted string and loads the data into the object.
+     *
+     * @param string $rawData The raw INI data as a string.
+     * @param bool $systemEnv Flag to indicate whether to use environment variable replacement.
+     * @return self Returns the current object instance.
      */
     public function loadIniString($rawData, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_string($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        $data = PicoIniUtil::parseIniString($rawData);
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
     /**
-     * Load data from INI file
+     * Load data from an INI file.
      *
-     * @param string $path File path
-     * @param bool $systemEnv Flag to use environment variable
-     * @return self
+     * This method reads an INI file and loads the data into the object.
+     *
+     * @param string $path The path to the INI file.
+     * @param bool $systemEnv Flag to indicate whether to use environment variable replacement.
+     * @return self Returns the current object instance.
      */
     public function loadIniFile($path, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_file($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        $data = PicoIniUtil::parseIniFile($path);
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
+            $this->loadData($data);
         }
-        $data = PicoArrayUtil::camelize($data);
-        $this->loadData($data);
         return $this;
     }
 
     /**
-     * Load data from Yaml string
+     * Load data from a YAML string.
      *
-     * @param string $rawData String of Yaml
-     * @param bool $systemEnv Replace all environment variable value
-     * @param bool $asObject Result is object instead of array
-     * @param bool $recursive Convert all object to MagicObject
-     * @return self
+     * This method parses a YAML formatted string and loads the data into the object.
+     *
+     * @param string $rawData The YAML data as a string.
+     * @param bool $systemEnv Flag to indicate whether to replace environment variables.
+     * @param bool $asObject Flag to indicate whether to return results as an object.
+     * @param bool $recursive Flag to indicate whether to convert nested objects to MagicObject.
+     * @return self Returns the current object instance.
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parse($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
-        else
-        {
-            $this->loadData($data);
-        }
-
         return $this;
     }
 
     /**
-     * Load data from Yaml file
+     * Load data from a YAML file.
      *
-     * @param string $path File path
-     * @param bool $systemEnv Replace all environment variable value
-     * @param bool $asObject Result is object instead of array
-     * @param bool $recursive Convert all object to MagicObject
-     * @return self
+     * This method reads a YAML file and loads the data into the object.
+     *
+     * @param string $path The path to the YAML file.
+     * @param bool $systemEnv Flag to indicate whether to replace environment variables.
+     * @param bool $asObject Flag to indicate whether to return results as an object.
+     * @param bool $recursive Flag to indicate whether to convert nested objects to MagicObject.
+     * @return self Returns the current object instance.
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = Yaml::parseFile($path);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
-        else
-        {
-            $this->loadData($data);
-        }
-
         return $this;
     }
 
     /**
-     * Load data from JSON string
+     * Load data from a JSON string.
      *
-     * @param string $rawData Raw data
-     * @param bool $systemEnv Flag to use environment variable
-     * @param bool $recursive Flag to create recursive object
-     * @return self
+     * This method parses a JSON formatted string and loads the data into the object.
+     *
+     * @param string $rawData The JSON data as a string.
+     * @param bool $systemEnv Flag to indicate whether to replace environment variables.
+     * @param bool $recursive Flag to create recursive object.
+     * @return self Returns the current object instance.
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = json_decode($rawData);
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
-        }
-        else
-        {
-            $this->loadData($data);
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
 
         return $this;
     }
 
     /**
-     * Load data from JSON file
+     * Load data from a JSON file.
      *
-     * @param string $path File path
-     * @param bool $systemEnv Flag to use environment variable
-     * @param bool $recursive Flag to create recursive object
-     * @return self
+     * This method reads a JSON file and loads the data into the object.
+     *
+     * @param string $path The path to the JSON file.
+     * @param bool $systemEnv Flag to indicate whether to replace environment variables.
+     * @param bool $recursive Flag to create recursive object.
+     * @return self Returns the current object instance.
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
         $data = json_decode(file_get_contents($path));
-        $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
-        if($systemEnv)
+        if(isset($data) && !empty($data))
         {
-            $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
-        }
-        $data = PicoArrayUtil::camelize($data);
+            $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
+            if($systemEnv)
+            {
+                $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
+            }
+            $data = PicoArrayUtil::camelize($data);
 
-        if($recursive)
-        {
-            $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            if($recursive)
+            {
+                $this->loadData(PicoSecretParser::parseRecursiveObject($data));
+            }
+            else
+            {
+                $this->loadData($data);
+            }
         }
-        else
-        {
-            $this->loadData($data);
-        }
-
         return $this;
     }
 
     /**
-     * Set readonly. When object is set to readonly, setter will not change value of its properties but loadData still works fine
+     * Set the object to read-only mode.
      *
-     * @param bool $readonly Flag to set object to be readonly
-     * @return self
+     * When in read-only mode, setters will not change the value of the object's properties,
+     * but the loadData method will still work.
+     *
+     * @param bool $readonly Flag to set the object to read-only.
+     * @return self Returns the current object instance.
      */
     protected function readOnly($readonly)
     {
@@ -750,11 +810,11 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Set property value
+     * Set a property value.
      *
-     * @param string $propertyName Property name
-     * @param mixed|null $propertyValue Property value
-     * @return self
+     * @param string $propertyName The name of the property to set.
+     * @param mixed|null $propertyValue The value to set for the property.
+     * @return self Returns the current object instance.
      */
     public function set($propertyName, $propertyValue)
     {
@@ -762,11 +822,11 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Add array element of property
+     * Add an element to a property array.
      *
-     * @param string $propertyName
-     * @param mixed $propertyValue
-     * @return self
+     * @param string $propertyName The name of the property.
+     * @param mixed $propertyValue The value to add.
+     * @return self Returns the current object instance.
      */
     public function push($propertyName, $propertyValue)
     {
@@ -780,10 +840,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Remove last array element of property
+     * Remove the last element from a property array.
      *
-     * @param string $propertyName
-     * @return mixed
+     * @param string $propertyName The name of the property.
+     * @return mixed|null The removed value or null if the property is not an array.
      */
     public function pop($propertyName)
     {
@@ -796,10 +856,10 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Get property value
+     * Get a property value.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null $propertyValue Property value
+     * @param string $propertyName The name of the property.
+     * @return mixed|null The value of the property or null if not set.
      */
     public function get($propertyName)
     {
@@ -807,10 +867,11 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Get property value
+     * Get a property value or return a default value if not set.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null $propertyValue Property value
+     * @param string $propertyName The name of the property.
+     * @param mixed|null $defaultValue The default value to return if the property is not set.
+     * @return mixed The property value or the default value.
      */
     public function getOrDefault($propertyName, $defaultValue = null)
     {
@@ -819,12 +880,18 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Copy value from other object
+     * Copies values from another object to the current object based on specified filters.
      *
-     * @param self|mixed $source Source
-     * @param array $filter Filter
-     * @param bool $includeNull Flag to include null
-     * @return void
+     * This method allows selective copying of property values from a source object to the 
+     * current object. You can specify which properties to copy using a filter, and you can 
+     * choose whether to include properties with null values.
+     *
+     * @param self|mixed $source The source object from which to copy values.
+     * @param array|null $filter An optional array of property names to filter which values 
+     *                           should be copied. If null, all properties will be considered.
+     * @param bool $includeNull A flag indicating whether to include properties with null 
+     *                          values. Defaults to false, meaning null values will be excluded.
+     * @return self Returns the current object instance for method chaining.
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
     {
@@ -851,12 +918,17 @@ class SecretObject extends stdClass //NOSONAR
                 $this->set($property, $value);
             }
         }
+        return $this;
     }
 
     /**
-     * Get object value
-     * @param bool $snakeCase Flag to snake case property
-     * @return stdClass
+     * Get object value.
+     *
+     * This method retrieves the values of the object's properties, optionally converting 
+     * the property names to snake case.
+     *
+     * @param bool $snakeCase Flag to convert property names to snake case.
+     * @return stdClass An object containing the values of the properties.
      */
     public function value($snakeCase = false)
     {
@@ -883,9 +955,13 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Get object value
-     * @param bool $snakeCase Flag to snake case property
-     * @return stdClass
+     * Get object value as an object.
+     *
+     * This method is an alias for the value() method, allowing for retrieval of 
+     * object values, optionally in snake case.
+     *
+     * @param bool $snakeCase Flag to convert property names to snake case.
+     * @return stdClass An object containing the values of the properties.
      */
     public function valueObject($snakeCase = false)
     {
@@ -893,9 +969,13 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Get object value as associative array
-     * @param bool $snakeCase Flag to snake case property
-     * @return array
+     * Get object value as an associative array.
+     *
+     * This method retrieves the object values and converts them to an associative array,
+     * optionally converting property names to snake case.
+     *
+     * @param bool $snakeCase Flag to convert property names to snake case.
+     * @return array An associative array containing the values of the properties.
      */
     public function valueArray($snakeCase = false)
     {
@@ -904,9 +984,12 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Get object value as associated array with upper case first
+     * Get object value as an associative array with upper camel case keys.
      *
-     * @return array
+     * This method retrieves the object values and converts them to an associative array,
+     * with keys formatted in upper camel case.
+     *
+     * @return array An associative array containing the values of the properties with upper camel case keys.
      */
     public function valueArrayUpperCamel()
     {
@@ -925,9 +1008,9 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if JSON naming strategy is snake case or not
+     * Check if JSON naming strategy is snake case.
      *
-     * @return bool
+     * @return bool True if the naming strategy is snake case, otherwise false.
      */
     protected function _snakeJson()
     {
@@ -938,9 +1021,9 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if Yaml naming strategy is snake case or not
+     * Check if YAML naming strategy is snake case.
      *
-     * @return bool
+     * @return bool True if the naming strategy is snake case, otherwise false.
      */
     protected function _snakeYaml()
     {
@@ -951,9 +1034,9 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     *  Check if JSON naming strategy is upper camel case or not
+     * Check if JSON naming strategy is upper camel case.
      *
-     * @return bool
+     * @return bool True if the naming strategy is upper camel case, otherwise false.
      */
     protected function isUpperCamel()
     {
@@ -964,9 +1047,9 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Check if JSON naming strategy is camel case or not
+     * Check if JSON naming strategy is camel case.
      *
-     * @return bool
+     * @return bool True if the naming strategy is camel case, otherwise false.
      */
     protected function _camel()
     {
@@ -974,10 +1057,14 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Property list
-     * @var boolean $reflectSelf Flag to reflect self
-     * @var boolean $asArrayProps Flag to convert properties as array
-     * @return array
+     * Get the list of properties of the class.
+     *
+     * This method returns an array of properties defined in the class, optionally 
+     * reflecting the self class or converting the properties to an array.
+     *
+     * @param bool $reflectSelf Flag to include properties defined in the current class.
+     * @param bool $asArrayProps Flag to return properties as an array.
+     * @return array An array of ReflectionProperty objects or property names.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -1013,11 +1100,12 @@ class SecretObject extends stdClass //NOSONAR
     /**
      * Modify null properties.
      *
-     * This method keeps track of properties that have been set to null.
+     * This method keeps track of properties that have been set to null, allowing for 
+     * tracking changes to properties.
      *
      * @param string $propertyName The name of the property.
      * @param mixed $propertyValue The value of the property.
-     * @return void
+     * @return self Returns the current object instance.
      */
     private function modifyNullProperties($propertyName, $propertyValue)
     {
@@ -1029,12 +1117,15 @@ class SecretObject extends stdClass //NOSONAR
         {
             unset($this->_nullProperties[$propertyName]);
         }
+        return $this;
     }
 
     /**
      * Get the encrypted value of the object.
      *
-     * @return array An array representation of the encrypted values.
+     * This method returns an array representation of the object's encrypted values.
+     *
+     * @return array An array containing the encrypted values.
      */
     public function encryptedValue()
     {
