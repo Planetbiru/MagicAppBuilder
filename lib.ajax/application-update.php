@@ -2,6 +2,7 @@
 use AppBuilder\AppBuilder;
 use AppBuilder\AppSecretObject;
 use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
@@ -13,7 +14,7 @@ try
 {
 	$inputPost = new InputPost();
 
-	$appId = $inputPost->getApplicationId();
+	$appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
 	$type = $inputPost->getType();

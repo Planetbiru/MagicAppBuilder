@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Request\InputGet;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -8,7 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 $constShowActive = ' show active';
 $constSelected = ' selected';
 $inputGet = new InputGet();
-$applicationId = $inputGet->getApplicationId();
+$applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
 if($applicationId != null)
 {

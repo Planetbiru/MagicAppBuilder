@@ -2,6 +2,7 @@
 
 use AppBuilder\AppSecretObject;
 use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 
@@ -11,7 +12,7 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 try
 {
 	$inputPost = new InputPost();
-	$appId = $inputPost->getApplicationId();
+	$appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 	$builderConfig = new AppSecretObject(null);
 
     $builderConfigPath = dirname(__DIR__) . "/inc.cfg/core.yml";
