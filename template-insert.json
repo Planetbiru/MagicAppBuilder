@@ -1,0 +1,43 @@
+
+{
+    "response_code": "00",
+    "response_message": "Success",
+    "data": {
+        "input": [
+            {
+                "field": "song_id",
+                "label": "Song ID",
+                "type": "string",
+                "source": "text"
+            },
+            {
+                "field": "title",
+                "label": "Title",
+                "type": "string",
+                "source": "text"
+            },
+            {
+                "field": "album_id",
+                "label": "Album",
+                "type": "string",
+                "source": "select",
+                "map": [
+                    {
+                        "label": "Album 1",
+                        "value": "1111"
+                    },
+                    {
+                        "label": "Album 2",
+                        "value": "1112"
+                    }
+                ]
+            },
+            {
+                "field": "active",
+                "label": "Active",
+                "type": "boolean",
+                "source": "checkbox"
+            }
+        ]
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "response_code": "00",
+    "response_message": "Success",
+    "waiting_for_code": 2,
+    "waiting_for_action": "update",
+    "waiting_for_message": "This data require approval to be updated",
+    "data": {
+        "master": [
+            {
+                "field": "song_id",
+                "hidden": false,
+                "readonly": false,
+                "label": "Song ID",
+                "type": "string",
+                "value": "111111"
+            },
+            {
+                "field": "title",
+                "hidden": false,
+                "readonly": false,
+                "label": "Title",
+                "type": "string",
+                "value": "Song 1"
+            },
+            {
+                "field": "album_id",
+                "hidden": true,
+                "readonly": false,
+                "label": "Album ID",
+                "value": "2222"
+            },
+            {
+                "field": "album",
+                "hidden": false,
+                "readonly": true,
+                "label": "Album",
+                "value": "Album 1"
+            },
+            {
+                "field": "active",
+                "hidden": false,
+                "readonly": false,
+                "label": "Active",
+                "type": "boolean",
+                "value": true
+            }
+        ],
+        "draft": [
+            {
+                "field": "song_id",
+                "hidden": false,
+                "readonly": false,
+                "label": "Song ID",
+                "type": "string",
+                "value": "111111"
+            },
+            {
+                "field": "title",
+                "hidden": false,
+                "readonly": false,
+                "label": "Title",
+                "type": "string",
+                "value": "Song 1"
+            },
+            {
+                "field": "album_id",
+                "hidden": true,
+                "readonly": false,
+                "label": "Album ID",
+                "value": "2222"
+            },
+            {
+                "field": "album",
+                "hidden": false,
+                "readonly": true,
+                "label": "Album",
+                "value": "Album 1"
+            },
+            {
+                "field": "active",
+                "hidden": false,
+                "readonly": false,
+                "label": "Active",
+                "type": "boolean",
+                "value": true
+            }
+        ]
+    }
+}

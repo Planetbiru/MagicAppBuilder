@@ -942,6 +942,29 @@ jQuery(function(){
       }
     });
   });
+  
+  $(document).on('click', '.button-application-menu', function(e){
+    e.preventDefault();
+    let updateBtn = $('#modal-application-setting .button-save-application-config');
+    updateBtn[0].disabled = true;
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    
+    $('#modal-application-menu .modal-body').empty();
+    $('#modal-application-menu .modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+    $('#modal-application-menu').modal('show');
+  
+    $.ajax({
+      type:'GET',
+      url:'lib.ajax/application-menu.php',
+      data: {applicationId:applicationId},
+      dataType:'html',
+      success:function(data){
+        $('#modal-application-menu .modal-body').empty().append(data);
+        reloadApplicationList();
+        updateBtn[0].disabled = false;
+      }
+    });
+  });
 
   $(document).on('click', '.button-application-default', function(e){
     e.preventDefault();

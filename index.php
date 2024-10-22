@@ -1019,6 +1019,34 @@ $constSelected = ' selected';
       </div>
     </div>
   </div>
+  
+  <div class="modal fade" id="modal-application-menu" tabindex="-1" aria-labelledby="application_menu" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Menu</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+        
+        </div>
+        <div class="modal-footer">
+          <input class="btn btn-success button-save-menu" type="button" name="button-save-menu" value="Save">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function showMenu(applicationId)
+    {
+      
+    }
+  </script>
 
 </body>
 </html>
