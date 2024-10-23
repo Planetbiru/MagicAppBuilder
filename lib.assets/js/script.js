@@ -1015,6 +1015,7 @@ jQuery(function(){
       newMenuStr += "<li class=\"sortable-menu-item\">\r\n";
       newMenuStr += '<span class="sortable-move-icon move-icon-up" onclick="moveUp(this)"></span>' + "\r\n";
       newMenuStr += '<span class="sortable-move-icon move-icon-down" onclick="moveDown(this)"></span>' + "\r\n";
+      newMenuStr += '<span class="sortable-move-icon move-icon"></span>' + "\r\n";
       newMenuStr += "<a href=\"#\">" + newMenu + "</a>\r\n";
       newMenuStr += '<span class="sortable-toggle-icon"></span>' + "\r\n";
       newMenuStr += "<ul class=\"sortable-submenu\">\r\n";
@@ -1091,6 +1092,29 @@ jQuery(function(){
     });
   });
 
+  $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function(e){
+    e.preventDefault();
+    $(this).attr('spellcheck', 'false')
+    $(this).attr('contenteditable', 'true')
+  });
+
+  $(document).on('focus', '.sortable-menu-item > a[contenteditable="true"], .sortable-submenu-item > a[contenteditable="true"]', function(e){
+    e.preventDefault();
+    $(this).attr('spellcheck', 'false')
+    $(this).attr('contenteditable', 'true');
+    var range = document.createRange();
+    var sel = window.getSelection();
+    range.selectNodeContents(this);
+    range.collapse(false); // Menempatkan kursor di akhir
+    sel.removeAllRanges();
+    sel.addRange(range);
+  });
+
+  $(document).on('blur', '.sortable-menu-item > a, .sortable-submenu-item > a', function(e){
+    e.preventDefault();
+    $(this).removeAttr('contenteditable')
+  });
+
   
   
   reloadApplicationList();
@@ -1124,6 +1148,11 @@ function initMenu() {
       item.addEventListener('drop', dropToSubmenu);
   });
 
+  document.querySelectorAll('.move-icon-down').forEach(item => {
+      item.setAttribute('draggable', true);
+      item.addEventListener('dragstart', dragStart);
+  });
+
   // Set up drag and drop for menu items
   document.querySelectorAll('.sortable-menu-item').forEach(item => {
       item.addEventListener('dragover', dragOver); // Added dragover event
@@ -1141,6 +1170,12 @@ function dragStart(e) {
       draggedItem = e.target;
       e.dataTransfer.effectAllowed = 'move';
   }
+  if(e.target.classList.contains('move-icon-down'))
+  {
+    console.log('icon move')
+      draggedItem = e.target.parentNode;
+      e.dataTransfer.effectAllowed = 'move';
+  }
   if(e.target.parentNode.classList.contains('sortable-submenu-item'))
   {
       draggedItem = e.target.parentNode;
@@ -1156,6 +1191,14 @@ function dropToMenu(e) {
   e.preventDefault();
   if (draggedItem) {
       // Append dragged item to the menu item
+      console.log('ok')
+      if(e.target.classList.length == 0)
+      {
+        let target = $(e.target).closest('.sortable-menu-item')[0];
+        target.querySelector('.sortable-submenu').appendChild(draggedItem);
+        target.classList.remove('expanded');
+        target.classList.add('expanded');
+      }
       if(e.target.classList.contains('sortable-menu-item'))
       {
           if(e.target.querySelector('.sortable-submenu') == null)
@@ -1166,12 +1209,10 @@ function dropToMenu(e) {
               e.target.appendChild(sm);   
           }
           e.target.querySelector('.sortable-submenu').appendChild(draggedItem);
-
-
           e.target.classList.remove('expanded');
           e.target.classList.add('expanded');
       }
-      if(e.target.classList.contains('sortable-submenu'))
+      if(e.target.classList.contains('sortable-submenu') || e.target.classList.contains('move-icon'))
       {
           // Append dragged item to an existing submenu
           e.target.appendChild(draggedItem);

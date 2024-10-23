@@ -661,6 +661,10 @@ h3.entity-table-name {
     a {
         color: #555555;
         text-decoration: none;
+		display: inline-block;
+		padding: 3px 5px;
+		border: 1px solid transparent;
+		border-radius: 3px;
     }
 
     .sortable-menu-item {
@@ -669,6 +673,13 @@ h3.entity-table-name {
         padding: 10px;
         border-radius: 5px;
         position: relative;
+
+		a {
+			display: inline-block;
+			padding: 3px 5px;
+			border: 1px solid transparent;
+			border-radius: 3px;
+		}
 
         .sortable-toggle-icon {
             cursor: pointer;
@@ -713,8 +724,13 @@ h3.entity-table-name {
         margin-right: 2px;
         font-size: 14px;
 		display: inline-block;
-		width: 8px;
+		
 		text-align: center;
+		&.move-icon::before
+		{
+			content: '✥';
+			cursor: move;
+		}
 		&.move-icon-up::before
 		{
 			content: '↑';
@@ -724,4 +740,23 @@ h3.entity-table-name {
 			content: '↓';
 		}
     }
+	.sortable-move-icon {
+        width: 8px;
+	}
+	sortable-move-icon {
+        width: 12px;
+	}
+}
+
+.sortable-menu-item > a[contenteditable="true"], .sortable-submenu-item > a[contenteditable="true"]{
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	
+}
+
+.sortable-menu-item > a{
+	width: calc(100% - 105px);
+} 
+.sortable-submenu-item > a{
+	width: calc(100% - 90px);
 }
