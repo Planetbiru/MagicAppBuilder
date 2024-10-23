@@ -199,7 +199,11 @@ $constSelected = ' selected';
                       </tr>
                       <tr>
                         <td>Add Menu</td>
-                        <td><label for=""><input type="checkbox" name="module_ass_menu"> Yes</label></td>
+                        <td><label for=""><input type="checkbox" name="module_ass_menu" checkdate> Yes</label></td>
+                      </tr>
+                      <tr>
+                        <td>Append To</td>
+                        <td><select class="form-control" name="module_menu"></select></td>
                       </tr>
                     </tbody>
                   </table>
@@ -1034,7 +1038,29 @@ $constSelected = ' selected';
         
         </div>
         <div class="modal-footer">
-          <input class="btn btn-success button-save-menu" type="button" name="button-save-menu" value="Save">
+          <button type="button" class="btn btn-primary button-add-menu">Add</button>
+          <button type="button" class="btn btn-success button-save-menu">Save</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-application-menu-add" tabindex="-1" aria-labelledby="application_menu_add" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Menu</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">
+        
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success button-apply-new-menu">OK</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

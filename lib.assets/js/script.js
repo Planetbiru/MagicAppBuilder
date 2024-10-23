@@ -968,6 +968,91 @@ jQuery(function(){
     });
   });
 
+  $(document).on('click', '#modal-application-menu .button-save-menu', function(e){
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = modal.attr('data-application-id');
+    const jsonOutput = JSON.stringify(serializeMenu());
+    $.ajax({
+      type:'POST',
+      url:'lib.ajax/application-menu-update.php',
+      data: {applicationId:applicationId, data:jsonOutput},
+      success:function(data){
+        modal.modal('hide');
+        loadMenu();
+      }
+    });
+  });
+
+  $(document).on('click', '#modal-application-menu .button-add-menu', function(e){
+    e.preventDefault();
+    $('#new_menu').val('');
+    let modal = $('#modal-application-menu-add');
+    modal.modal('show');
+    setTimeout(function(){
+      $('#new_menu').val('');
+      $('#new_menu').focus(); 
+    }, 600);
+  });
+
+  $(document).on('click', '#modal-application-menu-add .button-apply-new-menu', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+
+    let invalidName = false;
+    let newMenu = $('#new_menu').val();
+
+    let existingMenu = serializeMenu();
+    for (let i in existingMenu) {
+      if (existingMenu[i].label.toLowerCase() == newMenu.toLowerCase()) {
+        invalidName = true;
+      }
+    }
+
+    if (!invalidName) {
+      let newMenuStr = '';
+
+      newMenuStr += "<li class=\"sortable-menu-item\">\r\n";
+      newMenuStr += '<span class="sortable-move-icon move-icon-up" onclick="moveUp(this)"></span>' + "\r\n";
+      newMenuStr += '<span class="sortable-move-icon move-icon-down" onclick="moveDown(this)"></span>' + "\r\n";
+      newMenuStr += "<a href=\"#\">" + newMenu + "</a>\r\n";
+      newMenuStr += '<span class="sortable-toggle-icon"></span>' + "\r\n";
+      newMenuStr += "<ul class=\"sortable-submenu\">\r\n";
+      newMenuStr += "</ul>\r\n";
+      newMenuStr += "</li>\r\n";
+
+      let lastMenu = $(newMenuStr);
+
+      $('.sortable-menu').append(lastMenu);
+
+      let icon = lastMenu.find('.sortable-toggle-icon')[0];
+
+      icon.addEventListener('click', function () {
+        this.parentNode.classList.toggle('expanded')
+
+      });
+
+
+      // Set up drag and drop for submenu items
+      document.querySelectorAll('.sortable-submenu-item').forEach(item => {
+        item.setAttribute('draggable', true);
+        item.addEventListener('dragstart', dragStart);
+        item.addEventListener('dragover', dragOver);
+        item.addEventListener('drop', dropToSubmenu);
+      });
+
+      // Set up drag and drop for menu items
+      lastMenu[0].addEventListener('dragover', dragOver); // Added dragover event
+      lastMenu[0].addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
+
+      modal.modal('hide');
+    }
+    else
+    {
+      $('#new_menu').select();
+    }
+  });
+
   $(document).on('click', '.button-application-default', function(e){
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
@@ -1006,23 +1091,11 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', '#modal-application-menu .button-save-menu', function(e){
-    e.preventDefault();
-    let modal = $(this).closest('.modal');
-    let applicationId = modal.attr('data-application-id');
-    const jsonOutput = JSON.stringify(serializeMenu());
-    $.ajax({
-      type:'POST',
-      url:'lib.ajax/application-menu-update.php',
-      data: {applicationId:applicationId, data:jsonOutput},
-      success:function(data){
-        modal.modal('hide');
-      }
-    });
-  });
+  
   
   reloadApplicationList();
   loadTable();
+  loadMenu();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
@@ -2491,6 +2564,24 @@ function loadTable() {
         $('select[name="source_table"]').val(val);
       }
     },
+  });
+}
+
+function loadMenu() {
+  $.ajax({
+    type: "get",
+    url: "lib.ajax/application-menu-json.php",
+    dataType: "json",
+    success: function (data) {
+      $('select[name="module_menu"]').empty(); 
+      for (let i in data) {
+        if (data.hasOwnProperty(i)) {
+          $('select[name="module_menu"]')[0].append(
+            new Option(data[i].label, data[i].label)
+          );
+        }
+      } 
+    }
   });
 }
 

@@ -6,10 +6,13 @@ use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$constShowActive = ' show active';
-$constSelected = ' selected';
 $inputGet = new InputGet();
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+
+if(!isset($applicationId) || empty($applicationId))
+{
+    $applicationId = $builderConfig->getCurrentApplication()->getId();
+}
 
 if($applicationId != null)
 {
@@ -42,9 +45,9 @@ echo "<ul class=\"sortable-menu\">\r\n";
         echo '<span class="sortable-move-icon move-icon-up" onclick="moveUp(this)"></span>'."\r\n";
         echo '<span class="sortable-move-icon move-icon-down" onclick="moveDown(this)"></span>'."\r\n";
         echo "<a href=\"#\">".$menu->getLabel()."</a>\r\n";
-        $submenus = $menu->getSubmenus();
         echo '<span class="sortable-toggle-icon"></span>'."\r\n";
         echo "<ul class=\"sortable-submenu\">\r\n";
+        $submenus = $menu->getSubmenus();
         if(is_array($submenus))
         {
             foreach($submenus as $menu)
