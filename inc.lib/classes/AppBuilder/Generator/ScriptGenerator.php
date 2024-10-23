@@ -502,9 +502,10 @@ class ScriptGenerator
     /**
      * Updates the menu configuration by adding a new module to the appropriate section.
      *
-     * This method checks if the menu configuration file exists, creates it if it does not,
-     * and loads the current menu structure from a YAML file. It then adds the provided
-     * module information as a submenu item under the specified menu label.
+     * This method checks if the menu configuration file exists. If it does not, it creates
+     * the file and loads the current menu structure from a YAML file. The provided module
+     * information is then added as a submenu item under the specified menu label if it
+     * does not already exist.
      *
      * @param SecretObject $appConf Configuration object containing application settings.
      * @param InputPost $request Request object containing the target, module menu, 
@@ -527,24 +528,45 @@ class ScriptGenerator
         }    
         $menus = new SecretObject();     
         $menus->loadYamlFile($menuPath, false, true, true);
-        $target = trim($request->getTarget(), "/\\");
-        $moduleMenu = $request->getModuleMenu();
-        $label = $request->getModuleName();
-        $link = $target."/".$request->getModuleFile();
-        $menuArray = $menus->valueArray();
-        foreach($menuArray as $index=>$menu)
+
+        $existingMenus = [];
+
+        foreach($menus as $menu)
         {
-            if(trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
+
+            $submenus = $menu->getSubmenus();
+            if(is_array($submenus))
             {
-                if(!isset($menuArray[$index]['submenus']))
+                foreach($submenus as $menu)
                 {
-                    $menuArray[$index]['submenus'] = [];
+                    $existingMenus[] = $menu->getLink()."-".$menu->getLabel();
                 }
-                $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
             }
         }
-        $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
-        file_put_contents($menuPath, $yaml);
+
+        $target = trim($request->getTarget(), "/\\");
+        $moduleMenu = trim($request->getModuleMenu());
+        $label = trim($request->getModuleName());
+        $link = $target."/".$request->getModuleFile();
+
+        $menuToCheck = $label."-".$link;
+        if(!in_array($menuToCheck, $existingMenus))
+        {
+            $menuArray = $menus->valueArray();
+            foreach($menuArray as $index=>$menu)
+            {
+                if(trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
+                {
+                    if(!isset($menuArray[$index]['submenus']))
+                    {
+                        $menuArray[$index]['submenus'] = [];
+                    }
+                    $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+                }
+            }
+            $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
+            file_put_contents($menuPath, $yaml);
+        }
     }
     
     /**
