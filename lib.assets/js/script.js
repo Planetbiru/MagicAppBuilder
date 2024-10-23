@@ -123,16 +123,16 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, "g"), replacement);
 };
 
-jQuery(function(){
+jQuery(function () {
 
-  $(document).on('change', '.multiple-selection', function(e){
+  $(document).on('change', '.multiple-selection', function (e) {
     let val = $(this).val();
     $('.multiple-selection').val(val);
   });
 
-  $(document).on('click', '#vscode', function(){
+  $(document).on('click', '#vscode', function () {
     let dir = $('#current_application option:selected').attr('data-directory');
-    let lnk = 'vscode://file/'+dir;
+    let lnk = 'vscode://file/' + dir;
     window.location = lnk;
   });
 
@@ -398,53 +398,49 @@ jQuery(function(){
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
-    
+
     let paths = [];
-    $('#modal-create-application table.path-manager tbody tr').each(function(){
+    $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);
       let name = tr.find('td:nth-child(1) input[type="text"]').val();
       let path = tr.find('td:nth-child(2) input[type="text"]').val();
       let active = tr.find('td:nth-child(3) input[type="checkbox"]')[0].checked;
-      paths.push({name:name, path:path, active:active});
+      paths.push({ name: name, path: path, active: active });
     });
-    
+
     if (name != "" && id != "" && directory != "" && author != "") {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
         dataType: "html",
-        data: { id: id, name: name, type:type, description: description, directory: directory, namespace:namespace, author: author, paths:paths, magic_app_version:magic_app_version },
+        data: { id: id, name: name, type: type, description: description, directory: directory, namespace: namespace, author: author, paths: paths, magic_app_version: magic_app_version },
         success: function (data) {
           reloadApplicationList();
         },
-        error: function(e1, e2)
-        {
+        error: function (e1, e2) {
         }
       });
     }
     $(modal).modal('hide');
-    
+
   });
 
   $('#modal-update-path').on('show.bs.modal', function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: {action: 'get'},
+      data: { action: 'get' },
       success: function (data) {
-        while($('#modal-update-path table.path-manager > tbody > tr').length > 1)
-        {
+        while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
           $('#modal-update-path table.path-manager > tbody > tr:last').remove();
         }
-        for(let d in data)
-        {
-          if(d > 0)
-          {
+        for (let d in data) {
+          if (d > 0) {
             let clone = $('#modal-update-path table.path-manager > tbody > tr:first').clone();
-            
+
             $('#modal-update-path table.path-manager > tbody').append(clone);
           }
-          let clone2 = $('#modal-update-path table.path-manager > tbody > tr:nth-child('+(parseInt(d)+1)+')');
+          let clone2 = $('#modal-update-path table.path-manager > tbody > tr:nth-child(' + (parseInt(d) + 1) + ')');
           clone2.find('input[type="text"].location-path').val(data[d].path);
           clone2.find('input[type="text"].location-name').val(data[d].name);
           clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
@@ -458,31 +454,28 @@ jQuery(function(){
   $(document).on("click", "#update_module_path", function (e) {
     e.preventDefault();
     let paths = [];
-    $('#modal-update-path table.path-manager tbody tr').each(function(){
+    $('#modal-update-path table.path-manager tbody tr').each(function () {
       let tr = $(this);
       let name = tr.find('td:nth-child(1) input[type="text"]').val();
       let path = tr.find('td:nth-child(2) input[type="text"]').val();
       let active = tr.find('td:nth-child(3) input[type="checkbox"]')[0].checked;
-      paths.push({name:name, path:path, active:active});
+      paths.push({ name: name, path: path, active: active });
     });
     let select = $('#current_module_location');
     if (paths.length > 0) {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
-        data: {action: 'update', paths:paths},
+        data: { action: 'update', paths: paths },
         success: function (data) {
           select.empty();
-          for(let d in data)
-          {
+          for (let d in data) {
             select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
-            if(data[d].active)
-            {
+            if (data[d].active) {
               select.val(data[d].path);
             }
           }
-          while($('#modal-update-path table.path-manager tbody tr').length > 1)
-          {
+          while ($('#modal-update-path table.path-manager tbody tr').length > 1) {
             $('#modal-update-path table.path-manager tbody tr:last-child').remove();
           }
           $('#modal-update-path table.path-manager tbody tr input[type="text"]').val('');
@@ -492,20 +485,18 @@ jQuery(function(){
     $('#modal-update-path').modal('hide');
   });
 
-  $(document).on('click', '#update_current_location', function(e){
+  $(document).on('click', '#update_current_location', function (e) {
     e.preventDefault();
     let select = $('#current_module_location');
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: {action: 'default', selected_path:select.val()},
+      data: { action: 'default', selected_path: select.val() },
       success: function (data) {
         select.empty();
-        for(let d in data)
-        {
+        for (let d in data) {
           select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
-          if(data[d].active)
-          {
+          if (data[d].active) {
             select.val(data[d].path);
           }
         }
@@ -567,16 +558,15 @@ jQuery(function(){
       },
     });
   });
-  
-  $(document).on('click', '.generate_entity', function(){
+
+  $(document).on('click', '.generate_entity', function () {
     let entityName = $('.rd-entity-name').val();
     let tableName = $('.rd-table-name').val();
-    if(confirm('Are you sure you want to generate entity and replace existing file?'))
-    {
+    if (confirm('Are you sure you want to generate entity and replace existing file?')) {
       $.ajax({
         method: "POST",
         url: "lib.ajax/entity-generator.php",
-        data: { entityName:entityName, tableName:tableName},
+        data: { entityName: entityName, tableName: tableName },
         success: function (data) {
           updateEntityFile();
           updateEntityQuery(true);
@@ -586,89 +576,83 @@ jQuery(function(){
     }
   });
 
-  $(document).on('change', '.map-key', function(e){
-    onChangeMapKey($(this));
-  });
-  
-  $(document).on('keyup', '.map-key', function(e){
+  $(document).on('change', '.map-key', function (e) {
     onChangeMapKey($(this));
   });
 
-  $(document).on('change', '#export_to_excel', function(e){
+  $(document).on('keyup', '.map-key', function (e) {
+    onChangeMapKey($(this));
+  });
+
+  $(document).on('change', '#export_to_excel', function (e) {
     let chk = $(this)[0].checked;
-    if(chk)
-    {
+    if (chk) {
       $('#export_to_csv')[0].checked = false;
       $('#export_use_temporary')[0].disabled = true;
     }
   });
-  
-  $(document).on('change', '#export_to_csv', function(e){
+
+  $(document).on('change', '#export_to_csv', function (e) {
     let chk = $(this)[0].checked;
-    if(chk)
-    {
+    if (chk) {
       $('#export_to_excel')[0].checked = false;
       $('#export_use_temporary')[0].disabled = false;
     }
-    else
-    {
+    else {
       $('#export_use_temporary')[0].disabled = true;
     }
   });
-  
-  $(document).on('change', '.entity-container-relationship .entity-checkbox', function(e){
+
+  $(document).on('change', '.entity-container-relationship .entity-checkbox', function (e) {
     loadDiagramMultiple();
   });
-  
-  $(document).on('click', '.reload-diagram', function(e){
+
+  $(document).on('click', '.reload-diagram', function (e) {
     loadDiagramMultiple();
   });
-  
-  $(document).on('click', '.entity-container-relationship .entity-li a', function(e){
+
+  $(document).on('click', '.entity-container-relationship .entity-li a', function (e) {
     e.preventDefault();
     let params = [];
     params = addDiagramOption(params);
-    params.push('entity[]='+$(this).attr('data-entity-name'));
-    params.push('rnd='+(new Date()).getTime());
+    params.push('entity[]=' + $(this).attr('data-entity-name'));
+    params.push('rnd=' + (new Date()).getTime());
     let img = $('<img />');
-    img.attr('src', 'lib.ajax/entity-relationship-diagram.php?'+params.join('&'));
+    img.attr('src', 'lib.ajax/entity-relationship-diagram.php?' + params.join('&'));
     $('.erd-image').empty().append(img);
   });
-  
-  $(document).on('click', '.btn-move-up', function(){
+
+  $(document).on('click', '.btn-move-up', function () {
     let row = $(this).closest('tr');
-    if(row.prev().length)
-    {
+    if (row.prev().length) {
       row.insertBefore(row.prev());
     }
   });
-  
-  $(document).on('click', '.btn-move-down', function(){
+
+  $(document).on('click', '.btn-move-down', function () {
     let row = $(this).closest('tr');
-    if(row.next().length)
-    {
+    if (row.next().length) {
       row.insertAfter(row.next());
     }
   });
-  
-  $(document).on('click', 'table.path-manager .path-remover', function(){
+
+  $(document).on('click', 'table.path-manager .path-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
-    if(count > 1)
-    {
+    if (count > 1) {
       $(this).closest('tr').remove();
     }
     fixPathForm();
   });
-  
-  $(document).on('click', 'table.path-manager .add-path', function(){
+
+  $(document).on('click', 'table.path-manager .add-path', function () {
     let clone = $(this).closest('table').find('tbody tr:first').clone();
     clone.find('input[type="text"]').val('');
     clone.find('input[type="checkbox"]').removeAttr('checked');
     $(this).closest('table').find('tbody').append(clone);
     fixPathForm();
   });
-  
-  $(document).on('click', '.create-new-application', function(){
+
+  $(document).on('click', '.create-new-application', function () {
     let createBtn = $('#modal-create-application #create_new_app');
     createBtn[0].disabled = true;
     $('[name="application_name"]').val('');
@@ -680,7 +664,7 @@ jQuery(function(){
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
-      success:function(data){
+      success: function (data) {
         $('[name="application_name"]').val(data.application_name);
         $('[name="application_id"]').val(data.application_id);
         $('[name="application_type"]').val(data.application_type);
@@ -689,8 +673,7 @@ jQuery(function(){
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
         let value = '';
-        for(let i in data.magic_app_versions)
-        {
+        for (let i in data.magic_app_versions) {
           let latest = data.magic_app_versions[i]['latest'];
           $('[name="magic_app_version"]')[0].appendChild(
             new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
@@ -714,7 +697,7 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', '#button-save-entity-translation', function(){
+  $(document).on('click', '#button-save-entity-translation', function () {
     let translated = transEd2.getDoc().getValue();
     let entityName = $('.entity-name').val();
     let propertyNames = $('.entity-property-name').val();
@@ -729,7 +712,7 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', '#button-save-module-translation', function(){
+  $(document).on('click', '#button-save-module-translation', function () {
     let translated = transEd4.getDoc().getValue();
     let propertyNames = $('.module-property-name').val();
     let targetLanguage = $('.target-language').val();
@@ -743,33 +726,33 @@ jQuery(function(){
     });
   });
 
-  $(document).on('change', '.target-language', function(){
+  $(document).on('change', '.target-language', function () {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
 
-  $(document).on('change', '.filter-translate', function(){
+  $(document).on('change', '.filter-translate', function () {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
     $('.filter-translate').val(val);
     reloadTranslate(translateFor);
   });
 
-  $(document).on('change', '.select-module', function(){
+  $(document).on('change', '.select-module', function () {
     let checked = $(this)[0].checked;
-    $(this).closest('.module-group').find('ul li').each(function(e){
+    $(this).closest('.module-group').find('ul li').each(function (e) {
       $(this).find('input[type="checkbox"]')[0].checked = checked;
     });
     translateModule();
   });
-  
-  $(document).on('change', '.module-for-translate', function(){
+
+  $(document).on('change', '.module-for-translate', function () {
     translateModule();
   });
 
-  $(document).on('click', 'table.language-manager .add-language', function(){
+  $(document).on('click', 'table.language-manager .add-language', function () {
     let clone = $(this).closest('table').find('tbody tr:first').clone();
     clone.find('input[type="text"]').val('');
     clone.find('input[type="checkbox"]').removeAttr('checked');
@@ -777,10 +760,9 @@ jQuery(function(){
     fixLanguageForm();
   });
 
-  $(document).on('click', 'table.language-manager .language-remover', function(){
+  $(document).on('click', 'table.language-manager .language-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
-    if(count > 1)
-    {
+    if (count > 1) {
       $(this).closest('tr').remove();
     }
     fixLanguageForm();
@@ -790,20 +772,17 @@ jQuery(function(){
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: {action: 'get'},
+      data: { action: 'get' },
       success: function (data) {
-        while($('#modal-update-language table.language-manager > tbody > tr').length > 1)
-        {
+        while ($('#modal-update-language table.language-manager > tbody > tr').length > 1) {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
-        for(let d in data)
-        {
-          if(d > 0)
-          {
-            let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone(); 
+        for (let d in data) {
+          if (d > 0) {
+            let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
           }
-          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child('+(parseInt(d)+1)+')');
+          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child(' + (parseInt(d) + 1) + ')');
           clone2.find('input[type="text"].language-name').val(data[d].name);
           clone2.find('input[type="text"].language-code').val(data[d].code);
           clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
@@ -816,34 +795,30 @@ jQuery(function(){
   $(document).on("click", "#update-application-language", function (e) {
     e.preventDefault();
     let languages = [];
-    $('#modal-update-language table.language-manager tbody tr').each(function(){
+    $('#modal-update-language table.language-manager tbody tr').each(function () {
       let tr = $(this);
       let name = tr.find('td:nth-child(1) input[type="text"]').val();
       let code = tr.find('td:nth-child(2) input[type="text"]').val();
       let active = tr.find('td:nth-child(3) input[type="checkbox"]')[0].checked;
-      languages.push({name:name, code:code, active:active});
+      languages.push({ name: name, code: code, active: active });
     });
     let select = $('.target-language');
     if (languages.length > 0) {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
-        data: {action: 'update', languages:languages},
+        data: { action: 'update', languages: languages },
         success: function (data) {
           select.empty();
-          for(let d in data)
-          {
-            for(let i = 0; i<select.length; i++)
-            {
+          for (let d in data) {
+            for (let i = 0; i < select.length; i++) {
               select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
-              if(data[d].active)
-              {
+              if (data[d].active) {
                 select.val(data[d].code);
               }
             }
           }
-          while($('#modal-update-language table.language-manager tbody tr').length > 1)
-          {
+          while ($('#modal-update-language table.language-manager tbody tr').length > 1) {
             $('#modal-update-language table.language-manager tbody tr:last-child').remove();
           }
           $('#modal-update-language table.language-manager tbody tr input[type="text"]').val('');
@@ -853,22 +828,19 @@ jQuery(function(){
     $('#modal-update-language').modal('hide');
   });
 
-  $(document).on('click', '.default-language', function(e){
+  $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: {action: 'default', selected_language:select.val()},
+      data: { action: 'default', selected_language: select.val() },
       success: function (data) {
         select.empty();
-        for(let d in data)
-        {
-          for(let i = 0; i<select.length; i++)
-          {
+        for (let d in data) {
+          for (let i = 0; i < select.length; i++) {
             select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
-            if(data[d].active)
-            {
+            if (data[d].active) {
               select.val(data[d].code);
             }
           }
@@ -877,14 +849,13 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', 'area', function(e){
+  $(document).on('click', 'area', function (e) {
     e.preventDefault();
     let dataType = $(this).attr('data-type');
     let request = {};
     let modalTitle = '';
     let url = '';
-    if(dataType == 'area-relation')
-    {
+    if (dataType == 'area-relation') {
       url = 'lib.ajax/entity-relationship.php';
       modalTitle = 'Entity Relationship';
       let namespaceName = $(this).attr('data-namespace');
@@ -895,18 +866,17 @@ jQuery(function(){
       let referenceEntityName = $(this).attr('data-reference-entity');
       let referenceTableName = $(this).attr('data-reference-table-name');
       let referenceColumnName = $(this).attr('data-reference-column-name');
-      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName, columnName:columnName, referenceNamespaceName:referenceNamespaceName, referenceEntityName:referenceEntityName, referenceTableName:referenceTableName, referenceColumnName:referenceColumnName};
+      request = { dataType: dataType, namespaceName: namespaceName, entityName: entityName, tableName: tableName, columnName: columnName, referenceNamespaceName: referenceNamespaceName, referenceEntityName: referenceEntityName, referenceTableName: referenceTableName, referenceColumnName: referenceColumnName };
     }
-    else
-    {
+    else {
       url = 'lib.ajax/entity-detail.php';
       modalTitle = 'Entity Detail';
       let namespaceName = $(this).attr('data-namespace');
       let entityName = $(this).attr('data-entity');
       let tableName = $(this).attr('data-table-name');
-      request = {dataType:dataType, namespaceName:namespaceName, entityName:entityName, tableName:tableName};
+      request = { dataType: dataType, namespaceName: namespaceName, entityName: entityName, tableName: tableName };
     }
-    
+
     $('.entity-detail').empty();
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
@@ -916,14 +886,14 @@ jQuery(function(){
       dataType: 'html',
       url: url,
       data: request,
-      success: function(data){
+      success: function (data) {
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
       }
     });
   });
 
-  $(document).on('click', '.button-application-setting', function(e){
+  $(document).on('click', '.button-application-setting', function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
@@ -931,19 +901,19 @@ jQuery(function(){
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
     $.ajax({
-      type:'GET',
-      url:'lib.ajax/application-setting.php',
-      data: {applicationId:applicationId},
-      dataType:'html',
-      success:function(data){
+      type: 'GET',
+      url: 'lib.ajax/application-setting.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
         $('#modal-application-setting .application-setting').empty().append(data);
         reloadApplicationList();
         updateBtn[0].disabled = false;
       }
     });
   });
-  
-  $(document).on('click', '.button-application-menu', function(e){
+
+  $(document).on('click', '.button-application-menu', function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
@@ -953,13 +923,13 @@ jQuery(function(){
     modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     modal.attr('data-application-id', applicationId);
     modal.modal('show');
-  
+
     $.ajax({
-      type:'GET',
-      url:'lib.ajax/application-menu.php',
-      data: {applicationId:applicationId},
-      dataType:'html',
-      success:function(data){
+      type: 'GET',
+      url: 'lib.ajax/application-menu.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
         $('#modal-application-menu .modal-body').empty().append(data);
         reloadApplicationList();
         updateBtn[0].disabled = false;
@@ -968,30 +938,30 @@ jQuery(function(){
     });
   });
 
-  $(document).on('click', '#modal-application-menu .button-save-menu', function(e){
+  $(document).on('click', '#modal-application-menu .button-save-menu', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     let applicationId = modal.attr('data-application-id');
     const jsonOutput = JSON.stringify(serializeMenu());
     $.ajax({
-      type:'POST',
-      url:'lib.ajax/application-menu-update.php',
-      data: {applicationId:applicationId, data:jsonOutput},
-      success:function(data){
+      type: 'POST',
+      url: 'lib.ajax/application-menu-update.php',
+      data: { applicationId: applicationId, data: jsonOutput },
+      success: function (data) {
         modal.modal('hide');
         loadMenu();
       }
     });
   });
 
-  $(document).on('click', '#modal-application-menu .button-add-menu', function(e){
+  $(document).on('click', '#modal-application-menu .button-add-menu', function (e) {
     e.preventDefault();
     $('#new_menu').val('');
     let modal = $('#modal-application-menu-add');
     modal.modal('show');
-    setTimeout(function(){
+    setTimeout(function () {
       $('#new_menu').val('');
-      $('#new_menu').focus(); 
+      $('#new_menu').focus();
     }, 600);
   });
 
@@ -1033,7 +1003,6 @@ jQuery(function(){
 
       });
 
-
       // Set up drag and drop for submenu items
       document.querySelectorAll('.sortable-submenu-item').forEach(item => {
         item.setAttribute('draggable', true);
@@ -1048,75 +1017,76 @@ jQuery(function(){
 
       modal.modal('hide');
     }
-    else
-    {
+    else {
       $('#new_menu').select();
     }
   });
 
-  $(document).on('click', '.button-application-default', function(e){
+  $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $.ajax({
-      type:'POST',
-      url:'lib.ajax/application-default.php',
-      data: {applicationId:applicationId},
-      success:function(data){
+      type: 'POST',
+      url: 'lib.ajax/application-default.php',
+      data: { applicationId: applicationId },
+      success: function (data) {
         reloadApplicationList();
       }
     });
   });
 
-  $(document).on('click', '.button-application-open', function(e){
+  $(document).on('click', '.button-application-open', function (e) {
     e.preventDefault();
     let path = $(this).closest('.application-item').attr('data-path');
-    window.location = 'vscode://file/'+path;
+    window.location = 'vscode://file/' + path;
   });
 
-  $(document).on('click', '.refresh-application-list', function(e){
+  $(document).on('click', '.refresh-application-list', function (e) {
     e.preventDefault();
     reloadApplicationList();
   });
 
-  $(document).on('click', '.button-save-workspace', function(e){
+  $(document).on('click', '.button-save-workspace', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     let workspace = modal.find('[name="workspace"]').val();
     $.ajax({
-      type:'POST',
-      url:'lib.ajax/workspace-update.php',
-      data: {workspace:workspace},
-      success:function(data){
+      type: 'POST',
+      url: 'lib.ajax/workspace-update.php',
+      data: { workspace: workspace },
+      success: function (data) {
         modal.modal('hide');
       }
     });
   });
 
-  $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function(e){
+  $(document).on('click', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault();
-    $(this).attr('spellcheck', 'false')
-    $(this).attr('contenteditable', 'true')
   });
 
-  $(document).on('focus', '.sortable-menu-item > a[contenteditable="true"], .sortable-submenu-item > a[contenteditable="true"]', function(e){
-    e.preventDefault();
-    $(this).attr('spellcheck', 'false')
-    $(this).attr('contenteditable', 'true');
-    var range = document.createRange();
-    var sel = window.getSelection();
-    range.selectNodeContents(this);
-    range.collapse(false); // Menempatkan kursor di akhir
-    sel.removeAllRanges();
-    sel.addRange(range);
+  $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
+    e.preventDefault(); 
+
+    let editable = $(this).attr('contenteditable');
+    if(typeof editable == 'undefined' || editable == '' || editable == 'false')
+    {
+      $(this).attr('spellcheck', 'false'); 
+      $(this).attr('contenteditable', 'true');
+      $(this).focus();     
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(this);
+      range.collapse(false); 
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   });
 
-  $(document).on('blur', '.sortable-menu-item > a, .sortable-submenu-item > a', function(e){
+  $(document).on('blur', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault();
-    $(this).removeAttr('contenteditable')
+    $(this).removeAttr('contenteditable');
   });
 
-  
-  
   reloadApplicationList();
   loadTable();
   loadMenu();
@@ -1134,52 +1104,52 @@ jQuery(function(){
 function initMenu() {
   // Add click event to toggle the display of submenus
   document.querySelectorAll('.sortable-toggle-icon').forEach(icon => {
-      icon.addEventListener('click', function () {
-          this.parentNode.classList.toggle('expanded')
+    icon.addEventListener('click', function () {
+      this.parentNode.classList.toggle('expanded')
 
-      });
+    });
   });
 
   // Set up drag and drop for submenu items
   document.querySelectorAll('.sortable-submenu-item').forEach(item => {
-      item.setAttribute('draggable', true);
-      item.addEventListener('dragstart', dragStart);
-      item.addEventListener('dragover', dragOver);
-      item.addEventListener('drop', dropToSubmenu);
+    item.setAttribute('draggable', true);
+    item.addEventListener('dragstart', dragStart);
+    item.addEventListener('dragover', dragOver);
+    item.addEventListener('drop', dropToSubmenu);
   });
 
   document.querySelectorAll('.move-icon-down').forEach(item => {
-      item.setAttribute('draggable', true);
-      item.addEventListener('dragstart', dragStart);
+    item.setAttribute('draggable', true);
+    item.addEventListener('dragstart', dragStart);
   });
 
   // Set up drag and drop for menu items
   document.querySelectorAll('.sortable-menu-item').forEach(item => {
-      item.addEventListener('dragover', dragOver); // Added dragover event
-      item.addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
+    item.addEventListener('dragover', dragOver); // Added dragover event
+    item.addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
   });
 
-  
+
 }
 
 let draggedItem = null;
 
 function dragStart(e) {
-  if(e.target.classList.contains('sortable-submenu-item'))
-  {
-      draggedItem = e.target;
-      e.dataTransfer.effectAllowed = 'move';
+  if (e.target.classList.contains('sortable-submenu-item')) {
+    draggedItem = e.target;
+    e.dataTransfer.effectAllowed = 'move';
   }
-  if(e.target.classList.contains('move-icon-down'))
+  else 
   {
-    console.log('icon move')
-      draggedItem = e.target.parentNode;
-      e.dataTransfer.effectAllowed = 'move';
-  }
-  if(e.target.parentNode.classList.contains('sortable-submenu-item'))
-  {
-      draggedItem = e.target.parentNode;
-      e.dataTransfer.effectAllowed = 'move';
+    let target = e.target.closest('.sortable-submenu-item');
+    if(target != null)
+    {
+      draggedItem = target;
+      if(target.dataTransfer)
+      {
+        target.dataTransfer.effectAllowed = 'move';
+      }
+    }
   }
 }
 
@@ -1188,38 +1158,44 @@ function dragOver(e) {
 }
 
 function dropToMenu(e) {
-  e.preventDefault();
-  if (draggedItem) {
-      // Append dragged item to the menu item
-      console.log('ok')
-      if(e.target.classList.length == 0)
-      {
-        let target = $(e.target).closest('.sortable-menu-item')[0];
-        target.querySelector('.sortable-submenu').appendChild(draggedItem);
-        target.classList.remove('expanded');
-        target.classList.add('expanded');
+  e.preventDefault(); // Prevent default behavior to allow the drop
+
+  if (draggedItem) { // Check if there is an item being dragged
+
+    // If the target has no classes
+    if (e.target.classList.length === 0) {
+      let target = e.target.closest('.sortable-menu-item'); // Find the closest element that is a menu item
+      if (target) {
+        target.querySelector('.sortable-submenu').appendChild(draggedItem); // Add the dragged item to the submenu
+        target.classList.remove('expanded'); // Remove the expanded class
+        target.classList.add('expanded'); // Add the expanded class
       }
-      if(e.target.classList.contains('sortable-menu-item'))
-      {
-          if(e.target.querySelector('.sortable-submenu') == null)
-          {
-              // Create a new submenu if it doesn't exist
-              let sm = document.createElement('ul');
-              sm.classList.add('sortable-submenu');
-              e.target.appendChild(sm);   
-          }
-          e.target.querySelector('.sortable-submenu').appendChild(draggedItem);
-          e.target.classList.remove('expanded');
-          e.target.classList.add('expanded');
+    }
+
+    // If the target is a menu item
+    if (e.target.classList.contains('sortable-menu-item')) {
+      // Check if a submenu already exists
+      if (!e.target.querySelector('.sortable-submenu')) {
+        // If not, create a new submenu
+        let sm = document.createElement('ul'); // Create a new ul element
+        sm.classList.add('sortable-submenu'); // Add the sortable-submenu class
+        e.target.appendChild(sm); // Add the submenu to the menu item
       }
-      if(e.target.classList.contains('sortable-submenu') || e.target.classList.contains('move-icon'))
-      {
-          // Append dragged item to an existing submenu
-          e.target.appendChild(draggedItem);
-          e.target.parentNode.classList.remove('expanded');
-          e.target.parentNode.classList.add('expanded');
-      }
-      draggedItem = null; // Clear the dragged item
+      // Add the dragged item to the submenu
+      e.target.querySelector('.sortable-submenu').appendChild(draggedItem);
+      e.target.classList.remove('expanded'); // Remove the expanded class
+      e.target.classList.add('expanded'); // Add the expanded class
+    }
+
+    // If the target is a submenu or move icon
+    if (e.target.classList.contains('sortable-submenu') || e.target.classList.contains('move-icon')) {
+      // Add the dragged item to the existing submenu
+      e.target.appendChild(draggedItem);
+      e.target.parentNode.classList.remove('expanded'); // Remove the expanded class from the parent
+      e.target.parentNode.classList.add('expanded'); // Add the expanded class to the parent
+    }
+
+    draggedItem = null; // Clear the dragged item after the drop
   }
 }
 
@@ -1230,14 +1206,14 @@ function dropToMenu(e) {
 function dropToSubmenu(e) {
   e.preventDefault();
   if (e.target.classList.contains('sortable-submenu-item')) {
-      const isAfter = e.offsetY > (e.target.offsetHeight / 2);
-      if (isAfter) {
-          e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
-      } else {
-          e.target.parentNode.insertBefore(draggedItem, e.target);
-      }
+    const isAfter = e.offsetY > (e.target.offsetHeight / 2);
+    if (isAfter) {
+      e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
+    } else {
+      e.target.parentNode.insertBefore(draggedItem, e.target);
+    }
   } else if (e.target.classList.contains('sortable-submenu')) {
-      e.target.appendChild(draggedItem);
+    e.target.appendChild(draggedItem);
   }
 }
 
@@ -1249,18 +1225,18 @@ function serializeMenu() {
   const menu = [];
   const menuItems = document.querySelectorAll('.sortable-menu-item');
   menuItems.forEach(menuItem => {
-      const menuData = {
-        label: menuItem.querySelector('a').textContent,
-          submenus: []
-      };
-      const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
-      submenuItems.forEach(submenuItem => {
-          menuData.submenus.push({
-            label: submenuItem.querySelector('a').textContent,
-              link: submenuItem.querySelector('a').getAttribute('href')
-          });
+    const menuData = {
+      label: menuItem.querySelector('a').textContent,
+      submenus: []
+    };
+    const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
+    submenuItems.forEach(submenuItem => {
+      menuData.submenus.push({
+        label: submenuItem.querySelector('a').textContent,
+        link: submenuItem.querySelector('a').getAttribute('href')
       });
-      menu.push(menuData);
+    });
+    menu.push(menuData);
   });
   return menu; // Return the constructed menu array
 }
@@ -1269,7 +1245,7 @@ function moveUp(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const prevItem = item.previousElementSibling;
   if (prevItem) {
-      item.parentNode.insertBefore(item, prevItem);
+    item.parentNode.insertBefore(item, prevItem);
   }
 }
 
@@ -1277,7 +1253,7 @@ function moveDown(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const nextItem = item.nextElementSibling;
   if (nextItem) {
-      item.parentNode.insertBefore(nextItem, item);
+    item.parentNode.insertBefore(nextItem, item);
   }
 }
 
@@ -1297,24 +1273,22 @@ function moveDown(element) {
  *
  * @returns {void} This function does not return a value.
  */
-function reloadApplicationList()
-{
+function reloadApplicationList() {
   $.ajax({
-      type:'GET',
-      url:'lib.ajax/application-list.php',
-      success:function(data){
-        $('.application-card').empty().append(data);
-      }
+    type: 'GET',
+    url: 'lib.ajax/application-list.php',
+    success: function (data) {
+      $('.application-card').empty().append(data);
+    }
   });
 
   $.ajax({
-    type:'GET',
-    url:'lib.ajax/path-list.php',
+    type: 'GET',
+    url: 'lib.ajax/path-list.php',
     dataType: 'json',
-    success:function(data){
+    success: function (data) {
       $('[name="current_module_location"]').empty();
-      for(let i in data)
-      {
+      for (let i in data) {
         $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
       }
     }
@@ -1334,14 +1308,11 @@ function reloadApplicationList()
  *                                either "module" or "entity".
  * @returns {void} This function does not return a value.
  */
-function reloadTranslate(translateFor)
-{
-  if(translateFor == "module")
-  {
+function reloadTranslate(translateFor) {
+  if (translateFor == "module") {
     translateModule();
   }
-  else if(translateFor == "entity")
-  {
+  else if (translateFor == "entity") {
     translateEntity();
   }
 }
@@ -1361,18 +1332,16 @@ function reloadTranslate(translateFor)
  *                            after the translation process is complete.
  * @returns {void} This function does not return a value.
  */
-function translateEntity(clbk)
-{
+function translateEntity(clbk) {
   entityName = currentEntity2Translated;
-  if(entityName != '')
-  {
+  if (entityName != '') {
     let targetLanguage = $('.target-language').val();
     let filter = $('.filter-translate').val();
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
-      data: { userAction: 'get', entityName: entityName, targetLanguage:targetLanguage, filter:filter},
+      data: { userAction: 'get', entityName: entityName, targetLanguage: targetLanguage, filter: filter },
       success: function (data) {
         let textOut1 = [];
         let textOut2 = [];
@@ -1393,8 +1362,7 @@ function translateEntity(clbk)
       },
     });
   }
-  if(typeof clbk != 'undefined')
-  {
+  if (typeof clbk != 'undefined') {
     clbk();
   }
 }
@@ -1412,27 +1380,25 @@ function translateEntity(clbk)
  *
  * @returns {void} This function does not return a value.
  */
-function translateModule()
-{
+function translateModule() {
   let translated = null;
   let propertyNames = null;
   let targetLanguage = $('.target-language').val();
   let filter = $('.filter-translate').val();
   let modules = [];
-  
-  $('.module-for-translate').each(function(e){
+
+  $('.module-for-translate').each(function (e) {
     let checked = $(this)[0].checked;
-    if(checked)
-    {
+    if (checked) {
       modules.push($(this).val());
     }
   });
-  
+
   $.ajax({
     method: "POST",
     url: "lib.ajax/module-translate.php",
     dataType: "json",
-    data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter:filter},
+    data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter: filter },
     success: function (data) {
       let textOut1 = [];
       let textOut2 = [];
@@ -1560,15 +1526,14 @@ function loadState(defdata, frm1, frm2) {
  *
  * @returns {void} This function does not return a value.
  */
-function fixPathForm()
-{
+function fixPathForm() {
   let index = 0;
-  $('table.path-manager tbody tr').each(function(){
-      let tr = $(this);
-      tr.find('td:nth-child(1) input[type="text"]').attr('name', 'name['+index+']');
-      tr.find('td:nth-child(2) input[type="text"]').attr('name', 'path['+index+']');
-      tr.find('td:nth-child(3) input[type="checkbox"]').attr('name', 'checked['+index+']');
-      index++;
+  $('table.path-manager tbody tr').each(function () {
+    let tr = $(this);
+    tr.find('td:nth-child(1) input[type="text"]').attr('name', 'name[' + index + ']');
+    tr.find('td:nth-child(2) input[type="text"]').attr('name', 'path[' + index + ']');
+    tr.find('td:nth-child(3) input[type="checkbox"]').attr('name', 'checked[' + index + ']');
+    index++;
   });
 }
 
@@ -1587,15 +1552,14 @@ function fixPathForm()
  *
  * @returns {void} This function does not return a value.
  */
-function fixLanguageForm()
-{
+function fixLanguageForm() {
   let index = 0;
-  $('table.language-manager tbody tr').each(function(){
-      let tr = $(this);
-      tr.find('td:nth-child(1) input[type="text"]').attr('name', 'language_name['+index+']');
-      tr.find('td:nth-child(2) input[type="text"]').attr('name', 'language_code['+index+']');
-      tr.find('td:nth-child(3) input[type="checkbox"]').attr('name', 'checked['+index+']');
-      index++;
+  $('table.language-manager tbody tr').each(function () {
+    let tr = $(this);
+    tr.find('td:nth-child(1) input[type="text"]').attr('name', 'language_name[' + index + ']');
+    tr.find('td:nth-child(2) input[type="text"]').attr('name', 'language_code[' + index + ']');
+    tr.find('td:nth-child(3) input[type="checkbox"]').attr('name', 'checked[' + index + ']');
+    index++;
   });
 }
 
@@ -1610,15 +1574,14 @@ function fixLanguageForm()
  * @param {Array<string>} params - An array to which the diagram options will be added.
  * @returns {Array<string>} The updated parameters array containing the added options.
  */
-function addDiagramOption(params)
-{
-  params.push('maximum_level='+$('[name="maximum_level"]').val());
-  params.push('maximum_column='+$('[name="maximum_column"]').val());
-  params.push('margin_x='+$('[name="margin_x"]').val());
-  params.push('margin_y='+$('[name="margin_y"]').val());
-  params.push('entity_margin_x='+$('[name="entity_margin_x"]').val());
-  params.push('entity_margin_y='+$('[name="entity_margin_y"]').val());
-  params.push('zoom='+$('[name="zoom"]').val());
+function addDiagramOption(params) {
+  params.push('maximum_level=' + $('[name="maximum_level"]').val());
+  params.push('maximum_column=' + $('[name="maximum_column"]').val());
+  params.push('margin_x=' + $('[name="margin_x"]').val());
+  params.push('margin_y=' + $('[name="margin_y"]').val());
+  params.push('entity_margin_x=' + $('[name="entity_margin_x"]').val());
+  params.push('entity_margin_y=' + $('[name="entity_margin_y"]').val());
+  params.push('zoom=' + $('[name="zoom"]').val());
   return params;
 }
 
@@ -1640,38 +1603,34 @@ function addDiagramOption(params)
  *
  * @returns {void} This function does not return a value.
  */
-function loadDiagramMultiple()
-{
+function loadDiagramMultiple() {
   let params = [];
   params = addDiagramOption(params);
-  
-  $('.entity-container-relationship .entity-checkbox').each(function(){
-    if($(this)[0].checked)
-    {
-      params.push('entity[]='+$(this).val());
+
+  $('.entity-container-relationship .entity-checkbox').each(function () {
+    if ($(this)[0].checked) {
+      params.push('entity[]=' + $(this).val());
     }
   });
-  params.push('rnd='+(new Date()).getTime());
+  params.push('rnd=' + (new Date()).getTime());
   let img = $('<img />');
-  let urlImage = 'lib.ajax/entity-relationship-diagram.php?'+params.join('&');
-  let urlMap = 'lib.ajax/entity-relationship-diagram-map.php?'+params.join('&');
+  let urlImage = 'lib.ajax/entity-relationship-diagram.php?' + params.join('&');
+  let urlMap = 'lib.ajax/entity-relationship-diagram-map.php?' + params.join('&');
   img.attr('src', urlImage);
   $('.erd-image').empty().append(img);
-  
-  $('[name="erd-map"]').load(urlMap, function(){
+
+  $('[name="erd-map"]').load(urlMap, function () {
     img.attr('usemap', '#erd-map');
   });
 }
 
-function downloadSVG()
-{
+function downloadSVG() {
   const imageSVG = document.querySelector('.erd-image img');
-  let url = imageSVG.getAttribute('src');                      
+  let url = imageSVG.getAttribute('src');
   window.open(url);
 }
 
-function downloadPNG()
-{
+function downloadPNG() {
   const imageSVG = document.querySelector('.erd-image img');
   let url = imageSVG.getAttribute('src');
   const canvas = document.createElement('canvas');
@@ -1679,11 +1638,11 @@ function downloadPNG()
   canvas.width = imageSVG.width;
   canvas.height = imageSVG.height;
   const img = new Image();
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      const pngData = canvas.toDataURL('image/png');
-      window.open(pngData);
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    const pngData = canvas.toDataURL('image/png');
+    window.open(pngData);
   };
   img.src = url;
 }
@@ -1702,24 +1661,19 @@ function downloadPNG()
  *                       whose value is being changed.
  * @returns {void} This function does not return a value.
  */
-function onChangeMapKey(obj)
-{
+function onChangeMapKey(obj) {
   let val = obj.val();
-  if((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default'))
-  {
-    if(!obj.hasClass('input-invalid-value'))
-    {
+  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default')) {
+    if (!obj.hasClass('input-invalid-value')) {
       obj.addClass('input-invalid-value');
-      setTimeout(function(){
-        obj.val('data-'+val.toLowerCase());
+      setTimeout(function () {
+        obj.val('data-' + val.toLowerCase());
         onChangeMapKey(obj);
       }, 500);
     }
   }
-  else
-  {
-    if(obj.hasClass('input-invalid-value'))
-    {
+  else {
+    if (obj.hasClass('input-invalid-value')) {
       obj.removeClass('input-invalid-value');
     }
   }
@@ -1831,8 +1785,7 @@ function saveEntity() {
  * @returns {void} This function does not return a value.
  */
 function addHilightLineError(lineNumber) {
-  if(lineNumber != -1)
-  {
+  if (lineNumber != -1) {
     cmEditorFile.addLineClass(lineNumber, 'background', 'highlight-line');
   }
   lastErrorLine = lineNumber;
@@ -1847,8 +1800,7 @@ function addHilightLineError(lineNumber) {
  * @returns {void} This function does not return a value.
  */
 function removeHilightLineError() {
-  if(lastErrorLine != -1)
-  {
+  if (lastErrorLine != -1) {
     cmEditorFile.removeLineClass(lastErrorLine, 'background', 'highlight-line');
   }
 }
@@ -2044,7 +1996,7 @@ function updateEntityFile() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
-      $(".container-translate-entity .entity-list").empty().append(data);  
+      $(".container-translate-entity .entity-list").empty().append(data);
       $('.entity-container-file .entity-list [data-toggle="tooltip"], .container-translate-entity .entity-list [data-toggle="tooltip"]').tooltip({
         placement: 'top'
       });
@@ -2296,7 +2248,7 @@ function generateScript(selector) {
         includeEdit: includeEdit,
         includeDetail: includeDetail,
         includeList: includeList,
-        includeExport:includeExport,
+        includeExport: includeExport,
         isKey: isKey,
         isInputRequired: isInputRequired,
         elementType: elementType,
@@ -2616,14 +2568,14 @@ function loadMenu() {
     url: "lib.ajax/application-menu-json.php",
     dataType: "json",
     success: function (data) {
-      $('select[name="module_menu"]').empty(); 
+      $('select[name="module_menu"]').empty();
       for (let i in data) {
         if (data.hasOwnProperty(i)) {
           $('select[name="module_menu"]')[0].append(
             new Option(data[i].label, data[i].label)
           );
         }
-      } 
+      }
     }
   });
 }
@@ -2717,7 +2669,7 @@ function restoreForm(data) {
           tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
           tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
-          
+
           if (data.fields[i].elementType == 'select') {
             tr.find('.reference-data').val(JSON.stringify(data.fields[i].referenceData));
             tr.find('.reference_button_data').css('display', 'inline');
@@ -2747,8 +2699,7 @@ function restoreForm(data) {
   cnt = 0;
   selector = '#modal-filter-data tbody tr:last-child';
 
-  while ($('#modal-filter-data tbody tr').length > 1) 
-  {
+  while ($('#modal-filter-data tbody tr').length > 1) {
     $(selector).remove();
   }
   $(selector).find('.data-filter-column-name').val('');
@@ -2811,7 +2762,7 @@ function restoreForm(data) {
     if ($('#modal-module-features [name="manualsortorder"]').length) {
       $('#modal-module-features [name="manualsortorder"]')[0].checked = data.features.sortOrder === true || data.features.sortOrder == 'true';
     }
-    
+
     if ($('#modal-module-features [name="export_to_excel"]').length) {
       $('#modal-module-features [name="export_to_excel"]')[0].checked = data.features.exportToExcel === true || data.features.exportToExcel == 'true';
     }
@@ -2941,12 +2892,12 @@ function generateSelectFilter(field, args) {
       "smallserial",
       "serial",
       "bigserial",
-      "tinyint",      
+      "tinyint",
     ],
     FILTER_SANITIZE_NUMBER_FLOAT: [
-      "numeric", 
-      "double", 
-      "real", 
+      "numeric",
+      "double",
+      "real",
       "money"
     ],
     FILTER_SANITIZE_SPECIAL_CHARS: [
@@ -3051,20 +3002,20 @@ function generateSelectType(field, args) {
       "boolean",
     ],
     float: [
-      "numeric", 
-      "double", 
-      "real", 
+      "numeric",
+      "double",
+      "real",
       "money"
     ],
     text: [
-      "char", 
-      "character", 
-      "varchar", 
-      "character varying", 
+      "char",
+      "character",
+      "varchar",
+      "character varying",
       "text"
     ],
     "datetime-local": [
-      "datetime", 
+      "datetime",
       "timestamp"
     ],
     date: [
@@ -3214,9 +3165,9 @@ function generateRow(field, args, skipedOnInsertEdit) {
   }
 
   exportRow =
-      '  <td align="center"><input type="checkbox" class="include_export" name="include_export_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
+    '  <td align="center"><input type="checkbox" class="include_export" name="include_export_' +
+    field +
+    '" value="1" checked="checked"></td>\r\n';
 
   let rowHTML =
     '<tr data-field-name="' +
@@ -3232,17 +3183,17 @@ function generateRow(field, args, skipedOnInsertEdit) {
     '"></td>\r\n' +
     '  <td><input type="hidden" class="input-field-name" name="caption_' +
     field +
-    '" value="' +field.replaceAll("_", " ").capitalize().prettify().trim() +'" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
+    '" value="' + field.replaceAll("_", " ").capitalize().prettify().trim() + '" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
     insertRow + editRow +
-    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' +field +'" value="1" checked="checked"></td>\r\n' +
+    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' + field + '" value="1" checked="checked"></td>\r\n' +
     listRow +
     exportRow +
-    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' +field +'" value="1"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' +field +'" value="1"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="text" checked="checked"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="textarea"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="checkbox"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' +field +'" value="select"></td>\r\n' +
+    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' + field + '" value="1"></td>\r\n' +
+    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' + field + '" value="1"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="text" checked="checked"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="textarea"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="checkbox"></td>\r\n' +
+    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="select"></td>\r\n' +
     '  <td align="center"><input type="hidden" class="reference-data" name="reference_data_' +
     field +
     '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button></td>\r\n' +
@@ -3404,23 +3355,19 @@ function removeLastColumn(table) {
 function selectReferenceType(data) {
   let referenceType = data.type ? data.type : "entity";
   let obj = $('#modal-create-reference-data .modal-dialog');
-  if(referenceType == 'entity' || referenceType == 'map')
-  {
+  if (referenceType == 'entity' || referenceType == 'map') {
     obj.addClass('modal-lg');
-    if(obj.hasClass('modal-md'))
-    {
+    if (obj.hasClass('modal-md')) {
       obj.removeClass('modal-md');
     }
   }
-  else
-  {
+  else {
     obj.addClass('modal-md');
-    if(obj.hasClass('modal-lg'))
-    {
+    if (obj.hasClass('modal-lg')) {
       obj.removeClass('modal-lg');
     }
   }
-  
+
   if ($('.reference_type[value="' + referenceType + '"]').length > 0) {
     $('.reference_type[value="' + referenceType + '"]')[0].checked = true;
   }
@@ -3459,8 +3406,7 @@ function setEntityData(data) {
   $(selector).find(".rd-option-text-node-format").val(entity.textNodeFormat);
   $(selector).find(".rd-option-indent").val(entity.indent);
   let multiple = data.multipleSelection || '0';
-  if(multiple != '1')
-  {
+  if (multiple != '1') {
     multiple = '0';
   }
   $('.multiple-selection').val(multiple);
@@ -3806,13 +3752,11 @@ function isNumeric(str) {
  *
  * @param {Array} languages - An array of language objects containing name and code.
  */
-function setLanguage(languages)
-{
-  $('select.target-language').each(function(){
+function setLanguage(languages) {
+  $('select.target-language').each(function () {
     let select = $(this);
     select.empty();
-    for(let d in languages)
-    {
+    for (let d in languages) {
       select[0].options[select[0].options.length] = new Option(languages[d].name + ' - ' + languages[d].code, languages[d].code);
     }
   });

@@ -751,6 +751,8 @@ h3.entity-table-name {
 .sortable-menu-item > a[contenteditable="true"], .sortable-submenu-item > a[contenteditable="true"]{
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
+	cursor: text; /* Menampilkan kursor teks */
+	
 	
 }
 
