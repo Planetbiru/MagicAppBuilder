@@ -22,13 +22,17 @@ use stdClass;
 class ScriptGenerator
 {
     /**
-     * Create delete section without approval
+     * Create delete section without approval.
      *
-     * @param AppBuilder $appBuilder
-     * @param MagicObject $entityMain
-     * @param boolean $trashRequired
-     * @param MagicObject $entityTrash
-     * @return string
+     * Generates a delete section for an entity, optionally using a trash entity.
+     *
+     * @param AppBuilder $appBuilder Instance of AppBuilder.
+     * @param MagicObject $entityMain Main entity object.
+     * @param boolean $trashRequired Indicates if trash functionality is required.
+     * @param MagicObject $entityTrash Trash entity object.
+     * @param callable $callbackUpdateStatusSuccess Callback for successful status update.
+     * @param callable $callbackUpdateStatusException Callback for failed status update.
+     * @return string Generated delete section as a string.
      */
     public function createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException)
     {
@@ -43,10 +47,12 @@ class ScriptGenerator
     }
 
     /**
-     * Get auth file
+     * Get the authentication file path.
      *
-     * @param AppSecretObject $appConf
-     * @return string
+     * Retrieves the path to the authentication file based on the application's configuration.
+     *
+     * @param AppSecretObject $appConf Application configuration object.
+     * @return string Path to the authentication file.
      */
     public function getAuthFile($appConf)
     {
@@ -63,10 +69,13 @@ class ScriptGenerator
     }
 
     /**
-     * Chek if field has reference data
+     * Check if a field has reference data.
      *
-     * @param AppField $value
-     * @return boolean
+     * Determines if the provided field has valid reference data.
+     *
+     * @param AppField $value Field object to check.
+     * @param boolean $includeMap Indicates if map reference data should also be included in the check.
+     * @return boolean True if reference data exists; otherwise, false.
      */
     public function hasReferenceData($value, $includeMap = false)
     {
@@ -93,10 +102,12 @@ class ScriptGenerator
     }
 
     /**
-     * Chek if field has reference filter
+     * Check if a field has a reference filter.
      *
-     * @param AppField $value
-     * @return boolean
+     * Determines if the provided field has a valid reference filter.
+     *
+     * @param AppField $value Field object to check.
+     * @return boolean True if reference filter exists; otherwise, false.
      */
     public function hasReferenceFilter($value)
     {
@@ -107,13 +118,15 @@ class ScriptGenerator
     }
 
     /**
-     * Add use from approval
+     * Add use statement from approval entity.
      *
-     * @param string[] $uses
-     * @param AppSecretObject $appConf
-     * @param boolean $approvalRequired
-     * @param MagicObject $entity
-     * @return string[]
+     * Adds a use statement for the approval entity if approval is required.
+     *
+     * @param string[] $uses Array of existing use statements.
+     * @param AppSecretObject $appConf Application configuration object.
+     * @param boolean $approvalRequired Indicates if approval is required.
+     * @param MagicObject $entity Entity object.
+     * @return string[] Updated array of use statements.
      */
     public function addUseFromApproval($uses, $appConf, $approvalRequired, $entity)
     {
@@ -127,13 +140,15 @@ class ScriptGenerator
     }
 
     /**
-     * Add use from approval
+     * Add use statement from trash entity.
      *
-     * @param string[] $uses
-     * @param AppSecretObject $appConf
-     * @param boolean $trashRequired
-     * @param MagicObject $entity
-     * @return string[]
+     * Adds a use statement for the trash entity if trash functionality is required.
+     *
+     * @param string[] $uses Array of existing use statements.
+     * @param AppSecretObject $appConf Application configuration object.
+     * @param boolean $trashRequired Indicates if trash is required.
+     * @param MagicObject $entity Entity object.
+     * @return string[] Updated array of use statements.
      */
     public function addUseFromTrash($uses, $appConf, $trashRequired, $entity)
     {
@@ -147,12 +162,14 @@ class ScriptGenerator
     }
 
     /**
-     * Add use from approval
+     * Add use statements from reference entities.
      *
-     * @param string[] $uses
-     * @param AppSecretObject $appConf
-     * @param array $referenceEntity
-     * @return string[]
+     * Adds use statements for all unique reference entities provided.
+     *
+     * @param string[] $uses Array of existing use statements.
+     * @param AppSecretObject $appConf Application configuration object.
+     * @param array $referenceEntity Array of reference entity objects.
+     * @return string[] Updated array of use statements.
      */
     public function addUseFromReference($uses, $appConf, $referenceEntity)
     {
@@ -171,10 +188,12 @@ class ScriptGenerator
     }
     
     /**
-     * Get entity approval
+     * Get the approval entity.
      *
-     * @param MagicObject $entity
-     * @return MagicObject
+     * Retrieves the approval entity associated with the provided entity.
+     *
+     * @param MagicObject $entity Entity object to check.
+     * @return MagicObject Approval entity object.
      */
     private function getEntityApproval($entity)
     {
@@ -190,10 +209,12 @@ class ScriptGenerator
     }
     
     /**
-     * Get entity trash
+     * Get the trash entity.
      *
-     * @param MagicObject $entity
-     * @return MagicObject
+     * Retrieves the trash entity associated with the provided entity.
+     *
+     * @param MagicObject $entity Entity object to check.
+     * @return MagicObject Trash entity object.
      */
     private function getEntityTrash($entity)
     {
@@ -209,10 +230,13 @@ class ScriptGenerator
     }
 
     /**
-     * Get absolute direcory
-     * @param string $dir
-     * @param string $target
-     * @return string
+     * Get the absolute directory path.
+     *
+     * Computes the absolute path based on the provided directory and target.
+     *
+     * @param string $dir Base directory path.
+     * @param string $target Target path to process.
+     * @return string Absolute directory path.
      */
     private function getAbsoludeDir($dir, $target)
     {
@@ -443,8 +467,6 @@ class ScriptGenerator
         $baseDir = $appConf->getBaseApplicationDirectory();
         $this->prepareApplication($appConf, $baseDir);
 
-
-
         $target = trim($request->getTarget(), "/\\");
         if(!empty($target)) {
             $target = "/".$target;
@@ -478,11 +500,19 @@ class ScriptGenerator
     }
 
     /**
-     * Update menu
+     * Updates the menu configuration by adding a new module to the appropriate section.
      *
-     * @param SecretObject $appConf
-     * @param InputPost $request
+     * This method checks if the menu configuration file exists, creates it if it does not,
+     * and loads the current menu structure from a YAML file. It then adds the provided
+     * module information as a submenu item under the specified menu label.
+     *
+     * @param SecretObject $appConf Configuration object containing application settings.
+     * @param InputPost $request Request object containing the target, module menu, 
+     *        module name, and module file information.
+     *
      * @return void
+     *
+     * @throws Exception If there is an error reading or writing the menu configuration file.
      */
     private function updateMenu($appConf, $request)
     {
@@ -494,18 +524,13 @@ class ScriptGenerator
                 mkdir(dirname($menuPath), 0755, true);
             }
             file_put_contents($menuPath, "");
-        }
-        
-        $menus = new SecretObject();
-        
+        }    
+        $menus = new SecretObject();     
         $menus->loadYamlFile($menuPath, false, true, true);
-
-
         $target = trim($request->getTarget(), "/\\");
         $moduleMenu = $request->getModuleMenu();
         $label = $request->getModuleName();
         $link = $target."/".$request->getModuleFile();
-
         $menuArray = $menus->valueArray();
         foreach($menuArray as $index=>$menu)
         {
@@ -518,12 +543,26 @@ class ScriptGenerator
                 $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
             }
         }
-
         $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
         file_put_contents($menuPath, $yaml);
-        
     }
     
+    /**
+     * Initializes callback functions based on the application type.
+     *
+     * This method sets up success and failure callback functions for create and update actions
+     * if the application type is 'api'. If the application type is not 'api', all callback
+     * functions will be set to null.
+     *
+     * The created callback functions are designed to send success or exception responses
+     * using the provided API response handler.
+     *
+     * @param SecretObject $appConfig Configuration object containing application settings.
+     *
+     * @return stdClass An object containing the initialized callback functions for
+     *                  create and update operations. Each function is either a callable
+     *                  or null depending on the application type.
+     */
     private function initializeCallbackFunctions($appConfig)
     {
         if($appConfig->getApplication()->getType() == 'api') {
@@ -588,11 +627,13 @@ class ScriptGenerator
     }
     
     /**
-     * Add exporter library
+     * Add exporter library.
      *
-     * @param string[] $uses
-     * @param AppFeatures $appFeatures
-     * @return string[]
+     * Adds use statements for the exporter library if exporting features (Excel or CSV) are enabled.
+     *
+     * @param string[] $uses Array of existing use statements.
+     * @param AppFeatures $appFeatures Application feature configuration.
+     * @return string[] Updated array of use statements.
      */
     public function addExporterLibrary($uses, $appFeatures)
     {
@@ -605,10 +646,10 @@ class ScriptGenerator
     }
     
     /**
-     * Add empty line
+     * Add an empty line to the use statements.
      *
-     * @param string[] $uses
-     * @return string[]
+     * @param string[] $uses Array of existing use statements.
+     * @return string[] Updated array of use statements with an empty line added.
      */
     public function addAddEmptyLine($uses)
     {
@@ -617,13 +658,15 @@ class ScriptGenerator
     }
     
     /**
-     * Create use statements
+     * Create use statements for the application.
      *
-     * @param SecretObject $appConf
-     * @param string $entityMainName
-     * @param boolean $approvalRequired
-     * @param boolean $sortOrder
-     * @return string[]
+     * Generates an array of use statements based on application configuration and entity details.
+     *
+     * @param SecretObject $appConf Application configuration object.
+     * @param string $entityMainName Main entity name.
+     * @param boolean $approvalRequired Flag indicating if approval is required.
+     * @param boolean $sortOrder Flag indicating if sorting is required.
+     * @return string[] Array of generated use statements.
      */
     public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder)
     {
@@ -662,12 +705,14 @@ class ScriptGenerator
     }
 
     /**
-     * Generate entity if not exists
+     * Generate entities if they do not exist.
      *
-     * @param PicoDatabase $database
-     * @param SecretObject $appConf
-     * @param EntityInfo $entityInfo
-     * @param MagicObject[] $referenceEntities
+     * Checks for the existence of entity files and generates them if they are missing.
+     *
+     * @param PicoDatabase $database Database connection object.
+     * @param SecretObject $appConf Application configuration object.
+     * @param EntityInfo $entityInfo Information about the entity.
+     * @param MagicObject[] $referenceEntities Array of reference entities to check.
      * @return void
      */
     private function generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities)
@@ -696,10 +741,12 @@ class ScriptGenerator
     }
 
     /**
-     * Prepare application
+     * Prepare the application directory structure and configuration.
      *
-     * @param SecretObject $appConf
-     * @param string $baseDir
+     * Creates necessary directories and prepares the application setup based on the configuration.
+     *
+     * @param SecretObject $appConf Application configuration object.
+     * @param string $baseDir Base directory for the application.
      * @return void
      */
     public function prepareApplication($appConf, $baseDir)
@@ -728,9 +775,13 @@ class ScriptGenerator
     }
     
     /**
-     * Prepare composer
+     * Prepare the composer setup.
      *
-     * @param SecretObject $appConf
+     * Sets up the composer configuration and copies the composer.phar file to the target directory.
+     *
+     * @param SecretObject $appConf Application configuration object.
+     * @param MagicObject $composer Composer configuration object.
+     * @param MagicObject $magicApp MagicApp configuration object.
      * @return void
      */
     public function prepareComposer($appConf, $composer, $magicApp)
@@ -756,9 +807,9 @@ class ScriptGenerator
     }
     
     /**
-     * Prepare direciry
+     * Prepare a directory by creating it if it does not exist.
      *
-     * @param string $baseDir
+     * @param string $baseDir Directory path to prepare.
      * @return void
      */
     public function prepareDir($baseDir)
@@ -769,10 +820,12 @@ class ScriptGenerator
     }
     
     /**
-     * Update composer
+     * Update the composer configuration file.
      *
-     * @param SecretObject $appConf
-     * @param SecretObject $composer
+     * Modifies the composer.json file to include new autoload settings.
+     *
+     * @param SecretObject $appConf Application configuration object.
+     * @param SecretObject $composer Composer configuration object.
      * @return void
      */
     public function updateComposer($appConf, $composer)
@@ -809,11 +862,11 @@ class ScriptGenerator
     }
     
     /**
-     * Update PSR0
+     * Update PSR-0 autoloading settings in the composer.json file.
      *
-     * @param MagicObject $appConf
-     * @param MagicObject $composer
-     * @param stdClass $composerJson
+     * @param MagicObject $appConf Application configuration object.
+     * @param MagicObject $composer Composer configuration object.
+     * @param stdClass $composerJson Decoded composer.json object.
      * @return void
      */
     private function updatePsr0($appConf, $composer, $composerJson)
@@ -859,11 +912,11 @@ class ScriptGenerator
     }
     
     /**
-     * Update PSR4
+     * Update PSR-4 autoloading settings in the composer.json file.
      *
-     * @param MagicObject $appConf
-     * @param MagicObject $composer
-     * @param stdClass $composerJson
+     * @param MagicObject $appConf Application configuration object.
+     * @param MagicObject $composer Composer configuration object.
+     * @param stdClass $composerJson Decoded composer.json object.
      * @return void
      */
     public function updatePsr4($appConf, $composer, $composerJson)
@@ -884,10 +937,12 @@ class ScriptGenerator
     }
     
     /**
-     * Fix namespace
+     * Fix the namespace in the specified file.
      *
-     * @param string $path
-     * @param string $entityNamespace
+     * Replaces the namespace in a file with the specified entity namespace.
+     *
+     * @param string $path Path to the file to update.
+     * @param string $entityNamespace The new namespace to set in the file.
      * @return void
      */
     private function fixNamespace($path, $entityNamespace)
