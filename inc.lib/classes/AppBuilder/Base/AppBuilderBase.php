@@ -18,6 +18,14 @@ use AppBuilder\AppEntityGenerator;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Database\PicoDatabase;
 
+/**
+ * Base class for the AppBuilder framework.
+ *
+ * This class serves as the foundation for building applications using the AppBuilder framework.
+ * It encapsulates configuration settings, entity information, and various helper methods
+ * for application development. The class also manages different aspects of the application,
+ * such as field definitions, actions, and AJAX support.
+ */
 class AppBuilderBase //NOSONAR
 {
     const TAB1 = "\t";
@@ -153,13 +161,15 @@ class AppBuilderBase //NOSONAR
     /**
      * Constructor
      *
-     * @param SecretObject $appBuilderConfig AppBuilder config
-     * @param SecretObject $appConfig App config
-     * @param AppFeatures $appFeatures App features
-     * @param EntityInfo $entityInfo Entity info
-     * @param EntityApvInfo $entityApvInfo Entity app info
-     * @param AppField[] $allField All field
-     * @param boolean $ajaxSupport Ajax support
+     * Initializes the object with application and entity configurations.
+     *
+     * @param SecretObject $appBuilderConfig AppBuilder configuration object.
+     * @param SecretObject $appConfig Application configuration object.
+     * @param AppFeatures $appFeatures Application features object.
+     * @param EntityInfo $entityInfo Entity information object.
+     * @param EntityApvInfo $entityApvInfo Entity approval information object.
+     * @param AppField[] $allField Array of all field objects.
+     * @param boolean $ajaxSupport Indicates if AJAX support is enabled.
      */
     public function __construct($appBuilderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport)
     {
@@ -190,10 +200,12 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Get input filter
+     * Get input filter for a specific field.
      *
-     * @param string $fieldName
-     * @return string
+     * Retrieves the input filter associated with the given field name.
+     *
+     * @param string $fieldName Name of the field.
+     * @return string|null Input filter string or null if not found.
      */
     public function getInputFilter($fieldName)
     {
@@ -208,10 +220,12 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Load application config
+     * Load application configuration from a YAML file.
      *
-     * @param string $appName Application name
-     * @return MagicObject
+     * Loads the configuration for a specified application name.
+     *
+     * @param string $appName Application name.
+     * @return MagicObject Loaded application configuration object.
      */
     public function loadApplicationConfig($appName)
     {
@@ -222,9 +236,9 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Get config base directory
+     * Get the base directory for configuration files.
      *
-     * @return  string
+     * @return string Base directory path for configurations.
      */
     public function getConfigBaseDirectory()
     {
@@ -232,11 +246,10 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Set config base directory
+     * Set the base directory for configuration files.
      *
-     * @param  string  $configBaseDirectory  Config base directory
-     *
-     * @return  self
+     * @param string $configBaseDirectory New base directory path for configurations.
+     * @return self
      */
     public function setConfigBaseDirectory($configBaseDirectory)
     {
@@ -246,11 +259,14 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Create constructor
+     * Create constructor code for an object.
      *
-     * @param string $objectName Object name
-     * @param string $entityName Entity name
-     * @return string
+     * Generates code for creating a new instance of an entity.
+     *
+     * @param string $objectName Name of the object.
+     * @param string $entityName Name of the entity.
+     * @param string|null $dataToLoad Optional data to load into the entity.
+     * @return string Generated constructor code as a string.
      */
     protected function createConstructor($objectName, $entityName, $dataToLoad = null)
     {
@@ -263,12 +279,16 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Create setter for object
+     * Create setter method for an object field.
      *
-     * @param string $objectName Object name
-     * @param string $fieldName Field name
-     * @param string $fieldFilter Field filter
-     * @return string
+     * Generates code for a setter method for a specified field.
+     *
+     * @param string $objectName Name of the object.
+     * @param string $fieldName Name of the field.
+     * @param string $fieldFilter Field filter type.
+     * @param string|null $primaryKeyName Optional primary key name.
+     * @param boolean $updatePk Indicates if the primary key should be updated.
+     * @return string|null Generated setter code as a string or null if skipped.
      */
     protected function createSetter($objectName, $fieldName, $fieldFilter, $primaryKeyName = null, $updatePk = false)
     {
@@ -292,9 +312,11 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Get entity info
+     * Get entity information.
      *
-     * @return  EntityInfo
+     * Retrieves the entity information object.
+     *
+     * @return EntityInfo Entity information object.
      */
     public function getentityInfo()
     {
@@ -302,11 +324,12 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Set entity info
+     * Set entity information.
      *
-     * @param  EntityInfo  $entityInfo  Entity info
+     * Updates the entity information object.
      *
-     * @return  self
+     * @param EntityInfo $entityInfo New entity information object.
+     * @return self
      */
     public function setentityInfo($entityInfo)
     {
@@ -316,12 +339,14 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Load or create application config
+     * Load or create application configuration.
      *
-     * @param string $appId App ID
-     * @param string $appBaseConfigPath App base config path
-     * @param string $configTemplatePath Config template path
-     * @return AppSecretObject
+     * Loads existing configuration or creates a new one from a template.
+     *
+     * @param string $appId Application ID.
+     * @param string $appBaseConfigPath Base path for application configuration.
+     * @param string $configTemplatePath Path to the configuration template.
+     * @return AppSecretObject Loaded or created application configuration object.
      */
     public static function loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath)
     {
@@ -343,11 +368,13 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Load or create application config
+     * Update application configuration.
      *
-     * @param string $appId App ID
-     * @param string $appBaseConfigPath App base config path
-     * @param SecretObject $appConfig App config
+     * Saves the provided configuration for the specified application ID.
+     *
+     * @param string $appId Application ID.
+     * @param string $appBaseConfigPath Base path for application configuration.
+     * @param SecretObject $appConfig Application configuration object.
      */
     public static function updateConfig($appId, $appBaseConfigPath, $appConfig)
     {
@@ -363,9 +390,9 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Get appBuilder config
+     * Get the AppBuilder configuration object.
      *
-     * @return  SecretObject
+     * @return SecretObject AppBuilder configuration object.
      */
     public function getAppBuilderConfig()
     {
@@ -373,21 +400,24 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Get current action
+     * Get the current action from the application configuration.
      *
-     * @return  SecretObject
-     */ 
+     * @return SecretObject Current action object.
+     */
     public function getCurrentAction()
     {
         return $this->currentAction;
     }
     
+    
     /**
-     * Create element form
+     * Create a form element in the DOM.
      *
-     * @param DOMDocument $dom DOM Document
-     * @param string $name Attribute
-     * @return DOMElement
+     * Generates a 'form' element with specified attributes.
+     *
+     * @param DOMDocument $dom DOM Document object.
+     * @param string $name Name attribute for the form.
+     * @return DOMElement Created 'form' element.
      */
     private function createElementForm($dom, $name)
     {
@@ -400,10 +430,12 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create element table responsive
+     * Create a responsive table element in the DOM.
      *
-     * @param DOMDocument $dom DOM Document
-     * @return DOMElement
+     * Generates a 'table' element with responsive attributes.
+     *
+     * @param DOMDocument $dom DOM Document object.
+     * @return DOMElement Created 'table' element.
      */
     private function createElementTableResponsive($dom)
     {
@@ -417,10 +449,12 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Create element table responsive
+     * Create a responsive approval table element in the DOM.
      *
-     * @param DOMDocument $dom DOM Document
-     * @return DOMElement
+     * Generates a 'table' element with approval-specific responsive attributes.
+     *
+     * @param DOMDocument $dom DOM Document object.
+     * @return DOMElement Created 'table' element for approval.
      */
     private function createElementTableResponsiveApproval($dom)
     {
@@ -434,10 +468,16 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create element cancel button
+     * Create a cancel button element in the DOM.
      *
-     * @param DOMDocument $dom DOM Document
-     * @return DOMElement
+     * Generates a 'button' element with specified attributes.
+     *
+     * @param DOMDocument $dom DOM Document object.
+     * @param string $value Button text.
+     * @param string|null $name Optional name attribute for the button.
+     * @param string|null $id Optional id attribute for the button.
+     * @param string|null $onclickUrlVariable Optional URL for the button's onclick event.
+     * @return DOMElement Created 'button' element.
      */
     private function createCancelButton($dom, $value, $name = null, $id = null, $onclickUrlVariable = null)
     {
@@ -461,10 +501,12 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Get text
+     * Get text for a specific language ID.
      *
-     * @param string $id
-     * @return string
+     * Retrieves a localized string based on the given language ID.
+     *
+     * @param string $id Language ID.
+     * @return string Localized text as a string.
      */
     private function getTextOfLanguage($id)
     {
@@ -480,10 +522,12 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Fix table tags
+     * Fix table HTML tags.
      *
-     * @param string $html
-     * @return string
+     * Corrects self-closing tags in table HTML.
+     *
+     * @param string $html HTML string to fix.
+     * @return string Fixed HTML string.
      */
     private function fixTable($html)
     {
@@ -498,10 +542,12 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Fix PHP code
+     * Fix PHP code in HTML string.
      *
-     * @param string $html
-     * @return string
+     * Corrects encoded PHP code in the provided HTML string.
+     *
+     * @param string $html HTML string to fix.
+     * @return string Fixed HTML string with valid PHP code.
      */
     private function fixPhpCode($html)
     {
@@ -513,13 +559,13 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create GUI INSERT section without approval
+     * Create GUI INSERT section without approval.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $fields
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * Generates an HTML form for inserting new records, including input fields and buttons.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param AppField[] $fields Array of AppField objects representing the form fields.
+     * @return string Generated HTML and PHP code for the INSERT form.
      */
     public function createGuiInsert($mainEntity, $fields)
     {
@@ -563,13 +609,14 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create GUI INSERT section without approval
+     * Create GUI UPDATE section, optionally requiring approval.
      *
-     * @param AppField[] $appFields
-     * @param MagicObject $mainEntity
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * Generates an HTML form for updating existing records, with logic for handling approval.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param AppField[] $fields Array of AppField objects representing the form fields.
+     * @param boolean $approvalRequired Flag indicating if approval is needed for the update.
+     * @return string Generated HTML and PHP code for the UPDATE form.
      */
     public function createGuiUpdate($mainEntity, $fields, $approvalRequired = false)
     {
@@ -676,14 +723,16 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create GUI DETAIL section without approval
+     * Create GUI DETAIL section, handling approval if required.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param MagicObject[] $referenceData
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * Generates a detail view for an entity, displaying its properties and handling approval logic.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param AppField[] $appFields Array of AppField objects for displaying the entity's details.
+     * @param MagicObject[] $referenceData Array of reference data for related entities.
+     * @param boolean $approvalRequired Flag indicating if approval is needed.
+     * @param MagicObject|null $approvalEntity Optional entity for handling approval logic.
+     * @return string Generated HTML and PHP code for the DETAIL view.
      */
     public function createGuiDetail($mainEntity, $appFields, $referenceData, $approvalRequired = false, $approvalEntity = null)
     {
@@ -698,10 +747,12 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Define map
+     * Define a mapping for subquery references.
      *
-     * @param MagicObject[] $referenceData
-     * @return string
+     * Constructs an array mapping of reference data for entity relationships.
+     *
+     * @param MagicObject[] $referenceData Array of reference data objects.
+     * @return string PHP array definition of subquery references.
      */
     public function defineSubqueryReference($referenceData)
     {
@@ -741,10 +792,12 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Define map
+     * Define a mapping for specific fields with associative data.
      *
-     * @param MagicObject[] $referenceData
-     * @return string
+     * Builds a mapping of values for fields that contain associative data structures.
+     *
+     * @param MagicObject[] $referenceData Array of reference data objects.
+     * @return string PHP code defining the mapping for specified fields.
      */
     public function defineMap($referenceData)
     {
@@ -774,14 +827,16 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Create GUI DETAIL section with approval
+     * Create GUI DETAIL section with approval.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param MagicObject[] $referenceData
-     * @param boolean $approvalRequired
-     * @param MagicObject $approvalEntity
-     * @return string
+     * Generates an HTML detail view for an entity, including logic for handling approval.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param MagicObject[] $referenceData Array of reference data for related entities.
+     * @param boolean $approvalRequired Indicates if approval is required for the detail view.
+     * @param MagicObject|null $approvalEntity Optional entity for handling approval logic.
+     * @return string Generated HTML and PHP code for the DETAIL view with approval.
      */
     public function createGuiDetailWithApproval($mainEntity, $appFields, $referenceData, $approvalRequired = false, $approvalEntity = null)
     {
@@ -886,12 +941,14 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
-     * Create GUI DETAIL section with approval
+     * Create GUI DETAIL section without approval.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param MagicObject[] $referenceData
-     * @return string
+     * Generates an HTML detail view for an entity without requiring approval.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param MagicObject[] $referenceData Array of reference data for related entities.
+     * @return string Generated HTML and PHP code for the DETAIL view without approval.
      */
     public function createGuiDetailWithoutApproval($mainEntity, $appFields, $referenceData)
     {
@@ -958,12 +1015,14 @@ class AppBuilderBase //NOSONAR
     }
 
     /**
-     * Undocumented function
+     * Create a detail table for displaying entity information.
      *
-     * @param string $objectName
-     * @param AppField[] $appFields
-     * @param string $primaryKeyName
-     * @return string
+     * Generates a table layout for the detail view of an entity, including form elements.
+     *
+     * @param string $objectName The name of the entity object.
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param string $primaryKeyName The name of the primary key for the entity.
+     * @return string Generated HTML code for the detail table.
      */
     public function createTableDetail($objectName, $appFields, $primaryKeyName)
     {
@@ -1014,13 +1073,17 @@ if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($
     }
 
     /**
-     * Undocumented function
+     * Create a comparison detail table for the entity, including approval entity.
      *
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField[] $appFields
-     * @param string $primaryKeyName
-     * @return string
+     * Generates a comparison table layout for the detail view of an entity with its approval counterpart.
+     *
+     * @param MagicObject $mainEntity The main entity object containing metadata.
+     * @param string $objectName The name of the entity object.
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param string $primaryKeyName The name of the primary key for the entity.
+     * @param MagicObject $approvalEntity The approval entity for comparison.
+     * @param string $objectApprovalName The name of the approval entity object.
+     * @return string Generated HTML code for the comparison detail table.
      */
     public function createTableDetailCompare($mainEntity, $objectName, $appFields, $primaryKeyName, $approvalEntity, $objectApprovalName)
     {
@@ -1070,6 +1133,13 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         return $htmlDetail;
     }
 
+    /**
+     * Create export value for a given field.
+     *
+     * @param string $objectName The name of the object.
+     * @param AppField $field The field object containing information about the field.
+     * @return string The formatted export value as a string.
+     */
     private function createExportValue($objectName, $field)
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
@@ -1144,6 +1214,13 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
 
     }
 
+    /**
+     * Generate the export script for the specified entity and fields.
+     *
+     * @param MagicObject $entityMain The main entity object for the export.
+     * @param AppField[] $exportFields An array of AppField objects to be exported.
+     * @return string The generated export script as a string.
+     */
     private function createExportScript($entityMain, $exportFields)
     {
         $entityName = $entityMain->getentityName();
@@ -1231,16 +1308,18 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
     }
 
     /**
-     * Create GUI LIST section 
+     * Create the GUI list section for displaying entities.
      *
-     * @param MagicObject $mainEntity
-     * @param AppField[] $appFields
-     * @param MagicObject[] $referenceData
-     * @param boolean $sortOrder
-     * @param boolean $approvalRequired
-     * @param array $specification
-     * @param array $sortable
-     * @return string
+     * @param MagicObject $entityMain The main entity object for the list.
+     * @param AppField[] $listFields An array of fields to be displayed in the list.
+     * @param AppField[] $exportFields An array of fields available for export.
+     * @param MagicObject[] $referenceData Additional reference data objects.
+     * @param AppField[] $filterFields An array of fields used for filtering.
+     * @param boolean $sortOrder The sorting order (true for ascending, false for descending).
+     * @param boolean $approvalRequired Indicates if approval is required.
+     * @param array $specification Additional specifications for data retrieval.
+     * @param array $sortable Sorting options for the list.
+     * @return string The generated HTML output for the list section.
      */
     public function createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable) //NOSONAR
     {
@@ -1385,6 +1464,11 @@ catch(Exception $e)
         return $result;
     }
     
+    /**
+     * Generate script for displaying a message when no data is found.
+     *
+     * @return string The script for handling no data found scenarios.
+     */
     public function scriptWhenListNotFound()
     {
         if($this->appFeatures->isApprovalRequired())
@@ -1424,11 +1508,11 @@ else
     }
     
     /**
-     * Create pagination
+     * Create pagination controls for data display.
      *
-     * @param string $className
-     * @param string $paginationVar
-     * @return string
+     * @param string $className The CSS class for the pagination.
+     * @param string|null $paginationVar The variable containing pagination data, if available.
+     * @return string The generated HTML for pagination.
      */
     public function createPagination($className, $paginationVar = null)
     {
@@ -1464,8 +1548,10 @@ else
     }
 
     /**
-     * Get additional filter
-     * @return string
+     * Get additional filters based on the provided specifications.
+     *
+     * @param array $specification The array of specifications for filtering data.
+     * @return string The additional filter script as a string.
      */
     private function getAdditionalFilter($specification)
     {
@@ -1503,8 +1589,10 @@ else
     }
 
     /**
-     * Get sortable params
-     * @return string
+     * Get sortable parameters based on the specified sortable fields.
+     *
+     * @param array $sortable The array of sortable field specifications.
+     * @return string The generated sortable parameters as a string.
      */
     private function getSortableParams($sortable)
     {
@@ -1534,16 +1622,16 @@ else
     }
     
     /**
-     * Create GUI LIST section 
+     * Create the script before the GUI list section.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param AppField[] $listFields
-     * @param AppField[] $filterFields
-     * @param MagicObject[] $referenceData
-     * @param array $specification
-     * @param array $sortable
-     * @return string
+     * @param DOMDocument $dom The DOM document for generating HTML.
+     * @param MagicObject $mainEntity The main entity object.
+     * @param AppField[] $listFields An array of fields to be displayed in the list.
+     * @param AppField[] $filterFields An array of filter fields.
+     * @param MagicObject[] $referenceData An array of reference data objects.
+     * @param array $specification Specifications for filtering.
+     * @param array $sortable Sortable field specifications.
+     * @return string The generated script for the list section.
      */
     public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable)
     {
@@ -1609,6 +1697,11 @@ $subqueryMap = '.$referece.';
         return $script;
     }
 
+    /**
+     * Generate the script to find all entities based on conditions.
+     *
+     * @return string The script for finding all entities.
+     */
     private function getFindAllScript()
     {
         $features = $this->appFeatures;
@@ -1623,10 +1716,10 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get filter type
+     * Get the filter type for a specific field.
      *
-     * @param AppField $field
-     * @return string
+     * @param AppField $field The field object to determine the filter type.
+     * @return string The determined filter type.
      */
     private function getFilterType($field)
     {
@@ -1654,16 +1747,16 @@ $subqueryMap = '.$referece.';
         return $dataType;
     }
     
+    
     /**
-     * Create list
+     * Create the data list form with a table and buttons.
      *
-     * @param DOMDocument $dom
-     * @param AppField[] $listFields
-     * @param string $objectName
-     * @param string $primaryKey
-     * @param boolean $sortOrder
-     * @param boolean $approvalRequired
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document for generating HTML.
+     * @param AppField[] $listFields An array of fields to be displayed in the list.
+     * @param string $objectName The name of the object being listed.
+     * @param string $primaryKey The primary key for the object.
+     * @param boolean $approvalRequired Indicates if approval is required.
+     * @return DOMElement The generated form element containing the data list.
      */
     public function createDataList($dom, $listFields, $objectName, $primaryKey, $approvalRequired)
     {
@@ -1703,11 +1796,11 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create buttons
+     * Create a wrapper for buttons in the data list.
      *
-     * @param DOMDocument $dom
-     * @param AppFeatures $appFeatures
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document for generating HTML.
+     * @param AppFeatures $appFeatures The application features object.
+     * @return DOMElement The generated button wrapper element.
      */
     public function createButtonWrapper($dom, $appFeatures)
     {
@@ -1777,13 +1870,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create table list
+     * Create a data table list with headers and rows.
      *
-     * @param DOMDocument $dom
-     * @param AppField[] $listFields
-     * @param string $primaryKey
-     * @param boolean $approvalRequired
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document for generating HTML.
+     * @param AppField[] $listFields An array of fields to be displayed in the table.
+     * @param string $objectName The name of the object being listed.
+     * @param string $primaryKey The primary key for the object.
+     * @param boolean $approvalRequired Indicates if approval is required.
+     * @return DOMElement The generated table element containing the data list.
      */
     public function createDataTableList($dom, $listFields, $objectName, $primaryKey, $approvalRequired = false)
     {
@@ -1808,14 +1902,15 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create table list head
+     * Creates the table header for a list of items.
      *
-     * @param DOMDocument $dom
-     * @param AppField[] $listFields
-     * @param string $objectName
-     * @param string $primaryKey
-     * @param boolean $approvalRequired
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param AppField[] $listFields An array of fields to include in the header.
+     * @param string $objectName The name of the object for which the table is being created.
+     * @param string $primaryKey The primary key of the object.
+     * @param boolean $approvalRequired Indicates if approval actions are required.
+     * 
+     * @return DOMElement The created table header element (thead).
      */
     public function createTableListHead($dom, $listFields, $primaryKey, $approvalRequired = false)
     {
@@ -1968,13 +2063,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create table list body
+     * Creates an approve button element.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param string $primaryKey
-     * @param string $upperPkName
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param string $objectName The name of the object for which the button is being created.
+     * @param string $primaryKey The primary key of the object.
+     * @param string $upperPkName The upper camel case name of the primary key.
+     * 
+     * @return DOMElement The created approve button element (a).
      */
     private function createButtonApprove($dom, $objectName, $primaryKey, $upperPkName)
     {
@@ -1995,13 +2091,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create table list body
+     * Creates a reject button element.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param string $primaryKey
-     * @param string $upperPkName
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param string $objectName The name of the object for which the button is being created.
+     * @param string $primaryKey The primary key of the object.
+     * @param string $upperPkName The upper camel case name of the primary key.
+     * 
+     * @return DOMElement The created reject button element (a or text node).
      */
     private function createButtonReject($dom, $objectName, $primaryKey, $upperPkName)
     {
@@ -2021,13 +2118,15 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create table list body
+     * Creates the table body for a list of items.
      *
-     * @param DOMDocument $dom
-     * @param AppField[] $listFields
-     * @param string $primaryKey
-     * @param boolean $approvalRequired
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param AppField[] $listFields An array of fields to include in the body.
+     * @param string $objectName The name of the object for which the table is being created.
+     * @param string $primaryKey The primary key of the object.
+     * @param boolean $approvalRequired Indicates if approval actions are required.
+     * 
+     * @return DOMElement The created table body element (tbody).
      */
     public function createTableListBody($dom, $listFields, $objectName, $primaryKey, $approvalRequired = false)
     {
@@ -2225,11 +2324,12 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create filter
+     * Creates a filter form with various filter elements.
      *
-     * @param DOMDocument $dom
-     * @param AppField[] $filterFields
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param AppField[] $filterFields An array of fields to be included in the filter.
+     * 
+     * @return DOMElement The created filter form element (form).
      */
     public function createFilterForm($dom, $filterFields)
     {
@@ -2324,12 +2424,13 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Append filter
+     * Appends filter elements to the given form.
      *
-     * @param DOMDocument $dom
-     * @param DOMElement $form
-     * @param AppField[] $filterFields
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param DOMElement $form The form element to which filters will be appended.
+     * @param AppField[] $filterFields An array of fields for filtering.
+     * 
+     * @return DOMElement The updated form element with appended filters.
      */
     public function appendFilter($dom, $form, $filterFields)
     {
@@ -2464,10 +2565,11 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Is multiple selection
+     * Checks if the reference filter allows multiple selections.
      *
-     * @param MagicObject $referenceFilter
-     * @return boolean
+     * @param MagicObject $referenceFilter The reference filter object to check.
+     * 
+     * @return boolean True if multiple selection is allowed, otherwise false.
      */
     public function isMultipleSelection($referenceFilter)
     {
@@ -2478,7 +2580,14 @@ $subqueryMap = '.$referece.';
         return false;
     }
     
-    public function getObjectNameFromFieldName($fieldName)
+    /**
+     * Retrieves the object name derived from the field name.
+     *
+     * @param string $fieldName The field name to process.
+     * 
+     * @return string The corresponding object name.
+     */
+        public function getObjectNameFromFieldName($fieldName)
     {
         if(PicoStringUtil::endsWith($fieldName, "_id"))
         {
@@ -2491,14 +2600,15 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create insert form table
+     * Creates a responsive insert form table for the specified fields.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField[] $fields
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param MagicObject $mainEntity The main entity object for the form.
+     * @param string $objectName The name of the object being inserted.
+     * @param AppField[] $fields An array of fields to include in the form.
+     * @param string $primaryKeyName The name of the primary key for the object.
+     * 
+     * @return DOMElement The created insert form table element (table).
      */
     private function createInsertFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName)
     {
@@ -2517,14 +2627,15 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create insert form table
+     * Creates a responsive update form table for the specified fields.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField[] $fields
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param MagicObject $mainEntity The main entity object for the form.
+     * @param string $objectName The name of the object being updated.
+     * @param AppField[] $fields An array of fields to include in the form.
+     * @param string $primaryKeyName The name of the primary key for the object.
+     * 
+     * @return DOMElement The created update form table element (table).
      */
     private function createUpdateFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName)
     {
@@ -2543,12 +2654,13 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create detail table
+     * Creates a responsive detail table for the specified fields.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param AppField[] $fields
-     * @return DOMElement
+     * @param DOMDocument $dom The DOM document to create elements in.
+     * @param string $objectName The name of the object being detailed.
+     * @param AppField[] $fields An array of fields to include in the detail view.
+     * 
+     * @return DOMElement The created detail table element (table).
      */
     private function createDetailTable($dom, $objectName, $fields)
     {
@@ -2567,16 +2679,16 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create detail compare table
+     * Create a detailed comparison table for two entities.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField[] $fields
-     * @param string $primaryKeyName
-     * @param MagicObject $approvalEntity
-     * @param string $objectApprovalName
-     * @return DOMElement
+     * @param DOMDocument $dom             The DOM document to append the table to.
+     * @param MagicObject $mainEntity      The main entity for comparison.
+     * @param string $objectName           The name of the main object.
+     * @param AppField[] $fields           The fields to include in the comparison.
+     * @param string $primaryKeyName       The name of the primary key field.
+     * @param MagicObject $approvalEntity   The approval entity for comparison.
+     * @param string $objectApprovalName    The name of the approval object.
+     * @return DOMElement                  The generated comparison table element.
      */
     private function createDetailTableCompare($dom, $mainEntity, $objectName, $fields, $primaryKeyName, $approvalEntity, $objectApprovalName)
     {
@@ -2615,14 +2727,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create insert form table
+     * Create a row for inserting a new entity in a form.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField $field
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * @param DOMDocument $dom             The DOM document to append the row to.
+     * @param MagicObject $mainEntity      The main entity being modified.
+     * @param string $objectName           The name of the object.
+     * @param AppField $field              The field being inserted.
+     * @param string $primaryKeyName       The name of the primary key field.
+     * @return DOMElement                  The generated row element.
      */
     private function createInsertRow($dom, $mainEntity, $objectName, $field, $primaryKeyName)
     {
@@ -2662,14 +2774,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create insert form table
+     * Create a row for updating an existing entity in a form.
      *
-     * @param DOMDocument $dom
-     * @param MagicObject $mainEntity
-     * @param string $objectName
-     * @param AppField $field
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * @param DOMDocument $dom             The DOM document to append the row to.
+     * @param MagicObject $mainEntity      The main entity being modified.
+     * @param string $objectName           The name of the object.
+     * @param AppField $field              The field being updated.
+     * @param string $primaryKeyName       The name of the primary key field.
+     * @return DOMElement                  The generated row element.
      */
     private function createUpdateRow($dom, $mainEntity, $objectName, $field, $primaryKeyName)
     {
@@ -2709,12 +2821,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create detail form table
+     * Create a detail row for displaying an entity's field.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param AppField $field
-     * @return DOMElement
+     * @param DOMDocument $dom             The DOM document to append the row to.
+     * @param string $objectName           The name of the object.
+     * @param AppField $field              The field to display.
+     * @return DOMElement                  The generated detail row element.
      */
     private function createDetailRow($dom, $objectName, $field)
     {
@@ -2752,12 +2864,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create detail form table
+     * Create a value representation for a field in a detail row.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param AppField $field
-     * @return DOMElement|DOMText
+     * @param DOMDocument $dom             The DOM document to append the value to.
+     * @param string $objectName           The name of the object.
+     * @param AppField $field              The field whose value is to be displayed.
+     * @return DOMElement|DOMText          The generated value element or text node.
      */
     private function createDetailValue($dom, $objectName, $field)
     {
@@ -2834,13 +2946,13 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create detail form table
+     * Create a row to compare values between the main and approval entities.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param AppField $field
-     * @param string $objectApprovalName
-     * @return DOMElement
+     * @param DOMDocument $dom             The DOM document to append the row to.
+     * @param string $objectName           The name of the main object.
+     * @param AppField $field              The field to compare.
+     * @param string $objectApprovalName    The name of the approval object.
+     * @return DOMElement                  The generated comparison row element.
      */
     private function createDetailCompareRow($dom, $objectName, $field, $objectApprovalName)
     {
@@ -2941,13 +3053,14 @@ $subqueryMap = '.$referece.';
 
         return $tr;
     }
+    
     /**
-     * Create insert form table
+     * Create an input control for an insert form.
      *
-     * @param DOMDocument $dom
-     * @param AppField $field
-     * @param string $id
-     * @return DOMElement
+     * @param DOMDocument $dom         The DOM document to which the control will be added.
+     * @param AppField $field          The field definition for the control.
+     * @param string|null $id          The optional ID attribute for the control.
+     * @return DOMElement              The created input control element.
      */
     private function createInsertControl($dom, $field, $id = null)
     {
@@ -3028,14 +3141,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create insert form table
+     * Create an input control for an update form.
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param AppField $field
-     * @param string $primaryKeyName
-     * @param string $id
-     * @return DOMElement
+     * @param DOMDocument $dom         The DOM document to which the control will be added.
+     * @param string $objectName       The name of the object being updated.
+     * @param AppField $field          The field definition for the control.
+     * @param string $primaryKeyName   The primary key field name.
+     * @param string|null $id          The optional ID attribute for the control.
+     * @return DOMElement              The created input control element.
      */
     private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null)
     {
@@ -3129,11 +3242,11 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Add attribute id
+     * Add an ID attribute to a DOM element if provided.
      *
-     * @param DOMElement $element
-     * @param string $id
-     * @return DOMElement
+     * @param DOMElement $element      The DOM element to which the ID will be added.
+     * @param string|null $id          The ID value to set on the element.
+     * @return DOMElement              The modified DOM element with the ID attribute.
      */
     public function addAttributeId($element, $id)
     {
@@ -3145,13 +3258,13 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Append &lt;option&gt; to element &lt;select&gt;
+     * Append options to a select element from a reference data object.
      *
-     * @param DOMDocument $dom
-     * @param DOMElement $input
-     * @param MagicObject $referenceData
-     * @param string $selected
-     * @return DOMElement
+     * @param DOMDocument $dom         The DOM document to which the options will be added.
+     * @param DOMElement $input        The select element to append options to.
+     * @param MagicObject $referenceData The reference data containing the options.
+     * @param string|null $selected     The optional selected value.
+     * @return DOMElement              The select element with appended options.
      */
     private function appendOption($dom, $input,  $referenceData, $selected = null)
     {
@@ -3201,14 +3314,15 @@ $subqueryMap = '.$referece.';
         }
         return $input;
     }
+    
     /**
-     * Create insert form table
+     * Append a list of options to a select element from a map.
      *
-     * @param DOMDocument $dom
-     * @param DOMElement $input
-     * @param MagicObject $map
-     * @param string $selected
-     * @return DOMElement
+     * @param DOMDocument $dom         The DOM document to which the options will be added.
+     * @param DOMElement $input        The select element to append options to.
+     * @param MagicObject $map         The map containing the options.
+     * @param string|null $selected     The optional selected value.
+     * @return DOMElement              The select element with appended options.
      */
     private function appendOptionList($dom, $input, $map, $selected = null)
     {
@@ -3238,11 +3352,11 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create insert form table
+     * Add custom attributes to a select option element.
      *
-     * @param DOMElement $input
-     * @param MagicObject $opt
-     * @return DOMElement
+     * @param DOMElement $input        The option element to which attributes will be added.
+     * @param MagicObject $opt         The option data containing additional attributes.
+     * @return DOMElement              The option element with custom attributes.
      */
     private function addSelectAttribute($input, $opt)
     {
@@ -3265,9 +3379,10 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Build caption for option
-     * @param string $caption Original
-     * @return string Final
+     * Build a caption for an option.
+     *
+     * @param string $caption          The original caption string.
+     * @return string                  The formatted caption string.
      */
     private function buildCaption($caption)
     {
@@ -3286,16 +3401,16 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Append option from entiry
+     * Append options to a select element based on an entity.
      *
-     * @param DOMDocument $dom
-     * @param DOMElement $input
-     * @param MagicObject $entity
-     * @param array $specification
-     * @param array $sortable
-     * @param string $selected
-     * @param MagicObject $additionalOutput
-     * @return DOMElement
+     * @param DOMDocument $dom         The DOM document to which the options will be added.
+     * @param DOMElement $input        The select element to append options to.
+     * @param MagicObject $entity      The entity providing options.
+     * @param array $specification     The specification for the entity.
+     * @param array $sortable          The sorting criteria for the entity options.
+     * @param string|null $selected     The optional selected value.
+     * @param MagicObject|null $additionalOutput Optional additional output for the options.
+     * @return DOMElement              The select element with appended options.
      */
     private function appendOptionEntity($dom, $input, $entity, $specification, $sortable, $selected = null, $additionalOutput = null)
     {
@@ -3341,9 +3456,10 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get entity option format
-     * @param string $textNodeFormat
-     * @return string
+     * Get the format for an entity option based on its text node format.
+     *
+     * @param string $textNodeFormat   The text node format string.
+     * @return string                  The formatted string for the option.
      */
     private function getEntityOptionFormat($textNodeFormat)
     {
@@ -3356,9 +3472,10 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get indent string
-     * @param integer $indent
-     * @return string
+     * Get the indent string based on the specified indent value.
+     *
+     * @param int $indent              The indent level.
+     * @return string                  The formatted indent string.
      */
     private function getIndentString($indent)
     {
@@ -3374,8 +3491,10 @@ $subqueryMap = '.$referece.';
     /**
      * Build specification
      *
-     * @param array $specification
-     * @return string
+     * Constructs a specification string based on the provided array of specifications.
+     *
+     * @param array $specification Array of specifications.
+     * @return string The constructed specification string.
      */
     private function buildSpecification($specification)
     {
@@ -3401,8 +3520,10 @@ $subqueryMap = '.$referece.';
     /**
      * Build sortable
      *
-     * @param array $sortable
-     * @return string
+     * Constructs a sortable string based on the provided array of sortable options.
+     *
+     * @param array $sortable Array of sortable options.
+     * @return string The constructed sortable string.
      */
     private function buildSortable($sortable)
     {
@@ -3427,8 +3548,12 @@ $subqueryMap = '.$referece.';
     /**
      * Get sort type
      *
-     * @paramstring $sortType
-     * @return string
+     * Returns the appropriate sort type string. If the provided sort type
+     * is already a PicoSort constant, it returns it; otherwise, it wraps
+     * the sort type in double quotes.
+     *
+     * @param string $sortType The sort type.
+     * @return string The processed sort type.
      */
     public function getSortType($sortType)
     {
@@ -3445,8 +3570,11 @@ $subqueryMap = '.$referece.';
     /**
      * Fix value
      *
-     * @param mixed $value
-     * @return mixed
+     * Formats the provided value according to its type. Returns 'null' for null values,
+     * formats booleans to 'true' or 'false', and ensures string values are properly quoted.
+     *
+     * @param mixed $value The value to format.
+     * @return mixed The formatted value.
      */
     private function fixValue($value)
     {
@@ -3485,11 +3613,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Set input attribute
+     * Set input type attribute
      *
-     * @param DOMElement $input
-     * @param string $dataType
-     * @return DOMElement
+     * Sets the HTML type attribute for the input element based on the provided data type.
+     * Adds appropriate classes for styling.
+     *
+     * @param DOMElement $input The input element to modify.
+     * @param string $dataType The data type for the input (e.g., int, float).
+     * @return DOMElement The modified input element.
      */
     private function setInputTypeAttribute($input, $dataType)
     {
@@ -3516,8 +3647,11 @@ $subqueryMap = '.$referece.';
 
     /**
      * Create map input type
-     * @param string $dataType
-     * @return string
+     *
+     * Maps specific data types to corresponding HTML input types.
+     *
+     * @param string $dataType The data type to map.
+     * @return string The corresponding HTML input type.
      */
     private function mapInputType($dataType)
     {
@@ -3534,8 +3668,13 @@ $subqueryMap = '.$referece.';
     /**
      * Create button container table for create
      *
-     * @param DOMDocument $dom
-     * @return DOMElement
+     * Generates a table element containing buttons for the create action.
+     *
+     * @param DOMDocument $dom The DOM document for creating elements.
+     * @param string $name The name for the button container.
+     * @param string $id The ID for the button container.
+     * @param string $userAction The user action context.
+     * @return DOMElement The generated button container table.
      */
     private function createButtonContainerTableCreate($dom, $name, $id, $userAction)
     {
@@ -3579,10 +3718,13 @@ $subqueryMap = '.$referece.';
     /**
      * Create button container table for update
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * Generates a table element containing buttons for the update action, including
+     * a hidden primary key input.
+     *
+     * @param DOMDocument $dom The DOM document for creating elements.
+     * @param string $objectName The name of the object being updated.
+     * @param string $primaryKeyName The name of the primary key field.
+     * @return DOMElement The generated button container table.
      */
     private function createButtonContainerTableUpdate($dom, $objectName, $primaryKeyName)
     {
@@ -3633,12 +3775,15 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create button container table
+     * Create button container table for detail
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * Generates a table element containing buttons for viewing the detail of an object,
+     * with conditional buttons based on user permissions.
+     *
+     * @param DOMDocument $dom The DOM document for creating elements.
+     * @param string $objectName The name of the object being detailed.
+     * @param string $primaryKeyName The name of the primary key field.
+     * @return DOMElement The generated button container table.
      */
     private function createButtonContainerTableDetail($dom,  $objectName, $primaryKeyName)
     {
@@ -3731,10 +3876,13 @@ $subqueryMap = '.$referece.';
     /**
      * Create button container table for approval
      *
-     * @param DOMDocument $dom
-     * @param string $objectName
-     * @param string $primaryKeyName
-     * @return DOMElement
+     * Generates a table element containing buttons for the approval action,
+     * with conditions based on the current user action.
+     *
+     * @param DOMDocument $dom The DOM document for creating elements.
+     * @param string $objectName The name of the object being approved.
+     * @param string $primaryKeyName The name of the primary key field.
+     * @return DOMElement The generated button container table.
      */
     private function createButtonContainerTableApproval($dom, $objectName, $primaryKeyName)
     {
@@ -3844,8 +3992,11 @@ $subqueryMap = '.$referece.';
     /**
      * Convert XML to HTML
      *
-     * @param string $xml
-     * @return string
+     * This function processes the provided XML string, removing the XML declaration
+     * and decoding any encoded scripts found within the XML.
+     *
+     * @param string $xml The XML string to convert.
+     * @return string The converted HTML string.
      */
     public function xmlToHtml($xml)
     {
@@ -3875,10 +4026,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Decode string
+     * Decode a base64 encoded string
      *
-     * @param string $stringFound
-     * @return string
+     * This function extracts the encoded script from a given string and decodes it.
+     *
+     * @param string $stringFound The encoded string to decode.
+     * @return string The decoded string.
      */
     public function decodeString($stringFound)
     {
@@ -3895,10 +4048,13 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create PHP output
+     * Create PHP output for a given value
      *
-     * @param string $value
-     * @return string
+     * This function returns a string formatted to echo the specified value within
+     * PHP opening and closing tags.
+     *
+     * @param string $value The value to output.
+     * @return string The formatted PHP output string.
      */
     public function createPhpOutputValue($value)
     {
@@ -3906,10 +4062,13 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Get class function
+     * Retrieve class attributes from a DOM element
      *
-     * @param DOMElement $node
-     * @return string[]
+     * This function extracts the class attribute from the given DOM element
+     * and returns it as an array of class names.
+     *
+     * @param DOMElement $node The DOM element from which to extract class names.
+     * @return string[] An array of class names.
      */
     public function getClass($node)
     {
@@ -3922,11 +4081,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Add class function
+     * Add a class to a DOM element
      *
-     * @param DOMElement $node
-     * @param string $class
-     * @return DOMElement
+     * This function adds a specified class to the class attribute of the
+     * given DOM element.
+     *
+     * @param DOMElement $node The DOM element to modify.
+     * @param string $class The class to add.
+     * @return DOMElement The modified DOM element.
      */
     public function addClass($node, $class)
     {
@@ -3937,11 +4099,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Remove class function
+     * Remove a class from a DOM element
      *
-     * @param DOMElement $node
-     * @param string $class
-     * @return DOMElement
+     * This function removes a specified class from the class attribute of the
+     * given DOM element.
+     *
+     * @param DOMElement $node The DOM element to modify.
+     * @param string $class The class to remove.
+     * @return DOMElement The modified DOM element.
      */
     public function removeClass($node, $class)
     {
@@ -3959,13 +4124,16 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create single entity function
+     * Generate a single entity in the database
      *
-     * @param PicoDatabase $database
-     * @param SecretObject $appConf
-     * @param MagicObject $entityMain
-     * @param string $tableName
-     * @param string[] $nonupdatables
+     * This function creates a new entity in the specified table using the provided
+     * database and configuration settings.
+     *
+     * @param PicoDatabase $database The database instance to use.
+     * @param SecretObject $appConf The application configuration object.
+     * @param string $entityName The name of the entity to generate.
+     * @param string $tableName The name of the table to which the entity belongs.
+     * @param string[] $nonupdatables An array of non-updatable fields.
      * @return void
      */
     public function generateEntity($database, $appConf, $entityName, $tableName, $nonupdatables)
@@ -3977,13 +4145,16 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create main entity function
+     * Generate the main entity in the database
      *
-     * @param PicoDatabase $database
-     * @param SecretObject $appConf
-     * @param MagicObject $entityMain
-     * @param EntityInfo $entityInfo
-     * @param MagicObject[] $referenceData
+     * This function creates the main entity using the provided configuration
+     * and reference data.
+     *
+     * @param PicoDatabase $database The database instance to use.
+     * @param SecretObject $appConf The application configuration object.
+     * @param MagicObject $entityMain The main entity object.
+     * @param EntityInfo $entityInfo The entity information.
+     * @param MagicObject[] $referenceData An array of reference data objects.
      * @return void
      */
     public function generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData)
@@ -4000,14 +4171,17 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create approval entity function
+     * Generate the approval entity in the database
      *
-     * @param PicoDatabase $database
-     * @param SecretObject $appConf
-     * @param MagicObject $entityMain
-     * @param EntityInfo $entityInfo
-     * @param MagicObject $entityApproval
-     * @param MagicObject[] $referenceData
+     * This function creates an approval entity using the provided configuration
+     * and reference data.
+     *
+     * @param PicoDatabase $database The database instance to use.
+     * @param SecretObject $appConf The application configuration object.
+     * @param MagicObject $entityMain The main entity object.
+     * @param EntityInfo $entityInfo The entity information.
+     * @param MagicObject $entityApproval The approval entity object.
+     * @param MagicObject[] $referenceData An array of reference data objects.
      * @return void
      */
     public function generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData)
@@ -4024,14 +4198,17 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create trash entity function
+     * Generate the trash entity in the database
      *
-     * @param PicoDatabase $database
-     * @param SecretObject $appConf
-     * @param MagicObject $entityMain
-     * @param EntityInfo $entityInfo
-     * @param MagicObject $entityTrash
-     * @param MagicObject[] $referenceData
+     * This function creates a trash entity using the provided configuration
+     * and reference data.
+     *
+     * @param PicoDatabase $database The database instance to use.
+     * @param SecretObject $appConf The application configuration object.
+     * @param MagicObject $entityMain The main entity object.
+     * @param EntityInfo $entityInfo The entity information.
+     * @param MagicObject $entityTrash The trash entity object.
+     * @param MagicObject[] $referenceData An array of reference data objects.
      * @return void
      */
     public function generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData)
@@ -4047,9 +4224,12 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get successor main columns
+     * Retrieve successor main columns based on application features
      *
-     * @return array
+     * This function returns an array of columns for the successor entity based on
+     * the application's feature configuration.
+     *
+     * @return array An array of column definitions.
      */
     public function getSucessorMainColumns()
     {
@@ -4086,10 +4266,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Get predecessor approval columns
+     * Retrieve predecessor approval columns for the approval entity
      *
-     * @param MagicObject $entityApproval
-     * @return array
+     * This function returns the columns needed for the predecessor approval entity.
+     *
+     * @param MagicObject $entityApproval The approval entity object.
+     * @return array An array of column definitions.
      */
     public function getPredecessorApprovalColumns($entityApproval)
     {
@@ -4100,9 +4282,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Get successor approval columns
+     * Retrieve successor approval columns based on application features
      *
-     * @return array
+     * This function returns an array of columns for the successor approval entity
+     * based on the application's feature configuration.
+     *
+     * @return array An array of column definitions.
      */
     public function getSucessorApprovalColumns()
     {
@@ -4133,10 +4318,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Get predecessor trash columns
+     * Retrieve predecessor trash columns for the trash entity
      *
-     * @param MagicObject $entityTrash
-     * @return array
+     * This function returns the columns needed for the predecessor trash entity.
+     *
+     * @param MagicObject $entityTrash The trash entity object.
+     * @return array An array of column definitions.
      */
     public function getPredecessorTrashColumns($entityTrash)
     {
@@ -4147,9 +4334,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Get successor approval columns
+     * Retrieve successor trash columns based on application features
      *
-     * @return array
+     * This function returns an array of columns for the successor trash entity
+     * based on the application's feature configuration.
+     *
+     * @return array An array of column definitions.
      */
     public function getSucessorTrashColumns()
     {
@@ -4179,9 +4369,11 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get column info
+     * Retrieve column information for the entity
      *
-     * @return array
+     * This function returns the definitions for common columns in the entity.
+     *
+     * @return array An array of column definitions.
      */
     public function getColumnInfo()
     {
@@ -4204,10 +4396,12 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Check if value is true
+     * Check if the provided value is considered true
      *
-     * @param mixed $value
-     * @return boolean
+     * This function checks the value against various true-like representations.
+     *
+     * @param mixed $value The value to check.
+     * @return bool Returns true if the value is considered true, false otherwise.
      */
     public static function isTrue($value)
     {
@@ -4215,9 +4409,11 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Include app header
+     * Generate a require statement for the app header
      *
-     * @return string
+     * This function returns a string to include the main application header.
+     *
+     * @return string The require statement for the app header.
      */
     public function getIncludeHeader()
     {
@@ -4225,9 +4421,11 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Include app footer
+     * Generate a require statement for the app footer
      *
-     * @return string
+     * This function returns a string to include the main application footer.
+     *
+     * @return string The require statement for the app footer.
      */
     public function getIncludeFooter()
     {
@@ -4235,10 +4433,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Construct entity label
+     * Construct a label for an entity
      *
-     * @param string $entityName
-     * @return string
+     * This function creates a language object for the specified entity name.
+     *
+     * @param string $entityName The name of the entity for which to create a label.
+     * @return string The constructed entity label.
      */
     public function constructEntityLabel($entityName)
     {
@@ -4246,11 +4446,14 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Undocumented function
+     * Add tab indentation to HTML content
      *
-     * @param string $html
-     * @param integer $tab
-     * @return string
+     * This function indents each line of the given HTML string by a specified number
+     * of spaces, based on the current indentation level.
+     *
+     * @param string $html The HTML string to modify.
+     * @param integer $indent The number of spaces to indent each line.
+     * @return string The modified HTML string with added indentation.
      */
     public function addTab($html, $indent = 2)
     {
@@ -4270,10 +4473,12 @@ $subqueryMap = '.$referece.';
     }
     
     /**
-     * Create tab
+     * Create a string of tabs for indentation
      *
-     * @param integer $n
-     * @return string
+     * This function generates a string consisting of a specified number of tab characters.
+     *
+     * @param integer $n The number of tabs to create.
+     * @return string The generated string of tab characters.
      */
     private function createTab($n)
     {
@@ -4286,11 +4491,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Undocumented function
+     * Add indentation to each line of HTML content
      *
-     * @param string $html
-     * @param integer $tab
-     * @return string
+     * This function prepends a specified number of tabs to each line of the given
+     * HTML string.
+     *
+     * @param string $html The HTML string to modify.
+     * @param integer $indent The number of tabs to add to each line.
+     * @return string The modified HTML string with added indentation.
      */
     public function addIndent($html, $indent = 1)
     {
@@ -4309,11 +4517,14 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Add wrapper
+     * Wrap HTML content in specified wrapper tags
      *
-     * @param string $html
-     * @param string $wrapper
-     * @return string
+     * This function wraps the given HTML string in a div element with a specific
+     * class based on the type of wrapper specified.
+     *
+     * @param string $html The HTML string to wrap.
+     * @param string $wrapper The type of wrapper to use (insert, update, detail, list).
+     * @return string The wrapped HTML string.
      */
     public function addWrapper($html, $wrapper)
     {
@@ -4358,10 +4569,15 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get string of
+     * Get a formatted string representation of the provided input.
      *
-     * @param string $str
-     * @return string
+     * This method checks if the input string is alphanumeric (excluding underscores)
+     * and returns a formatted string accordingly. If the input is alphanumeric,
+     * it returns a string suitable for field reference; otherwise, it returns
+     * the input string wrapped in quotes.
+     *
+     * @param string $str The input string to format.
+     * @return string The formatted string representation.
      */
     public function getStringOf($str)
     {
@@ -4376,11 +4592,17 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Create sort order session
-     * @param string $objectName
-     * @param string $entityName
-     * @param string $primaryKeyName
-     * @return string
+     * Create a sort order section in the session.
+     *
+     * This method generates a block of code to handle the sorting of entities
+     * based on the new order provided in the input. It initializes the object
+     * for the entity, checks for new order data, and updates the sort order
+     * in the database.
+     *
+     * @param string $objectName The name of the object to sort.
+     * @param string $entityName The name of the entity being sorted.
+     * @param string $primaryKeyName The name of the primary key for the entity.
+     * @return string The generated code for the sort order section.
      */
     public function createSortOrderSection($objectName, $entityName, $primaryKeyName)
     {
@@ -4416,11 +4638,16 @@ $subqueryMap = '.$referece.';
         $lines[] = self::CURLY_BRACKET_CLOSE;   
         return implode("\r\n", $lines);
     }
-
+    
     /**
-     *  Fix variable
-     * @param string $input
-     * @return string
+     * Fix variable input by ensuring it has a leading dollar sign.
+     *
+     * This method checks if the input string contains a leading dollar sign.
+     * If not, it adds one. It also ensures that double dollar signs are
+     * replaced with a single dollar sign.
+     *
+     * @param string $input The input string to fix.
+     * @return string The fixed input string.
      */
     public function fixVariableInput($input)
     {
@@ -4436,21 +4663,24 @@ $subqueryMap = '.$referece.';
     
 
     /**
-     * Get target
+     * Get the target value.
      *
-     * @return  string
-     */ 
+     * This method retrieves the current value of the target property.
+     *
+     * @return string The target value.
+     */
     public function getTarget()
     {
         return $this->target;
     }
 
     /**
-     * Set target
+     * Set the target value.
      *
-     * @param  string  $target  Target
+     * This method updates the target property with the provided value.
      *
-     * @return  self
+     * @param string $target The new target value.
+     * @return self The current instance for method chaining.
      */ 
     public function setTarget($target)
     {
@@ -4460,21 +4690,24 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get update entity
+     * Get the update entity status.
      *
-     * @return  boolean
-     */ 
+     * This method retrieves the current status of the updateEntity property.
+     *
+     * @return boolean True if the updateEntity is enabled, false otherwise.
+     */
     public function getUpdateEntity()
     {
         return $this->updateEntity;
     }
 
     /**
-     * Set update entity
+     * Set the update entity status.
      *
-     * @param  boolean  $updateEntity  Update entity
+     * This method updates the updateEntity property with the provided boolean value.
      *
-     * @return  self
+     * @param boolean $updateEntity The new status for updateEntity.
+     * @return self The current instance for method chaining.
      */ 
     public function setUpdateEntity($updateEntity)
     {
