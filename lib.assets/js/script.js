@@ -2331,6 +2331,8 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
+    moduleAdMenu: $('[name="module_as_menu"]').val(),
+    moduleMenu: $('[name="module_menu"]').val(),
     target: $('#current_module_location').val(),
     updateEntity: $('[name="update_entity"]')[0].checked,
   };

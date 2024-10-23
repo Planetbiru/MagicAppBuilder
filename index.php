@@ -187,19 +187,19 @@ $constSelected = ' selected';
                       </tr>
                       <tr>
                         <td>Load Saved Module</td>
-                        <td><label for=""><input type="checkbox" name="module_load_previous" checked> Yes</label></td>
+                        <td><label for=""><input type="checkbox" name="module_load_previous" value="1" checked> Yes</label></td>
                       </tr>
                       <tr>
                         <td>Add To Module List</td>
-                        <td><label for=""><input type="checkbox" name="module_add_to_list"> Yes</label></td>
+                        <td><label for=""><input type="checkbox" name="module_add_to_list" value="1"> Yes</label></td>
                       </tr>
                       <tr>
                         <td>Special Access</td>
-                        <td><label for=""><input type="checkbox" name="module_special_access"> Yes</label></td>
+                        <td><label for=""><input type="checkbox" name="module_special_access" value="1"> Yes</label></td>
                       </tr>
                       <tr>
                         <td>Add Menu</td>
-                        <td><label for=""><input type="checkbox" name="module_ass_menu" checkdate> Yes</label></td>
+                        <td><label for=""><input type="checkbox" name="module_as_menu" value="1" checkdate> Yes</label></td>
                       </tr>
                       <tr>
                         <td>Append To</td>

@@ -16,6 +16,7 @@ use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use MagicObject\SecretObject;
+use MagicObject\Util\PicoYamlUtil;
 use stdClass;
 
 class ScriptGenerator
@@ -410,7 +411,6 @@ class ScriptGenerator
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields, $callbackUpdateSuccess, $callbackUpdateFailed);
             
             $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
-            error_log("FUNC = ".print_r($callbackUpdateStatusException, true));
             $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);           
             $deleteSection = $this->createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
 
@@ -474,6 +474,54 @@ class ScriptGenerator
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
+        $this->updateMenu($appConf, $request);
+    }
+
+    /**
+     * Update menu
+     *
+     * @param SecretObject $appConf
+     * @param InputPost $request
+     * @return void
+     */
+    private function updateMenu($appConf, $request)
+    {
+        $menuPath = $appConf->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
+        if(!file_exists($menuPath))
+        {
+            if(!file_exists(basename($menuPath)))
+            {
+                mkdir(dirname($menuPath), 0755, true);
+            }
+            file_put_contents($menuPath, "");
+        }
+        
+        $menus = new SecretObject();
+        
+        $menus->loadYamlFile($menuPath, false, true, true);
+
+
+        $target = trim($request->getTarget(), "/\\");
+        $moduleMenu = $request->getModuleMenu();
+        $label = $request->getModuleName();
+        $link = $target."/".$request->getModuleFile();
+
+        $menuArray = $menus->valueArray();
+        foreach($menuArray as $index=>$menu)
+        {
+            if(trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
+            {
+                if(!isset($menuArray[$index]['submenus']))
+                {
+                    $menuArray[$index]['submenus'] = [];
+                }
+                $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+            }
+        }
+
+        $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
+        file_put_contents($menuPath, $yaml);
+        
     }
     
     private function initializeCallbackFunctions($appConfig)

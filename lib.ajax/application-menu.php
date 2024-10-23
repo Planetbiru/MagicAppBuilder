@@ -23,7 +23,7 @@ if($applicationId != null)
         $appConfig->loadYamlFile($appConfigPath, false, true, true);
     }
 }
-$menuPath = $appConfig->getApplication()->getBaseApplicationDirectory()."/.inc.config/menu.yml";
+$menuPath = $appConfig->getApplication()->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
 if(!file_exists($menuPath))
 {
     if(!file_exists(basename($menuPath)))
