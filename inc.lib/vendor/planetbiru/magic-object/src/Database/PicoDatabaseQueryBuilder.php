@@ -2,8 +2,12 @@
 namespace MagicObject\Database;
 
 /**
- * Query builder
+ * Class PicoDatabaseQueryBuilder
  * 
+ * A query builder for constructing SQL statements programmatically. This class 
+ * facilitates the creation of various SQL commands including SELECT, INSERT, 
+ * UPDATE, and DELETE, while managing database-specific nuances.
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject

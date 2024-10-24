@@ -21,8 +21,8 @@ class EntityUtil
     /**
      * Get the property column names from the entity.
      *
-     * @param MagicObject $entity Input entity
-     * @return array<string>
+     * @param MagicObject $entity The input entity.
+     * @return string[] An array of property column names.
      */
     public static function getPropertyColumn($entity)
     {
@@ -43,8 +43,8 @@ class EntityUtil
     /**
      * Get the property join column names from the entity.
      *
-     * @param MagicObject $entity Input entity
-     * @return array<string>
+     * @param MagicObject $entity The input entity.
+     * @return string[] An array of property join column names.
      */
     public static function getPropertyJoinColumn($entity)
     {
@@ -65,9 +65,9 @@ class EntityUtil
     /**
      * Get entity data mapped to new keys.
      *
-     * @param array|stdClass|MagicObject $data Data to be mapped
-     * @param array<string> $map Mapping of keys
-     * @return array
+     * @param array|stdClass|MagicObject $data Data to be mapped.
+     * @param string[] $map An array mapping of keys.
+     * @return array An array of mapped data.
      */
     public static function getEntityData($data, $map)
     {
@@ -93,9 +93,9 @@ class EntityUtil
     /**
      * Map data from an array.
      *
-     * @param array $data Data to map
-     * @param array<string> $map Mapping of keys
-     * @return array
+     * @param array $data Data to map.
+     * @param string[] $map An array mapping of keys.
+     * @return array An array of mapped data.
      */
     private static function fromArray($data, $map)
     {
@@ -113,9 +113,9 @@ class EntityUtil
     /**
      * Map data from a stdClass.
      *
-     * @param stdClass $data Data to map
-     * @param array<string> $map Mapping of keys
-     * @return array
+     * @param stdClass $data Data to map.
+     * @param string[] $map An array mapping of keys.
+     * @return array An array of mapped data.
      */
     private static function fromStdClass($data, $map)
     {
@@ -133,9 +133,9 @@ class EntityUtil
     /**
      * Map data from a MagicObject.
      *
-     * @param MagicObject $data Input entity
-     * @param array<string> $map Mapping of keys
-     * @return array
+     * @param MagicObject $data The input entity.
+     * @param string[] $map An array mapping of keys.
+     * @return array An array of mapped data.
      */
     private static function fromMagicObject($data, $map)
     {

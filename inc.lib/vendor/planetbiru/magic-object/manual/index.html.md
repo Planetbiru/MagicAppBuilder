@@ -12,6 +12,7 @@
 
 ---
 includes:
+  - intro
   - installation
   - implementation
   - simple-object
@@ -21,6 +22,7 @@ includes:
   - object-from-ini
   - environment-variable
   - secret-object
+  - magic-dto
   - input
   - session
   - entity

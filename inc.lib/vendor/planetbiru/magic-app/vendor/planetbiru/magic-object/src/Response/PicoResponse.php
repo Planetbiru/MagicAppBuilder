@@ -210,11 +210,11 @@ class PicoResponse
     }
 
     /**
-     * Send http status
+     * Send HTTP status code.
      *
      * @param int $code HTTP status code
-     * @param string $text HTTP status text
-     * @return int
+     * @param string|null $text HTTP status text
+     * @return int The HTTP status code sent
      */
     public static function sendHttpStatus($code = 0, $text = null)
     {
@@ -241,7 +241,7 @@ class PicoResponse
      * Get HTTP response code text.
      *
      * @param int $code HTTP status code
-     * @return string|null
+     * @return string|null The HTTP status text or null if not found
      */
     public static function getHttpResponseCode($code)
     {
@@ -250,7 +250,7 @@ class PicoResponse
 
     /**
      * Redirect the browser to the current URL.
-     * WARNING! Use this only if there is a POST input that will control the process to prevent an endless loop that causes damage to the server. Modern browsers may prevent undesirable things from happening but other browsers may not have this feature.
+     * WARNING: Use this only if there is a POST input that will control the process to prevent an endless loop that could damage the server.
      *
      * @return void
      */
