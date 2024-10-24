@@ -1028,7 +1028,7 @@ $constSelected = ' selected';
     <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Menu</h5>
+          <h5 class="modal-title">Application Menu</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -1066,13 +1066,5 @@ $constSelected = ' selected';
       </div>
     </div>
   </div>
-  
-  <script>
-    function showMenu(applicationId)
-    {
-      
-    }
-  </script>
-
 </body>
 </html>

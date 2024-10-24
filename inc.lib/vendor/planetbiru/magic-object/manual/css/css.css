@@ -94,14 +94,37 @@
     color: rgb(25, 152, 184);
 }
 body {
-    margin: 0;
     padding: auto;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: #333333;
+    font-family: Arial, sans-serif; /* Ganti dengan Georgia, Helvetica, atau font lain sesuai kebutuhan */
+    font-size: 14px; /* Ukuran font */
+    line-height: 1.5; /* Spasi baris */
+    color: #333; /* Warna teks */
+    background-color: #f9f9f9; /* Warna latar belakang */
+    margin: 0;
 }
 
 .articles {
     padding: 20px 20px 0 250px;
+}
+
+.articles h1{
+    font-size: 28px;
+    font-weight: normal;
+}
+
+.articles h2{
+    font-size: 24px;
+    font-weight: normal;
+}
+
+.articles h3{
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.articles h4{
+    font-size: 16px;
+    font-weight: normal;
 }
 
 pre {
@@ -109,7 +132,7 @@ pre {
     border: 1px solid #DDDDDD;
     background-color: #F4F4F4;
     width: 100%;
-    padding: 20px 20px;
+    padding: 16px 16px;
     overflow-x: hidden;
     box-sizing: border-box;
     overflow: auto;
@@ -117,8 +140,8 @@ pre {
 
 code {
     display: inline-block;
-    background-color: #F4F4F4;
-    padding: 2px 4px;
+    background-color: #EEEEEE;
+    padding: 0px 2px;
     border-radius: 1px;
 }
 

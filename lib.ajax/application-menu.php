@@ -55,6 +55,7 @@ echo "<ul class=\"sortable-menu\">\r\n";
                 echo "<li class=\"sortable-submenu-item\">\r\n";
                 echo '<span class="sortable-move-icon move-icon-up" onclick="moveUp(this)"></span>'."\r\n";
                 echo '<span class="sortable-move-icon move-icon-down" onclick="moveDown(this)"></span>'."\r\n";
+                echo '<span class="sortable-move-icon move-icon"></span>'."\r\n";
                 echo "<a href=\"".$menu->getLink()."\">".$menu->getLabel()."</a>\r\n";
                 echo "</li>\r\n";
             }
