@@ -1353,10 +1353,29 @@ catch(Exception $e)
 <li>The MagicDto class utilizes PHP annotations to clarify the purpose of each property. These annotations enhance code readability and provide useful metadata for serialization.</li>
 </ul>
 </li>
+<li>
+<p><strong>XML Support</strong></p>
+<ul>
+<li>MagicDto provides support for both XML input and output. This feature allows seamless integration with systems that utilize XML as their primary data format, making it easier to work with various data sources and services.</li>
+</ul>
+<p>To parse XML string, use method <code>MagicTdo::xmlToObject(string $xmlString)</code>. This method takes an XML string as input and returning it as a stdClass object.</p>
+</li>
 </ol>
 <h3>Class Structure</h3>
 <p>The <code>MagicDto</code> class is designed with properties that have protected access levels, ensuring encapsulation while still allowing derived classes to access these properties. Each property is annotated with <code>@var</code>, which specifies its data type. This structured approach enhances type safety and improves code quality.</p>
 <h4>Key Annotations</h4>
+<p><strong>Class Annotations</strong></p>
+<ol>
+<li>
+<p><strong>@JSON</strong></p>
+<p>The <code>@JSON</code> annotation controls whether the JSON format should be prettified. Using <code>@JSON(prettify=true)</code> will format the output in a more readable way, while <code>@JSON(prettify=false)</code> will minimize the format</p>
+</li>
+<li>
+<p><strong>@XML</strong></p>
+<p>The <code>@XML</code> annotation controls whether the XML format should be prettified. Using <code>@XML(prettify=true)</code> will format the output in a more readable way, while <code>@XML(prettify=false)</code> will minimize the format    </p>
+</li>
+</ol>
+<p><strong>Property Annotations</strong></p>
 <ol>
 <li>
 <p><strong>@Source</strong></p>
@@ -1388,6 +1407,24 @@ protected $title;</code></pre>
 protected $title;</code></pre>
 <p>In this example, <code>@Source("album_name")</code> indicates that the incoming data will use <code>album_name</code>, while <code>@JsonProperty("album_title")</code> specifies that when the data is serialized, it will be output as <code>album_title</code>.</p>
 <p>To facilitate bidirectional communication, we need two different DTOs. The <code>@Source</code> annotation in the first DTO corresponds to the <code>@JsonProperty</code> annotation in the second DTO, while the <code>@JsonProperty</code> in the first DTO maps to the <code>@Source</code> in the second DTO.</p>
+<ol start="3">
+<li>
+<p><strong>@JsonFormat</strong></p>
+<p>The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be <code>DateTime</code>. It is written as <code>@JsonFormat(pattern="Y-m-d H:i:s")</code>. If this annotation is not provided, MagicDto will serialize the property using the default format Y-m-d H:i:s. This ensures that data sent to third-party applications adheres to their expected format.</p>
+<p>Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as 'Y-m-d H:i:s' for complete timestamps or 'd/m/Y' for more localized representations, depending on the specific requirements of your application.</p>
+<p>MagicDto automatically parses input as both strings and integers. The integer is a unique timestamp, while the string date-time format must be one of the following:</p>
+<ul>
+<li><strong>'Y-m-d'</strong>,              // ISO 8601: 2024-10-24</li>
+<li><strong>'Y-m-d H:i:s'</strong>,        // ISO 8601: 2024-10-24 15:30:00</li>
+<li><strong>'Y-m-d\TH:i:s'</strong>,       // ISO 8601: 2024-10-24T15:30:00</li>
+<li><strong>'Y-m-d\TH:i:s\Z'</strong>,     // ISO 8601: 2024-10-24T15:30:00Z</li>
+<li><strong>'D, d M Y H:i:s O'</strong>,   // RFC 2822: Thu, 24 Oct 2024 15:30:00 +0000</li>
+<li><strong>'d/m/Y'</strong>,              // Local format: 24/10/2024</li>
+<li><strong>'d F Y'</strong>,              // Format with month name: 24 October 2024</li>
+<li><strong>'l, d F Y'</strong>            // Format with day of the week: Thursday, 24 October 2024</li>
+</ul>
+</li>
+</ol>
 <p><strong>Example:</strong></p>
 <p>DTO on the Input Side</p>
 <pre><code class="language-php">class AlbumDtoInput extends MagicDto
@@ -1409,7 +1446,8 @@ protected $title;</code></pre>
     /**
      * @Source("date_release")
      * @JsonProperty("releaseDate")
-     * @var string
+     * @JsonFormat(pattern="Y-m-d H:i:s")
+     * @var DateTime
      */
     protected $release;
 
@@ -1668,12 +1706,40 @@ protected $title;</code></pre>
 }
 </code></pre>
 <p><strong>Usage</strong></p>
+<ol>
+<li>JSON Format</li>
+</ol>
 <pre><code class="language-php">$song = new Song(null, $database);
 $song-&gt;find("1234");
 $songDto = new SongDto($song);
 
 header("Content-type: application/json");
 echo $songDto;</code></pre>
+<ol start="2">
+<li>XML Format</li>
+</ol>
+<pre><code class="language-php">$song = new Song(null, $database);
+$song-&gt;find("1234");
+$songDto = new SongDto($song);
+
+header("Content-type: application/xml");
+echo $songDto-&gt;toXml("root");</code></pre>
+<ol start="3">
+<li>Parse XML</li>
+</ol>
+<pre><code class="language-php">$albumDto = new AlbumDto();
+$obj = $albumDto-&gt;xmlToObject($xmlString);
+// $obj is stdClass
+header("Content-type: application/json");
+echo json_encode($obj);</code></pre>
+<ol start="3">
+<li>Load from XML</li>
+</ol>
+<pre><code class="language-php">$albumDto = new AlbumDtoInput();
+$albumDto-&gt;loadXml($xmlString);
+header("Content-type: application/json");
+echo $albumDto;</code></pre>
+<p><code>loadXml</code> method will load data from XML to <code>AlbumDtoInput</code>. <code>AlbumDtoInput</code> is the inverse of <code>AlbumDto</code>, where values of the <code>@JsonProperty</code> and <code>@Source</code> annotations are swapped. This inversion also applies to the objects contained within it.</p>
 <h4>Explanation</h4>
 <ul>
 <li>

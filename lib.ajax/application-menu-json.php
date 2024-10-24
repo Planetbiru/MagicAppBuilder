@@ -35,7 +35,5 @@ if(!file_exists($menuPath))
 }
 
 $menus = new SecretObject();
-
 $menus->loadYamlFile($menuPath, false, true, true);
-
 ResponseUtil::sendJSON($menus, false, true);

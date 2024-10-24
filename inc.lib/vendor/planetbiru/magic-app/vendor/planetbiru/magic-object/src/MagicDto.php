@@ -2,13 +2,18 @@
 
 namespace MagicObject;
 
+use DateTime;
+use DOMDocument;
+use InvalidArgumentException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\ClassUtil\PicoObjectParser;
+use MagicObject\Util\PicoDateTimeUtil;
 use MagicObject\Util\PicoGenericObject;
 use ReflectionClass;
 use ReflectionProperty;
+use SimpleXMLElement;
 use stdClass;
 
 /**
@@ -27,6 +32,7 @@ class MagicDto extends stdClass // NOSONAR
 {
     // Format constants
     const JSON = 'JSON';
+    const XML = 'XML';
     const PRETTIFY = 'prettify';
 
     /**
@@ -107,6 +113,25 @@ class MagicDto extends stdClass // NOSONAR
         }
         return $this;
     }
+
+    /**
+     * Loads XML data into the object.
+     *
+     * This method accepts an XML string, converts it to an object representation,
+     * and then loads the resulting data into the internal data source of the object.
+     * It processes the XML input, ensuring that only non-scalar values are handled 
+     * appropriately. This method is useful for integrating with external XML data sources.
+     *
+     * @param string $xmlString The XML string to load into the object.
+     * @return self Returns the current instance for method chaining.
+     * @throws InvalidArgumentException If the XML string is invalid or cannot be parsed.
+     */
+    public function loadXml($xmlString)
+    {
+        $data = $this->xmlToObject($xmlString);
+        $this->loadData($data);
+        return $this;
+    }
     
     /**
      * Get the object values
@@ -128,16 +153,40 @@ class MagicDto extends stdClass // NOSONAR
 
                 $objectTest = class_exists($var) ? new $var() : null;
 
-                if ($this->isSelfInstance($var, $objectTest)) {
+                if ($this->isSelfInstance($objectTest)) {
                     $returnValue->$propertyName = $this->handleSelfInstance($source, $var, $propertyName);
                 } elseif ($this->isMagicObjectInstance($objectTest)) {
                     $returnValue->$propertyName = $this->handleMagicObject($source, $propertyName);
-                } else {
+                } elseif ($this->isDateTimeInstance($objectTest)) {
+                    $returnValue->$propertyName = $this->formatDateTime($this->handleDateTimeObject($source, $propertyName), $this, $key);
+                } else if($this->_dataSource instanceof stdClass || is_object($this->_dataSource)) {
+                    $returnValue->$propertyName = $this->handleStdClass($source, $key, $propertyName);
+                } else if(isset($this->_dataSource)) {
                     $returnValue->$propertyName = $this->handleDefaultCase($source, $key, $propertyName);
                 }
             }
         }
         return $returnValue;
+    }
+
+    private function formatDateTime($dateTime, $class, $property)
+    {
+        if(!isset($dateTime))
+        {
+            return null;
+        }
+        $reflexProp = new PicoAnnotationParser(get_class($class), $property, PicoAnnotationParser::PROPERTY);
+        $parameters = $reflexProp->getParameters();
+        if(isset($parameters['JsonFormat']))
+        {
+            $parsed = $reflexProp->parseKeyValueAsObject($parameters['JsonFormat']);
+            $format = isset($parsed->pattern) ? $parsed->pattern : 'Y-m-d H:i:s';
+        }
+        else
+        {
+            $format = 'Y-m-d H:i:s';
+        }
+        return $dateTime->format($format);
     }
 
     /**
@@ -203,13 +252,12 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Checks if the given variable is a self-instance.
      *
-     * @param string $var The variable name.
      * @param mixed $objectTest The object to test against.
      * @return bool True if it's a self-instance, otherwise false.
      */
-    private function isSelfInstance($var, $objectTest)
+    private function isSelfInstance($objectTest)
     {
-        return strtolower($var) != 'stdclass' && $objectTest instanceof self;
+        return $objectTest instanceof self;
     }
 
     /**
@@ -246,6 +294,17 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
+     * Checks if the given object is an instance of DateTime or its derivatives.
+     *
+     * @param mixed $objectTest The object to test.
+     * @return bool True if it is a MagicObject instance, otherwise false.
+     */
+    private function isDateTimeInstance($objectTest)
+    {
+        return $objectTest instanceof DateTime;
+    }
+
+    /**
      * Handles the case where the property is an instance of MagicObject.
      *
      * @param string|null $source The source to extract the value from.
@@ -266,6 +325,23 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
+     * Handles the case where the property is an instance of DateTime.
+     *
+     * @param string|null $source The source to extract the value from.
+     * @param string $propertyName The name of the property.
+     * @return DateTime|null The handled value for the MagicObject instance.
+     */
+    private function handleDateTimeObject($source, $propertyName)
+    {
+        if (strpos($source, "->") === false) {
+            $value = isset($source) ? $this->_dataSource->get($source) : $this->_dataSource->get($propertyName);
+            return PicoDateTimeUtil::parseDateTime($value);
+        } else {
+            return PicoDateTimeUtil::parseDateTime($this->getNestedValue($source));
+        }
+    }
+
+    /**
      * Handles the default case when retrieving property values.
      *
      * @param string|null $source The source to extract the value from.
@@ -277,6 +353,23 @@ class MagicDto extends stdClass // NOSONAR
     {
         if (strpos($source, "->") === false) {
             return isset($source) ? $this->_dataSource->get($source) : $this->_dataSource->get($key);
+        } else {
+            return $this->getNestedValue($source);
+        }
+    }
+
+    /**
+     * Handles the stdClass when retrieving property values.
+     *
+     * @param string|null $source The source to extract the value from.
+     * @param string $key The key of the property.
+     * @param string $propertyName The name of the property.
+     * @return mixed The handled default value.
+     */
+    private function handleStdClass($source, $key, $propertyName)
+    {
+        if (strpos($source, "->") === false) {
+            return isset($source) && isset($this->_dataSource->{$source}) ? $this->_dataSource->{$source} : $this->_dataSource->{$key};
         } else {
             return $this->getNestedValue($source);
         }
@@ -360,11 +453,24 @@ class MagicDto extends stdClass // NOSONAR
      *
      * @return bool True if JSON output is set to be prettified; otherwise, false
      */
-    protected function _pretty()
+    protected function _prettyJson()
     {
         return isset($this->_classParams[self::JSON])
             && isset($this->_classParams[self::JSON][self::PRETTIFY])
             && strcasecmp($this->_classParams[self::JSON][self::PRETTIFY], 'true') == 0
+            ;
+    }
+
+    /**
+     * Check if the XML output should be prettified
+     *
+     * @return bool True if XML output is set to be prettified; otherwise, false
+     */
+    protected function _prettyXml()
+    {
+        return isset($this->_classParams[self::XML])
+            && isset($this->_classParams[self::XML][self::PRETTIFY])
+            && strcasecmp($this->_classParams[self::XML][self::PRETTIFY], 'true') == 0
             ;
     }
 
@@ -439,18 +545,47 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
+     * Convert XML to an object.
+     *
+     * This function takes an XML string as input and returning it as a stdClass object.
+     *
+     * @param string $xmlString The XML string to be converted.
+     * @return stdClass An object representation of the XML data.
+     * @throws InvalidArgumentException If the XML is invalid or cannot be parsed.
+     */
+    public function xmlToObject($xmlString) {
+        // Suppress errors to handle them manually
+        libxml_use_internal_errors(true);
+        
+        // Convert the XML string to a SimpleXMLElement
+        $xmlObject = simplexml_load_string($xmlString);
+        
+        // Check for errors in XML parsing
+        if ($xmlObject === false) {
+            $errors = libxml_get_errors();
+            libxml_clear_errors();
+            throw new InvalidArgumentException('Invalid XML provided: ' . implode(', ', array_map(function($error) {
+                return $error->message;
+            }, $errors)));
+        }
+
+        // Convert SimpleXMLElement to stdClass
+        return json_decode(json_encode($xmlObject));
+    }
+
+    /**
      * Magic method to convert the object to a JSON string representation.
      *
-     * This method recursively converts the object's properties into a JSON format. 
-     * If any property is an instance of the same class, it will be stringified 
-     * as well. The output can be formatted for readability based on the 
-     * `_pretty()` method's return value.
+     * This method recursively converts the object's properties into JSON format. 
+     * If any property is an instance of the same class, it will also be stringified. 
+     * The output can be formatted for readability based on the JSON annotation 
+     * of the class.
      *
-     * @return string A JSON representation of the object, possibly pretty-printed.
+     * @return string A JSON representation of the object, potentially formatted for readability.
      */
     public function __toString()
     {
-        $pretty = $this->_pretty();
+        $pretty = $this->_prettyJson();
         $flag = $pretty ? JSON_PRETTY_PRINT : 0;
         $obj = clone $this;
         foreach($obj as $key=>$value)
@@ -465,13 +600,14 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Convert the object to a string.
+     * Magic method to convert the object to a JSON string representation.
      *
-     * This method returns the string representation of the object by calling 
-     * the magic `__toString()` method. It's useful for obtaining the 
-     * JSON representation directly as a string.
+     * This method recursively converts the object's properties into JSON format. 
+     * If any property is an instance of the same class, it will also be stringified. 
+     * The output can be formatted for readability based on the JSON annotation 
+     * of the class.
      *
-     * @return string The string representation of the object.
+     * @return string A JSON representation of the object, potentially formatted for readability.
      */
     public function toString()
     {
@@ -507,4 +643,71 @@ class MagicDto extends stdClass // NOSONAR
     {
         return json_decode((string) $this, true);
     }
+
+
+    /**
+     * Convert the object's properties to XML format.
+     *
+     * This method generates an XML representation of the object based on its properties. 
+     * The XML structure is built from the object's properties, and the output can 
+     * be formatted for readability based on the XML annotation of the class.
+     *
+     * @param string $root The name of the root element in the XML structure.
+     * @return string XML representation of the object's properties, potentially formatted for readability.
+     * @throws InvalidArgumentException If the JSON representation of the object is invalid.
+     */
+    public function toXml($root = "root") {
+        // Decode the JSON string into an associative array
+        $dataArray = $this->toArray();
+        
+        // Check if JSON was valid
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidArgumentException('Invalid JSON provided.');
+        }
+
+        // Create the XML structure
+        $xml = new SimpleXMLElement("<$root/>");
+        
+        // Recursive function to convert array to XML
+        $this->arrayToXml($dataArray, $xml);
+
+        $pretty = $this->_prettyXml();
+
+        if($pretty)
+        {      
+            // Convert SimpleXMLElement to DOMDocument for prettifying
+            $dom = new DOMDocument('1.0', 'UTF-8');
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            $dom->loadXML($xml->asXML());
+            return $dom->saveXML();
+        }
+        else
+        {
+            return $xml->asXML();
+        }
+    }
+
+    /**
+     * Helper function to convert an array to XML
+     *
+     * @param array $dataArray The array to convert
+     * @param SimpleXMLElement $xml XML element to append to
+     */
+    function arrayToXml($dataArray, $xml) {
+        foreach ($dataArray as $key => $value) {
+            // Replace spaces and special characters in key names
+            $key = preg_replace('/[^a-z0-9_]/i', '_', $key);
+            
+            // If the value is an array, call this function recursively
+            if (is_array($value)) {
+                $subNode = $xml->addChild($key);
+                $this->arrayToXml($value, $subNode);
+            } else {
+                // If the value is not an array, just add it as a child
+                $xml->addChild($key, htmlspecialchars($value));
+            }
+        }
+    }
+
 }

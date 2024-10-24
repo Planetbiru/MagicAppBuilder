@@ -27,11 +27,29 @@ In modern applications, especially those that interact with third-party services
     
     -   The MagicDto class utilizes PHP annotations to clarify the purpose of each property. These annotations enhance code readability and provide useful metadata for serialization.
 
+4. **XML Support**
+    -   MagicDto provides support for both XML input and output. This feature allows seamless integration with systems that utilize XML as their primary data format, making it easier to work with various data sources and services.
+
+    To parse XML string, use method `MagicTdo::xmlToObject(string $xmlString)`. This method takes an XML string as input and returning it as a stdClass object.
+
 ### Class Structure
 
 The `MagicDto` class is designed with properties that have protected access levels, ensuring encapsulation while still allowing derived classes to access these properties. Each property is annotated with `@var`, which specifies its data type. This structured approach enhances type safety and improves code quality.
 
 #### Key Annotations
+
+**Class Annotations**
+
+1.  **@JSON**
+    
+    The `@JSON` annotation controls whether the JSON format should be prettified. Using `@JSON(prettify=true)` will format the output in a more readable way, while `@JSON(prettify=false)` will minimize the format
+
+2.  **@XML**
+    
+    The `@XML` annotation controls whether the XML format should be prettified. Using `@XML(prettify=true)` will format the output in a more readable way, while `@XML(prettify=false)` will minimize the format    
+
+
+**Property Annotations**
 
 1.  **@Source**
     
@@ -48,7 +66,7 @@ protected $title;
 2.  **@JsonProperty**
 
     The `@JsonProperty` annotation specifies the output property name when data is serialized to JSON. If this annotation is not provided, MagicDto will serialize the property using its class property name. This ensures that data sent to third-party applications adheres to their expected format.
-    
+
 ```php
 /**
  * @JsonProperty("album_title")
@@ -71,6 +89,26 @@ protected $title;
 In this example, `@Source("album_name")` indicates that the incoming data will use `album_name`, while `@JsonProperty("album_title")` specifies that when the data is serialized, it will be output as `album_title`.
 
 To facilitate bidirectional communication, we need two different DTOs. The `@Source` annotation in the first DTO corresponds to the `@JsonProperty` annotation in the second DTO, while the `@JsonProperty` in the first DTO maps to the `@Source` in the second DTO.
+
+3.  **@JsonFormat**
+
+    The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be `DateTime`. It is written as `@JsonFormat(pattern="Y-m-d H:i:s")`. If this annotation is not provided, MagicDto will serialize the property using the default format Y-m-d H:i:s. This ensures that data sent to third-party applications adheres to their expected format.
+
+    Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as 'Y-m-d H:i:s' for complete timestamps or 'd/m/Y' for more localized representations, depending on the specific requirements of your application.
+
+    MagicDto automatically parses input as both strings and integers. The integer is a unique timestamp, while the string date-time format must be one of the following:
+  
+    - **'Y-m-d'**,              // ISO 8601: 2024-10-24
+    - **'Y-m-d H:i:s'**,        // ISO 8601: 2024-10-24 15:30:00
+    - **'Y-m-d\TH:i:s'**,       // ISO 8601: 2024-10-24T15:30:00
+    - **'Y-m-d\TH:i:s\Z'**,     // ISO 8601: 2024-10-24T15:30:00Z
+    - **'D, d M Y H:i:s O'**,   // RFC 2822: Thu, 24 Oct 2024 15:30:00 +0000
+    - **'d/m/Y'**,              // Local format: 24/10/2024
+    - **'d F Y'**,              // Format with month name: 24 October 2024
+    - **'l, d F Y'**            // Format with day of the week: Thursday, 24 October 2024
+
+
+
 
 **Example:**
 
@@ -96,7 +134,8 @@ class AlbumDtoInput extends MagicDto
     /**
      * @Source("date_release")
      * @JsonProperty("releaseDate")
-     * @var string
+     * @JsonFormat(pattern="Y-m-d H:i:s")
+     * @var DateTime
      */
     protected $release;
 
@@ -384,6 +423,8 @@ class AgencyDto extends MagicDto
 
 **Usage**
 
+1. JSON Format
+
 ```php
 $song = new Song(null, $database);
 $song->find("1234");
@@ -392,6 +433,39 @@ $songDto = new SongDto($song);
 header("Content-type: application/json");
 echo $songDto;
 ```
+
+2. XML Format
+
+```php
+$song = new Song(null, $database);
+$song->find("1234");
+$songDto = new SongDto($song);
+
+header("Content-type: application/xml");
+echo $songDto->toXml("root");
+```
+
+3. Parse XML
+
+```php
+$albumDto = new AlbumDto();
+$obj = $albumDto->xmlToObject($xmlString);
+// $obj is stdClass
+header("Content-type: application/json");
+echo json_encode($obj);
+```
+
+3. Load from XML
+
+```php
+$albumDto = new AlbumDtoInput();
+$albumDto->loadXml($xmlString);
+header("Content-type: application/json");
+echo $albumDto;
+```
+
+`loadXml` method will load data from XML to `AlbumDtoInput`. `AlbumDtoInput` is the inverse of `AlbumDto`, where values of the `@JsonProperty` and `@Source` annotations are swapped. This inversion also applies to the objects contained within it.
+
 
 #### Explanation
 
