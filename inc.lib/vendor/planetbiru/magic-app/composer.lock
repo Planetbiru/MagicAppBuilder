@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2"
+                "reference": "d317de971f43390db79861fb80d56b5827d874ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2",
-                "reference": "ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/d317de971f43390db79861fb80d56b5827d874ed",
+                "reference": "d317de971f43390db79861fb80d56b5827d874ed",
                 "shasum": ""
             },
             "require": {
@@ -43,7 +43,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/2.2.0"
             },
-            "time": "2024-10-24T12:55:01+00:00"
+            "time": "2024-10-24T22:20:35+00:00"
         },
         {
             "name": "symfony/yaml",

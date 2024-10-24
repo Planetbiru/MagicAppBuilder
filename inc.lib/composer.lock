@@ -146,12 +146,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "720c7d869f32bec8c171005fa5015192556e35a1"
+                "reference": "29245447e749c101c55f618337aff11ee95b5aa9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/720c7d869f32bec8c171005fa5015192556e35a1",
-                "reference": "720c7d869f32bec8c171005fa5015192556e35a1",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/29245447e749c101c55f618337aff11ee95b5aa9",
+                "reference": "29245447e749c101c55f618337aff11ee95b5aa9",
                 "shasum": ""
             },
             "require": {
@@ -177,7 +177,7 @@
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
                 "source": "https://github.com/Planetbiru/MagicApp/tree/2.2.0"
             },
-            "time": "2024-10-24T13:10:01+00:00"
+            "time": "2024-10-24T22:23:22+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -185,12 +185,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2"
+                "reference": "d317de971f43390db79861fb80d56b5827d874ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2",
-                "reference": "ebd8dfc8076071f98518fe9a81bce2d46bcfb1d2",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/d317de971f43390db79861fb80d56b5827d874ed",
+                "reference": "d317de971f43390db79861fb80d56b5827d874ed",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/2.2.0"
             },
-            "time": "2024-10-24T12:55:01+00:00"
+            "time": "2024-10-24T22:20:35+00:00"
         },
         {
             "name": "symfony/yaml",
