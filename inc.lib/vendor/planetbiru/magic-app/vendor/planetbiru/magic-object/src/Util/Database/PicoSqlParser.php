@@ -19,6 +19,12 @@ namespace MagicObject\Util\Database;
  */
 class PicoSqlParser
 {
+    const KEY_COLUMN_NAME = 'Column Name';
+    const KEY_PRIMARY_KEY = 'Primary Key';
+    const KEY_TYPE = 'Type';
+    const KEY_LENGTH = 'Length';
+    const KEY_NULLABLE = 'Nullable';
+    const KEY_DEFAULT = 'Default';
     /**
      * Type list
      *
@@ -67,18 +73,18 @@ class PicoSqlParser
      * @return array Information about the table, columns, and primary key.
      * @throws InvalidArgumentException if the SQL statement is not a valid CREATE TABLE statement.
      */
-    public function parseTable($sql)
+    public function parseTable($sql) //NOSONAR
     {
         $arr = explode(";", $sql);
         $sql = $arr[0];
         
         $rg_tb = '/(create\s+table\s+if\s+not\s+exists|create\s+table)\s+(?<tb>.*)\s+\(/i';
-        $rg_fld = '/(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp .*)/i';
+        $rg_fld = '/(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp .*)/i'; //NOSONAR
         $rg_fld2 = '/(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/i';
         $rg_not_null = '/not\s+null/i';
         $rg_pk = '/primary\s+key/i';
         $rg_fld_def = '/default\s+(.+)/i';
-        $rg_pk2 = '/(PRIMARY|UNIQUE) KEY\s+[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/i';
+        $rg_pk2 = '/(PRIMARY|UNIQUE) KEY\s+[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/i'; //NOSONAR
 
         preg_match($rg_tb, $sql, $result);
         $tableName = $result['tb'];
@@ -102,7 +108,7 @@ class PicoSqlParser
 
                 $def = null;
                 preg_match($rg_fld_def, $attr2, $def);
-                $comment = null;
+                $comment = null; //NOSONAR
 
                 if ($def) {
                     $def = trim($def[1]);
@@ -120,12 +126,12 @@ class PicoSqlParser
                         $def = null;
                     }
                     $fld_list[] = [
-                        'Column Name' => $columnName,
-                        'Type' => trim($rg_fld2_result['ftype']),
-                        'Length' => $length,
-                        'Primary Key' => $is_pk,
-                        'Nullable' => $nullable,
-                        'Default' => $def
+                        self::KEY_COLUMN_NAME => $columnName,
+                        self::KEY_TYPE => trim($rg_fld2_result['ftype']),
+                        self::KEY_LENGTH => $length,
+                        self::KEY_PRIMARY_KEY => $is_pk,
+                        self::KEY_NULLABLE => $nullable,
+                        self::KEY_DEFAULT => $def
                     ];
                     $columnList[] = $columnName;
                 }
@@ -135,9 +141,10 @@ class PicoSqlParser
             }
 
             if ($primaryKey !== null) {
-                foreach ($fld_list as &$column) {
-                    if ($column['Column Name'] === $primaryKey) {
-                        $column['Primary Key'] = true;
+                foreach ($fld_list as &$column) //NOSONAR
+                {
+                    if ($column[self::KEY_COLUMN_NAME] === $primaryKey) {
+                        $column[self::KEY_PRIMARY_KEY] = true;
                     }
                 }
             }
@@ -147,8 +154,8 @@ class PicoSqlParser
                 $x = str_replace(['(', ')'], '', $x);
                 $pkeys = array_map('trim', explode(',', $x));
                 foreach ($fld_list as &$column) {
-                    if ($this->inArray($pkeys, $column['Column Name'])) {
-                        $column['Primary Key'] = true;
+                    if ($this->inArray($pkeys, $column[self::KEY_COLUMN_NAME])) {
+                        $column[self::KEY_PRIMARY_KEY] = true;
                     }
                 }
             }
@@ -193,7 +200,7 @@ class PicoSqlParser
      */
     public function getResult()
     {
-        return $this->tableInfo;
+        return $this->getTableInfo();
     }
 
     /**

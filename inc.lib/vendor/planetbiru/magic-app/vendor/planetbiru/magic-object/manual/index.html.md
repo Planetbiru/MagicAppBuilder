@@ -25,6 +25,7 @@ includes:
   - magic-dto
   - input
   - session
+  - database
   - entity
   - specification
   - pagable
@@ -34,6 +35,7 @@ includes:
   - database-dump
   - object-label
   - database-query-builder
+  - sqlite
   - upload-file
   - data-table
   - database-migration

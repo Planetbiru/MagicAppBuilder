@@ -1992,6 +1992,238 @@ $sessions-&gt;startSession();</code></pre>
 </article>
 
 <article class="article" id="part14">
+<h2>Database</h2>
+<h3>Overview</h3>
+<p><code>PicoDatabase</code> is a PHP class designed for simplified database interactions using PDO (PHP Data Objects). It provides methods to connect to a database, execute SQL commands, manage transactions, and fetch results in various formats. This manual outlines how to use the class, its features, and provides examples for reference.</p>
+<h3>Features</h3>
+<ul>
+<li><strong>Connection Management</strong>: Establish and manage database connections.</li>
+<li><strong>SQL Execution</strong>: Execute various SQL commands such as INSERT, UPDATE, DELETE, and SELECT.</li>
+<li><strong>Transaction Handling</strong>: Support for committing and rolling back transactions.</li>
+<li><strong>Result Fetching</strong>: Fetch results in different formats (array, object, etc.).</li>
+<li><strong>Callbacks</strong>: Support for custom callback functions for query execution and debugging.</li>
+<li><strong>Unique ID Generation</strong>: Generate unique identifiers for database records.</li>
+</ul>
+<h3>Installation</h3>
+<p>To use the <code>PicoDatabase</code> class, ensure you have PHP with PDO support. Include the class file in your project, and you can instantiate it with your database credentials.</p>
+<pre><code class="language-php">use MagicObject\Database\PicoDatabase;
+
+// Example credentials setup
+$credentials = new SecretObject();
+$db = new PicoDatabase($credentials);</code></pre>
+<p><strong>Credentials</strong></p>
+<p>To create database credentials, please see the <code>SecretObject</code> section.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace MagicObject\Database;
+
+use MagicObject\SecretObject;
+
+/**
+ * PicoDatabaseCredentials class
+ * 
+ * This class encapsulates database credentials and utilizes the SecretObject to encrypt all attributes,
+ * ensuring the security of database configuration details from unauthorized access.
+ * 
+ * It provides getter methods to retrieve database connection parameters such as driver, host, port,
+ * username, password, database name, schema, and application time zone.
+ * 
+ * Example usage:
+ * ```php
+ * $credentials = new PicoDatabaseCredentials();
+ * $credentials-&gt;setHost('localhost');
+ * $credentials-&gt;setUsername('user');
+ * $credentials-&gt;setPassword('password');
+ * ```
+ * 
+ * The attributes are automatically encrypted when set, providing a secure way to handle sensitive
+ * information within your application.
+ * 
+ * @author Kamshory
+ * @package MagicObject\Database
+ * @link https://github.com/Planetbiru/MagicObject
+ */
+class PicoDatabaseCredentials extends SecretObject
+{
+    /**
+     * Database driver (e.g., 'mysql', 'pgsql').
+     *
+     * @var string
+     */
+    protected $driver = 'mysql';
+
+    /**
+     * Database server host.
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $host = 'localhost';
+
+    /**
+     * Database server port.
+     *
+     * @var int
+     */
+    protected $port = 3306;
+
+    /**
+     * Database username.
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $username = "";
+
+    /**
+     * Database user password.
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $password = "";
+
+    /**
+     * Database name.
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $databaseName = "";
+
+    /**
+     * Database schema (default: 'public').
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $databaseSchema = "public"; 
+
+    /**
+     * Application time zone.
+     *
+     * @var string
+     */
+    protected $timeZone = "Asia/Jakarta";
+}</code></pre>
+<h3>Class Methods</h3>
+<h4>Constructor</h4>
+<pre><code class="language-php">public function __construct($databaseCredentials, $callbackExecuteQuery = null, $callbackDebugQuery = null)</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>SecretObject $databaseCredentials</code>: Database credentials object.</li>
+<li><code>callable|null $callbackExecuteQuery</code>: Optional callback for executing modifying queries.
+<ul>
+<li>If the callback has <strong>3 parameters</strong>, it will be:
+<ul>
+<li><code>$sqlQuery</code>: The SQL query being executed.</li>
+<li><code>$params</code>: The parameters used in the SQL query.</li>
+<li><code>$type</code>: The type of query (e.g., <code>PicoDatabase::QUERY_INSERT</code>).</li>
+</ul></li>
+<li>If the callback has <strong>2 parameters</strong>, it will be:
+<ul>
+<li><code>$sqlQuery</code>: The SQL query being executed.</li>
+<li><code>$type</code>: The type of query.</li>
+</ul></li>
+</ul></li>
+<li><code>callable|null $callbackDebugQuery</code>: Optional callback for debugging queries.
+<ul>
+<li>If the callback has <strong>2 parameters</strong>, it will be:
+<ul>
+<li><code>$sqlQuery</code>: The SQL query being debugged.</li>
+<li><code>$params</code>: The parameters used in the SQL query.</li>
+</ul></li>
+<li>If the callback has <strong>1 parameter</strong>, it will be:
+<ul>
+<li><code>$sqlQuery</code>: The SQL query being debugged.</li>
+</ul></li>
+</ul></li>
+</ul>
+<h4>Connecting to the Database</h4>
+<pre><code class="language-php">public function connect($withDatabase = true): bool</code></pre>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>bool $withDatabase</code>: Whether to select the database upon connection.</li>
+</ul>
+<p><strong>Returns</strong>: <code>true</code> if connection is successful, <code>false</code> otherwise.</p>
+<h4>Disconnecting from the Database</h4>
+<pre><code class="language-php">public function disconnect(): self</code></pre>
+<p><strong>Returns</strong>: Current instance for method chaining.</p>
+<h4>Query Execution</h4>
+<pre><code class="language-php">public function query($sql, $params = null)</code></pre>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>string $sql</code>: SQL command to be executed.</li>
+<li><code>array|null $params</code>: Optional parameters for the SQL query.
+<strong>Returns</strong>: PDOStatement object or <code>false</code> on failure.</li>
+</ul>
+<h5>Fetch a Single Result</h5>
+<pre><code class="language-php">public function fetch($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null, $params = null)</code></pre>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>string $sql</code>: SQL command.</li>
+<li><code>int $tentativeType</code>: Fetch mode (default is <code>PDO::FETCH_ASSOC</code>).</li>
+<li><code>mixed $defaultValue</code>: Default value if no results found.</li>
+<li><code>array|null $params</code>: Optional parameters.
+<strong>Returns</strong>: Fetched result or default value.</li>
+</ul>
+<h4>Fetch All Results</h4>
+<pre><code class="language-php">public function fetchAll($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null, $params = null)</code></pre>
+<p>Similar to fetch, but returns all matching results as an array.</p>
+<h3>Transaction Management</h3>
+<h4>Commit Transaction</h4>
+<pre><code class="language-php">public function commit(): bool</code></pre>
+<p><strong>Returns:</strong> true if successful.</p>
+<h4>Rollback Transaction</h4>
+<pre><code class="language-php">public function rollback(): bool</code></pre>
+<p><strong>Returns:</strong> true if successful.</p>
+<h4>Unique ID Generation</h4>
+<pre><code class="language-php">public function generateNewId(): string</code></pre>
+<p><strong>Returns:</strong> A unique 20-byte ID.</p>
+<h4>Last Inserted ID</h4>
+<pre><code class="language-php">public function lastInsertId($name = null): string|false</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string|null $name: Sequence name (for PostgreSQL).</li>
+</ul>
+<p><strong>Returns:</strong> The last inserted ID or false on error.</p>
+<h3>Connection Status</h3>
+<h4>Check Connection</h4>
+<pre><code class="language-php">public function isConnected(): bool</code></pre>
+<h3>Example Usage</h3>
+<h4>Connecting and Fetching Data</h4>
+<pre><code class="language-php">// Instantiate PicoDatabase
+$db = new PicoDatabase($credentials);
+
+// Connect to the database
+if ($db-&gt;connect()) {
+    // Fetch a user by ID
+    $user = $db-&gt;fetch("SELECT * FROM users WHERE id = ?", [1]);
+    print_r($user);
+
+    // Disconnect
+    $db-&gt;disconnect();
+}</code></pre>
+<h4>Executing a Transaction</h4>
+<pre><code class="language-php">$db-&gt;connect();
+$db-&gt;setAudoCommit(false); // Disable autocommit
+
+try {
+    $db-&gt;executeInsert("INSERT INTO users (name) VALUES (?)", ['John Doe']);
+    $db-&gt;commit(); // Commit the transaction
+} catch (Exception $e) {
+    $db-&gt;rollback(); // Rollback on error
+}</code></pre>
+<h3>Conclusion</h3>
+<p><code>PicoDatabase</code> is a robust class for managing database operations in PHP applications. By following the examples and method descriptions provided in this manual, you can effectively utilize its features for your database interactions. For further assistance, refer to the source code and documentation available at <a href="https://github.com/Planetbiru/MagicObject">MagicObject GitHub</a>.</p>
+</article>
+
+<article class="article" id="part15">
 <h2>Entity</h2>
 <p>Entity is class to access database. Entity is derived from MagicObject. Some annotations required to activated all entity features. </p>
 <p><strong>Constructor</strong></p>
@@ -6479,7 +6711,7 @@ catch(Exception $e)
 }</code></pre>
 </article>
 
-<article class="article" id="part15">
+<article class="article" id="part16">
 <h3>Specification</h3>
 <p>Specifications are implemented in the PicoSpecification and PicoPredicate classes. PicoSpecification is a framework that can contain one or more PicoPredicate.</p>
 <p>For example, we have the following query:</p>
@@ -6972,7 +7204,7 @@ catch(Exception $e)
 }</code></pre>
 </article>
 
-<article class="article" id="part16">
+<article class="article" id="part17">
 <h3>Pageable and Sortable</h3>
 <p>In MagicObject, pageable is used to divide data rows into several pages. This is required by the application to display a lot of data per page. While sortable is used to sort data before the data is divided per page.</p>
 <p>Pageable can stand alone without sortable. However, this method is not recommended because the data sequence is not as expected. If new data is entered, users will have difficulty finding where it is located in the list and on which page the data will appear. The solution is to add a sortable that will sort the data based on certain columns. For example, the time of data creation is descending, then the new data will be on the first page. Conversely, if sorted based on the time of data creation is ascending, then the new data will be on the last page.</p>
@@ -7264,7 +7496,7 @@ $pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
 <p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 200 OFFSET 400</code></p>
 </article>
 
-<article class="article" id="part17">
+<article class="article" id="part18">
 <h2>Filtering, Ordering and Pagination</h2>
 <p>MagicObject will filter data according to the given criteria. On the other hand, MagicObject will only retrieve data on the specified page by specifying <code>limit</code> and <code>offset</code> data in the <code>select</code> query.</p>
 <p>Example parameters:</p>
@@ -8147,7 +8379,7 @@ require_once "inc/footer.php";
 ?&gt;</code></pre>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part19">
 <h2>Native Query</h2>
 <p>In MagicObject version 2, native queries have been introduced as an efficient way to interact with the database.</p>
 <p>Native queries offer significant performance improvements when handling large volumes of data, allowing users to craft highly efficient queries that meet diverse requirements.</p>
@@ -8777,7 +9009,7 @@ fclose($fp);</code></pre>
 <p>By leveraging the native query feature in MagicObject, you can create efficient and maintainable database interactions, enhancing your application's performance and security.</p>
 </article>
 
-<article class="article" id="part19">
+<article class="article" id="part20">
 <h2>Multiple Database Connections</h2>
 <p>MagicObject version 2 introduces support for multiple database connections, enabling users to manage entities stored across different databases seamlessly. When performing operations such as JOINs with entities from multiple databases, it is essential to define a database connection for each entity involved.</p>
 <h3>Example Scenario</h3>
@@ -8942,7 +9174,7 @@ $song-&gt;databaseEntity($databaseEntity);</code></pre>
 <p>With MagicObject version 2, managing entities across multiple database connections is straightforward. By defining the correct associations and utilizing the provided methods, users can effectively work with complex data structures that span multiple databases. Make sure to handle exceptions properly to ensure robustness in your application.</p>
 </article>
 
-<article class="article" id="part20">
+<article class="article" id="part21">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <h3>Database Dump Overview</h3>
@@ -9456,7 +9688,7 @@ $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL, new 
 <p>This approach allows developers to quickly switch between database types and manage their database schemas and data efficiently. The use of dedicated instances of PicoDatabaseDump for multiple tables ensures clarity and organization in your database operations.</p>
 </article>
 
-<article class="article" id="part21">
+<article class="article" id="part22">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -9581,7 +9813,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part22">
+<article class="article" id="part23">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -9848,7 +10080,374 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part23">
+<article class="article" id="part24">
+<h2>PicoSqlite</h2>
+<h3>Overview</h3>
+<p><code>PicoSqlite</code> is a PHP class designed for simplified interactions with SQLite databases using PDO (PHP Data Objects). This class extends <code>PicoDatabase</code> and provides methods for connecting to the database, creating tables, and performing basic CRUD (Create, Read, Update, Delete) operations.</p>
+<p>Here are some advantages of using SQLite:</p>
+<ol>
+<li>
+<p><strong>Lightweight</strong>: SQLite is a serverless, self-contained database engine that requires minimal setup and uses a single file to store the entire database, making it easy to manage and deploy.</p>
+</li>
+<li>
+<p><strong>Easy to Use</strong>: Its simple API allows for straightforward integration with PHP, enabling quick database operations without the overhead of complex configurations.</p>
+</li>
+<li>
+<p><strong>No Server Required</strong>: Unlike other database systems, SQLite does not require a separate server process, which simplifies the development process and reduces resource usage.</p>
+</li>
+<li>
+<p><strong>Cross-Platform</strong>: SQLite databases are cross-platform and can be used on various operating systems without compatibility issues.</p>
+</li>
+<li>
+<p><strong>Fast Performance</strong>: For smaller databases and applications, SQLite often outperforms more complex database systems, thanks to its lightweight architecture.</p>
+</li>
+<li>
+<p><strong>ACID Compliance</strong>: SQLite provides full ACID (Atomicity, Consistency, Isolation, Durability) compliance, ensuring reliable transactions and data integrity.</p>
+</li>
+<li>
+<p><strong>Rich Feature Set</strong>: Despite being lightweight, SQLite supports many advanced features like transactions, triggers, views, and complex queries.</p>
+</li>
+<li>
+<p><strong>No Configuration Required</strong>: SQLite is easy to set up and requires no configuration, allowing developers to focus on building applications rather than managing the database server.</p>
+</li>
+<li>
+<p><strong>Great for Prototyping</strong>: Its simplicity makes it ideal for prototyping applications before moving to a more complex database system.</p>
+</li>
+<li>
+<p><strong>Good for Read-Heavy Workloads</strong>: SQLite performs well in read-heavy scenarios, making it suitable for applications where data is frequently read but rarely modified.</p>
+</li>
+</ol>
+<p>These features make SQLite a popular choice for many PHP applications, especially for smaller projects or for applications that need a lightweight database solution.</p>
+<p>SQLite has a slightly different method for determining whether a SELECT query returns matching rows. While other databases often utilize the rowCount() method to get this information, SQLite does not support this functionality in the same way. To address this limitation, MagicObject has implemented a solution that seamlessly handles row checking for users. With MagicObject, developers can interact with SQLite without needing to worry about the intricacies of row counting. This allows for a more intuitive and efficient experience when working with SQLite, enabling users to focus on their application logic rather than the underlying database mechanics.</p>
+<h3>Requirements</h3>
+<ul>
+<li>PHP 7.0 or higher</li>
+<li>PDO extension enabled</li>
+</ul>
+<h3>Installation</h3>
+<p>To use the <code>PicoSqlite</code> class, include it in your PHP project. Ensure that your project structure allows for proper namespace loading.</p>
+<pre><code class="language-php">use MagicObject\Database\PicoSqlite;
+
+// Example usage:
+$db = new PicoSqlite('path/to/database.sqlite');</code></pre>
+<h3>Class Methods</h3>
+<h4>Constructor</h4>
+<pre><code class="language-php">public function __construct($databaseFilePath)</code></pre>
+<p><strong>Parameters:</strong></p>
+<pre><code>string $databaseFilePath: The path to the SQLite database file.</code></pre>
+<p><strong>Throws:</strong> PDOException if the connection fails.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">$sqlite = new PicoSqlite('path/to/database.sqlite');</code></pre>
+<h4>Connecting to the Database</h4>
+<pre><code class="language-php">public function connect($withDatabase = true)</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>bool $withDatabase: Optional. Default is true. Indicates whether to select the database when connecting.</li>
+</ul>
+<p><strong>Returns:</strong> <code>bool</code> - True if the connection is successful, false otherwise.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">if ($sqlite-&gt;connect()) {
+    echo "Connected to database successfully.";
+} else {
+    echo "Failed to connect.";
+}</code></pre>
+<h4>Check Table</h4>
+<pre><code class="language-php">public function tableExists($tableName) : bool</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string $tableName: The name of the table to check.</li>
+</ul>
+<p><strong>Returns:</strong> <code>bool</code> - True if the table exists, false otherwise.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">if ($sqlite-&gt;tableExists('users')) {
+    echo "Table exists.";
+} else {
+    echo "Table does not exist.";
+}</code></pre>
+<h4>Create Table</h4>
+<pre><code class="language-php">public function createTable($tableName, $columns) : int|false</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string $tableName: The name of the table to create.</li>
+<li>string[] $columns: An array of columns in the format 'column_name TYPE'.</li>
+</ul>
+<p><strong>Returns:</strong> <code>int|false</code> - Number of rows affected or false on failure.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">$columns = ['id INTEGER PRIMARY KEY', 'name TEXT', 'email TEXT'];
+$sqlite-&gt;createTable('users', $columns);</code></pre>
+<h4>Insert</h4>
+<pre><code class="language-php">public function insert($tableName, $data) : array </code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string $tableName: The name of the table to insert into.</li>
+<li>array $data: An associative array of column names and values to insert.</li>
+</ul>
+<p><strong>Returns:</strong> <code>bool</code> - True on success, false on failure.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">$data = ['name' =&gt; 'John Doe', 'email' =&gt; 'john@example.com'];
+$sqlite-&gt;insert('users', $data);</code></pre>
+<pre><code class="language-php">public function update($tableName, $data, $conditions) : bool</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string $tableName: The name of the table to update.
+array $data: An associative array of column names and new values.</li>
+<li>array $conditions: An associative array of conditions for the WHERE clause.</li>
+</ul>
+<p><strong>Returns:</strong> <code>bool</code> - True on success, false on failure.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">$data = ['name' =&gt; 'John Smith'];
+$conditions = ['id' =&gt; 1];
+$sqlite-&gt;update('users', $data, $conditions);</code></pre>
+<h4>Delete</h4>
+<pre><code class="language-php">public function delete($tableName, $conditions) : bool </code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>string $tableName: The name of the table to delete from.</li>
+<li>array $conditions: An associative array of conditions for the WHERE clause.</li>
+</ul>
+<p><strong>Returns:</strong> <code>bool</code> - True on success, false on failure.</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-php">$conditions = ['id' =&gt; 1];
+$sqlite-&gt;delete('users', $conditions);</code></pre>
+<h3>Entity with PicoSqlite</h3>
+<pre><code class="language-php">&lt;?php
+
+use MagicObject\Database\PicoSqlite;
+use MagicObject\MagicObject;
+use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
+
+require_once dirname(__DIR__) . "/vendor/autoload.php";
+
+/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
+ * @Table(name="album")
+ * @Cache(enable="true")
+ * @package MusicProductionManager\Data\Entity
+ */
+class Album extends MagicObject
+{
+    /**
+     * Album ID
+     * 
+     * @Id
+     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @NotNull
+     * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
+     * @Label(content="Album ID")
+     * @var string
+     */
+    protected $albumId;
+
+    /**
+     * Name
+     * 
+     * @Column(name="name", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Name")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Title
+     * 
+     * @Column(name="title", type="text", nullable=true)
+     * @Label(content="Title")
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * Description
+     * 
+     * @Column(name="description", type="longtext", nullable=true)
+     * @Label(content="Description")
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * Producer ID
+     * 
+     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Producer ID")
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * Release Date
+     * 
+     * @Column(name="release_date", type="date", nullable=true)
+     * @Label(content="Release Date")
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * Number Of Song
+     * 
+     * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
+     * @Label(content="Number Of Song")
+     * @var integer
+     */
+    protected $numberOfSong;
+
+    /**
+     * Duration
+     * 
+     * @Column(name="duration", type="float", nullable=true)
+     * @Label(content="Duration")
+     * @var double
+     */
+    protected $duration;
+
+    /**
+     * Image Path
+     * 
+     * @Column(name="image_path", type="text", nullable=true)
+     * @Label(content="Image Path")
+     * @var string
+     */
+    protected $imagePath;
+
+    /**
+     * Sort Order
+     * 
+     * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
+     * @Label(content="Sort Order")
+     * @var integer
+     */
+    protected $sortOrder;
+
+    /**
+     * Time Create
+     * 
+     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
+
+    /**
+     * Time Edit
+     * 
+     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
+
+    /**
+     * Admin Create
+     * 
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @var string
+     */
+    protected $adminCreate;
+
+    /**
+     * Admin Edit
+     * 
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @var string
+     */
+    protected $adminEdit;
+
+    /**
+     * IP Create
+     * 
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @var string
+     */
+    protected $ipCreate;
+
+    /**
+     * IP Edit
+     * 
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @var string
+     */
+    protected $ipEdit;
+
+    /**
+     * Active
+     * 
+     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var boolean
+     */
+    protected $active;
+
+    /**
+     * As Draft
+     * 
+     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var boolean
+     */
+    protected $asDraft;
+
+}
+
+$database = new PicoSqlite(__DIR__ . "/db.sqlite", null, function($sql){
+    //echo $sql."\r\n";
+});
+try
+{
+    $database-&gt;connect();
+
+    $album = new Album(null, $database);
+
+    // create table if not exists
+    $util = new PicoDatabaseUtilSqlite();
+    $tableStructure = $util-&gt;showCreateTable($album, true);
+    $database-&gt;query($tableStructure);
+
+    $album-&gt;setAlbumId("1235");
+    $album-&gt;setName("Meraih Mimpi 2 ");
+    $album-&gt;setTitle("Meraih Mimpi 2");
+    $album-&gt;setDescription("Album pertama dengan judul Meraih Mimpi 2");
+    $album-&gt;setProducerId("5678");
+    $album-&gt;setReleaseDate("2024-09-09");
+    $album-&gt;setNumberOfSong(10);
+    $album-&gt;duration(185*60);
+    $album-&gt;setSortOrder(1);
+    $album-&gt;setIpCreate("::1");
+    $album-&gt;setIpEdit("::1");
+    $album-&gt;setTimeCreate(date("Y-m-d H:i:s"));
+    $album-&gt;setTimeEdit(date("Y-m-d H:i:s"));
+    $album-&gt;setAdminCreate("1");
+    $album-&gt;setAdminEdit("1");
+    $album-&gt;setIpCreate("::1");
+    $album-&gt;setActive(true);
+    $album-&gt;setIpCreate("::1");
+    $album-&gt;setAsDraf(false);
+    $album-&gt;save();
+
+    $album2 = new Album(null, $database);
+
+    $res = $album2-&gt;findAll();
+    foreach($res-&gt;getResult() as $row)
+    {
+        echo $row."\r\n";
+    }
+}
+catch(Exception $e)
+{
+    echo $e-&gt;getMessage();
+}</code></pre>
+<h3>Error Handling</h3>
+<p>If an operation fails, <code>PicoSqlite</code> may throw exceptions or return false. It is recommended to implement error handling using try-catch blocks to catch <code>PDOException</code> for connection-related issues.</p>
+<h3>Conclusion</h3>
+<p><code>PicoSqlite</code> provides an efficient way to interact with SQLite databases. Its straightforward API allows developers to perform common database operations with minimal code. For more advanced database operations, consider extending the class or using additional PDO features.</p>
+</article>
+
+<article class="article" id="part25">
 <h2>Upload File</h2>
 <p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
 <p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
@@ -9908,7 +10507,7 @@ else
 <p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like getAll() and isMultiple(), developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
 </article>
 
-<article class="article" id="part24">
+<article class="article" id="part26">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>
@@ -10128,7 +10727,7 @@ $apa = $rumah;
 echo $apa;</code></pre>
 </article>
 
-<article class="article" id="part25">
+<article class="article" id="part27">
 <h2>Database Migration</h2>
 <p>MagicObject allows users to import data from a database with different table names and column names between the source database and the destination database. This feature is used by developers who develop applications that are already used in production environments.</p>
 <p>On the one hand, the application requires a new database structure according to what is defined by the developer. On the other hand, users want to use existing data.</p>

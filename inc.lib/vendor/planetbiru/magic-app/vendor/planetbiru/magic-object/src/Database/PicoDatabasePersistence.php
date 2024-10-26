@@ -529,7 +529,7 @@ class PicoDatabasePersistence // NOSONAR
             
             if(isset($cache))
             {
-                $noCache = self::VALUE_FALSE == strtolower($cache[self::KEY_ENABLE]);
+                $noCache = isset($cache[self::KEY_ENABLE]) && self::VALUE_FALSE == strtolower($cache[self::KEY_ENABLE]);
             }
             if(empty($package))
             {
@@ -595,10 +595,15 @@ class PicoDatabasePersistence // NOSONAR
      * Get match row
      *
      * @param PDOStatement $stmt PDO statement
+     * @param string $databaseType Database type
      * @return bool
      */
-    public function matchRow($stmt)
+    public function matchRow($stmt, $databaseType = null)
     {
+        if(isset($databaseType) && $databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            return true;
+        }
         if($stmt == null)
         {
             return false;
@@ -1913,11 +1918,19 @@ class PicoDatabasePersistence // NOSONAR
             try
             {
                 $stmt = $this->database->executeQuery($sqlQuery);
-                if($this->matchRow($stmt))
+                if($this->matchRow($stmt, $this->database->getDatabaseType()))
                 {
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $data = $this->fixDataType($row, $info); 
-                    $data = $this->join($data, $row, $info);
+                    if($row === false)
+                    {
+                        // SQLite database
+                        $data = null;
+                    }
+                    else
+                    {
+                        $data = $this->fixDataType($row, $info); 
+                        $data = $this->join($data, $row, $info);
+                    }
                     return $data;
                 }
                 else
@@ -2336,11 +2349,19 @@ class PicoDatabasePersistence // NOSONAR
                 ->limit(1)
                 ->offset(0);
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $data = $this->fixDataType($row, $info); 
-                $data = self::applySubqueryResult($data, $row, $subqueryMap);
+                if($row === false)
+                {
+                    // SQLite database
+                    $data = null;
+                }
+                else
+                {
+                    $data = $this->fixDataType($row, $info); 
+                    $data = self::applySubqueryResult($data, $row, $subqueryMap);
+                }
             }
             else
             {
@@ -2378,7 +2399,7 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))                
                 {
@@ -2485,7 +2506,7 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))                
                 {
@@ -2567,7 +2588,7 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))               
                 {
@@ -2774,11 +2795,19 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $data = $this->fixDataType($row, $info);               
-                $data = $this->join($data, $row, $info);
+                if($row === false)
+                {
+                    // SQLite database
+                    $data = null;
+                }
+                else
+                {
+                    $data = $this->fixDataType($row, $info);               
+                    $data = $this->join($data, $row, $info);
+                }
             }
             else
             {
@@ -3325,11 +3354,19 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $data = $this->fixDataType($row, $info);
-                $data = $this->join($data, $row, $info);
+                if($row === false)
+                {
+                    // SQLite database
+                    $data = null;
+                }
+                else
+                {
+                    $data = $this->fixDataType($row, $info);
+                    $data = $this->join($data, $row, $info);
+                }
             }
             else
             {
@@ -3385,7 +3422,7 @@ class PicoDatabasePersistence // NOSONAR
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
-            if($this->matchRow($stmt))
+            if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
                 {

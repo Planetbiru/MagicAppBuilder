@@ -4,24 +4,22 @@ namespace MagicObject\Util\Database;
 
 use Exception;
 use MagicObject\Database\PicoDatabase;
-use MagicObject\Database\PicoDatabaseQueryBuilder;
-use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Database\PicoTableInfo;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
 
 /**
- * Class PicoDatabaseUtilMySql
+ * Class PicoDatabaseUtilSqlite
  *
  * This class extends the PicoDatabaseUtilBase and implements the PicoDatabaseUtilInterface specifically 
- * for MySQL database operations. It provides specialized utility methods tailored to leverage MySQL's 
+ * for SQLite database operations. It provides specialized utility methods tailored to leverage SQLite's 
  * features and syntax while ensuring compatibility with the general database utility interface.
  *
  * Key functionalities include:
  *
  * - **Retrieve and display column information for tables:** Methods to fetch detailed column data, 
- *   including types and constraints, from MySQL tables.
+ *   including types and constraints, from SQLite tables.
  * - **Generate SQL statements to create tables based on existing structures:** Automated generation 
  *   of CREATE TABLE statements to replicate existing table schemas.
  * - **Dump data from various sources into SQL insert statements:** Convert data from different formats 
@@ -29,34 +27,176 @@ use PDO;
  * - **Facilitate the import of data between source and target databases:** Streamlined processes for 
  *   transferring data, including handling pre and post-import scripts to ensure smooth operations.
  * - **Ensure data integrity by fixing types during the import process:** Validation and correction of 
- *   data types to match MySQL's requirements, enhancing data quality during imports.
+ *   data types to match SQLite's requirements, enhancing data quality during imports.
  *
- * This class is designed for developers who are working with MySQL databases and need a robust set of tools 
+ * This class is designed for developers who are working with SQLite databases and need a robust set of tools 
  * to manage database operations efficiently. By adhering to the PicoDatabaseUtilInterface, it provides 
- * a consistent API for database utilities while taking advantage of MySQL-specific features.
+ * a consistent API for database utilities while taking advantage of SQLite-specific features.
  *
  * Usage:
- * To use this class, instantiate it with a MySQL database connection and utilize its methods to perform 
+ * To use this class, instantiate it with a SQLite database connection and utilize its methods to perform 
  * various database tasks, ensuring efficient data management and manipulation.
  *
  * @author Kamshory
  * @package MagicObject\Util\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface //NOSONAR
+class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface //NOSONAR
 {
 
     /**
-     * Retrieves a list of columns for a specified table.
+     * Generates a SQL CREATE TABLE query based on the provided class annotations.
      *
-     * @param PicoDatabase $database Database connection.
-     * @param string $tableName Table name.
-     * @return array An array of column details.
+     * This function inspects the given class for its properties and their annotations
+     * to construct a SQL statement that can be used to create a corresponding table in a database.
+     * It extracts the table name from the `@Table` annotation and processes each property 
+     * to determine the column definitions from the `@Column` annotations.
+     *
+     * @param MagicObject $entity The instance of the class whose properties will be used
+     *                             to generate the table structure.
+     * @param bool $createIfNotExists If true, the query will include an "IF NOT EXISTS" clause.
+     * @param bool $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
+     * @return string The generated SQL CREATE TABLE query.
+     * 
+     * @throws ReflectionException If the class does not exist or is not accessible.
+     */
+    function showCreateTable($entity, $createIfNotExists = false, $dropIfExists = false) {        
+        $tableInfo = $entity->tableInfo();
+        $tableName = $tableInfo->getTableName();
+    
+        // Start building the CREATE TABLE query
+        if($createIfNotExists)
+        {
+            $condition = " IF NOT EXISTS";
+        }
+        else
+        {
+            $condition = "";
+        }
+
+        $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
+
+        $query = "";
+        if($dropIfExists)
+        {
+            $query .= "-- DROP TABLE IF EXISTS `$tableName`;\r\n\r\n";
+        }
+        $query .= "CREATE TABLE$condition $tableName (\n";
+    
+        // Define primary key
+        $primaryKey = null;
+
+        $pKeys = $tableInfo->getPrimaryKeys();
+
+        $pKeyArr = [];
+        $pKeyArrUsed = [];
+        if(isset($pKeys) && is_array($pKeys) && !empty($pKeys))
+        {
+            $pkVals = array_values($pKeys);
+            foreach($pkVals as $pk)
+            {
+                $pKeyArr[] = $pk['name'];
+            }
+        }
+
+        foreach ($tableInfo->getColumns() as $column) {
+        
+            $columnName = $column['name'];
+            $columnType = $column['type'];
+            $length = isset($column['length']) ? $column['length'] : null;
+            $nullable = (isset($column['nullable']) && $column['nullable'] === 'true') ? ' NULL' : ' NOT NULL';
+            $defaultValue = isset($column['default_value']) ? " DEFAULT '{$column['default_value']}'" : '';
+
+            // Convert column type for SQL
+            $columnType = strtolower($columnType); // Convert to lowercase for case-insensitive comparison
+
+            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
+                $sqlType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+                $pKeyArrUsed[] = $columnName;
+            } elseif (strpos($columnType, 'varchar') !== false) {
+                $sqlType = "VARCHAR($length)";
+            } elseif ($columnType === 'int') {
+                $sqlType = 'INT';
+            } elseif ($columnType === 'float') {
+                $sqlType = 'FLOAT';
+            } elseif ($columnType === 'text') {
+                $sqlType = 'TEXT';
+            } elseif ($columnType === 'longtext') {
+                $sqlType = 'LONGTEXT';
+            } elseif ($columnType === 'date') {
+                $sqlType = 'DATE';
+            } elseif ($columnType === 'timestamp') {
+                $sqlType = 'TIMESTAMP';
+            } elseif ($columnType === 'tinyint(1)') {
+                $sqlType = 'TINYINT(1)';
+            } else {
+                $sqlType = 'VARCHAR(255)'; // Fallback type
+            }
+
+            // Add to query
+            $query .= "    $columnName $sqlType$nullable$defaultValue,\n";
+            
+        }
+    
+        // Remove the last comma and add primary key constraint
+        $query = rtrim($query, ",\n") . "\n";
+    
+        $pKeyArrFinal = [];
+        foreach($pKeyArr as $k=>$v)
+        {
+            if(!in_array($v, $pKeyArrUsed))
+            {
+                $pKeyArrFinal[] = $v;
+            }
+        }
+
+        if (!empty($pKeyArrFinal)) {
+            $primaryKey = implode(", ", $pKeyArrFinal);
+            $query = rtrim($query, ",\n");
+            $query .= ",\n    PRIMARY KEY ($primaryKey)\n";
+        }
+    
+        $query .= ");";
+    
+        return str_replace("\n", "\r\n", $query);
+    }
+
+    /**
+     * Retrieves a list of columns for a specified table in the database.
+     *
+     * This method queries the information schema to obtain details about the columns 
+     * of the specified table, including their names, data types, nullability, 
+     * default values, and any additional attributes such as primary keys and auto-increment.
+     *
+     * @param PicoDatabase $database The database connection instance.
+     * @param string $tableName The name of the table to retrieve column information from.
+     * @return array An array of associative arrays containing details about each column,
+     *               where each associative array includes:
+     *               - 'Field': The name of the column.
+     *               - 'Type': The data type of the column.
+     *               - 'Null': Indicates if the column allows NULL values ('YES' or 'NO').
+     *               - 'Key': Indicates if the column is a primary key ('PRI' or null).
+     *               - 'Default': The default value of the column, or 'None' if not set.
+     *               - 'Extra': Additional attributes of the column, such as 'auto_increment'.
+     * @throws Exception If the database connection fails or the query cannot be executed.
      */
     public function getColumnList($database, $tableName)
     {
-        $sql = "SHOW COLUMNS FROM $tableName";
-        return $database->fetchAll($sql);
+        $stmt = $database->query("PRAGMA table_info($tableName)");
+
+        // Fetch and display the column details
+        $rows = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = array(
+                "Field" => $row['name'],
+                "Type" => $row['type'],
+                "Null" => $row['notnull'] ? 'YES' : 'NO',
+                "Key" => $row['pk'] ? 'PRI' : null,
+                "Default" => $row['dflt_value'] ? $row['dflt_value'] : 'None',
+                "Extra" => ($row['pk'] == 1 && $row['type'] === 'INTEGER') ? 'auto_increment' : null
+            );
+        }
+        return $rows;
     }
 
     /**
@@ -192,113 +332,6 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
     }
 
     /**
-     * Dumps a single record into an SQL INSERT statement.
-     *
-     * This method takes a data record and constructs an SQL INSERT statement 
-     * for the specified table. It maps the values of the record to the corresponding 
-     * columns based on the provided column definitions.
-     *
-     * @param array $columns An associative array where keys are column names and values are column details.
-     * @param string $tableName The name of the table where the record will be inserted.
-     * @param MagicObject $record The data record to be inserted, which provides a method to retrieve values.
-     *
-     * @return string The generated SQL INSERT statement.
-     * @throws Exception If the record cannot be processed or if there are no values to insert.
-     */
-    public function dumpRecord($columns, $tableName, $record)
-    {
-        $value = $record->valueArray();
-        $rec = array();
-        foreach($value as $key=>$val)
-        {
-            if(isset($columns[$key]))
-            {
-                $rec[$columns[$key][parent::KEY_NAME]] = $val;
-            }
-        }
-        $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_MYSQL);
-        $queryBuilder->newQuery()
-            ->insert()
-            ->into($tableName)
-            ->fields(array_keys($rec))
-            ->values(array_values($rec));
-
-        return $queryBuilder->toString();
-    }
-
-    /**
-     * Retrieves the columns of a specified table from the database.
-     *
-     * This method executes a SQL query to show the columns of the given table and returns 
-     * an associative array where the keys are column names and the values are their respective types.
-     *
-     * @param PicoDatabase $database Database connection object.
-     * @param string $tableName Name of the table whose columns are to be retrieved.
-     * @return array An associative array mapping column names to their types.
-     * @throws Exception If the query fails or the table does not exist.
-     */
-    public function showColumns($database, $tableName)
-    {
-        $sql = "SHOW COLUMNS FROM $tableName";
-        $result = $database->fetchAll($sql, PDO::FETCH_ASSOC);
-
-        $columns = array();
-        foreach($result as $row)
-        {
-            $columns[$row['Field']] = $row['Type'];
-        }
-        return $columns;
-    }
-
-    /**
-     * Automatically configures the import data settings based on the source and target databases.
-     *
-     * This method connects to the source and target databases, retrieves the list of existing 
-     * tables, and updates the configuration for each target table by checking its presence in the 
-     * source database. It handles exceptions and logs any errors encountered during the process.
-     *
-     * @param SecretObject $config The configuration object containing database and table information.
-     * @return SecretObject The updated configuration object with modified table settings.
-     */
-    public function autoConfigureImportData($config)
-    {
-        $databaseConfigSource = $config->getDatabaseSource();
-        $databaseConfigTarget = $config->getDatabaseTarget();
-
-        $databaseSource = new PicoDatabase($databaseConfigSource);
-        $databaseTarget = new PicoDatabase($databaseConfigTarget);
-        try
-        {
-            $databaseSource->connect();
-            $databaseTarget->connect();
-            $tables = $config->getTable();
-
-            $existingTables = array();
-            foreach($tables as $tb)
-            {
-                $existingTables[] = $tb->getTarget();
-            }
-
-            $sourceTableList = $databaseSource->fetchAll("SHOW TABLES", PDO::FETCH_NUM);
-            $targetTableList = $databaseTarget->fetchAll("SHOW TABLES", PDO::FETCH_NUM);
-
-            $sourceTables = call_user_func_array('array_merge', $sourceTableList);
-            $targetTables = call_user_func_array('array_merge', $targetTableList);
-
-            foreach($targetTables as $target)
-            {
-                $tables = $this->updateConfigTable($databaseSource, $databaseTarget, $tables, $sourceTables, $target, $existingTables);
-            }
-            $config->setTable($tables);
-        }
-        catch(Exception $e)
-        {
-            error_log($e->getMessage());
-        }
-        return $config;
-    }
-
-    /**
      * Fixes imported data based on specified column types.
      *
      * This method processes the input data array and adjusts the values 
@@ -339,5 +372,52 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         return $data;
     }
 
+    /**
+     * Automatically configures the import data settings based on the source and target databases.
+     *
+     * This method connects to the source and target databases, retrieves the list of existing 
+     * tables, and updates the configuration for each target table by checking its presence in the 
+     * source database. It handles exceptions and logs any errors encountered during the process.
+     *
+     * @param SecretObject $config The configuration object containing database and table information.
+     * @return SecretObject The updated configuration object with modified table settings.
+     */
+    public function autoConfigureImportData($config)
+    {
+        $databaseConfigSource = $config->getDatabaseSource();
+        $databaseConfigTarget = $config->getDatabaseTarget();
+
+        $databaseSource = new PicoDatabase($databaseConfigSource);
+        $databaseTarget = new PicoDatabase($databaseConfigTarget);
+        try
+        {
+            $databaseSource->connect();
+            $databaseTarget->connect();
+            $tables = $config->getTable();
+
+            $existingTables = array();
+            foreach($tables as $tb)
+            {
+                $existingTables[] = $tb->getTarget();
+            }
+
+            $sourceTableList = $databaseSource->fetchAll("SELECT name FROM sqlite_master WHERE type='table'", PDO::FETCH_NUM);
+            $targetTableList = $databaseTarget->fetchAll("SELECT name FROM sqlite_master WHERE type='table'", PDO::FETCH_NUM);
+
+            $sourceTables = call_user_func_array('array_merge', $sourceTableList);
+            $targetTables = call_user_func_array('array_merge', $targetTableList);
+
+            foreach($targetTables as $target)
+            {
+                $tables = $this->updateConfigTable($databaseSource, $databaseTarget, $tables, $sourceTables, $target, $existingTables);
+            }
+            $config->setTable($tables);
+        }
+        catch(Exception $e)
+        {
+            error_log($e->getMessage());
+        }
+        return $config;
+    }
     
 }

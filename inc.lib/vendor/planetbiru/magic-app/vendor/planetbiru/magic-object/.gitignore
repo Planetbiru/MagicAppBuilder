@@ -1,3 +1,4 @@
 /vendor/
 tests/import.yml
 tests/db.sql
+tests/db.sqlite
