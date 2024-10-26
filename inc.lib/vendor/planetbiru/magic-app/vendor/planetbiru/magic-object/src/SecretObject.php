@@ -257,7 +257,7 @@ class SecretObject extends stdClass //NOSONAR
             $var = lcfirst(substr($method, 3));
             return $this->_get($var);
         }
-        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && isset($params[0]) && !$this->_readonly) {
+        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && is_array($params) && !empty($params) && !$this->_readonly) {
             $var = lcfirst(substr($method, 3));
             $this->_set($var, $params[0]);
             $this->modifyNullProperties($var, $params[0]);

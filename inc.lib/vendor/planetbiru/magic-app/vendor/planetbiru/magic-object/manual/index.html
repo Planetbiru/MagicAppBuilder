@@ -10425,8 +10425,8 @@ try
     $album-&gt;setAdminEdit("1");
     $album-&gt;setIpCreate("::1");
     $album-&gt;setActive(true);
-    $album-&gt;setIpCreate("::1");
-    $album-&gt;setAsDraf(false);
+    $album-&gt;setAsDraft(false);
+    echo $album."\r\n--------\r\n";
     $album-&gt;save();
 
     $album2 = new Album(null, $database);

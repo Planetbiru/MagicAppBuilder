@@ -11820,8 +11820,8 @@ try
     $album->setAdminEdit("1");
     $album->setIpCreate("::1");
     $album->setActive(true);
-    $album->setIpCreate("::1");
-    $album->setAsDraf(false);
+    $album->setAsDraft(false);
+    echo $album."\r\n--------\r\n";
     $album->save();
 
     $album2 = new Album(null, $database);

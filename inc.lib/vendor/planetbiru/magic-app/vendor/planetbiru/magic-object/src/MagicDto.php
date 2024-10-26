@@ -284,9 +284,14 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Handles the case where the property is a self-instance.
      *
+     * This method retrieves the value from the data source based on the provided
+     * source or property name. If the source indicates a nested property, it 
+     * retrieves that value instead. It constructs an instance of the specified 
+     * class type and returns its stringified value.
+     *
      * @param string|null $source The source to extract the value from.
-     * @param string $var The variable type.
-     * @param string $propertyName The name of the property.
+     * @param string $var The variable type (class name) to instantiate.
+     * @param string $propertyName The name of the property to fall back on.
      * @return mixed The handled value for the self-instance.
      */
     private function handleSelfInstance($source, $var, $propertyName)
@@ -339,6 +344,10 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Handles the case where the property is an instance of MagicObject.
      *
+     * This method retrieves the value from the data source and checks if it 
+     * is an instance of MagicObject or its derivatives. If so, it returns 
+     * the stringified value; otherwise, it returns a JSON-encoded version.
+     *
      * @param string|null $source The source to extract the value from.
      * @param string $propertyName The name of the property.
      * @return mixed The handled value for the MagicObject instance.
@@ -359,9 +368,12 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Handles the case where the property is an instance of DateTime.
      *
+     * This method retrieves the value from the data source and parses it into
+     * a DateTime object, either from the source or a nested value.
+     *
      * @param string|null $source The source to extract the value from.
      * @param string $propertyName The name of the property.
-     * @return DateTime|null The handled value for the MagicObject instance.
+     * @return DateTime|null The handled DateTime value or null if not applicable.
      */
     private function handleDateTimeObject($source, $propertyName)
     {
@@ -376,6 +388,9 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Handles the default case when retrieving property values.
      *
+     * This method delegates the handling of standard class properties to 
+     * another method.
+     *
      * @param string|null $source The source to extract the value from.
      * @param string $key The key of the property.
      * @return mixed The handled default value.
@@ -388,9 +403,12 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Handles the stdClass when retrieving property values.
      *
+     * This method retrieves the value from the data source based on the given 
+     * source or key, accounting for nested properties if necessary.
+     *
      * @param string|null $source The source to extract the value from.
      * @param string $key The key of the property.
-     * @return mixed The handled default value.
+     * @return mixed The retrieved value or null if not found.
      */
     private function handleStdClass($source, $key)
     {
@@ -418,8 +436,11 @@ class MagicDto extends stdClass // NOSONAR
     /**
      * Retrieves nested values from the data source based on a specified source string.
      *
+     * This method splits the source string by the "->" delimiter to navigate through
+     * nested properties in the data source, returning the final nested value found.
+     *
      * @param string $source The source string indicating the path to the value.
-     * @return mixed The nested value retrieved from the data source.
+     * @return mixed The nested value retrieved from the data source, or null if not found.
      */
     private function getNestedValue($source)
     {
@@ -438,9 +459,12 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Get the object value as a specified format
+     * Get the object value as a specified format.
      *
-     * @return stdClass An object representing the value of the instance
+     * This method creates a clone of the current object and transforms its properties
+     * into a value representation, returning the object as an instance of stdClass.
+     *
+     * @return stdClass An object representing the value of the instance.
      */
     public function valueObject()
     {
@@ -457,9 +481,11 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Get the object value as an associative array
+     * Get the object value as an associative array.
      *
-     * @return array An associative array representing the object values
+     * This method converts the object's value representation into an associative array.
+     *
+     * @return array An associative array representing the object values.
      */
     public function valueArray()
     {
@@ -468,9 +494,12 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Get the object value as an associative array with the first letter of each key in upper camel case
+     * Get the object value as an associative array with the first letter of each key in upper camel case.
      *
-     * @return array An associative array with keys in upper camel case
+     * This method transforms the keys of the associative array representation of the
+     * object values to be in upper camel case format.
+     *
+     * @return array An associative array with keys in upper camel case.
      */
     public function valueArrayUpperCamel()
     {
@@ -489,9 +518,12 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Check if the JSON output should be prettified
+     * Check if the JSON output should be prettified.
      *
-     * @return bool True if JSON output is set to be prettified; otherwise, false
+     * This method checks the class parameters to determine if JSON output
+     * formatting should be applied to enhance readability.
+     *
+     * @return bool True if JSON output is set to be prettified; otherwise, false.
      */
     protected function _prettyJson()
     {
@@ -502,9 +534,12 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Check if the XML output should be prettified
+     * Check if the XML output should be prettified.
      *
-     * @return bool True if XML output is set to be prettified; otherwise, false
+     * This method checks the class parameters to determine if XML output
+     * formatting should be applied to enhance readability.
+     *
+     * @return bool True if XML output is set to be prettified; otherwise, false.
      */
     protected function _prettyXml()
     {
@@ -515,11 +550,15 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Get a list of properties
+     * Retrieves a list of properties from the current class or its parent class.
      *
-     * @param bool $reflectSelf Flag indicating whether to reflect properties of the current class
-     * @param bool $asArrayProps Flag indicating whether to return properties as an array
-     * @return array An array of property names or ReflectionProperty objects
+     * This method uses reflection to obtain the properties defined in the class.
+     * It can return either the property names as an array or the ReflectionProperty
+     * objects, depending on the specified flags.
+     *
+     * @param bool $reflectSelf Flag indicating whether to reflect properties of the current class (true) or the parent class (false).
+     * @param bool $asArrayProps Flag indicating whether to return property names as an array (true) or as ReflectionProperty objects (false).
+     * @return array An array of property names or ReflectionProperty objects, based on the provided flags.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -553,9 +592,13 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Recursively stringify an object or array of objects.
+     * Recursively converts an object or an array of objects to their string representation.
      *
-     * @param self $value The object to stringify.
+     * This method traverses through an object or an array of objects of the same class
+     * and calls their respective stringify methods, if applicable. The final output 
+     * is the stringified representation of the object or array.
+     *
+     * @param self|array $value The object or array of objects to stringify.
      * @return mixed The stringified object or array.
      */
     private function stringifyObject($value)
@@ -729,10 +772,16 @@ class MagicDto extends stdClass // NOSONAR
     }
 
     /**
-     * Helper function to convert an array to XML
+     * Converts an array to XML format and appends it to a SimpleXMLElement.
      *
-     * @param array $dataArray The array to convert
-     * @param SimpleXMLElement $xml XML element to append to
+     * This function takes an associative or indexed array and recursively converts
+     * it into XML elements. Keys in the array are sanitized to ensure they are valid
+     * XML element names. Values that are not arrays are added as child elements.
+     *
+     * @param array $dataArray The array to convert to XML.
+     * @param SimpleXMLElement $xml The XML element to which the converted data will be appended.
+     * 
+     * @return void This function does not return a value. It modifies the provided XML element.
      */
     public function arrayToXml($dataArray, $xml) {
         foreach ($dataArray as $key => $value) {

@@ -246,7 +246,7 @@ class AcuanPengawasan extends MagicObject
 }
 
 $database = new PicoSqlite(__DIR__ . "/db.sqlite", null, function($sql){
-    //echo $sql."\r\n";
+    echo $sql."\r\n";
 });
 try
 {
@@ -258,23 +258,20 @@ try
     // create table if not exists
     $util = new PicoDatabaseUtilSqlite();
     $tableStructure = $util->showCreateTable($album, true);
-    echo $tableStructure;
+    //echo $tableStructure."\r\n";
 
-    print_r($util->getColumnList($database, 'album'));
     $database->query($tableStructure);
 
     $tableStructure2 = $util->showCreateTable($acuanPengawasan, true);
-    echo $tableStructure2;
+    //echo $tableStructure2."\r\n";
 
-    print_r($util->getColumnList($database, 'acuan_pengawasan'));
     $database->query($tableStructure);
     $database->query($tableStructure2);
 
 
-    $album->setAlbumId("1235");
-    $album->setName("Meraih Mimpi 2 ");
-    $album->setTitle("Meraih Mimpi 2");
-    $album->setDescription("Album pertama dengan judul Meraih Mimpi 2");
+    $album->setName("Meraih Mimpi 1 ");
+    $album->setTitle("Meraih Mimpi 1");
+    $album->setDescription("Album pertama dengan judul Meraih Mimpi 1");
     $album->setProducerId("5678");
     $album->setReleaseDate("2024-09-09");
     $album->setNumberOfSong(10);
@@ -289,15 +286,36 @@ try
     $album->setIpCreate("::1");
     $album->setActive(true);
     $album->setIpCreate("::1");
-    $album->setAsDraf(false);
+    $album->setAsDraft(false);
+    
     $album->save();
+
+    
+    $album->unsetAlbumId();
+    $album->setName("Meraih Mimpi 2 ");
+    $album->setTitle("Meraih Mimpi 2");
+    $album->setDescription("Album pertama dengan judul Meraih Mimpi 2");
+    $album->save();
+
+    $album->unsetAlbumId();
+    $album->setName("Meraih Mimpi 3 ");
+    $album->setTitle("Meraih Mimpi 3");
+    $album->setDescription("Album pertama dengan judul Meraih Mimpi 3");
+    $album->save();
+
+    $album->unsetAlbumId();
+    $album->setName("Meraih Mimpi 4");
+    $album->setTitle("Meraih Mimpi 4");
+    $album->setDescription("Album pertama dengan judul Meraih Mimpi 4");
+    $album->save();
+
 
     $album2 = new Album(null, $database);
     
     $res = $album2->findAll();
     foreach($res->getResult() as $row)
     {
-        echo $row."\r\n";
+        //echo $row."\r\n";
     }
 }
 catch(Exception $e)

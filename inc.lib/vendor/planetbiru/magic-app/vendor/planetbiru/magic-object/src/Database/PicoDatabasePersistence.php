@@ -973,7 +973,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param PicoTableInfo $info Table information
      * @param bool $firstCall First call
-     * @return void
+     * @return self
      */
     private function addGeneratedValue($info, $firstCall)
     {
@@ -992,6 +992,7 @@ class PicoDatabasePersistence // NOSONAR
                 }
             }
         }
+        return $this;
     }
     
     /**
@@ -999,7 +1000,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $prop Property name
      * @param string $strategy Generation strategy
-     * @return void
+     * @return self
      */
     private function setGeneratedValue($prop, $strategy, $firstCall)
     {
@@ -1025,6 +1026,7 @@ class PicoDatabasePersistence // NOSONAR
                 $this->dbAutoinrementCompleted = true;
             }         
         }
+        return $this;
     }
 
     /**
@@ -2918,7 +2920,7 @@ class PicoDatabasePersistence // NOSONAR
      * Prepare join cache
      *
      * @param string $classNameJoin Join class name
-     * @return void
+     * @return self
      */
     private function prepareJoinCache($classNameJoin)
     {
@@ -2926,6 +2928,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             $this->joinCache[$classNameJoin] = array();
         }
+        return $this;
     }
 
     /**
