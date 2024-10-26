@@ -228,7 +228,10 @@ class SphericalGeometry
      */
     public static function computeSignedArea($latLngsArray, $signed = true)
     {
-        if (empty($latLngsArray) || count($latLngsArray) < 3) return 0;
+        if (empty($latLngsArray) || count($latLngsArray) < 3) 
+        {
+            return 0;
+        }
         
         $e = 0;
         $r2 = pow(self::EARTH_RADIUS, 2);

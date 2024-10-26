@@ -30,7 +30,7 @@ class PicoColumnGenerator
         if ($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MARIADB || 
             $database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MYSQL) 
         {
-            return PicoDatabaseUtilMySql::getColumnList($database, $picoTableName);
+            return (new PicoDatabaseUtilMySql())->getColumnList($database, $picoTableName);
         }
         
         // Return an empty array if the database type is not supported

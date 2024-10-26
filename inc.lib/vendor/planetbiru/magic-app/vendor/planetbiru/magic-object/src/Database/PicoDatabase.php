@@ -9,6 +9,7 @@ use PDOStatement;
 use MagicObject\Exceptions\InvalidDatabaseConfiguration;
 use MagicObject\Exceptions\NullPointerException;
 use MagicObject\SecretObject;
+use ReflectionFunction;
 use stdClass;
 
 /**
@@ -49,49 +50,49 @@ class PicoDatabase //NOSONAR
      *
      * @var SecretObject
      */
-    private $databaseCredentials;
+    protected $databaseCredentials;
 
     /**
      * Indicates whether the database is connected or not.
      *
      * @var bool
      */
-    private $connected = false;
+    protected $connected = false;
 
     /**
      * Autocommit setting.
      *
      * @var bool
      */
-    private $autocommit = true;
+    protected $autocommit = true;
 
     /**
      * Database connection.
      *
      * @var PDO
      */
-    private $databaseConnection;
+    protected $databaseConnection;
 
     /**
      * Database type.
      *
      * @var string
      */
-    private $databaseType = "";
+    protected $databaseType = "";
 
     /**
      * Callback function when executing queries that modify data.
      *
      * @var callable|null
      */
-    private $callbackExecuteQuery = null;
+    protected $callbackExecuteQuery = null;
 
     /**
      * Callback function when executing any query.
      *
      * @var callable|null
      */
-    private $callbackDebugQuery = null;
+    protected $callbackDebugQuery = null;
 
     /**
      * Constructor to initialize the PicoDatabase object.
@@ -282,23 +283,25 @@ class PicoDatabase //NOSONAR
      * Execute a query.
      *
      * @param string $sql SQL to be executed.
+     * @param array|null $params Optional parameters for the SQL query.
      * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
-     * @throws PDOException
+     * @throws PDOException If an error occurs while executing the query.
      */
-    public function query($sql)
+    public function query($sql, $params = null)
     {
-        return $this->executeQuery($sql);
+        return $this->executeQuery($sql, $params);
     }
 
     /**
      * Fetch a result.
      *
      * @param string $sql SQL to be executed.
-     * @param int $tentativeType Tentative type for fetch mode.
+     * @param int $tentativeType Tentative type for fetch mode (e.g., PDO::FETCH_ASSOC).
      * @param mixed $defaultValue Default value to return if no results found.
+     * @param array|null $params Optional parameters for the SQL query.
      * @return array|object|stdClass|null Returns the fetched result as an array, object, or stdClass, or the default value if no results are found.
      */
-    public function fetch($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null)
+    public function fetch($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null, $params = null)
     {
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
@@ -309,8 +312,19 @@ class PicoDatabase //NOSONAR
         $stmt = $this->databaseConnection->prepare($sql);
         
         try {
-            $stmt->execute();
-            $result = $stmt->rowCount() > 0 ? $stmt->fetch($tentativeType) : $defaultValue;
+            $stmt->execute($params);
+            if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+            {
+                $result = $stmt->fetch($tentativeType);
+                if($result === false)
+                {
+                    $result = $defaultValue;
+                }
+            }
+            else
+            {
+                $result = $stmt->rowCount() > 0 ? $stmt->fetch($tentativeType) : $defaultValue;
+            }
         } catch (PDOException $e) {
             $result = $defaultValue;
         }
@@ -322,9 +336,11 @@ class PicoDatabase //NOSONAR
      * Check if a record exists.
      *
      * @param string $sql SQL to be executed.
+     * @param array|null $params Optional parameters for the SQL query.
      * @return bool True if the record exists, false otherwise.
+     * @throws NullPointerException If the database connection is null.
      */
-    public function isRecordExists($sql)
+    public function isRecordExists($sql, $params = null)
     {
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
@@ -334,8 +350,16 @@ class PicoDatabase //NOSONAR
         $stmt = $this->databaseConnection->prepare($sql);
         
         try {
-            $stmt->execute();
-            return $stmt->rowCount() > 0;
+            $stmt->execute($params);
+            if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+            {
+                $result = $stmt->fetch();
+                return $result !== false;
+            }
+            else
+            {
+                return $stmt->rowCount() > 0;
+            }
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
@@ -345,11 +369,12 @@ class PicoDatabase //NOSONAR
      * Fetch all results.
      *
      * @param string $sql SQL to be executed.
-     * @param int $tentativeType Tentative type for fetch mode.
+     * @param int $tentativeType Tentative type for fetch mode (e.g., PDO::FETCH_ASSOC).
      * @param mixed $defaultValue Default value to return if no results found.
+     * @param array|null $params Optional parameters for the SQL query.
      * @return array|null Returns an array of results or the default value if no results are found.
      */
-    public function fetchAll($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null)
+    public function fetchAll($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null, $params = null)
     {
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
@@ -360,8 +385,19 @@ class PicoDatabase //NOSONAR
         $stmt = $this->databaseConnection->prepare($sql);
         
         try {
-            $stmt->execute();
-            $result = $stmt->rowCount() > 0 ? $stmt->fetchAll($tentativeType) : $defaultValue;
+            $stmt->execute($params);
+            if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+            {
+                $result = $stmt->fetch($tentativeType);
+                if($result === false)
+                {
+                    $result = $defaultValue;
+                }
+            }
+            else
+            {
+                $result = $stmt->rowCount() > 0 ? $stmt->fetchAll($tentativeType) : $defaultValue;
+            }
         } catch (PDOException $e) {
             $result = $defaultValue;
         }
@@ -373,18 +409,20 @@ class PicoDatabase //NOSONAR
      * Execute a query without returning anything.
      *
      * @param string $sql Query string to be executed.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @throws NullPointerException If the database connection is null.
      */
-    public function execute($sql)
+    public function execute($sql, $params = null)
     {
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
         
-        $this->executeDebug($sql);
+        $this->executeDebug($sql, $params);
         $stmt = $this->databaseConnection->prepare($sql);
         
         try {
-            $stmt->execute();
+            $stmt->execute($params);
         } catch (PDOException $e) {
             // Handle exception as needed
         }
@@ -394,20 +432,22 @@ class PicoDatabase //NOSONAR
      * Execute a query and return the statement.
      *
      * @param string $sql Query string to be executed.
-     * @return PDOStatement|bool Returns the PDOStatement object if successful, or false on failure.
-     * @throws PDOException
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
+     * @throws NullPointerException If the database connection is null.
+     * @throws PDOException If an error occurs while executing the query.
      */
-    public function executeQuery($sql)
+    public function executeQuery($sql, $params = null)
     {
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
         
-        $this->executeDebug($sql);
+        $this->executeDebug($sql, $params);
         $stmt = $this->databaseConnection->prepare($sql);
         
         try {
-            $stmt->execute();
+            $stmt->execute($params);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
@@ -419,12 +459,13 @@ class PicoDatabase //NOSONAR
      * Execute an insert query.
      *
      * @param string $sql Query string to be executed.
-     * @return PDOStatement|bool Returns the PDOStatement object if successful, or false on failure.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
      */
-    public function executeInsert($sql)
+    public function executeInsert($sql, $params = null)
     {
-        $stmt = $this->executeQuery($sql);
-        $this->executeCallback($sql, self::QUERY_INSERT);
+        $stmt = $this->executeQuery($sql, $params);
+        $this->executeCallback($sql, $params, self::QUERY_INSERT);
         return $stmt;
     }
 
@@ -432,12 +473,13 @@ class PicoDatabase //NOSONAR
      * Execute an update query.
      *
      * @param string $sql Query string to be executed.
-     * @return PDOStatement|bool Returns the PDOStatement object if successful, or false on failure.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
      */
-    public function executeUpdate($sql)
+    public function executeUpdate($sql, $params = null)
     {
-        $stmt = $this->executeQuery($sql);
-        $this->executeCallback($sql, self::QUERY_UPDATE);
+        $stmt = $this->executeQuery($sql, $params);
+        $this->executeCallback($sql, $params, self::QUERY_UPDATE);
         return $stmt;
     }
 
@@ -445,12 +487,13 @@ class PicoDatabase //NOSONAR
      * Execute a delete query.
      *
      * @param string $sql Query string to be executed.
-     * @return PDOStatement|bool Returns the PDOStatement object if successful, or false on failure.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
      */
-    public function executeDelete($sql)
+    public function executeDelete($sql, $params = null)
     {
-        $stmt = $this->executeQuery($sql);
-        $this->executeCallback($sql, self::QUERY_DELETE);
+        $stmt = $this->executeQuery($sql, $params);
+        $this->executeCallback($sql, $params, self::QUERY_DELETE);
         return $stmt;
     }
 
@@ -458,12 +501,13 @@ class PicoDatabase //NOSONAR
      * Execute a transaction query.
      *
      * @param string $sql Query string to be executed.
-     * @return PDOStatement|bool Returns the PDOStatement object if successful, or false on failure.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or false on failure.
      */
-    public function executeTransaction($sql)
+    public function executeTransaction($sql, $params = null)
     {
-        $stmt = $this->executeQuery($sql);
-        $this->executeCallback($sql, self::QUERY_TRANSACTION);
+        $stmt = $this->executeQuery($sql, $params);
+        $this->executeCallback($sql, $params, self::QUERY_TRANSACTION);
         return $stmt;
     }
 
@@ -471,11 +515,25 @@ class PicoDatabase //NOSONAR
      * Execute a callback query function.
      *
      * @param string $query SQL to be executed.
-     * @param string $type Query type.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @param string|null $type Query type.
      */
-    private function executeCallback($query, $type)
+    private function executeCallback($query, $params = null, $type = null)
     {
         if ($this->callbackExecuteQuery !== null && is_callable($this->callbackExecuteQuery)) {
+            $reflection = new ReflectionFunction($this->callbackDebugQuery);
+
+            // Get number of parameters
+            $numberOfParams = $reflection->getNumberOfParameters();
+            $numberOfRequiredParams = $reflection->getNumberOfRequiredParameters();
+            if($numberOfParams == 3)
+            {
+                call_user_func($this->callbackDebugQuery, $query, $params, $type);
+            }
+            else
+            {
+                call_user_func($this->callbackDebugQuery, $query);
+            }
             call_user_func($this->callbackExecuteQuery, $query, $type);
         }
     }
@@ -484,11 +542,27 @@ class PicoDatabase //NOSONAR
      * Execute a debug query function.
      *
      * @param string $query SQL to be executed.
+     * @param array|null $params Optional parameters for the SQL query.
      */
-    private function executeDebug($query)
+    private function executeDebug($query, $params = null)
     {
         if ($this->callbackDebugQuery !== null && is_callable($this->callbackDebugQuery)) {
-            call_user_func($this->callbackDebugQuery, $query);
+
+            $reflection = new ReflectionFunction($this->callbackDebugQuery);
+
+            // Get number of parameters
+            $numberOfParams = $reflection->getNumberOfParameters();
+            $numberOfRequiredParams = $reflection->getNumberOfRequiredParameters();
+
+            if($numberOfParams == 2)
+            {
+                call_user_func($this->callbackDebugQuery, $query, $params);
+            }
+            else
+            {
+                call_user_func($this->callbackDebugQuery, $query);
+            }
+            
         }
     }
 
