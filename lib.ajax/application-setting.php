@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\AppArchitecture;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
@@ -83,11 +84,11 @@ else
                                 <td><input class="form-control" type="text" name="application_name" value="<?php echo $app->getName(); ?>"></td>
                             </tr>
                             <tr>
-                                <td>Application Type</td>
+                                <td>Architecture</td>
                                 <td>
-                                    <select class="form-control" name="application_type">
-                                        <option value="fullstack"<?php echo $app->getType() == 'fullstack' ? ' selected' : ''; ?>>Fullstack Application</option>
-                                        <option value="api"<?php echo $app->getType() == 'api' ? ' selected' : ''; ?>>Application Programming Interface (API)</option>
+                                    <select class="form-control" name="application_architecture">
+                                        <option value="<?php echo AppArchitecture::MONOLITH;?>"<?php echo $app->getArchitecture() == AppArchitecture::MONOLITH ? ' selected' : ''; ?>>Monolith Application</option>
+                                        <option value="<?php echo AppArchitecture::MICROSERVICES;?>"<?php echo $app->getArchitecture() == AppArchitecture::MICROSERVICES ? ' selected' : ''; ?>>Microservices Application</option>
                                     </select>
                                 </td>
                             </tr>
@@ -133,7 +134,7 @@ else
                             </td>
                             </tr>
                             <tr class="database-credential file-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
-                                <td>File Path</td>
+                                <td>Database File Path</td>
                                 <td><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>"></td>
                             </tr>
                             <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">

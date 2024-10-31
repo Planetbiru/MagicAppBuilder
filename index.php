@@ -693,11 +693,11 @@ $constSelected = ' selected';
                   <td><input class="form-control" type="text" name="application_id"></td>
                 </tr>
                 <tr>
-                  <td>Application Type</td>
+                  <td>Architecture</td>
                   <td>
-                      <select class="form-control" name="application_type">
-                          <option value="fullstack">Fullstack Application</option>
-                          <option value="api">Application Programming Interface (API)</option>
+                      <select class="form-control" name="application_architecture">
+                          <option value="monolith">Monolith Application</option>
+                          <option value="microservices">Microservices Aplication</option>
                       </select>
                   </td>
                 </tr>

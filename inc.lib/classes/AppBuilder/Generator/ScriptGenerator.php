@@ -2,6 +2,7 @@
 
 namespace AppBuilder\Generator;
 
+use AppBuilder\AppArchitecture;
 use AppBuilder\AppBuilder;
 use AppBuilder\AppBuilderApproval;
 use AppBuilder\AppFeatures;
@@ -573,8 +574,8 @@ class ScriptGenerator
      * Initializes callback functions based on the application type.
      *
      * This method sets up success and failure callback functions for create and update actions
-     * if the application type is 'api'. If the application type is not 'api', all callback
-     * functions will be set to null.
+     * if the application type is 'microservices'. If the application type is not 'microservices',
+     * all callback functions will be set to null.
      *
      * The created callback functions are designed to send success or exception responses
      * using the provided API response handler.
@@ -583,11 +584,12 @@ class ScriptGenerator
      *
      * @return stdClass An object containing the initialized callback functions for
      *                  create and update operations. Each function is either a callable
-     *                  or null depending on the application type.
+     *                  or null, depending on the application type.
      */
     private function initializeCallbackFunctions($appConfig)
     {
-        if($appConfig->getApplication()->getType() == 'api') {
+        if($appConfig->getApplication()->getArchitecture() == AppArchitecture::MICROSERVICES) {
+            // Define callback functions for microservices application
             $callbackCreateSuccess = function($objectName, $primaryKeyName) {
                 return "\t\t".'$apiResponse->sendSuccess(UserAction::CREATE, $'.$objectName.", $primaryKeyName);";
             };
@@ -624,6 +626,7 @@ class ScriptGenerator
         }
         else
         {
+            // Set all callback functions to null for monolith application
             $callbackCreateSuccess = null;
             $callbackCreateFailed = null;
             
@@ -634,6 +637,7 @@ class ScriptGenerator
             $callbackUpdateStatusException = null;
         }
         
+        // Create an object to hold the callback functions
         $stdClass = new stdClass;
         
         $stdClass->callbackCreateSuccess = $callbackCreateSuccess;

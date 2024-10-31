@@ -170,7 +170,7 @@ jQuery(function () {
     let inputs = form.serializeArray();
     let dataToPost = {
       name: form.find('[name="application_name"]').val(),
-      type: form.find('[name="application_type"]').val(),
+      architecture: form.find('[name="application_architecture"]').val(),
       description: form.find('[name="description"]').val(),
       database: {},
       sessions: {},
@@ -391,7 +391,7 @@ jQuery(function () {
     e.preventDefault();
     let modal = $(this).closest(".modal");
     let name = modal.find('[name="application_name"]').val().trim();
-    let type = modal.find('[name="application_type"]').val().trim();
+    let architecture = modal.find('[name="application_architecture"]').val().trim();
     let description = modal.find('[name="application_description"]').val().trim();
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
@@ -413,7 +413,7 @@ jQuery(function () {
         method: "POST",
         url: "lib.ajax/application-create.php",
         dataType: "html",
-        data: { id: id, name: name, type: type, description: description, directory: directory, namespace: namespace, author: author, paths: paths, magic_app_version: magic_app_version },
+        data: { id: id, name: name, architecture: architecture, description: description, directory: directory, namespace: namespace, author: author, paths: paths, magic_app_version: magic_app_version },
         success: function (data) {
           reloadApplicationList();
         },
@@ -667,7 +667,7 @@ jQuery(function () {
       success: function (data) {
         $('[name="application_name"]').val(data.application_name);
         $('[name="application_id"]').val(data.application_id);
-        $('[name="application_type"]').val(data.application_type);
+        $('[name="application_architecture"]').val(data.application_architecture);
         $('[name="application_directory"]').val(data.application_directory);
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);

@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\AppArchitecture;
 use AppBuilder\Util\Composer\ComposerUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtil;
@@ -39,7 +40,7 @@ $data = array(
     'application_directory' => $appBaseDir,
     'application_namespace' => 'ApplicationName',
     'application_author' => 'Your Name',
-    'application_type' => 'fullstack',
+    'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
     'magic_app_versions' => $magicAppList
 );

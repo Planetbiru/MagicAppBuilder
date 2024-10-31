@@ -17,7 +17,7 @@ try
 	$appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
-	$type = $inputPost->getType();
+	$architecture = $inputPost->getArchitecture();
 	
 	$databaseConfig = new SecretObject($inputPost->getDatabase());
 	$sessionsConfig = new SecretObject($inputPost->getSessions());
@@ -32,7 +32,7 @@ try
 	{
 		$appConfig->getApplication()->setName($applicationName);
 		$appConfig->getApplication()->setDescription($description);
-		$appConfig->getApplication()->setType($type);
+		$appConfig->getApplication()->setArchitecture($architecture);
 	}
 
     $existingDatabase = $appConfig->getDatabase();
@@ -104,7 +104,7 @@ try
             {
                 $arr[$idx]['name'] = $applicationName;
 				$arr[$idx]['description'] = $description;
-				$arr[$idx]['type'] = $type;
+				$arr[$idx]['architecture'] = $architecture;
             }
         }
         file_put_contents($appListPath, PicoYamlUtil::dump($arr, null, 4, 0));
