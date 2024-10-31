@@ -477,6 +477,13 @@ $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong->dumpStructure($song, PicoDatabaseType::DATABASE_TYPE_MYSQL, true, true);
 ```
 
+**Parameters:**
+
+-    **$song:** An instance of the Song class, representing the table structure you want to dump.
+-    **PicoDatabaseType::DATABASE_TYPE_MYSQL:** The type of database you are targeting (e.g., MySQL, PostgreSQL).
+-    **true (createIfNotExists):** Whether to include the "IF NOT EXISTS" clause in the CREATE statement.
+-    **true (dropIfExists):** Whether to include the "DROP TABLE IF EXISTS" statement before creating the table.
+
 ### Dump Data
 
 We can dump data by connecting to real database. Don't forget to define the target database type. If we will dump multiple table, we must use dedicated instance of `PicoDatabaseDump`.
@@ -487,6 +494,39 @@ $pageData = $song->findAll();
 $dumpForSong = new PicoDatabaseDump();
 echo $dumpForSong->dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL);
 ```
+
+**Important Note:**
+
+When exporting a table with a large amount of data, the above method may not be suitable, as it can consume a significant amount of memory while trying to accommodate all the data before writing it to a file.
+
+To efficiently handle large datasets, you can use the following approach:
+
+```php
+$song = new Song(null, $database);
+/*
+$speficication = null
+$pageable = null
+$sortable = null
+$passive = true
+$subqueryMap = null
+$findOption = MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA
+*/
+$pageData = $song->findAll(null, null, null, true, null, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+$dumpForSong = new PicoDatabaseDump();
+
+$dumpForSong->dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL, new Song(), $maxRecord, function($sql){
+    $fp = fopen("dump.sql", "a");
+    fputs($fp, $sql);
+    fclose($fp);
+});
+```
+
+**Explanation:**
+
+-    **findAll Parameters:** This allows you to customize your query. The options provided (e.g., FIND_OPTION_NO_COUNT_DATA, FIND_OPTION_NO_FETCH_DATA) ensure that only the necessary data is fetched, thus reducing memory consumption.
+-    **Callback Function:** The anonymous function passed as a parameter to dumpData handles the SQL output, appending it to dump.sql in an efficient manner, thereby avoiding excessive memory usage.
+
+By following these guidelines, you can effectively manage both the structure and data dumping processes while optimizing for performance and resource utilization.
 
 ### Summary
 

@@ -12,6 +12,7 @@
 
 ---
 includes:
+  - intro
   - installation
   - implementation
   - simple-object
@@ -21,8 +22,10 @@ includes:
   - object-from-ini
   - environment-variable
   - secret-object
+  - magic-dto
   - input
   - session
+  - database
   - entity
   - specification
   - pagable
@@ -32,6 +35,7 @@ includes:
   - database-dump
   - object-label
   - database-query-builder
+  - sqlite
   - upload-file
   - data-table
   - database-migration

@@ -10,7 +10,8 @@ $config->loadYamlFile('import.yml', true, true, true);
 
 $fp = fopen(__DIR__.'/db.sql', 'w');
 fclose($fp);
-$sql = PicoDatabaseUtilMySql::importData($config, function($sql, $source, $target){
+$tool = new PicoDatabaseUtilMySql();
+$sql = $tool->importData($config, function($sql, $source, $target){
     $fp = fopen(__DIR__.'/db.sql', 'a');
     fwrite($fp, $sql.";\r\n\r\n");
     fclose($fp);

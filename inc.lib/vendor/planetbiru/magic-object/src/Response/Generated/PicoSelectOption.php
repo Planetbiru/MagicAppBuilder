@@ -92,12 +92,12 @@ class PicoSelectOption
     }
 
     /**
-     * Create attributes for an option element
+     * Create attributes for an option element.
      *
-     * @param MagicObject $row Entity representing a row
-     * @param string $attr Attribute name for the option
-     * @param string $value Option value
-     * @return array
+     * @param MagicObject $row Entity representing a row.
+     * @param string $attr Attribute name for the option.
+     * @param string $value Option value.
+     * @return array Attributes for the option element.
      */
     private function createAttributes($row, $attr, $value)
     {
@@ -149,10 +149,10 @@ class PicoSelectOption
     }
 
     /**
-     * Convert an array of attributes to an HTML attributes string
+     * Convert an array of attributes to an HTML attributes string.
      *
-     * @param array $array Attributes to convert
-     * @return string
+     * @param array $array Attributes to convert.
+     * @return string String representation of HTML attributes.
      */
     private function attributeToString($array)
     {
@@ -169,9 +169,9 @@ class PicoSelectOption
     }
 
     /**
-     * Convert the options to HTML `<option>` elements
+     * Convert the options to HTML `<option>` elements.
      *
-     * @return string
+     * @return string HTML string of `<option>` elements.
      */
     public function __toString()
     {

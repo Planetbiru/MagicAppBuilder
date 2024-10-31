@@ -1,7 +1,6 @@
 <?php
 
 use MagicObject\SecretObject;
-use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once __DIR__ . "/inc.app/auth.php";
 require_once __DIR__ . "/inc.app/navs.php";
@@ -9,8 +8,7 @@ require_once __DIR__ . "/inc.app/navs.php";
 $constShowActive = ' show active';
 $constSelected = ' selected';
 
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -84,8 +82,7 @@ $constSelected = ' selected';
             <div class="row application-card">
             
             </div>
-          </div>
-        
+          </div>  
         </div>
 
         <?php
@@ -1035,8 +1032,7 @@ $constSelected = ' selected';
           </button>
         </div>
         <div class="modal-body">
-          
-        
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary button-add-menu">Add</button>
@@ -1057,8 +1053,7 @@ $constSelected = ' selected';
           </button>
         </div>
         <div class="modal-body">
-          <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">
-        
+          <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success button-apply-new-menu">OK</button>

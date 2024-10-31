@@ -27,4 +27,9 @@ class PicoDatabaseType
      * PostgreSQL database type.
      */
     const DATABASE_TYPE_POSTGRESQL = "postgresql";
+
+    /**
+     * SQLite database type.
+     */
+    const DATABASE_TYPE_SQLITE = "sqlite";
 }
