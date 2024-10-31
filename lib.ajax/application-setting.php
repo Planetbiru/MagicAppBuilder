@@ -1,5 +1,6 @@
 <?php
 
+use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
@@ -29,6 +30,37 @@ if($applicationId != null)
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
 $cfgSession = new SecretObject($appConfig->getSessions());
 $app = new SecretObject($appConfig->getApplication());
+
+$databases = new MagicObject();
+
+$databases->loadYamlString("
+supportedDatabase:
+  mariadb: 
+    name: MariaDB
+    base: nonfile-base
+  mysql: 
+    name: MySQL
+    base: nonfile-base
+  postgresql: 
+    name: PostgreSQL
+    base: nonfile-base
+  sqlite: 
+    name: SQLite
+    base: file-base
+", false, true, true);
+
+$supportedDatabase = $databases->getSupportedDatabase();
+
+$selectedDatabaseSystem = $supportedDatabase->get($cfgDatabase->getDriver());
+if(isset($selectedDatabaseSystem) && $selectedDatabaseSystem instanceof MagicObject)
+{
+    $databases->setSelectedBase($selectedDatabaseSystem->getBase());
+}
+else
+{
+    $databases->setSelectedBase('nonfile-base');
+}
+
 ?>
 <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
@@ -88,33 +120,43 @@ $app = new SecretObject($appConfig->getApplication());
                             <td>Driver</td>
                             <td>
                                 <select class="form-control" name="database_driver" id="database_driver">
-                                <option value="mysql" <?php echo $cfgDatabase->getDriver() == 'mysql' ? $constSelected : ''; ?>>MySQL</option>
-                                <option value="mariadb" <?php echo $cfgDatabase->getDriver() == 'mariadb' ? $constSelected : ''; ?>>MariaDB</option>
-                                <option value="postgresql" <?php echo $cfgDatabase->getDriver() == 'postgresql' ? $constSelected : ''; ?>>PostgreSQL</option>
+                                    <?php
+                                    $arr = $supportedDatabase->valueArray();
+                                    foreach($arr as $key=>$value)
+                                    {
+                                        ?>
+                                        <option value="<?php echo $key;?>" <?php echo $cfgDatabase->getDriver() == $key ? $constSelected : ''; ?> data-base="<?php echo $value['base'];?>"><?php echo $value['name'];?></option>
+                                        <?php
+                                    }
+                                    ?>
                                 </select>
                             </td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential file-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
+                                <td>File Path</td>
+                                <td><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>"></td>
+                            </tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Host</td>
                                 <td><input class="form-control" type="text" name="database_host" id="database_host" value="<?php echo $cfgDatabase->getHost(); ?>"></td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Port</td>
                                 <td><input class="form-control" type="text" name="database_port" id="database_port" value="<?php echo $cfgDatabase->getPort(); ?>"></td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Username</td>
                                 <td><input class="form-control" type="text" name="database_username" id="database_username" value="<?php echo $cfgDatabase->getUsername(); ?>"></td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Password</td>
                                 <td><input class="form-control" name="database_password" type="password" id="database_password" value=""></td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Name</td>
                                 <td><input class="form-control" type="text" name="database_database_name" id="database_database_name" value="<?php echo $cfgDatabase->getDatabaseName(); ?>"></td>
                             </tr>
-                            <tr>
+                            <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Schema</td>
                                 <td><input class="form-control" type="text" name="database_database_schema" id="database_database_schema" value="<?php echo $cfgDatabase->getDatabaseSchema(); ?>"></td>
                             </tr>

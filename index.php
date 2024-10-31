@@ -354,7 +354,6 @@ $constSelected = ' selected';
                   </div>
                 </div>
 
-
                 <div class="modal fade" id="modal-module-features" tabindex="-1" aria-labelledby="modal_features_label" aria-hidden="true">
                   <div class="modal-dialog modal-md modal-dialog-centered">
                     <div class="modal-content">
@@ -367,7 +366,6 @@ $constSelected = ' selected';
                       <div class="modal-body">
                         <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
                           <tbody>
-
                             <tr>
                               <td>Activate/Decativate</td>
                               <td><label><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1"> Activate/Decativate</label> &nbsp;</td>
@@ -408,7 +406,6 @@ $constSelected = ' selected';
                               <td>Trash</td>
                               <td><label><input type="checkbox" name="with_trash" id="with_trash" value="1"> Trash</label> &nbsp;</td>
                             </tr>
-
                             <tr>
                               <td>AJAX Support</td>
                               <td><label><input type="checkbox" name="ajax_support" id="ajax_support" value="1"> AJAX Support</label> &nbsp;</td>

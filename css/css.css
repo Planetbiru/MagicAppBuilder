@@ -653,4 +653,12 @@ h3.entity-table-name {
   padding: 10px;
   border: 1px solid #DDDDDD;
   box-sizing: border-box;
+}
+
+.nonfile-base, .file-base {
+  display: none;
+}
+
+.nonfile-base[data-current-database-type=nonfile-base], .file-base[data-current-database-type=file-base] {
+  display: table-row;
 }/*# sourceMappingURL=css.css.map */

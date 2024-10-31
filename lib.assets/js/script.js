@@ -1093,6 +1093,11 @@ jQuery(function () {
     $(this).removeAttr('contenteditable');
   });
 
+  $(document).on('change', 'table select[name=database_driver]', function(e){
+    let base = $(this).find('option:selected').attr('data-base');
+    $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
+  });
+
   reloadApplicationList();
   loadTable();
   loadMenu();
@@ -1134,8 +1139,6 @@ function initMenu() {
     item.addEventListener('dragover', dragOver); // Added dragover event
     item.addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
   });
-
-
 }
 
 let draggedItem = null;
