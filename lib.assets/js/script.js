@@ -1073,6 +1073,7 @@ jQuery(function () {
       range.collapse(false); 
       sel.removeAllRanges();
       sel.addRange(range);
+      $(this).focus();    
     }
   });
   
