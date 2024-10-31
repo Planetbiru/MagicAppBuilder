@@ -593,54 +593,65 @@ h3.entity-table-name {
 	background-color: #EEEEEE;
 }
 
-.animation-wave, .animation-wave > span{
-	position:relative;
-	display:inline-block;
-	height:12px;
-	line-height:1;
-}
-.animation-wave > span{
-	vertical-align:top;
-}
-.animation-wave{
-	padding:0px 10px;
-}
-.animation-wave > span{
-	padding:0px 8px;
-}
-.animation-wave::before, .animation-wave::after, .animation-wave > span::before, .animation-wave > span::after{
-	content:"";
-	width:6px;
-	height:6px;
-	position:absolute;
-	animation-name:anim-wave;
-	animation-duration:1s;
-	animation-iteration-count:infinite;
-	animation-timing-function: cubic-bezier(.45,.05,.55,.95);
-}
-.animation-wave::before, .animation-wave > span::before{
-	left:0;
-}
-.animation-wave::after, .animation-wave > span::after{
-	right:0;
+.animation-wave, 
+.animation-wave > span {
+    position: relative;
+    display: inline-block;
+    height: 12px;
+    line-height: 1;
+
+    > span {
+        vertical-align: top;
+        padding: 0 8px;
+    }
+
+    padding: 0 10px;
+
+    &::before, 
+    &::after, 
+    > span::before, 
+    > span::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        position: absolute;
+        animation-name: anim-wave;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-timing-function: cubic-bezier(.45, .05, .55, .95);
+    }
+
+    &::before, 
+    > span::before {
+        left: 0;
+    }
+
+    &::after, 
+    > span::after {
+        right: 0;
+    }
+
+    &::before {
+        animation-delay: 0;
+        background-color: #007ac8;
+    }
+
+    > span::before {
+        animation-delay: 0.25s;
+        background-color: green;
+    }
+
+    > span::after {
+        animation-delay: 0.50s;
+        background-color: #ffe100;
+    }
+
+    &::after {
+        animation-delay: 0.75s;
+        background-color: #FF0000;
+    }
 }
 
-.animation-wave::before{
-	animation-delay:0;
-	background-color: #007ac8;
-}
-.animation-wave > span::before{
-	animation-delay:0.25s;
-	background-color: green;
-}
-.animation-wave > span::after{
-	animation-delay:0.50s;
-	background-color: #ffe100;
-}
-.animation-wave::after{
-	animation-delay:0.75s;
-	background-color:#FF0000;
-}
 
 @keyframes anim-wave{
 	0%{
@@ -653,7 +664,6 @@ h3.entity-table-name {
 		top:1px;
 	}
 }
-
 .sortable-menu {
     list-style-type: none;
     padding: 0;
@@ -661,25 +671,18 @@ h3.entity-table-name {
     a {
         color: #555555;
         text-decoration: none;
-		display: inline-block;
-		padding: 2px 4px;
-		border: 1px solid transparent;
-		border-radius: 3px;
+        display: inline-block;
+        padding: 2px 4px;
+        border: 1px solid transparent;
+        border-radius: 3px;
     }
 
     .sortable-menu-item {
         margin: 10px 0;
         background-color: #f1f1f1;
-        padding: 8px;
+        padding: 6px 8px;
         border-radius: 3px;
         position: relative;
-
-		a {
-			display: inline-block;
-			padding: 2px 4px;
-			border: 1px solid transparent;
-			border-radius: 3px;
-		}
 
         .sortable-toggle-icon {
             cursor: pointer;
@@ -689,7 +692,7 @@ h3.entity-table-name {
 
             &::after {
                 content: '▶';
-				color: #555555;
+                color: #555555;
             }
         }
 
@@ -700,7 +703,6 @@ h3.entity-table-name {
 
             .sortable-toggle-icon::after {
                 content: '▼';
-				color: #555555;
             }
         }
 
@@ -719,48 +721,59 @@ h3.entity-table-name {
         }
     }
 
-    .sortable-move-icon {
+    .sortable-icon {
         cursor: pointer;
         margin-right: 2px;
         font-size: 14px;
-		display: inline-block;
-		
-		text-align: center;
-		&.move-icon::before
-		{
-			content: '✥';
-			cursor: move;
-		}
-		&.move-icon-up::before
-		{
-			content: '↑';
-		}
-		&.move-icon-down::before
-		{
-			content: '↓';
-		}
+        display: inline-block;
+        width: 10px;
+        text-align: center;
+
+        &.icon-move::before {
+            content: '✥';
+            cursor: move;
+        }
+
+        &.icon-move-up::before {
+            content: '↑';
+        }
+
+        &.icon-move-down::before {
+            content: '↓';
+        }
+
+        &.icon-edit {
+            transform: rotate(90deg);
+        }
+
+        &.icon-edit::before {
+            content: '✎';
+        }
     }
-	.sortable-move-icon {
-        width: 8px;
-	}
-	sortable-move-icon {
-        width: 12px;
-	}
-}
 
-.sortable-menu-item > a[contenteditable="true"], .sortable-submenu-item > a[contenteditable="true"]{
-	background-color: #FFFFFF;
-	border: 1px solid #CCCCCC;
-	cursor: text; /* Menampilkan kursor teks */
-	
-	
-}
 
-.sortable-menu-item > a{
-	width: calc(100% - 55px);
-} 
-.sortable-submenu-item > a{
-	width: calc(100% - 55px);
+	.sortable-menu-item > input.form-control,
+	.sortable-submenu-item > input.form-control {
+		display: inline;
+		padding: 4px 7px;
+	}
+
+	.sortable-menu-item > a,
+	.sortable-submenu-item > a {
+		padding: 5px 7px 0;
+		display: inline-block;
+		border: 1px solid transparent;
+		border-radius: 3px;
+	}
+
+	.sortable-menu-item > a,
+	.sortable-menu-item input.form-control,
+	.sortable-submenu-item > a,
+	.sortable-submenu-item input.form-control {
+		width: calc(100% - 80px);
+		height: 30px;
+		vertical-align: middle;
+	}
 }
 
 #query_to_execute{

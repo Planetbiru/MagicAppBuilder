@@ -487,26 +487,26 @@ h3.entity-table-name {
   background-color: #EEEEEE;
 }
 
-.animation-wave, .animation-wave > span {
+.animation-wave,
+.animation-wave > span {
   position: relative;
   display: inline-block;
   height: 12px;
   line-height: 1;
+  padding: 0 10px;
 }
-
-.animation-wave > span {
+.animation-wave > span,
+.animation-wave > span > span {
   vertical-align: top;
+  padding: 0 8px;
 }
-
-.animation-wave {
-  padding: 0px 10px;
-}
-
-.animation-wave > span {
-  padding: 0px 8px;
-}
-
-.animation-wave::before, .animation-wave::after, .animation-wave > span::before, .animation-wave > span::after {
+.animation-wave::before, .animation-wave::after,
+.animation-wave > span::before,
+.animation-wave > span::after,
+.animation-wave > span::before,
+.animation-wave > span::after,
+.animation-wave > span > span::before,
+.animation-wave > span > span::after {
   content: "";
   width: 6px;
   height: 6px;
@@ -516,31 +516,35 @@ h3.entity-table-name {
   animation-iteration-count: infinite;
   animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
-
-.animation-wave::before, .animation-wave > span::before {
+.animation-wave::before,
+.animation-wave > span::before,
+.animation-wave > span::before,
+.animation-wave > span > span::before {
   left: 0;
 }
-
-.animation-wave::after, .animation-wave > span::after {
+.animation-wave::after,
+.animation-wave > span::after,
+.animation-wave > span::after,
+.animation-wave > span > span::after {
   right: 0;
 }
-
-.animation-wave::before {
+.animation-wave::before,
+.animation-wave > span::before {
   animation-delay: 0;
   background-color: #007ac8;
 }
-
-.animation-wave > span::before {
+.animation-wave > span::before,
+.animation-wave > span > span::before {
   animation-delay: 0.25s;
   background-color: green;
 }
-
-.animation-wave > span::after {
+.animation-wave > span::after,
+.animation-wave > span > span::after {
   animation-delay: 0.5s;
   background-color: #ffe100;
 }
-
-.animation-wave::after {
+.animation-wave::after,
+.animation-wave > span::after {
   animation-delay: 0.75s;
   background-color: #FF0000;
 }
@@ -571,15 +575,9 @@ h3.entity-table-name {
 .sortable-menu .sortable-menu-item {
   margin: 10px 0;
   background-color: #f1f1f1;
-  padding: 8px;
+  padding: 6px 8px;
   border-radius: 3px;
   position: relative;
-}
-.sortable-menu .sortable-menu-item a {
-  display: inline-block;
-  padding: 2px 4px;
-  border: 1px solid transparent;
-  border-radius: 3px;
 }
 .sortable-menu .sortable-menu-item .sortable-toggle-icon {
   cursor: pointer;
@@ -596,7 +594,6 @@ h3.entity-table-name {
 }
 .sortable-menu .sortable-menu-item.expanded .sortable-toggle-icon::after {
   content: "▼";
-  color: #555555;
 }
 .sortable-menu .sortable-menu-item .sortable-submenu {
   list-style-type: none;
@@ -610,42 +607,49 @@ h3.entity-table-name {
   border-radius: 3px;
   cursor: move;
 }
-.sortable-menu .sortable-move-icon {
+.sortable-menu .sortable-icon {
   cursor: pointer;
   margin-right: 2px;
   font-size: 14px;
   display: inline-block;
+  width: 10px;
   text-align: center;
 }
-.sortable-menu .sortable-move-icon.move-icon::before {
+.sortable-menu .sortable-icon.icon-move::before {
   content: "✥";
   cursor: move;
 }
-.sortable-menu .sortable-move-icon.move-icon-up::before {
+.sortable-menu .sortable-icon.icon-move-up::before {
   content: "↑";
 }
-.sortable-menu .sortable-move-icon.move-icon-down::before {
+.sortable-menu .sortable-icon.icon-move-down::before {
   content: "↓";
 }
-.sortable-menu .sortable-move-icon {
-  width: 8px;
+.sortable-menu .sortable-icon.icon-edit {
+  transform: rotate(90deg);
 }
-.sortable-menu sortable-move-icon {
-  width: 12px;
+.sortable-menu .sortable-icon.icon-edit::before {
+  content: "✎";
 }
-
-.sortable-menu-item > a[contenteditable=true], .sortable-submenu-item > a[contenteditable=true] {
-  background-color: #FFFFFF;
-  border: 1px solid #CCCCCC;
-  cursor: text; /* Menampilkan kursor teks */
+.sortable-menu .sortable-menu-item > input.form-control,
+.sortable-menu .sortable-submenu-item > input.form-control {
+  display: inline;
+  padding: 4px 7px;
 }
-
-.sortable-menu-item > a {
-  width: calc(100% - 55px);
+.sortable-menu .sortable-menu-item > a,
+.sortable-menu .sortable-submenu-item > a {
+  padding: 5px 7px 0;
+  display: inline-block;
+  border: 1px solid transparent;
+  border-radius: 3px;
 }
-
-.sortable-submenu-item > a {
-  width: calc(100% - 55px);
+.sortable-menu .sortable-menu-item > a,
+.sortable-menu .sortable-menu-item input.form-control,
+.sortable-menu .sortable-submenu-item > a,
+.sortable-menu .sortable-submenu-item input.form-control {
+  width: calc(100% - 80px);
+  height: 30px;
+  vertical-align: middle;
 }
 
 #query_to_execute {

@@ -981,9 +981,9 @@ jQuery(function () {
       let newMenuStr = '';
 
       newMenuStr += "<li class=\"sortable-menu-item\">\r\n";
-      newMenuStr += '<span class="sortable-move-icon move-icon-up" onclick="moveUp(this)"></span>' + "\r\n";
-      newMenuStr += '<span class="sortable-move-icon move-icon-down" onclick="moveDown(this)"></span>' + "\r\n";
-      newMenuStr += '<span class="sortable-move-icon move-icon"></span>' + "\r\n";
+      newMenuStr += '<span class="sortable-icon icon-move-up" onclick="moveUp(this)"></span>' + "\r\n";
+      newMenuStr += '<span class="sortable-icon icon-move-down" onclick="moveDown(this)"></span>' + "\r\n";
+      newMenuStr += '<span class="sortable-icon icon-move"></span>' + "\r\n";
       newMenuStr += "<a href=\"#\">" + newMenu + "</a>\r\n";
       newMenuStr += '<span class="sortable-toggle-icon"></span>' + "\r\n";
       newMenuStr += "<ul class=\"sortable-submenu\">\r\n";
@@ -1058,24 +1058,23 @@ jQuery(function () {
   $(document).on('click', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault();
   });
-
   $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault(); 
-    let editable = $(this).attr('contenteditable');
-    if(typeof editable == 'undefined' || editable == '' || editable == 'false')
-    {
-      $(this).attr('spellcheck', 'false'); 
-      $(this).attr('contenteditable', 'true');
-      $(this).focus();     
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(this);
-      range.collapse(false); 
-      sel.removeAllRanges();
-      sel.addRange(range);
-      $(this).focus();    
-    }
+    let el = $(this).siblings('.icon-edit')[0];
+    editMenu(el);
   });
+
+
+
+  $(document).on('blur', '.sortable-menu-item > input[type="text"], .sortable-submenu-item > input[type="text"]', function (e) {
+    e.preventDefault();
+    let input = $(this);
+    let menu = $(this).siblings('a.app-menu-text');
+    input.css({display:'none'});
+    menu.text(input.val())
+    menu.css({display:''});
+  });
+
   
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
@@ -1084,23 +1083,23 @@ jQuery(function () {
   });
   
 
-  $(document).on('blur', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
-    e.preventDefault();
-    $(this).removeAttr('contenteditable');
-  });
+
 
   $(document).on('change', 'table select[name=database_driver]', function(e){
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
 
-  $(document).on(' keyup', 'input[type="number"]', function() {
+  $(document).on('blur keyup', 'input[type="number"]', function() {
     if (isNaN($(this).val()) || $(this).val().trim() === '') {
         $(this).addClass('input-invalid-value');
     } else {
         $(this).removeClass('input-invalid-value');
     }
   });
+
+
+
 
   reloadApplicationList();
   loadTable();
@@ -1110,6 +1109,10 @@ jQuery(function () {
   updateEntityFile();
   updateModuleFile();
 });
+
+
+let timeoutEditMenu = setTimeout('', 100);;
+
 
 /**
 * Initializes the sortable menu by setting up event listeners
@@ -1133,7 +1136,7 @@ function initMenu() {
     item.addEventListener('drop', dropToSubmenu);
   });
 
-  document.querySelectorAll('.move-icon-down').forEach(item => {
+  document.querySelectorAll('.icon-move-down').forEach(item => {
     item.setAttribute('draggable', true);
     item.addEventListener('dragstart', dragStart);
   });
@@ -1143,6 +1146,31 @@ function initMenu() {
     item.addEventListener('dragover', dragOver); // Added dragover event
     item.addEventListener('drop', dropToMenu); // Adjusted to call dropToMenu
   });
+}
+
+function editMenu(el)
+{
+  let elem = $(el);
+  let parent = elem.closest('li');
+  let menu = elem.siblings('.app-menu-text');
+  if(parent.find('input'))
+  {
+    parent.find('input').remove();
+  }
+  let input = $('<input />');
+  input.attr({type:'text', class:'form-control'});
+  menu.css('display', 'none');
+  parent.append(input)
+  input.val(menu.text());
+  input.focus();
+  input.select();
+  input.focus();
+}
+
+function editSubmenu(el)
+{
+  let menu = $(el).siblings('.app-submenu');
+  console.log(menu.text())
 }
 
 let draggedItem = null;
@@ -1201,7 +1229,7 @@ function dropToMenu(e) {
     }
 
     // If the target is a submenu or move icon
-    if (e.target.classList.contains('sortable-submenu') || e.target.classList.contains('move-icon')) {
+    if (e.target.classList.contains('sortable-submenu') || e.target.classList.contains('icon-move')) {
       // Add the dragged item to the existing submenu
       e.target.appendChild(draggedItem);
       e.target.parentNode.classList.remove('expanded'); // Remove the expanded class from the parent
@@ -1239,14 +1267,14 @@ function serializeMenu() {
   const menuItems = document.querySelectorAll('.sortable-menu-item');
   menuItems.forEach(menuItem => {
     const menuData = {
-      label: menuItem.querySelector('a').textContent,
+      label: menuItem.querySelector('a.app-menu-text').textContent,
       submenus: []
     };
     const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
     submenuItems.forEach(submenuItem => {
       menuData.submenus.push({
-        label: submenuItem.querySelector('a').textContent,
-        link: submenuItem.querySelector('a').getAttribute('href')
+        label: submenuItem.querySelector('a.app-menu-text').textContent,
+        link: submenuItem.querySelector('a.app-menu-text').getAttribute('href')
       });
     });
     menu.push(menuData);
