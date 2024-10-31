@@ -1081,6 +1081,12 @@ jQuery(function () {
       sel.addRange(range);
     }
   });
+  
+  $(document).on('click', '#button_execute_entity_query', function (e) {
+    e.preventDefault();
+    $('#modal-query-executor').modal('show');
+  });
+  
 
   $(document).on('blur', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault();

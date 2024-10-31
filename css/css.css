@@ -646,4 +646,11 @@ h3.entity-table-name {
 
 .sortable-submenu-item > a {
   width: calc(100% - 55px);
+}
+
+#query_to_execute {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #DDDDDD;
+  box-sizing: border-box;
 }/*# sourceMappingURL=css.css.map */

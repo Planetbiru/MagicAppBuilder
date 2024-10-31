@@ -541,6 +541,7 @@ $constSelected = ' selected';
                   <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
                   <div class="button-area">
                     <button class="btn btn-success" id="button_save_entity_query" type="button" disabled>Save Query</button>
+                    <button class="btn btn-primary" id="button_execute_entity_query" type="button">Execute Query</button>
                   </div>
                 </div>
               </div>
@@ -1061,6 +1062,28 @@ $constSelected = ' selected';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success button-apply-new-menu">OK</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="modal-query-executor" tabindex="-1" aria-labelledby="application_query_executor" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Query Executor</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="query-container">
+            <textarea name="query_to_execute" id="query_to_execute"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success button-execute-query">Execute</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
