@@ -94,7 +94,7 @@ else
                             </tr>
                             <tr>
                                 <td>Description</td>
-                                <td><input class="form-control" type="text" name="description" value="<?php echo $app->getDescription(); ?>"></td>
+                                <td><textarea class="form-control" name="description" spellcheck="false"><?php echo $app->getDescription(); ?></textarea></td>
                             </tr>
                         </tbody>
                     </table>
@@ -143,7 +143,7 @@ else
                             </tr>
                             <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Port</td>
-                                <td><input class="form-control" type="text" name="database_port" id="database_port" value="<?php echo $cfgDatabase->getPort(); ?>"></td>
+                                <td><input class="form-control" type="number" min="0" step="1" name="database_port" id="database_port" value="<?php echo $cfgDatabase->getPort(); ?>"></td>
                             </tr>
                             <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Username</td>
@@ -190,7 +190,7 @@ else
                             </tr>
                             <tr>
                                 <td>Session Life Time</td>
-                                <td><input class="form-control" type="text" name="sessions_max_life_time" id="sessions_max_life_time" value="<?php echo $cfgSession->getMaxLifeTime(); ?>"></td>
+                                <td><input class="form-control" type="number" min="0" step="1" name="sessions_max_life_time" id="sessions_max_life_time" value="<?php echo $cfgSession->getMaxLifeTime(); ?>"></td>
                             </tr>
                             <tr>
                                 <td>Session Save Handler</td>

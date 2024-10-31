@@ -1084,6 +1084,10 @@ jQuery(function () {
   
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
+
+    $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
+
+
     $('#modal-query-executor').modal('show');
   });
   
@@ -1097,6 +1101,14 @@ jQuery(function () {
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
+
+  $(document).on(' keyup', 'input[type="number"]', function() {
+    if (isNaN($(this).val()) || $(this).val().trim() === '') {
+        $(this).addClass('input-invalid-value');
+    } else {
+        $(this).removeClass('input-invalid-value');
+    }
+});
 
   reloadApplicationList();
   loadTable();

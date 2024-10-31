@@ -971,7 +971,7 @@ $constSelected = ' selected';
   </div>
 
   <div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Application Setting</h5>
@@ -1071,7 +1071,7 @@ $constSelected = ' selected';
         </div>
         <div class="modal-body">
           <div class="query-container">
-            <textarea name="query_to_execute" id="query_to_execute"></textarea>
+            <textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
           </div>
         </div>
         <div class="modal-footer">

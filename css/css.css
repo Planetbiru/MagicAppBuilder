@@ -653,6 +653,7 @@ h3.entity-table-name {
   padding: 10px;
   border: 1px solid #DDDDDD;
   box-sizing: border-box;
+  min-height: 200px;
 }
 
 .nonfile-base, .file-base {
@@ -661,4 +662,14 @@ h3.entity-table-name {
 
 .nonfile-base[data-current-database-type=nonfile-base], .file-base[data-current-database-type=file-base] {
   display: table-row;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }/*# sourceMappingURL=css.css.map */
