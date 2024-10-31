@@ -968,10 +968,8 @@ jQuery(function () {
   $(document).on('click', '#modal-application-menu-add .button-apply-new-menu', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
-
     let invalidName = false;
     let newMenu = $('#new_menu').val();
-
     let existingMenu = serializeMenu();
     for (let i in existingMenu) {
       if (existingMenu[i].label.toLowerCase() == newMenu.toLowerCase()) {
@@ -993,14 +991,11 @@ jQuery(function () {
       newMenuStr += "</li>\r\n";
 
       let lastMenu = $(newMenuStr);
-
       $('.sortable-menu').append(lastMenu);
-
       let icon = lastMenu.find('.sortable-toggle-icon')[0];
 
       icon.addEventListener('click', function () {
         this.parentNode.classList.toggle('expanded')
-
       });
 
       // Set up drag and drop for submenu items
@@ -1066,7 +1061,6 @@ jQuery(function () {
 
   $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
     e.preventDefault(); 
-
     let editable = $(this).attr('contenteditable');
     if(typeof editable == 'undefined' || editable == '' || editable == 'false')
     {
@@ -1084,10 +1078,7 @@ jQuery(function () {
   
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
-
     $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
-
-
     $('#modal-query-executor').modal('show');
   });
   
@@ -1108,7 +1099,7 @@ jQuery(function () {
     } else {
         $(this).removeClass('input-invalid-value');
     }
-});
+  });
 
   reloadApplicationList();
   loadTable();
