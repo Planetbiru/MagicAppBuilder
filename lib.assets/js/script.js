@@ -1083,8 +1083,6 @@ jQuery(function () {
   });
   
 
-
-
   $(document).on('change', 'table select[name=database_driver]', function(e){
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
@@ -1160,7 +1158,7 @@ function editMenu(el)
   let input = $('<input />');
   input.attr({type:'text', class:'form-control'});
   menu.css('display', 'none');
-  parent.append(input)
+  menu.before(input)
   input.val(menu.text());
   input.focus();
   input.select();

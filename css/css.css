@@ -606,6 +606,14 @@ h3.entity-table-name {
   padding: 4px 8px;
   border-radius: 3px;
   cursor: move;
+  position: relative;
+}
+.sortable-menu .sortable-menu-item .sortable-submenu .sortable-submenu-item::after {
+  content: "✥";
+  cursor: move;
+  top: 10px;
+  right: 11px;
+  position: absolute;
 }
 .sortable-menu .sortable-icon {
   cursor: pointer;
@@ -628,6 +636,9 @@ h3.entity-table-name {
 .sortable-menu .sortable-icon.icon-edit {
   transform: rotate(90deg);
 }
+.sortable-menu .sortable-icon.icon-edit {
+  margin-right: 8px;
+}
 .sortable-menu .sortable-icon.icon-edit::before {
   content: "✎";
 }
@@ -638,7 +649,7 @@ h3.entity-table-name {
 }
 .sortable-menu .sortable-menu-item > a,
 .sortable-menu .sortable-submenu-item > a {
-  padding: 5px 11px 0;
+  padding: 5px 6px 0;
   display: inline-block;
   border: 1px solid transparent;
   border-radius: 3px;
@@ -676,6 +687,8 @@ input[type=number][name=database_port]::-webkit-outer-spin-button {
 
 input[type=number][name=database_port] {
   -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+          appearance: textfield;
 }
 
 .tooltip {
