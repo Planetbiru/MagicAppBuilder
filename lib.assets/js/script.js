@@ -1663,6 +1663,8 @@ function loadDiagramMultiple() {
   $('[name="erd-map"]').load(urlMap, function () {
     img.attr('usemap', '#erd-map');
   });
+
+  
 }
 
 function downloadSVG() {

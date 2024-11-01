@@ -760,7 +760,7 @@ h3.entity-table-name {
 
 	.sortable-menu-item > a,
 	.sortable-submenu-item > a {
-		padding: 5px 7px 0;
+		padding: 5px 11px 0;
 		display: inline-block;
 		border: 1px solid transparent;
 		border-radius: 3px;
@@ -791,13 +791,20 @@ h3.entity-table-name {
 	display: table-row;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type=number][name="database_port"]::-webkit-inner-spin-button,
+input[type=number][name="database_port"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-input[type=number] {
+input[type=number][name="database_port"] {
     -moz-appearance: textfield;
 }
 
+.tooltip {
+	background-color: rgba(0, 0, 0, 0.7);
+	color: white;
+	padding: 5px;
+	border-radius: 4px;
+	z-index: 1000;
+}

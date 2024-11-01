@@ -480,7 +480,10 @@ class EntityRelationshipDiagram //NOSONAR
                 'data-type'=>'area-entity',
                 'data-namespace'=>$diagram->getNamespace(),
                 'data-entity'=>$diagram->getEntityName(),
-                'data-table-name'=>$diagram->getTableName()
+                'data-table-name'=>$diagram->getTableName(),
+                'data-toggle'=>'tooltip',
+                'data-html'=>'true',
+                'title'=>$diagram->getEntityName()
             );
             $area[] = new Area($rect, $this->zoom, '#'.$diagram->getTableName(), $attributes);
         }
@@ -527,6 +530,9 @@ class EntityRelationshipDiagram //NOSONAR
                 'data-reference-entity'=>$entityRelationship->getReferenceDiagram()->getEntityName(),
                 'data-reference-table-name'=>$entityRelationship->getReferenceDiagram()->getTableName(),
                 'data-reference-column-name'=>$entityRelationship->getReferenceColumn()->getColumnName(),
+                'data-toggle'=>'tooltip',
+                'data-html'=>'true',
+                'title'=>$entityRelationship->getDiagram()->getEntityName().' -> '.$entityRelationship->getReferenceDiagram()->getEntityName()
             );
             $area[] = new Area($poly, $this->zoom, $href, $attributes);
         }
