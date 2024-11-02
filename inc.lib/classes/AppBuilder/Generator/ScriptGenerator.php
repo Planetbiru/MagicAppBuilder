@@ -538,9 +538,9 @@ class ScriptGenerator
             $submenus = $menu->getSubmenus();
             if(is_array($submenus))
             {
-                foreach($submenus as $menu)
+                foreach($submenus as $submenu)
                 {
-                    $existingMenus[] = $menu->getLink()."-".$menu->getLabel();
+                    $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
                 }
             }
         }
@@ -548,7 +548,7 @@ class ScriptGenerator
         $target = trim($request->getTarget(), "/\\");
         $moduleMenu = trim($request->getModuleMenu());
         $label = trim($request->getModuleName());
-        $link = $target."/".$request->getModuleFile();
+        $link = trim($target."/".$request->getModuleFile());
 
         $menuToCheck = $label."-".$link;
         if(!in_array($menuToCheck, $existingMenus))
