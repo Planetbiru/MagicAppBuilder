@@ -1,6 +1,6 @@
 ## Input POST/GET/COOKIE/REQUEST/SERVER
 
-In PHP, handling user input can be done through various superglobals, such as $_POST, $_GET, $_COOKIE, $_REQUEST, and $_SERVER. Each of these superglobals serves a specific purpose for gathering data from different types of requests.
+In PHP, handling user input can be done through various superglobals, such as `$_POST`, `$_GET`, `$_COOKIE`, `$_REQUEST`, and `$_SERVER`. Each of these superglobals serves a specific purpose for gathering data from different types of requests.
 
 ### Input POST
 

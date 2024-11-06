@@ -97,7 +97,7 @@ class ImageColor
      * Set the red component of the color.
      *
      * @param int $red The red component.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setRed($red)
     {
@@ -120,7 +120,7 @@ class ImageColor
      * Set the green component of the color.
      *
      * @param int $green The green component.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setGreen($green)
     {
@@ -143,7 +143,7 @@ class ImageColor
      * Set the blue component of the color.
      *
      * @param int $blue The blue component.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setBlue($blue)
     {

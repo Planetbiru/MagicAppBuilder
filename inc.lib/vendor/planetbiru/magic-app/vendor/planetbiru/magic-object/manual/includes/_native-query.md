@@ -19,13 +19,13 @@ Native queries do not support multiple database connections. This means that all
 
 The parameters accepted by the native query function are as follows:
 
-1. string
-2. int or integer
-3. float
-4. bool or boolean
-5. null
-6. DateTime
-7. array of string, int, bool and DateTime
+1. `string`
+2. `int` or `integer`
+3. `float`
+4. `bool` or `boolean`
+5. `null`
+6. `DateTime`
+7. `array` of `string`, `int`, `bool` and `DateTime`
 
 For columns with data type `DATETIME` and `TIMESTAMP`, users can use either `string` or `DateTime` parameters. `DateTime` will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the `in` and `=` criteria.
 

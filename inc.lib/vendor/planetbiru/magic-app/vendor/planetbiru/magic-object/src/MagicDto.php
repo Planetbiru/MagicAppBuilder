@@ -12,6 +12,7 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 use MagicObject\Util\PicoDateTimeUtil;
 use MagicObject\Util\PicoGenericObject;
 use ReflectionClass;
+use ReflectionMethod;
 use ReflectionProperty;
 use SimpleXMLElement;
 use stdClass;
@@ -74,6 +75,20 @@ class MagicDto extends stdClass // NOSONAR
             }
         }
     }
+
+    /**
+     * Before loading data.
+     *
+     * This method is called before loading data into the object. Users can override 
+     * this method to manipulate the object as needed.
+     *
+     * @param mixed $object The object to manipulate before loading data.
+     * @return mixed The manipulated object.
+     */
+    public function onLoadData($object)
+    {
+        return $object;
+    }
     
     /**
      * Loads data into the object.
@@ -104,13 +119,32 @@ class MagicDto extends stdClass // NOSONAR
                 $data instanceof PicoGenericObject) {
                 // Directly assign the data source if it is an allowed object type
                 $this->_dataSource = $data;
+                if($this->isMethodOverridden($this, "onLoadData"))
+                {
+                    $this->_dataSource = $this->onLoadData($this->_dataSource);
+                }
             } else {
                 // Parse the object or array recursively
                 $this->_dataSource = PicoObjectParser::parseRecursiveObject($data);
+                if($this->isMethodOverridden($this, "onLoadData"))
+                {
+                    $this->_dataSource = $this->onLoadData($this->_dataSource);
+                }
             } 
         }
         return $this;
     }
+
+    private function isMyChild($object) {
+        $reflection = new ReflectionClass($object);
+        $parentClass = $reflection->getParentClass();
+        if(!$parentClass)
+        {
+            return false;
+        }
+        return get_class($parentClass) == get_class(new self());
+    }
+    
 
     /**
      * Loads XML data into the object.
@@ -159,15 +193,15 @@ class MagicDto extends stdClass // NOSONAR
                 $objectTest = $this->createTestObject($var);
 
                 if ($this->isSelfInstance($objectTest)) {
-                    $returnValue->$propertyName = $this->handleSelfInstance($source, $var, $propertyName);
+                    $returnValue->{$propertyName} = $this->handleSelfInstance($source, $var, $propertyName);
                 } elseif ($this->isMagicObjectInstance($objectTest)) {
-                    $returnValue->$propertyName = $this->handleMagicObject($source, $propertyName);
+                    $returnValue->{$propertyName} = $this->handleMagicObject($source, $propertyName);
                 } elseif ($this->isDateTimeInstance($objectTest)) {
-                    $returnValue->$propertyName = $this->formatDateTime($this->handleDateTimeObject($source, $propertyName), $this, $key);
+                    $returnValue->{$propertyName} = $this->formatDateTime($this->handleDateTimeObject($source, $propertyName), $this, $key);
                 } else if($this->_dataSource instanceof stdClass || is_object($this->_dataSource)) {
-                    $returnValue->$propertyName = $this->handleStdClass($source, $key);
+                    $returnValue->{$propertyName} = $this->handleStdClass($source, $key);
                 } else if(isset($this->_dataSource)) {
-                    $returnValue->$propertyName = $this->handleDefaultCase($source, $key);
+                    $returnValue->{$propertyName} = $this->handleDefaultCase($source, $key);
                 }
             }
         }
@@ -797,6 +831,36 @@ class MagicDto extends stdClass // NOSONAR
                 $xml->addChild($key, htmlspecialchars($value));
             }
         }
+    }
+
+    private function isMethodOverridden($childClass, $methodName) {
+        // Buat instance ReflectionClass untuk kelas anak
+        $childReflection = new ReflectionClass($childClass);
+        
+        // Dapatkan kelas induk
+        $parentClass = $childReflection->getParentClass();
+        
+        if ($parentClass) {
+            // Dapatkan metode dari kelas anak
+            $childMethods = $childReflection->getMethods(ReflectionMethod::IS_PUBLIC);
+            
+            // Dapatkan metode dari kelas induk
+            $parentMethods = $parentClass->getMethods(ReflectionMethod::IS_PUBLIC);
+            
+            // Ambil nama metode dari metode induk
+            $parentMethodNames = array_map(function($method) {
+                return $method->getName();
+            }, $parentMethods);
+            
+            // Cek apakah metode ada di kelas anak dan juga di kelas induk
+            foreach ($childMethods as $method) {
+                if ($method->getName() === $methodName && in_array($methodName, $parentMethodNames)) {
+                    return true; // Metode telah di-override
+                }
+            }
+        }
+        
+        return false; // Jika tidak ada kelas induk atau metode tidak di-override
     }
 
 }

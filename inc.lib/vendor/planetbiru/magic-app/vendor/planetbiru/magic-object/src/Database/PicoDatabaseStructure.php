@@ -143,7 +143,6 @@ class PicoDatabaseStructure
         $reflexClass = new PicoAnnotationParser($this->className);
         $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);
         $values = $this->parseKeyValue($reflexClass, $table, self::ANNOTATION_TABLE);
-
         $picoTableName = $values[self::KEY_NAME];
         $columns = array();
         $primaryKeys = array();

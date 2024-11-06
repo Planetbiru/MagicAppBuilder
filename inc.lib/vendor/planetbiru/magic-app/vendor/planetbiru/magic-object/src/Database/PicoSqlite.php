@@ -12,6 +12,7 @@ use PDOException;
  */
 class PicoSqlite extends PicoDatabase
 {
+    const LOGIC_AND = " and ";
     /**
      * Database file path
      *
@@ -119,7 +120,7 @@ class PicoSqlite extends PicoDatabase
     public function select($tableName, $conditions = []) {
         $sql = "SELECT * FROM $tableName";
         if (!empty($conditions)) {
-            $conditionStr = implode(" AND ", array_map(function($key) {
+            $conditionStr = implode(self::LOGIC_AND, array_map(function($key) {
                 return "$key = :$key";
             }, array_keys($conditions)));
             $sql .= " WHERE $conditionStr";
@@ -146,7 +147,7 @@ class PicoSqlite extends PicoDatabase
             return "$key = :$key";
         }, array_keys($data)));
 
-        $conditionStr = implode(" AND ", array_map(function($key) {
+        $conditionStr = implode(self::LOGIC_AND, array_map(function($key) {
             return "$key = :$key";
         }, array_keys($conditions)));
 
@@ -168,7 +169,7 @@ class PicoSqlite extends PicoDatabase
      * @return bool Returns true on success or false on failure.
      */
     public function delete($tableName, $conditions) {
-        $conditionStr = implode(" AND ", array_map(function($key) {
+        $conditionStr = implode(self::LOGIC_AND, array_map(function($key) {
             return "$key = :$key";
         }, array_keys($conditions)));
 

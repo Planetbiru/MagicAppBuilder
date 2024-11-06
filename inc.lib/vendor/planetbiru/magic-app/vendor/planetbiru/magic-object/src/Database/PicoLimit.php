@@ -3,10 +3,10 @@
 namespace MagicObject\Database;
 
 /**
- * Class for limiting and offsetting select database records.
+ * Class PicoLimit
  *
- * This class provides functionality to manage pagination in database queries
- * by setting limits and offsets.
+ * This class provides functionality to manage pagination in database queries 
+ * by setting limits and offsets for record retrieval.
  * 
  * @author Kamshory
  * @package MagicObject\Database
@@ -15,24 +15,24 @@ namespace MagicObject\Database;
 class PicoLimit
 {
     /**
-     * Limit of records to retrieve.
+     * The maximum number of records to retrieve.
      *
      * @var int
      */
     private $limit = 0;
 
     /**
-     * Offset for records to skip.
+     * The number of records to skip before starting to collect the result set.
      *
      * @var int
      */
     private $offset = 0;
 
     /**
-     * Constructor
+     * Constructor to initialize offset and limit.
      *
-     * @param int $offset Offset
-     * @param int $limit Limit
+     * @param int $offset The number of records to skip. Default is 0.
+     * @param int $limit The maximum number of records to retrieve. Default is 0.
      */
     public function __construct($offset = 0, $limit = 0)
     {
@@ -41,9 +41,12 @@ class PicoLimit
     }
 
     /**
-     * Increase the offset for the next page.
+     * Increment the offset to retrieve the next page of records.
      *
-     * @return self
+     * This method adjusts the offset based on the current limit, allowing 
+     * for the retrieval of the next set of records in a paginated result.
+     *
+     * @return self Returns the current instance for method chaining.
      */
     public function nextPage()
     {
@@ -52,9 +55,12 @@ class PicoLimit
     }
 
     /**
-     * Decrease the offset for the previous page.
+     * Decrement the offset to retrieve the previous page of records.
      *
-     * @return self
+     * This method adjusts the offset back, ensuring it does not fall below 
+     * zero, thus allowing navigation to the previous set of records.
+     *
+     * @return self Returns the current instance for method chaining.
      */
     public function previousPage()
     {
@@ -63,7 +69,7 @@ class PicoLimit
     }
 
     /**
-     * Get the limit value.
+     * Get the maximum number of records to retrieve.
      *
      * @return int
      */
@@ -73,10 +79,12 @@ class PicoLimit
     }
 
     /**
-     * Set the limit value.
+     * Set the maximum number of records to retrieve.
      *
-     * @param int $limit Limit
-     * @return self
+     * This method ensures that the limit is at least 1.
+     *
+     * @param int $limit The maximum number of records.
+     * @return self Returns the current instance for method chaining.
      */
     public function setLimit($limit)
     {
@@ -85,7 +93,7 @@ class PicoLimit
     }
 
     /**
-     * Get the offset value.
+     * Get the current offset for record retrieval.
      *
      * @return int
      */
@@ -95,10 +103,12 @@ class PicoLimit
     }
 
     /**
-     * Set the offset value.
+     * Set the number of records to skip before starting to collect the result set.
      *
-     * @param int $offset Offset
-     * @return self
+     * This method ensures that the offset is not negative.
+     *
+     * @param int $offset The number of records to skip.
+     * @return self Returns the current instance for method chaining.
      */
     public function setOffset($offset)
     {
@@ -107,7 +117,10 @@ class PicoLimit
     }
 
     /**
-     * Get the current page information.
+     * Get information about the current page based on the offset and limit.
+     *
+     * This method calculates the current page number and returns a 
+     * PicoPage object containing the page number and limit.
      *
      * @return PicoPage
      */
@@ -120,9 +133,12 @@ class PicoLimit
     }
 
     /**
-     * Magic method to return a string representation of the object.
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {

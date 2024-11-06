@@ -82,7 +82,7 @@ class PicoGenericObject extends stdClass
     public function set($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $this->$var = $propertyValue;
+        $this->{$var} = $propertyValue;
         return $this;
     }
 
@@ -102,7 +102,7 @@ class PicoGenericObject extends stdClass
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : null;
+        return isset($this->{$var}) ? $this->{$var} : null;
     }
 
     /**
@@ -160,7 +160,7 @@ class PicoGenericObject extends stdClass
      */
     public function __isset($name)
     {
-        return isset($this->$name) ? $this->$name : null;
+        return isset($this->{$name}) ? $this->{$name} : null;
     }
 
     /**
@@ -176,7 +176,7 @@ class PicoGenericObject extends stdClass
      */
     public function __unset($name)
     {
-        unset($this->$name);
+        unset($this->{$name});
         return $this;
     }
 
@@ -211,22 +211,22 @@ class PicoGenericObject extends stdClass
         if (strncasecmp($method, "isset", 5) === 0)
         {
             $var = lcfirst(substr($method, 5));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0)
         {
             $var = lcfirst(substr($method, 2));
-            return isset($this->$var) ? $this->$var == 1 : false;
+            return isset($this->{$var}) ? $this->{$var} == 1 : false;
         }
         else if (strncasecmp($method, "get", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            return isset($this->$var) ? $this->$var : null;
+            return isset($this->{$var}) ? $this->{$var} : null;
         }
         else if (strncasecmp($method, "set", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            $this->$var = $params[0];
+            $this->{$var} = $params[0];
             return $this;
         }
         else if (strncasecmp($method, "unset", 5) === 0)

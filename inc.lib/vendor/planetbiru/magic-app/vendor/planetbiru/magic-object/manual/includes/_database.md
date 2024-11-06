@@ -71,6 +71,13 @@ class PicoDatabaseCredentials extends SecretObject
     protected $driver = 'mysql';
 
     /**
+     * Database file path for SQLite database only
+     *
+     * @var string
+     */
+    protected $databaseFilePath;
+
+    /**
      * Database server host.
      *
      * @EncryptIn
@@ -139,7 +146,6 @@ class PicoDatabaseCredentials extends SecretObject
 public function __construct($databaseCredentials, $callbackExecuteQuery = null, $callbackDebugQuery = null)
 ```
 
-
 **Parameters:**
 
 -   `SecretObject $databaseCredentials`: Database credentials object.
@@ -158,12 +164,58 @@ public function __construct($databaseCredentials, $callbackExecuteQuery = null, 
     -   If the callback has **1 parameter**, it will be:
         -   `$sqlQuery`: The SQL query being debugged.
 
+To use setter methods for configuring the `callbackExecuteQuery` and `callbackDebugQuery` in the PicoDatabase class, follow the example below. This allows you to set the callbacks after instantiation
+
+**Setting Callbacks with Setters**
+
+Here's how you can set the callbacks using setter methods:
+
+```php
+use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseCredentials;
+
+// Example credentials setup
+$credentials = new PicoDatabaseCredentials();
+$credentials->setHost('localhost');
+$credentials->setUsername('user');
+$credentials->setPassword('password');
+
+// Instantiate PicoDatabase
+$db = new PicoDatabase($credentials);
+
+// Set callback for executing queries
+$db->setCallbackExecuteQuery(function($sqlQuery, $params, $type) {
+    echo "Executing query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+
+// Set callback for debugging queries
+$db->setCallbackDebugQuery(function($sqlQuery, $params) {
+    echo "Debugging query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+
+```
+
+**Disabling Callbacks Using Setters**
+
+You can also disable the callbacks by setting them to `null`:
+
+```php
+// Instantiate PicoDatabase
+$dbWithoutCallbacks = new PicoDatabase($credentials);
+
+// Disable callbacks
+$dbWithoutCallbacks->setCallbackExecuteQuery(null);
+$dbWithoutCallbacks->setCallbackDebugQuery(null);
+
+```
+
 #### Connecting to the Database
 
 ```php
 public function connect($withDatabase = true): bool
 ```
-
 
 **Parameters**:
 

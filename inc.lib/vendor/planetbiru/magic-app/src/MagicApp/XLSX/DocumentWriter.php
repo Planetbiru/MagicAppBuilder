@@ -35,7 +35,7 @@ class DocumentWriter
      *
      * @param AppLanguage $appLanguage Application language instance
      */
-    public function __construct(AppLanguage $appLanguage)
+    public function __construct($appLanguage)
     {
         $this->appLanguage = $appLanguage;
     }
@@ -46,7 +46,7 @@ class DocumentWriter
      * @param PicoPageData $pageData Page data
      * @return bool True if no data has been fetched, false otherwise
      */
-    protected function noFetchData(PicoPageData $pageData): bool
+    protected function noFetchData($pageData)
     {
         return $pageData->getFindOption() & MagicObject::FIND_OPTION_NO_FETCH_DATA;
     }
@@ -56,7 +56,7 @@ class DocumentWriter
      *
      * @return AppLanguage The current application language
      */ 
-    public function getAppLanguage(): AppLanguage
+    public function getAppLanguage()
     {
         return $this->appLanguage;
     }
@@ -65,9 +65,9 @@ class DocumentWriter
      * Set the application language
      *
      * @param AppLanguage $appLanguage Application language
-     * @return self
+     * @return DocumentWriter
      */ 
-    public function setAppLanguage(AppLanguage $appLanguage): self
+    public function setAppLanguage($appLanguage)
     {
         $this->appLanguage = $appLanguage;
 
@@ -80,7 +80,7 @@ class DocumentWriter
      * @param AppLanguage $appLanguage Application language
      * @return XLSXDocumentWriter An instance of XLSXDocumentWriter
      */
-    public static function getXLSXDocumentWriter(AppLanguage $appLanguage): XLSXDocumentWriter
+    public static function getXLSXDocumentWriter($appLanguage)
     {
         return new XLSXDocumentWriter($appLanguage);
     }
@@ -91,7 +91,7 @@ class DocumentWriter
      * @param AppLanguage $appLanguage Application language
      * @return CSVDocumentWriter An instance of CSVDocumentWriter
      */
-    public static function getCSVDocumentWriter(AppLanguage $appLanguage): CSVDocumentWriter
+    public static function getCSVDocumentWriter($appLanguage)
     {
         return new CSVDocumentWriter($appLanguage);
     }
