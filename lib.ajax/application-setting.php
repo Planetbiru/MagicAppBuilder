@@ -165,6 +165,13 @@ else
                                 <td>Time Zone</td>
                                 <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
                             </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-primary" type="button" id="test-database-connection">Test Connection</button>
+                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;">Create Database</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

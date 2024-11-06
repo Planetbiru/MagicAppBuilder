@@ -27,7 +27,7 @@ class NodeAttribute
      *
      * @param string[] $values An array of attribute values.
      */
-    public function __construct(array $values)
+    public function __construct($values)
     {
         $this->values = $values;
     }

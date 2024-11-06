@@ -129,50 +129,61 @@ class PicoIniUtil
      */
     public static function parseIniString($str)
     {
+        // Split the input string into lines
         $lines = explode("\n", $str);
-        $ret = array();
-        $inside_section = false;
+        $ret = array(); // Initialize the result array
+        $insideSection = false; // Track if we are inside a section
 
+        // Iterate through each line of the INI string
         foreach ($lines as $line) {
 
-            $line = trim($line);
+            $line = trim($line); // Remove whitespace from the beginning and end
 
+            // Skip invalid lines
             if (self::invalidLine($line)) {
                 continue;
             }
 
+            // Check for a section header
             if ($line[0] == "[" && $endIdx = strpos($line, "]")) {
-                $inside_section = substr($line, 1, $endIdx - 1);
+                $insideSection = substr($line, 1, $endIdx - 1);
                 continue;
             }
 
+            // Skip lines without an equals sign
             if (!strpos($line, '=')) {
                 continue;
             }
 
+            // Split the line into key and value
             $tmp = explode("=", $line, 2);
 
-            if ($inside_section) {
+            if ($insideSection) {
+                // Process key-value pairs inside a section
+                $key = rtrim($tmp[0]); // Trim the key
+                $value = ltrim($tmp[1]); // Trim the value
+                $value = self::removeSurroundingQuotes($value); // Apply any necessary value fixes
+                $value = self::removeSurroundingQuotesRegex($value); // Apply additional fixes
 
-                $key = rtrim($tmp[0]);
-                $value = ltrim($tmp[1]);
-                $value = self::fixValue1($value);
-                $value = self::fixValue2($value);
+                // Match the key format to determine if it's a sub-array
                 preg_match("^\[(.*?)\]^", $key, $matches);
                 if (self::matchValue($matches)) {
-                    $arr_name = preg_replace('#\[(.*?)\]#is', '', $key);
-                    $ret = self::fixValue3($ret, $inside_section, $arr_name, $matches, $value);
+                    // Handle array-like keys
+                    $arrName = preg_replace('#\[(.*?)\]#is', '', $key);
+                    $ret = self::organizeValue($ret, $insideSection, $arrName, $matches, $value);
 
                 } else {
-                    $ret[$inside_section][trim($tmp[0])] = $value;
+                    // Standard key-value assignment
+                    $ret[$insideSection][trim($tmp[0])] = $value;
                 }
             } else {
-                $value = ltrim($tmp[1]);
-                $value = self::fixValue1($value);
-                $ret[trim($tmp[0])] = $value;
+                // Process key-value pairs outside of any section
+                $value = ltrim($tmp[1]); // Trim the value
+                $value = self::removeSurroundingQuotes($value); // Apply value fixes
+                $ret[trim($tmp[0])] = $value; // Assign to the result array
             }
         }
-        return $ret;
+        return $ret; // Return the final parsed array
     }
 
     /**
@@ -202,13 +213,13 @@ class PicoIniUtil
     /**
      * Remove surrounding quotes from a value.
      *
-     * This method checks if the value is surrounded by double or single quotes 
-     * and removes them if present.
+     * This method checks if the given value is surrounded by either double or single quotes
+     * and removes those quotes if they are present.
      *
      * @param string $value The value to fix.
      * @return string The cleaned value without surrounding quotes.
      */
-    public static function fixValue1($value)
+    public static function removeSurroundingQuotes($value)
     {
         if (
             PicoStringUtil::startsWith($value, '"') && PicoStringUtil::endsWith($value, '"')
@@ -222,13 +233,13 @@ class PicoIniUtil
     /**
      * Remove surrounding quotes from a value using regex.
      *
-     * This method checks if the value matches the pattern of being surrounded by 
+     * This method checks if the given value matches the pattern of being surrounded by
      * double or single quotes and removes them if so.
      *
      * @param string $value The value to fix.
      * @return string The cleaned value without surrounding quotes.
      */
-    public static function fixValue2($value)
+    public static function removeSurroundingQuotesRegex($value)
     {
         if (preg_match("/^\".*\"$/", $value) || preg_match("/^'.*'$/", $value)) {
             $value = mb_substr($value, 1, mb_strlen($value) - 2);
@@ -239,26 +250,26 @@ class PicoIniUtil
     /**
      * Fix and organize the value in the parsed result.
      *
-     * This method ensures that the given array is correctly formatted 
-     * based on the provided parameters, handling nested structures.
+     * This method ensures that the provided array is correctly formatted based on the
+     * given parameters, handling nested structures as needed.
      *
      * @param array $ret The parsed result array to update.
-     * @param string $inside_section The current section name.
-     * @param string $arr_name The name of the array key.
+     * @param string $insideSection The name of the current section.
+     * @param string $arrName The name of the array key to update.
      * @param array $matches Matches found during parsing.
-     * @param mixed $value The value to assign.
+     * @param mixed $value The value to assign to the array.
      * @return array The updated parsed result array.
      */
-    public static function fixValue3($ret, $inside_section, $arr_name, $matches, $value)
+    public static function organizeValue($ret, $insideSection, $arrName, $matches, $value)
     {
-        if (!isset($ret[$inside_section][$arr_name]) || !is_array($ret[$inside_section][$arr_name])) {
-            $ret[$inside_section][$arr_name] = array();
+        if (!isset($ret[$insideSection][$arrName]) || !is_array($ret[$insideSection][$arrName])) {
+            $ret[$insideSection][$arrName] = array();
         }
 
         if (isset($matches[1]) && !empty($matches[1])) {
-            $ret[$inside_section][$arr_name][$matches[1]] = $value;
+            $ret[$insideSection][$arrName][$matches[1]] = $value;
         } else {
-            $ret[$inside_section][$arr_name][] = $value;
+            $ret[$insideSection][$arrName][] = $value;
         }
         return $ret;
     }

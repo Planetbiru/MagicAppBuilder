@@ -212,7 +212,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $rawData Raw INI data
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadIniString($rawData, $systemEnv = false)
     {
@@ -236,7 +236,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $path File path to the INI file
      * @param bool $systemEnv Flag to indicate whether to use environment variables
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadIniFile($path, $systemEnv = false)
     {
@@ -262,7 +262,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -310,7 +310,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -358,7 +358,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -406,7 +406,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $systemEnv Replace all environment variable values
      * @param bool $asObject Result as an object instead of an array
      * @param bool $recursive Convert all objects to MagicObject
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -454,7 +454,7 @@ class MagicObject extends stdClass // NOSONAR
      * but loadData will still function normally.
      *
      * @param bool $readonly Flag to set the object as read-only
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     protected function readOnly($readonly)
     {
@@ -466,7 +466,7 @@ class MagicObject extends stdClass // NOSONAR
      * Set the database connection.
      *
      * @param PicoDatabase $database Database connection
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function withDatabase($database)
     {
@@ -543,7 +543,7 @@ class MagicObject extends stdClass // NOSONAR
             {
                 if(in_array($key, $propertyNames))
                 {
-                    $resultData->$key = $val;
+                    $resultData->{$key} = $val;
                 }
             }
             return $resultData;
@@ -607,7 +607,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select data from the database.
      *
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function select()
@@ -632,7 +632,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select all data from the database.
      *
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function selectAll()
@@ -1061,7 +1061,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return void
+     * @return self
      */
     private function modifyNullProperties($propertyName, $propertyValue)
     {
@@ -1073,6 +1073,7 @@ class MagicObject extends stdClass // NOSONAR
         {
             unset($this->_nullProperties[$propertyName]);
         }
+        return $this;
     }
 
     /**
@@ -1081,7 +1082,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param string $propertyName Property name
      * @param mixed|null $propertyValue Property value
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue, $skipModifyNullProperties = false)
     {
@@ -1099,16 +1100,16 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function push($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(!isset($this->$var))
+        if(!isset($this->{$var}))
         {
-            $this->$var = array();
+            $this->{$var} = array();
         }
-        array_push($this->$var, $propertyValue);
+        array_push($this->{$var}, $propertyValue);
         return $this;
     }
     
@@ -1117,7 +1118,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function append($propertyName, $propertyValue)
     {
@@ -1129,16 +1130,16 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function unshift($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(!isset($this->$var))
+        if(!isset($this->{$var}))
         {
-            $this->$var = array();
+            $this->{$var} = array();
         }
-        array_unshift($this->$var, $propertyValue);
+        array_unshift($this->{$var}, $propertyValue);
         return $this;
     }
     
@@ -1147,7 +1148,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param mixed $propertyValue Property value
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function prepend($propertyName, $propertyValue)
     {
@@ -1163,9 +1164,9 @@ class MagicObject extends stdClass // NOSONAR
     public function pop($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(isset($this->$var) && is_array($this->$var))
+        if(isset($this->{$var}) && is_array($this->{$var}))
         {
-            return array_pop($this->$var);
+            return array_pop($this->{$var});
         }
         return null;
     }
@@ -1179,9 +1180,9 @@ class MagicObject extends stdClass // NOSONAR
     public function shift($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(isset($this->$var) && is_array($this->$var))
+        if(isset($this->{$var}) && is_array($this->{$var}))
         {
-            return array_shift($this->$var);
+            return array_shift($this->{$var});
         }
         return null;
     }
@@ -1195,7 +1196,7 @@ class MagicObject extends stdClass // NOSONAR
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : null;
+        return isset($this->{$var}) ? $this->{$var} : null;
     }
 
     /**
@@ -1208,7 +1209,7 @@ class MagicObject extends stdClass // NOSONAR
     public function getOrDefault($propertyName, $defaultValue = null)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : $defaultValue;
+        return isset($this->{$var}) ? $this->{$var} : $defaultValue;
     }
 
     /**
@@ -1246,7 +1247,7 @@ class MagicObject extends stdClass // NOSONAR
     public function __isset($propertyName)
     {
         $propertyName = lcfirst($propertyName);
-        return isset($this->$propertyName);
+        return isset($this->{$propertyName});
     }
 
     /**
@@ -1258,7 +1259,7 @@ class MagicObject extends stdClass // NOSONAR
     public function __unset($propertyName)
     {
         $propertyName = lcfirst($propertyName);
-        unset($this->$propertyName);
+        unset($this->{$propertyName});
     }
 
     /**
@@ -1267,7 +1268,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param self|mixed $source Source data
      * @param array|null $filter Filter
      * @param bool $includeNull Flag to include null values
-     * @return void
+     * @return self
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
     {
@@ -1294,6 +1295,7 @@ class MagicObject extends stdClass // NOSONAR
                 $this->set($property, $value);
             }
         }
+        return $this;
     }
 
     /**
@@ -1301,7 +1303,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $propertyName Property name
      * @param bool $skipModifyNullProperties Skip modifying null properties
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     private function removeValue($propertyName, $skipModifyNullProperties = false)
     {
@@ -1315,7 +1317,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function tableInfo()
     {
-        if(!isset($this->tableInfo))
+        if(!isset($this->_tableInfoProp))
         {
             $this->_persistProp = new PicoDatabasePersistence($this->_database, $this);
             $this->_tableInfoProp = $this->_persistProp->getTableInfo();
@@ -1348,7 +1350,7 @@ class MagicObject extends stdClass // NOSONAR
                     {
                         $col = $columnName;
                     }
-                    $defaultValue->$col = $this->_persistProp->fixData($column[self::KEY_VALUE], $column[self::KEY_PROPERTY_TYPE]);
+                    $defaultValue->{$col} = $this->_persistProp->fixData($column[self::KEY_VALUE], $column[self::KEY_PROPERTY_TYPE]);
                 }
             }
         }
@@ -1368,7 +1370,7 @@ class MagicObject extends stdClass // NOSONAR
         foreach ($this as $key => $val) {
             if(!in_array($key, $parentProps))
             {
-                $value->$key = $val;
+                $value->{$key} = $val;
             }
         }
         if($snakeCase)
@@ -1376,7 +1378,7 @@ class MagicObject extends stdClass // NOSONAR
             $value2 = new stdClass;
             foreach ($value as $key => $val) {
                 $key2 = PicoStringUtil::snakeize($key);
-                $value2->$key2 = PicoStringUtil::snakeizeObject($val);
+                $value2->{$key2} = PicoStringUtil::snakeizeObject($val);
             }
             return $value2;
         }
@@ -2384,33 +2386,33 @@ class MagicObject extends stdClass // NOSONAR
     {
         if (strncasecmp($method, "hasValue", 8) === 0) {
             $var = lcfirst(substr($method, 8));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "isset", 5) === 0) {
             $var = lcfirst(substr($method, 5));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0) {
             $var = lcfirst(substr($method, 2));
-            return isset($this->$var) ? $this->$var == 1 : false;
+            return isset($this->{$var}) ? $this->{$var} == 1 : false;
         }
         else if (strncasecmp($method, "equals", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            return isset($this->$var) && $this->$var == $params[0];
+            return isset($this->{$var}) && $this->{$var} == $params[0];
         }
         else if (strncasecmp($method, "get", 3) === 0) {
             $var = lcfirst(substr($method, 3));
-            return isset($this->$var) ? $this->$var : null;
+            return isset($this->{$var}) ? $this->{$var} : null;
         }
-        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && isset($params[0]) && !$this->_readonly) {
+        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && is_array($params) && !empty($params) && !$this->_readonly) {
             $var = lcfirst(substr($method, 3));
-            $this->$var = $params[0];
+            $this->{$var} = $params[0];
             $this->modifyNullProperties($var, $params[0]);
             return $this;
         }
         else if (strncasecmp($method, "unset", 5) === 0 && !$this->_readonly) {
             $var = lcfirst(substr($method, 5));
-            $this->removeValue($var, $params[0]);
+            $this->removeValue($var);
             return $this;
         }
         else if (strncasecmp($method, "push", 4) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
@@ -2567,32 +2569,32 @@ class MagicObject extends stdClass // NOSONAR
         else if (strncasecmp($method, "createSelected", 14) === 0) {
             $var = lcfirst(substr($method, 14));
             if(isset($params) && isset($params[0])) {
-                return isset($this->$var) && $this->$var == $params[0] ? self::ATTR_SELECTED : '';
+                return isset($this->{$var}) && $this->{$var} == $params[0] ? self::ATTR_SELECTED : '';
             }
             else {
-                return isset($this->$var) && $this->$var == 1 ? self::ATTR_SELECTED : '';
+                return isset($this->{$var}) && $this->{$var} == 1 ? self::ATTR_SELECTED : '';
             }
         }
         else if (strncasecmp($method, "createChecked", 13) === 0) {
             $var = lcfirst(substr($method, 13));
             if(isset($params) && isset($params[0])) {
-                return isset($this->$var) && $this->$var == $params[0] ? self::ATTR_CHECKED : '';
+                return isset($this->{$var}) && $this->{$var} == $params[0] ? self::ATTR_CHECKED : '';
             } else {
-                return isset($this->$var) && $this->$var == 1 ? self::ATTR_CHECKED : '';
+                return isset($this->{$var}) && $this->{$var} == 1 ? self::ATTR_CHECKED : '';
             }
         }
         else if (strncasecmp($method, "startsWith", 10) === 0) {
             $var = lcfirst(substr($method, 10));
             $value = $params[0];
             $caseSensitive = isset($params[1]) && $params[1];
-            $haystack = $this->$var;
+            $haystack = $this->{$var};
             return PicoStringUtil::startsWith($haystack, $value, $caseSensitive);
         }
         else if (strncasecmp($method, "endsWith", 8) === 0) {
             $var = lcfirst(substr($method, 8));
             $value = $params[0];
             $caseSensitive = isset($params[1]) && $params[1];
-            $haystack = $this->$var;
+            $haystack = $this->{$var};
             return PicoStringUtil::endsWith($haystack, $value, $caseSensitive);
         }
         else if (strncasecmp($method, "label", 5) === 0) {
@@ -2619,23 +2621,23 @@ class MagicObject extends stdClass // NOSONAR
         }
         else if(strncasecmp($method, "option", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            return isset($this->$var) && ($this->$var == 1 || $this->$var === true) ? $params[0] : $params[1];
+            return isset($this->{$var}) && ($this->{$var} == 1 || $this->{$var} === true) ? $params[0] : $params[1];
         }
         else if(strncasecmp($method, "notNull", 7) === 0) {
             $var = lcfirst(substr($method, 7));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if(strncasecmp($method, "notEmpty", 8) === 0) {
             $var = lcfirst(substr($method, 8));
-            return isset($this->$var) && !empty($this->$var);
+            return isset($this->{$var}) && !empty($this->{$var});
         }
         else if(strncasecmp($method, "notZero", 7) === 0) {
             $var = lcfirst(substr($method, 7));
-            return isset($this->$var) && $this->$var != 0;
+            return isset($this->{$var}) && $this->{$var} != 0;
         }
         else if (strncasecmp($method, "notEquals", 9) === 0) {
             $var = lcfirst(substr($method, 9));
-            return isset($this->$var) && $this->$var != $params[0];
+            return isset($this->{$var}) && $this->{$var} != $params[0];
         }
     }
 

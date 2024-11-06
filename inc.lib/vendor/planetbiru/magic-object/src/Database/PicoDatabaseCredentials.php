@@ -31,11 +31,20 @@ use MagicObject\SecretObject;
 class PicoDatabaseCredentials extends SecretObject
 {
     /**
-     * Database driver (e.g., 'mysql', 'pgsql').
+     * Database driver (e.g., 'mysql', 'postgresql', 'mariadb).
      *
      * @var string
      */
     protected $driver = 'mysql';
+
+    /**
+     * Database file path for SQLite.
+     *
+     * @EncryptIn
+     * @DecryptOut
+     * @var string
+     */
+    protected $databaseFilePath;
 
     /**
      * Database server host.
@@ -45,7 +54,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @var string
      */
     protected $host = 'localhost';
-
+    
     /**
      * Database server port.
      *

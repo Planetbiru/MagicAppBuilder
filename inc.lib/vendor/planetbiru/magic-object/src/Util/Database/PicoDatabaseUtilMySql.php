@@ -50,12 +50,12 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * Retrieves a list of columns for a specified table.
      *
      * @param PicoDatabase $database Database connection.
-     * @param string $picoTableName Table name.
+     * @param string $tableName Table name.
      * @return array An array of column details.
      */
-    public function getColumnList($database, $picoTableName)
+    public function getColumnList($database, $tableName)
     {
-        $sql = "SHOW COLUMNS FROM $picoTableName";
+        $sql = "SHOW COLUMNS FROM $tableName";
         return $database->fetchAll($sql);
     }
 
@@ -67,20 +67,20 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
      * @param PicoTableInfo $tableInfo     The information about the table, including column details and primary keys.
-     * @param string        $picoTableName  The name of the table for which the structure is being generated.
+     * @param string        $tableName  The name of the table for which the structure is being generated.
      * @param bool         $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
      * @param bool         $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
      * @param string|null  $engine            The storage engine to use for the table (optional, default is null).
      * @param string|null  $charset           The character set to use for the table (optional, default is null).
      * @return string                           The SQL statement to create the table, including column definitions and primary keys.
      */
-    public function dumpStructure($tableInfo, $picoTableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
+    public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
     {
         $query = array();
         $columns = array();
         if($dropIfExists)
         {
-            $query[] = "-- DROP TABLE IF EXISTS `$picoTableName`;";
+            $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
             $query[] = "";
         }
         $createStatement = "";
@@ -93,7 +93,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
 
-        $query[] = "$createStatement `$picoTableName` (";
+        $query[] = "$createStatement `$tableName` (";
 
         foreach($tableInfo->getColumns() as $column)
         {
@@ -106,7 +106,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         if(isset($pk) && is_array($pk) && !empty($pk))
         {
             $query[] = "";
-            $query[] = "ALTER TABLE `$picoTableName`";
+            $query[] = "ALTER TABLE `$tableName`";
             foreach($pk as $primaryKey)
             {
                 $query[] = "\tADD PRIMARY KEY (`$primaryKey[name]`)";
@@ -119,7 +119,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
             {
                 $query[] = "";
-                $query[] = "ALTER TABLE `$picoTableName` \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
+                $query[] = "ALTER TABLE `$tableName` \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
                 $query[] = ";";
             }
         }
@@ -199,13 +199,13 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * columns based on the provided column definitions.
      *
      * @param array $columns An associative array where keys are column names and values are column details.
-     * @param string $picoTableName The name of the table where the record will be inserted.
+     * @param string $tableName The name of the table where the record will be inserted.
      * @param MagicObject $record The data record to be inserted, which provides a method to retrieve values.
      *
      * @return string The generated SQL INSERT statement.
      * @throws Exception If the record cannot be processed or if there are no values to insert.
      */
-    public function dumpRecord($columns, $picoTableName, $record)
+    public function dumpRecord($columns, $tableName, $record)
     {
         $value = $record->valueArray();
         $rec = array();
@@ -219,7 +219,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_MYSQL);
         $queryBuilder->newQuery()
             ->insert()
-            ->into($picoTableName)
+            ->into($tableName)
             ->fields(array_keys($rec))
             ->values(array_values($rec));
 
