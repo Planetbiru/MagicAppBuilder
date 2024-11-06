@@ -73,7 +73,7 @@ class PicoSqlParser
      * @return array Information about the table, columns, and primary key.
      * @throws InvalidArgumentException if the SQL statement is not a valid CREATE TABLE statement.
      */
-    public function parseTable($sql) //NOSONAR
+    public function parseTable($sql) // NOSONAR
     {
         $arr = explode(";", $sql);
         $sql = $arr[0];

@@ -90,8 +90,8 @@ class AppLanguage extends PicoLanguage
     {
         $var = PicoStringUtil::camelize($propertyName);
 
-        if (isset($this->$var)) {
-            return $this->$var;
+        if (isset($this->{$var})) {
+            return $this->{$var};
         } else {
             $value = PicoStringUtil::camelToTitle($var);
             if (isset($this->callback) && is_callable($this->callback)) {

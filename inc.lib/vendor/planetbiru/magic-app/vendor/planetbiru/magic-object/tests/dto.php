@@ -2,6 +2,7 @@
 
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
+use MagicObject\Exceptions\InvalidParameterException;
 use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\MagicDto;
 use MagicObject\MagicObject;
@@ -685,6 +686,17 @@ class AlbumDto extends MagicDto
      */
     protected $releaseDate;
 	
+
+	public function onLoadData($data)
+	{
+		if($data instanceof EntityAlbum)
+		{
+			$data->setName("Malik");
+			$data->getProducer()->setName("aaaaa");
+		}
+		throw new InvalidParameterException("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		return $data;
+	}
 }
 
 class ProducerDto extends MagicDto

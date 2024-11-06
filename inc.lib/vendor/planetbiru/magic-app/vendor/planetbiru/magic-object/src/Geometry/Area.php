@@ -208,7 +208,7 @@ class Area
      * Set the zoom factor.
      *
      * @param float $zoom Zoom factor
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setZoom($zoom)
     {

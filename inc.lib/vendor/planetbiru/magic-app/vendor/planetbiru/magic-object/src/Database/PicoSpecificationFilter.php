@@ -51,9 +51,12 @@ class PicoSpecificationFilter
     }
 
     /**
-     * Magic method to return a JSON representation of the object.
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string JSON encoded string of the object properties.
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {

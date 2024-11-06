@@ -84,7 +84,7 @@ class PicoEntityLanguage
      * Load data into the object from the given entity.
      *
      * @param MagicObject $entity The entity to load.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function loadEntityLabel($entity)
     {
@@ -129,7 +129,7 @@ class PicoEntityLanguage
      * @param string $code Language code.
      * @param object|stdClass|array $reference Reference data for the language.
      * @param bool $use Flag to indicate whether to use this language immediately.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function addLanguage($code, $reference, $use = false)
     {
@@ -144,7 +144,7 @@ class PicoEntityLanguage
      * Remove a language from the entity.
      *
      * @param string $code Language code to remove.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function removeLanguage($code)
     {
@@ -162,7 +162,7 @@ class PicoEntityLanguage
      * Set the current language.
      *
      * @param string $code Language code to set as current.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function selectLanguage($code)
     {
@@ -236,12 +236,12 @@ class PicoEntityLanguage
      *
      * @param string $propertyName Name of the property to set.
      * @param mixed|null $propertyValue Value to set for the property.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $this->$var = $propertyValue;
+        $this->{$var} = $propertyValue;
         return $this;
     }
 
@@ -284,7 +284,7 @@ class PicoEntityLanguage
      */
     public function __isset($name)
     {
-        return isset($this->$name);
+        return isset($this->{$name});
     }
 
     /**

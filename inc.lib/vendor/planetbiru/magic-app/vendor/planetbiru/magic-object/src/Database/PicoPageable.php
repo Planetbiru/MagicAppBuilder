@@ -15,23 +15,23 @@ use stdClass;
 class PicoPageable
 {
     /**
-     * Page
+     * Current page information.
      *
-     * @var PicoPage
+     * @var PicoPage|null
      */
     private $page = null;
 
     /**
-     * Sortable
+     * Sortable information.
      *
-     * @var PicoSortable
+     * @var PicoSortable|null
      */
     private $sortable = null;
 
     /**
-     * Offset and limit
+     * Offset and limit for database queries.
      *
-     * @var PicoLimit
+     * @var PicoLimit|null
      */
     private $offsetLimit = null;
 
@@ -80,9 +80,9 @@ class PicoPageable
 
 
     /**
-     * Get sortable
+     * Retrieves the sortable information.
      *
-     * @return PicoSortable
+     * @return PicoSortable|null
      */
     public function getSortable()
     {
@@ -90,11 +90,11 @@ class PicoPageable
     }
 
     /**
-     * Set sortable
+     * Sets the sortable information.
      *
-     * @param PicoSortable $sortable Sortable
+     * @param PicoSortable $sortable Sortable information.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setSortable($sortable)
     {
@@ -104,11 +104,13 @@ class PicoPageable
     }
 
     /**
-     * Add sortable
+     * Adds a sortable criterion.
      *
-     * @param string $sortBy Sort by
-     * @param string $sortType Sort type
-     * @return self
+     * @param string $sortBy The field to sort by.
+     * @param string $sortType The type of sorting (e.g., 'asc' or 'desc').
+     *
+     * @return self Returns the current instance for method chaining.
+     * @throws InvalidParameterException If $sortBy is null or empty.
      */
     public function addSortable($sortBy, $sortType)
     {
@@ -124,10 +126,10 @@ class PicoPageable
     }
 
     /**
-     * Create sort by
+     * Creates the ORDER BY clause based on the current sortable criteria.
      *
-     * @param PicoTableInfo $tableInfo Table information
-     * @return string|null
+     * @param PicoTableInfo $tableInfo Information about the table.
+     * @return string|null The ORDER BY clause or null if no sortable criteria exist.
      */
     public function createOrderBy($tableInfo)
     {
@@ -139,9 +141,9 @@ class PicoPageable
     }
 
     /**
-     * Get page
+     * Retrieves the current page information.
      *
-     * @return PicoPage
+     * @return PicoPage|null
      */
     public function getPage()
     {
@@ -149,11 +151,11 @@ class PicoPageable
     }
 
     /**
-     * Set page
+     * Sets the current page information.
      *
-     * @param PicoPage $page Page
+     * @param PicoPage $page Page information.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setPage($page)
     {
@@ -165,9 +167,9 @@ class PicoPageable
     }
 
     /**
-     * Get offset and limit
+     * Retrieves the offset and limit for database queries.
      *
-     * @return PicoLimit
+     * @return PicoLimit|null
      */
     public function getOffsetLimit()
     {
@@ -175,11 +177,11 @@ class PicoPageable
     }
 
     /**
-     * Set offset and limit
+     * Sets the offset and limit for database queries.
      *
-     * @param PicoLimit  $offsetLimit  Offset and limit
+     * @param PicoLimit $offsetLimit Offset and limit information.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setOffsetLimit($offsetLimit)
     {
@@ -189,9 +191,12 @@ class PicoPageable
     }
 
     /**
-     * Magic method to debug object
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {

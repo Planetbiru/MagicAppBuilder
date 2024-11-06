@@ -141,6 +141,8 @@ class PicoTableInfo // NOSONAR
         $stdClass->autoIncrementKeys = $this->autoIncrementKeys;
         $stdClass->defaultValue = $this->defaultValue;
         $stdClass->notNullColumns = $this->notNullColumns;
+        $stdClass->this->noCache = $this->noCache;
+        $stdClass->package = $this->package;
         return json_encode($stdClass);
     }
 
@@ -359,8 +361,6 @@ class PicoTableInfo // NOSONAR
         return $this;
     }
 
-    
-
     /**
      * Get the package name or namespace.
      *
@@ -378,7 +378,7 @@ class PicoTableInfo // NOSONAR
      *
      * @return  self
      */ 
-    public function setPackage(string $package)
+    public function setPackage($package)
     {
         $this->package = $package;
 

@@ -61,14 +61,17 @@
 
 <article class="article" id="part2">
 <h1>MagicObject Installation</h1>
+<h2>Installing MagicObject</h2>
 <p>To install <strong>MagicObbject</strong></p>
 <pre><code>composer require planetbiru/magic-object</code></pre>
 <p>or if composer is not installed</p>
 <pre><code>php composer.phar require planetbiru/magic-object</code></pre>
+<h2>Removing MagicObject</h2>
 <p>To remove <strong>MagicObbject</strong></p>
 <pre><code>composer remove planetbiru/magic-object</code></pre>
 <p>or if composer is not installed</p>
 <pre><code>php composer.phar remove planetbiru/magic-object</code></pre>
+<h2>Installing Composer</h2>
 <p>To install composer on your PC or download latest composer.phar, click <a href="https://getcomposer.org/download/">https://getcomposer.org/download/</a> </p>
 </article>
 
@@ -1333,6 +1336,12 @@ catch(Exception $e)
 <h3>The Need for MagicDto</h3>
 <p>In modern applications, especially those that interact with third-party services, maintaining consistent data formats can be challenging. Different systems may use varying naming conventions, such as camel case (<code>myProperty</code>) and snake case (<code>my_property</code>). Additionally, inconsistencies can occur with uppercase and lowercase letters, leading to potential mismatches when exchanging data.</p>
 <p><strong>MagicDto</strong> addresses these issues by allowing developers to create DTOs that seamlessly translate property names between different naming conventions. This ensures that data is properly formatted for both internal and external use, enhancing interoperability and reducing errors.</p>
+<h3>Benefits of Using MagicDto</h3>
+<ul>
+<li><strong>Reduced Complexity</strong>: By automating property translation, MagicDto minimizes the need for manual mapping code, reducing complexity and potential errors.</li>
+<li><strong>Improved Maintainability</strong>: With clearly defined annotations and a structured approach, developers can easily understand and maintain the DTOs, even as systems evolve.</li>
+<li><strong>Enhanced Interoperability</strong>: MagicDto ensures that data exchanged between different systems is consistent and correctly formatted, leading to smoother integrations and fewer runtime issues.</li>
+</ul>
 <h3>Features of MagicDto</h3>
 <ol>
 <li>
@@ -1372,7 +1381,7 @@ catch(Exception $e)
 </li>
 <li>
 <p><strong>@XML</strong></p>
-<p>The <code>@XML</code> annotation controls whether the XML format should be prettified. Using <code>@XML(prettify=true)</code> will format the output in a more readable way, while <code>@XML(prettify=false)</code> will minimize the format    </p>
+<p>The <code>@XML</code> annotation controls whether the XML format should be prettified. Using <code>@XML(prettify=true)</code> will format the output in a more readable way, while <code>@XML(prettify=false)</code> will minimize the format</p>
 </li>
 </ol>
 <p><strong>Property Annotations</strong></p>
@@ -1410,21 +1419,69 @@ protected $title;</code></pre>
 <ol start="3">
 <li>
 <p><strong>@JsonFormat</strong></p>
-<p>The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be <code>DateTime</code>. It is written as <code>@JsonFormat(pattern="Y-m-d H:i:s")</code>. If this annotation is not provided, MagicDto will serialize the property using the default format Y-m-d H:i:s. This ensures that data sent to third-party applications adheres to their expected format.</p>
-<p>Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as 'Y-m-d H:i:s' for complete timestamps or 'd/m/Y' for more localized representations, depending on the specific requirements of your application.</p>
+<p>The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be <code>DateTime</code>. It is written as <code>@JsonFormat(pattern="Y-m-d H:i:s")</code>. If this annotation is not provided, MagicDto will serialize the property using the default format <code>Y-m-d H:i:s</code>. This ensures that data sent to third-party applications adheres to their expected format.</p>
+<p>Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as <code>Y-m-d H:i:s</code> for complete timestamps or <code>d/m/Y</code> for more localized representations, depending on the specific requirements of your application.</p>
 <p>MagicDto automatically parses input as both strings and integers. The integer is a unique timestamp, while the string date-time format must be one of the following:</p>
-<ul>
-<li><strong>'Y-m-d'</strong>,              // ISO 8601: 2024-10-24</li>
-<li><strong>'Y-m-d H:i:s'</strong>,        // ISO 8601: 2024-10-24 15:30:00</li>
-<li><strong>'Y-m-d\TH:i:s'</strong>,       // ISO 8601: 2024-10-24T15:30:00</li>
-<li><strong>'Y-m-d\TH:i:s\Z'</strong>,     // ISO 8601: 2024-10-24T15:30:00Z</li>
-<li><strong>'D, d M Y H:i:s O'</strong>,   // RFC 2822: Thu, 24 Oct 2024 15:30:00 +0000</li>
-<li><strong>'d/m/Y'</strong>,              // Local format: 24/10/2024</li>
-<li><strong>'d F Y'</strong>,              // Format with month name: 24 October 2024</li>
-<li><strong>'l, d F Y'</strong>            // Format with day of the week: Thursday, 24 October 2024</li>
-</ul>
 </li>
 </ol>
+<h4>Date Format Examples</h4>
+<p>Below are various date format strings that you can use in PHP, along with their descriptions and typical use cases:</p>
+<ul>
+<li>
+<p><strong><code>'Y-m-d'</code></strong><br />
+<em>Format:</em> ISO 8601<br />
+<em>Example:</em> <code>2024-10-24</code><br />
+<em>Description:</em> This format represents the date in a standard way that is widely used in APIs and databases. It is particularly useful for storing dates in a consistent format.</p>
+</li>
+<li>
+<p><strong><code>'Y-m-d H:i:s'</code></strong><br />
+<em>Format:</em> ISO 8601 with Time<br />
+<em>Example:</em> <code>2024-10-24 15:30:00</code><br />
+<em>Description:</em> This format includes both the date and time, making it suitable for logging events or recording timestamps in applications where precision is required.</p>
+</li>
+<li>
+<p><strong><code>'Y-m-d\TH:i:s'</code></strong><br />
+<em>Format:</em> ISO 8601 with 'T' Separator<br />
+<em>Example:</em> <code>2024-10-24T15:30:00</code><br />
+<em>Description:</em> This format uses a 'T' to separate the date and time, conforming to the strict ISO 8601 standard. It is commonly used in JSON data and web APIs.</p>
+</li>
+<li>
+<p><strong><code>'Y-m-d\TH:i:s\Z'</code></strong><br />
+<em>Format:</em> ISO 8601 with UTC Indicator<br />
+<em>Example:</em> <code>2024-10-24T15:30:00Z</code><br />
+<em>Description:</em> Similar to the previous format but includes a 'Z' at the end to indicate that the time is in UTC (Coordinated Universal Time). Useful in global applications where time zone context is important.</p>
+</li>
+<li>
+<p><strong><code>'D, d M Y H:i:s O'</code></strong><br />
+<em>Format:</em> RFC 2822<br />
+<em>Example:</em> <code>Thu, 24 Oct 2024 15:30:00 +0000</code><br />
+<em>Description:</em> This format is often used in email headers and HTTP headers. It provides a readable representation of the date and time along with the time zone offset.</p>
+</li>
+<li>
+<p><strong><code>'d/m/Y'</code></strong><br />
+<em>Format:</em> Local Format<br />
+<em>Example:</em> <code>24/10/2024</code><br />
+<em>Description:</em> A simple date format that is commonly used in various countries. It is easily readable and useful for forms and local applications.</p>
+</li>
+<li>
+<p><strong><code>'d F Y'</code></strong><br />
+<em>Format:</em> Date with Full Month Name<br />
+<em>Example:</em> <code>24 October 2024</code><br />
+<em>Description:</em> This format spells out the month, making it very human-readable. Ideal for generating reports or documents where clarity is essential.</p>
+</li>
+<li>
+<p><strong><code>'l, d F Y'</code></strong><br />
+<em>Format:</em> Date with Day of the Week<br />
+<em>Example:</em> <code>Thursday, 24 October 2024</code><br />
+<em>Description:</em> This format includes the full name of the day, providing a complete and easily readable date string. Perfect for calendars, invitations, or any context where a formal date presentation is needed.</p>
+</li>
+<li>
+<p><strong><code>'U'</code></strong><br />
+<em>Format:</em> Unix Timestamp<br />
+<em>Example:</em> <code>1698151800</code><br />
+<em>Description:</em> This format represents the date as a Unix timestamp, which is the number of seconds that have elapsed since January 1, 1970 (UTC). It is useful for database storage and calculations involving time, as well as for interoperability with systems that utilize Unix timestamps.</p>
+</li>
+</ul>
 <p><strong>Example:</strong></p>
 <p>DTO on the Input Side</p>
 <pre><code class="language-php">class AlbumDtoInput extends MagicDto
@@ -1490,8 +1547,8 @@ protected $title;</code></pre>
     protected $songs;
 }</code></pre>
 <p><strong>Description</strong></p>
-<p>In this example, we have two DTO classes: AlbumDtoInput and AlbumDtoOutput. The AlbumDtoInput class is designed to receive data from external sources, using the @Source annotation to specify the incoming property names and the @JsonProperty annotation to define the corresponding properties in the internal representation.</p>
-<p>Conversely, the AlbumDtoOutput class is structured for sending data outwards. Here, the @Source annotation reflects the internal property names, while the @JsonProperty annotation defines the expected property names when the data is serialized for external use. This bidirectional mapping ensures that data flows seamlessly between internal and external systems.</p>
+<p>In this example, we have two DTO classes: <code>AlbumDtoInput</code> and <code>AlbumDtoOutput</code>. The <code>AlbumDtoInput</code> class is designed to receive data from external sources, using the <code>@Source</code> annotation to specify the incoming property names and the <code>@JsonProperty</code> annotation to define the corresponding properties in the internal representation.</p>
+<p>Conversely, the <code>AlbumDtoOutput</code> class is structured for sending data outwards. Here, the <code>@Source</code> annotation reflects the internal property names, while the <code>@JsonProperty</code> annotation defines the expected property names when the data is serialized for external use. This bidirectional mapping ensures that data flows seamlessly between internal and external systems.</p>
 <p>The <code>@Source</code> annotation allows a Data Transfer Object (DTO) to inherit properties from an underlying object, enabling seamless data integration across related entities.</p>
 <h3>Cross Object Mapping</h3>
 <h4>Cross Object Mapping Explanation</h4>
@@ -1513,10 +1570,8 @@ protected $title;</code></pre>
 <ul>
 <li><strong>Song</strong>
 <ul>
-<li><strong>Artist</strong>
-<ul>
+<li><strong>Artist</strong></li>
 <li><strong>Agency</strong></li>
-</ul></li>
 </ul></li>
 </ul>
 <p>When creating a DTO for a <code>Song</code>, the user can incorporate properties from the associated <code>Agency</code> into the <code>SongDto</code>. This is particularly useful for aggregating data from related models without needing to replicate information.</p>
@@ -1597,7 +1652,7 @@ protected $title;</code></pre>
 
     // Additional properties and methods for the Agency can be defined here.
 }</code></pre>
-<p><strong>SongDto</strong> </p>
+<p><strong>SongDto</strong></p>
 <pre><code class="language-php">class SongDto extends MagicDto
 {
     /**
@@ -1640,7 +1695,7 @@ protected $title;</code></pre>
 
     // Additional properties and methods for the SongDto can be defined here.
 }</code></pre>
-<p><strong>ArtistDto</strong> </p>
+<p><strong>ArtistDto</strong></p>
 <pre><code class="language-php">class ArtistDto extends MagicDto
 {
     /**
@@ -1683,7 +1738,7 @@ protected $title;</code></pre>
 
     // Additional properties and methods for the SongDto can be defined here.
 }</code></pre>
-<p><strong>AgencyDto</strong> </p>
+<p><strong>AgencyDto</strong></p>
 <pre><code class="language-php">class AgencyDto extends MagicDto
 {
     /**
@@ -1740,32 +1795,55 @@ $albumDto-&gt;loadXml($xmlString);
 header("Content-type: application/json");
 echo $albumDto;</code></pre>
 <p><code>loadXml</code> method will load data from XML to <code>AlbumDtoInput</code>. <code>AlbumDtoInput</code> is the inverse of <code>AlbumDto</code>, where values of the <code>@JsonProperty</code> and <code>@Source</code> annotations are swapped. This inversion also applies to the objects contained within it.</p>
+<h3>Customizing Data Transfer Objects (DTOs) in MagicDto</h3>
+<p>When creating a Data Transfer Object (DTO) using <code>MagicDto</code>, users have the flexibility to define override methods that can manipulate input data before it is loaded into the DTO. This allows for customization and validation of the data being processed.</p>
+<h4>Example of an Override Method</h4>
+<pre><code class="language-php">public function onBeforeLoad($data)
+{
+    // This method can be overridden to manipulate the incoming data
+    return $data;
+}</code></pre>
+<p>By overriding the onBeforeLoad method, users can modify the input data directly before it is handled by the DTO. This can be useful for tasks such as data sanitization or transformation.</p>
+<h4>Handling Various Data Types</h4>
+<p><code>MagicDto</code> is designed to accept parameters of various data types, such as objects, arrays, or scalar values. To prevent errors during operations, it is crucial for users to check the data type before executing any logic on the input data.</p>
+<h4>Example of Validating Input Data</h4>
+<pre><code class="language-php">public function onLoadData($data)
+{
+    // Check if the input data is an instance of EntityAlbum
+    if ($data instanceof EntityAlbum) {
+        // Modify properties of the EntityAlbum object
+        $data-&gt;setName("Album Name");
+        $data-&gt;setProducerName($data-&gt;getProducer()-&gt;getName());
+    }
+
+    // Return the modified data
+    return $data;
+}</code></pre>
+<p>In the <code>`onLoadData</code> method, we first verify whether the incoming <code>$data</code> is an instance of <code>EntityAlbum</code>. If it is, we proceed to set specific properties on the <code>EntityAlbum</code> object. This ensures that the operations performed are valid and appropriate for the type of data being processed.</p>
+<h4>Example of Throwing Exceptions</h4>
+<pre><code class="language-php">public function onBeforeLoad($data)
+{
+    if ($data instanceof EntityAlbum) {
+        throw new InvalidArgumentException("Data must be an EntityAlbum.");
+    }
+
+    // Further manipulation of data can occur here
+    return $data;
+}</code></pre>
+<p>In this example, if the incoming data is not an <code>EntityAlbum</code>, an <code>InvalidArgumentException</code> is thrown, preventing further processing of invalid data.</p>
 <h4>Explanation</h4>
 <ul>
-<li>
-<p><strong>@Source</strong>: This annotation specifies the path to the property within the nested object structure. In this case, <code>artist-&gt;agency-&gt;name</code> indicates that the <code>agencyName</code> will pull data from the <code>name</code> property of the <code>Agency</code> object linked to the <code>Artist</code>.</p>
-</li>
-<li>
-<p><strong>@JsonProperty</strong>: This annotation maps the <code>agencyName</code> property to a different key in the JSON representation of the DTO. Here, it will be serialized as <code>agency_name</code>.</p>
-</li>
-<li>
-<p><strong>protected $agencyName</strong>: This declares the <code>agencyName</code> property with protected visibility, ensuring that it can only be accessed within the class itself and by subclasses.</p>
-</li>
+<li><strong>@Source</strong>: This annotation specifies the path to the property within the nested object structure. In this case, <code>artist-&gt;agency-&gt;name</code> indicates that the <code>agencyName</code> will pull data from the <code>name</code> property of the <code>Agency</code> object linked to the <code>Artist</code>.</li>
+<li><strong>@JsonProperty</strong>: This annotation maps the <code>agencyName</code> property to a different key in the JSON representation of the DTO. Here, it will be serialized as <code>agency_name</code>.</li>
 </ul>
 <p>This approach enhances data encapsulation and promotes cleaner code by allowing DTOs to automatically gather necessary data from related entities.</p>
-<h3>Benefits of Using MagicDto</h3>
-<ul>
-<li><strong>Reduced Complexity</strong>: By automating property translation, MagicDto minimizes the need for manual mapping code, reducing complexity and potential errors.</li>
-<li><strong>Improved Maintainability</strong>: With clearly defined annotations and a structured approach, developers can easily understand and maintain the DTOs, even as systems evolve.</li>
-<li><strong>Enhanced Interoperability</strong>: MagicDto ensures that data exchanged between different systems is consistent and correctly formatted, leading to smoother integrations and fewer runtime issues.</li>
-</ul>
 <h3>Conclusion</h3>
 <p>MagicDto is a powerful solution for managing data transfer in applications that need to communicate with external systems. By leveraging flexible naming strategies and clear annotations, it simplifies the process of creating and maintaining DTOs, ensuring seamless data exchange. Whether you’re building a new application or integrating with legacy systems, MagicDto can help you navigate the complexities of data serialization and improve overall application reliability.</p>
 </article>
 
 <article class="article" id="part12">
 <h2>Input POST/GET/COOKIE/REQUEST/SERVER</h2>
-<p>In PHP, handling user input can be done through various superglobals, such as $_POST, $_GET, $_COOKIE, $_REQUEST, and $_SERVER. Each of these superglobals serves a specific purpose for gathering data from different types of requests.</p>
+<p>In PHP, handling user input can be done through various superglobals, such as <code>$_POST</code>, <code>$_GET</code>, <code>$_COOKIE</code>, <code>$_REQUEST</code>, and <code>$_SERVER</code>. Each of these superglobals serves a specific purpose for gathering data from different types of requests.</p>
 <h3>Input POST</h3>
 <p>The <code>$_POST</code> superglobal is used to collect data sent via HTTP POST requests. In the provided code snippet:</p>
 <pre><code class="language-php">
@@ -2053,6 +2131,13 @@ class PicoDatabaseCredentials extends SecretObject
     protected $driver = 'mysql';
 
     /**
+     * Database file path for SQLite database only
+     *
+     * @var string
+     */
+    protected $databaseFilePath;
+
+    /**
      * Database server host.
      *
      * @EncryptIn
@@ -2144,6 +2229,42 @@ class PicoDatabaseCredentials extends SecretObject
 </ul></li>
 </ul></li>
 </ul>
+<p>To use setter methods for configuring the <code>callbackExecuteQuery</code> and <code>callbackDebugQuery</code> in the PicoDatabase class, follow the example below. This allows you to set the callbacks after instantiation</p>
+<p><strong>Setting Callbacks with Setters</strong></p>
+<p>Here's how you can set the callbacks using setter methods:</p>
+<pre><code class="language-php">use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseCredentials;
+
+// Example credentials setup
+$credentials = new PicoDatabaseCredentials();
+$credentials-&gt;setHost('localhost');
+$credentials-&gt;setUsername('user');
+$credentials-&gt;setPassword('password');
+
+// Instantiate PicoDatabase
+$db = new PicoDatabase($credentials);
+
+// Set callback for executing queries
+$db-&gt;setCallbackExecuteQuery(function($sqlQuery, $params, $type) {
+    echo "Executing query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+
+// Set callback for debugging queries
+$db-&gt;setCallbackDebugQuery(function($sqlQuery, $params) {
+    echo "Debugging query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+</code></pre>
+<p><strong>Disabling Callbacks Using Setters</strong></p>
+<p>You can also disable the callbacks by setting them to <code>null</code>:</p>
+<pre><code class="language-php">// Instantiate PicoDatabase
+$dbWithoutCallbacks = new PicoDatabase($credentials);
+
+// Disable callbacks
+$dbWithoutCallbacks-&gt;setCallbackExecuteQuery(null);
+$dbWithoutCallbacks-&gt;setCallbackDebugQuery(null);
+</code></pre>
 <h4>Connecting to the Database</h4>
 <pre><code class="language-php">public function connect($withDatabase = true): bool</code></pre>
 <p><strong>Parameters</strong>:</p>
@@ -8397,13 +8518,13 @@ require_once "inc/footer.php";
 <h3>Parameters</h3>
 <p>The parameters accepted by the native query function are as follows:</p>
 <ol>
-<li>string</li>
-<li>int or integer</li>
-<li>float</li>
-<li>bool or boolean</li>
-<li>null</li>
-<li>DateTime</li>
-<li>array of string, int, bool and DateTime</li>
+<li><code>string</code></li>
+<li><code>int</code> or <code>integer</code></li>
+<li><code>float</code></li>
+<li><code>bool</code> or <code>boolean</code></li>
+<li><code>null</code></li>
+<li><code>DateTime</code></li>
+<li><code>array</code> of <code>string</code>, <code>int</code>, <code>bool</code> and <code>DateTime</code></li>
 </ol>
 <p>For columns with data type <code>DATETIME</code> and <code>TIMESTAMP</code>, users can use either <code>string</code> or <code>DateTime</code> parameters. <code>DateTime</code> will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the <code>in</code> and <code>=</code> criteria.</p>
 <h3>Return Type</h3>
@@ -10449,13 +10570,23 @@ catch(Exception $e)
 
 <article class="article" id="part25">
 <h2>Upload File</h2>
-<p>Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.</p>
-<p>When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.</p>
+<h3>Overview</h3>
+<p>Uploading files can be challenging, especially for novice developers. This guide explains how to manage single and multiple file uploads in PHP, highlighting the differences and providing straightforward examples.</p>
+<h3>Key Features</h3>
+<ul>
+<li><strong>Easy File Handling:</strong> The <code>PicoUploadFile</code> class simplifies the process of retrieving uploaded files.</li>
+<li><strong>Unified Retrieval:</strong> The <code>getAll</code> method allows you to handle files uploaded through both single and multiple forms without needing separate logic.</li>
+</ul>
+<h3>Uploading Files</h3>
+<h4>Single File Upload</h4>
+<p>To upload a single file, use the following HTML form:</p>
 <pre><code class="language-html">&lt;!-- single file --&gt;
 &lt;form action="" method="post" enctype="multipart/form-data"&gt;
      &lt;input name="myupload" type="file" /&gt;
      &lt;input type="submit" /&gt;
 &lt;/form&gt;</code></pre>
+<h4>Multiple File Upload</h4>
+<p>To enable multiple file uploads, modify the input name to include brackets (<code>[]</code>) and use the <code>multiple</code> attribute:</p>
 <pre><code class="language-html">&lt;!-- multiple files --&gt;
 &lt;form action="" method="post" enctype="multipart/form-data"&gt;
      &lt;input name="myupload[]" type="file" webkitdirectory multiple /&gt;
@@ -10465,33 +10596,30 @@ catch(Exception $e)
 <li>For single uploads, the input field is named <code>myupload</code>.</li>
 <li>For multiple uploads, the input field name is <code>myupload[]</code>, which allows multiple files to be uploaded at once.</li>
 </ul>
+<h3>PHP Backend Handling</h3>
+<p>To handle the uploaded files on the server side, you can use the PicoUploadFile class. Here’s how to do it:</p>
 <pre><code class="language-php">&lt;?php
 
-use MagicObject\File\PicoUplodFile;
+use MagicObject\File\PicoUploadFile;
 
 require_once "vendor/autoload.php";
 
-$files = new PicoUplodFile();
+$files = new PicoUploadFile();
 
 $file1 = $files-&gt;get('myupload');
-// or 
+// or alternatively
 // $file1 = $files-&gt;myupload;
 
 $targetDir = __DIR__;
 
-foreach($file1-&gt;getAll() as $fileItem)
-{
+foreach ($file1-&gt;getAll() as $fileItem) {
     $temporaryName = $fileItem-&gt;getTmpName();
     $name = $fileItem-&gt;getName();
     $size = $fileItem-&gt;getSize();
+
     echo "$name | $temporaryName | $size\r\n";
-    move_uploaded_file($temporaryName, $targetDir."/".$name);
-}
-</code></pre>
-<ul>
-<li>The <code>PicoUplodFile</code> class simplifies file handling. The developer can retrieve the uploaded files easily using the get method.</li>
-<li>The <code>getAll</code> method retrieves all files, regardless of whether they were uploaded via single or multiple file forms.</li>
-</ul>
+    move_uploaded_file($temporaryName, $targetDir . "/" . $name);
+}</code></pre>
 <h3>Checking Upload Type</h3>
 <p>Developers simply retrieve data using the <code>getAll</code> method and developers will get all files uploaded by users either via single file or multiple file forms. If necessary, the developer can check whether the file was uploaded using a single file or multiple file form with the <code>isMultiple()</code> method</p>
 <pre><code class="language-php">
@@ -10504,7 +10632,7 @@ else
     // do something here
 }</code></pre>
 <h3>Summary</h3>
-<p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like getAll() and isMultiple(), developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
+<p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like <code>getAll()</code> and <code>isMultiple()</code>, developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
 </article>
 
 <article class="article" id="part26">

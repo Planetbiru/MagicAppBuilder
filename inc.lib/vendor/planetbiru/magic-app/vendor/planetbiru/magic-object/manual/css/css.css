@@ -151,3 +151,20 @@ pre code {
     padding: 0;
     line-height: 1.3;
 }
+
+pre .keyword {
+    color: blue; /* Warna untuk keyword */
+    font-weight: bold;
+}
+pre .function {
+    color: green; /* Warna untuk fungsi */
+}
+pre .variable {
+    color: brown; /* Warna untuk variabel */
+}
+pre .string {
+    color: red; /* Warna untuk string */
+}
+pre .comment {
+    color: grey; /* Warna untuk komentar */
+}

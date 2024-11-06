@@ -5,6 +5,7 @@ namespace MagicObject\Util\Database;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoTableInfo;
+use MagicObject\Exceptions\InvalidParameterException;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
@@ -60,19 +61,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * 
      * @throws ReflectionException If the class does not exist or is not accessible.
      */
-    function showCreateTable($entity, $createIfNotExists = false, $dropIfExists = false) {        
+    public function showCreateTable($entity, $createIfNotExists = false, $dropIfExists = false) {        
         $tableInfo = $entity->tableInfo();
         $tableName = $tableInfo->getTableName();
     
         // Start building the CREATE TABLE query
-        if($createIfNotExists)
-        {
-            $condition = " IF NOT EXISTS";
-        }
-        else
-        {
-            $condition = "";
-        }
+        $condition = $this->createIfNotExists($createIfNotExists);
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
 
@@ -110,41 +104,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             // Convert column type for SQL
             $columnType = strtolower($columnType); // Convert to lowercase for case-insensitive comparison
 
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
-                $sqlType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-                $pKeyArrUsed[] = $columnName;
-            } elseif (strpos($columnType, 'varchar') !== false) {
-                $sqlType = "VARCHAR($length)";
-            } elseif ($columnType === 'tinyint(1)') {
-                $sqlType = 'TINYINT(1)';
-            } elseif (stripos($columnType, 'tinyint') !== false) {
-                $sqlType = strtoupper($columnType);
-            } elseif (stripos($columnType, 'smallint') !== false) {
-                $sqlType = strtoupper($columnType);
-            } elseif (stripos($columnType, 'bigint') !== false) {
-                $sqlType = strtoupper($columnType);
-            } elseif (stripos($columnType, 'integer') !== false) {
-                $sqlType = strtoupper($columnType);
-            } elseif (stripos($columnType, 'int') !== false) {
-                $sqlType = strtoupper($columnType);
-            } elseif ($columnType === 'int') {
-                $sqlType = 'INT';
-            } elseif ($columnType === 'float') {
-                $sqlType = 'FLOAT';
-            } elseif ($columnType === 'text') {
-                $sqlType = 'TEXT';
-            } elseif ($columnType === 'longtext') {
-                $sqlType = 'LONGTEXT';
-            } elseif ($columnType === 'date') {
-                $sqlType = 'DATE';
-            } elseif ($columnType === 'timestamp') {
-                $sqlType = 'TIMESTAMP';
-            } elseif ($columnType === 'blob') {
-                $sqlType = 'BLOB';
-            } else {
-                $sqlType = 'VARCHAR(255)'; // Fallback type
-            }
-
+            $attr = $this->determineSqlType($column, $autoIncrementKeys, $length, $pKeyArrUsed);
+            
+            
+            $sqlType = $attr['sqlType'];
+            $pKeyArrUsed = $attr['pKeyArrUsed'];
+            
             // Add to query
             $query .= "\t$columnName $sqlType$nullable$defaultValue,\n";
             
@@ -153,14 +118,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Remove the last comma and add primary key constraint
         $query = rtrim($query, ",\n") . "\n";
     
-        $pKeyArrFinal = [];
-        foreach($pKeyArr as $k=>$v)
-        {
-            if(!in_array($v, $pKeyArrUsed))
-            {
-                $pKeyArrFinal[] = $v;
-            }
-        }
+        $pKeyArrFinal = $this->getPkeyArrayFinal($pKeyArr, $pKeyArrUsed);
 
         if (!empty($pKeyArrFinal)) {
             $primaryKey = implode(", ", $pKeyArrFinal);
@@ -172,6 +130,85 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
     
         return str_replace("\n", "\r\n", $query);
     }
+    
+    /**
+     * Returns "IF NOT EXISTS" if specified, otherwise an empty string.
+     *
+     * @param bool $createIfNotExists Flag indicating whether to include "IF NOT EXISTS".
+     * @return string The "IF NOT EXISTS" clause if applicable.
+     */
+    private function createIfNotExists($createIfNotExists) {
+        return $createIfNotExists ? " IF NOT EXISTS" : "";
+    }
+    
+    /**
+     * Filter the primary key array to exclude used primary keys.
+     *
+     * @param array $pKeyArr Array of primary key names.
+     * @param array $pKeyArrUsed Array of used primary key names.
+     * @return array Filtered array of primary key names.
+     */
+    private function getPkeyArrayFinal($pKeyArr, $pKeyArrUsed)
+    {
+        $pKeyArrFinal = [];
+        foreach($pKeyArr as $v)
+        {
+            if(!in_array($v, $pKeyArrUsed))
+            {
+                $pKeyArrFinal[] = $v;
+            }
+        }
+        return $pKeyArrFinal;
+    }
+    
+    /**
+     * Determine the SQL data type based on the given column information and auto-increment keys.
+     *
+     * @param array $column The column information, expected to include the column name and type.
+     * @param array|null $autoIncrementKeys The array of auto-increment keys, if any.
+     * @param int $length The length for VARCHAR types.
+     * @param array $pKeyArrUsed The array to store used primary key names.
+     * @return array An array containing the determined SQL data type and the updated primary key array.
+     */
+    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = array())
+    {
+        $columnName = $column[parent::KEY_NAME];
+        $columnType = strtolower($column['type']); // Assuming 'type' holds the column type
+        $sqlType = '';
+
+        // Check for auto-increment primary key
+        if (is_array($autoIncrementKeys) && in_array($columnName, $autoIncrementKeys)) {
+            $sqlType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+            $pKeyArrUsed[] = $columnName; // Add to used primary keys
+        } else {
+            // Default mapping of column types to SQL types
+            $typeMapping = array(
+                'varchar' => "VARCHAR($length)",
+                'tinyint(1)' => 'TINYINT(1)',
+                'float' => 'FLOAT',
+                'text' => 'TEXT',
+                'longtext' => 'LONGTEXT',
+                'date' => 'DATE',
+                'timestamp' => 'TIMESTAMP',
+                'blob' => 'BLOB',
+            );
+
+            // Check if the column type exists in the mapping
+            if (array_key_exists($columnType, $typeMapping)) {
+                $sqlType = $typeMapping[$columnType];
+            } else {
+                $sqlType = strtoupper($columnType);
+                if ($sqlType !== 'TINYINT(1)' && $sqlType !== 'FLOAT' && $sqlType !== 'TEXT' && 
+                    $sqlType !== 'LONGTEXT' && $sqlType !== 'DATE' && $sqlType !== 'TIMESTAMP' && 
+                    $sqlType !== 'BLOB') {
+                    $sqlType = 'VARCHAR(255)'; // Fallback type for unknown types
+                }
+            }
+        }
+
+        return array('sqlType' => $sqlType, 'pKeyArrUsed' => $pKeyArrUsed);
+    }
+
 
     /**
      * Retrieves a list of columns for a specified table in the database.
@@ -430,6 +467,30 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             error_log($e->getMessage());
         }
         return $config;
+    }
+    
+    /**
+     * Check if a table exists in the database.
+     *
+     * This method queries the database to determine if a specified table exists by checking 
+     * the SQLite master table. It throws an exception if the table name is null or empty.
+     *
+     * @param PicoDatabase $database The database instance to check.
+     * @param string $tableName The name of the table to check.
+     * @return bool True if the table exists, false otherwise.
+     * @throws InvalidParameterException If the table name is null or empty.
+     */
+    public function tableExists($database, $tableName)
+    {
+        if(!isset($tableName) || empty($tableName))
+        {
+            throw new InvalidParameterException("Table name can't be null or empty.");
+        }
+        $query = "SELECT name FROM sqlite_master WHERE type='table' AND name=:tableName";
+        $stmt = $database->getDatabaseConnection()->prepare($query);
+        $stmt->bindValue(':tableName', $tableName);
+        $stmt->execute();
+        return $stmt->fetch() !== false;
     }
     
 }

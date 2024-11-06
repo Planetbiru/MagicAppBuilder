@@ -37,7 +37,7 @@ class InputEnv extends PicoRequestBase {
      *
      * @param array $data Data to load into the object.
      * @param bool $tolower Flag to indicate if the keys should be converted to lowercase (default is false).
-     * @return self Returns the instance of the current object.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data, $tolower = false)
     {
