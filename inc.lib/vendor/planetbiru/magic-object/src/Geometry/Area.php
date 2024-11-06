@@ -172,12 +172,12 @@ class Area
         $attrs[] = 'coords="' . implode(", ", $this->getCoords($this->zoom)) . '"';
 
         if (isset($this->href)) {
-            $attrs[] = 'href="' . htmlspecialchars($this->href) . '"';
+            $attrs[] = 'href="' . $this->href . '"';
         }
 
         if (isset($this->attributes) && is_array($this->attributes)) {
             foreach ($this->attributes as $key => $value) {
-                $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                $attrs[] = $key . '="' . $value . '"';
             }
         }
 

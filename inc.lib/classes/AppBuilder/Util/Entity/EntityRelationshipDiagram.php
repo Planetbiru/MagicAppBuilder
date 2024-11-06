@@ -532,7 +532,7 @@ class EntityRelationshipDiagram //NOSONAR
                 'data-reference-column-name'=>$entityRelationship->getReferenceColumn()->getColumnName(),
                 'data-toggle'=>'tooltip',
                 'data-html'=>'true',
-                'title'=>$entityRelationship->getDiagram()->getEntityName().' -> '.$entityRelationship->getReferenceDiagram()->getEntityName()
+                'title'=>$entityRelationship->getDiagram()->getEntityName().' &#10132; '.$entityRelationship->getReferenceDiagram()->getEntityName()
             );
             $area[] = new Area($poly, $this->zoom, $href, $attributes);
         }
