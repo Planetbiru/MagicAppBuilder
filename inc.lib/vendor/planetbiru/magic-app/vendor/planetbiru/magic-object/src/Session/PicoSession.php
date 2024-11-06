@@ -172,7 +172,7 @@ class PicoSession
      * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
      * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
      * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setSessionCookieParams($maxlifetime, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
     {
@@ -202,7 +202,7 @@ class PicoSession
      * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
      * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
      * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
     {
@@ -225,7 +225,7 @@ class PicoSession
      * Sets the session name.
      *
      * @param string $name The name of the session.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setSessionName($name)
     {
@@ -248,7 +248,7 @@ class PicoSession
      * Sets the maximum lifetime for the session.
      *
      * @param int $lifeTime Maximum lifetime for the session in seconds.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setSessionMaxLifeTime($lifeTime)
     {
@@ -263,7 +263,7 @@ class PicoSession
      * @param string $host Redis host.
      * @param int $port Redis port.
      * @param string $auth Redis authentication.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function saveToRedis($host, $port, $auth)
     {
@@ -277,7 +277,7 @@ class PicoSession
      * Saves the session to files.
      *
      * @param string $path The directory where session files will be stored.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function saveToFiles($path)
     {
@@ -300,7 +300,7 @@ class PicoSession
      * Sets a new session ID.
      *
      * @param string $id The new session ID.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setSessionId($id)
     {

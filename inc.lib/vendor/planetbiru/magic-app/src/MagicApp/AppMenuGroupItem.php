@@ -95,7 +95,7 @@ class AppMenuGroupItem
      *
      * @return self
      */ 
-    public function setMenuItems(array $menuItems)
+    public function setMenuItems($menuItems)
     {
         $this->menuItems = $menuItems;
 

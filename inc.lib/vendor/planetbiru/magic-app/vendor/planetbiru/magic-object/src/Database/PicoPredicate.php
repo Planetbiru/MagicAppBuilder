@@ -396,7 +396,10 @@ class PicoPredicate //NOSONAR
     }
 
     /**
-     * Convert the object to a JSON string representation.
+     * Convert the object to a JSON string representation for debugging.
+     *
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.
      */

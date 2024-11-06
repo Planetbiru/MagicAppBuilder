@@ -82,7 +82,7 @@ class ImageUtil
      * @param int $width The width of the new image.
      * @param int $height The height of the new image.
      * @param ImageColor|null $color Optional color to fill the image.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public static function empty($width, $height, $color = null)
     {
@@ -355,7 +355,7 @@ class ImageUtil
      * @param int $newX The new width.
      * @param int $newY The new height.
      * @param ImageColor|null $color Optional color to fill the extra space.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      * @throws ImageUtilException If an error occurs during resizing.
      */
     public function resizeAspectRatio($newX, $newY, ImageColor $color = null)
@@ -413,7 +413,7 @@ class ImageUtil
      * @param int $position The position where the stamp will be placed.
      * @param int $padding The padding between the stamp and the edges.
      * @param int $opacity The opacity of the stamp (0-100).
-     * @return self
+     * @return self Returns the current instance for method chaining.
      * @throws ImageUtilException If an error occurs during stamping.
      * @throws FileNotFoundException If the source image is not found.
      */
@@ -570,7 +570,7 @@ class ImageUtil
      * @param float $fromY The starting Y coordinate.
      * @param float $toX The ending X coordinate.
      * @param float $toY The ending Y coordinate.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function crop($fromX, $fromY, $toX, $toY)
     {
@@ -588,7 +588,7 @@ class ImageUtil
     /**
      * Discards changes and restores the original image state.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function restore()
     {

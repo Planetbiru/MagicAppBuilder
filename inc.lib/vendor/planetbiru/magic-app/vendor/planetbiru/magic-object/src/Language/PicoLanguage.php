@@ -33,7 +33,7 @@ class PicoLanguage
      * Load data into the object.
      *
      * @param stdClass|array $data Data to be loaded into the object.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -51,12 +51,12 @@ class PicoLanguage
      *
      * @param string $propertyName Name of the property to set.
      * @param mixed|null $propertyValue Value to assign to the property.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $this->$var = $propertyValue;
+        $this->{$var} = $propertyValue;
         return $this;
     }
 
@@ -69,7 +69,7 @@ class PicoLanguage
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : null;
+        return isset($this->{$var}) ? $this->{$var} : null;
     }
 
     /**
@@ -107,7 +107,7 @@ class PicoLanguage
      */
     public function __isset($name)
     {
-        return isset($this->$name);
+        return isset($this->{$name});
     }
 
     /**
@@ -118,7 +118,7 @@ class PicoLanguage
      */
     public function __unset($name)
     {
-        unset($this->$name);
+        unset($this->{$name});
     }
 
     /**
@@ -150,7 +150,7 @@ class PicoLanguage
             return $this->get($var);
         } elseif (strncasecmp($method, "equals", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            $value = isset($this->$var) ? $this->$var : null;
+            $value = isset($this->{$var}) ? $this->{$var} : null;
             return isset($params[0]) && $params[0] == $value;
         }
     }

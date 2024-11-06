@@ -90,7 +90,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     public function set($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $this->$var = $propertyValue;
+        $this->{$var} = $propertyValue;
         return $this;
     }
 
@@ -104,7 +104,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     public function get($propertyName, $params = null)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $value = isset($this->$var) ? $this->$var : null;
+        $value = isset($this->{$var}) ? $this->{$var} : null;
         if(isset($params) && !empty($params))
         {
             $filter = $params[0];
@@ -142,7 +142,7 @@ class PicoRequestBase extends stdClass //NOSONAR
         {
             if(!in_array($key, $parentProps))
             {
-                $value->$key = $val;
+                $value->{$key} = $val;
             }
         }
         if($snakeCase)
@@ -151,7 +151,7 @@ class PicoRequestBase extends stdClass //NOSONAR
             foreach ($value as $key => $val)
             {
                 $key2 = PicoStringUtil::snakeize($key);
-                $value2->$key2 = $val;
+                $value2->{$key2} = $val;
             }
             return $value2;
         }
@@ -611,17 +611,17 @@ class PicoRequestBase extends stdClass //NOSONAR
         if (strncasecmp($method, "countable", 9) === 0)
         {
             $var = lcfirst(substr($method, 9));
-            return isset($this->$var) && is_array($this->$var);
+            return isset($this->{$var}) && is_array($this->{$var});
         }
         else if (strncasecmp($method, "isset", 5) === 0)
         {
             $var = lcfirst(substr($method, 5));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0)
         {
             $var = lcfirst(substr($method, 2));
-            return isset($this->$var) && ($this->$var == 1 || strtolower($this->$var) == 'true');
+            return isset($this->{$var}) && ($this->{$var} == 1 || strtolower($this->{$var}) == 'true');
         }
         else if (strncasecmp($method, "get", 3) === 0)
         {
@@ -631,44 +631,44 @@ class PicoRequestBase extends stdClass //NOSONAR
         else if (strncasecmp($method, "set", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            $this->$var = $params[0];
+            $this->{$var} = $params[0];
             return $this;
         }
         else if (strncasecmp($method, "equals", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            $value = isset($this->$var) ? $this->$var : null;
+            $value = isset($this->{$var}) ? $this->{$var} : null;
             return isset($params[0]) && $params[0] == $value;
         }
         else if (strncasecmp($method, "checkbox", 8) === 0) {
             $var = lcfirst(substr($method, 8));
-            $this->$var = isset($this->$var) ? $this->$var : $params[0];
+            $this->{$var} = isset($this->{$var}) ? $this->{$var} : $params[0];
             return $this;
         }
         else if (strncasecmp($method, "filter", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            if(isset($this->$var))
+            if(isset($this->{$var}))
             {
-                $this->$var = $this->applyFilter($this->$var, $params[0]);
+                $this->{$var} = $this->applyFilter($this->{$var}, $params[0]);
             }
             return $this;
         }
         else if (strncasecmp($method, "createSelected", 14) === 0) {
             $var = lcfirst(substr($method, 14));
-            if(isset($this->$var))
+            if(isset($this->{$var}))
             {
-                return $this->$var == $params[0] ? ' selected="selected"' : '';
+                return $this->{$var} == $params[0] ? ' selected="selected"' : '';
             }
         }
         else if (strncasecmp($method, "createChecked", 13) === 0) {
             $var = lcfirst(substr($method, 13));
-            if(isset($this->$var))
+            if(isset($this->{$var}))
             {
-                return $this->$var == $params[0] ? ' checked="checked"' : '';
+                return $this->{$var} == $params[0] ? ' checked="checked"' : '';
             }
         }
         else if (strncasecmp($method, "unset", 5) === 0) {
             $var = lcfirst(substr($method, 5));
-            unset($this->$var);
+            unset($this->{$var});
             return $this;
         }
     }

@@ -28,7 +28,7 @@ class Polygon
      *
      * @param Point[] $points Initial points for the polygon.
      */
-    public function __construct(array $points = [])
+    public function __construct($points = [])
     {
         $this->points = $points;
     }
@@ -37,9 +37,9 @@ class Polygon
      * Add a point to the polygon.
      *
      * @param Point $point Point to add.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
-    public function addPoint(Point $point): self
+    public function addPoint($point)
     {
         $this->points[] = $point;
         return $this;
@@ -50,9 +50,9 @@ class Polygon
      *
      * This method removes all points currently defined for the polygon.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
-    public function clearPolygon(): self
+    public function clearPolygon()
     {
         $this->points = [];
         return $this;
@@ -64,7 +64,7 @@ class Polygon
      * @return float The area of the polygon.
      * @throws InvalidPolygonException If the polygon has fewer than 3 points.
      */
-    public function getArea(): float
+    public function getArea()
     {
         $cnt = count($this->points);
         if ($cnt < 3) {
@@ -89,7 +89,7 @@ class Polygon
      * @return float The circumference of the polygon.
      * @throws InvalidPolygonException If the polygon has fewer than 2 points.
      */
-    public function getCircumference(): float
+    public function getCircumference()
     {
         $cnt = count($this->points);
         if ($cnt < 2) {
@@ -112,7 +112,7 @@ class Polygon
      *
      * @return Point[] An array of Point objects that define the polygon.
      */
-    public function getPoints(): array
+    public function getPoints()
     {
         return $this->points;
     }

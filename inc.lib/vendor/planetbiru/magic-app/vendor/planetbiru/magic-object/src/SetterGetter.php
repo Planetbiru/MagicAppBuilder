@@ -109,7 +109,7 @@ class SetterGetter extends stdClass
     public function set($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        $this->$var = $propertyValue;
+        $this->{$var} = $propertyValue;
         return $this;
     }
 
@@ -125,11 +125,11 @@ class SetterGetter extends stdClass
     public function push($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(!isset($this->$var))
+        if(!isset($this->{$var}))
         {
-            $this->$var = array();
+            $this->{$var} = array();
         }
-        array_push($this->$var, $propertyValue);
+        array_push($this->{$var}, $propertyValue);
         return $this;
     }
 
@@ -142,9 +142,9 @@ class SetterGetter extends stdClass
     public function pop($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(isset($this->$var) && is_array($this->$var))
+        if(isset($this->{$var}) && is_array($this->{$var}))
         {
-            return array_pop($this->$var);
+            return array_pop($this->{$var});
         }
         return null;
     }
@@ -158,7 +158,7 @@ class SetterGetter extends stdClass
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : null;
+        return isset($this->{$var}) ? $this->{$var} : null;
     }
 
     /**
@@ -200,7 +200,7 @@ class SetterGetter extends stdClass
      */
     public function __isset($name)
     {
-        return isset($this->$name) ? $this->$name : null;
+        return isset($this->{$name}) ? $this->{$name} : null;
     }
 
     /**
@@ -213,7 +213,7 @@ class SetterGetter extends stdClass
      */
     public function __unset($name)
     {
-        unset($this->$name);
+        unset($this->{$name});
     }
 
     /**
@@ -232,7 +232,7 @@ class SetterGetter extends stdClass
         {
             if(!in_array($key, $parentProps))
             {
-                $value->$key = $val;
+                $value->{$key} = $val;
             }
         }
         if($snakeCase)
@@ -241,7 +241,7 @@ class SetterGetter extends stdClass
             foreach ($value as $key => $val)
             {
                 $key2 = PicoStringUtil::snakeize($key);
-                $value2->$key2 = $val;
+                $value2->{$key2} = $val;
             }
             return $value2;
         }
@@ -323,28 +323,27 @@ class SetterGetter extends stdClass
      * @param array $params Parameters passed to the method.
      * @return mixed|null The result of the method call or null if the method does not return a value.
      */
-
     public function __call($method, $params) //NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0)
         {
             $var = lcfirst(substr($method, 5));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0)
         {
             $var = lcfirst(substr($method, 2));
-            return isset($this->$var) ? $this->$var == 1 : false;
+            return isset($this->{$var}) ? $this->{$var} == 1 : false;
         }
         else if (strncasecmp($method, "get", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            return isset($this->$var) ? $this->$var : null;
+            return isset($this->{$var}) ? $this->{$var} : null;
         }
         else if (strncasecmp($method, "set", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            $this->$var = $params[0];
+            $this->{$var} = $params[0];
             return $this;
         }
         else if (strncasecmp($method, "unset", 5) === 0)
@@ -355,21 +354,21 @@ class SetterGetter extends stdClass
         }
         else if (strncasecmp($method, "push", 4) === 0) {
             $var = lcfirst(substr($method, 4));
-            if(!isset($this->$var))
+            if(!isset($this->{$var}))
             {
-                $this->$var = array();
+                $this->{$var} = array();
             }
-            if(is_array($this->$var))
+            if(is_array($this->{$var}))
             {
-                array_push($this->$var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
+                array_push($this->{$var}, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
             }
             return $this;
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
             $var = lcfirst(substr($method, 3));
-            if(isset($this->$var) && is_array($this->$var))
+            if(isset($this->{$var}) && is_array($this->{$var}))
             {
-                return array_pop($this->$var);
+                return array_pop($this->{$var});
             }
             return null;
         }

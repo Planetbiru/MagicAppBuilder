@@ -29,7 +29,6 @@ use ReflectionClass;
  * THE SOFTWARE.
  * 
  * @package MagicObject\Util\ClassUtil
- * @link https://github.com/Planetbiru/MagicObject
  */
 class ExtendedReflectionClass extends ReflectionClass {
 

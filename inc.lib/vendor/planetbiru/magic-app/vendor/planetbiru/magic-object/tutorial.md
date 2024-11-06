@@ -90,6 +90,8 @@ Finally, MagicObject includes comprehensive **debugging tools** to inspect and a
 
 # MagicObject Installation
 
+## Installing MagicObject
+
 To install **MagicObbject**
 
 ```
@@ -102,6 +104,8 @@ or if composer is not installed
 php composer.phar require planetbiru/magic-object
 ```
 
+## Removing MagicObject
+
 To remove **MagicObbject**
 
 ```
@@ -113,6 +117,8 @@ or if composer is not installed
 ```
 php composer.phar remove planetbiru/magic-object
 ```
+
+## Installing Composer
 
 To install composer on your PC or download latest composer.phar, click https://getcomposer.org/download/ 
 # MagicObject Implementation
@@ -1524,7 +1530,6 @@ catch(Exception $e)
 }
 
 ```
-
 ## MagicDto
 
 ### Introduction to DTOs
@@ -1539,24 +1544,28 @@ In modern applications, especially those that interact with third-party services
 
 **MagicDto** addresses these issues by allowing developers to create DTOs that seamlessly translate property names between different naming conventions. This ensures that data is properly formatted for both internal and external use, enhancing interoperability and reducing errors.
 
+### Benefits of Using MagicDto
+
+- **Reduced Complexity**: By automating property translation, MagicDto minimizes the need for manual mapping code, reducing complexity and potential errors.
+- **Improved Maintainability**: With clearly defined annotations and a structured approach, developers can easily understand and maintain the DTOs, even as systems evolve.
+- **Enhanced Interoperability**: MagicDto ensures that data exchanged between different systems is consistent and correctly formatted, leading to smoother integrations and fewer runtime issues.
+
 ### Features of MagicDto
 
-1.  **Flexible Naming Strategies**:
-    
-    -   MagicDto supports both camel case and snake case naming strategies. This flexibility is particularly useful when integrating with diverse APIs or legacy systems that may employ different conventions.
+1. **Flexible Naming Strategies**:
 
-2.  **Automatic Property Mapping**:
-    
-    -   Users can define DTOs that automatically map properties from their internal representation to the expected format of third-party services. This reduces boilerplate code and simplifies maintenance.
- 
-3.  **Annotations for Clarity**:
-    
-    -   The MagicDto class utilizes PHP annotations to clarify the purpose of each property. These annotations enhance code readability and provide useful metadata for serialization.
+   - MagicDto supports both camel case and snake case naming strategies. This flexibility is particularly useful when integrating with diverse APIs or legacy systems that may employ different conventions.
+2. **Automatic Property Mapping**:
 
+   - Users can define DTOs that automatically map properties from their internal representation to the expected format of third-party services. This reduces boilerplate code and simplifies maintenance.
+3. **Annotations for Clarity**:
+
+   - The MagicDto class utilizes PHP annotations to clarify the purpose of each property. These annotations enhance code readability and provide useful metadata for serialization.
 4. **XML Support**
-    -   MagicDto provides support for both XML input and output. This feature allows seamless integration with systems that utilize XML as their primary data format, making it easier to work with various data sources and services.
 
-    To parse XML string, use method `MagicTdo::xmlToObject(string $xmlString)`. This method takes an XML string as input and returning it as a stdClass object.
+   - MagicDto provides support for both XML input and output. This feature allows seamless integration with systems that utilize XML as their primary data format, making it easier to work with various data sources and services.
+
+   To parse XML string, use method `MagicTdo::xmlToObject(string $xmlString)`. This method takes an XML string as input and returning it as a stdClass object.
 
 ### Class Structure
 
@@ -1566,20 +1575,18 @@ The `MagicDto` class is designed with properties that have protected access leve
 
 **Class Annotations**
 
-1.  **@JSON**
-    
-    The `@JSON` annotation controls whether the JSON format should be prettified. Using `@JSON(prettify=true)` will format the output in a more readable way, while `@JSON(prettify=false)` will minimize the format
+1. **@JSON**
 
-2.  **@XML**
-    
-    The `@XML` annotation controls whether the XML format should be prettified. Using `@XML(prettify=true)` will format the output in a more readable way, while `@XML(prettify=false)` will minimize the format    
+   The `@JSON` annotation controls whether the JSON format should be prettified. Using `@JSON(prettify=true)` will format the output in a more readable way, while `@JSON(prettify=false)` will minimize the format
+2. **@XML**
 
+   The `@XML` annotation controls whether the XML format should be prettified. Using `@XML(prettify=true)` will format the output in a more readable way, while `@XML(prettify=false)` will minimize the format
 
 **Property Annotations**
 
-1.  **@Source**
-    
-    The `@Source` annotation indicates the source property that maps to a specific field in the incoming data. If this annotation is omitted, MagicDto will default to using the property name that matches the class property name. This allows for flexibility in cases where the external API may use different naming conventions.
+1. **@Source**
+
+   The `@Source` annotation indicates the source property that maps to a specific field in the incoming data. If this annotation is omitted, MagicDto will default to using the property name that matches the class property name. This allows for flexibility in cases where the external API may use different naming conventions.
 
 ```php
 /**
@@ -1589,9 +1596,9 @@ The `MagicDto` class is designed with properties that have protected access leve
 protected $title;
 ```
 
-2.  **@JsonProperty**
+2. **@JsonProperty**
 
-    The `@JsonProperty` annotation specifies the output property name when data is serialized to JSON. If this annotation is not provided, MagicDto will serialize the property using its class property name. This ensures that data sent to third-party applications adheres to their expected format.
+   The `@JsonProperty` annotation specifies the output property name when data is serialized to JSON. If this annotation is not provided, MagicDto will serialize the property using its class property name. This ensures that data sent to third-party applications adheres to their expected format.
 
 ```php
 /**
@@ -1616,24 +1623,63 @@ In this example, `@Source("album_name")` indicates that the incoming data will u
 
 To facilitate bidirectional communication, we need two different DTOs. The `@Source` annotation in the first DTO corresponds to the `@JsonProperty` annotation in the second DTO, while the `@JsonProperty` in the first DTO maps to the `@Source` in the second DTO.
 
-3.  **@JsonFormat**
+3. **@JsonFormat**
 
-    The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be `DateTime`. It is written as `@JsonFormat(pattern="Y-m-d H:i:s")`. If this annotation is not provided, MagicDto will serialize the property using the default format Y-m-d H:i:s. This ensures that data sent to third-party applications adheres to their expected format.
+   The @JsonFormat annotation specifies the output date-time format when data is serialized to JSON. The property type must be `DateTime`. It is written as `@JsonFormat(pattern="Y-m-d H:i:s")`. If this annotation is not provided, MagicDto will serialize the property using the default format `Y-m-d H:i:s`. This ensures that data sent to third-party applications adheres to their expected format.
 
-    Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as 'Y-m-d H:i:s' for complete timestamps or 'd/m/Y' for more localized representations, depending on the specific requirements of your application.
+   Format the date and time according to the conventions used in the PHP programming language. This includes utilizing the built-in date and time functions, which allow for various formatting options to display dates and times in a way that is both readable and compatible with PHP's standards. Ensure that you adhere to formats such as `Y-m-d H:i:s` for complete timestamps or `d/m/Y` for more localized representations, depending on the specific requirements of your application.
 
-    MagicDto automatically parses input as both strings and integers. The integer is a unique timestamp, while the string date-time format must be one of the following:
-  
-    - **'Y-m-d'**,              // ISO 8601: 2024-10-24
-    - **'Y-m-d H:i:s'**,        // ISO 8601: 2024-10-24 15:30:00
-    - **'Y-m-d\TH:i:s'**,       // ISO 8601: 2024-10-24T15:30:00
-    - **'Y-m-d\TH:i:s\Z'**,     // ISO 8601: 2024-10-24T15:30:00Z
-    - **'D, d M Y H:i:s O'**,   // RFC 2822: Thu, 24 Oct 2024 15:30:00 +0000
-    - **'d/m/Y'**,              // Local format: 24/10/2024
-    - **'d F Y'**,              // Format with month name: 24 October 2024
-    - **'l, d F Y'**            // Format with day of the week: Thursday, 24 October 2024
+   MagicDto automatically parses input as both strings and integers. The integer is a unique timestamp, while the string date-time format must be one of the following:
 
 
+#### Date Format Examples
+
+Below are various date format strings that you can use in PHP, along with their descriptions and typical use cases:
+
+-   **`'Y-m-d'`**  
+    _Format:_ ISO 8601  
+    _Example:_ `2024-10-24`  
+    _Description:_ This format represents the date in a standard way that is widely used in APIs and databases. It is particularly useful for storing dates in a consistent format.
+    
+-   **`'Y-m-d H:i:s'`**  
+    _Format:_ ISO 8601 with Time  
+    _Example:_ `2024-10-24 15:30:00`  
+    _Description:_ This format includes both the date and time, making it suitable for logging events or recording timestamps in applications where precision is required.
+    
+-   **`'Y-m-d\TH:i:s'`**  
+    _Format:_ ISO 8601 with 'T' Separator  
+    _Example:_ `2024-10-24T15:30:00`  
+    _Description:_ This format uses a 'T' to separate the date and time, conforming to the strict ISO 8601 standard. It is commonly used in JSON data and web APIs.
+    
+-   **`'Y-m-d\TH:i:s\Z'`**  
+    _Format:_ ISO 8601 with UTC Indicator  
+    _Example:_ `2024-10-24T15:30:00Z`  
+    _Description:_ Similar to the previous format but includes a 'Z' at the end to indicate that the time is in UTC (Coordinated Universal Time). Useful in global applications where time zone context is important.
+    
+-   **`'D, d M Y H:i:s O'`**  
+    _Format:_ RFC 2822  
+    _Example:_ `Thu, 24 Oct 2024 15:30:00 +0000`  
+    _Description:_ This format is often used in email headers and HTTP headers. It provides a readable representation of the date and time along with the time zone offset.
+    
+-   **`'d/m/Y'`**  
+    _Format:_ Local Format  
+    _Example:_ `24/10/2024`  
+    _Description:_ A simple date format that is commonly used in various countries. It is easily readable and useful for forms and local applications.
+    
+-   **`'d F Y'`**  
+    _Format:_ Date with Full Month Name  
+    _Example:_ `24 October 2024`  
+    _Description:_ This format spells out the month, making it very human-readable. Ideal for generating reports or documents where clarity is essential.
+    
+-   **`'l, d F Y'`**  
+    _Format:_ Date with Day of the Week  
+    _Example:_ `Thursday, 24 October 2024`  
+    _Description:_ This format includes the full name of the day, providing a complete and easily readable date string. Perfect for calendars, invitations, or any context where a formal date presentation is needed.
+    
+-   **`'U'`**  
+    _Format:_ Unix Timestamp  
+    _Example:_ `1698151800`  
+    _Description:_ This format represents the date as a Unix timestamp, which is the number of seconds that have elapsed since January 1, 1970 (UTC). It is useful for database storage and calculations involving time, as well as for interoperability with systems that utilize Unix timestamps.
 
 
 **Example:**
@@ -1711,29 +1757,28 @@ class AlbumDtoOutput extends MagicDto
 
 **Description**
 
-In this example, we have two DTO classes: AlbumDtoInput and AlbumDtoOutput. The AlbumDtoInput class is designed to receive data from external sources, using the @Source annotation to specify the incoming property names and the @JsonProperty annotation to define the corresponding properties in the internal representation.
+In this example, we have two DTO classes: `AlbumDtoInput` and `AlbumDtoOutput`. The `AlbumDtoInput` class is designed to receive data from external sources, using the `@Source` annotation to specify the incoming property names and the `@JsonProperty` annotation to define the corresponding properties in the internal representation.
 
-Conversely, the AlbumDtoOutput class is structured for sending data outwards. Here, the @Source annotation reflects the internal property names, while the @JsonProperty annotation defines the expected property names when the data is serialized for external use. This bidirectional mapping ensures that data flows seamlessly between internal and external systems.
+Conversely, the `AlbumDtoOutput` class is structured for sending data outwards. Here, the `@Source` annotation reflects the internal property names, while the `@JsonProperty` annotation defines the expected property names when the data is serialized for external use. This bidirectional mapping ensures that data flows seamlessly between internal and external systems.
 
 The `@Source` annotation allows a Data Transfer Object (DTO) to inherit properties from an underlying object, enabling seamless data integration across related entities.
 
 ### Cross Object Mapping
 
-
 #### Cross Object Mapping Explanation
 
-1.  **Concept Clarification**:
-    
-    -   Cross Object Mapping refers to the ability to access and utilize properties from related objects in a hierarchical structure. In your case, the `SongDto` pulls in the agency name associated with the artist of a song.
-2.  **DTO Definition**:
-    
-    -   A DTO is a simple object that carries data between processes. In this context, `SongDto` aggregates data from the `Song`, `Artist`, and `Agency` models without duplicating properties unnecessarily.
+1. **Concept Clarification**:
+
+   - Cross Object Mapping refers to the ability to access and utilize properties from related objects in a hierarchical structure. In your case, the `SongDto` pulls in the agency name associated with the artist of a song.
+2. **DTO Definition**:
+
+   - A DTO is a simple object that carries data between processes. In this context, `SongDto` aggregates data from the `Song`, `Artist`, and `Agency` models without duplicating properties unnecessarily.
 
 For example, we want to directly include properties from the agency within the SongDto.
 
--   **Song**
-    -   **Artist**
-        -   **Agency**
+- **Song**
+  - **Artist**
+    - **Agency**
 
 When creating a DTO for a `Song`, the user can incorporate properties from the associated `Agency` into the `SongDto`. This is particularly useful for aggregating data from related models without needing to replicate information.
 
@@ -1766,7 +1811,7 @@ class Song extends MagicObject {
     * @var Artist
     */
     protected $artist;
-    
+  
     // Additional properties and methods for the Song can be defined here.
 }
 ```
@@ -1798,7 +1843,7 @@ class Artist extends MagicObject {
     * @var Agency
     */
     protected $agency;
-    
+  
     // Additional properties and methods for the Artist can be defined here.
 }
 ```
@@ -1822,12 +1867,12 @@ class Agency extends MagicObject {
     * @var string
     */
     protected $name;
-    
+  
     // Additional properties and methods for the Agency can be defined here.
 }
 ```
 
-**SongDto** 
+**SongDto**
 
 ```php
 class SongDto extends MagicDto
@@ -1874,7 +1919,7 @@ class SongDto extends MagicDto
 }
 ```
 
-**ArtistDto** 
+**ArtistDto**
 
 ```php
 class ArtistDto extends MagicDto
@@ -1921,7 +1966,7 @@ class ArtistDto extends MagicDto
 }
 ```
 
-**AgencyDto** 
+**AgencyDto**
 
 ```php
 class AgencyDto extends MagicDto
@@ -1992,22 +2037,67 @@ echo $albumDto;
 
 `loadXml` method will load data from XML to `AlbumDtoInput`. `AlbumDtoInput` is the inverse of `AlbumDto`, where values of the `@JsonProperty` and `@Source` annotations are swapped. This inversion also applies to the objects contained within it.
 
+### Customizing Data Transfer Objects (DTOs) in MagicDto
+
+When creating a Data Transfer Object (DTO) using `MagicDto`, users have the flexibility to define override methods that can manipulate input data before it is loaded into the DTO. This allows for customization and validation of the data being processed.
+
+#### Example of an Override Method
+
+```php
+public function onBeforeLoad($data)
+{
+    // This method can be overridden to manipulate the incoming data
+    return $data;
+}
+```
+
+By overriding the onBeforeLoad method, users can modify the input data directly before it is handled by the DTO. This can be useful for tasks such as data sanitization or transformation.
+
+#### Handling Various Data Types
+
+`MagicDto` is designed to accept parameters of various data types, such as objects, arrays, or scalar values. To prevent errors during operations, it is crucial for users to check the data type before executing any logic on the input data.
+
+#### Example of Validating Input Data
+
+```php
+public function onLoadData($data)
+{
+    // Check if the input data is an instance of EntityAlbum
+    if ($data instanceof EntityAlbum) {
+        // Modify properties of the EntityAlbum object
+        $data->setName("Album Name");
+        $data->setProducerName($data->getProducer()->getName());
+    }
+
+    // Return the modified data
+    return $data;
+}
+```
+
+In the ``onLoadData` method, we first verify whether the incoming `$data` is an instance of `EntityAlbum`. If it is, we proceed to set specific properties on the `EntityAlbum` object. This ensures that the operations performed are valid and appropriate for the type of data being processed.
+
+#### Example of Throwing Exceptions
+
+```php
+public function onBeforeLoad($data)
+{
+    if ($data instanceof EntityAlbum) {
+        throw new InvalidArgumentException("Data must be an EntityAlbum.");
+    }
+
+    // Further manipulation of data can occur here
+    return $data;
+}
+```
+
+In this example, if the incoming data is not an `EntityAlbum`, an `InvalidArgumentException` is thrown, preventing further processing of invalid data.
 
 #### Explanation
 
--   **@Source**: This annotation specifies the path to the property within the nested object structure. In this case, `artist->agency->name` indicates that the `agencyName` will pull data from the `name` property of the `Agency` object linked to the `Artist`.
-    
--   **@JsonProperty**: This annotation maps the `agencyName` property to a different key in the JSON representation of the DTO. Here, it will be serialized as `agency_name`.
-    
--   **protected $agencyName**: This declares the `agencyName` property with protected visibility, ensuring that it can only be accessed within the class itself and by subclasses.
+- **@Source**: This annotation specifies the path to the property within the nested object structure. In this case, `artist->agency->name` indicates that the `agencyName` will pull data from the `name` property of the `Agency` object linked to the `Artist`.
+- **@JsonProperty**: This annotation maps the `agencyName` property to a different key in the JSON representation of the DTO. Here, it will be serialized as `agency_name`.
 
 This approach enhances data encapsulation and promotes cleaner code by allowing DTOs to automatically gather necessary data from related entities.
-
-### Benefits of Using MagicDto
-
--   **Reduced Complexity**: By automating property translation, MagicDto minimizes the need for manual mapping code, reducing complexity and potential errors.
--   **Improved Maintainability**: With clearly defined annotations and a structured approach, developers can easily understand and maintain the DTOs, even as systems evolve.
--   **Enhanced Interoperability**: MagicDto ensures that data exchanged between different systems is consistent and correctly formatted, leading to smoother integrations and fewer runtime issues.
 
 ### Conclusion
 
@@ -2015,7 +2105,7 @@ MagicDto is a powerful solution for managing data transfer in applications that 
 
 ## Input POST/GET/COOKIE/REQUEST/SERVER
 
-In PHP, handling user input can be done through various superglobals, such as $_POST, $_GET, $_COOKIE, $_REQUEST, and $_SERVER. Each of these superglobals serves a specific purpose for gathering data from different types of requests.
+In PHP, handling user input can be done through various superglobals, such as `$_POST`, `$_GET`, `$_COOKIE`, `$_REQUEST`, and `$_SERVER`. Each of these superglobals serves a specific purpose for gathering data from different types of requests.
 
 ### Input POST
 
@@ -2388,6 +2478,13 @@ class PicoDatabaseCredentials extends SecretObject
     protected $driver = 'mysql';
 
     /**
+     * Database file path for SQLite database only
+     *
+     * @var string
+     */
+    protected $databaseFilePath;
+
+    /**
      * Database server host.
      *
      * @EncryptIn
@@ -2456,7 +2553,6 @@ class PicoDatabaseCredentials extends SecretObject
 public function __construct($databaseCredentials, $callbackExecuteQuery = null, $callbackDebugQuery = null)
 ```
 
-
 **Parameters:**
 
 -   `SecretObject $databaseCredentials`: Database credentials object.
@@ -2475,12 +2571,58 @@ public function __construct($databaseCredentials, $callbackExecuteQuery = null, 
     -   If the callback has **1 parameter**, it will be:
         -   `$sqlQuery`: The SQL query being debugged.
 
+To use setter methods for configuring the `callbackExecuteQuery` and `callbackDebugQuery` in the PicoDatabase class, follow the example below. This allows you to set the callbacks after instantiation
+
+**Setting Callbacks with Setters**
+
+Here's how you can set the callbacks using setter methods:
+
+```php
+use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseCredentials;
+
+// Example credentials setup
+$credentials = new PicoDatabaseCredentials();
+$credentials->setHost('localhost');
+$credentials->setUsername('user');
+$credentials->setPassword('password');
+
+// Instantiate PicoDatabase
+$db = new PicoDatabase($credentials);
+
+// Set callback for executing queries
+$db->setCallbackExecuteQuery(function($sqlQuery, $params, $type) {
+    echo "Executing query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+
+// Set callback for debugging queries
+$db->setCallbackDebugQuery(function($sqlQuery, $params) {
+    echo "Debugging query: $sqlQuery\n";
+    echo "Parameters: " . json_encode($params) . "\n";
+});
+
+```
+
+**Disabling Callbacks Using Setters**
+
+You can also disable the callbacks by setting them to `null`:
+
+```php
+// Instantiate PicoDatabase
+$dbWithoutCallbacks = new PicoDatabase($credentials);
+
+// Disable callbacks
+$dbWithoutCallbacks->setCallbackExecuteQuery(null);
+$dbWithoutCallbacks->setCallbackDebugQuery(null);
+
+```
+
 #### Connecting to the Database
 
 ```php
 public function connect($withDatabase = true): bool
 ```
-
 
 **Parameters**:
 
@@ -9512,13 +9654,13 @@ Native queries do not support multiple database connections. This means that all
 
 The parameters accepted by the native query function are as follows:
 
-1. string
-2. int or integer
-3. float
-4. bool or boolean
-5. null
-6. DateTime
-7. array of string, int, bool and DateTime
+1. `string`
+2. `int` or `integer`
+3. `float`
+4. `bool` or `boolean`
+5. `null`
+6. `DateTime`
+7. `array` of `string`, `int`, `bool` and `DateTime`
 
 For columns with data type `DATETIME` and `TIMESTAMP`, users can use either `string` or `DateTime` parameters. `DateTime` will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the `in` and `=` criteria.
 
@@ -11847,9 +11989,20 @@ If an operation fails, `PicoSqlite` may throw exceptions or return false. It is 
 `PicoSqlite` provides an efficient way to interact with SQLite databases. Its straightforward API allows developers to perform common database operations with minimal code. For more advanced database operations, consider extending the class or using additional PDO features.
 ## Upload File
 
-Uploading lots of files with arrays is difficult for some developers, especially novice developers. There is a significant difference between uploading a single file and multiple files.
+### Overview
 
-When the developer decides to change the form from single file to multiple files or vice versa, the backend developer must change the code to handle the uploaded files.
+Uploading files can be challenging, especially for novice developers. This guide explains how to manage single and multiple file uploads in PHP, highlighting the differences and providing straightforward examples.
+
+### Key Features
+
+-    **Easy File Handling:** The `PicoUploadFile` class simplifies the process of retrieving uploaded files.
+-    **Unified Retrieval:** The `getAll` method allows you to handle files uploaded through both single and multiple forms without needing separate logic.
+
+### Uploading Files
+
+#### Single File Upload
+
+To upload a single file, use the following HTML form:
 
 ```html
 <!-- single file -->
@@ -11858,6 +12011,10 @@ When the developer decides to change the form from single file to multiple files
      <input type="submit" />
 </form>
 ```
+
+#### Multiple File Upload
+
+To enable multiple file uploads, modify the input name to include brackets (`[]`) and use the `multiple` attribute:
 
 ```html
 <!-- multiple files -->
@@ -11870,34 +12027,34 @@ When the developer decides to change the form from single file to multiple files
 - For single uploads, the input field is named `myupload`.
 - For multiple uploads, the input field name is `myupload[]`, which allows multiple files to be uploaded at once.
 
+### PHP Backend Handling
+
+To handle the uploaded files on the server side, you can use the PicoUploadFile class. Here’s how to do it:
+
 ```php
 <?php
 
-use MagicObject\File\PicoUplodFile;
+use MagicObject\File\PicoUploadFile;
 
 require_once "vendor/autoload.php";
 
-$files = new PicoUplodFile();
+$files = new PicoUploadFile();
 
 $file1 = $files->get('myupload');
-// or 
+// or alternatively
 // $file1 = $files->myupload;
 
 $targetDir = __DIR__;
 
-foreach($file1->getAll() as $fileItem)
-{
-	$temporaryName = $fileItem->getTmpName();
-	$name = $fileItem->getName();
-	$size = $fileItem->getSize();
-	echo "$name | $temporaryName | $size\r\n";
-	move_uploaded_file($temporaryName, $targetDir."/".$name);
+foreach ($file1->getAll() as $fileItem) {
+    $temporaryName = $fileItem->getTmpName();
+    $name = $fileItem->getName();
+    $size = $fileItem->getSize();
+    
+    echo "$name | $temporaryName | $size\r\n";
+    move_uploaded_file($temporaryName, $targetDir . "/" . $name);
 }
-
 ```
-
-- The `PicoUplodFile` class simplifies file handling. The developer can retrieve the uploaded files easily using the get method.
-- The `getAll` method retrieves all files, regardless of whether they were uploaded via single or multiple file forms.
 
 ### Checking Upload Type
 
@@ -11917,7 +12074,7 @@ else
 
 ### Summary
 
-This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like getAll() and isMultiple(), developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.
+This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like `getAll()` and `isMultiple()`, developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.
 ## Language
 
 MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.

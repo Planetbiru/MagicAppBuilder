@@ -405,7 +405,7 @@ class DtoSong extends SetterGetter
      * Construct DtoSong from EntitySong and not copy other properties
      * 
      * @param EntitySong $input
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public static function valueOf($input)
     {

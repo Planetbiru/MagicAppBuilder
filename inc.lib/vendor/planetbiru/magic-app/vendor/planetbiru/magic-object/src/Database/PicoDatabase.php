@@ -104,11 +104,9 @@ class PicoDatabase //NOSONAR
     public function __construct($databaseCredentials, $callbackExecuteQuery = null, $callbackDebugQuery = null)
     {
         $this->databaseCredentials = $databaseCredentials;
-        
         if ($callbackExecuteQuery !== null && is_callable($callbackExecuteQuery)) {
             $this->callbackExecuteQuery = $callbackExecuteQuery;
         }
-
         if ($callbackDebugQuery !== null && is_callable($callbackDebugQuery)) {
             $this->callbackDebugQuery = $callbackDebugQuery;
         }
@@ -117,36 +115,85 @@ class PicoDatabase //NOSONAR
     /**
      * Connect to the database.
      *
-     * @param bool $withDatabase Flag to select the database when connected.
+     * Establishes a connection to the specified database type. Optionally selects a database if the 
+     * connection is to an RDMS and the flag is set.
+     *
+     * @param bool $withDatabase Flag to select the database when connected (default is true).
      * @return bool True if the connection is successful, false if it fails.
      */
     public function connect($withDatabase = true)
     {
-        $databaseTimeZone = $this->databaseCredentials->getTimeZone();
-        
+        $databaseTimeZone = $this->databaseCredentials->getTimeZone();      
         if ($databaseTimeZone !== null && !empty($databaseTimeZone)) {
             date_default_timezone_set($this->databaseCredentials->getTimeZone());
         }
-
-        $timeZoneOffset = date("P");
+        $this->databaseType = $this->getDbType($this->databaseCredentials->getDriver());
+        if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            return $this->connectSqlite();
+        }
+        else
+        {
+            return $this->connectRDMS($withDatabase);
+        }
+    }
+    
+    /**
+     * Connect to SQLite database.
+     *
+     * Establishes a connection to an SQLite database using the specified file path in the credentials.
+     * Throws an exception if the database path is not set or is empty.
+     *
+     * @return bool True if the connection is successful, false if it fails.
+     * @throws InvalidDatabaseConfiguration If the database path is empty.
+     * @throws PDOException If the connection fails with an error.
+     */
+    private function connectSqlite()
+    {
         $connected = false;
-
+        $path = $this->databaseCredentials->getDatabaseFilePath();
+        if(!isset($path) || empty($path))
+        {
+            throw new InvalidDatabaseConfiguration("Database path may not be empty. Please check your database configuration!");
+        }
+        try {
+            $this->databaseConnection = new PDO("sqlite:" . $path);
+            $this->databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $connected = true;
+            $this->connected = true;
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), intval($e->getCode()));
+        }
+        return $connected;
+    }
+    
+    /**
+     * Connect to the RDMS (Relational Database Management System).
+     *
+     * Establishes a connection to an RDMS database using the provided credentials and optionally selects 
+     * a specific database based on the provided flag. Sets the time zone for the connection and handles 
+     * schema settings for PostgreSQL.
+     *
+     * @param bool $withDatabase Flag to select the database when connected (default is true).
+     * @return bool True if the connection is successful, false if it fails.
+     * @throws InvalidDatabaseConfiguration If the database username is empty.
+     * @throws PDOException If the connection fails with an error.
+     */
+    private function connectRDMS($withDatabase = true)
+    {
+        $connected = false;
+        $timeZoneOffset = date("P");
         try {
             $connectionString = $this->constructConnectionString($withDatabase);
-            
             if (!$this->databaseCredentials->issetUsername()) {
                 throw new InvalidDatabaseConfiguration("Database username may not be empty. Please check your database configuration!");
             }
-
             $initialQueries = "SET time_zone = '$timeZoneOffset';";
-
-            if ($this->databaseCredentials->getDriver() == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL &&
-                $this->databaseCredentials->getDatabaseShema() != null && 
-                $this->databaseCredentials->getDatabaseShema() != "") {
-                $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseShema();
+            if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL &&
+                $this->databaseCredentials->getDatabaseSchema() != null && 
+                $this->databaseCredentials->getDatabaseSchema() != "") {
+                $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema();
             }
-
-            $this->databaseType = $this->databaseCredentials->getDriver();
             $this->databaseConnection = new PDO(
                 $connectionString,
                 $this->databaseCredentials->getUsername(),
@@ -157,14 +204,41 @@ class PicoDatabase //NOSONAR
                     PDO::MYSQL_ATTR_FOUND_ROWS => true
                 ]
             );
-
             $connected = true;
             $this->connected = $connected;
         } catch (Exception $e) {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
-
         return $connected;
+    }
+    
+    /**
+     * Determine the database type based on the provided database type string.
+     *
+     * This method checks the input string for common database type identifiers (SQLite, PostgreSQL, 
+     * MariaDB, MySQL) and returns the corresponding constant from the PicoDatabaseType class.
+     *
+     * @param string $databaseType The database type string to evaluate.
+     * @return string The corresponding database type constant from PicoDatabaseType.
+     */
+    private function getDbType($databaseType) // NOSONAR
+    {
+        if(stripos($databaseType, 'sqlite') !== false)
+        {
+            return PicoDatabaseType::DATABASE_TYPE_SQLITE;
+        }
+        else if(stripos($databaseType, 'postgre') !== false || stripos($databaseType, 'pgsql') !== false)
+        {
+            return PicoDatabaseType::DATABASE_TYPE_POSTGRESQL;
+        }
+        else if(stripos($databaseType, 'maria') !== false)
+        {
+            return PicoDatabaseType::DATABASE_TYPE_MARIADB;
+        }
+        else
+        {
+            return PicoDatabaseType::DATABASE_TYPE_MYSQL;
+        }
     }
 
     /**
@@ -203,7 +277,7 @@ class PicoDatabase //NOSONAR
     /**
      * Disconnect from the database.
      *
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function disconnect()
     {
@@ -215,7 +289,7 @@ class PicoDatabase //NOSONAR
      * Set the time zone offset.
      *
      * @param string $timeZoneOffset Client time zone.
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setTimeZoneOffset($timeZoneOffset)
     {
@@ -228,7 +302,7 @@ class PicoDatabase //NOSONAR
      * Change the database.
      *
      * @param string $databaseName Database name.
-     * @return self Returns the instance of the current object for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function useDatabase($databaseName)
     {
@@ -525,7 +599,6 @@ class PicoDatabase //NOSONAR
 
             // Get number of parameters
             $numberOfParams = $reflection->getNumberOfParameters();
-            $numberOfRequiredParams = $reflection->getNumberOfRequiredParameters();
             if($numberOfParams == 3)
             {
                 call_user_func($this->callbackDebugQuery, $query, $params, $type);
@@ -552,7 +625,6 @@ class PicoDatabase //NOSONAR
 
             // Get number of parameters
             $numberOfParams = $reflection->getNumberOfParameters();
-            $numberOfRequiredParams = $reflection->getNumberOfRequiredParameters();
 
             if($numberOfParams == 2)
             {
@@ -623,9 +695,12 @@ class PicoDatabase //NOSONAR
     }
 
     /**
-     * Magic method to debug the object.
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string Returns a JSON representation of the object's state.
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {
@@ -636,10 +711,34 @@ class PicoDatabase //NOSONAR
         return json_encode($val);
     }
 
+
+    /**
+     * Get callback function when executing queries that modify data.
+     *
+     * @return callable|null
+     */ 
+    public function getCallbackExecuteQuery()
+    {
+        return $this->callbackExecuteQuery;
+    }
+
+    /**
+     * Set callback function when executing queries that modify data.
+     *
+     * @param callable|null  $callbackExecuteQuery  Callback function when executing queries that modify data.
+     * @return self Returns the current instance for method chaining.
+     */ 
+    public function setCallbackExecuteQuery($callbackExecuteQuery)
+    {
+        $this->callbackExecuteQuery = $callbackExecuteQuery;
+
+        return $this;
+    }
+
     /**
      * Get callback function when executing any query.
      *
-     * @return  callable|null
+     * @return callable|null
      */ 
     public function getCallbackDebugQuery()
     {
@@ -647,12 +746,15 @@ class PicoDatabase //NOSONAR
     }
 
     /**
-     * Get callback function when executing queries that modify data.
+     * Set callback function when executing any query.
      *
-     * @return  callable|null
+     * @param callable|null  $callbackDebugQuery  Callback function when executing any query.
+     * @return self Returns the current instance for method chaining.
      */ 
-    public function getCallbackExecuteQuery()
+    public function setCallbackDebugQuery($callbackDebugQuery)
     {
-        return $this->callbackExecuteQuery;
+        $this->callbackDebugQuery = $callbackDebugQuery;
+
+        return $this;
     }
 }

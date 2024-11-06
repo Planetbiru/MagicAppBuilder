@@ -101,6 +101,16 @@ class PicoDatabaseQueryBuilder // NOSONAR
         return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) == 0;
     }
 
+	/**
+     * Check if the database type is SQLite.
+     *
+     * @return bool True if the database type is SQLite, false otherwise.
+     */
+    public function isSqlite()
+    {
+        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) == 0;
+    }
+
     /**
      * Initialize a new SQL query by resetting the buffer, limit, and offset.
      *
@@ -624,7 +634,8 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	public function escapeSQL($query)
 	{
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false ||
-			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false) {
+			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false ||
+			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) {
 			return str_replace(["\r", "\n"], ["\\r", "\\n"], addslashes($query));
 		}
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) !== false) {
