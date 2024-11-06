@@ -534,7 +534,6 @@ class ScriptGenerator
 
         foreach($menus as $menu)
         {
-
             $submenus = $menu->getSubmenus();
             if(is_array($submenus))
             {
