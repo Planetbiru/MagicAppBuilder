@@ -21,7 +21,7 @@ if($inputPost->issetTestConnection())
 {
     $databaseDriver = $inputPost->getDatabaseDriver();
     $databaseHost = $inputPost->getDatabaseHost();
-    $databaseFilePath = $inputPost->getDatabaseDatabaseFilePath();
+    $databaseDatabaseFilePath = $inputPost->getDatabaseDatabaseFilePath();
     $databasePort = intval($inputPost->getDatabasePort());
     $databaseUsername = $inputPost->getDatabaseUsername();
     $databasePassword = $inputPost->getDatabasePassword();
@@ -31,7 +31,7 @@ if($inputPost->issetTestConnection())
 
     $databaseConfig = new SecretObject([
         'driver'=>$databaseDriver,
-        'databaseFilePath'=>$databaseFilePath,
+        'databaseFilePath'=>$databaseDatabaseFilePath,
         'host'=>$databaseHost,
         'port'=>$databasePort,
         'username'=>$databaseUsername,
