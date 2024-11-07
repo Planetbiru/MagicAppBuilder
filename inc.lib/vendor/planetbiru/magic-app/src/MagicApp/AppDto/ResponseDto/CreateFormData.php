@@ -28,7 +28,7 @@ class CreateFormData extends ToString
      *
      * @var InputFormData[] Array of `InputFormData` objects.
      */
-    public $column;
+    protected $column;
 
     /**
      * The buttons associated with the form.
@@ -36,7 +36,7 @@ class CreateFormData extends ToString
      *
      * @var ButtonFormData[] Array of `ButtonFormData` objects.
      */
-    public $button;
+    protected $button;
 
     /**
      * CreateFormData constructor.

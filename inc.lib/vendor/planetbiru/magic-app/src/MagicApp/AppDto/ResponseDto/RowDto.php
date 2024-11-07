@@ -27,14 +27,14 @@ class RowDto extends ToString
      *
      * @var MagicObject
      */
-    public $data;
+    protected $data;
 
     /**
      * Metadata associated with the row.
      *
      * @var MetadataDto
      */
-    public $metadata;
+    protected $metadata;
 
     /**
      * Constructor to initialize properties of the RowDto class.

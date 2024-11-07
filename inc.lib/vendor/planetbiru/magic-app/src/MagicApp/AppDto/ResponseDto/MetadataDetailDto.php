@@ -31,14 +31,14 @@ class MetadataDetailDto extends MetadataDto
      *
      * @var array
      */
-    public $primaryKey;
+    protected $primaryKey;
 
     /**
      * Indicates whether the metadata is active.
      *
      * @var bool
      */
-    public $active;
+    protected $active;
 
     /**
      * Represents the status of the operation.
@@ -53,21 +53,21 @@ class MetadataDetailDto extends MetadataDto
      *
      * @var int
      */
-    public $waitingFor;
+    protected $waitingFor;
 
     /**
      * Code representing the waiting status.
      *
      * @var string
      */
-    public $waitingForCode;
+    protected $waitingForCode;
 
     /**
      * Message associated with the waiting status.
      *
      * @var string
      */
-    public $waitingForMessage;
+    protected $waitingForMessage;
 
     /**
      * Constructor to initialize properties of the MetadataDetailDto class.

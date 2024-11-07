@@ -24,49 +24,49 @@ class ListDto extends ToString
      *
      * @var string
      */
-    public $namespace;
+    protected $namespace;
     
     /**
      * The ID of the module associated with the data.
      *
      * @var string
      */
-    public $moduleId;
+    protected $moduleId;
 
     /**
      * The name of the module associated with the data.
      *
      * @var string
      */
-    public $moduleName;
+    protected $moduleName;
 
     /**
      * The title of the module associated with the data.
      *
      * @var string
      */
-    public $moduleTitle;
+    protected $moduleTitle;
 
     /**
      * The response code indicating the status of the request.
      *
      * @var string|null
      */
-    public $responseCode;
+    protected $responseCode;
 
     /**
      * A message providing additional information about the response.
      *
      * @var string|null
      */
-    public $responseMessage;
+    protected $responseMessage;
 
     /**
      * The main data structure containing the list of items.
      *
      * @var ListDataDto|null
      */
-    public $data;
+    protected $data;
 
     /**
      * Constructor to initialize properties.
@@ -124,7 +124,7 @@ class ListDto extends ToString
      */
     public function setPage($pageable)
     {
-        $this->data->page = new PageDto($pageable);
+        $this->data->setPage(new PageDto($pageable));
         return $this;
     }
 
@@ -134,14 +134,14 @@ class ListDto extends ToString
      * @param ListDataTitleDto $title The title to append.
      * @return self The current instance for method chaining.
      */
-    public function appendTitle($title)
+    public function addTitle($title)
     {
         if($this->data->getTitle() == null)
         {
             $this->data->resetTitle();
         }
         
-        $this->data->appendTitle($title);
+        $this->data->addTitle($title);
         
         return $this;
     }
@@ -164,7 +164,7 @@ class ListDto extends ToString
         }
         
         // Append the DataMap instance to the data structure
-        $this->data->appendDataMap($dataMap);
+        $this->data->addDataMap($dataMap);
         
         return $this; // Return the current instance for method chaining
     }
@@ -174,12 +174,12 @@ class ListDto extends ToString
      *
      * This method accepts various types of input to create a column title,
      * including associative arrays, stdClass objects, and instances of
-     * MagicObject, SetterGetter, or PicoGenericObject. It extracts the key
+     * MagicObject, SetterGetter, or PicoGenericObject. It extracts the name
      * and value for the title and appends it to the data structure.
      *
      * @param array|stdClass|MagicObject|SetterGetter|PicoGenericObject $title The title to add, which can be:
-     * - An associative array with 'key' and 'value' elements.
-     * - A stdClass object with 'key' and 'value' properties.
+     * - An associative array with 'name' and 'value' elements.
+     * - A stdClass object with 'name' and 'value' properties.
      * - An instance of MagicObject, SetterGetter, or PicoGenericObject 
      *   that has methods `getKey()` and `getValue()`.
      *
@@ -192,13 +192,13 @@ class ListDto extends ToString
             $this->data->resetTitle();
         }     
         $finalTitle = null;     
-        if($title instanceof stdClass && isset($title->key) && isset($title->value))
+        if($title instanceof stdClass && isset($title->name) && isset($title->value))
         {
-            $finalTitle = new ListDataTitleDto($title->key, $title->value);
+            $finalTitle = new ListDataTitleDto($title->name, $title->value);
         }
-        else if(is_array($title) && isset($title['key']) && isset($title['value']))
+        else if(is_array($title) && isset($title[ConstantDto::NAME]) && isset($title[ConstantDto::VALUE]))
         {
-            $finalTitle = new ListDataTitleDto($title['key'], $title['value']);
+            $finalTitle = new ListDataTitleDto($title[ConstantDto::NAME], $title[ConstantDto::VALUE]);
         }
         else if(($title instanceof MagicObject || $title instanceof SetterGetter || $title instanceof PicoGenericObject) && $title->issetKey() && $title->issetValue())
         {
@@ -206,25 +206,8 @@ class ListDto extends ToString
         }
         if(isset($finalTitle))
         {
-            $this->data->appendTitle($finalTitle);
+            $this->data->addTitle($finalTitle);
         }
-        return $this;
-    }
-
-    /**
-     * Append a data map to the table.
-     *
-     * @param mixed $dataMap The data map to append.
-     * @return self The current instance for method chaining.
-     */
-    public function appendDataMap($dataMap)
-    {
-        if (!isset($this->data->dataMap)) {
-            $this->data->dataMap = array();
-        }
-        
-        $this->data->dataMap[] = $dataMap;
-        
         return $this;
     }
 
@@ -241,11 +224,10 @@ class ListDto extends ToString
     public function addPrimaryKeyName($primaryKeyName, $primaryKeyDataType)
     {
         if (!isset($this->data->primaryKeyName)) {
-            $this->data->primaryKeyName = []; // Initialize as an array if not set
-            $this->data->primaryKeyDataType = []; // Initialize as an array if not set
+            $this->data->setPrimaryKeyName([]); // Initialize as an array if not set
+            $this->data->setPrimaryKeyDataType([]); // Initialize as an array if not set
         }   
-        $this->data->primaryKeyName[] = $primaryKeyName; // Append the primary key name
-        $this->data->primaryKeyDataType[$primaryKeyName] = $primaryKeyDataType; // Append the primary key data type
+        $this->data->addPrimaryKeyName($primaryKeyName, $primaryKeyDataType); // Append the primary key name
         return $this;
     }
     
@@ -259,13 +241,13 @@ class ListDto extends ToString
      * @param MetadataDto $metadata The metadata associated with the row data.
      * @return self The current instance for method chaining.
      */
-    public function appendData($data, $metadata)
+    public function addData($data, $metadata)
     {
         if(!isset($this->data))
         {
             $this->data = new ListDataDto();
         }   
-        $this->data->appendData($data, $metadata);
+        $this->data->addData($data, $metadata);
         return $this;
     }
 
@@ -282,7 +264,7 @@ class ListDto extends ToString
     /**
      * Set the response code indicating the status of the request.
      *
-     * @param string|null  $responseCode  The response code indicating the status of the request.
+     * @param string|null $responseCode The response code indicating the status of the request.
      *
      * @return self The current instance for method chaining.
      */ 
@@ -325,6 +307,19 @@ class ListDto extends ToString
     public function getData()
     {
         return $this->data;
+    }
+    
+    /**
+     * Adds a data control to the data object.
+     * This function allows for the addition of a data control to be managed by the current object.
+     *
+     * @param ButtonFormData $dataControl The ButtonFormData object containing the data control to be added.
+     * @return self Returns the current object instance for method chaining.
+     */
+    public function addDataControl($dataControl)
+    {
+        $this->data->addDataControl($dataControl);
+        return $this;
     }
 
 }

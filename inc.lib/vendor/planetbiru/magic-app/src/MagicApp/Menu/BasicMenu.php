@@ -9,10 +9,15 @@ use MagicObject\MagicObject;
 /**
  * Class BasicMenu
  *
- * A class that provides basic functionalities for managing and rendering menus
- * based on a specified entity, specification, and sorting options. It allows
- * for loading data from the database and rendering it using a user-defined
- * callback function.
+ * Represents a basic menu structure that loads and renders data for the menu using an entity, 
+ * a specification (for filtering), and sortable options (for ordering). It provides functionality 
+ * to load data from a database or other entity, apply specifications and sorting, and render the data 
+ * using a callback function. The `BasicMenu` class can be extended or customized to cater to various 
+ * menu structures in an application.
+ *
+ * @package MagicApp\Menu
+ * @author Kamshory
+ * @link https://github.com/Planetbiru/MagicApp
  */
 class BasicMenu
 {

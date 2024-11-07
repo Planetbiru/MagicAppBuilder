@@ -4,6 +4,25 @@ namespace MagicApp\Config;
 
 use MagicObject\SecretObject;
 
+/**
+ * Class SecretDatabaseWriter
+ * 
+ * This class is responsible for encrypting and writing the configuration details 
+ * for a database connection. The class extends the `SecretObject` class and 
+ * manages sensitive database configuration values (such as database driver, 
+ * file, host, port, username, password, etc.) before they are stored or transmitted 
+ * in an encrypted format.
+ * 
+ * The properties of this class represent various database connection settings, 
+ * and are marked with the `@EncryptIn` annotation to signify that these values 
+ * should be encrypted before being saved or used. This class is intended for 
+ * securely managing database connection details, ensuring that sensitive data 
+ * is not stored in plaintext.
+ *
+ * @package MagicApp\Config
+ * @link https://github.com/Planetbiru/MagicApp
+ * @author Kamshory
+ */
 class SecretDatabaseWriter extends SecretObject
 {
     /**
@@ -13,6 +32,14 @@ class SecretDatabaseWriter extends SecretObject
 	 * @var string
 	 */
 	protected $driver;
+	
+	/**
+	 * Database file path (for SQLite)
+	 *
+	 * @EncryptIn
+	 * @var string
+	 */
+	protected $databaseFilePath;
 
 	/**
 	 * Database server host

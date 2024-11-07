@@ -28,14 +28,14 @@ class SelectOptionDto extends ToString
      *
      * @var string
      */
-    public $source;
+    protected $source;
 
     /**
      * The namespace where the module is located, such as "/", "/admin", "/supervisor", etc.
      *
      * @var string
      */
-    public $namespace;
+    protected $namespace;
 
     /**
      * The field that this option corresponds to. This could be the name of the property
@@ -45,7 +45,7 @@ class SelectOptionDto extends ToString
      *
      * @var string
      */
-    public $field;
+    protected $field;
 
     /**
      * The `OptionDto` object that contains the actual option's text, value, and attributes.
@@ -54,7 +54,7 @@ class SelectOptionDto extends ToString
      *
      * @var OptionDto
      */
-    public $option;
+    protected $option;
 
     /**
      * Constructor for the SelectOptionDto class.

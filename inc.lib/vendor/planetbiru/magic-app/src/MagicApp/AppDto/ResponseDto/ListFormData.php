@@ -34,7 +34,7 @@ class ListFormData extends ToString
      *
      * @var ListFilterControl[]
      */
-    public $filterControl;
+    protected $filterControl;
 
     /**
      * An array of data control elements used for managing and displaying
@@ -43,7 +43,7 @@ class ListFormData extends ToString
      *
      * @var DataControl[]
      */
-    public $dataControl;
+    protected $dataControl;
 
     /**
      * Constructor for the ListFormData class.

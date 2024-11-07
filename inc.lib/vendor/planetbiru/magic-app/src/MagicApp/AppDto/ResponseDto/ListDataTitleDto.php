@@ -19,28 +19,28 @@ class ListDataTitleDto extends ToString
      *
      * @var string|null
      */
-    public $field;
+    protected $field;
 
     /**
      * The display value of the column title.
      *
      * @var string|null
      */
-    public $label;
+    protected $label;
 
     /**
      * Indicates if the column is sortable.
      *
      * @var bool
      */
-    public $sortable;
+    protected $sortable;
 
     /**
      * The current sort direction (ASC/DESC).
      *
      * @var string|null
      */
-    public $currentSort;
+    protected $currentSort;
 
     /**
      * Constructor to initialize the column title.

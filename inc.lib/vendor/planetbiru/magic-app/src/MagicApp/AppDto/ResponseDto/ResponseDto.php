@@ -22,21 +22,21 @@ class ResponseDto extends ToString
      *
      * @var string|null
      */
-    public $responseCode;
+    protected $responseCode;
 
     /**
      * A message providing additional information about the response.
      *
      * @var string|null
      */
-    public $responseMessage;
+    protected $responseMessage;
 
     /**
      * The data associated with the response.
      *
      * @var mixed
      */
-    public $data;
+    protected $data;
 
     /**
      * Constructor to initialize properties.

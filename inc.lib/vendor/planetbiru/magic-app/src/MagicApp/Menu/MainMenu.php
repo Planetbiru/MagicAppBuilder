@@ -7,9 +7,19 @@ use MagicObject\MagicObject;
 /**
  * Class MainMenu
  *
- * Extends the BasicMenu class to provide functionalities specific to managing
- * a hierarchical menu structure. It organizes menu items into groups based
- * on specified column names, allowing for structured retrieval of menu data.
+ * Represents the main menu structure that organizes a list of menu items 
+ * into groups based on specified column names. It extends the `BasicMenu` class 
+ * and provides functionality for organizing menu items into logical groups, 
+ * such as grouping by menu category or other criteria.
+ *
+ * This class also supports associating each menu group with a unique identifier 
+ * and allows for easy retrieval of the grouped menu structure. It is designed 
+ * to be used in scenarios where menus need to be structured dynamically and 
+ * grouped based on data stored in an entity or database.
+ *
+ * @package MagicApp\Menu
+ * @link https://github.com/Planetbiru/MagicApp
+ * @author Kamshory
  */
 class MainMenu extends BasicMenu
 {

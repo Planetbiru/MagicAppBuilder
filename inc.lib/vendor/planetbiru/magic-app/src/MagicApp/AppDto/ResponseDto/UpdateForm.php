@@ -32,49 +32,49 @@ class UpdateForm extends ToString
      *
      * @var string
      */
-    public $namespace;
+    protected $namespace;
     
     /**
      * The ID of the module associated with the data.
      *
      * @var string
      */
-    public $moduleId;
+    protected $moduleId;
 
     /**
      * The name of the module associated with the data.
      *
      * @var string
      */
-    public $moduleName;
+    protected $moduleName;
 
     /**
      * The title of the module associated with the data.
      *
      * @var string
      */
-    public $moduleTitle;
+    protected $moduleTitle;
 
     /**
      * The response code indicating the status of the request.
      *
      * @var string|null
      */
-    public $responseCode;
+    protected $responseCode;
 
     /**
      * A message providing additional information about the response.
      *
      * @var string|null
      */
-    public $responseMessage;
+    protected $responseMessage;
 
     /**
      * The main data structure containing the list form.
      *
      * @var UpdateFormData|null
      */
-    public $data;
+    protected $data;
 
     /**
      * Get the namespace where the module is located.

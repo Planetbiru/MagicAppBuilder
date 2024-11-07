@@ -37,7 +37,7 @@ class InputFormData extends ToString
      *
      * @var string
      */
-    public $label;
+    protected $label;
 
     /**
      * The field name that this filter corresponds to in the data model.
@@ -45,14 +45,14 @@ class InputFormData extends ToString
      *
      * @var string
      */
-    public $field;
+    protected $field;
 
     /**
      * A unique name or identifier for this filter, used to reference the filter in the user interface.
      *
      * @var string
      */
-    public $name;
+    protected $name;
 
     /**
      * The unique identifier for the filter control element, typically used for DOM element identification.
@@ -60,7 +60,7 @@ class InputFormData extends ToString
      *
      * @var string
      */
-    public $id;
+    protected $id;
 
     /**
      * The type of HTML input element used for the filter. The available types include:
@@ -74,7 +74,7 @@ class InputFormData extends ToString
      *
      * @var string
      */
-    public $element;
+    protected $element;
 
     /**
      * An associative array of HTML attributes to apply to the filter element.
@@ -82,7 +82,7 @@ class InputFormData extends ToString
      *
      * @var array
      */
-    public $attribute;
+    protected $attribute;
 
     /**
      * The text content for button elements, used to define the button's label (e.g., "Apply", "Reset").
@@ -90,7 +90,7 @@ class InputFormData extends ToString
      *
      * @var string
      */
-    public $textContent;
+    protected $textContent;
 
     /**
      * Select option for "select" input elements, represented by a `SelectOptionDto` object.
@@ -98,14 +98,14 @@ class InputFormData extends ToString
      *
      * @var SelectOptionDto
      */
-    public $selectOption;
+    protected $selectOption;
 
     /**
      * The default value for the filter input. This is the value that will be pre-filled or selected when the form is loaded.
      *
      * @var mixed
      */
-    public $defaultValue;
+    protected $defaultValue;
 
     // Getter and Setter Methods
 

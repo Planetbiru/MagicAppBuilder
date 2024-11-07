@@ -19,49 +19,49 @@ class DetailDto extends ToString
      *
      * @var string
      */
-    public $namespace;
+    protected $namespace;
     
     /**
      * The ID of the module associated with the data.
      *
      * @var string
      */
-    public $moduleId;
+    protected $moduleId;
 
     /**
      * The name of the module associated with the data.
      *
      * @var string
      */
-    public $moduleName;
+    protected $moduleName;
 
     /**
      * The title of the module associated with the data.
      *
      * @var string
      */
-    public $moduleTitle;
+    protected $moduleTitle;
 
     /**
      * The response code indicating the status of the request.
      *
      * @var string|null
      */
-    public $responseCode;
+    protected $responseCode;
 
     /**
      * A message providing additional information about the response.
      *
      * @var string|null
      */
-    public $responseMessage;
+    protected $responseMessage;
 
     /**
      * The main data structure containing the list of items.
      *
      * @var DetailDataDto
      */
-    public $data;
+    protected $data;
 
     /**
      * Constructor for initializing the DetailDto instance.
@@ -74,7 +74,7 @@ class DetailDto extends ToString
     {
         $this->responseCode = $responseCode;    
         $this->responseMessage = $responseMessage;    
-        $this->data = $data;    
+        $this->data = $data;   
     }
 
     /**
@@ -125,7 +125,7 @@ class DetailDto extends ToString
      */
     public function addData($field, $value, $type = null, $label = null, $readonly = false, $hidden = false, $valueDraft = null)
     {
-        $this->data->appendData($field, $value, $type, $label, $readonly, $hidden, $valueDraft);
+        $this->data->addData($field, $value, $type, $label, $readonly, $hidden, $valueDraft);
         return $this; // Return current instance for method chaining.
     }
 
@@ -142,11 +142,10 @@ class DetailDto extends ToString
     public function addPrimaryKeyName($primaryKeyName, $primaryKeyDataType)
     {
         if (!isset($this->data->primaryKeyName)) {
-            $this->data->primaryKeyName = array(); // Initialize as an array if not set
-            $this->data->primaryKeyDataType = array(); // Initialize as an array if not set
+            $this->data->setPrimaryKeyName([]); // Initialize as an array if not set
+            $this->data->setPrimaryKeyDataType([]); // Initialize as an array if not set
         }   
-        $this->data->primaryKeyName[] = $primaryKeyName; // Append the primary key name
-        $this->data->primaryKeyDataType[$primaryKeyName] = $primaryKeyDataType; // Append the primary key data type
+        $this->data->addPrimaryKeyName($primaryKeyName, $primaryKeyDataType); // Append the primary key name
         return $this; // Return current instance for method chaining.
     }
 
@@ -158,7 +157,21 @@ class DetailDto extends ToString
      */ 
     public function setMetadata($metadata)
     {
-        $this->data->column->metadata = $metadata;
+        $this->data->getColumn()->setMetadata($metadata);
         return $this; // Return current instance for method chaining.
     }
+    
+    /**
+     * Adds a data control to the data object.
+     * This function allows for the addition of a data control to be managed by the current object.
+     *
+     * @param ButtonFormData $dataControl The ButtonFormData object containing the data control to be added.
+     * @return self Returns the current object instance for method chaining.
+     */
+    public function addDataControl($dataControl)
+    {
+        $this->data->addDataControl($dataControl);
+        return $this;
+    }
+
 }

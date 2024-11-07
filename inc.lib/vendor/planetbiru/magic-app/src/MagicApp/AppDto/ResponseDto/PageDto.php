@@ -21,18 +21,18 @@ use MagicObject\Database\PicoPageable;
 class PageDto extends ToString
 {
     /**
-     * The current page number
+     * The current page number, start from 1
      *
      * @var int
      */
-    public $pageNumber;
+    protected $pageNumber;
 
     /**
      * The page size, i.e., the number of items displayed per page
      *
      * @var int
      */
-    public $pageSize;
+    protected $pageSize;
 
     /**
      * The data offset, which is used to calculate the starting position of data on 
@@ -40,7 +40,7 @@ class PageDto extends ToString
      *
      * @var int
      */
-    public $dataOffset;
+    protected $dataOffset;
 
     /**
      * Constructor for the PageDto class.
@@ -66,13 +66,7 @@ class PageDto extends ToString
                 $this->pageSize = $page->getPage()->getPageSize();
                 $this->dataOffset = ($this->pageNumber - 1) * $this->pageSize;
             }
-            else if($page instanceof PicoPage)
-            {
-                $this->pageNumber = $page->getPageNumber();
-                $this->pageSize = $page->getPageSize();
-                $this->dataOffset = ($this->pageNumber - 1) * $this->pageSize;
-            }
-            else if($page instanceof PageDto)
+            else if($page instanceof PicoPage || $page instanceof PageDto)
             {
                 $this->pageNumber = $page->getPageNumber();
                 $this->pageSize = $page->getPageSize();
