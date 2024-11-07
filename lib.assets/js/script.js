@@ -1111,10 +1111,73 @@ jQuery(function () {
       data:input,
       dataType:'json',
       success:function(data){
-        console.log(data)
+        if(data.conneted1)
+        {
+          if(!data.conneted2)
+          {
+            $('#create-database').css({'display':'inline'});
+            showAlertUI('Database Connection Test', 'Successfully connected to the server, but database not found.');
+          }
+          else
+          {
+            $('#create-database').css({'display':'none'});
+            showAlertUI('Database Connection Test', 'Successfully connected to the database.');
+          }
+        }
+        else
+        {
+          $('#create-database').css({'display':'none'});
+          showAlertUI('Database Connection Test', 'Invalid database credentials.');
+        }
+      },
+      error: function(xhr, status, error) {
+        // Menangani kesalahan jika request AJAX gagal
+        $('#create-database').css('display', 'none');
+        showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
     })
-    console.log(input)
+  });
+
+  $(document).on('click', '#create-database', function(e1){
+    let table = $(this).closest('table');
+    let input = {'createDatabase':'create'};
+    table.find(':input').each(function(e2){
+      if($(this).attr('name') != undefined && $(this).attr('name') != '')
+      {
+        input[$(this).attr('name')] = $(this).val();
+      }
+    });
+    $.ajax({
+      type:'POST', 
+      url:'lib.ajax/database-create.php',
+      data:input,
+      dataType:'json',
+      success:function(data){
+        if(data.conneted1)
+        {
+          if(!data.conneted2)
+          {
+            $('#create-database').css({'display':'inline'});
+            showAlertUI('Database Connection Test', 'Successfully connected to the server, but database creation failed.');
+          }
+          else
+          {
+            $('#create-database').css({'display':'none'});
+            showAlertUI('Database Connection Test', 'Successfully created and connected to the database.');
+          }
+        }
+        else
+        {
+          $('#create-database').css({'display':'none'});
+          showAlertUI('Database Connection Test', 'Invalid database credentials.');
+        }
+      },
+      error: function(xhr, status, error) {
+        // Menangani kesalahan jika request AJAX gagal
+        $('#create-database').css('display', 'none');
+        showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
+      }
+    })
   });
 
 

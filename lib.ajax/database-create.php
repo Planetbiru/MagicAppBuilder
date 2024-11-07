@@ -17,7 +17,7 @@ $result->success = false;
 $result->error1 = null;
 $result->error2 = null;
 
-if($inputPost->issetTestConnection())
+if($inputPost->issetCreateDatabase())
 {
     $databaseDriver = $inputPost->getDatabaseDriver();
     $databaseHost = $inputPost->getDatabaseHost();
