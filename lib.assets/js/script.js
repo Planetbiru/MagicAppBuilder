@@ -1131,7 +1131,6 @@ jQuery(function () {
         }
       },
       error: function(xhr, status, error) {
-        // Menangani kesalahan jika request AJAX gagal
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1173,7 +1172,6 @@ jQuery(function () {
         }
       },
       error: function(xhr, status, error) {
-        // Menangani kesalahan jika request AJAX gagal
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
