@@ -7,9 +7,11 @@ use Throwable;
 /**
  * Class ClassNotFoundException
  *
- * Custom exception class for handling scenarios where a result is expected
- * but none is returned. This can be useful for database queries or API calls
- * where a missing result should be treated as an exceptional case.
+ * Custom exception class for handling scenarios where a class could not be found.
+ * This exception is typically thrown when attempting to use or instantiate a class
+ * that does not exist or is not autoloaded properly. 
+ * It can be used in situations such as when a class name is misspelled, 
+ * or the class file is not found in the expected location.
  * 
  * @author Kamshory
  * @package MagicObject\Exceptions

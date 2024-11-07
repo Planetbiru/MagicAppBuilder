@@ -6,12 +6,21 @@ use Throwable;
 
 /**
  * Class InvalidQueryInputException
- *
- * Custom exception class for handling errors related to invalid query inputs.
- * This exception can be thrown when a database query receives inputs that 
- * do not conform to expected formats or constraints, such as invalid data types, 
- * missing required parameters, or malformed query structures. It is useful 
- * in scenarios involving database interactions or data retrieval processes.
+ * 
+ * Thrown when there is an error with the format of annotation attributes applied to a class, property, or method.
+ * 
+ * This exception is triggered when annotations provided in the code do not meet the expected format or structure.
+ * Common scenarios for throwing this exception include:
+ * - Malformed annotation values.
+ * - Missing required parameters in annotations.
+ * - Incorrect application of annotations to classes, properties, or methods that do not support them.
+ * 
+ * Example scenarios where this exception may be used:
+ * - A class is annotated with an unsupported attribute or a malformed annotation.
+ * - A property is annotated with an incorrect attribute that does not conform to the expected format.
+ * - A method receives an unsupported or malformed annotation, resulting in a failure during runtime or reflection processing.
+ * 
+ * This exception is useful for catching annotation-related errors early in the code execution, allowing developers to quickly address any misconfigurations.
  * 
  * @author Kamshory
  * @package MagicObject\Exceptions
