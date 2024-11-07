@@ -19,17 +19,19 @@ $result->error2 = null;
 if($inputPost->issetTestConnection())
 {
     $databaseDriver = $inputPost->getDatabaseDriver();
-    $databaseFilePath = $inputPost->getDatabaseFilePath();
+    $databaseHost = $inputPost->getDatabaseHost();
+    $databaseFilePath = $inputPost->getDatabaseDatabaseFilePath();
     $databasePort = intval($inputPost->getDatabasePort());
     $databaseUsername = $inputPost->getDatabaseUsername();
     $databasePassword = $inputPost->getDatabasePassword();
-    $databaseName = $inputPost->getDatabaseName();
+    $databaseName = $inputPost->getDatabaseDatabaseName();
     $databaseSchema = $inputPost->getDatabaseSchema();
     $databaseTimeZone = $inputPost->getDatabaseTimeZone();
 
     $databaseConfig = new SecretObject([
         'driver'=>$databaseDriver,
         'databaseFilePath'=>$databaseFilePath,
+        'host'=>$databaseHost,
         'port'=>$databasePort,
         'username'=>$databaseUsername,
         'password'=>$databasePassword,

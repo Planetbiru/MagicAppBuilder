@@ -1096,6 +1096,27 @@ jQuery(function () {
     }
   });
 
+  $(document).on('click', '#test-database-connection', function(e1){
+    let table = $(this).closest('table');
+    let input = {'testConnection':'test'};
+    table.find(':input').each(function(e2){
+      if($(this).attr('name') != undefined && $(this).attr('name') != '')
+      {
+        input[$(this).attr('name')] = $(this).val();
+      }
+    });
+    $.ajax({
+      type:'POST', 
+      url:'lib.ajax/database-test.php',
+      data:input,
+      dataType:'json',
+      success:function(data){
+        console.log(data)
+      }
+    })
+    console.log(input)
+  });
+
 
 
 

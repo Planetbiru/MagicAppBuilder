@@ -6,6 +6,7 @@
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: true
     type: fullstack
+    architecture: monolith
 -
     id: sipro
     name: 'SIPRO PLN'
