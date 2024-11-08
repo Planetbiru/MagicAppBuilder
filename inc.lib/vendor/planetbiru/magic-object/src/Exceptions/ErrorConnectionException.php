@@ -7,9 +7,11 @@ use Throwable;
 /**
  * Class ErrorConnectionException
  *
- * Custom exception class for handling scenarios where a result is expected
- * but none is returned. This can be useful for database queries or API calls
- * where a missing result should be treated as an exceptional case.
+ * Custom exception class for handling errors related to connection issues.
+ * This exception is typically thrown when a connection attempt to a remote service,
+ * database, or external resource fails. It can be used in scenarios where the system
+ * expects a successful connection but encounters issues, such as timeouts, server 
+ * unavailability, or invalid credentials.
  * 
  * @author Kamshory
  * @package MagicObject\Exceptions
