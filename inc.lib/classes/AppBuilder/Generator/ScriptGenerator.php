@@ -382,14 +382,11 @@ class ScriptGenerator //NOSONAR
         $entityMainName = $entityMain->getEntityName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
-        $sortOrder = $appFeatures->isSortOrder();
-        
+        $sortOrder = $appFeatures->isSortOrder();    
         $activationKey = $entityInfo->getActive();
-        
         $appConf = $appConfig->getApplication();
         
-        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder);
-        
+        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder);   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
@@ -459,8 +456,7 @@ class ScriptGenerator //NOSONAR
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
             
-            // CRUD
-            
+            // CRUD        
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields, $callbackUpdateSuccess, $callbackUpdateFailed);
             
