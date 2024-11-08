@@ -16,7 +16,7 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 try
 {
     $cachePath = $workspaceDirectory."/magic-app-version.json";
-    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-1 days'))
+    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-6 hours'))
     {
         $magicAppList = ComposerUtil::getMagicAppVersionList();
         file_put_contents($cachePath, json_encode($magicAppList));

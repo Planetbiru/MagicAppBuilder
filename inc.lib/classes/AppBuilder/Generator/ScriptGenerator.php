@@ -20,7 +20,7 @@ use MagicObject\SecretObject;
 use MagicObject\Util\PicoYamlUtil;
 use stdClass;
 
-class ScriptGenerator
+class ScriptGenerator //NOSONAR
 {
     /**
      * Create delete section without approval.
@@ -254,6 +254,63 @@ class ScriptGenerator
         }
         return $dir;
     }
+    
+    /**
+     * Processes a single field and updates the provided arrays accordingly.
+     *
+     * @param AppField $field The field object to be processed.
+     * @param array &$insertFields The array to hold fields to be inserted.
+     * @param array &$editFields The array to hold fields to be edited.
+     * @param array &$detailFields The array to hold fields to be displayed in detail view.
+     * @param array &$listFields The array to hold fields to be listed.
+     * @param array &$exportFields The array to hold fields for export.
+     * @param array &$filterFields The array to hold fields used for filtering.
+     * @param array &$referenceData The array to hold reference data for fields.
+     * @param array &$referenceEntities The array to hold reference entities.
+     * @param array &$referenceEntitiesUse The array to hold entities that need to be used in both create and update operations.
+     * @return void
+     */
+    private function processField(AppField $field, &$insertFields, &$editFields, &$detailFields, &$listFields, &$exportFields, &$filterFields, &$referenceData, &$referenceEntities, &$referenceEntitiesUse) //NOSONAR
+    {
+        $create = false;
+        $update = false;
+
+        if ($field->getIncludeInsert()) {
+            $insertFields[$field->getFieldName()] = $field;
+            $create = true;
+        }
+        if ($field->getIncludeEdit()) {
+            $editFields[$field->getFieldName()] = $field;
+            $update = true;
+        }
+        if ($field->getIncludeDetail()) {
+            $detailFields[$field->getFieldName()] = $field;
+        }
+        if ($field->getIncludeList()) {
+            $listFields[$field->getFieldName()] = $field;
+        }
+        if ($field->getIncludeExport()) {
+            $exportFields[$field->getFieldName()] = $field;
+        }
+        if ($field->getFilterElementType() != "") {
+            $filterFields[$field->getFieldName()] = $field;
+        }
+        if ($this->hasReferenceData($field, true)) {
+            $referenceData[$field->getFieldName()] = $field->getReferenceData();
+        }
+        if ($this->hasReferenceData($field)) {
+            $ent = $field->getReferenceData()->getEntity();
+            $referenceEntities[] = $ent;
+            if ($create && $update) {
+                $referenceEntitiesUse[] = $ent;
+            }
+        }
+        if ($this->hasReferenceFilter($field)) {
+            $ent = $field->getReferenceFilter()->getEntity();
+            $referenceEntities[] = $ent;
+            $referenceEntitiesUse[] = $ent;
+        }
+    }
 
     /**
      * Generates the application module based on the provided configuration and request data.
@@ -273,7 +330,7 @@ class ScriptGenerator
      * @return void This method does not return a value. It generates and writes the application module script
      * to the specified location, as defined in the request.
      */
-    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) 
+    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo)
     {
         $insertFields = array();
         $editFields = array();
@@ -295,48 +352,23 @@ class ScriptGenerator
         $callbackUpdateStatusSuccess = $clbk->callbackUpdateStatusSuccess;
         $callbackUpdateStatusException = $clbk->callbackUpdateStatusException;
         
-        foreach($request->getFields() as $value) {
+        foreach ($request->getFields() as $value) {
             $field = new AppField($value);
             $allField[] = $field;
-
-            $create = false;
-            $update = false;
-
-            if($field->getIncludeInsert()) {
-                $insertFields[$field->getFieldName()] = $field;
-                $create = true;
-            }
-            if($field->getIncludeEdit()) {
-                $editFields[$field->getFieldName()] = $field;
-                $update = true;
-            }
-            if($field->getIncludeDetail()) {
-                $detailFields[$field->getFieldName()] = $field;
-            }
-            if($field->getIncludeList()) {
-                $listFields[$field->getFieldName()] = $field;
-            }
-            if($field->getIncludeExport()) {
-                $exportFields[$field->getFieldName()] = $field;
-            }
-            if($field->getFilterElementType() != "") {
-                $filterFields[$field->getFieldName()] = $field;
-            }
-            if($this->hasReferenceData($field, true)){
-                $referenceData[$field->getFieldName()] = $field->getReferenceData();
-            }
-            if($this->hasReferenceData($field)){
-                $ent = $field->getReferenceData()->getEntity();
-                $referenceEntities[] = $ent;
-                if($create && $update) {
-                    $referenceEntitiesUse[] = $ent;
-                }
-            }
-            if($this->hasReferenceFilter($field)){
-                $ent = $field->getReferenceFilter()->getEntity();
-                $referenceEntities[] = $ent;
-                $referenceEntitiesUse[] = $ent;
-            }
+    
+            // Process the field by updating the arrays
+            $this->processField(
+                $field,
+                $insertFields,
+                $editFields,
+                $detailFields,
+                $listFields,
+                $exportFields,
+                $filterFields,
+                $referenceData,
+                $referenceEntities,
+                $referenceEntitiesUse
+            );
         }
         
         $entity = $request->getEntity();      
@@ -362,8 +394,7 @@ class ScriptGenerator
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
         $uses = $this->addExporterLibrary($uses, $appFeatures);      
-        $uses = $this->addAddEmptyLine($uses);
-        
+        $uses = $this->addAddEmptyLine($uses);     
         
         $uses[] = "";
         
@@ -371,8 +402,7 @@ class ScriptGenerator
         
         $includeDir = $this->getAuthFile($appConf);
 
-        $dir = "__DIR__";
-        $dir = $this->getAbsoludeDir($dir, $request->getTarget());
+        $dir = $this->getAbsoludeDir("__DIR__", $request->getTarget());
         
         $includes[] = "require_once $dir . $includeDir;";
         $includes[] = "";
@@ -395,7 +425,6 @@ class ScriptGenerator
         "\t".'exit();'."\r\n".
         '}';
         $declaration[] = '';
-
 
         $declarationSection = implode("\r\n", $declaration);
         
@@ -468,26 +497,14 @@ class ScriptGenerator
         $baseDir = $appConf->getBaseApplicationDirectory();
         $this->prepareApplication($appConf, $baseDir);
 
-        $target = trim($request->getTarget(), "/\\");
-        if(!empty($target)) {
-            $target = "/".$target;
-        }
-
-        $path = $baseDir."$target/".$moduleFile;
-        if(!file_exists(dirname($path))) {
-            mkdir(dirname($path), 0755, true);
-        }
-
+        $path = $this->getModulePath($request, $baseDir, $moduleFile);
         
-        $finalScript = "<"."?php\r\n\r\n".$merged."\r\n\r\n";
-        if(substr_count($finalScript, 'AppFormBuilder') == 1) {
-            $finalScript = str_replace("use MagicApp\AppFormBuilder;\r\n", '', $finalScript);
-        }
-        file_put_contents($path, $finalScript);
+        $this->prepareDirContainer($path);     
+        $this->createFinalScript($path, $merged);
 
         $updateEntity = $request->getUpdateEntity() == '1' || $request->getUpdateEntity() == 'true';
+        
         $appBuilder->setUpdateEntity($updateEntity);
-
         $appBuilder->generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData);
 
         if($approvalRequired) {
@@ -498,6 +515,97 @@ class ScriptGenerator
         }
         $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
         $this->updateMenu($appConf, $request);
+    }
+    
+    /**
+     * Creates and writes the final PHP script to the specified path by merging content 
+     * and removing redundant 'AppFormBuilder' usage if applicable.
+     *
+     * @param string $path The path where the final script should be written.
+     * @param string $merged The merged content to be included in the final script.
+     * @return void
+     */
+    private function createFinalScript($path, $merged)
+    {
+        $finalScript = "<"."?php\r\n\r\n".$merged."\r\n\r\n";
+        if(substr_count($finalScript, 'AppFormBuilder') == 1) {
+            $finalScript = str_replace("use MagicApp\AppFormBuilder;\r\n", '', $finalScript);
+        }
+        file_put_contents($path, $finalScript);
+    }
+    
+    /**
+     * Constructs the full path to a module file based on the request target, base directory, and module filename.
+     *
+     * @param MagicObject|InputPost $request The request object, which contains the target path information.
+     * @param string $baseDir The base directory where the module resides.
+     * @param string $moduleFile The filename of the module to be appended to the path.
+     * @return string The full file path to the module, including the target subdirectory.
+     */
+    private function getModulePath($request, $baseDir, $moduleFile)
+    {
+        $target = trim($request->getTarget(), "/\\");
+        if(!empty($target)) {
+            $target = "/".$target;
+        }
+
+        return $baseDir."$target/".$moduleFile;
+    }
+    
+    /**
+     * Prepares the directory container by creating the parent directories if they don't exist.
+     *
+     * @param string $path The path where the directory container should be prepared.
+     * @return void
+     */
+    private function prepareDirContainer($path)
+    {
+        if(!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+    }
+    
+    /**
+     * Prepares the file by ensuring its parent directory exists and creating an empty file if needed.
+     *
+     * @param string $path The path of the file to be prepared.
+     * @return void
+     */
+    private function prepareFile($path)
+    {
+        if(!file_exists($path))
+        {
+            if(!file_exists(basename($path)))
+            {
+                mkdir(dirname($path), 0755, true);
+            }
+            file_put_contents($path, "");
+        } 
+    }
+    
+    /**
+     * Retrieves a list of existing menu items from the provided menu structure.
+     *
+     * @param array $menus An array of menu objects, each potentially containing submenus.
+     * @return array An array of strings representing the existing menu items, 
+     *               formatted as "submenuLink-submenuLabel".
+     */
+    private function getExistingMenu($menus)
+    {
+        $existingMenus = [];
+
+        foreach($menus as $menu)
+        {
+            $submenus = $menu->getSubmenus();
+            if(is_array($submenus))
+            {
+                foreach($submenus as $submenu)
+                {
+                    $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
+                }
+            }
+        }
+        return $existingMenus;
     }
 
     /**
@@ -519,30 +627,11 @@ class ScriptGenerator
     private function updateMenu($appConf, $request)
     {
         $menuPath = $appConf->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
-        if(!file_exists($menuPath))
-        {
-            if(!file_exists(basename($menuPath)))
-            {
-                mkdir(dirname($menuPath), 0755, true);
-            }
-            file_put_contents($menuPath, "");
-        }    
+        $this->prepareFile($menuPath);
         $menus = new SecretObject();     
         $menus->loadYamlFile($menuPath, false, true, true);
 
-        $existingMenus = [];
-
-        foreach($menus as $menu)
-        {
-            $submenus = $menu->getSubmenus();
-            if(is_array($submenus))
-            {
-                foreach($submenus as $submenu)
-                {
-                    $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
-                }
-            }
-        }
+        $existingMenus = $this->getExistingMenu($menus);
 
         $target = trim($request->getTarget(), "/\\");
         $moduleMenu = trim($request->getModuleMenu());
