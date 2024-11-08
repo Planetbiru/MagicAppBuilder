@@ -907,6 +907,11 @@ jQuery(function () {
       dataType: 'html',
       success: function (data) {
         $('#modal-application-setting .application-setting').empty().append(data);
+        setTimeout(function(){
+          // set database_password to be empty
+          // prevent autofill password
+          $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
+        }, 2000);
         reloadApplicationList();
         updateBtn[0].disabled = false;
       }
