@@ -1183,9 +1183,6 @@ jQuery(function () {
     })
   });
 
-
-
-
   reloadApplicationList();
   loadTable();
   loadMenu();
@@ -1193,7 +1190,55 @@ jQuery(function () {
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
+  initTooltip();
 });
+
+function initTooltip() {
+  $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function(e) {
+    var tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
+    var tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
+
+    // Append the tooltip to the body and make it visible
+    $('body').append(tooltip);
+
+    // Show the tooltip when the area element is hovered
+    tooltip.addClass('visible');
+
+    // Calculate tooltip position based on the cursor coordinates
+    $(document).on('mousemove', function(e) {
+      var tooltipWidth = tooltip.outerWidth();
+      var tooltipHeight = tooltip.outerHeight();
+
+      // Determine the position of the tooltip to avoid it going off-screen
+      var mouseX = e.pageX + 15; // Right offset
+      var mouseY = e.pageY + 15; // Bottom offset
+
+      // Check if the tooltip exceeds the window width and adjust if necessary
+      if (mouseX + tooltipWidth > $(window).width()) {
+        mouseX = e.pageX - tooltipWidth - 15; // Position it to the left if it goes off the right
+      }
+
+      // Check if the tooltip exceeds the window height and adjust if necessary
+      if (mouseY + tooltipHeight > $(window).height()) {
+        mouseY = e.pageY - tooltipHeight - 15; // Position it to the top if it goes off the bottom
+      }
+
+      // Update the position of the tooltip based on the cursor position
+      tooltip.css({
+        left: mouseX,
+        top: mouseY
+      });
+    });
+  });
+
+  $(document).on('mouseleave', '[name="erd-map"] area, [data-toggle="tooltip"]', function(e) {
+    // Remove the tooltip when the mouse leaves the area
+    $('.tooltip').remove();
+
+    // Remove the mousemove event from the document to avoid unnecessary event listeners
+    $(document).off('mousemove');
+  });
+}
 
 
 let timeoutEditMenu = setTimeout('', 100);;
@@ -2074,9 +2119,6 @@ function updateEntityQuery(autoload) {
     dataType: "html",
     success: function (data) {
       $(".entity-container-query .entity-list").empty().append(data);
-      $('.entity-container-query .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
       let ents = getEntitySelection();
       let merged = $(".entity-merge")[0].checked;
       if (autoload) {
@@ -2101,10 +2143,6 @@ function updateEntityRelationshipDiagram() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-relationship .entity-list").empty().append(data);
-      $('.entity-container-relationship .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
-
     },
   });
 }
@@ -2125,9 +2163,6 @@ function updateEntityFile() {
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
-      $('.entity-container-file .entity-list [data-toggle="tooltip"], .container-translate-entity .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
     },
   });
 }
@@ -2147,9 +2182,6 @@ function updateModuleFile() {
     dataType: "html",
     success: function (data) {
       $(".module-container .module-list-file").empty().append(data);
-      $('.module-container .module-list-file [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
     },
   });
 
