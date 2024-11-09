@@ -153,8 +153,7 @@ jQuery(function () {
     let moduleFileName = masterTableName + ".php";
     let moduleCode = masterTableName;
     let moduleName = masterTableName;
-    let masterPrimaryKeyName =
-      $(this).find("option:selected").attr("data-primary-key") || "";
+    let masterPrimaryKeyName = $(this).find("option:selected").attr("data-primary-key") || "";
     updateTableName(
       moduleFileName,
       moduleCode,
@@ -413,7 +412,17 @@ jQuery(function () {
         method: "POST",
         url: "lib.ajax/application-create.php",
         dataType: "html",
-        data: { id: id, name: name, architecture: architecture, description: description, directory: directory, namespace: namespace, author: author, paths: paths, magic_app_version: magic_app_version },
+        data: { 
+          id: id, 
+          name: name, 
+          architecture: architecture, 
+          description: description, 
+          directory: directory, 
+          namespace: namespace, 
+          author: author, 
+          paths: paths, 
+          magic_app_version: magic_app_version 
+        },
         success: function (data) {
           reloadApplicationList();
         },
@@ -446,7 +455,6 @@ jQuery(function () {
           clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
         }
         fixPathForm()
-
       },
     });
   });
