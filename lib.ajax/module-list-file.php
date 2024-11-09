@@ -21,7 +21,7 @@ try
         $dir =  $baseDirectory."$target";
         $pattern = $baseDirectory."$target/*.php";
         $list = glob($pattern);
-        $li = array();
+        $li = [];
         foreach($list as $idx=>$file)
         {
             $module = basename($file, '.php');

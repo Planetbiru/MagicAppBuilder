@@ -145,6 +145,21 @@ button {
   width: 200px;
 }
 
+.btn {
+  margin-top: -3px;
+}
+
+.modal-header {
+  padding: 0.6rem 1rem;
+}
+.modal-header .close {
+  margin: -0.75rem -1rem -1rem auto;
+}
+
+.modal-footer {
+  padding: 1rem 0.75rem 0.75rem;
+}
+
 .modal-md .config-table,
 .modal-sm .config-table {
   width: 100%;

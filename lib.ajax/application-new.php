@@ -32,9 +32,9 @@ try
 }
 catch(Exception $e)
 {
-    $magicAppList = array();
+    $magicAppList = [];
 }
-$data = array(
+$data = [
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
@@ -43,6 +43,6 @@ $data = array(
     'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
     'magic_app_versions' => $magicAppList
-);
+];
 
 ResponseUtil::sendJSON($data, false, true);

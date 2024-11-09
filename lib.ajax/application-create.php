@@ -3,7 +3,6 @@
 use AppBuilder\Generator\ScriptGenerator;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
-use AppBuilder\Util\ResponseUtil;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Response\PicoResponse;
@@ -33,7 +32,7 @@ if (!file_exists($dir2))
 }
 $path2 = $dir2 . "/default.yml";
 
-$application = array(
+$application = [
     'id' => $newAppId,
     'name' => trim($inputPost->getName()),
     'architecture' => trim($inputPost->getType()),
@@ -41,7 +40,7 @@ $application = array(
     'documentRoot' => trim($baseApplicationDirectory),
     'author' => trim($inputPost->getAuthor()),
     'selected' => false
-);
+];
 
 $existing = new SecretObject();
 $existing->loadYamlFile($path);
@@ -133,7 +132,7 @@ $application->setMagicApp(array(
 
 $newApp->setApplication($application);
 
-$entityInfo = array(
+$entityInfo = [
     'name' => 'name',
     'active' => 'active',
     'draft' => 'draft',
@@ -151,14 +150,14 @@ $entityInfo = array(
     'approval_id' => 'approval_id',
     'approval_note' => 'approval_note',
     'approval_status' => 'approval_status'
-);
+];
 
 $newApp->setEntityInfo($entityInfo);
-$newApp->setCurrentAction(array(
+$newApp->setCurrentAction([
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
-));
+]);
 $newApp->setGlobalVariableDatabase('database');
 
 file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());

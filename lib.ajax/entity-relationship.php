@@ -14,7 +14,7 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-    $allQueries = array();
+    $allQueries = [];
     if(
         $inputGet->getNamespaceName() != '' 
         && $inputGet->getEntityName() != ''

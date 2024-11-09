@@ -24,7 +24,7 @@ try {
 
         exec("php -l $path 2>&1", $output, $return_var);
 
-        $errors = array();
+        $errors = [];
         if (isset($output) && is_array($output)) {
             foreach ($output as $line) {
                 $errors[] = $line . "\n";

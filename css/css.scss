@@ -196,6 +196,21 @@ button {
 		}
 	}
 }
+.btn
+{
+	margin-top: -3px;
+}
+.modal-header
+{
+	padding: 0.6rem 1rem;
+	.close {
+		margin: -0.75rem -1rem -1rem auto;
+	}
+}
+.modal-footer
+{
+	padding: 1rem .75rem 0.75rem;
+}
 
 .modal-md,
 .modal-sm {

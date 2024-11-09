@@ -16,7 +16,7 @@ if($inputPost->getAction() == "update")
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
         
         $paths = $inputPost->getPaths();
-        $currentPaths = array();
+        $currentPaths = [];
         if(is_array($paths) && !empty($paths))
         {
             $appConf = $appConfig->getApplication();
@@ -24,7 +24,7 @@ if($inputPost->getAction() == "update")
             {
                 $appConf = new SecretObject();
             }
-            $currentPaths = array();
+            $currentPaths = [];
             $selected = '';
             foreach($paths as $p)
             {
@@ -66,7 +66,7 @@ else if($inputPost->getAction() == "get")
         $currentPaths = $appConf->getBaseModuleDirectory();
         if(!isset($currentPaths) || !is_array($currentPaths))
         {
-            $currentPaths = array();
+            $currentPaths = [];
         }
         ResponseUtil::sendJSON($currentPaths);
     }
@@ -91,7 +91,7 @@ else if($inputPost->getAction() == "default")
         $currentPaths = $appConf->getBaseModuleDirectory();
         if(!isset($currentPaths) || !is_array($currentPaths))
         {
-            $currentPaths = array();
+            $currentPaths = [];
         }
         foreach($currentPaths as $idx=>$p)
         {

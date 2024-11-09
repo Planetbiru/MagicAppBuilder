@@ -13,15 +13,15 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-    $allQueries = array();
+    $allQueries = [];
     $merged = $inputGet->getMerged();
 
     if($inputGet->getEntity() != null && $inputGet->countableEntity() && count($inputGet->getEntity()) > 0)
     {
         $inputEntity = $inputGet->getEntity();
-        $entities = array();
-        $entityNames = array();
-        $entities = array();
+        $entities = [];
+        $entityNames = [];
+        $entities = [];
         
         $entityMarginX = $inputGet->getEntityMarginX();
         $entityMarginY = $inputGet->getEntityMarginY();
