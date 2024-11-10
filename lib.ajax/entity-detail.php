@@ -38,7 +38,7 @@ try
                     <thead>
                         <tr>
                             <td width="24">No</td>
-                            <td>Column</td>
+                            <td>Field</td>
                             <td width="15%">Type</td>
                             <td width="10%">Length</td>
                             <td width="10%">Nullable</td>
