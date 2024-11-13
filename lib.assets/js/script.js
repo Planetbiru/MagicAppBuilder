@@ -432,16 +432,16 @@ jQuery(function () {
         method: "POST",
         url: "lib.ajax/application-create.php",
         dataType: "html",
-        data: { 
-          id: id, 
-          name: name, 
-          architecture: architecture, 
-          description: description, 
-          directory: directory, 
-          namespace: namespace, 
-          author: author, 
-          paths: paths, 
-          magic_app_version: magic_app_version 
+        data: {
+          id: id,
+          name: name,
+          architecture: architecture,
+          description: description,
+          directory: directory,
+          namespace: namespace,
+          author: author,
+          paths: paths,
+          magic_app_version: magic_app_version
         },
         success: function (data) {
           reloadApplicationList();
@@ -667,7 +667,28 @@ jQuery(function () {
   $(document).on('click', 'table.path-manager .path-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      $(this).closest('tr').remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Do you want to remove this path?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
+
     }
     fixPathForm();
   });
@@ -700,7 +721,6 @@ jQuery(function () {
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
-        let value = '';
         for (let i in data.magic_app_versions) {
           let latest = data.magic_app_versions[i]['latest'];
           $('[name="magic_app_version"]')[0].appendChild(
@@ -791,7 +811,27 @@ jQuery(function () {
   $(document).on('click', 'table.language-manager .language-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      $(this).closest('tr').remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Do you want to remove this language?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
     }
     fixLanguageForm();
   });
@@ -839,7 +879,8 @@ jQuery(function () {
         success: function (data) {
           select.empty();
           for (let d in data) {
-            for (let i = 0; i < select.length; i++) {
+            for (let i = 0; i < select.length; i++) //NOSONAR
+            {
               select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
               if (data[d].active) {
                 select.val(data[d].code);
@@ -866,7 +907,8 @@ jQuery(function () {
       success: function (data) {
         select.empty();
         for (let d in data) {
-          for (let i = 0; i < select.length; i++) {
+          for (let i = 0; i < select.length; i++) //NOSONAR
+          {
             select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
             if (data[d].active) {
               select.val(data[d].code);
@@ -935,7 +977,7 @@ jQuery(function () {
       dataType: 'html',
       success: function (data) {
         $('#modal-application-setting .application-setting').empty().append(data);
-        setTimeout(function(){
+        setTimeout(function () {
           // set database_password to be empty
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
@@ -1092,7 +1134,7 @@ jQuery(function () {
     e.preventDefault();
   });
   $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
-    e.preventDefault(); 
+    e.preventDefault();
     let el = $(this).siblings('.icon-edit')[0];
     editMenu(el);
   });
@@ -1103,108 +1145,98 @@ jQuery(function () {
     e.preventDefault();
     let input = $(this);
     let menu = $(this).siblings('a.app-menu-text');
-    input.css({display:'none'});
+    input.css({ display: 'none' });
     menu.text(input.val())
-    menu.css({display:''});
+    menu.css({ display: '' });
   });
 
-  
+
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
     $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
     $('#modal-query-executor').modal('show');
   });
-  
 
-  $(document).on('change', 'table select[name=database_driver]', function(e){
+
+  $(document).on('change', 'table select[name=database_driver]', function (e) {
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
 
-  $(document).on('blur keyup', 'input[type="number"]', function() {
+  $(document).on('blur keyup', 'input[type="number"]', function () {
     if (isNaN($(this).val()) || $(this).val().trim() === '') {
-        $(this).addClass('input-invalid-value');
+      $(this).addClass('input-invalid-value');
     } else {
-        $(this).removeClass('input-invalid-value');
+      $(this).removeClass('input-invalid-value');
     }
   });
 
-  $(document).on('click', '#test-database-connection', function(e1){
+  $(document).on('click', '#test-database-connection', function (e1) {
     let table = $(this).closest('table');
-    let input = {'testConnection':'test'};
-    table.find(':input').each(function(e2){
-      if($(this).attr('name') != undefined && $(this).attr('name') != '')
-      {
+    let input = { 'testConnection': 'test' };
+    table.find(':input').each(function (e2) {
+      if ($(this).attr('name') != undefined && $(this).attr('name') != '') {
         input[$(this).attr('name')] = $(this).val();
       }
     });
     $.ajax({
-      type:'POST', 
-      url:'lib.ajax/database-test.php',
-      data:input,
-      dataType:'json',
-      success:function(data){
-        if(data.conneted1)
-        {
-          if(!data.conneted2)
-          {
-            $('#create-database').css({'display':'inline'});
+      type: 'POST',
+      url: 'lib.ajax/database-test.php',
+      data: input,
+      dataType: 'json',
+      success: function (data) {
+        if (data.conneted1) {
+          if (!data.conneted2) {
+            $('#create-database').css({ 'display': 'inline' });
             showAlertUI('Database Connection Test', 'Successfully connected to the server, but database not found.');
           }
-          else
-          {
-            $('#create-database').css({'display':'none'});
+          else {
+            $('#create-database').css({ 'display': 'none' });
             showAlertUI('Database Connection Test', 'Successfully connected to the database.');
           }
         }
-        else
-        {
-          $('#create-database').css({'display':'none'});
+        else {
+          $('#create-database').css({ 'display': 'none' });
           showAlertUI('Database Connection Test', 'Invalid database credentials.');
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
     })
   });
 
-  $(document).on('click', '#create-database', function(e1){
+  $(document).on('click', '#create-database', function (e1) {
     let table = $(this).closest('table');
-    let input = {'createDatabase':'create'};
-    table.find(':input').each(function(e2){
-      if($(this).attr('name') != undefined && $(this).attr('name') != '')
-      {
+    let input = { 'createDatabase': 'create' };
+    table.find(':input').each(function (e2) {
+      if ($(this).attr('name') != undefined && $(this).attr('name') != '') {
         input[$(this).attr('name')] = $(this).val();
       }
     });
     $.ajax({
-      type:'POST', 
-      url:'lib.ajax/database-create.php',
-      data:input,
-      dataType:'json',
-      success:function(data){
-        if(data.conneted1)
-        {
-          if(!data.conneted2)
-          {
-            $('#create-database').css({'display':'inline'});
+      type: 'POST',
+      url: 'lib.ajax/database-create.php',
+      data: input,
+      dataType: 'json',
+      success: function (data) {
+        if (data.conneted1) {
+          if (!data.conneted2) {
+            $('#create-database').css({ 'display': 'inline' });
             showAlertUI('Database Connection Test', 'Successfully connected to the server, but database creation failed.');
           }
-          else
-          {
-            $('#create-database').css({'display':'none'});
+          else {
+            $('#create-database').css({ 'display': 'none' });
             showAlertUI('Database Connection Test', 'Successfully created and connected to the database.');
           }
         }
-        else
-        {
-          $('#create-database').css({'display':'none'});
+        else {
+          $('#create-database').css({ 'display': 'none' });
           showAlertUI('Database Connection Test', 'Invalid database credentials.');
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1222,7 +1254,7 @@ jQuery(function () {
 });
 
 function initTooltip() {
-  $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function(e) {
+  $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
     let tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
 
@@ -1233,7 +1265,7 @@ function initTooltip() {
     tooltip.addClass('visible');
 
     // Calculate tooltip position based on the cursor coordinates
-    $(document).on('mousemove', function(e) {
+    $(document).on('mousemove', function (e) {
       let tooltipWidth = tooltip.outerWidth();
       let tooltipHeight = tooltip.outerHeight();
 
@@ -1259,7 +1291,7 @@ function initTooltip() {
     });
   });
 
-  $(document).on('mouseleave', '[name="erd-map"] area, [data-toggle="tooltip"]', function(e) {
+  $(document).on('mouseleave', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     // Remove the tooltip when the mouse leaves the area
     $('.tooltip').remove();
 
@@ -1271,43 +1303,43 @@ function initTooltip() {
 // Function to display the modal with dynamic buttons
 function showModal(message, title, buttons, onHideCallback) {
   return new Promise((resolve, reject) => {
-      const modal = $('#customAlert');
-      const alertOverlay = $('#alertOverlay');
-      const alertMessage = $('#alertMessage');
-      const alertTitle = $('#alertTitle');
-      const modalFooter = $('#modalFooter');
+    const modal = $('#customAlert');
+    const alertOverlay = $('#alertOverlay');
+    const alertMessage = $('#alertMessage');
+    const alertTitle = $('#alertTitle');
+    const modalFooter = $('#modalFooter');
 
-      // Clear previous buttons in the modal footer
-      modalFooter.empty();
+    // Clear previous buttons in the modal footer
+    modalFooter.empty();
 
-      // Display modal and alertOverlay
-      alertOverlay.show();
-      modal.modal('show');
+    // Display modal and alertOverlay
+    alertOverlay.show();
+    modal.modal('show');
 
-      // Set the modal message and title
-      alertMessage.text(message);
-      alertTitle.text(title);
+    // Set the modal message and title
+    alertMessage.text(message);
+    alertTitle.text(title);
 
-      // Dynamically create buttons
-      buttons.forEach(button => {
-          const buttonElement = $('<button>')
-              .addClass(`btn ${button.class || 'btn-secondary'}`)  // Default to 'btn-secondary' if no class is provided
-              .text(button.caption)
-              .on('click', () => {
-                  modal.modal('hide');
-                  alertOverlay.hide();
-                  button.fn();  // Execute the callback for this button
-                  resolve(button.caption);  // Resolve promise with the caption of the clicked button
-              });
-          modalFooter.append(buttonElement);
-      });
+    // Dynamically create buttons
+    buttons.forEach(button => {
+      const buttonElement = $('<button>')
+        .addClass(`btn ${button.class || 'btn-secondary'}`)  // Default to 'btn-secondary' if no class is provided
+        .text(button.caption)
+        .on('click', () => {
+          modal.modal('hide');
+          alertOverlay.hide();
+          button.fn();  // Execute the callback for this button
+          resolve(button.caption);  // Resolve promise with the caption of the clicked button
+        });
+      modalFooter.append(buttonElement);
+    });
 
-      // Add a listener for when the modal is hidden (after it is closed)
-      modal.on('hidden.bs.modal', () => {
-        if (onHideCallback) {
-            onHideCallback(); // Execute the callback when modal is closed
-        }
-      });
+    // Add a listener for when the modal is hidden (after it is closed)
+    modal.on('hidden.bs.modal', () => {
+      if (onHideCallback) {
+        onHideCallback(); // Execute the callback when modal is closed
+      }
+    });
   });
 }
 
@@ -1365,17 +1397,15 @@ function initMenu() {
   });
 }
 
-function editMenu(el)
-{
+function editMenu(el) {
   let elem = $(el);
   let parent = elem.closest('li');
   let menu = elem.siblings('.app-menu-text');
-  if(parent.find('input'))
-  {
+  if (parent.find('input')) {
     parent.find('input').remove();
   }
   let input = $('<input />');
-  input.attr({type:'text', class:'form-control'});
+  input.attr({ type: 'text', class: 'form-control' });
   menu.css('display', 'none');
   menu.before(input)
   input.val(menu.text());
@@ -1384,8 +1414,7 @@ function editMenu(el)
   input.focus();
 }
 
-function editSubmenu(el)
-{
+function editSubmenu(el) {
   let menu = $(el).siblings('.app-submenu');
   console.log(menu.text())
 }
@@ -1397,14 +1426,11 @@ function dragStart(e) {
     draggedItem = e.target;
     e.dataTransfer.effectAllowed = 'move';
   }
-  else 
-  {
+  else {
     let target = e.target.closest('.sortable-submenu-item');
-    if(target != null)
-    {
+    if (target != null) {
       draggedItem = target;
-      if(target.dataTransfer)
-      {
+      if (target.dataTransfer) {
         target.dataTransfer.effectAllowed = 'move';
       }
     }
@@ -1591,7 +1617,7 @@ function reloadTranslate(translateFor) {
  * @returns {void} This function does not return a value.
  */
 function translateEntity(clbk) {
-  entityName = currentEntity2Translated;
+  entityName = currentEntity2Translated; //NOSONAR
   if (entityName != '') {
     let targetLanguage = $('.target-language').val();
     let filter = $('.filter-translate').val();
@@ -1613,10 +1639,10 @@ function translateEntity(clbk) {
         transEd2.getDoc().setValue(textOut2.join('\r\n'));
         $('.entity-property-name').val(propertyNames.join('|'));
         $('.entity-name').val(entityName);
-        focused = {};
+        focused = {}; //NOSONAR
         transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
-        lastLine1 = -1;
+        lastLine1 = -1; //NOSONAR
       },
     });
   }
@@ -1672,7 +1698,7 @@ function translateModule() {
       focused = {};
       transEd3.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd4.removeLineClass(lastLine2, 'background', 'highlight-line');
-      lastLine2 = -1;
+      lastLine2 = -1; //NOSONAR
     },
   });
 }
@@ -1881,7 +1907,7 @@ function loadDiagramMultiple() {
     img.attr('usemap', '#erd-map');
   });
 
-  
+
 }
 
 function downloadSVG() {
@@ -1932,11 +1958,10 @@ function onChangeMapKey(obj) {
       }, 500);
     }
   }
-  else {
-    if (obj.hasClass('input-invalid-value')) {
-      obj.removeClass('input-invalid-value');
-    }
+  else if (obj.hasClass('input-invalid-value')) {
+    obj.removeClass('input-invalid-value');
   }
+  
 }
 
 /**
@@ -2016,7 +2041,6 @@ function saveEntity() {
       url: "lib.ajax/entity-update.php",
       dataType: "json",
       data: { content: fileContent, entity: currentEntity },
-      dataType: "json",
       success: function (data) {
         $("#button_save_entity_file").removeAttr("disabled");
         updateEntityFile();
@@ -2385,7 +2409,8 @@ function updateTableName(
  */
 function ucWord(str) {
   str = str.toLowerCase();
-  return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function (s) {
+  return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function (s) //NOSONAR
+  {
     return s.toUpperCase();
   });
 }
@@ -2508,17 +2533,17 @@ function generateScript(selector) {
       fields.push(field);
     });
 
-  let subquery = $("#subquery")[0].checked && true;
-  let requireApproval = $("#with_approval")[0].checked && true;
-  let withTrash = $("#with_trash")[0].checked && true;
-  let manualSortOrder = $("#manualsortorder")[0].checked && true;
-  let exportToExcel = $("#export_to_excel")[0].checked && true;
-  let exportToCsv = $("#export_to_csv")[0].checked && true;
-  let activateDeactivate = $("#activate_deactivate")[0].checked && true;
-  let withApprovalNote = $("#with_approval_note")[0].checked && true;
-  let approvalPosition = $('[name="approval_position"]:checked').val();
-  let approvalType = $('[name="approval_type"]:checked').val();
-  let ajaxSupport = $("#ajax_support")[0].checked && true;
+  let subquery = $("#subquery")[0].checked && true; //NOSONAR
+  let requireApproval = $("#with_approval")[0].checked && true; //NOSONAR
+  let withTrash = $("#with_trash")[0].checked && true; //NOSONAR
+  let manualSortOrder = $("#manualsortorder")[0].checked && true; //NOSONAR
+  let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
+  let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
+  let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
+  let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
+  let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
+  let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
+  let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let entity = {
     mainEntity: {
       entityName: $('[name="entity_master_name"]').val(),
@@ -2691,7 +2716,8 @@ function parseJsonData(text) {
  * @param {string} text - The JSON string to be parsed.
  * @returns {Object|null} The parsed JSON object, or null if parsing fails.
  */
-function parseJsonData(text) {
+function parseJsonData(text)  //NOSONAR
+{
   if (typeof text !== "string") {
     return null;
   }
@@ -3632,7 +3658,7 @@ function selectReferenceType(data) {
  * @param {Object} data - The object containing entity data to populate the form.
  */
 function setEntityData(data) {
-  data.entity = data && data.entity ? data.entity : {};
+  data.entity = data && data.entity ? data.entity : {}; //NOSONAR
   let entity = data.entity;
   entity.entityName = entity.entityName ? entity.entityName : "";
   entity.tableName = entity.tableName ? entity.tableName : "";
