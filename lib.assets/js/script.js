@@ -3224,7 +3224,7 @@ function generateSelectFilter(field, args)  //NOSONAR
     "</select>\r\n"
   );
 
-  let i, j, k, l;
+  let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";
   let found = false;
   for (i in matchByType) {
@@ -3379,7 +3379,7 @@ function arrayUnique(arr1) {
  */
 function isKeyWord(str) {
   str = str.toString();
-  let i, j;
+  let i;
   let kw = keyWords.split(",");
   for (i in kw) {
     if (str.equalIgnoreCase(kw[i])) {
