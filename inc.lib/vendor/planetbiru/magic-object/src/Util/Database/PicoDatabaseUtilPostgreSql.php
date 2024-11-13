@@ -2,7 +2,6 @@
 
 namespace MagicObject\Util\Database;
 
-use ErrorException;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
@@ -318,7 +317,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             }
         }
 
-        $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_POSTGRESQL);
+        $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_PGSQL);
         $queryBuilder->newQuery()
             ->insert()
             ->into($tableName)

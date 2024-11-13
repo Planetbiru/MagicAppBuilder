@@ -16,7 +16,9 @@ use MagicObject\MagicObject;
 class PicoDatabaseEntity
 {
     /**
-     * @var PicoDatabase[] An associative array of databases indexed by entity class name.
+     * An associative array of databases indexed by entity class name.
+     * 
+     * @var PicoDatabase[] 
      */
     private $databases = [];
     
@@ -68,7 +70,7 @@ class PicoDatabaseEntity
     /**
      * Get default database connection
      *
-     * @return  PicoDatabase
+     * @return PicoDatabase
      */ 
     public function getDefaultDatabase()
     {
@@ -78,9 +80,9 @@ class PicoDatabaseEntity
     /**
      * Set default database connection
      *
-     * @param  PicoDatabase $defaultDatabase Default database connection
+     * @param PicoDatabase $defaultDatabase Default database connection
      *
-     * @return  self
+     * @return self
      */ 
     public function setDefaultDatabase($defaultDatabase)
     {

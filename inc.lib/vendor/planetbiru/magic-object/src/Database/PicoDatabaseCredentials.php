@@ -31,7 +31,7 @@ use MagicObject\SecretObject;
 class PicoDatabaseCredentials extends SecretObject
 {
     /**
-     * Database driver (e.g., 'mysql', 'postgresql', 'mariadb).
+     * Database driver (e.g., 'mysql', 'pgsql', 'mariadb', 'sqlite').
      *
      * @var string
      */

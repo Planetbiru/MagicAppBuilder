@@ -118,6 +118,35 @@ Additionally, MagicObject 2.1 allows users to parse table structures directly fr
 
 These utilities not only enhance efficiency but also provide a robust foundation for database development, allowing users to focus on building applications rather than wrestling with database compatibility issues. With MagicObject 2.1, database management becomes more intuitive and accessible, empowering developers to harness the full potential of their data.
 
+
+# **PDO Support in MagicObject 2.7**
+
+## **Overview**
+
+With the release of **MagicObject 2.7**, a significant update has been introduced to allow users to leverage **PDO** (PHP Data Objects) for database connections. In previous versions, **MagicObject** required the use of **PicoDatabase**, its custom database handling class. However, recognizing that many developers are accustomed to establishing database connections via traditional PDO, this new version introduces flexibility by allowing PDO connections to be passed directly to the **MagicObject** constructor.
+
+This update aims to bridge the gap between traditional PDO-based database management and the advanced features provided by **MagicObject**, thus enhancing compatibility while retaining all the powerful functionality of the framework.
+
+## **Why PDO Support?**
+
+The decision to support **PDO** was made to accommodate users who have already established database connections in their applications using PDO, instead of relying on **PicoDatabase** from the start. By supporting PDO, **MagicObject** allows users to continue working with their preferred method of connecting to the database while still benefiting from the full range of features and utilities **MagicObject** offers.
+
+While PDO is now an option for initializing **MagicObject**, it is used only in the constructor. Once the object is initialized, **MagicObject** continues to use **PicoDatabase** for all subsequent database interactions, ensuring that users can still benefit from **PicoDatabase**'s advanced features like automatic query building, database abstraction, and optimized query execution.
+
+## **How PDO Support Works**
+
+In **MagicObject 2.7**, when you pass a **PDO** connection object to the constructor, it is automatically converted into a **PicoDatabase** instance using the `PicoDatabase::fromPdo()` static method. This ensures that even though PDO is used to establish the initial connection, the object will still operate using **PicoDatabase** for all subsequent database operations. The constructor of **MagicObject** ensures that the database connection is properly initialized and the type of database is correctly detected based on the PDO driver.
+
+# **Pageable and Sortable in Native Query in MagicObject 2.7**
+
+In **MagicObject version 2.7**, support for **pageable** and **sortable** functionality has been added to native queries. Previously, native queries did not support pagination and sorting directly. Instead, users had to manually include `SORT BY` and `LIMIT OFFSET` clauses in their queries, which made them less flexible. This approach was problematic because each Database Management System (DBMS) has its own syntax for writing queries, making it cumbersome to adapt queries for different platforms.
+
+With the introduction of pageable and sortable support in version 2.7, users can now easily pass **pagination** parameters using the `PicoPageable` type and **sorting** parameters using the `PicoSortable` type directly into their native queries. These parameters can be placed anywhere within the query, but it is recommended to position them either at the beginning or the end of the query for optimal readability and organization.
+
+This enhancement makes native queries more flexible and easier to maintain, as the logic for pagination and sorting is handled automatically, without requiring manual intervention for each DBMS. As a result, users can now write cleaner, more efficient, and database-agnostic native queries.
+
+
+
 # Tutorial
 
 Tutorial is provided here https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md

@@ -2421,6 +2421,28 @@ This implementation provides a robust framework for session management in a PHP 
 -   **Callbacks**: Support for custom callback functions for query execution and debugging.
 -   **Unique ID Generation**: Generate unique identifiers for database records.
 
+### Database Support
+
+MagicObject supports the following databases:
+
+1. **MySQL**
+    
+    One of the most popular open-source relational databases, known for its speed, reliability, and ease of use. MySQL is widely used in web applications and offers strong performance, security features, and support for SQL standards.
+
+2. **MariaDB**
+    
+    A fork of MySQL, created by the original developers of MySQL after concerns over Oracle’s acquisition of MySQL. MariaDB is designed to maintain compatibility with MySQL while adding new features and optimizations. It is fully open-source and highly regarded for its performance and stability.
+
+3. **PostgreSQL**
+    
+    A powerful, open-source relational database system known for its robustness, SQL compliance, and extensive feature set, including ACID compliance, JSON support, and advanced indexing mechanisms.
+
+4. **SQLite**
+    
+    A lightweight, serverless, self-contained SQL database engine that is highly portable. It is often used for embedded systems or small-scale applications due to its minimal setup and resource usage. Despite its simplicity, SQLite supports a wide range of SQL features and is widely used in mobile apps and other local storage scenarios.
+
+MagicObject’s compatibility with these databases enables flexible, scalable, and efficient data management across different platforms and environments.
+
 ### Installation
 
 To use the `PicoDatabase` class, ensure you have PHP with PDO support. Include the class file in your project, and you can instantiate it with your database credentials.
@@ -2650,7 +2672,7 @@ public function query($sql, $params = null)
 -   `array|null $params`: Optional parameters for the SQL query.
 **Returns**: PDOStatement object or `false` on failure.
 
-##### Fetch a Single Result
+#### Fetch a Single Result
 
 ```php
 public function fetch($sql, $tentativeType = PDO::FETCH_ASSOC, $defaultValue = null, $params = null)
@@ -2753,6 +2775,37 @@ try {
 ### Conclusion
 
 `PicoDatabase` is a robust class for managing database operations in PHP applications. By following the examples and method descriptions provided in this manual, you can effectively utilize its features for your database interactions. For further assistance, refer to the source code and documentation available at [MagicObject GitHub](https://github.com/Planetbiru/MagicObject).
+
+## MagicObject with PDO
+
+### Overview
+
+With the release of **MagicObject 2.7**, a significant update has been introduced to allow users to leverage **PDO** (PHP Data Objects) for database connections. In previous versions, **MagicObject** required the use of **PicoDatabase**, its custom database handling class. However, recognizing that many developers are accustomed to establishing database connections via traditional PDO, this new version introduces flexibility by allowing PDO connections to be passed directly to the **MagicObject** constructor.
+
+This update aims to bridge the gap between traditional PDO-based database management and the advanced features provided by **MagicObject**, thus enhancing compatibility while retaining all the powerful functionality of the framework.
+
+### Why PDO Support?
+
+The decision to support **PDO** was made to accommodate users who have already established database connections in their applications using PDO, instead of relying on **PicoDatabase** from the start. By supporting PDO, **MagicObject** allows users to continue working with their preferred method of connecting to the database while still benefiting from the full range of features and utilities **MagicObject** offers.
+
+While PDO is now an option for initializing **MagicObject**, it is used only in the constructor. Once the object is initialized, **MagicObject** continues to use **PicoDatabase** for all subsequent database interactions, ensuring that users can still benefit from **PicoDatabase**'s advanced features like automatic query building, database abstraction, and optimized query execution.
+
+### How PDO Support Works
+
+In **MagicObject 2.7**, when you pass a **PDO** connection object to the constructor, it is automatically converted into a **PicoDatabase** instance using the `PicoDatabase::fromPdo()` static method. This ensures that even though PDO is used to establish the initial connection, the object will still operate using **PicoDatabase** for all subsequent database operations. The constructor of **MagicObject** ensures that the database connection is properly initialized and the type of database is correctly detected based on the PDO driver.
+
+### Benefits of PDO Support in MagicObject 2.7
+
+-   **Compatibility**: This change makes **MagicObject** more compatible with existing applications that are already using PDO for database connections. Developers can continue to use PDO for initializing connections while taking advantage of **PicoDatabase**'s advanced database features for the rest of the application.
+    
+-   **Flexibility**: Developers now have the flexibility to choose between traditional PDO connections and **PicoDatabase**, depending on their needs. This is especially useful for applications transitioning to **MagicObject** but needing to maintain compatibility with existing database handling code.
+    
+-   **Ease of Transition**: By supporting PDO in the constructor, **MagicObject** makes it easier for developers to gradually adopt its features without the need to refactor existing database handling code.
+
+### Conclusion
+
+Version 2.7 of **MagicObject** introduces an important enhancement by allowing PDO connections to be used alongside **PicoDatabase**. This update provides greater flexibility for developers, allowing them to work with traditional PDO connections if they choose, while still benefiting from the advanced features of **MagicObject** for database interactions. This change aligns with the goal of making **MagicObject** more accessible to a wider range of developers, whether they are just starting with **MagicObject** or are looking to transition from an existing PDO-based application.
+
 ## Entity
 
 Entity is class to access database. Entity is derived from MagicObject. Some annotations required to activated all entity features. 
@@ -9698,6 +9751,14 @@ Native query must be a function of a class that extends from the MagicObject cla
 
 Native queries can be created on entities used by the application. If in the previous version the entity only contained properties, then in version 2.0, the entity can also contain functions for native queries. However, entities in versions 1 and 2 both support functions but functions with native queries are only supported in version 2.0.
 
+### Pagination and Sorting
+
+In **MagicObject version 2.7**, support for **pageable** and **sortable** functionality has been added to native queries. Previously, native queries did not support pagination and sorting directly. Instead, users had to manually include `SORT BY` and `LIMIT OFFSET` clauses in their queries, which made them less flexible. This approach was problematic because each Database Management System (DBMS) has its own syntax for writing queries, making it cumbersome to adapt queries for different platforms.
+
+With the introduction of pageable and sortable support in version 2.7, users can now easily pass **pagination** parameters using the `PicoPageable` type and **sorting** parameters using the `PicoSortable` type directly into their native queries. These parameters can be placed anywhere within the query, but it is recommended to position them either at the beginning or the end of the query for optimal readability and organization.
+
+This enhancement makes native queries more flexible and easier to maintain, as the logic for pagination and sorting is handled automatically, without requiring manual intervention for each DBMS. As a result, users can now write cleaner, more efficient, and database-agnostic native queries.
+
 ### Debug Query
 
 MagicObject checks if the database connection has a debugging function for queries. If available, it sends the executed query along with the parameter values to this function, aiding users in identifying errors during query definition and execution.
@@ -9973,6 +10034,28 @@ class Supervisor extends MagicObject
         // Call parent method to execute the query
         return $this->executeNativeQuery();
     }
+
+    /**
+     * Native query 13
+     *
+     * This method will return a prepared statement for further operations if necessary.
+     *
+     * @param PicoPagebale $pageable
+     * @param PicoSortable $sortable
+     * @param bool $aktif The active status to filter results.
+     * @return MagicObject[]
+     * @query("
+      SELECT supervisor.* 
+      FROM supervisor 
+      WHERE supervisor.supervisor_id in :supervisorId 
+      AND supervisor.aktif = :aktif
+     ")
+     */
+    public function native13($pageable, $sortable, $aktif)
+    {
+        // Call parent method to execute the query
+        return $this->executeNativeQuery();
+    }
 }
 
 $obj = new Supervisor(null, $database);
@@ -10026,6 +10109,25 @@ echo "Alamat: " . $native8->getTelepon() . "\r\n";
 echo "Alamat: " . $native9[0]->getTelepon() . "\r\n";
 echo "Alamat: " . $native10->getTelepon() . "\r\n";
 echo "Alamat: " . $native11[0]->getTelepon() . "\r\n";
+
+
+$sortable = new PicoSortable();
+$sortable->addSortable(new PicoSort("nama", PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(3, 20));
+
+try
+{
+    $native13 = $obj->native13($pageable, $sortable, true);
+    echo "\r\nnative13:\r\n";
+    foreach($native13 as $sup)
+    {
+        echo $sup."\r\n\r\n";
+    }
+}
+catch(Exception $e)
+{
+    echo $e->getMessage();
+}
 ```
 
 For the purpose of exporting large amounts of data, use the PDOStatement return type. PDOStatement allows users to read one by one and process it immediately, allowing PHP to release memory from the previous process. PHP does not need to store very large data in a variable.
@@ -10314,7 +10416,7 @@ In this example, we will illustrate how to manage entities stored in different d
 
 ### Entity Definitions
 
-Here are the definitions for the Album, Artist, and Song classes:
+Here are the definitions for the `Album`, `Artist`, `Producer`, and `Song` classes:
 
 **Album Class**
 
@@ -10453,12 +10555,12 @@ $artist = new Artist(null, $database2);
 
 ### Setting Database Entities
 
-You can set the database entities for Album and Artist associated with a Song instance in several ways:
+You can set the database entities for `Album`, `Producer`, and `Artist` associated with a `Song` instance in several ways:
 
 **Method 1: Chaining Method Calls**
 
 ```php
-$song->databaseEntity($album)->->databaseEntity($producer)->databaseEntity($artist);
+$song->databaseEntity($album)->databaseEntity($producer)->databaseEntity($artist);
 ```
 
 **Method 2: Using a DatabaseEntity Instance**
@@ -11987,7 +12089,7 @@ If an operation fails, `PicoSqlite` may throw exceptions or return false. It is 
 ### Conclusion
 
 `PicoSqlite` provides an efficient way to interact with SQLite databases. Its straightforward API allows developers to perform common database operations with minimal code. For more advanced database operations, consider extending the class or using additional PDO features.
-## Upload File
+## File Upload
 
 ### Overview
 
@@ -12075,6 +12177,103 @@ else
 ### Summary
 
 This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like `getAll()` and `isMultiple()`, developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.
+
+## Resumable File Download
+
+### Namespace
+
+`MagicObject\File`
+
+### Description
+
+The `PicoDownloadFile` class is designed to facilitate efficient file downloading in PHP, supporting **partial content** (range requests) for large files. It ensures that requested files exist, handles errors gracefully, and enables downloading in chunks to minimize server load and bandwidth consumption, particularly for large files.
+
+The class supports the following:
+
+-   Verifying the existence of the file.
+-   Handling byte-range requests for resuming downloads.
+-   Sending appropriate HTTP headers to manage the download.
+-   Streaming the file to the client in manageable chunks (default size: 8 KB).
+-   Returning relevant HTTP status codes and error messages.
+
+This class is ideal for scenarios where large files need to be served to clients and you want to offer functionality like resuming interrupted downloads.
+
+
+### Constructor
+
+```php
+__construct($filepath, $filename = null)
+```
+
+**Parameters**:
+
+-   `$filepath` (string): The full path to the file that should be downloaded.
+-   `$filename` (string|null, optional): The name of the file for download. If not provided, the filename is extracted from the `filepath` using `basename()`.
+
+**Description**: Initializes the `PicoDownloadFile` object with the path of the file to be downloaded and an optional filename for the download response. If the filename is not specified, the base name of the file is used.
+
+**Example**:
+
+```php
+$file = new PicoDownloadFile("/path/to/large-file.zip", "downloaded-file.zip");
+```
+
+### Method
+
+```php
+download($exit = false)
+```
+
+**Parameters**:
+
+-   `$exit` (bool, optional): Whether to terminate the script after sending the file. Default is `false`.
+
+**Returns**:
+
+-   `bool`: Returns `true` if the entire file was successfully sent, `false` if only part of the file was sent (due to range requests).
+
+**Description**: This method is responsible for initiating the file download process. It performs the following:
+
+1.  Verifies the existence of the file.
+2.  Handles byte-range requests for partial downloads (useful for resuming interrupted downloads).
+3.  Sends the appropriate HTTP headers for the file download.
+4.  Streams the file to the client in chunks of 8 KB (by default).
+
+If `$exit` is set to `true`, the script will terminate after the file is sent.
+
+**Example 1**
+
+```php
+<?php
+require 'vendor/autoload.php'; // Include the PicoDownloadFile class
+$path = "/path/to/large-file.zip";
+$localName = "downloaded-file.zip";
+$file = new PicoDownloadFile($path, $localName);
+$file->download(true); // Initiate download and terminate the script after sending
+```
+
+**Example 2**
+
+```php
+<?php
+require 'vendor/autoload.php'; // Include the PicoDownloadFile class
+$path = "/path/to/large-file.zip";
+$localName = "downloaded-file.zip";
+$file = new PicoDownloadFile($path, $localName);
+$finished = $file->download(false); // Initiate download without terminate the script after sending
+if($finished && file_exists($path))
+{
+	unlink($path); // Delete file when finish
+}
+```
+
+### Error Handling
+
+-   **404 - File Not Found**: If the file does not exist at the specified path, a 404 error is returned.
+-   **416 - Range Not Satisfiable**: If an invalid byte range is requested (e.g., the start byte is larger than the end byte), a 416 error is returned.
+-   **500 - Internal Server Error**: If there is an issue opening the file for reading (e.g., permissions issues), a 500 error is returned.
+
+
 ## Language
 
 MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.

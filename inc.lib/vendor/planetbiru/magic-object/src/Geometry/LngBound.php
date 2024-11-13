@@ -88,43 +88,43 @@ class LngBounds
     /**
      * Check if this LngBounds intersects with another LngBounds.
      *
-     * @param LngBounds $LngBounds The LngBounds to check for intersection.
+     * @param LngBounds $lngBounds The LngBounds to check for intersection.
      * @return bool True if they intersect, false otherwise.
      */
-    public function intersects($LngBounds) // NOSONAR
+    public function intersects($lngBounds) // NOSONAR
     {
-        if ($this->isEmpty() || $LngBounds->isEmpty()) 
+        if ($this->isEmpty() || $lngBounds->isEmpty()) 
         {
             return false;
         } 
         else if ($this->_swLng > $this->_neLng) 
         {
-            return $LngBounds->getSw() > $LngBounds->getNe() 
-                || $LngBounds->getSw() <= $this->_neLng 
-                || $LngBounds->getNe() >= $this->_swLng;
+            return $lngBounds->getSw() > $lngBounds->getNe() 
+                || $lngBounds->getSw() <= $this->_neLng 
+                || $lngBounds->getNe() >= $this->_swLng;
         } 
-        else if ($LngBounds->getSw() > $LngBounds->getNe()) 
+        else if ($lngBounds->getSw() > $lngBounds->getNe()) 
         {
-            return $LngBounds->getSw() <= $this->_neLng || $LngBounds->getNe() >= $this->_swLng;
+            return $lngBounds->getSw() <= $this->_neLng || $lngBounds->getNe() >= $this->_swLng;
         } 
         else 
         {
-            return $LngBounds->getSw() <= $this->_neLng && $LngBounds->getNe() >= $this->_swLng;
+            return $lngBounds->getSw() <= $this->_neLng && $lngBounds->getNe() >= $this->_swLng;
         }
     }
 
     /**
      * Check if this LngBounds is equal to another LngBounds.
      *
-     * @param LngBounds $LngBounds The LngBounds object to compare.
+     * @param LngBounds $lngBounds The LngBounds object to compare.
      * @return bool True if they are equal, false otherwise.
      */
-    public function equals($LngBounds)
+    public function equals($lngBounds)
     {
         return $this->isEmpty() 
-            ? $LngBounds->isEmpty() 
-            : fmod(abs($LngBounds->getSw() - $this->_swLng), 360) 
-                + fmod(abs($LngBounds->getNe() - $this->_neLng), 360) 
+            ? $lngBounds->isEmpty() 
+            : fmod(abs($lngBounds->getSw() - $this->_swLng), 360) 
+                + fmod(abs($lngBounds->getNe() - $this->_neLng), 360) 
                 <= SphericalGeometry::EQUALS_MARGIN_ERROR;   
     }
 

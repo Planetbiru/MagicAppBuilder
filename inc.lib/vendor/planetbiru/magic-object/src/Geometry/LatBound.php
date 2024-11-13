@@ -80,28 +80,28 @@ class LatBounds
     /**
      * Determine if this LatBounds intersects with another LatBounds.
      *
-     * @param LatBounds $LatBounds The other LatBounds to check for intersection.
+     * @param LatBounds $latBounds The other LatBounds to check for intersection.
      * @return bool True if there is an intersection, false otherwise.
      */
-    public function intersects($LatBounds)
+    public function intersects($latBounds)
     {
-        return $this->_swLat <= $LatBounds->getSw() 
-            ? $LatBounds->getSw() <= $this->_neLat && $LatBounds->getSw() <= $LatBounds->getNe() 
-            : $this->_swLat <= $LatBounds->getNe() && $this->_swLat <= $this->_neLat;
+        return $this->_swLat <= $latBounds->getSw() 
+            ? $latBounds->getSw() <= $this->_neLat && $latBounds->getSw() <= $latBounds->getNe() 
+            : $this->_swLat <= $latBounds->getNe() && $this->_swLat <= $this->_neLat;
     }
 
     /**
      * Check if this LatBounds is equal to another LatBounds within a certain margin of error.
      *
-     * @param LatBounds $LatBounds The other LatBounds to compare.
+     * @param LatBounds $latBounds The other LatBounds to compare.
      * @return bool True if they are equal, false otherwise.
      */
-    public function equals($LatBounds)
+    public function equals($latBounds)
     {
         return $this->isEmpty() 
-            ? $LatBounds->isEmpty() 
-            : abs($LatBounds->getSw() - $this->_swLat) 
-                + abs($this->_neLat - $LatBounds->getNe()) 
+            ? $latBounds->isEmpty() 
+            : abs($latBounds->getSw() - $this->_swLat) 
+                + abs($this->_neLat - $latBounds->getNe()) 
                 <= SphericalGeometry::EQUALS_MARGIN_ERROR;
     }
 

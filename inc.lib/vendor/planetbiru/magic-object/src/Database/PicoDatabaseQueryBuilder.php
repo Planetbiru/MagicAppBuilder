@@ -98,7 +98,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      */
     public function isPgSql()
     {
-        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) == 0;
+        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) == 0;
     }
 
 	/**
@@ -586,6 +586,10 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql()) {
 			return "START TRANSACTION";
 		}
+		else if($this->isSqlite())
+		{
+			return "BEGIN TRANSACTION";
+		}
 		return null;
 	}
 
@@ -596,7 +600,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function commit()
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "COMMIT";
 		}
 		return null;
@@ -609,7 +613,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function rollback()
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "ROLLBACK";
 		}
 		return null;
@@ -638,7 +642,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) {
 			return str_replace(["\r", "\n"], ["\\r", "\\n"], addslashes($query));
 		}
-		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) !== false) {
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) !== false) {
 			return str_replace(["\r", "\n"], ["\\r", "\\n"], $this->replaceQuote($query));
 		}
 		return $query;
@@ -740,8 +744,12 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql()) {
 			$this->buffer .= "LAST_INSERT_ID()\r\n";
 		}
-		if ($this->isPgSql()) {
+		else if ($this->isPgSql()) {
 			$this->buffer .= "LASTVAL()\r\n";
+		}
+		else if ($this->isSqlite())
+		{
+			$this->buffer .= "last_insert_rowid()";
 		}
 		return $this;
 	}
@@ -753,7 +761,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentDate()
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_DATE";
 		}
 		return null;
@@ -766,7 +774,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentTime()
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_TIME";
 		}
 		return null;
@@ -779,7 +787,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentTimestamp()
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_TIMESTAMP";
 		}
 		return null;
@@ -793,6 +801,10 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function now($precision = 0)
 	{
+		if($this->isSqlite())
+		{
+			return "CURRENT_TIMESTAMP";
+		}
 		if ($precision > 6) {
 			$precision = 6;
 		}
@@ -833,6 +845,62 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	}
 
 	/**
+	 * Adds pagination and sorting clauses to a native query string.
+	 * 
+	 * This function appends the appropriate `ORDER BY` and `LIMIT $limit OFFSET $offset` or `LIMIT $offset, $limit`
+	 * clauses to the provided SQL query string based on the given pagination and sorting parameters.
+	 * It supports various database management systems (DBMS) and adjusts the query syntax 
+	 * accordingly (e.g., for PostgreSQL, SQLite, MySQL, MariaDB, etc.).
+	 *
+	 * @param string $queryString The original SQL query string to which pagination and sorting will be added.
+	 * @param PicoPageable|null $pageable The pagination parameters, or `null` if pagination is not required.
+	 * @param PicoSortable|null $sortable The sorting parameters, or `null` if sorting is not required.
+	 * 
+	 * @return string The modified SQL query string with added pagination and sorting clauses.
+	 */
+	public function addPaginationAndSorting($queryString, $pageable, $sortable)
+	{
+		if(!isset($pageable) && !isset($sortable))
+		{
+			return $queryString;
+		}
+
+		$queryString = rtrim($queryString, " \r\n\t; ");
+
+		if(isset($sortable))
+		{
+			foreach($sortable->getSortable() as $sort)
+			{
+				$columnName = $sort->getSortBy();
+				$sortType = $sort->getSortType();             				
+				$sorts[] = $columnName . " " . $sortType;           
+			}
+			if(!empty($sorts))
+			{
+				$queryString .= "\r\nORDER BY ".implode(", ", $sorts);
+			}
+		}
+		if(isset($pageable))
+		{
+			$limitOffset = $pageable->getOffsetLimit();
+			$limit = $limitOffset->getLimit();
+			$offset = $limitOffset->getOffset();
+			if($this->isPgSql() || $this->isSqlite())
+			{
+				// PostgeSQL and SQLite
+				$queryString .= "\r\nLIMIT $limit OFFSET $offset";
+			}
+			else if($this->isMySql())
+			{
+				// MariaDB and MySQL
+				$queryString .= "\r\nLIMIT $offset, $limit";
+			}
+		}
+		
+		return $queryString;
+	}
+
+	/**
 	 * Get the current SQL query as a string.
 	 *
 	 * @return string The constructed SQL query.
@@ -853,7 +921,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->limitOffset) {
 			if ($this->isMySql()) {
 				$sql .= "LIMIT " . $this->offset . ", " . $this->limit;
-			} elseif ($this->isPgSql()) {
+			} elseif ($this->isPgSql() || $this->isSqlite()) {
 				$sql .= "LIMIT " . $this->limit . " OFFSET " . $this->offset;
 			}
 		}

@@ -63,6 +63,14 @@ Native query must be a function of a class that extends from the MagicObject cla
 
 Native queries can be created on entities used by the application. If in the previous version the entity only contained properties, then in version 2.0, the entity can also contain functions for native queries. However, entities in versions 1 and 2 both support functions but functions with native queries are only supported in version 2.0.
 
+### Pagination and Sorting
+
+In **MagicObject version 2.7**, support for **pageable** and **sortable** functionality has been added to native queries. Previously, native queries did not support pagination and sorting directly. Instead, users had to manually include `SORT BY` and `LIMIT OFFSET` clauses in their queries, which made them less flexible. This approach was problematic because each Database Management System (DBMS) has its own syntax for writing queries, making it cumbersome to adapt queries for different platforms.
+
+With the introduction of pageable and sortable support in version 2.7, users can now easily pass **pagination** parameters using the `PicoPageable` type and **sorting** parameters using the `PicoSortable` type directly into their native queries. These parameters can be placed anywhere within the query, but it is recommended to position them either at the beginning or the end of the query for optimal readability and organization.
+
+This enhancement makes native queries more flexible and easier to maintain, as the logic for pagination and sorting is handled automatically, without requiring manual intervention for each DBMS. As a result, users can now write cleaner, more efficient, and database-agnostic native queries.
+
 ### Debug Query
 
 MagicObject checks if the database connection has a debugging function for queries. If available, it sends the executed query along with the parameter values to this function, aiding users in identifying errors during query definition and execution.
@@ -338,6 +346,28 @@ class Supervisor extends MagicObject
         // Call parent method to execute the query
         return $this->executeNativeQuery();
     }
+
+    /**
+     * Native query 13
+     *
+     * This method will return a prepared statement for further operations if necessary.
+     *
+     * @param PicoPagebale $pageable
+     * @param PicoSortable $sortable
+     * @param bool $aktif The active status to filter results.
+     * @return MagicObject[]
+     * @query("
+      SELECT supervisor.* 
+      FROM supervisor 
+      WHERE supervisor.supervisor_id in :supervisorId 
+      AND supervisor.aktif = :aktif
+     ")
+     */
+    public function native13($pageable, $sortable, $aktif)
+    {
+        // Call parent method to execute the query
+        return $this->executeNativeQuery();
+    }
 }
 
 $obj = new Supervisor(null, $database);
@@ -391,6 +421,25 @@ echo "Alamat: " . $native8->getTelepon() . "\r\n";
 echo "Alamat: " . $native9[0]->getTelepon() . "\r\n";
 echo "Alamat: " . $native10->getTelepon() . "\r\n";
 echo "Alamat: " . $native11[0]->getTelepon() . "\r\n";
+
+
+$sortable = new PicoSortable();
+$sortable->addSortable(new PicoSort("nama", PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(3, 20));
+
+try
+{
+    $native13 = $obj->native13($pageable, $sortable, true);
+    echo "\r\nnative13:\r\n";
+    foreach($native13 as $sup)
+    {
+        echo $sup."\r\n\r\n";
+    }
+}
+catch(Exception $e)
+{
+    echo $e->getMessage();
+}
 ```
 
 For the purpose of exporting large amounts of data, use the PDOStatement return type. PDOStatement allows users to read one by one and process it immediately, allowing PHP to release memory from the previous process. PHP does not need to store very large data in a variable.

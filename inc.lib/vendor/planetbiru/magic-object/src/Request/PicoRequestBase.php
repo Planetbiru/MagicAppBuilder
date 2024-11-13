@@ -9,9 +9,11 @@ use MagicObject\Util\PicoStringUtil;
 use ReflectionClass;
 use stdClass;
 
+
 /**
- * Base class for handling requests.
- * 
+ * Base class for handling HTTP requests, including input sanitization, data manipulation, 
+ * and request type checking (GET, POST, AJAX, etc.).
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/Request
@@ -19,30 +21,31 @@ use stdClass;
 class PicoRequestBase extends stdClass //NOSONAR
 {
     /**
-     * Class parameters.
+     * Class parameters parsed from annotations.
      *
      * @var array
      */
     private $classParams = array();
 
     /**
-     * Flag to force input object as scalar.
+     * Flag to force input data to be scalar only.
      *
-     * @var boolean
+     * @var bool
      */
     protected $forceScalar = false;
 
     /**
-     * Flag for recursive processing.
+     * Flag for recursive data processing.
      *
-     * @var boolean
+     * @var bool
      */
     protected $_recursive = false;
 
     /**
-     * Constructor
+     * Constructor to initialize the request handler and process class annotations.
      *
-     * @param bool $forceScalar Indicates whether to only accept scalar values.
+     * @param bool $forceScalar Indicates whether to accept only scalar values for data input.
+     * @throws InvalidAnnotationException If there are invalid annotations in the class.
      */
     public function __construct($forceScalar = false)
     {
@@ -61,10 +64,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Load data into the object.
+     * Load data into the object, transforming keys to camelCase (optional).
      *
-     * @param mixed $data Data to be loaded.
-     * @param bool $tolower Flag to transform keys to lowercase.
+     * @param mixed $data Data to be loaded (can be an array or object).
+     * @param bool $tolower Flag indicating whether to convert keys to lowercase before loading.
      */
     public function loadData($data, $tolower = false)
     {
@@ -81,10 +84,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Set the value of a property.
+     * Set a property value dynamically on the object using camelCase notation.
      *
-     * @param string $propertyName Name of the property.
-     * @param mixed|null $propertyValue Value of the property.
+     * @param string $propertyName Name of the property to set.
+     * @param mixed $propertyValue Value to assign to the property.
      * @return self
      */
     public function set($propertyName, $propertyValue)
@@ -95,10 +98,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Get the value of a property.
+     * Get a property value dynamically from the object.
      *
-     * @param string $propertyName Name of the property.
-     * @param array|null $params Parameters for filtering.
+     * @param string $propertyName Name of the property to retrieve.
+     * @param array|null $params Optional parameters for filtering the value.
      * @return mixed|null
      */
     public function get($propertyName, $params = null)
@@ -129,9 +132,9 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Get the value of the object.
+     * Get the values of all properties as an object (optionally in snake_case).
      *
-     * @param bool $snakeCase Flag to define naming strategy.
+     * @param bool $snakeCase Flag to convert property names to snake_case.
      * @return stdClass
      */
     public function value($snakeCase = false)
@@ -159,10 +162,10 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Get a list of properties.
+     * Retrieve a list of properties defined in the class, optionally as an array of property names.
      *
-     * @param bool $reflectSelf Flag to indicate if class reflection should be used.
-     * @param bool $asArrayProps Flag to return properties as an array.
+     * @param bool $reflectSelf Flag to indicate whether to include only properties of the current class (not inherited).
+     * @param bool $asArrayProps Flag to return properties as an array of names.
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -196,12 +199,12 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Filter input data.
+     * Filter input data from global variables (GET, POST, etc.) according to the specified filter type.
      *
-     * @param int $type Request type.
-     * @param string $variableName Name of the variable.
-     * @param int $filter Filter type.
-     * @param bool $escapeSQL Flag to escape SQL.
+     * @param int $type The type of input (e.g., INPUT_GET, INPUT_POST).
+     * @param string $variableName The name of the variable to filter.
+     * @param int $filter The filter type to apply (e.g., FILTER_SANITIZE_EMAIL).
+     * @param bool $escapeSQL Flag to escape SQL-specific characters.
      * @return mixed
      */
     public function filterInput($type, $variableName, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
@@ -230,13 +233,13 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Filter a value based on the specified criteria.
+     * Filter a value (or nested values) based on the specified filter type and optional flags.
      *
      * @param mixed $val The value to be filtered.
-     * @param int $filter The filter type.
-     * @param bool $escapeSQL Flag to escape SQL.
+     * @param int $filter The filter type to apply (e.g., FILTER_SANITIZE_URL).
+     * @param bool $escapeSQL Flag to escape SQL-specific characters.
      * @param bool $nullIfEmpty Flag to return null if the value is empty.
-     * @param bool $requireScalar Flag to require scalar values only.
+     * @param bool $requireScalar Flag to require scalar values.
      * @return mixed|null
      */
     public function filterValue($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false, $requireScalar = false)
@@ -273,11 +276,11 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Filter a single value based on the specified criteria.
+     * Filter a single value based on the specified filter type, applying specific sanitization rules.
      *
      * @param mixed $val The value to be filtered.
-     * @param int $filter The filter type.
-     * @param bool $escapeSQL Flag to escape SQL.
+     * @param int $filter The filter type to apply (e.g., FILTER_SANITIZE_NUMBER_INT).
+     * @param bool $escapeSQL Flag to escape SQL-specific characters.
      * @param bool $nullIfEmpty Flag to return null if the value is empty.
      * @return mixed
      */
@@ -419,9 +422,9 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Add slashes to a string.
+     * Add escape slashes to a string to protect against SQL injection or special character issues.
      *
-     * @param string $input The input value.
+     * @param string $input The input string to escape.
      * @return string
      */
     public function addslashes($input)
@@ -430,10 +433,11 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Get the value from a formatted number.
+     * Format and return a numeric value by considering application-specific settings for decimal 
+     * and thousand separators.
      *
-     * @param stdClass|MagicObject $cfg Configuration object.
-     * @param mixed $input Input value.
+     * @param stdClass|MagicObject $cfg Configuration object containing separators.
+     * @param mixed $input The input value to format.
      * @return float
      */
     public function _getValue($cfg, $input)
@@ -468,7 +472,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is a GET request.
      *
-     * @return bool
+     * @return bool True if the request method is GET, false otherwise.
      */
     public function isGet()
     {
@@ -478,7 +482,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is a POST request.
      *
-     * @return bool
+     * @return bool True if the request method is POST, false otherwise.
      */
     public function isPost()
     {
@@ -488,7 +492,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     /**
      * Check if the request is an AJAX request.
      *
-     * @return bool
+     * @return bool True if the request is an AJAX request, false otherwise.
      */
     public function isAjax()
     {
@@ -496,9 +500,9 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Retrieve the HTTP method used for the request.
+     * Retrieve the HTTP method used for the current request.
      *
-     * @return string
+     * @return string The HTTP method (e.g., GET, POST).
      */
     public function getHttpMethod()
     {
@@ -506,9 +510,9 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Retrieve the user agent of the request.
+     * Retrieve the user agent string from the request headers.
      *
-     * @return string
+     * @return string The user agent string.
      */
     public function getUserAgent()
     {
@@ -516,9 +520,9 @@ class PicoRequestBase extends stdClass //NOSONAR
     }
 
     /**
-     * Retrieve the client IP address.
+     * Retrieve the client's IP address from the request headers.
      *
-     * @return string
+     * @return string The client's IP address.
      */
     public function getClientIp()
     {

@@ -2,6 +2,9 @@
 
 Entity is class to access database. Entity is derived from MagicObject. Some annotations required to activated all entity features. 
 
+MagicObject version 2.7 introduces new features for transactional database management, namely `startTransaction()`, `commit()`, and `rollback()`. These functions allow entities to directly initiate and manage transactions within their scope. The `startTransaction()` function begins a new transaction, while `commit()` ensures that all changes made during the transaction are permanently saved to the database. On the other hand, `rollback()` can be used to revert any changes made during the transaction in case of an error or interruption. These functions require an active database connection to operate, providing a streamlined way for entities to manage data consistency and integrity within their transactions.
+
+
 **Constructor**
 
 Parameters:
