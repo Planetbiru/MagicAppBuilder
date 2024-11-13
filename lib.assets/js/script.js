@@ -179,7 +179,15 @@ jQuery(function () {
       database: {},
       sessions: {},
       entity_info: {},
+      module_location: []
     };
+
+    form.find('.path-manager tbody tr').each(function(e2){
+      let name = $(this).find('[name^="name"]');
+      let path = $(this).find('[name^="path"]');
+      let checked = $(this).find('[name^="checked"]');
+      dataToPost.module_location.push({name:name.val(), path:path.val(), active:checked[0].checked});
+    });
 
     for (let i in inputs) {
       let name = inputs[i].name;
