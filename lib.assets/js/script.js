@@ -339,7 +339,27 @@ jQuery(function () {
   $(document).on("click", ".btn-remove-row", function (e) {
     let nrow = $(this).closest("tbody").find("tr").length;
     if (nrow > 1) {
-      $(this).closest("tr").remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Do you want to remove this row?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
     } else if (
       nrow == 1 &&
       $(this).closest("table").attr("data-empty-on-remove") == "true"
@@ -1203,8 +1223,8 @@ jQuery(function () {
 
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function(e) {
-    var tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
-    var tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
+    let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
+    let tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
 
     // Append the tooltip to the body and make it visible
     $('body').append(tooltip);
@@ -1214,12 +1234,12 @@ function initTooltip() {
 
     // Calculate tooltip position based on the cursor coordinates
     $(document).on('mousemove', function(e) {
-      var tooltipWidth = tooltip.outerWidth();
-      var tooltipHeight = tooltip.outerHeight();
+      let tooltipWidth = tooltip.outerWidth();
+      let tooltipHeight = tooltip.outerHeight();
 
       // Determine the position of the tooltip to avoid it going off-screen
-      var mouseX = e.pageX + 15; // Right offset
-      var mouseY = e.pageY + 15; // Bottom offset
+      let mouseX = e.pageX + 15; // Right offset
+      let mouseY = e.pageY + 15; // Bottom offset
 
       // Check if the tooltip exceeds the window width and adjust if necessary
       if (mouseX + tooltipWidth > $(window).width()) {
@@ -1246,6 +1266,65 @@ function initTooltip() {
     // Remove the mousemove event from the document to avoid unnecessary event listeners
     $(document).off('mousemove');
   });
+}
+
+// Function to display the modal with dynamic buttons
+function showModal(message, title, buttons, onHideCallback) {
+  return new Promise((resolve, reject) => {
+      const modal = $('#customAlert');
+      const alertOverlay = $('#alertOverlay');
+      const alertMessage = $('#alertMessage');
+      const alertTitle = $('#alertTitle');
+      const modalFooter = $('#modalFooter');
+
+      // Clear previous buttons in the modal footer
+      modalFooter.empty();
+
+      // Display modal and alertOverlay
+      alertOverlay.show();
+      modal.modal('show');
+
+      // Set the modal message and title
+      alertMessage.text(message);
+      alertTitle.text(title);
+
+      // Dynamically create buttons
+      buttons.forEach(button => {
+          const buttonElement = $('<button>')
+              .addClass(`btn ${button.class || 'btn-secondary'}`)  // Default to 'btn-secondary' if no class is provided
+              .text(button.caption)
+              .on('click', () => {
+                  modal.modal('hide');
+                  alertOverlay.hide();
+                  button.fn();  // Execute the callback for this button
+                  resolve(button.caption);  // Resolve promise with the caption of the clicked button
+              });
+          modalFooter.append(buttonElement);
+      });
+
+      // Add a listener for when the modal is hidden (after it is closed)
+      modal.on('hidden.bs.modal', () => {
+        if (onHideCallback) {
+            onHideCallback(); // Execute the callback when modal is closed
+        }
+      });
+  });
+}
+
+// Async function to wait for the result of the modal (any button press)
+async function asyncAlert(message, title, buttons) {
+  const result = await showModal(
+    message,
+    title,
+    buttons,
+    function () {
+      $('#alertOverlay').css({ 'display': 'none' });
+      $('.modal').css({ 'overflow': '', 'overflow-y': 'auto' })
+    }
+  );
+
+  // Log the result (the caption of the button clicked)
+  console.log(result);
 }
 
 

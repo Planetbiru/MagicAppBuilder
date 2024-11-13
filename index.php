@@ -1083,5 +1083,30 @@ $constSelected = ' selected';
       </div>
     </div>
   </div>
+
+  <!-- Overlay background (optional, will cover other elements when modal appears) -->
+  <div class="alertOverlay" id="alertOverlay"></div>
+  <!-- Modal Structure -->
+  <div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="alertTitle">Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p id="alertMessage">This is the alert message.</p>
+              </div>
+              <div class="modal-footer" id="modalFooter">
+                  <!-- Buttons will be dynamically added here -->
+              </div>
+          </div>
+      </div>
+  </div>
+
+
 </body>
 </html>
