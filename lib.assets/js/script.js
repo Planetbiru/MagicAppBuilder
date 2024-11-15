@@ -603,18 +603,34 @@ jQuery(function () {
   $(document).on('click', '.generate_entity', function () {
     let entityName = $('.rd-entity-name').val();
     let tableName = $('.rd-table-name').val();
-    if (confirm('Are you sure you want to generate entity and replace existing file?')) {
-      $.ajax({
-        method: "POST",
-        url: "lib.ajax/entity-generator.php",
-        data: { entityName: entityName, tableName: tableName },
-        success: function (data) {
-          updateEntityFile();
-          updateEntityQuery(true);
-          updateEntityRelationshipDiagram();
+
+    asyncAlert(
+      'Are you sure you want to generate entity and replace existing file?',  // Message to display in the modal
+      'Confirmation',  // Modal title
+      [
+        {
+          'caption': 'Yes',  // Caption for the button
+          'fn': () => {
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/entity-generator.php",
+              data: { entityName: entityName, tableName: tableName },
+              success: function (data) {
+                updateEntityFile();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+              },
+            });
+          },  // Callback for OK button
+          'class': 'btn-primary'  // Bootstrap class for styling
         },
-      });
-    }
+        {
+          'caption': 'No',  // Caption for the button
+          'fn': () => { },  // Callback for Cancel button
+          'class': 'btn-secondary'  // Bootstrap class for styling
+        }
+      ]
+    );
   });
 
   $(document).on('change', '.map-key', function (e) {
@@ -684,7 +700,7 @@ jQuery(function () {
       // Example of calling asyncAlert with dynamic buttons
       let row = $(this).closest('tr');
       asyncAlert(
-        'Do you want to remove this path?',  // Message to display in the modal
+        'Deleting this path will not remove the directory or its files. <br>Do you want to delete this path?',  // Message to display in the modal
         'Delete Confirmation',  // Modal title
         [
           {
@@ -828,7 +844,7 @@ jQuery(function () {
       // Example of calling asyncAlert with dynamic buttons
       let row = $(this).closest('tr');
       asyncAlert(
-        'Do you want to remove this language?',  // Message to display in the modal
+        'Deleting this language will not remove the directory or its files. <br>Do you want to delete this language?',  // Message to display in the modal
         'Delete Confirmation',  // Modal title
         [
           {
@@ -1330,8 +1346,8 @@ function showModal(message, title, buttons, onHideCallback) {
     modal.modal('show');
 
     // Set the modal message and title
-    alertMessage.text(message);
-    alertTitle.text(title);
+    alertMessage.html(message);
+    alertTitle.html(title);
 
     // Dynamically create buttons
     buttons.forEach(button => {
