@@ -926,6 +926,42 @@ jQuery(function () {
     $('#modal-update-language').modal('hide');
   });
 
+  $(document).on('click', '.button-execute-query', function(e){
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    asyncAlert(
+      'Do you want to execute the queries on the current database?',  // Message to display in the modal
+      'Confirmation',  // Modal title
+      [
+        {
+          'caption': 'Yes',  // Caption for the button
+          'fn': () => {
+            let query = modal.find('textarea').val();
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/query-execute.php",
+              data: { action: 'execute', query: query },
+              success: function (data) {
+                // reload query
+                let ents = getEntitySelection();
+                let merged = $(".entity-merge")[0].checked;
+                getEntityQuery(ents, merged);
+                modal.modal('hide');
+              },
+            });
+          },  // Callback for OK button
+          'class': 'btn-primary'  // Bootstrap class for styling
+        },
+        {
+          'caption': 'No',  // Caption for the button
+          'fn': () => { },  // Callback for Cancel button
+          'class': 'btn-secondary'  // Bootstrap class for styling
+        }
+      ]
+    );
+    
+  });
+
   $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');

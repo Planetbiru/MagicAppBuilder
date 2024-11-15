@@ -135,17 +135,6 @@ class MagicDto extends stdClass // NOSONAR
         return $this;
     }
 
-    private function isMyChild($object) {
-        $reflection = new ReflectionClass($object);
-        $parentClass = $reflection->getParentClass();
-        if(!$parentClass)
-        {
-            return false;
-        }
-        return get_class($parentClass) == get_class(new self());
-    }
-    
-
     /**
      * Loads XML data into the object.
      *

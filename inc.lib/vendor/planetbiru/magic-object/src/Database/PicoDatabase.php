@@ -735,6 +735,7 @@ class PicoDatabase //NOSONAR
      *
      * @param string $sql SQL query to be executed.
      * @param array|null $params Optional parameters to bind to the SQL query.
+     * @return PDOStatement|false Returns the PDOStatement object if successful, or `false` on failure.
      * @throws NullPointerException If the database connection is null.
      */
     public function execute($sql, $params = null)
@@ -751,6 +752,7 @@ class PicoDatabase //NOSONAR
         } catch (PDOException $e) {
             // Handle exception as needed
         }
+        return $stmt;
     }
 
     /**
@@ -898,8 +900,7 @@ class PicoDatabase //NOSONAR
             else
             {
                 call_user_func($this->callbackDebugQuery, $query);
-            }
-            
+            }           
         }
     }
 

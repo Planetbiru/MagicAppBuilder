@@ -66,7 +66,7 @@ class PicoDatabaseDump
             $tool = new PicoDatabaseUtilMySql();
             return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
-        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) 
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
             return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
@@ -92,7 +92,7 @@ class PicoDatabaseDump
             $tool = new PicoDatabaseUtilMySql();
             return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
-        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) 
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
             return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
@@ -370,7 +370,7 @@ class PicoDatabaseDump
                 $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
                 $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
 
-                if ($databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL) {
+                if ($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
                     $columnName = $entityColumn['name'];
                     $sequenceName = $tableName . "_" . $columnName;
                     $queries[] = "";

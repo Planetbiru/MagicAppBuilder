@@ -26,6 +26,7 @@ includes:
   - input
   - session
   - database
+  - with-pdo
   - entity
   - specification
   - pagable
@@ -37,6 +38,7 @@ includes:
   - database-query-builder
   - sqlite
   - upload-file
+  - download-file
   - data-table
   - database-migration
 ---

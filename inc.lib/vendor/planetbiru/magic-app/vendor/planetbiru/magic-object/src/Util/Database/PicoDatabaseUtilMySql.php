@@ -66,18 +66,18 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * including the option to include or exclude specific clauses such as "IF NOT EXISTS" and 
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
-     * @param PicoTableInfo $tableInfo     The information about the table, including column details and primary keys.
-     * @param string        $tableName  The name of the table for which the structure is being generated.
-     * @param bool         $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
-     * @param bool         $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
-     * @param string|null  $engine            The storage engine to use for the table (optional, default is null).
-     * @param string|null  $charset           The character set to use for the table (optional, default is null).
-     * @return string                           The SQL statement to create the table, including column definitions and primary keys.
+     * @param PicoTableInfo $tableInfo         The information about the table, including column details and primary keys.
+     * @param string        $tableName         The name of the table for which the structure is being generated.
+     * @param bool          $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
+     * @param bool          $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
+     * @param string|null   $engine            The storage engine to use for the table (optional, default is null).
+     * @param string|null   $charset           The character set to use for the table (optional, default is null).
+     * @return string                          The SQL statement to create the table, including column definitions and primary keys.
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
     {
-        $query = array();
-        $columns = array();
+        $query = [];
+        $columns = [];
         if($dropIfExists)
         {
             $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
@@ -144,7 +144,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function createColumn($column)
     {
-        $col = array();
+        $col = [];
         $col[] = "\t";
         $col[] = "`".$column[parent::KEY_NAME]."`";
         $col[] = $column['type'];
@@ -208,7 +208,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
     public function dumpRecord($columns, $tableName, $record)
     {
         $value = $record->valueArray();
-        $rec = array();
+        $rec = [];
         foreach($value as $key=>$val)
         {
             if(isset($columns[$key]))
@@ -242,7 +242,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $sql = "SHOW COLUMNS FROM $tableName";
         $result = $database->fetchAll($sql, PDO::FETCH_ASSOC);
 
-        $columns = array();
+        $columns = [];
         foreach($result as $row)
         {
             $columns[$row['Field']] = $row['Type'];
@@ -273,7 +273,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = array();
+            $existingTables = [];
             foreach($tables as $tb)
             {
                 $existingTables[] = $tb->getTarget();

@@ -109,6 +109,21 @@ class PicoPage
         $this->pageSize = max(1, intval($pageSize));
         return $this;
     }
+    
+    /**
+     * Calculates and retrieves the offset for database queries.
+     *
+     * The offset is used to determine the starting point for fetching data 
+     * in paginated queries, based on the current page number and page size.
+     *
+     * @return int The calculated offset for database queries.
+     */
+    public function getOffset()
+    {
+        $limit = $this->getPageSize();
+        $offset = ($this->getPageNumber() - 1) * $limit;
+        return max(0, $offset);
+    }
 
     /**
      * Calculates the limit and offset for database queries.

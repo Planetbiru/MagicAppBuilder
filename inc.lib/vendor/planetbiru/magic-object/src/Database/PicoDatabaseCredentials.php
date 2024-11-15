@@ -53,14 +53,14 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $host = 'localhost';
+    protected $host;
     
     /**
      * Database server port.
      *
      * @var int
      */
-    protected $port = 3306;
+    protected $port;
 
     /**
      * Database username.
@@ -69,7 +69,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $username = "";
+    protected $username;
 
     /**
      * Database user password.
@@ -78,7 +78,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $password = "";
+    protected $password;
 
     /**
      * Database name.
@@ -87,7 +87,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $databaseName = "";
+    protected $databaseName;
 
     /**
      * Database schema (default: 'public').
@@ -96,14 +96,14 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $databaseSchema = "public"; 
+    protected $databaseSchema; 
 
     /**
      * Application time zone.
      *
      * @var string
      */
-    protected $timeZone = "Asia/Jakarta";
+    protected $timeZone;
 
     /**
      * Get the database driver.

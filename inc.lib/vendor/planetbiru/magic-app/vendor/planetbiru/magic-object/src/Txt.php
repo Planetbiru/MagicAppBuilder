@@ -9,6 +9,8 @@ namespace MagicObject;
  * This class allows for flexible interaction by returning the names of methods and properties 
  * that are called statically or accessed dynamically but are not explicitly defined within the class.
  * It can be useful for implementing dynamic behavior or creating a fluent interface.
+ * 
+ * @final
  */
 class Txt
 {

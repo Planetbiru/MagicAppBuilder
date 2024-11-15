@@ -109,12 +109,14 @@ class PicoDatabasePersistence // NOSONAR
 
     /**
      * Imported class list
+     * 
      * @var array
      */
     private $importedClassList = array();
 
     /**
      * Flag that class list has been processed or not
+     * 
      * @var boolean
      */
     private $processClassList = false;

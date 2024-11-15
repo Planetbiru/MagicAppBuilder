@@ -352,7 +352,7 @@ class PicoDatabaseUtil
      * @param string $sqlText The raw SQL string containing one or more queries.
      * @return array An array of queries with their respective delimiters.
      */
-    public function splitSql($sqlText)
+    public static function splitSql($sqlText)
     {
         // Normalize newlines and clean up any redundant line breaks
         $sqlText = str_replace("\r\r\n", "\r\n", str_replace("\n", "\r\n", $sqlText));

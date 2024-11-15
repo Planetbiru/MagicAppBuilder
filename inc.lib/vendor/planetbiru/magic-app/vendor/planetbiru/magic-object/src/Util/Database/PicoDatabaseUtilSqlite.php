@@ -53,8 +53,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * It extracts the table name from the `@Table` annotation and processes each property 
      * to determine the column definitions from the `@Column` annotations.
      *
-     * @param MagicObject $entity The instance of the class whose properties will be used
-     *                             to generate the table structure.
+     * @param MagicObject $entity     The instance of the class whose properties will be used
+     *                                to generate the table structure.
      * @param bool $createIfNotExists If true, the query will include an "IF NOT EXISTS" clause.
      * @param bool $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
      * @return string The generated SQL CREATE TABLE query.
@@ -73,7 +73,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $query = "";
         if($dropIfExists)
         {
-            $query .= "-- DROP TABLE IF EXISTS `$tableName`;\r\n\r\n";
+            $query .= "-- DROP TABLE IF EXISTS $tableName;\r\n\r\n";
         }
         $query .= "CREATE TABLE$condition $tableName (\n";
     
@@ -170,7 +170,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * @param array $pKeyArrUsed The array to store used primary key names.
      * @return array An array containing the determined SQL data type and the updated primary key array.
      */
-    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = array())
+    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = [])
     {
         $columnName = $column[parent::KEY_NAME];
         $columnType = strtolower($column['type']); // Assuming 'type' holds the column type
@@ -200,7 +200,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 $sqlType = strtoupper($columnType);
                 if ($sqlType !== 'TINYINT(1)' && $sqlType !== 'FLOAT' && $sqlType !== 'TEXT' && 
                     $sqlType !== 'LONGTEXT' && $sqlType !== 'DATE' && $sqlType !== 'TIMESTAMP' && 
-                    $sqlType !== 'BLOB') {
+                    $sqlType !== 'BLOB') 
+                {
                     $sqlType = 'VARCHAR(255)'; // Fallback type for unknown types
                 }
             }
@@ -234,7 +235,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $stmt = $database->query("PRAGMA table_info($tableName)");
 
         // Fetch and display the column details
-        $rows = array();
+        $rows = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $rows[] = array(
                 "Field" => $row['name'],
@@ -255,21 +256,21 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * including the option to include or exclude specific clauses such as "IF NOT EXISTS" and 
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
-     * @param PicoTableInfo $tableInfo     The information about the table, including column details and primary keys.
-     * @param string        $tableName  The name of the table for which the structure is being generated.
-     * @param bool         $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
-     * @param bool         $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
-     * @param string|null  $engine            The storage engine to use for the table (optional, default is null).
-     * @param string|null  $charset           The character set to use for the table (optional, default is null).
-     * @return string                           The SQL statement to create the table, including column definitions and primary keys.
+     * @param PicoTableInfo $tableInfo         The information about the table, including column details and primary keys.
+     * @param string        $tableName         The name of the table for which the structure is being generated.
+     * @param bool          $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
+     * @param bool          $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
+     * @param string|null   $engine            The storage engine to use for the table (optional, default is null).
+     * @param string|null   $charset           The character set to use for the table (optional, default is null).
+     * @return string                          The SQL statement to create the table, including column definitions and primary keys.
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
     {
-        $query = array();
-        $columns = array();
+        $query = [];
+        $columns = [];
         if($dropIfExists)
         {
-            $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
+            $query[] = "-- DROP TABLE IF EXISTS $tableName;";
             $query[] = "";
         }
         $createStatement = "";
@@ -282,23 +283,23 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
 
-        $query[] = "$createStatement `$tableName` (";
+        $query[] = "$createStatement $tableName (";
 
         foreach($tableInfo->getColumns() as $column)
         {
             $columns[] = $this->createColumn($column);
         }
         $query[] = implode(",\r\n", $columns);
-        $query[] = ") ENGINE=$engine DEFAULT CHARSET=$charset;";
+        $query[] = ") ";
 
         $pk = $tableInfo->getPrimaryKeys();
         if(isset($pk) && is_array($pk) && !empty($pk))
         {
             $query[] = "";
-            $query[] = "ALTER TABLE `$tableName`";
+            $query[] = "ALTER TABLE $tableName";
             foreach($pk as $primaryKey)
             {
-                $query[] = "\tADD PRIMARY KEY (`$primaryKey[name]`)";
+                $query[] = "\tADD PRIMARY KEY ($primaryKey[name])";
             }
             $query[] = ";";
         }
@@ -308,7 +309,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
             {
                 $query[] = "";
-                $query[] = "ALTER TABLE `$tableName` \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
+                $query[] = "ALTER TABLE $tableName \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
                 $query[] = ";";
             }
         }
@@ -333,9 +334,9 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function createColumn($column)
     {
-        $col = array();
+        $col = [];
         $col[] = "\t";
-        $col[] = "`".$column[parent::KEY_NAME]."`";
+        $col[] = "".$column[parent::KEY_NAME]."";
         $col[] = $column['type'];
         if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
         {
@@ -369,11 +370,20 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
+        if(strtolower($defaultValue) == 'true' 
+        || strtolower($defaultValue) == 'false' 
+        || strtolower($defaultValue) == 'null'
+        )
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false || stripos($type, 'int') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
+        if(stripos($type, 'enum') !== false 
+        || stripos($type, 'char') !== false 
+        || stripos($type, 'text') !== false 
+        || stripos($type, 'int') !== false 
+        || stripos($type, 'float') !== false 
+        || stripos($type, 'double') !== false
+        )
         {
             return "'".$defaultValue."'";
         }
@@ -401,17 +411,25 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             {
                 $type = $columns[$name];
                 
-                if(strtolower($type) == 'tinyint(1)' || strtolower($type) == 'boolean' || strtolower($type) == 'bool')
+                if(strtolower($type) == 'tinyint(1)' 
+                || strtolower($type) == 'boolean' 
+                || strtolower($type) == 'bool'
+                )
                 {
                     // Process boolean types
                     $data = $this->fixBooleanData($data, $name, $value);
                 }
-                else if(stripos($type, 'integer') !== false || stripos($type, 'int(') !== false)
+                else if(stripos($type, 'integer') !== false 
+                || stripos($type, 'int(') !== false
+                )
                 {
                     // Process integer types
                     $data = $this->fixIntegerData($data, $name, $value);
                 }
-                else if(stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'decimal') !== false)
+                else if(stripos($type, 'float') !== false 
+                || stripos($type, 'double') !== false 
+                || stripos($type, 'decimal') !== false
+                )
                 {
                     // Process float types
                     $data = $this->fixFloatData($data, $name, $value);
@@ -444,7 +462,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = array();
+            $existingTables = [];
             foreach($tables as $tb)
             {
                 $existingTables[] = $tb->getTarget();
