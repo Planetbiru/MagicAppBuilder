@@ -222,26 +222,26 @@ class PicoEntityGenerator
     protected function getTypeMap()
     {
         return [
-            "double" => "double",
-            "float" => "double",
-            "bigint" => "integer",
-            "smallint" => "integer",
-            "tinyint(1)" => "boolean",
-            "tinyint" => "integer",
-            "int" => "integer",
-            "varchar" => "string",
-            "char" => "string",
-            "tinytext" => "string",
+            "double"     => "float",
+            "float"      => "float",
+            "bigint"     => "int",
+            "smallint"   => "int",
+            "tinyint(1)" => "bool",
+            "tinyint"    => "int",
+            "varchar"    => "string",
+            "char"       => "string",
+            "tinytext"   => "string",
             "mediumtext" => "string",
-            "longtext" => "string",
-            "text" => "string",
-            "enum" => "string",
-            "bool" => "boolean",
-            "boolean" => "boolean",
-            "timestamp" => "string",
-            "datetime" => "string",
-            "date" => "string",
-            "time" => "string"
+            "longtext"   => "string",
+            "int"        => "int",
+            "text"       => "string",
+            "enum"       => "string",
+            "boolean"    => "bool",
+            "bool"       => "bool",
+            "timestamp"  => "string",
+            "datetime"   => "string",
+            "date"       => "string",
+            "time"       => "string"
         ];
     }
 
