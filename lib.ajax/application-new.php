@@ -16,7 +16,7 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 try
 {
     $cachePath = $workspaceDirectory."/magic-app-version.json";
-    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-1 days'))
+    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-6 hours'))
     {
         $magicAppList = ComposerUtil::getMagicAppVersionList();
         file_put_contents($cachePath, json_encode($magicAppList));
@@ -32,9 +32,9 @@ try
 }
 catch(Exception $e)
 {
-    $magicAppList = array();
+    $magicAppList = [];
 }
-$data = array(
+$data = [
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
@@ -43,6 +43,6 @@ $data = array(
     'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
     'magic_app_versions' => $magicAppList
-);
+];
 
 ResponseUtil::sendJSON($data, false, true);

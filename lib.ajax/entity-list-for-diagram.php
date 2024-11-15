@@ -24,7 +24,7 @@ try
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     
     $list = glob($baseDir."/*.php");
-    $li = array();
+    $li = [];
     $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
     
@@ -40,7 +40,7 @@ try
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
             if(!isset($li[$tableName]))
             {
-                $li[$tableName]  = array();
+                $li[$tableName]  = [];
             }
             $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
         }
@@ -48,14 +48,14 @@ try
         {
             if(!isset($li[$idx]))
             {
-                $li[$idx]  = array();
+                $li[$idx]  = [];
             }
             $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);
 
-    $lim = array();
+    $lim = [];
     foreach($li as $elem)
     {
         $lim = array_merge($lim, $elem);
@@ -69,7 +69,7 @@ try
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     $list = glob($baseDir."/*.php");
-    $li = array();
+    $li = [];
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');
@@ -82,7 +82,7 @@ try
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
             if(!isset($li[$tableName]))
             {
-                $li[$tableName]  = array();
+                $li[$tableName]  = [];
             }
             $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
         }
@@ -90,14 +90,14 @@ try
         {
             if(!isset($li[$idx]))
             {
-                $li[$idx]  = array();
+                $li[$idx]  = [];
             }
             $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
         }
     }
     ksort($li);
  
-    $lim = array();
+    $lim = [];
     foreach($li as $elem)
     {
         $lim = array_merge($lim, $elem);

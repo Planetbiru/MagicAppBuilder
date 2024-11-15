@@ -21,7 +21,7 @@ if($inputPost->getUserAction() == 'get')
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);
         $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
         $targetLanguage = $inputPost->getTargetLanguage();
-        $allQueries = array();
+        $allQueries = [];
 
         if($inputPost->getEntityName())
         {
@@ -45,7 +45,7 @@ if($inputPost->getUserAction() == 'get')
                     $entity = new $className(null);
                     $entityLabel = new PicoEntityLanguage($entity);
                     $list = $entityLabel->propertyList(true);
-                    $response = array();
+                    $response = [];
                     foreach($list as $key)
                     {
                         $original = $entityLabel->get($key);
@@ -103,7 +103,7 @@ if($inputPost->getUserAction() == 'set')
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);
         $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
         
-        $allQueries = array();
+        $allQueries = [];
 
         if($inputPost->getEntityName())
         {

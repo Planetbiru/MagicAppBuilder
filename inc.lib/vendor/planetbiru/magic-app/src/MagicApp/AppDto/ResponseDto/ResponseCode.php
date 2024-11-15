@@ -23,14 +23,14 @@ class ResponseCode extends ToString
      *
      * @var string
      */
-    public $responseCode;
+    protected $responseCode;
 
     /**
      * A message providing additional information about the response.
      *
      * @var string
      */
-    public $responseMessage;
+    protected $responseMessage;
 
     /**
      * Constructor for initializing a ResponseCode instance.

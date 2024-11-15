@@ -14,7 +14,7 @@ try {
     $databaseName = $databaseConfig->getDatabaseName();
     $tableName = $inputPost->getTableName();
 
-    $excludeColumns = array();
+    $excludeColumns = [];
     $excludeColumns[] = $appConfig->entityInfo->getDraft();
     $excludeColumns[] = $appConfig->entityInfo->getWaitingFor();
     $excludeColumns[] = $appConfig->entityInfo->getAdminAskEdit();
@@ -42,9 +42,9 @@ try {
     $column = "";
     $i = 0;
 
-    $fields = array();
-    $cols = array();
-    $primaryKeys = array();
+    $fields = [];
+    $cols = [];
+    $primaryKeys = [];
 
     foreach ($rows as $i => $data) {
         $cols[] = $data['column_name'];

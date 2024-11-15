@@ -83,7 +83,7 @@ class Getter extends stdClass
     public function get($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : null;   
+        return isset($this->{$var}) ? $this->{$var} : null;   
     }
 
     /**
@@ -99,7 +99,7 @@ class Getter extends stdClass
         foreach ($this as $key => $val) {
             if(!in_array($key, $parentProps))
             {
-                $value->$key = $val;
+                $value->{$key} = $val;
             }
         }
         if($snakeCase)
@@ -107,7 +107,7 @@ class Getter extends stdClass
             $value2 = new stdClass;
             foreach ($value as $key => $val) {
                 $key2 = PicoStringUtil::snakeize($key);
-                $value2->$key2 = $val;
+                $value2->{$key2} = $val;
             }
             return $value2;
         }
@@ -160,11 +160,11 @@ class Getter extends stdClass
     {
         if (strncasecmp($method, "get", 3) === 0) {
             $var = lcfirst(substr($method, 3));
-            return isset($this->$var) ? $this->$var : null;
+            return isset($this->{$var}) ? $this->{$var} : null;
         }
         else if (strncasecmp($method, "equals", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            $value = isset($this->$var) ? $this->$var : null;
+            $value = isset($this->{$var}) ? $this->{$var} : null;
             return isset($params[0]) && $params[0] == $value;
         }
     }

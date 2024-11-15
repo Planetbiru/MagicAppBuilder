@@ -7,9 +7,14 @@ use Throwable;
 /**
  * Class CurlException
  *
- * Custom exception class for handling scenarios where a result is expected
- * but none is returned. This can be useful for database queries or API calls
- * where a missing result should be treated as an exceptional case.
+ * Custom exception class for handling errors related to cURL operations.
+ * This exception is typically thrown when there is an issue with a cURL request,
+ * such as network failure, timeouts, or invalid responses from the server.
+ * 
+ * The `CurlException` class allows you to capture and manage errors related to
+ * cURL requests, providing detailed information about the error message, code,
+ * and the previous exception if any. It extends the built-in `Exception` class,
+ * and can be caught and handled just like any other exception in PHP.
  * 
  * @author Kamshory
  * @package MagicObject\Exceptions

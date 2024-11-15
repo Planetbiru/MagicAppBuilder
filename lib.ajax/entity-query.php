@@ -19,15 +19,15 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-    $allQueries = array();
+    $allQueries = [];
     $merged = $inputPost->getMerged();
     if($merged)
     {
         if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
             $inputEntity = $inputPost->getEntity();
-            $entities = array();
-            $entityNames = array();
+            $entities = [];
+            $entityNames = [];
             foreach($inputEntity as $idx=>$entityName)
             {
                 $className = "\\".$baseEntity."\\".$entityName;
@@ -44,8 +44,8 @@ try
                         $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
                         if(!isset($entities[$tableName]))
                         {
-                            $entities[$tableName] = array();
-                            $entityNames[$tableName] = array();
+                            $entities[$tableName] = [];
+                            $entityNames[$tableName] = [];
                         }
                         $entities[$tableName][] = $entity;
                         $entityNames[$tableName][] = $entityName;
@@ -54,7 +54,7 @@ try
             }
             foreach($entities as $tableName=>$entity)
             {
-                $entityQueries = array();
+                $entityQueries = [];
                 $dumper = new PicoDatabaseDump();   
                 $quertArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database);
                 foreach($quertArr as $sql)
@@ -96,7 +96,7 @@ try
                         $dumper = new PicoDatabaseDump();
             
                         $quertArr = $dumper->createAlterTableAdd($entity);
-                        $entityQueries = array();
+                        $entityQueries = [];
                         foreach($quertArr as $sql)
                         {
                             if(!empty($sql))

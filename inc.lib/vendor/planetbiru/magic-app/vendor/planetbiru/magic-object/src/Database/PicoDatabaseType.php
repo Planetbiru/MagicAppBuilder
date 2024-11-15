@@ -43,6 +43,13 @@ class PicoDatabaseType
     const DATABASE_TYPE_POSTGRESQL = "postgresql";
 
     /**
+     * Constant for PostgreSQL database type.
+     *
+     * @var string
+     */
+    const DATABASE_TYPE_PGSQL = "pgsql";
+
+    /**
      * Constant for SQLite database type.
      *
      * @var string

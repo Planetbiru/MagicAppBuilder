@@ -96,6 +96,48 @@ else
                                 <td>Description</td>
                                 <td><textarea class="form-control" name="description" spellcheck="false"><?php echo $app->getDescription(); ?></textarea></td>
                             </tr>
+                            <tr>
+                                <td>Path</td>
+                                <td class="paths">
+                                    <table class="path-manager">
+                                    <thead>
+                                        <tr>
+                                        <td>Name</td>
+                                        <td>Path</td>
+                                        <td width="20"></td>
+                                        <td width="35"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $moduleLocation = $appConfig->getApplication() != null ? $appConfig->getApplication()->getBaseModuleDirectory() : [new SecretObject([
+                                            "name"=>"root",
+                                            "path"=>"/",
+                                            "active"=>false
+                                        ])];
+                                        foreach($moduleLocation as $index=>$location)
+                                        {
+                                        ?>
+                                        <tr>
+                                        <td><input class="form-control" type="text" name="name[<?php echo $index;?>]" value="<?php echo $location->getName();?>"></td>
+                                        <td><input class="form-control" type="text" name="path[<?php echo $index;?>]" value="<?php echo $location->getPath();?>"></td>
+                                        <td><input type="checkbox" name="checked[<?php echo $index;?>]"<?php echo $location->isActive() ? ' checked':'';?>></td>
+                                        <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                                        </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                        <td colspan="4">
+                                        <button type="button" class="btn btn-primary add-path">Add</button>
+                                        </td>
+                                        </tr>
+                                    </tfoot>
+                                    </table>
+                                </td>
+                                </tr>
                         </tbody>
                     </table>
                 </div>
@@ -164,6 +206,13 @@ else
                             <tr>
                                 <td>Time Zone</td>
                                 <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-primary" type="button" id="test-database-connection">Test Connection</button>
+                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;">Create Database</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

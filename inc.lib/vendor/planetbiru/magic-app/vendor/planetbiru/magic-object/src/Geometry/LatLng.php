@@ -75,17 +75,17 @@ class LatLng
     /**
      * Check if this LatLng is equal to another LatLng object within a certain margin of error.
      *
-     * @param LatLng $LatLng The LatLng object to compare.
+     * @param LatLng $latLng The LatLng object to compare.
      * @return bool True if they are equal, false otherwise.
      */
-    public function equals($LatLng)
+    public function equals($latLng)
     {
-        if (!is_object($LatLng) || !($LatLng instanceof self)) {
+        if (!is_object($latLng) || !($latLng instanceof self)) {
             return false;
         }
 
-        return abs($this->_lat - $LatLng->getLat()) <= SphericalGeometry::EQUALS_MARGIN_ERROR 
-            && abs($this->_lng - $LatLng->getLng()) <= SphericalGeometry::EQUALS_MARGIN_ERROR;             
+        return abs($this->_lat - $latLng->getLat()) <= SphericalGeometry::EQUALS_MARGIN_ERROR 
+            && abs($this->_lng - $latLng->getLng()) <= SphericalGeometry::EQUALS_MARGIN_ERROR;             
     }
 
     /**

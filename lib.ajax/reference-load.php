@@ -38,42 +38,42 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
         $draft = $entityConstant->getDraft();
         $sortOrder = $entityConstant->getSortOrder();
         $draft = $entityConstant->getDraft();
-        $data = array(
+        $data = [
             "type" => "entity",
-            "entity" => array(
+            "entity" => [
                 "entityName" => $entityName,
                 "tableName" => $tableName,
                 "primaryKey" => $fieldName,
                 "value" => $name,
                 "objectName" => $objectName,
                 "propertyName" => $name,
-                "specification" => array(
-                    array(
+                "specification" => [
+                    [
                         "column" => PicoStringUtil::camelize($active),
                         "value" => true
-                    ),
-                    array(
+                    ],
+                    [
                         "column" => PicoStringUtil::camelize($draft),
-                        "value" => true
-                    )
-                ),
-                "sortable" => array(
-                    array(
+                        "value" => false
+                    ]
+                ],
+                "sortable" => [
+                    [
                         "sortBy" => PicoStringUtil::camelize($sortOrder),
                         "sortType" => "PicoSort::ORDER_TYPE_ASC"
-                    ),
-                    array(
+                    ],
+                    [
                         "sortBy" => PicoStringUtil::camelize($name),
                         "sortType" => "PicoSort::ORDER_TYPE_ASC"
-                    )
-                ),
-                "additionalOutput" => array()
-            ),
-            "map" => array(),
+                    ]
+                ],
+                "additionalOutput" => []
+            ],
+            "map" => [],
             "yesno" => null,
             "truefalse" => null,
             "onezero" => null
-        );
+        ];
         ResponseUtil::sendJSON($data);
     }
 }

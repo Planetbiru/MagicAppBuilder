@@ -23,18 +23,18 @@ try
 	$column = "";
 	$i = 0;
 
-	$tables = array();
-    $fields = array();
-	$cols = array();
+	$tables = [];
+    $fields = [];
+	$cols = [];
 
 	foreach ($rows as $i=>$data) { 	
 		if(!isset($tables[$data['table_name']]) || $data['column_key'] == 'PRI')
 		{
 			if(!isset($tables[$data['table_name']]))
 			{
-				$tables[$data['table_name']] = array();
+				$tables[$data['table_name']] = [];
 				$tables[$data['table_name']]['table_name'] = $data['table_name'];
-				$tables[$data['table_name']]['primary_key'] = array();
+				$tables[$data['table_name']]['primary_key'] = [];
 			}
 			$tables[$data['table_name']]['primary_key'][] = $data['column_name'];
 		}

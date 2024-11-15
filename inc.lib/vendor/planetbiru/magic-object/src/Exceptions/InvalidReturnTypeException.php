@@ -7,7 +7,10 @@ use Throwable;
 /**
  * Class InvalidReturnTypeException
  *
- * Exception thrown when an invalid return type is encountered.
+ * Exception thrown when a function or method returns a value that does not match the expected return type.
+ * This can occur in systems with strict typing or when there is a mismatch between a declared return type 
+ * and the actual returned value during execution. It is particularly useful in frameworks or libraries 
+ * that rely on reflection or type hinting to ensure correct return types.
  *
  * @package MagicObject\Exceptions
  * @link https://github.com/Planetbiru/MagicObject

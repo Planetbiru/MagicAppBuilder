@@ -6,11 +6,13 @@
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: true
     type: fullstack
+    architecture: monolith
 -
     id: sipro
-    name: 'SIPRO PLN'
+    name: 'Nama Aplikasi'
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     selected: false
     type: api
+    architecture: monolith

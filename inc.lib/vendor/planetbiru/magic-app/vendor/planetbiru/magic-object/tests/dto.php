@@ -694,7 +694,6 @@ class AlbumDto extends MagicDto
 			$data->setName("Malik");
 			$data->getProducer()->setName("aaaaa");
 		}
-		throw new InvalidParameterException("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		return $data;
 	}
 }

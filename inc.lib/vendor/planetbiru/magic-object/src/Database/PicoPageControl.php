@@ -19,60 +19,62 @@ use MagicObject\Pagination\PicoPagination;
 class PicoPageControl
 {
     /**
-     * Page data
+     * Page data object containing pagination information.
      *
      * @var PicoPageData
      */
     private $pageData;
 
     /**
-     * Parameter name
+     * Parameter name used for pagination in the URL.
      *
      * @var string
      */
     private $parameterName;
 
     /**
-     * Path
+     * Base path for pagination links.
      *
      * @var string
      */
     private $path;
 
     /**
-     * Prev
+     * Symbol for the previous page button.
      *
      * @var string
      */
     private $prev;
 
     /**
-     * Next
+     * Symbol for the next page button.
      *
      * @var string
      */
     private $next;
 
     /**
-     * First
+     * Symbol for the first page button.
      *
      * @var string
      */
     private $first;
 
     /**
-     * Last
+     * Symbol for the last page button.
      *
      * @var string
      */
     private $last;
 
     /**
-     * Constructor
+     * Constructor for the PicoPageControl class.
      *
-     * @param PicoPageData $pageData Page data
-     * @param string $parameterName Parameter name for page
-     * @param string $path Full path
+     * Initializes pagination control with page data and optional parameter name and path.
+     *
+     * @param PicoPageData $pageData Page data object for pagination.
+     * @param string $parameterName Parameter name for the page (default is 'page').
+     * @param string|null $path Full path for generating pagination links (optional).
      */
     public function __construct($pageData, $parameterName = 'page', $path = null)
     {
@@ -88,10 +90,12 @@ class PicoPageControl
     }
 
     /**
-     * Set margin to pagination
+     * Sets the margin for pagination controls.
      *
-     * @param int $margin Margin (previous and next) from current page
-     * @return self
+     * This defines how many pages to show before and after the current page.
+     *
+     * @param int $margin Margin (number of pages before and after the current page).
+     * @return self Returns the current instance for method chaining.
      */
     public function setMargin($margin)
     {
@@ -100,13 +104,13 @@ class PicoPageControl
     }
 
     /**
-     * Set navigation
+     * Sets custom navigation symbols for pagination buttons.
      *
-     * @param string $prev Button symbol for previous page
-     * @param string $next Button symbol for next page
-     * @param string $first Button symbol for first page
-     * @param string $last Button symbol for last page
-     * @return self
+     * @param string|null $prev Button symbol for the previous page (optional).
+     * @param string|null $next Button symbol for the next page (optional).
+     * @param string|null $first Button symbol for the first page (optional).
+     * @param string|null $last Button symbol for the last page (optional).
+     * @return self Returns the current instance for method chaining.
      */
     public function setNavigation($prev = null, $next = null, $first = null, $last = null)
     {
@@ -118,9 +122,9 @@ class PicoPageControl
     }
 
     /**
-     * To HTML
+     * Converts the pagination control to HTML format.
      *
-     * @return string
+     * @return string HTML representation of the pagination controls.
      */
     public function toHTML()
     {
@@ -128,9 +132,9 @@ class PicoPageControl
     }
 
     /**
-     * Create HTML
+     * Generates the HTML for pagination controls.
      *
-     * @return string
+     * @return string HTML representation of the pagination controls.
      */
     public function __toString()
     {

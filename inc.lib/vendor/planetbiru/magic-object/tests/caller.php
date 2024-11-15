@@ -1,6 +1,10 @@
 <?php
 
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoPage;
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
@@ -253,16 +257,16 @@ class Supervisor extends MagicObject
      * This method will return an array of Supervisor object.
      *
      * @param int $supervisorId The ID of the table to search for.
-     * @param DateTime[] $timeCreate The date and time when data is created
-     * @return MagicObject
+     * @param PicoPageable $pageable
+     * @param PicoSortable $sortable
+     * @return MagicObject[]
      * @query("
       SELECT supervisor.*
       FROM supervisor 
-      WHERE supervisor.waktu_buat in :timeCreate 
-      AND supervisor.aktif = :aktif
+      WHERE supervisor.aktif = :aktif
      ")
      */
-    public function native13($timeCreate, $aktif)
+    public function native13($pageable, $sortable, $aktif)
     {
         // Call parent method to execute the query
         return $this->executeNativeQuery();
@@ -271,7 +275,7 @@ class Supervisor extends MagicObject
 
 $obj = new Supervisor(null, $database);
 
-/*
+
 $native1 = $obj->native1(1, true);
 
 $native2 = $obj->native2(1, true);
@@ -317,17 +321,24 @@ print_r($native11);
 
 // For the MagicObject return type, users can utilize the features of the MagicObject except for interacting with the database again because native queries are designed for a different purpose.
 
-echo "Alamat: " . $native8->getTelepon() . "\r\n";
-echo "Alamat: " . $native9[0]->getTelepon() . "\r\n";
-echo "Alamat: " . $native10->getTelepon() . "\r\n";
-echo "Alamat: " . $native11[0]->getTelepon() . "\r\n";
-*/
+echo "Telepon: " . $native8->getTelepon() . "\r\n";
+echo "Telepon: " . $native9[0]->getTelepon() . "\r\n";
+echo "Telepon: " . $native10->getTelepon() . "\r\n";
+echo "Telepon: " . $native11[0]->getTelepon() . "\r\n";
+
+
+$sortable = new PicoSortable();
+$sortable->addSortable(new PicoSort("nama", PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(1, 2));
 
 try
 {
-$native13 = $obj->native13([new DateTime('2025-03-27 15:23:47', new DateTimeZone($databaseCredential->getDatabase()->getTimeZone()))], true);
-echo "\r\nnative13:\r\n";
-echo ($native13);
+    $native13 = $obj->native13($pageable, $sortable, true);
+    echo "\r\nnative13:\r\n";
+    foreach($native13 as $sup)
+    {
+        echo $sup."\r\n\r\n";
+    }
 }
 catch(Exception $e)
 {

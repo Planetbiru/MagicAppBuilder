@@ -22,7 +22,7 @@ class PicoDatabaseUtilBase
     public function getAutoIncrementKey($tableInfo)
     {
         $autoIncrement = $tableInfo->getAutoIncrementKeys();
-        $autoIncrementKeys = array();
+        $autoIncrementKeys = [];
         if(is_array($autoIncrement) && !empty($autoIncrement))
         {
             foreach($autoIncrement as $col)
@@ -61,7 +61,7 @@ class PicoDatabaseUtilBase
             // Handle case where fetching data is not required
             if($data->getFindOption() & MagicObject::FIND_OPTION_NO_FETCH_DATA && $maxRecord > 0 && isset($callbackFunction) && is_callable($callbackFunction))
             {
-                $records = array();
+                $records = [];
                 $stmt = $data->getPDOStatement();
                 // Fetch records in batches
                 while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
@@ -81,7 +81,7 @@ class PicoDatabaseUtilBase
                             call_user_func($callbackFunction, $sql);
                         }
                         // Reset the records buffer
-                        $records = array();
+                        $records = [];
                     }
                 }
                 // Handle any remaining records
@@ -211,7 +211,7 @@ class PicoDatabaseUtilBase
     {
         $targetColumns = array_keys($this->showColumns($databaseTarget, $target));
         $sourceColumns = array_keys($this->showColumns($databaseSource, $target));
-        $map = array();
+        $map = [];
         foreach($targetColumns as $column)
         {
             if(!in_array($column, $sourceColumns))
@@ -306,7 +306,7 @@ class PicoDatabaseUtilBase
                 ->select("*")
                 ->from($sourceTable);
             $stmt = $databaseSource->query($queryBuilderSource);
-            $records = array();
+            $records = [];
             while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
             {
                 $data = $this->processDataMapping($data, $columns, $tableInfo->getMap());
@@ -322,7 +322,7 @@ class PicoDatabaseUtilBase
                         call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
                     }
                     // reset buffer
-                    $records = array();
+                    $records = [];
                 }
             }
             if(!empty($records) && isset($callbackFunction) && is_callable($callbackFunction))
@@ -542,7 +542,7 @@ class PicoDatabaseUtilBase
     public function insert($tableName, $data)
     {
         // Collect all unique columns from the data records
-        $columns = array();
+        $columns = [];
         foreach ($data as $record) {
             $columns = array_merge($columns, array_keys($record));
         }
@@ -557,7 +557,7 @@ class PicoDatabaseUtilBase
         implode(",\r\n", array_fill(0, count($data), $placeholders));
 
         // Prepare values for binding
-        $values = array();
+        $values = [];
         foreach ($data as $record) {
             foreach ($columns as $column) {
                 // Use null if the value is not set
@@ -582,7 +582,7 @@ class PicoDatabaseUtilBase
      * @param MagicObject $record Data record.
      * @return string SQL insert statement.
      */
-    public function dumpRecord($columns, $picoTableName, $record)
+    public function dumpRecord($columns, $picoTableName, $record) //NOSONAR
     {
         return null;
     }
@@ -598,7 +598,7 @@ class PicoDatabaseUtilBase
      * @param string[] $columns An associative array mapping column names to their types.
      * @return mixed[] The updated data array with fixed types.
      */
-    public function fixImportData($data, $columns)
+    public function fixImportData($data, $columns) //NOSONAR
     {
         return null;
     }
@@ -614,7 +614,7 @@ class PicoDatabaseUtilBase
      * @return array An associative array mapping column names to their types.
      * @throws Exception If the query fails or the table does not exist.
      */
-    public function showColumns($database, $tableName)
+    public function showColumns($database, $tableName) //NOSONAR
     {
         return null;
     }
@@ -631,7 +631,7 @@ class PicoDatabaseUtilBase
      */
     public function convertMariaDbToPostgreSql($mariadbQuery) {
         // Remove comments
-        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery);
+        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery); //NOSONAR
         
         // Replace MariaDB data types with PostgreSQL data types
         $replacements = [
@@ -660,8 +660,8 @@ class PicoDatabaseUtilBase
         $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
 
         // Handle AUTO_INCREMENT
-        $query = preg_replace('/AUTO_INCREMENT=\d+/', '', $query);
-        $query = preg_replace('/AUTO_INCREMENT/', '', $query);
+        $query = preg_replace('/AUTO_INCREMENT=\d+/', '', $query); //NOSONAR
+        $query = preg_replace('/AUTO_INCREMENT/', '', $query); //NOSONAR
         
         // Handle default values for strings and booleans
         $query = preg_replace('/DEFAULT \'(.*?)\'/', 'DEFAULT \'\1\'', $query);
@@ -690,7 +690,7 @@ class PicoDatabaseUtilBase
      */ 
     public function convertPostgreSqlToMySql($postgresqlQuery) {
         // Remove comments
-        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery);
+        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery); //NOSONAR
         
         // Replace PostgreSQL data types with MySQL data types
         $replacements = [
@@ -723,13 +723,13 @@ class PicoDatabaseUtilBase
         $query = preg_replace('/\bSERIAL\b/', 'INT AUTO_INCREMENT', $query);
         
         // Modify "IF NOT EXISTS" for MySQL
-        $query = preg_replace('/CREATE TABLE IF NOT EXISTS/', 'CREATE TABLE IF NOT EXISTS', $query);
+        $query = preg_replace('/CREATE TABLE IF NOT EXISTS/', 'CREATE TABLE IF NOT EXISTS', $query); //NOSONAR
     
         // Remove UNIQUE constraints if necessary (optional)
-        $query = preg_replace('/UNIQUE\s*\(.*?\),?\s*/i', '', $query);
+        $query = preg_replace('/UNIQUE\s*\(.*?\),?\s*/i', '', $query); //NOSONAR
         
         // Remove 'USING BTREE' if present
-        $query = preg_replace('/USING BTREE/', '', $query);
+        $query = preg_replace('/USING BTREE/', '', $query); //NOSONAR
     
         return $query;
     }

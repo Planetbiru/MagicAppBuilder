@@ -27,14 +27,14 @@ class MetadataDto extends ToString
      *
      * @var bool
      */
-    public $active;
+    protected $active;
 
     /**
      * Associated array key value primary key.
      *
      * @var array
      */
-    public $primaryKey;
+    protected $primaryKey;
 
     /**
      * Represents the status of the operation.
@@ -49,7 +49,7 @@ class MetadataDto extends ToString
      *
      * @var int
      */
-    public $waitingFor;
+    protected $waitingFor;
 
     /**
      * Creates a MetadataDto instance from provided data.
@@ -86,7 +86,15 @@ class MetadataDto extends ToString
      */
     public function __construct($primaryKey = null, $active = true, $waitingFor = 0)
     {
-        $this->primaryKey = $primaryKey;
+        $this->primaryKey = [];
+        
+        if(isset($primaryKey) && is_array($primaryKey))
+        {
+            foreach($primaryKey as $key=>$value)
+            {
+                $this->primaryKey[] = new PrimaryKeyValueDto($key, $value);
+            }
+        }
         $this->active = $active;
         $this->waitingFor = $waitingFor;
     }

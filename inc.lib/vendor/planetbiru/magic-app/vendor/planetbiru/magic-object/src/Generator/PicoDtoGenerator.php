@@ -85,16 +85,8 @@ class PicoDtoGenerator
      * @param string|null $entityName Name of the entity (optional)
      * @param bool $prettify Flag to prettify output (default: false)
      */
-    public function __construct(
-        $database,
-        $baseDir,
-        $tableName,
-        $baseNamespaceDto,
-        $dtoName,
-        $baseNamespaceEntity,
-        $entityName = null,
-        $prettify = false
-    ) {
+    public function __construct($database, $baseDir, $tableName, $baseNamespaceDto, $dtoName, $baseNamespaceEntity, $entityName = null, $prettify = false) //NOSONAR
+    {
         $this->database = $database;
         $this->baseDir = $baseDir;
         $this->tableName = $tableName;

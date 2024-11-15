@@ -10,34 +10,34 @@ namespace MagicObject\Request;
  * address, and script name.
  *
  * Available methods:
- * - getPhpSelf() returns $_SERVER['PHP_SELF']
- * - getGatewayInterface() returns $_SERVER['GATEWAY_INTERFACE']
- * - getServerAddr() returns $_SERVER['SERVER_ADDR']
- * - getScriptName() returns $_SERVER['SCRIPT_NAME']
- * - getServerSoftware() returns $_SERVER['SERVER_SOFTWARE']
- * - getServerProtocol() returns $_SERVER['SERVER_PROTOCOL']
- * - getRequestMethod() returns $_SERVER['REQUEST_METHOD']
- * - getRequestTime() returns $_SERVER['REQUEST_TIME']
- * - getRequestTimeFloat() returns $_SERVER['REQUEST_TIME_FLOAT']
- * - getQueryString() returns $_SERVER['QUERY_STRING']
- * - getDocumentRoot() returns $_SERVER['DOCUMENT_ROOT']
- * - getHttps() returns $_SERVER['HTTPS']
- * - getRemoteAddr() returns $_SERVER['REMOTE_ADDR']
- * - getRemotePort() returns $_SERVER['REMOTE_PORT']
- * - getRemoteUser() returns $_SERVER['REMOTE_USER']
- * - getRedirectRemoteUser() returns $_SERVER['REDIRECT_REMOTE_USER']
- * - getScriptFilename() returns $_SERVER['SCRIPT_FILENAME']
- * - getServerAdmin() returns $_SERVER['SERVER_ADMIN']
- * - getServerPort() returns $_SERVER['SERVER_PORT']
- * - getServerSignature() returns $_SERVER['SERVER_SIGNATURE']
- * - getPathTranslated() returns $_SERVER['PATH_TRANSLATED']
- * - getRequestUri() returns $_SERVER['REQUEST_URI']
- * - getPhpAuthDigest() returns $_SERVER['PHP_AUTH_DIGEST']
- * - getPhpAuthUser() returns $_SERVER['PHP_AUTH_USER']
- * - getPhpAuthPw() returns $_SERVER['PHP_AUTH_PW']
- * - getAuthType() returns $_SERVER['AUTH_TYPE']
- * - getPathInfo() returns $_SERVER['PATH_INFO']
- * - getOrigPathInfo() returns $_SERVER['ORIG_PATH_INFO']
+ * - `getPhpSelf()` returns `$_SERVER['PHP_SELF']`
+ * - `getGatewayInterface()` returns `$_SERVER['GATEWAY_INTERFACE']`
+ * - `getServerAddr()` returns `$_SERVER['SERVER_ADDR']`
+ * - `getScriptName()` returns `$_SERVER['SCRIPT_NAME']`
+ * - `getServerSoftware()` returns `$_SERVER['SERVER_SOFTWARE']`
+ * - `getServerProtocol()` returns `$_SERVER['SERVER_PROTOCOL']`
+ * - `getRequestMethod()` returns `$_SERVER['REQUEST_METHOD']`
+ * - `getRequestTime()` returns `$_SERVER['REQUEST_TIME']`
+ * - `getRequestTimeFloat()` returns `$_SERVER['REQUEST_TIME_FLOAT']`
+ * - `getQueryString()` returns `$_SERVER['QUERY_STRING']`
+ * - `getDocumentRoot()` returns `$_SERVER['DOCUMENT_ROOT']`
+ * - `getHttps()` returns `$_SERVER['HTTPS']`
+ * - `getRemoteAddr()` returns `$_SERVER['REMOTE_ADDR']`
+ * - `getRemotePort()` returns `$_SERVER['REMOTE_PORT']`
+ * - `getRemoteUser()` returns `$_SERVER['REMOTE_USER']`
+ * - `getRedirectRemoteUser()` returns `$_SERVER['REDIRECT_REMOTE_USER']`
+ * - `getScriptFilename()` returns `$_SERVER['SCRIPT_FILENAME']`
+ * - `getServerAdmin()` returns `$_SERVER['SERVER_ADMIN']`
+ * - `getServerPort()` returns `$_SERVER['SERVER_PORT']`
+ * - `getServerSignature()` returns `$_SERVER['SERVER_SIGNATURE']`
+ * - `getPathTranslated()` returns `$_SERVER['PATH_TRANSLATED']`
+ * - `getRequestUri()` returns `$_SERVER['REQUEST_URI']`
+ * - `getPhpAuthDigest()` returns `$_SERVER['PHP_AUTH_DIGEST']`
+ * - `getPhpAuthUser()` returns `$_SERVER['PHP_AUTH_USER']`
+ * - `getPhpAuthPw()` returns `$_SERVER['PHP_AUTH_PW']`
+ * - `getAuthType()` returns `$_SERVER['AUTH_TYPE']`
+ * - `getPathInfo()` returns `$_SERVER['PATH_INFO']`
+ * - `getOrigPathInfo()` returns `$_SERVER['ORIG_PATH_INFO']`
  *
  * @author Kamshory
  * @package MagicObject\Request

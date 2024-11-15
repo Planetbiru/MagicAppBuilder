@@ -18,12 +18,24 @@ use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Secret object
- * 
- * This class provides mechanisms for managing properties with encryption 
- * and decryption capabilities, using annotations to specify which properties
- * should be secured.
- * 
+ * SecretObject class
+ *
+ * This class provides mechanisms to manage properties that require encryption 
+ * and decryption during their lifecycle. It uses annotations to specify which 
+ * properties should be encrypted or decrypted when they are set or retrieved. 
+ * These annotations help identify when to apply encryption or decryption, 
+ * either before saving (SET) or before fetching (GET).
+ *
+ * The class supports flexibility in data initialization, allowing data to be 
+ * passed as an array, an object, or even left empty. Additionally, a secure 
+ * callback function can be provided to handle key generation for encryption 
+ * and decryption operations.
+ *
+ * Key features:
+ * - Encryption and decryption of object properties based on annotations.
+ * - Support for customizing property naming strategies.
+ * - Option to provide a secure function for key generation.
+ *
  * @author Kamshory
  * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
@@ -129,17 +141,19 @@ class SecretObject extends stdClass //NOSONAR
     }
 
     /**
-     * Processes object information to determine encryption and decryption requirements.
+     * Analyzes the class's parameters and properties to determine which should be 
+     * encrypted or decrypted based on annotations.
      *
-     * This method retrieves the class parameters and properties using reflection, 
-     * parsing annotations to identify which properties should be encrypted or 
-     * decrypted. It populates the respective lists of properties based on the 
-     * annotations found.
+     * This method uses reflection to retrieve the class's parameters and properties. 
+     * It then parses annotations associated with these members to identify which 
+     * properties should undergo encryption or decryption during specific stages 
+     * (before storage or before retrieval). The appropriate lists of properties 
+     * are populated accordingly.
      *
      * @return void
      *
      * @throws InvalidAnnotationException If an invalid annotation is encountered 
-     *                                    while processing class parameters.
+     *                                    while processing class parameters or properties.
      */
     private function _objectInfo()
     {
@@ -148,42 +162,34 @@ class SecretObject extends stdClass //NOSONAR
         $params = $reflexClass->getParameters();
         $props = $reflexClass->getProperties();
 
-        foreach($params as $paramName=>$paramValue)
-        {
-            try
-            {
+        // Process each class parameter
+        foreach ($params as $paramName => $paramValue) {
+            try {
                 $vals = $reflexClass->parseKeyValue($paramValue);
                 $this->_classParams[$paramName] = $vals;
-            }
-            catch(InvalidQueryInputException $e)
-            {
-                throw new InvalidAnnotationException("Invalid annotation @".$paramName);
+            } catch (InvalidQueryInputException $e) {
+                throw new InvalidAnnotationException("Invalid annotation @" . $paramName);
             }
         }
 
-        // iterate each properties of the class
-        foreach($props as $prop)
-        {
+        // Process each class property
+        foreach ($props as $prop) {
             $reflexProp = new PicoAnnotationParser($className, $prop->name, 'property');
             $parameters = $reflexProp->getParameters();
 
-            // add property list to be encryped or decrypted
-            foreach($parameters as $param=>$val)
-            {
-                if(strcasecmp($param, self::ANNOTATION_ENCRYPT_IN) == 0)
-                {
+            // Check each property for encryption/decryption annotations
+            foreach ($parameters as $param => $val) {
+                if (strcasecmp($param, self::ANNOTATION_ENCRYPT_IN) == 0) {
+                    // Property should be encrypted before storing
                     $this->_encryptInProperties[] = $prop->name;
-                }
-                else if(strcasecmp($param, self::ANNOTATION_DECRYPT_OUT) == 0)
-                {
+                } else if (strcasecmp($param, self::ANNOTATION_DECRYPT_OUT) == 0) {
+                    // Property should be decrypted before retrieval
                     $this->_decryptOutProperties[] = $prop->name;
-                }
-                else if(strcasecmp($param, self::ANNOTATION_ENCRYPT_OUT) == 0)
-                {
+                } else if (strcasecmp($param, self::ANNOTATION_ENCRYPT_OUT) == 0) {
+                    // Property should be encrypted before retrieval
                     $this->_encryptOutProperties[] = $prop->name;
-                }
-                else if(strcasecmp($param, self::ANNOTATION_DECRYPT_IN) == 0)
-                {
+                } else if (strcasecmp($param, self::ANNOTATION_DECRYPT_IN) == 0) {
+                    // Property should be decrypted before storing
                     $this->_decryptInProperties[] = $prop->name;
                 }
             }
@@ -248,16 +254,16 @@ class SecretObject extends stdClass //NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0) {
             $var = lcfirst(substr($method, 5));
-            return isset($this->$var);
+            return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0) {
             $var = lcfirst(substr($method, 2));
-            return isset($this->$var) ? $this->$var == 1 : false;
+            return isset($this->{$var}) ? $this->{$var} == 1 : false;
         } else if (strncasecmp($method, "get", 3) === 0) {
             $var = lcfirst(substr($method, 3));
             return $this->_get($var);
         }
-        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && isset($params[0]) && !$this->_readonly) {
+        else if (strncasecmp($method, "set", 3) === 0 && isset($params) && is_array($params) && !empty($params) && !$this->_readonly) {
             $var = lcfirst(substr($method, 3));
             $this->_set($var, $params[0]);
             $this->modifyNullProperties($var, $params[0]);
@@ -271,21 +277,21 @@ class SecretObject extends stdClass //NOSONAR
         }
         else if (strncasecmp($method, "push", 4) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
             $var = lcfirst(substr($method, 4));
-            if(!isset($this->$var))
+            if(!isset($this->{$var}))
             {
-                $this->$var = array();
+                $this->{$var} = array();
             }
-            if(is_array($this->$var))
+            if(is_array($this->{$var}))
             {
-                array_push($this->$var, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
+                array_push($this->{$var}, isset($params) && is_array($params) && isset($params[0]) ? $params[0] : null);
             }
             return $this;
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
             $var = lcfirst(substr($method, 3));
-            if(isset($this->$var) && is_array($this->$var))
+            if(isset($this->{$var}) && is_array($this->{$var}))
             {
-                return array_pop($this->$var);
+                return array_pop($this->{$var});
             }
             return null;
         }
@@ -311,7 +317,7 @@ class SecretObject extends stdClass //NOSONAR
         {
             $value = $this->decryptValue($value, $this->secureKey());
         }
-        $this->$var = $value;
+        $this->{$var} = $value;
         return $this;
     }
 
@@ -348,7 +354,7 @@ class SecretObject extends stdClass //NOSONAR
      */
     private function _getValue($var)
     {
-        return isset($this->$var) ? $this->$var : null;
+        return isset($this->{$var}) ? $this->{$var} : null;
     }
 
     /**
@@ -409,7 +415,7 @@ class SecretObject extends stdClass //NOSONAR
         {
             foreach($data as $key=>$value)
             {
-                $data->$key = $this->encryptValue($value, $hexKey);
+                $data->{$key} = $this->encryptValue($value, $hexKey);
             }
         }
         else if(is_array($data))
@@ -421,7 +427,7 @@ class SecretObject extends stdClass //NOSONAR
         }
         else
         {
-            $data = $data."";
+            $data = (string) $data;
             return $this->encryptString($data, $hexKey);
         }
         return $data;
@@ -478,7 +484,7 @@ class SecretObject extends stdClass //NOSONAR
         {
             foreach($data as $key=>$value)
             {
-                $data->$key = $this->decryptValue($value, $hexKey);
+                $data->{$key} = $this->decryptValue($value, $hexKey);
             }
         }
         else if(is_array($data))
@@ -490,7 +496,7 @@ class SecretObject extends stdClass //NOSONAR
         }
         else
         {
-            $data = $data."";
+            $data = (string) $data;
             return $this->decryptString($data, $hexKey);
         }
         return $data;
@@ -579,7 +585,7 @@ class SecretObject extends stdClass //NOSONAR
      * array, or scalar value.
      *
      * @param mixed $data The data to load.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadData($data)
     {
@@ -610,7 +616,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param string $rawData The raw INI data as a string.
      * @param bool $systemEnv Flag to indicate whether to use environment variable replacement.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadIniString($rawData, $systemEnv = false)
     {
@@ -636,7 +642,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param string $path The path to the INI file.
      * @param bool $systemEnv Flag to indicate whether to use environment variable replacement.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadIniFile($path, $systemEnv = false)
     {
@@ -664,7 +670,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param bool $systemEnv Flag to indicate whether to replace environment variables.
      * @param bool $asObject Flag to indicate whether to return results as an object.
      * @param bool $recursive Flag to indicate whether to convert nested objects to MagicObject.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -699,7 +705,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param bool $systemEnv Flag to indicate whether to replace environment variables.
      * @param bool $asObject Flag to indicate whether to return results as an object.
      * @param bool $recursive Flag to indicate whether to convert nested objects to MagicObject.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -733,7 +739,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param string $rawData The JSON data as a string.
      * @param bool $systemEnv Flag to indicate whether to replace environment variables.
      * @param bool $recursive Flag to create recursive object.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadJsonString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -756,7 +762,6 @@ class SecretObject extends stdClass //NOSONAR
                 $this->loadData($data);
             }
         }
-
         return $this;
     }
 
@@ -768,7 +773,7 @@ class SecretObject extends stdClass //NOSONAR
      * @param string $path The path to the JSON file.
      * @param bool $systemEnv Flag to indicate whether to replace environment variables.
      * @param bool $recursive Flag to create recursive object.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function loadJsonFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
@@ -781,7 +786,6 @@ class SecretObject extends stdClass //NOSONAR
                 $data = PicoEnvironmentVariable::replaceSysEnvAll($data, true);
             }
             $data = PicoArrayUtil::camelize($data);
-
             if($recursive)
             {
                 $this->loadData(PicoSecretParser::parseRecursiveObject($data));
@@ -801,7 +805,7 @@ class SecretObject extends stdClass //NOSONAR
      * but the loadData method will still work.
      *
      * @param bool $readonly Flag to set the object to read-only.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     protected function readOnly($readonly)
     {
@@ -814,7 +818,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param string $propertyName The name of the property to set.
      * @param mixed|null $propertyValue The value to set for the property.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {
@@ -826,16 +830,16 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param string $propertyName The name of the property.
      * @param mixed $propertyValue The value to add.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     public function push($propertyName, $propertyValue)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(!isset($this->$var))
+        if(!isset($this->{$var}))
         {
-            $this->$var = array();
+            $this->{$var} = array();
         }
-        array_push($this->$var, $propertyValue);
+        array_push($this->{$var}, $propertyValue);
         return $this;
     }
 
@@ -848,9 +852,9 @@ class SecretObject extends stdClass //NOSONAR
     public function pop($propertyName)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        if(isset($this->$var) && is_array($this->$var))
+        if(isset($this->{$var}) && is_array($this->{$var}))
         {
-            return array_pop($this->$var);
+            return array_pop($this->{$var});
         }
         return null;
     }
@@ -876,7 +880,7 @@ class SecretObject extends stdClass //NOSONAR
     public function getOrDefault($propertyName, $defaultValue = null)
     {
         $var = PicoStringUtil::camelize($propertyName);
-        return isset($this->$var) ? $this->$var : $defaultValue;
+        return isset($this->{$var}) ? $this->{$var} : $defaultValue;
     }
 
     /**
@@ -891,7 +895,7 @@ class SecretObject extends stdClass //NOSONAR
      *                           should be copied. If null, all properties will be considered.
      * @param bool $includeNull A flag indicating whether to include properties with null 
      *                          values. Defaults to false, meaning null values will be excluded.
-     * @return self Returns the current object instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
     {
@@ -938,7 +942,7 @@ class SecretObject extends stdClass //NOSONAR
             if(!in_array($key, $parentProps))
             {
                 // get decripted or encrypted value
-                $value->$key = $this->_get($key);
+                $value->{$key} = $this->_get($key);
             }
         }
         if($snakeCase)
@@ -947,7 +951,7 @@ class SecretObject extends stdClass //NOSONAR
             foreach ($value as $key => $val) {
                 $key2 = PicoStringUtil::snakeize($key);
                 // get decripted or encrypted value
-                $value2->$key2 = PicoStringUtil::snakeizeObject($val);
+                $value2->{$key2} = PicoStringUtil::snakeizeObject($val);
             }
             return $value2;
         }
@@ -1105,7 +1109,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @param string $propertyName The name of the property.
      * @param mixed $propertyValue The value of the property.
-     * @return self Returns the current object instance.
+     * @return self Returns the current instance for method chaining.
      */
     private function modifyNullProperties($propertyName, $propertyValue)
     {

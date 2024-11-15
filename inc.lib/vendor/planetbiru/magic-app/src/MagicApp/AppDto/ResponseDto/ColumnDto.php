@@ -35,14 +35,14 @@ class ColumnDto extends ToString
      *
      * @var ColumnDataDto[] Array of `ColumnDataDto` objects.
      */
-    public $data;
+    protected $data;
 
     /**
      * Metadata associated with the row.
      *
      * @var MetadataDto An instance of `MetadataDto`.
      */
-    public $metadata;
+    protected $metadata;
 
     /**
      * ColumnDto constructor.

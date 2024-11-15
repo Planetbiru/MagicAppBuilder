@@ -20,7 +20,7 @@ namespace MagicObject\Util\Database;
  * Implementations of this interface should consider validation and error handling to ensure data integrity 
  * and security during database operations.
  */
-interface PicoDatabaseUtilInterface
+interface PicoDatabaseUtilInterface //NOSONAR
 {
     public function getColumnList($database, $picoTableName);
     public function getAutoIncrementKey($tableInfo);

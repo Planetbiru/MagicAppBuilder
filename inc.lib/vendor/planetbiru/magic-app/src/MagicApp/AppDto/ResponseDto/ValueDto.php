@@ -25,14 +25,14 @@ class ValueDto extends ToString
      *
      * @var mixed
      */
-    public $display;
+    protected $display;
 
     /**
      * Raw data.
      *
      * @var mixed
      */
-    public $raw;
+    protected $raw;
 
     /**
      * Constructor to initialize properties of the ValueDto class.

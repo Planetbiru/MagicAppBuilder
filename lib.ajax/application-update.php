@@ -13,7 +13,6 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 try
 {
 	$inputPost = new InputPost();
-
 	$appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
@@ -34,6 +33,13 @@ try
 		$appConfig->getApplication()->setDescription($description);
 		$appConfig->getApplication()->setArchitecture($architecture);
 	}
+
+    $moduleLocations = $inputPost->getModuleLocation();
+    foreach($moduleLocations as $i=>$v)
+    {
+        $moduleLocations[$i]['active'] = $moduleLocations[$i]['active'] == "true";
+    }
+    $appConfig->getApplication()->setBaseModuleDirectory($moduleLocations);
 
     $existingDatabase = $appConfig->getDatabase();
     if($existingDatabase == null)

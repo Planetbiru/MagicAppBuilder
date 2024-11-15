@@ -2,7 +2,7 @@
 
 # Introduction
 
-MagicObject is a powerful library for creating applications in PHP with ease. It allows for the derivation of classes with various intended uses. Below are some of its key features:
+MagicObject is a powerful library for developing applications in PHP with ease. It enables the dynamic creation of classes for various intended uses. Below are some of its key features:
 
 # Features
 
@@ -31,97 +31,45 @@ This library provides a versatile toolkit for building robust PHP applications!
 
 # Installation
 
-To install Magic Obbject
+To install MagicObject, run:
 
 ```
 composer require planetbiru/magic-object
 ```
 
-or if composer is not installed
+If Composer is not installed, use:
 
 ```
 php composer.phar require planetbiru/magic-object
 ```
 
-To remove Magic Obbject
+To remove MagicObject:
 
 ```
 composer remove planetbiru/magic-object
 ```
 
-or if composer is not installed
+Or if Composer is not installed:
 
 ```
 php composer.phar remove planetbiru/magic-object
 ```
 
-To install composer on your PC or download latest composer.phar, click https://getcomposer.org/download/ 
+o install Composer on your system or download the latest `composer.phar`, visit https://getcomposer.org/download/ 
 
 To see available versions of MagicObject, visit https://packagist.org/packages/planetbiru/magic-object
 
 # Advantages
 
-MagicObject is designed to be easy to use and can even be coded using a code generator. An example of a code generator that successfully creates MagicObject code using only parameters is MagicAppBuilder. MagicObject provides many ways to write code. Users can choose the way that is easiest to implement.
+MagicObject is designed for ease of use and can even be used with a code generator. An example of a code generator that successfully creates MagicObject code using only parameters is **MagicAppBuilder**. MagicObject offers many flexible ways to write code, allowing users to choose the approach that best suits their needs.
 
-MagicObject does not only pay attention to the ease of users in creating applications. MagicObject also pays attention to the efficiency of both time and resources used by applications so that applications can be run on servers with minimum specifications. This of course will save costs used both in application development and operations.
+In addition to prioritizing ease of use, MagicObject is also optimized for efficiency in terms of both time and resource usage, enabling applications to run smoothly even on servers with minimal specifications. This reduces costs in both development and operational phases.
 
 # Application Scaling
 
-For large applications, users can scale the database and storage. So that a user can access any server, use Redis as a session repository. MagicObject clouds session storage with Redis which can be secured using a password.
+For large applications, MagicObject supports database and storage scaling. You can distribute user access across multiple servers and use Redis for session storage. MagicObject integrates with Redis for cloud-based session storage, which can be secured using a password.
 
 ![](https://github.com/Planetbiru/MagicObject/blob/main/scale-up.svg)
-
-# Stable Version
-
-Stable version of MagicObject is `1.17.2` or above. Please don't install versions bellow it.
-
-
-# MagicObject Version 2
-
-## What is New
-
-1.  **Native Query**
-    
-    -   Introduced support for native SQL queries, allowing users to execute raw SQL statements directly within the framework. This feature enhances flexibility and provides greater control over complex queries that may not be easily constructed using the ORM layer.
-2.  **Multiple Database Connection**
-    
-    -   Added the ability to configure and manage multiple database connections. This allows developers to connect to different databases within the same application seamlessly, facilitating multi-database architectures and more complex application requirements.
-3.  **Enable or Disable Entity Cache on Join**
-    
-    -   Introduced a feature to enable or disable entity caching specifically for join operations. This gives developers fine-tuned control over caching strategies, improving performance while also allowing for fresh data retrieval when necessary.
-4.  **Enhanced Documentation**
-    
-    -   Comprehensive updates to the documentation for classes, properties, functions, and annotations. This includes clearer explanations, examples, and usage guidelines, making it easier for developers to understand and utilize the framework effectively.
-5.  **Bug Fixes on Previous Version**
-    
-    -   Addressed various bugs and issues reported in earlier versions. This includes performance improvements, stability enhancements, and corrections of minor errors that could affect the functionality of the framework.
-
-## Additional Features
-
--   **Improved Error Handling**: Enhanced mechanisms for error detection and handling, providing more informative messages to assist developers in troubleshooting.
--   **Performance Optimizations**: Various internal optimizations that improve the overall performance of the framework, particularly in database interactions.
--   **Backward Compatibility**: Ensured backward compatibility with version 1, allowing for a smooth transition for existing users to upgrade without significant changes to their codebase.
-
-## Migration Notes
-
--   When upgrading from version 1 to version 2, please review the migration notes for any breaking changes or required adjustments to your codebase. Detailed guidelines are provided to facilitate a smooth upgrade process.
-
-MagicObject 2.1 introduces package annotations for entities, enhancing the process of joining them. These annotations are essential, as the namespace is required to properly join entities. The join class should be referenced by its base name only, without the namespace; otherwise, MagicObject may fail to recognize the class.
-
-PHP does not provide a native method to retrieve a class's namespace. Earlier versions of MagicObject attempted to obtain this information by reading the PHP script, a method that proved both unsafe and inefficient.
-
-With the addition of package annotations to each entity, MagicObject now offers a safer and more efficient way to join entities. However, if a package annotation is not available on an entity, version 2.1 will still revert to the old method.
-
-MagicObject 2.1 introduces a suite of powerful database utilities aimed at enhancing database management and interoperability. One of the key features is the ability to seamlessly convert databases between PostgreSQL and MySQL, enabling developers to migrate their data and applications with ease. This conversion tool ensures that data types, constraints, and structures are accurately translated, reducing the potential for errors during migration.
-
-Additionally, MagicObject 2.1 allows users to parse table structures directly from SQL statements without the need to first dump them into a database. This functionality streamlines the process of understanding and manipulating database schemas, making it easier for developers to work with existing SQL code or to integrate with third-party systems.
-
-These utilities not only enhance efficiency but also provide a robust foundation for database development, allowing users to focus on building applications rather than wrestling with database compatibility issues. With MagicObject 2.1, database management becomes more intuitive and accessible, empowering developers to harness the full potential of their data.
-
-# Tutorial
-
-Tutorial is provided here https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md
-
 
 # Example
 
@@ -195,17 +143,332 @@ $cfg = new ConfigApp(null, true);
 $cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true, true);
 
 // to get database object,
-// $cfg->getDatabase()
+$cfg->getDatabase()
 //
 // to get database.host
-// $cfg->getDatabase()->getHost()
+ $cfg->getDatabase()->getHost()
 // to get database.database_name
-// $cfg->getDatabase()->getDatabaseName()
+$cfg->getDatabase()->getDatabaseName()
 ```
 
-# Application
+## Entity
 
-Applications that uses **MagicObjects** are :
+```php
+<?php
+
+namespace MusicProductionManager\Data\Entity;
+
+use MagicObject\MagicObject;
+
+/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
+ * @Table(name="album")
+ * @Cache(enable="true")
+ * @package MusicProductionManager\Data\Entity
+ */
+class Album extends MagicObject
+{
+	/**
+	 * Album ID
+	 * 
+	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @NotNull
+	 * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
+	 * @Label(content="Album ID")
+	 * @var string
+	 */
+	protected $albumId;
+
+	/**
+	 * Name
+	 * 
+	 * @Column(name="name", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Name")
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * Title
+	 * 
+	 * @Column(name="title", type="text", nullable=true)
+	 * @Label(content="Title")
+	 * @var string
+	 */
+	protected $title;
+
+	/**
+	 * Description
+	 * 
+	 * @Column(name="description", type="longtext", nullable=true)
+	 * @Label(content="Description")
+	 * @var string
+	 */
+	protected $description;
+
+	/**
+	 * Producer ID
+	 * 
+	 * @Column(name="producer_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Producer ID")
+	 * @var string
+	 */
+	protected $producerId;
+
+	/**
+	 * Release Date
+	 * 
+	 * @Column(name="release_date", type="date", nullable=true)
+	 * @Label(content="Release Date")
+	 * @var string
+	 */
+	protected $releaseDate;
+
+	/**
+	 * Number Of Song
+	 * 
+	 * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
+	 * @Label(content="Number Of Song")
+	 * @var integer
+	 */
+	protected $numberOfSong;
+
+	/**
+	 * Duration
+	 * 
+	 * @Column(name="duration", type="float", nullable=true)
+	 * @Label(content="Duration")
+	 * @var double
+	 */
+	protected $duration;
+
+	/**
+	 * Image Path
+	 * 
+	 * @Column(name="image_path", type="text", nullable=true)
+	 * @Label(content="Image Path")
+	 * @var string
+	 */
+	protected $imagePath;
+
+	/**
+	 * Sort Order
+	 * 
+	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
+	 * @Label(content="Sort Order")
+	 * @var integer
+	 */
+	protected $sortOrder;
+
+	/**
+	 * Time Create
+	 * 
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Time Create")
+	 * @var string
+	 */
+	protected $timeCreate;
+
+	/**
+	 * Time Edit
+	 * 
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Time Edit")
+	 * @var string
+	 */
+	protected $timeEdit;
+
+	/**
+	 * Admin Create
+	 * 
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Label(content="Admin Create")
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * Admin Edit
+	 * 
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Edit")
+	 * @var string
+	 */
+	protected $adminEdit;
+
+	/**
+	 * IP Create
+	 * 
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @Label(content="IP Create")
+	 * @var string
+	 */
+	protected $ipCreate;
+
+	/**
+	 * IP Edit
+	 * 
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="IP Edit")
+	 * @var string
+	 */
+	protected $ipEdit;
+
+	/**
+	 * Active
+	 * 
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @var boolean
+	 */
+	protected $active;
+
+	/**
+	 * As Draft
+	 * 
+	 * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @var boolean
+	 */
+	protected $asDraft;
+
+}
+```
+
+**Usage**
+
+```php
+<?php
+
+use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseCredentials;
+use MusicProductionManager\Config\ConfigApp;
+use MusicProductionManager\Data\Entity\Album;
+
+require_once dirname(__DIR__)."/vendor/autoload.php";
+
+$cfg = new ConfigApp(null, true);
+$cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true, true);
+
+$databaseCredentials = new PicoDatabaseCredentials($cfg->getDatabase());
+$database = new PicoDatabase($databaseCredentials);
+try {
+    $database->connect();
+  
+    // Create a new Album instance
+    $album1 = new Album(null, $database);
+    $album1->setAlbumId("123456");
+    $album1->setName("Album 1");
+    $album1->setAdminCreate("USER1");
+    $album1->setDuration(300);
+  
+    // Another way to create an object
+    // Create an object from stdClass or another object with matching properties (snake_case or camelCase)
+    $data = new stdClass;
+    // Snake case
+    $data->album_id = "123456";
+    $data->name = "Album 1";
+    $data->admin_create = "USER1";
+    $data->duration = 300;
+  
+    // Or camel case
+    $data->albumId = "123456";
+    $data->name = "Album 1";
+    $data->adminCreate = "USER1";
+    $data->duration = 300;
+  
+    $album1 = new Album($data, $database); 
+  
+    // Another way to create an object
+    // Create an object from an associative array with matching properties (snake_case or camelCase)
+    $data = array();
+    // Snake case
+    $data["album_id"] = "123456";
+    $data["name"] = "Album 1";
+    $data["admin_create"] = "USER1";
+    $data["duration"] = 300;
+  
+    // Or camel case
+    $data["albumId"] = "123456";
+    $data["name"] = "Album 1";
+    $data["adminCreate"] = "USER1";
+    $data["duration"] = 300;
+    $album1 = new Album($data, $database);
+  
+    // Get value from the form
+    // This method is not safe
+    $album1 = new Album($_POST, $database);
+  
+    // We can use another method
+    $inputPost = new InputPost();
+  
+    // We can apply filters
+    $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+    $inputPost->filterDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+  
+    // If a property is not present in $inputPost, we can set a default value
+    // Note that the user can modify the form and add/update unwanted properties
+    $inputPost->checkboxActive(false);
+    $inputPost->checkboxAsDraft(true);
+  
+    // We can remove any property data from the $inputPost object before applying it to the entity
+    // This property will not be saved to the database
+    $inputPost->setSortOrder(null);
+  
+    $album1 = new Album($inputPost, $database);
+  
+    // Insert into the database
+    $album1->insert();
+  
+    // Insert or update the record
+    $album1->save();
+  
+    // Update the record
+    // A NoRecordFoundException will be thrown if the ID is not found
+    $album1->update();
+  
+    // Convert the object to JSON
+    $json = $album1->toString();
+    // Alternatively:
+    $json = $album1 . "";
+  
+    // Send to the output buffer
+    // It is automatically converted to a string
+    echo $album1;
+  
+    // Find one record by ID
+    $album2 = new Album(null, $database);
+    $album2->findOneByAlbumId("123456");
+  
+    // Find multiple records
+    $album2 = new Album(null, $database);
+    $albums = $album2->findByAdminCreate("USER1");
+    $rows = $albums->getResult();
+    foreach ($rows as $albumSaved) {
+        // $albumSaved is an instance of Album
+  
+        // We can update the data
+        $albumSaved->setAdminEdit("USER1");
+        $albumSaved->setTimeEdit(date('Y-m-d H:i:s'));
+  
+        // This value will not be saved to the database because it does not have a corresponding column
+        $albumSaved->setAnyValue("ANY VALUE");
+  
+        $albumSaved->update();
+    }
+  
+} catch (Exception $e) {
+    // Handle the exception (currently doing nothing)
+}
+```
+
+# Tutorial
+
+A tutorial is available here: https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md
+
+# Applications Using MagicObject
 
 1. **Music Production Manager** https://github.com/kamshory/MusicProductionManager
 2. **AppBuilder** https://github.com/Planetbiru/AppBuilder

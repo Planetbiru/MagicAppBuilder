@@ -2,6 +2,9 @@
 
 namespace MagicApp\AppDto\ResponseDto;
 
+use MagicObject\MagicObject;
+use ReflectionClass;
+
 /**
  * Data Transfer Object (DTO) representing a column in a tabular data structure.
  * 
@@ -24,63 +27,63 @@ class ColumnDataDto extends ToString
      *
      * @var string
      */
-    public $field;
+    protected $field;
 
     /**
      * The label for the field, typically used in user interfaces.
      *
      * @var string
      */
-    public $label;
+    protected $label;
 
     /**
      * The value associated with the field for display purposes.
      *
      * @var mixed
      */
-    public $value;
+    protected $value;
 
     /**
      * The raw value associated with the field.
      *
      * @var mixed
      */
-    public $valueRaw;
+    protected $valueRaw;
 
     /**
      * The data type of the field.
      *
      * @var string
      */
-    public $type;
+    protected $type;
 
     /**
      * Indicates whether the field is read-only.
      *
      * @var bool
      */
-    public $readonly;
+    protected $readonly;
 
     /**
      * Indicates whether the field is hidden from the user interface.
      *
      * @var bool
      */
-    public $hidden;
+    protected $hidden;
 
     /**
      * The draft value associated with the field for temporary storage.
      *
      * @var mixed
      */
-    public $valueDraft;
+    protected $valueDraft;
 
     /**
      * The raw draft value associated with the field.
      *
      * @var mixed
      */
-    public $valueDraftRaw;
+    protected $valueDraftRaw;
 
     /**
      * Constructor to initialize properties of the ColumnDataDto class.
@@ -93,22 +96,28 @@ class ColumnDataDto extends ToString
      * @param bool $hidden Indicates if the field is hidden.
      * @param ValueDto $valueDraft The draft value associated with the field.
      */
-    public function __construct($field, $value, $type, $label, $readonly, $hidden, $valueDraft)
+    public function __construct($field, $value, $type, $label, $readonly = false, $hidden = false, $valueDraft = null)
     {
         $this->field = $field;
-        $this->value = $value->getDisplay();
-        if($value->getRaw() != null)
+        if(isset($value))
         {
-            $this->valueRaw = $value->getRaw();
+            $this->value = $value->getDisplay();
+            if($value->getRaw() != null)
+            {
+                $this->valueRaw = $value->getRaw();
+            }
         }
         $this->type = $type;
         $this->label = $label;
         $this->readonly = $readonly;
         $this->hidden = $hidden;
-        $this->valueDraft = $valueDraft->getDisplay();
-        if($valueDraft->getRaw() != null)
+        if(isset($valueDraft))
         {
-            $this->valueDraftRaw = $valueDraft->getRaw();
+            $this->valueDraft = $valueDraft->getDisplay();
+            if($valueDraft->getRaw() != null)
+            {
+                $this->valueDraftRaw = $valueDraft->getRaw();
+            }
         }
     }
 
@@ -264,5 +273,85 @@ class ColumnDataDto extends ToString
     {
         $this->valueDraft = $valueDraft;
         return $this; // Return current instance for method chaining.
+    }
+    
+    /**
+     * Retrieves and formats the properties of the current instance according to the specified naming strategy.
+     *
+     * This method extracts all properties of the current object, applies the given naming strategy
+     * (such as `camelCase` or `snake_case`), and processes nested objects or arrays recursively. 
+     * The result is returned as an instance of `StandardClass`, with private properties excluded from 
+     * the output.
+     *
+     * If no naming strategy is provided, the strategy is derived from class annotations, 
+     * if available, or defaults to the naming convention of the class.
+     * 
+     * The method also supports pretty-printing of the output if the `prettify` flag is set to `true`.
+     * Nested objects and arrays will have their properties or keys recursively formatted with the 
+     * specified naming strategy.
+     *
+     * Private properties from the current class are excluded from the formatted result, 
+     * but public and protected properties will be included, even if they are inherited.
+     *
+     * @param string|null $namingStrategy The naming strategy to apply when formatting property names.
+     *                                    If `null`, the strategy is determined based on class annotations.
+     * @param bool $prettify Whether to pretty-print the resulting JSON output. Default is `false`.
+     * @return StandardClass An object containing the formatted property values with the specified naming strategy.
+     *                       Private properties from the current class are excluded from the result.
+     */
+    public function propertyValue($namingStrategy = null, $prettify = false)
+    {
+        // Determine the naming strategy from class annotations if not provided
+        if ($namingStrategy === null) {
+            $namingStrategy = $this->getPropertyNamingStrategy(get_class($this));
+        }
+
+        $properties = get_object_vars($this); // Get all properties of the instance
+        $formattedProperties = new StandardClass;
+        $formattedProperties->setPrettify($prettify);
+
+        // Use ReflectionClass to inspect the current class and its properties
+        $reflection = new ReflectionClass($this);
+        $allProperties = $reflection->getProperties(); // Get all properties including private, protected, public
+
+        foreach ($allProperties as $property) {
+            $key = $property->getName();
+
+            // Skip private properties of the current class
+            if ($property->isPrivate() && $property->getDeclaringClass()->getName() === get_class($this)) {
+                continue; // Skip this property if it's private in the current class
+            }
+            
+            $value = $properties[$key]; // Get the value of the property
+
+            $formattedKey = $this->convertPropertyName($key, $namingStrategy);
+            if($formattedKey == $this->convertPropertyName(ConstantDto::FIELD, $namingStrategy) && isset($value) && is_string($value))
+            {
+                $value = $this->convertPropertyName($value, $namingStrategy);
+            }
+
+            // Handle different types of property values
+            if ($value === null) {
+                // Explicitly handle null values
+                $formattedProperties->{$formattedKey} = null;
+            } elseif ($value instanceof ToString) {
+                // Recursively retrieve property values from other ToString objects
+                $formattedProperties->{$formattedKey} = $value->propertyValue($namingStrategy);
+            } elseif ($value instanceof MagicObject) {
+                // Retrieve value from MagicObject, applying the naming strategy (snake case or camel case)
+                $formattedProperties->{$formattedKey} = $value->value($namingStrategy === self::SNAKE_CASE);
+            } elseif (is_array($value)) {
+                // Process arrays recursively, applying the naming strategy to array keys
+                $formattedProperties->{$formattedKey} = $this->processArray($value, $namingStrategy);
+            } elseif (is_object($value)) {
+                // Leave other objects as is (without changing naming strategy) in the result
+                $formattedProperties->{$formattedKey} = $value;
+            } else {
+                // Handle primitive values (string, int, float, etc.)
+                $formattedProperties->{$formattedKey} = $value;
+            }
+        }
+
+        return $formattedProperties;
     }
 }

@@ -13,10 +13,10 @@ let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,ana
  * @param {string} str - The string to compare against the calling string.
  * @returns {boolean} True if the strings are equal (ignoring case), false otherwise.
  */
-String.prototype.equalIgnoreCase = function (str) {
+String.prototype.equalIgnoreCase = function (str)  //NOSONAR
+{
   let str1 = this;
-  if (str1.toLowerCase() == str.toLowerCase()) return true;
-  return false;
+  return str1.toLowerCase() == str.toLowerCase();
 };
 
 /**
@@ -31,11 +31,11 @@ String.prototype.equalIgnoreCase = function (str) {
  * @param {boolean} [ignore=false] - If true, the replacement is case insensitive.
  * @returns {string} The modified string with all occurrences replaced.
  */
-String.prototype.replaceAll = function (str1, str2, ignore) {
+String.prototype.replaceAll = function (str1, str2, ignore)  //NOSONAR
+{
   return this.replace(
     new RegExp(
-      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"),
-      ignore ? "gi" : "g"
+      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), ignore ? "gi" : "g" //NOSONAR
     ),
     typeof str2 == "string" ? str2.replace(/\$/g, "$$$$") : str2
   );
@@ -53,10 +53,11 @@ String.prototype.replaceAll = function (str1, str2, ignore) {
  * @param {boolean} [ignore=false] - If true, the replacement is case insensitive.
  * @returns {string} The modified string with all occurrences replaced.
  */
-String.prototype.replaceAll = function (str1, str2, ignore) {
+String.prototype.replaceAll = function (str1, str2, ignore)  //NOSONAR
+{
   return this.replace(
     new RegExp(
-      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"),
+      str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), //NOSONAR
       ignore ? "gi" : "g"
     ),
     typeof str2 == "string" ? str2.replace(/\$/g, "$$$$") : str2
@@ -71,9 +72,10 @@ String.prototype.replaceAll = function (str1, str2, ignore) {
  *
  * @returns {string} The modified string with each word capitalized.
  */
-String.prototype.capitalize = function () {
+String.prototype.capitalize = function ()  //NOSONAR
+{
   return this.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
   });
 };
 
@@ -85,11 +87,13 @@ String.prototype.capitalize = function () {
  *
  * @returns {string} The modified string after applying the transformations.
  */
-String.prototype.prettify = function () {
-  let i, j, k;
+String.prototype.prettify = function ()  //NOSONAR
+{
+  let i, j;
   let str = this;
   let arr = str.split(" ");
-  for (i in arr) {
+  for (i = 0; i < arr.length; i++)  //NOSONAR
+  {
     j = arr[i];
     switch (j) {
       case "Id":
@@ -118,7 +122,8 @@ String.prototype.prettify = function () {
  * const result = str.replaceAll("Hello", "Hi");
  * console.log(result); // Output: "Hi, world! Hi again!"
  */
-String.prototype.replaceAll = function (search, replacement) {
+String.prototype.replaceAll = function (search, replacement)  //NOSONAR
+{
   let target = this;
   return target.replace(new RegExp(search, "g"), replacement);
 };
@@ -153,8 +158,7 @@ jQuery(function () {
     let moduleFileName = masterTableName + ".php";
     let moduleCode = masterTableName;
     let moduleName = masterTableName;
-    let masterPrimaryKeyName =
-      $(this).find("option:selected").attr("data-primary-key") || "";
+    let masterPrimaryKeyName = $(this).find("option:selected").attr("data-primary-key") || "";
     updateTableName(
       moduleFileName,
       moduleCode,
@@ -175,7 +179,15 @@ jQuery(function () {
       database: {},
       sessions: {},
       entity_info: {},
+      module_location: []
     };
+
+    form.find('.path-manager tbody tr').each(function(e2){
+      let name = $(this).find('[name^="name"]');
+      let path = $(this).find('[name^="path"]');
+      let checked = $(this).find('[name^="checked"]');
+      dataToPost.module_location.push({name:name.val(), path:path.val(), active:checked[0].checked});
+    });
 
     for (let i in inputs) {
       let name = inputs[i].name;
@@ -340,7 +352,27 @@ jQuery(function () {
   $(document).on("click", ".btn-remove-row", function (e) {
     let nrow = $(this).closest("tbody").find("tr").length;
     if (nrow > 1) {
-      $(this).closest("tr").remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Do you want to remove this row?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
     } else if (
       nrow == 1 &&
       $(this).closest("table").attr("data-empty-on-remove") == "true"
@@ -413,7 +445,17 @@ jQuery(function () {
         method: "POST",
         url: "lib.ajax/application-create.php",
         dataType: "html",
-        data: { id: id, name: name, architecture: architecture, description: description, directory: directory, namespace: namespace, author: author, paths: paths, magic_app_version: magic_app_version },
+        data: {
+          id: id,
+          name: name,
+          architecture: architecture,
+          description: description,
+          directory: directory,
+          namespace: namespace,
+          author: author,
+          paths: paths,
+          magic_app_version: magic_app_version
+        },
         success: function (data) {
           reloadApplicationList();
         },
@@ -446,7 +488,6 @@ jQuery(function () {
           clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
         }
         fixPathForm()
-
       },
     });
   });
@@ -562,18 +603,34 @@ jQuery(function () {
   $(document).on('click', '.generate_entity', function () {
     let entityName = $('.rd-entity-name').val();
     let tableName = $('.rd-table-name').val();
-    if (confirm('Are you sure you want to generate entity and replace existing file?')) {
-      $.ajax({
-        method: "POST",
-        url: "lib.ajax/entity-generator.php",
-        data: { entityName: entityName, tableName: tableName },
-        success: function (data) {
-          updateEntityFile();
-          updateEntityQuery(true);
-          updateEntityRelationshipDiagram();
+
+    asyncAlert(
+      'Are you sure you want to generate entity and replace existing file?',  // Message to display in the modal
+      'Confirmation',  // Modal title
+      [
+        {
+          'caption': 'Yes',  // Caption for the button
+          'fn': () => {
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/entity-generator.php",
+              data: { entityName: entityName, tableName: tableName },
+              success: function (data) {
+                updateEntityFile();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+              },
+            });
+          },  // Callback for OK button
+          'class': 'btn-primary'  // Bootstrap class for styling
         },
-      });
-    }
+        {
+          'caption': 'No',  // Caption for the button
+          'fn': () => { },  // Callback for Cancel button
+          'class': 'btn-secondary'  // Bootstrap class for styling
+        }
+      ]
+    );
   });
 
   $(document).on('change', '.map-key', function (e) {
@@ -639,7 +696,28 @@ jQuery(function () {
   $(document).on('click', 'table.path-manager .path-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      $(this).closest('tr').remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Deleting this path will not remove the directory or its files. <br>Do you want to delete this path?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
+
     }
     fixPathForm();
   });
@@ -672,7 +750,6 @@ jQuery(function () {
         $('[name="application_namespace"]').val(data.application_namespace);
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
-        let value = '';
         for (let i in data.magic_app_versions) {
           let latest = data.magic_app_versions[i]['latest'];
           $('[name="magic_app_version"]')[0].appendChild(
@@ -763,7 +840,27 @@ jQuery(function () {
   $(document).on('click', 'table.language-manager .language-remover', function () {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      $(this).closest('tr').remove();
+      // Display the alert when the page loads
+      // Example of calling asyncAlert with dynamic buttons
+      let row = $(this).closest('tr');
+      asyncAlert(
+        'Deleting this language will not remove the directory or its files. <br>Do you want to delete this language?',  // Message to display in the modal
+        'Delete Confirmation',  // Modal title
+        [
+          {
+            'caption': 'Yes',  // Caption for the button
+            'fn': () => {
+              row.remove();
+            },  // Callback for OK button
+            'class': 'btn-primary'  // Bootstrap class for styling
+          },
+          {
+            'caption': 'No',  // Caption for the button
+            'fn': () => { },  // Callback for Cancel button
+            'class': 'btn-secondary'  // Bootstrap class for styling
+          }
+        ]
+      );
     }
     fixLanguageForm();
   });
@@ -811,7 +908,8 @@ jQuery(function () {
         success: function (data) {
           select.empty();
           for (let d in data) {
-            for (let i = 0; i < select.length; i++) {
+            for (let i = 0; i < select.length; i++) //NOSONAR
+            {
               select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
               if (data[d].active) {
                 select.val(data[d].code);
@@ -828,6 +926,42 @@ jQuery(function () {
     $('#modal-update-language').modal('hide');
   });
 
+  $(document).on('click', '.button-execute-query', function(e){
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    asyncAlert(
+      'Do you want to execute the queries on the current database?',  // Message to display in the modal
+      'Confirmation',  // Modal title
+      [
+        {
+          'caption': 'Yes',  // Caption for the button
+          'fn': () => {
+            let query = modal.find('textarea').val();
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/query-execute.php",
+              data: { action: 'execute', query: query },
+              success: function (data) {
+                // reload query
+                let ents = getEntitySelection();
+                let merged = $(".entity-merge")[0].checked;
+                getEntityQuery(ents, merged);
+                modal.modal('hide');
+              },
+            });
+          },  // Callback for OK button
+          'class': 'btn-primary'  // Bootstrap class for styling
+        },
+        {
+          'caption': 'No',  // Caption for the button
+          'fn': () => { },  // Callback for Cancel button
+          'class': 'btn-secondary'  // Bootstrap class for styling
+        }
+      ]
+    );
+    
+  });
+
   $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');
@@ -838,7 +972,8 @@ jQuery(function () {
       success: function (data) {
         select.empty();
         for (let d in data) {
-          for (let i = 0; i < select.length; i++) {
+          for (let i = 0; i < select.length; i++) //NOSONAR
+          {
             select[i].options[select[i].options.length] = new Option(data[d].name + ' - ' + data[d].code, data[d].code);
             if (data[d].active) {
               select.val(data[d].code);
@@ -907,6 +1042,11 @@ jQuery(function () {
       dataType: 'html',
       success: function (data) {
         $('#modal-application-setting .application-setting').empty().append(data);
+        setTimeout(function () {
+          // set database_password to be empty
+          // prevent autofill password
+          $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
+        }, 2000);
         reloadApplicationList();
         updateBtn[0].disabled = false;
       }
@@ -1059,7 +1199,7 @@ jQuery(function () {
     e.preventDefault();
   });
   $(document).on('dblclick', '.sortable-menu-item > a, .sortable-submenu-item > a', function (e) {
-    e.preventDefault(); 
+    e.preventDefault();
     let el = $(this).siblings('.icon-edit')[0];
     editMenu(el);
   });
@@ -1070,34 +1210,103 @@ jQuery(function () {
     e.preventDefault();
     let input = $(this);
     let menu = $(this).siblings('a.app-menu-text');
-    input.css({display:'none'});
+    input.css({ display: 'none' });
     menu.text(input.val())
-    menu.css({display:''});
+    menu.css({ display: '' });
   });
 
-  
+
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
     $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
     $('#modal-query-executor').modal('show');
   });
-  
 
-  $(document).on('change', 'table select[name=database_driver]', function(e){
+
+  $(document).on('change', 'table select[name=database_driver]', function (e) {
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
 
-  $(document).on('blur keyup', 'input[type="number"]', function() {
+  $(document).on('blur keyup', 'input[type="number"]', function () {
     if (isNaN($(this).val()) || $(this).val().trim() === '') {
-        $(this).addClass('input-invalid-value');
+      $(this).addClass('input-invalid-value');
     } else {
-        $(this).removeClass('input-invalid-value');
+      $(this).removeClass('input-invalid-value');
     }
   });
 
+  $(document).on('click', '#test-database-connection', function (e1) {
+    let table = $(this).closest('table');
+    let input = { 'testConnection': 'test' };
+    table.find(':input').each(function (e2) {
+      if ($(this).attr('name') != undefined && $(this).attr('name') != '') {
+        input[$(this).attr('name')] = $(this).val();
+      }
+    });
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/database-test.php',
+      data: input,
+      dataType: 'json',
+      success: function (data) {
+        if (data.conneted1) {
+          if (!data.conneted2) {
+            $('#create-database').css({ 'display': 'inline' });
+            showAlertUI('Database Connection Test', 'Successfully connected to the server, but database not found.');
+          }
+          else {
+            $('#create-database').css({ 'display': 'none' });
+            showAlertUI('Database Connection Test', 'Successfully connected to the database.');
+          }
+        }
+        else {
+          $('#create-database').css({ 'display': 'none' });
+          showAlertUI('Database Connection Test', 'Invalid database credentials.');
+        }
+      },
+      error: function (xhr, status, error) {
+        $('#create-database').css('display', 'none');
+        showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
+      }
+    })
+  });
 
-
+  $(document).on('click', '#create-database', function (e1) {
+    let table = $(this).closest('table');
+    let input = { 'createDatabase': 'create' };
+    table.find(':input').each(function (e2) {
+      if ($(this).attr('name') != undefined && $(this).attr('name') != '') {
+        input[$(this).attr('name')] = $(this).val();
+      }
+    });
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/database-create.php',
+      data: input,
+      dataType: 'json',
+      success: function (data) {
+        if (data.conneted1) {
+          if (!data.conneted2) {
+            $('#create-database').css({ 'display': 'inline' });
+            showAlertUI('Database Connection Test', 'Successfully connected to the server, but database creation failed.');
+          }
+          else {
+            $('#create-database').css({ 'display': 'none' });
+            showAlertUI('Database Connection Test', 'Successfully created and connected to the database.');
+          }
+        }
+        else {
+          $('#create-database').css({ 'display': 'none' });
+          showAlertUI('Database Connection Test', 'Invalid database credentials.');
+        }
+      },
+      error: function (xhr, status, error) {
+        $('#create-database').css('display', 'none');
+        showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
+      }
+    })
+  });
 
   reloadApplicationList();
   loadTable();
@@ -1106,7 +1315,114 @@ jQuery(function () {
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
+  initTooltip();
 });
+
+function initTooltip() {
+  $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
+    let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
+    let tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
+
+    // Append the tooltip to the body and make it visible
+    $('body').append(tooltip);
+
+    // Show the tooltip when the area element is hovered
+    tooltip.addClass('visible');
+
+    // Calculate tooltip position based on the cursor coordinates
+    $(document).on('mousemove', function (e) {
+      let tooltipWidth = tooltip.outerWidth();
+      let tooltipHeight = tooltip.outerHeight();
+
+      // Determine the position of the tooltip to avoid it going off-screen
+      let mouseX = e.pageX + 15; // Right offset
+      let mouseY = e.pageY + 15; // Bottom offset
+
+      // Check if the tooltip exceeds the window width and adjust if necessary
+      if (mouseX + tooltipWidth > $(window).width()) {
+        mouseX = e.pageX - tooltipWidth - 15; // Position it to the left if it goes off the right
+      }
+
+      // Check if the tooltip exceeds the window height and adjust if necessary
+      if (mouseY + tooltipHeight > $(window).height()) {
+        mouseY = e.pageY - tooltipHeight - 15; // Position it to the top if it goes off the bottom
+      }
+
+      // Update the position of the tooltip based on the cursor position
+      tooltip.css({
+        left: mouseX,
+        top: mouseY
+      });
+    });
+  });
+
+  $(document).on('mouseleave', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
+    // Remove the tooltip when the mouse leaves the area
+    $('.tooltip').remove();
+
+    // Remove the mousemove event from the document to avoid unnecessary event listeners
+    $(document).off('mousemove');
+  });
+}
+
+// Function to display the modal with dynamic buttons
+function showModal(message, title, buttons, onHideCallback) {
+  return new Promise((resolve, reject) => {
+    const modal = $('#customAlert');
+    const alertOverlay = $('#alertOverlay');
+    const alertMessage = $('#alertMessage');
+    const alertTitle = $('#alertTitle');
+    const modalFooter = $('#modalFooter');
+
+    // Clear previous buttons in the modal footer
+    modalFooter.empty();
+
+    // Display modal and alertOverlay
+    alertOverlay.show();
+    modal.modal('show');
+
+    // Set the modal message and title
+    alertMessage.html(message);
+    alertTitle.html(title);
+
+    // Dynamically create buttons
+    buttons.forEach(button => {
+      const buttonElement = $('<button>')
+        .addClass(`btn ${button.class || 'btn-secondary'}`)  // Default to 'btn-secondary' if no class is provided
+        .text(button.caption)
+        .on('click', () => {
+          modal.modal('hide');
+          alertOverlay.hide();
+          button.fn();  // Execute the callback for this button
+          resolve(button.caption);  // Resolve promise with the caption of the clicked button
+        });
+      modalFooter.append(buttonElement);
+    });
+
+    // Add a listener for when the modal is hidden (after it is closed)
+    modal.on('hidden.bs.modal', () => {
+      if (onHideCallback) {
+        onHideCallback(); // Execute the callback when modal is closed
+      }
+    });
+  });
+}
+
+// Async function to wait for the result of the modal (any button press)
+async function asyncAlert(message, title, buttons) {
+  const result = await showModal(
+    message,
+    title,
+    buttons,
+    function () {
+      $('#alertOverlay').css({ 'display': 'none' });
+      $('.modal').css({ 'overflow': '', 'overflow-y': 'auto' })
+    }
+  );
+
+  // Log the result (the caption of the button clicked)
+  console.log(result);
+}
 
 
 let timeoutEditMenu = setTimeout('', 100);;
@@ -1146,17 +1462,15 @@ function initMenu() {
   });
 }
 
-function editMenu(el)
-{
+function editMenu(el) {
   let elem = $(el);
   let parent = elem.closest('li');
   let menu = elem.siblings('.app-menu-text');
-  if(parent.find('input'))
-  {
+  if (parent.find('input')) {
     parent.find('input').remove();
   }
   let input = $('<input />');
-  input.attr({type:'text', class:'form-control'});
+  input.attr({ type: 'text', class: 'form-control' });
   menu.css('display', 'none');
   menu.before(input)
   input.val(menu.text());
@@ -1165,8 +1479,7 @@ function editMenu(el)
   input.focus();
 }
 
-function editSubmenu(el)
-{
+function editSubmenu(el) {
   let menu = $(el).siblings('.app-submenu');
   console.log(menu.text())
 }
@@ -1178,14 +1491,11 @@ function dragStart(e) {
     draggedItem = e.target;
     e.dataTransfer.effectAllowed = 'move';
   }
-  else 
-  {
+  else {
     let target = e.target.closest('.sortable-submenu-item');
-    if(target != null)
-    {
+    if (target != null) {
       draggedItem = target;
-      if(target.dataTransfer)
-      {
+      if (target.dataTransfer) {
         target.dataTransfer.effectAllowed = 'move';
       }
     }
@@ -1372,7 +1682,7 @@ function reloadTranslate(translateFor) {
  * @returns {void} This function does not return a value.
  */
 function translateEntity(clbk) {
-  entityName = currentEntity2Translated;
+  entityName = currentEntity2Translated; //NOSONAR
   if (entityName != '') {
     let targetLanguage = $('.target-language').val();
     let filter = $('.filter-translate').val();
@@ -1394,10 +1704,10 @@ function translateEntity(clbk) {
         transEd2.getDoc().setValue(textOut2.join('\r\n'));
         $('.entity-property-name').val(propertyNames.join('|'));
         $('.entity-name').val(entityName);
-        focused = {};
+        focused = {}; //NOSONAR
         transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
-        lastLine1 = -1;
+        lastLine1 = -1; //NOSONAR
       },
     });
   }
@@ -1453,7 +1763,7 @@ function translateModule() {
       focused = {};
       transEd3.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd4.removeLineClass(lastLine2, 'background', 'highlight-line');
-      lastLine2 = -1;
+      lastLine2 = -1; //NOSONAR
     },
   });
 }
@@ -1662,7 +1972,7 @@ function loadDiagramMultiple() {
     img.attr('usemap', '#erd-map');
   });
 
-  
+
 }
 
 function downloadSVG() {
@@ -1713,11 +2023,10 @@ function onChangeMapKey(obj) {
       }, 500);
     }
   }
-  else {
-    if (obj.hasClass('input-invalid-value')) {
-      obj.removeClass('input-invalid-value');
-    }
+  else if (obj.hasClass('input-invalid-value')) {
+    obj.removeClass('input-invalid-value');
   }
+  
 }
 
 /**
@@ -1797,7 +2106,6 @@ function saveEntity() {
       url: "lib.ajax/entity-update.php",
       dataType: "json",
       data: { content: fileContent, entity: currentEntity },
-      dataType: "json",
       success: function (data) {
         $("#button_save_entity_file").removeAttr("disabled");
         updateEntityFile();
@@ -1987,9 +2295,6 @@ function updateEntityQuery(autoload) {
     dataType: "html",
     success: function (data) {
       $(".entity-container-query .entity-list").empty().append(data);
-      $('.entity-container-query .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
       let ents = getEntitySelection();
       let merged = $(".entity-merge")[0].checked;
       if (autoload) {
@@ -2014,10 +2319,6 @@ function updateEntityRelationshipDiagram() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-relationship .entity-list").empty().append(data);
-      $('.entity-container-relationship .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
-
     },
   });
 }
@@ -2038,9 +2339,6 @@ function updateEntityFile() {
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
-      $('.entity-container-file .entity-list [data-toggle="tooltip"], .container-translate-entity .entity-list [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
     },
   });
 }
@@ -2060,9 +2358,6 @@ function updateModuleFile() {
     dataType: "html",
     success: function (data) {
       $(".module-container .module-list-file").empty().append(data);
-      $('.module-container .module-list-file [data-toggle="tooltip"]').tooltip({
-        placement: 'top'
-      });
     },
   });
 
@@ -2179,7 +2474,8 @@ function updateTableName(
  */
 function ucWord(str) {
   str = str.toLowerCase();
-  return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function (s) {
+  return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function (s) //NOSONAR
+  {
     return s.toUpperCase();
   });
 }
@@ -2302,17 +2598,17 @@ function generateScript(selector) {
       fields.push(field);
     });
 
-  let subquery = $("#subquery")[0].checked && true;
-  let requireApproval = $("#with_approval")[0].checked && true;
-  let withTrash = $("#with_trash")[0].checked && true;
-  let manualSortOrder = $("#manualsortorder")[0].checked && true;
-  let exportToExcel = $("#export_to_excel")[0].checked && true;
-  let exportToCsv = $("#export_to_csv")[0].checked && true;
-  let activateDeactivate = $("#activate_deactivate")[0].checked && true;
-  let withApprovalNote = $("#with_approval_note")[0].checked && true;
-  let approvalPosition = $('[name="approval_position"]:checked').val();
-  let approvalType = $('[name="approval_type"]:checked').val();
-  let ajaxSupport = $("#ajax_support")[0].checked && true;
+  let subquery = $("#subquery")[0].checked && true; //NOSONAR
+  let requireApproval = $("#with_approval")[0].checked && true; //NOSONAR
+  let withTrash = $("#with_trash")[0].checked && true; //NOSONAR
+  let manualSortOrder = $("#manualsortorder")[0].checked && true; //NOSONAR
+  let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
+  let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
+  let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
+  let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
+  let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
+  let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
+  let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let entity = {
     mainEntity: {
       entityName: $('[name="entity_master_name"]').val(),
@@ -2485,7 +2781,8 @@ function parseJsonData(text) {
  * @param {string} text - The JSON string to be parsed.
  * @returns {Object|null} The parsed JSON object, or null if parsing fails.
  */
-function parseJsonData(text) {
+function parseJsonData(text)  //NOSONAR
+{
   if (typeof text !== "string") {
     return null;
   }
@@ -2693,7 +2990,8 @@ function loadColumn(tableName, selector) {
  * - Clears existing rows in filter and order modals before restoring new values
  * - Sets the state of feature toggles based on the provided data
  */
-function restoreForm(data) {
+function restoreForm(data)  //NOSONAR
+{
   // restore column
   if (typeof data.fields != 'undefined') {
     for (let i in data.fields) {
@@ -2911,7 +3209,8 @@ function getSkipedCol() {
  *
  * @returns {string} The outer HTML of the generated select element, including options.
  */
-function generateSelectFilter(field, args) {
+function generateSelectFilter(field, args)  //NOSONAR
+{
   let virtualDOM;
 
   args = args || {};
@@ -2985,7 +3284,7 @@ function generateSelectFilter(field, args) {
     "</select>\r\n"
   );
 
-  let i, j, k, l;
+  let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";
   let found = false;
   for (i in matchByType) {
@@ -3140,7 +3439,7 @@ function arrayUnique(arr1) {
  */
 function isKeyWord(str) {
   str = str.toString();
-  let i, j;
+  let i;
   let kw = keyWords.split(",");
   for (i in kw) {
     if (str.equalIgnoreCase(kw[i])) {
@@ -3163,7 +3462,8 @@ function isKeyWord(str) {
  * @param {Array} skipedOnInsertEdit - An array of field names to be skipped for insert/edit checkboxes.
  * @returns {string} The HTML string representing a table row with input elements.
  */
-function generateRow(field, args, skipedOnInsertEdit) {
+function generateRow(field, args, skipedOnInsertEdit)  //NOSONAR
+{
   // Check if the field is a reserved keyword
   let isKW = isKeyWord(field);
   let classes = [];
@@ -3426,7 +3726,7 @@ function selectReferenceType(data) {
  * @param {Object} data - The object containing entity data to populate the form.
  */
 function setEntityData(data) {
-  data.entity = data && data.entity ? data.entity : {};
+  data.entity = data && data.entity ? data.entity : {}; //NOSONAR
   let entity = data.entity;
   entity.entityName = entity.entityName ? entity.entityName : "";
   entity.tableName = entity.tableName ? entity.tableName : "";
@@ -3635,13 +3935,14 @@ function getAdditionalOutputData() {
  *
  * @param {Object} data - The object containing map data to populate the form.
  */
-function setMapData(data) {
+function setMapData(data)  //NOSONAR
+{
   let selector = '[data-name="map"]';
   let table = $(selector);
   let keys = [];
   data.map = data.map ? data.map : [];
   let map = data.map;
-  let mapKey = [];
+  let mapKey = [];  //NOSONAR
   if (map.length > 0) {
     let map0 = map[0];
     let objLength = 0;

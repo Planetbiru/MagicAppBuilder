@@ -14,7 +14,7 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-    $allQueries = array();
+    $allQueries = [];
     if(
         $inputGet->getNamespaceName() != '' 
         && $inputGet->getEntityName() != ''
@@ -49,7 +49,7 @@ try
                     <thead>
                         <tr>
                             <td width="24">No</td>
-                            <td>Column</td>
+                            <td>Field</td>
                             <td width="15%">Type</td>
                             <td width="10%">Length</td>
                             <td width="10%">Nullable</td>

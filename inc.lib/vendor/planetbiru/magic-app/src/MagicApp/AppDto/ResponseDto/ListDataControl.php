@@ -21,21 +21,21 @@ class ListDataControl extends ToString
      *
      * @var string
      */
-    public $field;
+    protected $field;
 
     /**
      * A unique name or identifier for this filter, used to reference the filter in the UI.
      *
      * @var string
      */
-    public $name;
+    protected $name;
 
     /**
      * The unique identifier for the filter control, typically used for DOM element identification.
      *
      * @var string
      */
-    public $id;
+    protected $id;
 
     /**
      * The type of HTML input element used for the filter. This can be one of the following types:
@@ -49,7 +49,7 @@ class ListDataControl extends ToString
      *
      * @var string
      */
-    public $element;
+    protected $element;
 
     /**
      * An associative array of HTML attributes to apply to the filter element. 
@@ -57,14 +57,14 @@ class ListDataControl extends ToString
      *
      * @var array
      */
-    public $attribute;
+    protected $attribute;
 
     /**
      * The text content for button elements, used to define the button's label (e.g., "Apply", "Reset").
      *
      * @var string
      */
-    public $textContent;
+    protected $textContent;
 
     /**
      * Gets the field name associated with the filter.

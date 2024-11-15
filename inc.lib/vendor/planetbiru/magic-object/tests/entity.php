@@ -629,6 +629,7 @@ $database = new PicoDatabase($databaseCredential->getDatabase(), function(){}, f
 $database->connect();
 
 $album = new EntityAlbum(null, $database);
+
 try
 {
 	/*

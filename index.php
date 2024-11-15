@@ -791,24 +791,7 @@ $constSelected = ' selected';
   </div>
 
 
-  <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Alert</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
   <div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
@@ -1081,5 +1064,49 @@ $constSelected = ' selected';
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Alert</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay background (optional, will cover other elements when modal appears) -->
+  <div class="alertOverlay" id="alertOverlay"></div>
+  <!-- Modal Structure -->
+  <div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="alertTitle">Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p id="alertMessage">This is the alert message.</p>
+              </div>
+              <div class="modal-footer" id="modalFooter">
+                  <!-- Buttons will be dynamically added here -->
+              </div>
+          </div>
+      </div>
+  </div>
+
+
 </body>
 </html>

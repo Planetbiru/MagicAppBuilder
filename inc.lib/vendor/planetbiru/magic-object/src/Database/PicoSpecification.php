@@ -374,9 +374,12 @@ class PicoSpecification //NOSONAR
     }
 
     /**
-     * Magic method for debugging the object.
+     * Convert the object to a JSON string representation for debugging.
      *
-     * @return string A string representation of the current specifications.
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
      */
     public function __toString()
     {

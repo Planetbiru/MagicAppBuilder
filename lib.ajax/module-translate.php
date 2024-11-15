@@ -13,7 +13,7 @@ $inputPost = new InputPost();
 
 function getKeys($path)
 {
-    $result = array();
+    $result = [];
     $content = file_get_contents($path);
     $p2 = 0;
     do{
@@ -36,8 +36,8 @@ function getKeys($path)
 
 if($inputPost->getUserAction() == 'get')
 {
-    $allKeys = array();
-    $response = array();
+    $allKeys = [];
+    $response = [];
     try
     {
         $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
@@ -59,7 +59,7 @@ if($inputPost->getUserAction() == 'get')
             
             $allKeys = array_unique($allKeys);
             
-            $parsed = array();
+            $parsed = [];
             foreach($allKeys as $key)
             {
                 $camel = PicoStringUtil::camelize($key);
@@ -68,7 +68,7 @@ if($inputPost->getUserAction() == 'get')
             
             $parsedLanguage = new MagicObject($parsed);   
             $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory() . "/" . $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
-            $langs = array();
+            $langs = [];
             
             if(file_exists($pathTrans))
             {
@@ -106,8 +106,8 @@ if($inputPost->getUserAction() == 'get')
 
 if($inputPost->getUserAction() == 'set')
 {
-    $allKeys = array();
-    $response = array();
+    $allKeys = [];
+    $response = [];
     
     $translated = $inputPost->getTranslated();
     $propertyNames = $inputPost->getPropertyNames();
@@ -142,7 +142,7 @@ if($inputPost->getUserAction() == 'set')
     $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
     if(!is_array($storedTranslatedLabel))
     {
-        $storedTranslatedLabel = array();
+        $storedTranslatedLabel = [];
     }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);

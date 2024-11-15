@@ -30,7 +30,7 @@ class UpdateFormData extends ToString
      *
      * @var InputFormData[] Array of `InputFormData` objects.
      */
-    public $column;
+    protected $column;
 
     /**
      * The buttons associated with the update form.
@@ -39,7 +39,7 @@ class UpdateFormData extends ToString
      *
      * @var ButtonFormData[] Array of `ButtonFormData` objects.
      */
-    public $button;
+    protected $button;
 
     /**
      * UpdateFormData constructor.

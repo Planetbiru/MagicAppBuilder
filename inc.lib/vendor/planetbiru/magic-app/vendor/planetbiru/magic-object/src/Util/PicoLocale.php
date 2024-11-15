@@ -5,6 +5,11 @@ namespace MagicObject\Util;
 /**
  * Locale
  * 
+ * The `PicoLocale` class serves as a container for a collection of predefined locale constants. 
+ * These constants represent different locale identifiers for various countries, regions, and languages, using the format of language-region (e.g., "en_US" for English in the United States, "fr_FR" for French in France).
+ * 
+ * Each constant corresponds to a specific locale, which can be used in applications to handle internationalization (i18n), localization (l10n), and formatting of data such as dates, currencies, and numbers, based on the user's regional settings.
+ * 
  * @author Kamshory
  * @package MagicObject\Util
  * @link https://github.com/Planetbiru/MagicObject

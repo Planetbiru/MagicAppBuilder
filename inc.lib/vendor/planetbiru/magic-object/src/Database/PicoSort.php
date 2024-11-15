@@ -2,6 +2,8 @@
 
 namespace MagicObject\Database;
 
+use stdClass;
+
 /**
  * Class PicoSort
  *
@@ -155,9 +157,9 @@ class PicoSort
      */
     public function __toString()
     {
-        return json_encode(array(
-            'sortBy' => $this->sortBy,
-            'sortType' => $this->sortType
-        ));
+        $stdClass = new stdClass;
+        $stdClass->sortBy = $this->sortBy;
+        $stdClass->sortType = $this->sortType;
+        return json_encode($stdClass);
     }
 }
