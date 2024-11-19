@@ -235,7 +235,7 @@ class AppBuilder extends AppBuilderBase
             $entityTrashName = $trashEntity->getEntityName();
             $objectTrashName = lcfirst($entityTrashName);
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->findOneBy".$upperPkName."(".parent::VAR."rowId);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk.parent::CALL_FIND_ONE_BY.$upperPkName."(".parent::VAR."rowId);";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectNameBk."->isset".$upperPkName."())";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;       
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectTrashName, $entityTrashName, $objectNameBk);

@@ -71,6 +71,8 @@ class AppBuilderBase //NOSONAR
     const PHP_TRY = "try";
     const MAP_FOR = '$mapFor';
     const REDIRECT_TO_ITSELF = 'currentModule->getRedirectUrl()';
+    const CALL_FIND_ONE_BY = '->findOneBy';
+    const CALL_FIND_ONE_BY_PRIMARY_KEY = '->findOneWithPrimaryKeyValue';
 
     /**
      * Set and get value style
@@ -658,7 +660,7 @@ class AppBuilderBase //NOSONAR
         $getData = array();
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
-        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
+        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
@@ -865,11 +867,11 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneWithPrimaryKeyValue(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         }
         
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
@@ -884,7 +886,7 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         if($features->getSubquery())
         {
-            $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName."->findOneWithPrimaryKeyValue(".self::VAR.$objectName.self::CALL_GET."ApprovalId(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectApprovalName.self::CALL_FIND_ONE_BY."(".self::VAR.$objectName.self::CALL_GET."ApprovalId(), ".self::VAR."subqueryMap);";
         }
         else
         {
@@ -973,11 +975,11 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneWithPrimaryKeyValue(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName."->findOneBy".$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
         }       
         
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
@@ -3932,10 +3934,10 @@ $subqueryMap = '.$referece.';
         $pkInputReject->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
 
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'if($inputGet->getNextAction() == UserAction::APPROVAL)'));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_CLOSE_TAG));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn12);
@@ -3946,12 +3948,12 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($pkInputApprove2);
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
 
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'else if($inputGet->getNextAction() == UserAction::APPROVE)'));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_CLOSE_TAG));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn1);
@@ -3960,12 +3962,12 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($pkInputApprove);
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5.'else'));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_OPEN));
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_CLOSE_TAG));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn2);
@@ -3974,10 +3976,10 @@ $subqueryMap = '.$referece.';
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($pkInputReject);
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."<?php"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::CURLY_BRACKET_CLOSE));
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB5."?>"));
+        $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_CLOSE_TAG));
         
         $td2->appendChild($dom->createTextNode(self::N_TAB4));
               

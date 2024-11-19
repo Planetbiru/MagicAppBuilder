@@ -440,7 +440,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
     
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->findOneBy".$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
@@ -580,7 +580,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
     
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->findOneBy".$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
