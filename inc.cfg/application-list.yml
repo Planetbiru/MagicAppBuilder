@@ -16,3 +16,11 @@
     selected: false
     type: api
     architecture: monolith
+-
+    id: 0673c952cb576d077460
+    name: 'Music Planetbiru'
+    architecture: monolith
+    description: 'Music Planetbiru'
+    documentRoot: 'D:/xampp/htdocs/0673c952cb576d077460'
+    author: Kamshory
+    selected: false
