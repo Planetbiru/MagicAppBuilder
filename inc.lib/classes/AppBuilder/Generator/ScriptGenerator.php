@@ -646,7 +646,21 @@ class ScriptGenerator //NOSONAR
                     {
                         $menuArray[$index]['submenus'] = [];
                     }
-                    $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+
+                    $hash = $label.$link;
+                    $skip = false;
+                    foreach($menuArray[$index]['submenus'] as $sub)
+                    {
+                        if($sub['label'].$sub['link'] == $hash)
+                        {
+                            $skip = true;
+                            break;
+                        }
+                    }
+                    if(!$skip)
+                    {
+                        $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+                    }
                 }
             }
             $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
