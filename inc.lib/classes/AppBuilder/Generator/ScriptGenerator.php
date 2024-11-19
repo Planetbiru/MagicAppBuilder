@@ -920,11 +920,9 @@ class ScriptGenerator //NOSONAR
         $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.phar";
         $sourcePath = dirname(dirname(dirname(__DIR__)))."/composer.phar";
         $success = copy($sourcePath, $targetPath);
-        error_log("copy($sourcePath, $targetPath)");
         if($success)
         {
             $cmd = "cd $targetDir"."&&"."php composer.phar require planetbiru/magic-app$version";
-            error_log("CMD: ".$cmd."\r\n");
             exec($cmd);     
             $this->updateComposer($appConf, $composer);
         }
