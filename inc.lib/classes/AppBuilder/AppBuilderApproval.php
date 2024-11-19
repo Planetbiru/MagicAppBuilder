@@ -30,14 +30,9 @@ class AppBuilderApproval extends AppBuilderBase
         $entityName = $mainEntity->getEntityName();
         $objectName = lcfirst($entityName);
         
-        $entityApprovalName = $approvalEntity->getEntityName();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($mainEntity->getPrimaryKey());
-        $upperApprovalPkName = PicoStringUtil::upperCamelize($approvalEntity->getPrimaryKey()); //NOSONAR
-        $objectApprovalName = lcfirst($entityApprovalName); //NOSONAR
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
         $upperDraft = PicoStringUtil::upperCamelize($this->entityInfo->getDraft());
-
-        $approvalId = PicoStringUtil::upperCamelize($this->entityInfo->getApprovalId()); //NOSONAR
 
         $lines = array();
         
@@ -325,7 +320,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception ".parent::VAR."e)";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Do something here when record is not found";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Perform an action here when the record is not found.";
         
         if(isset($callbackException) && is_callable($callbackException))
         {
@@ -334,7 +329,7 @@ class AppBuilderApproval extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1."error_log(\$e);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."error_log(\$e);";
         }
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
@@ -445,7 +440,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
     
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->findOneBy".$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
@@ -456,70 +451,71 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback on new data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback before update data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after update data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after activate data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after deactivate data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback before delete data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after delete data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after approve data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when when the user approves data modification. You can add or remove them.".parent::NEW_LINE
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when the user approves data modification.";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// You can modify this list by adding or removing fields as needed.".parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columToBeCopied = array(".parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.");";
@@ -550,9 +546,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::CURLY_BRACKET_CLOSE;
         return implode(parent::NEW_LINE, $lines);
-        
     }
-
     
     /**
      * Create a rejection section for the specified entity.
@@ -586,7 +580,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
     
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->findOneBy".$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
@@ -597,17 +591,17 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback before reject data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
         .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// callback after reject data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."}); ".parent::NEW_LINE; //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->reject(new $entityApprovalName(),".parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
@@ -643,10 +637,10 @@ class AppBuilderApproval extends AppBuilderBase
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityInfoName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityApvInfoName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null, ".parent::VAR."userId = null) {".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// approval validation here".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// if the return is incorrect, approval cannot take place".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// e.g. return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1."}";
 
@@ -656,10 +650,13 @@ class AppBuilderApproval extends AppBuilderBase
             
             $result .= ", ".parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1."true, ".parent::NEW_LINE 
             .parent::TAB1.parent::TAB1.parent::TAB1."new $entityTrashName() ".parent::NEW_LINE;
-            
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.");";
         }
-
-        $result .= parent::TAB1.parent::TAB1.parent::TAB1.");"; 
+        else
+        {
+            $result .= ");"; 
+        }
+        
         return $result;
     }
 }
