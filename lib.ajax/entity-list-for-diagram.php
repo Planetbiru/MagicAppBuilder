@@ -25,8 +25,8 @@ try
     
     $list = glob($baseDir."/*.php");
     $li = [];
-    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" title="%s"> %s</li>';
+    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" data-title="%s"> %s</li>';
     
     foreach($list as $idx=>$file)
     {
@@ -34,10 +34,10 @@ try
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($cacheDir, $file);       
         if($return_var === 0)
-        {
-            $filetime = date('Y-m-d H:i:s', filemtime($file));
+        {        
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $filetime = date('Y-m-d H:i:s', filemtime($file));
             if(!isset($li[$tableName]))
             {
                 $li[$tableName]  = [];

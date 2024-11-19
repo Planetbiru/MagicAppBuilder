@@ -22,8 +22,8 @@ try
     $list = glob($baseDir."/*.php");
     $li = [];
 
-    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" title="%s">%s</a></li>';
+    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
 
     
     
