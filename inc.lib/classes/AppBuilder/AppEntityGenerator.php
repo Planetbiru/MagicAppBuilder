@@ -286,8 +286,13 @@ namespace '.$this->baseNamespace.';
 use MagicObject\MagicObject;'.implode("\r\n", $uses).'
 
 /**
- * '.$className.' is entity of table '.$picoTableName.'. You can join this entity to other entity using annotation JoinColumn. 
- * Don\'t forget to add "use" statement if the entity is outside the namespace.
+ * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ *
+ * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @package '.$this->baseNamespace.'
