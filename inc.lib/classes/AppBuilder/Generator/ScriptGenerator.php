@@ -620,7 +620,7 @@ class ScriptGenerator //NOSONAR
      *
      * @throws Exception If there is an error reading or writing the menu configuration file.
      */
-    private function updateMenu($appConf, $request)
+    private function updateMenu($appConf, $request) // NOSONAR
     {
         $menuPath = $appConf->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         $this->prepareFile($menuPath);
