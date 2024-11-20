@@ -795,7 +795,7 @@ class ScriptGenerator //NOSONAR
     public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder)
     {
         $uses = array();
-        $uses[] = "// This script is generated automatically by AppBuilder";
+        $uses[] = "// This script is generated automatically by MagicAppBuilder";
         $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
         $uses[] = "use MagicObject\\MagicObject;";
