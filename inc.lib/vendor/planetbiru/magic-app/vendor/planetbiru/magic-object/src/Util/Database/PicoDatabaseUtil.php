@@ -382,7 +382,7 @@ class PicoDatabaseUtil
             // Handle "delimiter" statements
             if (stripos(trim($line), 'delimiter ') === 0) {
                 $parts = explode(' ', trim($line));
-                $delimiter = $parts[1] ?? ';';
+                $delimiter = $parts[1] != null ? ';' : null;
                 continue;
             }
 
