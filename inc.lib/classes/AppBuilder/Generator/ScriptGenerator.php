@@ -620,7 +620,7 @@ class ScriptGenerator //NOSONAR
      *
      * @throws Exception If there is an error reading or writing the menu configuration file.
      */
-    private function updateMenu($appConf, $request)
+    private function updateMenu($appConf, $request) // NOSONAR
     {
         $menuPath = $appConf->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         $this->prepareFile($menuPath);
@@ -646,7 +646,21 @@ class ScriptGenerator //NOSONAR
                     {
                         $menuArray[$index]['submenus'] = [];
                     }
-                    $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+
+                    $hash = $label.$link;
+                    $skip = false;
+                    foreach($menuArray[$index]['submenus'] as $sub)
+                    {
+                        if($sub['label'].$sub['link'] == $hash)
+                        {
+                            $skip = true;
+                            break;
+                        }
+                    }
+                    if(!$skip)
+                    {
+                        $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+                    }
                 }
             }
             $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
@@ -781,7 +795,7 @@ class ScriptGenerator //NOSONAR
     public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder)
     {
         $uses = array();
-        $uses[] = "// This script is generated automatically by AppBuilder";
+        $uses[] = "// This script is generated automatically by MagicAppBuilder";
         $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
         $uses[] = "use MagicObject\\MagicObject;";
@@ -906,11 +920,9 @@ class ScriptGenerator //NOSONAR
         $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.phar";
         $sourcePath = dirname(dirname(dirname(__DIR__)))."/composer.phar";
         $success = copy($sourcePath, $targetPath);
-        error_log("copy($sourcePath, $targetPath)");
         if($success)
         {
             $cmd = "cd $targetDir"."&&"."php composer.phar require planetbiru/magic-app$version";
-            error_log("CMD: ".$cmd."\r\n");
             exec($cmd);     
             $this->updateComposer($appConf, $composer);
         }

@@ -201,6 +201,65 @@ class AppEntityGenerator extends PicoEntityGenerator
     }
 
     /**
+     * Checks if a column in the reference data corresponds to an entity reference.
+     *
+     * This method verifies whether the specified column exists in the reference data
+     * and whether it represents an entity reference type.
+     *
+     * @param array $referenceData An associative array of reference data.
+     * @param string $columnName The column name to check within the reference data.
+     * @return boolean Returns true if the column is a valid entity reference, false otherwise.
+     */
+    private function isReference($referenceData, $columnName)
+    {
+        return isset($referenceData) && is_array($referenceData) && isset($referenceData[$columnName]) && $referenceData[$columnName]->getType() == 'entity';
+    }
+
+    /**
+     * Checks if at least one of the given fields is not null.
+     *
+     * This method determines whether the provided predecessor or successor fields 
+     * are not null, indicating their presence.
+     *
+     * @param array|null $predecessorField An array of predecessor fields (optional).
+     * @param array|null $successorField An array of successor fields (optional).
+     * @return bool True if at least one of the fields is not null, false otherwise.
+     */
+    private function atLeastOneNotNull($predecessorField, $successorField)
+    {
+        return $predecessorField != null || $successorField != null;
+    }
+
+    /**
+     * Checks if both parameters are not empty.
+     *
+     * This method verifies that both the provided object name and property name 
+     * are not empty, ensuring their values are valid.
+     *
+     * @param string $objectName The name of the object to check.
+     * @param string $propertyName The name of the property to check.
+     * @return bool True if both parameters are not empty, false otherwise.
+     */
+    private function notEmpty($objectName, $propertyName)
+    {
+        return !empty($objectName) && !empty($propertyName);
+    }
+
+    /**
+     * Converts a boolean value to its string representation.
+     *
+     * This method takes a boolean value and returns its string equivalent, 
+     * either "true" or "false".
+     *
+     * @param bool $value The boolean value to convert.
+     * @return string The string representation of the boolean value ("true" or "false").
+     */
+    private function boolToString($value)
+    {
+        return $value ? 'true' : 'false';
+    }
+
+    /**
      * Generate a custom entity class file.
      *
      * @param string|null $realEntityName Optional real entity name for the class.
@@ -228,7 +287,7 @@ class AppEntityGenerator extends PicoEntityGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
         
-        if($predecessorField != null || $successorField != null)
+        if($this->atLeastOneNotNull($predecessorField, $successorField))
         {
             $rows = $this->updateField($rows, $predecessorField, $successorField, $removePk);
         }
@@ -242,13 +301,6 @@ class AppEntityGenerator extends PicoEntityGenerator
             foreach($rows as $row)
             {
                 $columnName = $row['Field'];
-                $columnType = $row['Type'];
-                $columnKey = $row['Key'];
-                $columnNull = $row['Null'];
-                $columnDefault = $row['Default'];
-                $columnExtra = $row['Extra'];
-
-                $nonupdatable = in_array($columnName, $nonupdatables);
 
                 $prop = $this->createProperty($typeMap, $row, $nonupdatables);
 
@@ -257,7 +309,7 @@ class AppEntityGenerator extends PicoEntityGenerator
                     $attrs[] = $prop;
                 }
 
-                if(isset($referenceData) && is_array($referenceData) && isset($referenceData[$columnName]) && $referenceData[$columnName]->getType() == 'entity')
+                if($this->isReference($referenceData, $columnName))
                 {
                     $referenceEntity = $referenceData[$columnName]->getEntity();
                     $entityName = $referenceEntity->getEntityName(); // var type
@@ -265,7 +317,7 @@ class AppEntityGenerator extends PicoEntityGenerator
                     $objectName = $referenceEntity->getObjectName(); // var name
                     $referenceColumnName = $referenceEntity->getPrimaryKey(); // reference column key
                     $joinColumn = $columnName;
-                    if(!empty( $objectName) && !empty($propertyName))
+                    if($this->notEmpty($objectName, $propertyName))
                     {
                         $propRef = $this->createPropertyReference($joinColumn, $entityName, $objectName, $propertyName, $referenceColumnName);
                         $attrs[] = $propRef;
@@ -274,7 +326,7 @@ class AppEntityGenerator extends PicoEntityGenerator
 
             }
         }    
-        $prettify = $this->prettify ? 'true' : 'false';
+        $prettify = $this->boolToString($this->prettify);
         
 
         $uses = array();
@@ -286,8 +338,13 @@ namespace '.$this->baseNamespace.';
 use MagicObject\MagicObject;'.implode("\r\n", $uses).'
 
 /**
- * '.$className.' is entity of table '.$picoTableName.'. You can join this entity to other entity using annotation JoinColumn. 
- * Don\'t forget to add "use" statement if the entity is outside the namespace.
+ * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ *
+ * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @package '.$this->baseNamespace.'
@@ -299,11 +356,24 @@ class '.$className.' extends MagicObject
 {
 '.implode("\r\n", $attrs).'
 }';
-        if($this->updateEntity || !file_exists($path))
+        if($this->isNeedUpdateEntity($path))
         {
             return file_put_contents($path, $classStr);
         }
         return 0;
+    }
+
+    /**
+     * Determines if the entity file needs to be updated.
+     *
+     * This method checks whether the entity update flag is set or if the specified file does not exist.
+     *
+     * @param string $path The file path to check.
+     * @return bool True if the entity needs to be updated or the file does not exist, false otherwise.
+     */
+    private function isNeedUpdateEntity($path)
+    {
+        return $this->updateEntity || !file_exists($path);
     }
     
     /**

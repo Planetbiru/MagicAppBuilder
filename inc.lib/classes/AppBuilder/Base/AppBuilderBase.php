@@ -867,7 +867,7 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
         }
         else
         {
@@ -876,7 +876,7 @@ class AppBuilderBase //NOSONAR
         
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
-        $getData[] = self::TAB1.self::TAB1.self::TAB1.'// define map here';
+        $getData[] = self::TAB1.self::TAB1.self::TAB1.'// Define map here';
         $getData[] = $map;
 
         $getData[] = self::TAB1.self::TAB1.self::TAB1."if(UserAction::isRequireNextAction(\$inputGet) && ".self::VAR.$objectName."->notNullApprovalId())";
@@ -975,7 +975,7 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
         }
         else
         {
@@ -987,7 +987,7 @@ class AppBuilderBase //NOSONAR
 
         $getData[] = $this->constructEntityLabel($entityName);
         $getData[] = $this->getIncludeHeader();
-        $getData[] = self::TAB1.self::TAB1.self::TAB1.'// define map here';
+        $getData[] = self::TAB1.self::TAB1.self::TAB1.'// Define map here';
         $getData[] = $map;
 
         $getData[] = self::PHP_CLOSE_TAG.self::NEW_LINE.$htmlDetail.self::NEW_LINE.self::PHP_OPEN_TAG;

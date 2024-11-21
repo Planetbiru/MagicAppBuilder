@@ -97,7 +97,6 @@ if($inputPost->getUserAction() == 'set')
 
     try
     {
-        
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);
