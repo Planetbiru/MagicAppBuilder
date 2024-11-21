@@ -63,6 +63,7 @@ foreach ($menus as $menu) {
         $span->setAttribute('class', 'sortable-icon ' . $icon['class']);
         $span->setAttribute('onclick', $icon['onclick']);
         $menuItem->appendChild($span);
+        $menuItem->appendChild($dom->createTextNode(' '));
     }
 
     // Create the menu link
@@ -70,11 +71,13 @@ foreach ($menus as $menu) {
     $link->setAttribute('class', 'app-menu app-menu-text');
     $link->setAttribute('href', '#');
     $menuItem->appendChild($link);
+    $menuItem->appendChild($dom->createTextNode(' '));
 
     // Add a toggle icon
     $toggleIcon = $dom->createElement('span', '');
     $toggleIcon->setAttribute('class', 'sortable-toggle-icon');
     $menuItem->appendChild($toggleIcon);
+    $menuItem->appendChild($dom->createTextNode(' '));
 
     // Create <ul> for submenus
     $submenu = $dom->createElement('ul');
@@ -87,6 +90,7 @@ foreach ($menus as $menu) {
             // Create <li> for each submenu item
             $submenuLi = $dom->createElement('li');
             $submenuLi->setAttribute('class', 'sortable-submenu-item');
+            $submenuLi->appendChild($dom->createTextNode(' '));
 
             // Append icons for the submenu item
             foreach ($icons as $icon) {
@@ -94,6 +98,7 @@ foreach ($menus as $menu) {
                 $span->setAttribute('class', 'sortable-icon ' . $icon['class']);
                 $span->setAttribute('onclick', $icon['onclick']);
                 $submenuLi->appendChild($span);
+                $submenuLi->appendChild($dom->createTextNode(' '));
             }
 
             // Create the submenu link
@@ -101,9 +106,11 @@ foreach ($menus as $menu) {
             $submenuLink->setAttribute('class', 'app-submenu app-menu-text');
             $submenuLink->setAttribute('href', htmlspecialchars($submenuItem->getLink()));
             $submenuLi->appendChild($submenuLink);
+            $submenuLi->appendChild($dom->createTextNode(' '));
 
             // Add the submenu <li> to the <ul>
             $submenu->appendChild($submenuLi);
+            $submenu->appendChild($dom->createTextNode(' '));
         }
     }
 

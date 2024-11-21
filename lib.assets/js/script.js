@@ -1055,7 +1055,7 @@ jQuery(function () {
 
   $(document).on('click', '.button-application-menu', function (e) {
     e.preventDefault();
-    let updateBtn = $('#modal-application-setting .button-save-application-config');
+    let updateBtn = $('#modal-application-menu .button-save-menu');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     let modal = $('#modal-application-menu');
@@ -1120,11 +1120,11 @@ jQuery(function () {
     if (!invalidName) {
       let newMenuStr = '';
 
-      newMenuStr += "<li class=\"sortable-menu-item\">\r\n";
+      newMenuStr += '<li class="sortable-menu-item">' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-up" onclick="moveUp(this)"></span>' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-down" onclick="moveDown(this)"></span>' + "\r\n";
-      newMenuStr += '<span class="sortable-icon icon-move"></span>' + "\r\n";
-      newMenuStr += "<a href=\"#\">" + newMenu + "</a>\r\n";
+      newMenuStr += '<span class="sortable-icon icon-edit" onclick="editMenu(this)"></span>' + "\r\n";
+      newMenuStr += '<a class="app-menu app-menu-text" href="#">' + newMenu + '</a>' + "\r\n";
       newMenuStr += '<span class="sortable-toggle-icon"></span>' + "\r\n";
       newMenuStr += "<ul class=\"sortable-submenu\">\r\n";
       newMenuStr += "</ul>\r\n";
