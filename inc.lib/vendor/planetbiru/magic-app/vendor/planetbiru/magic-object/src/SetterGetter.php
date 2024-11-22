@@ -3,7 +3,6 @@
 namespace MagicObject;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoArrayUtil;
 use MagicObject\Util\PicoStringUtil;
@@ -27,10 +26,14 @@ class SetterGetter extends stdClass
 
     /**
      * Class parameter storage.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    private $classParams = array();
+    private $_classParams = array(); // NOSONAR
+
 
     /**
      * Constructor.
@@ -50,9 +53,9 @@ class SetterGetter extends stdClass
             try
             {
                 $vals = $jsonAnnot->parseKeyValue($paramValue);
-                $this->classParams[$paramName] = $vals;
+                $this->_classParams[$paramName] = $vals;
             }
-            catch(InvalidQueryInputException $e)
+            catch(InvalidAnnotationException $e)
             {
                 throw new InvalidAnnotationException("Invalid annotation @".$paramName);
             }
@@ -323,7 +326,7 @@ class SetterGetter extends stdClass
      * @param array $params Parameters passed to the method.
      * @return mixed|null The result of the method call or null if the method does not return a value.
      */
-    public function __call($method, $params) //NOSONAR
+    public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0)
         {
@@ -381,9 +384,9 @@ class SetterGetter extends stdClass
      */
     private function isSnake()
     {
-        return isset($this->classParams[self::JSON])
-            && isset($this->classParams[self::JSON]['property-naming-strategy'])
-            && strcasecmp($this->classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0
+        return isset($this->_classParams[self::JSON])
+            && isset($this->_classParams[self::JSON]['property-naming-strategy'])
+            && strcasecmp($this->_classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0
             ;
     }
 
@@ -404,9 +407,9 @@ class SetterGetter extends stdClass
      */
     private function isPretty()
     {
-        return isset($this->classParams[self::JSON])
-            && isset($this->classParams[self::JSON]['prettify'])
-            && strcasecmp($this->classParams[self::JSON]['prettify'], 'true') == 0
+        return isset($this->_classParams[self::JSON])
+            && isset($this->_classParams[self::JSON]['prettify'])
+            && strcasecmp($this->_classParams[self::JSON]['prettify'], 'true') == 0
             ;
     }
 

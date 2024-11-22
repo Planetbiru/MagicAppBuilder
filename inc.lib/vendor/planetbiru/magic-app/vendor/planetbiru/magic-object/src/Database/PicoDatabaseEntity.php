@@ -20,7 +20,7 @@ class PicoDatabaseEntity
      * 
      * @var PicoDatabase[] 
      */
-    private $databases = [];
+    private $databases = array();
     
     /**
      * Default database connection

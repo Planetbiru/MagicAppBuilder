@@ -63,38 +63,54 @@ class DataTable extends SetterGetter
 
     /**
      * Current language code.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var string
      */
-    private $_currentLanguage; //NOSONAR
+    private $_currentLanguage; // NOSONAR
 
     /**
      * Language instances.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var PicoLanguage[]
      */
-    private $_lableLanguage = array(); //NOSONAR
+    private $_lableLanguage = array(); // NOSONAR
 
     /**
      * Table identity.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var PicoGenericObject
      */
-    private $_tableIdentity; //NOSONAR
+    private $_tableIdentity; // NOSONAR
 
     /**
      * Table information.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var PicoTableInfo
      */
-    private $_tableInfo; //NOSONAR
+    private $_tableInfo; // NOSONAR
 
     /**
      * Labels for the table.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    private $_labels = array(); //NOSONAR
+    private $_labels = array(); // NOSONAR
+
 
     /**
      * Constructor

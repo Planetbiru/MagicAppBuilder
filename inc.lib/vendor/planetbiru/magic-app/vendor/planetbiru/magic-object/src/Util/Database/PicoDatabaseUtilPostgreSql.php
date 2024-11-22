@@ -44,7 +44,7 @@ use PDO;
  * @package MagicObject\Util\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface //NOSONAR
+class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface // NOSONAR
 {
 
     /**
@@ -91,7 +91,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = null, $charset = null)
     {
-        $query = [];
+        $query = array();
         if ($dropIfExists) {
             $query[] = "-- DROP TABLE IF EXISTS \"$tableName\";";
             $query[] = "";
@@ -142,7 +142,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function createColumn($column, $autoIncrementKeys = null)
     {
-        $col = [];
+        $col = array();
         $col[] = "\t";
         $col[] = "\"" . $column[parent::KEY_NAME] . "\"";
         
@@ -227,7 +227,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function createColumnPostgre($column, $autoIncrementKeys = null)
     {
-        $col = [];
+        $col = array();
         $col[] = "\t";
         $col[] = "\"" . $column[parent::KEY_NAME] . "\"";
 
@@ -310,7 +310,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
     public function dumpRecord($columns, $tableName, $record)
     {
         $value = $record->valueArray();
-        $rec = [];
+        $rec = array();
         foreach ($value as $key => $val) {
             if (isset($columns[$key])) {
                 $rec[$columns[$key][parent::KEY_NAME]] = $val;
@@ -350,7 +350,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
                 WHERE table_schema = '$schema' AND table_name = '$tableName'";
         $result = $database->fetchAll($sql, PDO::FETCH_ASSOC);
 
-        $columns = [];
+        $columns = array();
         foreach ($result as $row) {
             $columns[$row['column_name']] = $row['data_type'];
         }
@@ -390,7 +390,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = [];
+            $existingTables = array();
             foreach ($tables as $tb) {
                 $existingTables[] = $tb->getTarget();
             }

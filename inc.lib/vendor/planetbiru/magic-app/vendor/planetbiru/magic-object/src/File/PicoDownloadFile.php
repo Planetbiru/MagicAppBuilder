@@ -50,7 +50,7 @@ class PicoDownloadFile
      * 
      * @return bool Returns `true` if the entire file was successfully sent, `false` if only part of the file was sent.
      */
-    public function download($exit = false) //NOSONAR
+    public function download($exit = false) // NOSONAR
     {
         if (!$this->fileExists()) {
             $this->sendError(404, "File not found.");
@@ -119,7 +119,7 @@ class PicoDownloadFile
     private function getRange($fileSize)
     {
         if (isset($_SERVER['HTTP_RANGE'])) {
-            list($range, $extra) = explode(',', $_SERVER['HTTP_RANGE'], 2); //NOSONAR
+            list($range, $extra) = explode(',', $_SERVER['HTTP_RANGE'], 2); // NOSONAR
             list($start, $end) = explode('-', $range);
             $start = max(0, (int)$start);
             $end = $end ? (int)$end : $fileSize - 1;

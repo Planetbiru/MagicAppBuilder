@@ -86,7 +86,7 @@ class PicoArrayUtil
      * @param array &$array Array containing data to be processed by reference.
      * @return void
      */
-    private static function _camelize(&$array) //NOSONAR
+    private static function _camelize(&$array) // NOSONAR
     {
         foreach (array_keys($array) as $key) {
             // Working with references to avoid copying the value.
@@ -117,7 +117,7 @@ class PicoArrayUtil
      * @param array &$array Array containing data to be processed by reference.
      * @return void
      */
-    private static function _snakeize(&$array) //NOSONAR
+    private static function _snakeize(&$array) // NOSONAR
     {
         foreach (array_keys($array) as $key) {
             // Working with references to avoid copying the value.

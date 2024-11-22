@@ -246,13 +246,13 @@ class PicoDatabaseDump
         $tableName = $this->getTableName($tableName, $tableInfo);
         $database = $this->getDatabase($database, $entities);
 
-        $queryAlter = [];
+        $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
 
         if (!empty($tableInfo->getColumns())) {
-            $dbColumnNames = [];
+            $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
-            $createdColumns = [];
+            $createdColumns = array();
             if (is_array($rows) && !empty($rows)) {
                 foreach ($rows as $row) {
                     $dbColumnNames[] = $row['Field'];
@@ -290,13 +290,13 @@ class PicoDatabaseDump
         $tableName = $tableInfo->getTableName();
         $database = $entity->currentDatabase();
 
-        $queryAlter = [];
+        $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
 
         if (!empty($tableInfo->getColumns())) {
-            $dbColumnNames = [];
+            $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
-            $createdColumns = [];
+            $createdColumns = array();
             if (is_array($rows) && !empty($rows)) {
                 foreach ($rows as $row) {
                     $dbColumnNames[] = $row['Field'];
@@ -334,7 +334,7 @@ class PicoDatabaseDump
     private function addPrimaryKey($queryAlter, $tableInfo, $tableName, $createdColumns)
     {
         $pk = $tableInfo->getPrimaryKeys();
-        $queries = [];
+        $queries = array();
         if (isset($pk) && is_array($pk) && !empty($pk)) {
             foreach ($pk as $primaryKey) {
                 if (in_array($primaryKey['name'], $createdColumns)) {
@@ -361,7 +361,7 @@ class PicoDatabaseDump
      */
     private function addAutoIncrement($queryAlter, $tableInfo, $tableName, $createdColumns, $databaseType)
     {
-        $queries = [];
+        $queries = array();
         $aik = $this->getAutoIncrementKey($tableInfo);
         
         foreach ($tableInfo->getColumns() as $entityColumn) {
@@ -399,7 +399,7 @@ class PicoDatabaseDump
     public function getAutoIncrementKey($tableInfo)
     {
         $autoIncrement = $tableInfo->getAutoIncrementKeys();
-        $autoIncrementKeys = [];
+        $autoIncrementKeys = array();
         
         if (is_array($autoIncrement) && !empty($autoIncrement)) {
             foreach ($autoIncrement as $col) {

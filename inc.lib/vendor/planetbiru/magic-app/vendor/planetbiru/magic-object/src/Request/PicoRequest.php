@@ -60,7 +60,7 @@ class PicoRequest extends PicoRequestBase
     public static function getRequestHeaders()
     {
         if (!function_exists('getallheaders')) {
-            $headers = [];
+            $headers = array();
             foreach ($_SERVER as $name => $value) {
                 /* RFC2616 (HTTP/1.1) defines header fields as case-insensitive entities. */
                 if (strtolower(substr($name, 0, 5)) == 'http_') {

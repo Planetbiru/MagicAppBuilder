@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: true
+    selected: false
     type: fullstack
     architecture: monolith
 -
@@ -23,4 +23,4 @@
     description: 'Music Planetbiru'
     documentRoot: 'D:/xampp/htdocs/0673c952cb576d077460'
     author: Kamshory
-    selected: false
+    selected: true

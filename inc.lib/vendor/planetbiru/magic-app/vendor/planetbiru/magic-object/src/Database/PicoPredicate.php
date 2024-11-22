@@ -14,7 +14,7 @@ namespace MagicObject\Database;
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoPredicate //NOSONAR
+class PicoPredicate // NOSONAR
 {
     private $field = "";
     private $value = "";

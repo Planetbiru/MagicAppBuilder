@@ -43,7 +43,7 @@ use PDO;
  * @package MagicObject\Util\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface //NOSONAR
+class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface // NOSONAR
 {
 
     /**
@@ -76,8 +76,8 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
     {
-        $query = [];
-        $columns = [];
+        $query = array();
+        $columns = array();
         if($dropIfExists)
         {
             $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
@@ -144,7 +144,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function createColumn($column)
     {
-        $col = [];
+        $col = array();
         $col[] = "\t";
         $col[] = "`".$column[parent::KEY_NAME]."`";
         $col[] = $column['type'];
@@ -208,7 +208,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
     public function dumpRecord($columns, $tableName, $record)
     {
         $value = $record->valueArray();
-        $rec = [];
+        $rec = array();
         foreach($value as $key=>$val)
         {
             if(isset($columns[$key]))
@@ -242,7 +242,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $sql = "SHOW COLUMNS FROM $tableName";
         $result = $database->fetchAll($sql, PDO::FETCH_ASSOC);
 
-        $columns = [];
+        $columns = array();
         foreach($result as $row)
         {
             $columns[$row['Field']] = $row['Type'];
@@ -273,7 +273,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = [];
+            $existingTables = array();
             foreach($tables as $tb)
             {
                 $existingTables[] = $tb->getTarget();

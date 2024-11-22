@@ -8,6 +8,9 @@ use MagicObject\SecretObject;
  * Class PicoSession
  * This class manages session handling, providing methods to configure and manipulate sessions.
  * 
+ * The class provides an interface for session management, including handling session creation, destruction,
+ * configuration, and the ability to store/retrieve session data.
+ * 
  * @author Kamshory
  * @package MagicObject\Session
  * @link https://github.com/Planetbiru/MagicObject
@@ -22,20 +25,30 @@ class PicoSession
 
     /**
      * The state of the session.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var boolean
      */
-    private $_sessionState = self::SESSION_NOT_STARTED; //NOSONAR
+    private $_sessionState = self::SESSION_NOT_STARTED; // NOSONAR
 
     /**
      * The instance of the object.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var self
      */
-    private static $_instance; //NOSONAR
+    private static $_instance; // NOSONAR
+
 
     /**
      * Constructor to initialize session configuration.
+     *
+     * This constructor accepts a session configuration object and applies settings such as
+     * session name, max lifetime, and save handler (Redis or file system).
      *
      * @param SecretObject|null $sessConf Configuration for the session.
      */
@@ -61,6 +74,8 @@ class PicoSession
      * Returns the instance of PicoSession.
      * The session is automatically initialized if it wasn't already.
      *
+     * This method ensures that only one instance of PicoSession is created (Singleton pattern).
+     *
      * @param string|null $name Session name.
      * @param int $maxLifeTime Maximum lifetime of the session.
      * @return self The instance of PicoSession.
@@ -83,6 +98,8 @@ class PicoSession
     /**
      * (Re)starts the session.
      *
+     * This method starts a session if it hasn't been started already.
+     *
      * @return bool True if the session has been initialized, false otherwise.
      */
     public function startSession()
@@ -96,6 +113,8 @@ class PicoSession
     /**
      * Checks if the session has been started.
      *
+     * This method checks whether the current session has been started.
+     *
      * @return bool True if the session has started, false otherwise.
      */
     public function isSessionStarted()
@@ -106,6 +125,8 @@ class PicoSession
     /**
      * Stores data in the session.
      * Example: $_instance->foo = 'bar';
+     *
+     * This magic method stores data in the PHP session.
      *
      * @param string $name Name of the data.
      * @param mixed $value The data to store.
@@ -120,6 +141,8 @@ class PicoSession
      * Retrieves data from the session.
      * Example: echo $_instance->foo;
      *
+     * This magic method retrieves data from the PHP session.
+     *
      * @param string $name Name of the data to retrieve.
      * @return mixed The data stored in session, or null if not set.
      */
@@ -130,6 +153,8 @@ class PicoSession
 
     /**
      * Checks if a value is set in the session.
+     *
+     * This magic method checks whether a value is set in the session.
      *
      * @param string $name Name of the data to check.
      * @return bool True if the data is set, false otherwise.
@@ -142,6 +167,8 @@ class PicoSession
     /**
      * Unsets a value in the session.
      *
+     * This magic method unsets data in the session.
+     *
      * @param string $name Name of the data to unset.
      * @return void
      */
@@ -152,6 +179,8 @@ class PicoSession
 
     /**
      * Destroys the current session.
+     *
+     * This method destroys the session and clears all session data.
      *
      * @return bool true if the session has been deleted, else false.
      */
@@ -167,6 +196,9 @@ class PicoSession
 
     /**
      * Sets cookie parameters for the session.
+     *
+     * This method sets parameters for the session cookie, including lifetime,
+     * security attributes, and SameSite settings.
      *
      * @param int $maxlifetime Maximum lifetime of the session cookie.
      * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
@@ -194,6 +226,8 @@ class PicoSession
     /**
      * Sets a cookie with SameSite attribute support for different PHP versions.
      *
+     * This method sets a cookie with the specified SameSite attribute, supporting both older and newer PHP versions.
+     *
      * @param string $name The name of the cookie.
      * @param string $value The value of the cookie.
      * @param int $expire The expiration time of the cookie.
@@ -204,7 +238,7 @@ class PicoSession
      * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
      * @return self Returns the current instance for method chaining.
      */
-    public function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
+    public function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT) // NOSONAR
     {
         if (PHP_VERSION_ID < 70300) {
             setcookie($name, $value, $expire, $path . '; samesite=' . $samesite, $domain, $secure, $httponly);
@@ -224,6 +258,8 @@ class PicoSession
     /**
      * Sets the session name.
      *
+     * This method sets the session name for the current session.
+     *
      * @param string $name The name of the session.
      * @return self Returns the current instance for method chaining.
      */
@@ -236,6 +272,8 @@ class PicoSession
     /**
      * Sets the session save path.
      *
+     * This method sets the path where session files will be stored.
+     *
      * @param string $path The session save path.
      * @return string|false The session save path on success, false on failure.
      */
@@ -246,6 +284,8 @@ class PicoSession
 
     /**
      * Sets the maximum lifetime for the session.
+     *
+     * This method sets the maximum lifetime of the session, affecting both garbage collection and cookie expiration.
      *
      * @param int $lifeTime Maximum lifetime for the session in seconds.
      * @return self Returns the current instance for method chaining.
@@ -259,6 +299,8 @@ class PicoSession
 
     /**
      * Saves the session to Redis.
+     *
+     * This method configures the session to be stored in Redis.
      *
      * @param string $host Redis host.
      * @param int $port Redis port.
@@ -276,6 +318,8 @@ class PicoSession
     /**
      * Saves the session to files.
      *
+     * This method configures the session to be stored in files.
+     *
      * @param string $path The directory where session files will be stored.
      * @return self Returns the current instance for method chaining.
      */
@@ -289,6 +333,8 @@ class PicoSession
     /**
      * Retrieves the current session ID.
      *
+     * This method retrieves the current session ID, if any.
+     *
      * @return string The current session ID.
      */
     public function getSessionId()
@@ -298,6 +344,8 @@ class PicoSession
 
     /**
      * Sets a new session ID.
+     *
+     * This method sets a new session ID for the current session.
      *
      * @param string $id The new session ID.
      * @return self Returns the current instance for method chaining.

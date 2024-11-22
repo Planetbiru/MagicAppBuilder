@@ -24,49 +24,49 @@ class PicoEntityLanguage
     const ANNOTATION_TABLE = "Table";
     const ANNOTATION_LANGUAGE = "Language";
 
-    private $_defaultColumnName = "key"; //NOSONAR
+    private $_defaultColumnName = "key"; // NOSONAR
 
     /**
      * Current language code.
      *
      * @var string
      */
-    private $_currentLanguage; //NOSONAR
+    private $_currentLanguage; // NOSONAR
 
     /**
      * Array of PicoLanguage objects.
      *
      * @var PicoLanguage[]
      */
-    private $_lableLanguage = array(); //NOSONAR
+    private $_lableLanguage = array(); // NOSONAR
 
     /**
      * Table identity object.
      *
      * @var PicoGenericObject
      */
-    private $_tableIdentity; //NOSONAR
+    private $_tableIdentity; // NOSONAR
 
     /**
      * Labels for the entity.
      *
      * @var array
      */
-    private $_labels = array(); //NOSONAR
+    private $_labels = array(); // NOSONAR
 
     /**
      * Entity class name.
      *
      * @var string
      */
-    private $_entityClassName = ""; //NOSONAR
+    private $_entityClassName = ""; // NOSONAR
 
     /**
      * Entity language code.
      *
      * @var string
      */
-    private $_entityLanguage = ""; //NOSONAR
+    private $_entityLanguage = ""; // NOSONAR
 
     /**
      * Constructor
@@ -308,7 +308,7 @@ class PicoEntityLanguage
      * @param array $args Arguments passed to the method; typically unused in this context.
      * @return mixed|null The value of the requested property if it exists; otherwise, null.
      */
-    public function __call($method, $args) //NOSONAR
+    public function __call($method, $args) // NOSONAR
     {
         if (stripos($method, "get") === 0 && strlen($method) > 3) {
             $prop = lcfirst(substr($method, 3));

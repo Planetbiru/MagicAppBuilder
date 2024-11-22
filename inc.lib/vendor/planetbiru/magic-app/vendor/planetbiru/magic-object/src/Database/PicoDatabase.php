@@ -37,7 +37,7 @@ use stdClass;
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabase //NOSONAR
+class PicoDatabase // NOSONAR
 {
     const QUERY_INSERT = "insert";
     const QUERY_UPDATE = "update";
@@ -626,7 +626,7 @@ class PicoDatabase //NOSONAR
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
         
-        $result = [];
+        $result = array();
         $this->executeDebug($sql);
         $stmt = $this->databaseConnection->prepare($sql);
         
@@ -703,7 +703,7 @@ class PicoDatabase //NOSONAR
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
         
-        $result = [];
+        $result = array();
         $this->executeDebug($sql);
         $stmt = $this->databaseConnection->prepare($sql);
         

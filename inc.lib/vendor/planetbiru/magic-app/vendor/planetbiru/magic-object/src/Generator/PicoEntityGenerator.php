@@ -99,7 +99,7 @@ class PicoEntityGenerator
         $description = $this->getPropertyName($columnName);
         $type = $this->getDataType($typeMap, $columnType);
 
-        $docs = [];
+        $docs = array();
         $docStart = "\t/**";
         $docEnd = "\t */";
 
@@ -122,7 +122,7 @@ class PicoEntityGenerator
             $docs[] = "\t * @NotNull";
         }
 
-        $attrs = [];
+        $attrs = array();
         $attrs[] = "name=\"$columnName\"";
         $attrs[] = "type=\"$columnType\"";
         $length = $this->getDataLength($columnType);
@@ -267,7 +267,7 @@ class PicoEntityGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = [];
+        $attrs = array();
         if (is_array($rows)) {
             foreach ($rows as $row) {
                 $prop = $this->createProperty($typeMap, $row, $nonupdatables);

@@ -15,7 +15,7 @@ namespace MagicObject\Util;
 #
 #
 
-class PicoParsedown //NOSONAR
+class PicoParsedown // NOSONAR
 {
     /**
      * The current version of the parser.
@@ -206,7 +206,7 @@ class PicoParsedown //NOSONAR
      * @param array $lines The lines of text to process.
      * @return string The generated HTML markup.
      */
-    protected function lines(array $lines) //NOSONAR
+    protected function lines(array $lines) // NOSONAR
     {
         $currentBlock = null;
 
@@ -439,7 +439,7 @@ class PicoParsedown //NOSONAR
      * @param array $block The block to complete.
      * @return array The completed code block.
      */
-    protected function blockCodeComplete($block) //NOSONAR
+    protected function blockCodeComplete($block) // NOSONAR
     {
         $text = $block['element']['text']['text'];
 
@@ -457,7 +457,7 @@ class PicoParsedown //NOSONAR
      * @param array $block The current fenced code block being processed.
      * @return array|null The updated fenced code block or null if not applicable.
      */
-    protected function blockFencedCodeComplete($block) //NOSONAR
+    protected function blockFencedCodeComplete($block) // NOSONAR
     {
         $text = $block['element']['text']['text'];
 
@@ -691,7 +691,7 @@ class PicoParsedown //NOSONAR
      * @param array $block The current list block being processed.
      * @return array|null The updated list block or null if not applicable.
      */
-    protected function blockListContinue($line, array $block) //NOSONAR
+    protected function blockListContinue($line, array $block) // NOSONAR
     {
         if ($block['indent'] === $line['indent'] && preg_match('/^' . $block['pattern'] . '(?:[ ]+(.*)|$)/', $line['text'], $matches)) {
             if (isset($block['interrupted'])) {
@@ -724,7 +724,7 @@ class PicoParsedown //NOSONAR
         }
 
         if (!isset($block['interrupted'])) {
-            $text = preg_replace('/^[ ]{0,4}/', '', $line['body']); //NOSONAR
+            $text = preg_replace('/^[ ]{0,4}/', '', $line['body']); // NOSONAR
 
             $block['li']['text'][] = $text;
 
@@ -734,7 +734,7 @@ class PicoParsedown //NOSONAR
         if ($line['indent'] > 0) {
             $block['li']['text'][] = '';
 
-            $text = preg_replace('/^[ ]{0,4}/', '', $line['body']); //NOSONAR
+            $text = preg_replace('/^[ ]{0,4}/', '', $line['body']); // NOSONAR
 
             $block['li']['text'][] = $text;
 
@@ -775,7 +775,7 @@ class PicoParsedown //NOSONAR
      */
     protected function blockQuote($line)
     {
-        if (preg_match('/^>[ ]?(.*)/', $line['text'], $matches)) //NOSONAR
+        if (preg_match('/^>[ ]?(.*)/', $line['text'], $matches)) // NOSONAR
         {
             return array(
                 'element' => array(
@@ -799,7 +799,7 @@ class PicoParsedown //NOSONAR
      */
     protected function blockQuoteContinue($line, array $block)
     {
-        if ($line['text'][0] === '>' && preg_match('/^>[ ]?(.*)/', $line['text'], $matches)) //NOSONAR
+        if ($line['text'][0] === '>' && preg_match('/^>[ ]?(.*)/', $line['text'], $matches)) // NOSONAR
         {
             if (isset($block['interrupted'])) {
                 $block['element']['text'][] = '';
@@ -869,7 +869,7 @@ class PicoParsedown //NOSONAR
      * @param array $line The line of text to process.
      * @return array|null The constructed markup block or null if not applicable.
      */
-    protected function blockMarkup($line) //NOSONAR
+    protected function blockMarkup($line) // NOSONAR
     {
         if ($this->markupEscaped || $this->safeMode) {
             return null;
@@ -961,7 +961,7 @@ class PicoParsedown //NOSONAR
      */
     protected function blockReference($line)
     {
-        if (preg_match('/^\[(.+?)\]:[ ]*<?(\S+?)>?(?:[ ]+["\'(](.+)["\')])?[ ]*$/', $line['text'], $matches)) //NOSONAR
+        if (preg_match('/^\[(.+?)\]:[ ]*<?(\S+?)>?(?:[ ]+["\'(](.+)["\')])?[ ]*$/', $line['text'], $matches)) // NOSONAR
         {
             $id = strtolower($matches[1]);
 
@@ -992,7 +992,7 @@ class PicoParsedown //NOSONAR
      * @param array|null $block The current block being processed.
      * @return array|null The constructed table block or null if not applicable.
      */
-    protected function blockTable($line, array $block = null) //NOSONAR
+    protected function blockTable($line, array $block = null) // NOSONAR
     {
         if (!isset($block) || isset($block['type']) || isset($block['interrupted'])) {
             return null;
@@ -1100,7 +1100,7 @@ class PicoParsedown //NOSONAR
      * @param array $block The current table block being processed.
      * @return array|null The updated table block or null if not applicable.
      */
-    protected function blockTableContinue($line, $block) //NOSONAR
+    protected function blockTableContinue($line, $block) // NOSONAR
     {
         if (isset($block['interrupted'])) {
             return null;
@@ -1203,7 +1203,7 @@ class PicoParsedown //NOSONAR
      * @param array $nonNestables An array of non-nestable inline types.
      * @return string The processed markup with inline elements.
      */
-    public function line($text, $nonNestables = array()) //NOSONAR
+    public function line($text, $nonNestables = array()) // NOSONAR
     {
         $markup = '';
 
@@ -1290,7 +1290,7 @@ class PicoParsedown //NOSONAR
 
         if (preg_match('/^(' . $marker . '+)[ ]*(.+?)[ ]*(?<!' . $marker . ')\1(?!' . $marker . ')/s', $excerpt['text'], $matches)) {
             $text = $matches[2];
-            $text = preg_replace("/[ ]*\n/", ' ', $text); //NOSONAR
+            $text = preg_replace("/[ ]*\n/", ' ', $text); // NOSONAR
 
             return array(
                 'extent' => strlen($matches[0]),
@@ -1447,7 +1447,7 @@ class PicoParsedown //NOSONAR
 
         $remainder = $excerpt['text'];
 
-        if (preg_match('/\[((?:[^][]++|(?R))*+)\]/', $remainder, $matches)) //NOSONAR
+        if (preg_match('/\[((?:[^][]++|(?R))*+)\]/', $remainder, $matches)) // NOSONAR
         {
             $element['text'] = $matches[1];
 
@@ -1458,7 +1458,7 @@ class PicoParsedown //NOSONAR
             return null;
         }
 
-        if (preg_match('/^[(]\s*+((?:[^ ()]++|[(][^ )]+[)])++)(?:[ ]+("[^"]*"|\'[^\']*\'))?\s*[)]/', $remainder, $matches)) //NOSONAR
+        if (preg_match('/^[(]\s*+((?:[^ ()]++|[(][^ )]+[)])++)(?:[ ]+("[^"]*"|\'[^\']*\'))?\s*[)]/', $remainder, $matches)) // NOSONAR
         {
             $element['attributes']['href'] = $matches[1];
 
@@ -1499,13 +1499,13 @@ class PicoParsedown //NOSONAR
      * @param array $excerpt Contains the text to be processed.
      * @return array|null Returns an array with the markup and its extent, or null if no valid markup is found.
      */
-    protected function inlineMarkup($excerpt) //NOSONAR
+    protected function inlineMarkup($excerpt) // NOSONAR
     {
         if ($this->markupEscaped || $this->safeMode || strpos($excerpt['text'], '>') === false) {
             return null;
         }
 
-        if ($excerpt['text'][1] === '/' && preg_match('/^<\/\w[\w-]*[ ]*>/s', $excerpt['text'], $matches)) //NOSONAR
+        if ($excerpt['text'][1] === '/' && preg_match('/^<\/\w[\w-]*[ ]*>/s', $excerpt['text'], $matches)) // NOSONAR
         {
             return array(
                 'markup' => $matches[0],
@@ -1513,7 +1513,7 @@ class PicoParsedown //NOSONAR
             );
         }
 
-        if ($excerpt['text'][1] === '!' && preg_match('/^<!---?[^>-](?:-?[^-])*-->/s', $excerpt['text'], $matches)) //NOSONAR
+        if ($excerpt['text'][1] === '!' && preg_match('/^<!---?[^>-](?:-?[^-])*-->/s', $excerpt['text'], $matches)) // NOSONAR
         {
             return array(
                 'markup' => $matches[0],
@@ -1590,7 +1590,7 @@ class PicoParsedown //NOSONAR
             return null;
         }
 
-        if (preg_match('/\bhttps?:[\/]{2}[^\s<]+\b\/*/ui', $excerpt['context'], $matches, PREG_OFFSET_CAPTURE)) //NOSONAR
+        if (preg_match('/\bhttps?:[\/]{2}[^\s<]+\b\/*/ui', $excerpt['context'], $matches, PREG_OFFSET_CAPTURE)) // NOSONAR
         {
             $url = $matches[0][0];
 
@@ -1642,9 +1642,9 @@ class PicoParsedown //NOSONAR
     protected function unmarkedText($text)
     {
         if ($this->breaksEnabled) {
-            $text = preg_replace('/[ ]*\n/', "<br />\n", $text); //NOSONAR
+            $text = preg_replace('/[ ]*\n/', "<br />\n", $text); // NOSONAR
         } else {
-            $text = preg_replace('/(?:[ ][ ]+|[ ]*\\\\)\n/', "<br />\n", $text); //NOSONAR
+            $text = preg_replace('/(?:[ ][ ]+|[ ]*\\\\)\n/', "<br />\n", $text); // NOSONAR
             $text = str_replace(" \n", "\n", $text);
         }
 
@@ -1657,7 +1657,7 @@ class PicoParsedown //NOSONAR
      * @param array $element The element to be rendered as HTML.
      * @return string The generated HTML markup for the element.
      */
-    protected function element(array $element) //NOSONAR
+    protected function element(array $element) // NOSONAR
     {
         if ($this->safeMode) {
             $element = $this->sanitiseElement($element);

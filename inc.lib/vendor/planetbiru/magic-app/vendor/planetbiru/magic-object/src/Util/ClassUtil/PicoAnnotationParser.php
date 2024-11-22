@@ -5,7 +5,6 @@ namespace MagicObject\Util\ClassUtil;
 use InvalidArgumentException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidParameterException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\ZeroArgumentException;
 use MagicObject\Util\PicoGenericObject;
 use MagicObject\Util\PicoStringUtil;
@@ -398,43 +397,43 @@ class PicoAnnotationParser
     }
 
     /**
-     * Parse key-value pairs from a query string.
+     * Parse key-value pairs from parameters string.
      *
-     * This method extracts key-value pairs from a query string, which may contain 
+     * This method extracts key-value pairs from parameters string, which may contain 
      * attributes with or without quotes. Numeric attributes will have an underscore 
      * prefix. Throws an exception if the input is invalid.
      *
-     * @param string $queryString The query string to parse.
+     * @param string $parametersString The parameters string to parse.
      * @return string[] An associative array of parsed key-value pairs.
-     * @throws InvalidQueryInputException If the input is not a valid query string.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
-    public function parseKeyValue($queryString)
+    public function parseKeyValue($parametersString)
     {
-        if(!isset($queryString) || empty($queryString) || $queryString instanceof PicoEmptyParameter)
+        if(!isset($parametersString) || empty($parametersString) || $parametersString instanceof PicoEmptyParameter)
         {
             return array();
         }
-        if(!is_string($queryString))
+        if(!is_string($parametersString))
         {
-            throw new InvalidAnnotationException("Invalid query string");
+            throw new InvalidAnnotationException("Invalid parameters string");
         }
 
         // For every modification, please test regular expression with https://regex101.com/
 
         // parse attributes with quotes
         $pattern1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\t\r\n|\r|\n]+)\"/m'; // NOSONAR
-        preg_match_all($pattern1, $queryString, $matches1);
+        preg_match_all($pattern1, $parametersString, $matches1);
         $pair1 = array_combine($matches1[1], $matches1[2]);
 
         // parse attributes without quotes
         $pattern2 = '/([_\-\w+]+)\=([a-zA-Z0-9._]+)/m'; // NOSONAR
-        preg_match_all($pattern2, $queryString, $matches2);
+        preg_match_all($pattern2, $parametersString, $matches2);
 
         $pair3 = $this->combineAndMerge($matches2, $pair1);
 
         // parse attributes without any value
         $pattern3 = '/([\w\=\-\_"]+)/m'; // NOSONAR
-        preg_match_all($pattern3, $queryString, $matches3);
+        preg_match_all($pattern3, $parametersString, $matches3);
 
         $pair4 = array();
         if(isset($matches3) && isset($matches3[0]) && is_array($matches3[0]))
@@ -477,26 +476,26 @@ class PicoAnnotationParser
     }
     
     /**
-     * Parse parameters from a query string and return them as a PicoGenericObject.
+     * Parse parameters from parameters string and return them as a PicoGenericObject.
      *
-     * This method transforms the key-value pairs parsed from the query string
+     * This method transforms the key-value pairs parsed from the parameters string
      * into an instance of PicoGenericObject. All numeric attributes will be 
      * prefixed with an underscore. 
      *
-     * @param string $queryString The query string to parse.
+     * @param string $parametersString The parameters string to parse.
      * @return PicoGenericObject An object containing the parsed key-value pairs.
-     * @throws InvalidAnnotationException If the input is not a valid query string.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
-    public function parseKeyValueAsObject($queryString)
+    public function parseKeyValueAsObject($parametersString)
     {
-        if(PicoStringUtil::isNullOrEmpty($queryString))
+        if(PicoStringUtil::isNullOrEmpty($parametersString))
         {
             return new PicoGenericObject();
         }
-        if(!is_string($queryString))
+        if(!is_string($parametersString))
         {
-            throw new InvalidAnnotationException("Invalid query string");
+            throw new InvalidAnnotationException("Invalid parameters string");
         }
-        return new PicoGenericObject($this->parseKeyValue($queryString));
+        return new PicoGenericObject($this->parseKeyValue($parametersString));
     }
 }

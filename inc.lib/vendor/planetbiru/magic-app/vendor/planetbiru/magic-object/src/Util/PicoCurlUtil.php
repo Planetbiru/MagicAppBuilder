@@ -24,7 +24,7 @@ class PicoCurlUtil {
      *
      * @var string[]
      */
-    private $responseHeaders = [];
+    private $responseHeaders = array();
 
     /**
      * Response body from the last request

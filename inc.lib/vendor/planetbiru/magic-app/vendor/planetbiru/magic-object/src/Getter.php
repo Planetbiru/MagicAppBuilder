@@ -3,7 +3,6 @@
 namespace MagicObject;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoStringUtil;
 use ReflectionClass;
@@ -33,10 +32,14 @@ class Getter extends stdClass
     
     /**
      * Class parameters that configure behavior such as JSON output formatting.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    private $_classParams = array(); //NOSONAR
+    private $_classParams = array(); // NOSONAR
+
 
     /**
      * Constructor that initializes class parameters based on annotations.
@@ -51,7 +54,7 @@ class Getter extends stdClass
             {
                 $vals = $jsonAnnot->parseKeyValue($paramValue);
             }
-            catch(InvalidQueryInputException $e)
+            catch(InvalidAnnotationException $e)
             {
                 throw new InvalidAnnotationException("Invalid annotation @".$paramName);
             }

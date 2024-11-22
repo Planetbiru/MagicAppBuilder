@@ -109,7 +109,7 @@ class PicoDatabaseUtil
      */
     public static function valuesFromParams($params)
     {
-        $ret = [];
+        $ret = array();
         if(self::isArray($params))
         {
             foreach($params as $param)
@@ -366,7 +366,7 @@ class PicoDatabaseUtil
         });
         
         // Initialize state variables
-        $queries = [];
+        $queries = array();
         $currentQuery = '';
         $isAppending = false;
         $delimiter = ';';
