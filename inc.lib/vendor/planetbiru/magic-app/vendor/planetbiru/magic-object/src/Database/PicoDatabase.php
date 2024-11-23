@@ -161,7 +161,9 @@ class PicoDatabase // NOSONAR
             $schema = $stmt->fetchColumn(); // Fetch the schema name
             
             $stmtTimezone = $pdo->query('SHOW timezone');
-            $timezone = $stmtTimezone->fetchColumn(); // Fetch the time zone
+            $systemTimeZone = $stmtTimezone->fetchColumn(); // Fetch the time zone
+
+            $timezone = $this->pgsqlToPhpTimezone($systemTimeZone);
         }
         elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             // For MySQL, the schema is the same as the database name
@@ -180,18 +182,13 @@ class PicoDatabase // NOSONAR
                 // This conversion may require a lookup table, as MySQL system time zones
                 // (e.g., 'CST', 'PST') are not directly equivalent to PHP time zones (e.g., 'Asia/Jakarta').
                 // Here, we will simply return the system time zone as a placeholder:
-                $timezone = $systemTimeZone;
+                $timezone = $this->mysqlToPhpTimezone($systemTimeZone);
             }
         }
         else {
             // For other drivers, set schema and time zone to null (or handle it as needed)
             $schema = null;
-            $timezone = null;
-        }
-
-        // If the time zone is provided, convert it to a recognized PHP time zone if necessary
-        if (isset($timezone)) {
-            $timezone = $this->mysqlToPhpTimezone($timezone);
+            $timezone = date_default_timezone_get();
         }
 
         // Create and populate the SecretObject with the connection details
@@ -233,9 +230,9 @@ class PicoDatabase // NOSONAR
             'CDT'  => 'America/Chicago',     // Central Daylight Time
             'EST'  => 'America/New_York',    // Eastern Standard Time
             'EDT'  => 'America/New_York',    // Eastern Daylight Time
-            'AKST' => 'America/Anchorage',  // Alaska Standard Time
-            'AKDT' => 'America/Anchorage',  // Alaska Daylight Time
-            'HST'  => 'Pacific/Honolulu',   // Hawaii Standard Time
+            'AKST' => 'America/Anchorage',   // Alaska Standard Time
+            'AKDT' => 'America/Anchorage',   // Alaska Daylight Time
+            'HST'  => 'Pacific/Honolulu',    // Hawaii Standard Time
 
             // United Kingdom
             'GMT'  => 'Europe/London',      // Greenwich Mean Time (Standard Time)
@@ -283,8 +280,89 @@ class PicoDatabase // NOSONAR
         return isset($timezoneMapping[$timezoneAbbr]) ? $timezoneMapping[$timezoneAbbr] : null;
     }
 
+    /**
+     * Converts a PostgreSQL timezone string to a PHP-compatible timezone identifier.
+     *
+     * @param string $pgsqlTimezone The PostgreSQL timezone string (e.g., from SHOW timezone).
+     * @return string|null The PHP timezone identifier or null if no match is found.
+     */
+    private function pgsqlToPhpTimezone($pgsqlTimezone)
+    {
+        // Comprehensive map of PostgreSQL timezones to PHP-compatible timezone identifiers
+        $timezoneMap = [
+            // UTC and variants
+            'UTC' => 'UTC',
+            'Etc/UTC' => 'UTC',
+            'Etc/GMT' => 'UTC',
 
+            // Common regions
+            'US/Eastern' => 'America/New_York',
+            'US/Central' => 'America/Chicago',
+            'US/Mountain' => 'America/Denver',
+            'US/Pacific' => 'America/Los_Angeles',
+            'US/Alaska' => 'America/Anchorage',
+            'US/Hawaii' => 'Pacific/Honolulu',
+            'America/Chicago' => 'America/Chicago',
+            'America/New_York' => 'America/New_York',
+            'America/Los_Angeles' => 'America/Los_Angeles',
+            'America/Denver' => 'America/Denver',
+            'America/Anchorage' => 'America/Anchorage',
+            'Pacific/Honolulu' => 'Pacific/Honolulu',
 
+            // European timezones
+            'Europe/London' => 'Europe/London',
+            'Europe/Berlin' => 'Europe/Berlin',
+            'Europe/Paris' => 'Europe/Paris',
+            'Europe/Madrid' => 'Europe/Madrid',
+            'Europe/Rome' => 'Europe/Rome',
+            'Europe/Moscow' => 'Europe/Moscow',
+
+            // Asia timezones
+            'Asia/Tokyo' => 'Asia/Tokyo',
+            'Asia/Shanghai' => 'Asia/Shanghai',
+            'Asia/Kolkata' => 'Asia/Kolkata',
+            'Asia/Dubai' => 'Asia/Dubai',
+            'Asia/Singapore' => 'Asia/Singapore',
+            'Asia/Hong_Kong' => 'Asia/Hong_Kong',
+            'Asia/Seoul' => 'Asia/Seoul',
+
+            // Australia timezones
+            'Australia/Sydney' => 'Australia/Sydney',
+            'Australia/Melbourne' => 'Australia/Melbourne',
+            'Australia/Brisbane' => 'Australia/Brisbane',
+            'Australia/Perth' => 'Australia/Perth',
+            'Australia/Adelaide' => 'Australia/Adelaide',
+
+            // Africa timezones
+            'Africa/Johannesburg' => 'Africa/Johannesburg',
+            'Africa/Cairo' => 'Africa/Cairo',
+            'Africa/Lagos' => 'Africa/Lagos',
+
+            // South America
+            'America/Sao_Paulo' => 'America/Sao_Paulo',
+            'America/Argentina/Buenos_Aires' => 'America/Argentina/Buenos_Aires',
+            'America/Santiago' => 'America/Santiago',
+
+            // Additional aliases or abbreviations
+            'EST' => 'America/New_York',
+            'CST' => 'America/Chicago',
+            'MST' => 'America/Denver',
+            'PST' => 'America/Los_Angeles',
+        ];
+
+        // Check for exact matches in the map
+        if (isset($timezoneMap[$pgsqlTimezone])) {
+            return $timezoneMap[$pgsqlTimezone];
+        }
+
+        // Use PHP's timezone database as a fallback for direct matches
+        if (in_array($pgsqlTimezone, timezone_identifiers_list(), true)) {
+            return $pgsqlTimezone;
+        }
+
+        // Return null if no match is found
+        return null;
+    }
 
     /**
      * Constructor to initialize the PicoDatabase object.
