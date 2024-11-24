@@ -109,7 +109,7 @@ class PicoDatabaseUtil
      */
     public static function valuesFromParams($params)
     {
-        $ret = [];
+        $ret = array();
         if(self::isArray($params))
         {
             foreach($params as $param)
@@ -366,7 +366,7 @@ class PicoDatabaseUtil
         });
         
         // Initialize state variables
-        $queries = [];
+        $queries = array();
         $currentQuery = '';
         $isAppending = false;
         $delimiter = ';';
@@ -382,7 +382,7 @@ class PicoDatabaseUtil
             // Handle "delimiter" statements
             if (stripos(trim($line), 'delimiter ') === 0) {
                 $parts = explode(' ', trim($line));
-                $delimiter = $parts[1] ?? ';';
+                $delimiter = $parts[1] != null ? ';' : null;
                 continue;
             }
 

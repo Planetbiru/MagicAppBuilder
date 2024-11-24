@@ -30,7 +30,7 @@ class Area
      *
      * @var float[]
      */
-    public $coords = [];
+    public $coords = array();
 
     /**
      * Hyperlink reference associated with the area.
@@ -125,7 +125,7 @@ class Area
     public function coordsFromPolygon($object)
     {
         $points = $object->getPoints();
-        $coords = [];
+        $coords = array();
         foreach ($points as $point) {
             $coords[] = $point->x;
             $coords[] = $point->y;
@@ -167,7 +167,7 @@ class Area
      */
     public function getHTML()
     {
-        $attrs = [];
+        $attrs = array();
         $attrs[] = 'shape="' . $this->shape . '"';
         $attrs[] = 'coords="' . implode(", ", $this->getCoords($this->zoom)) . '"';
 

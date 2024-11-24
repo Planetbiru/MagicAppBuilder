@@ -85,7 +85,7 @@ class PicoDtoGenerator
      * @param string|null $entityName Name of the entity (optional)
      * @param bool $prettify Flag to prettify output (default: false)
      */
-    public function __construct($database, $baseDir, $tableName, $baseNamespaceDto, $dtoName, $baseNamespaceEntity, $entityName = null, $prettify = false) //NOSONAR
+    public function __construct($database, $baseDir, $tableName, $baseNamespaceDto, $dtoName, $baseNamespaceEntity, $entityName = null, $prettify = false) // NOSONAR
     {
         $this->database = $database;
         $this->baseDir = $baseDir;
@@ -108,7 +108,7 @@ class PicoDtoGenerator
     protected function createProperty($typeMap, $columnName, $columnType)
     {
         $propertyName = PicoStringUtil::camelize($columnName);
-        $docs = [];
+        $docs = array();
         $docStart = "\t/**";
         $docEnd = "\t */";
 
@@ -247,7 +247,7 @@ class PicoDtoGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = [];
+        $attrs = array();
         if (is_array($rows)) {
             foreach ($rows as $row) {
                 $columnName = $row['Field'];

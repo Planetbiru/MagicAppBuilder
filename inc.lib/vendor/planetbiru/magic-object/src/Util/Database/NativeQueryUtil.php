@@ -96,7 +96,7 @@ class NativeQueryUtil
      *               PDOStatement, or a JSON string, based on the return type.
      * @throws InvalidReturnTypeException If the return type is invalid or unrecognized.
      */
-    public function handleReturnObject($stmt, $returnType) //NOSONAR
+    public function handleReturnObject($stmt, $returnType) // NOSONAR
     {
         // Handle basic return types
         switch ($returnType) {
@@ -200,7 +200,7 @@ class NativeQueryUtil
     private function mapRowsToMagicObject($stmt)
     {
         $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $objects = [];
+        $objects = array();
 
         foreach ($result as $row) {
             $objects[] = new MagicObject($row);
@@ -220,7 +220,7 @@ class NativeQueryUtil
     private function mapRowsToClass($stmt, $className)
     {
         $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $objects = [];
+        $objects = array();
 
         foreach ($result as $row) {
             $objects[] = new $className($row);

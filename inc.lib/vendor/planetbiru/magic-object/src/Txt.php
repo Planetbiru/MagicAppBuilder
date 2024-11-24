@@ -25,7 +25,7 @@ class Txt
      * @param array $arguments An array of arguments passed to the method.
      * @return string The name of the called method.
      */
-    public static function __callStatic($name, $arguments) //NOSONAR
+    public static function __callStatic($name, $arguments) // NOSONAR
     {
         return $name;
     }

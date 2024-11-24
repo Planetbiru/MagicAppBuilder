@@ -63,7 +63,7 @@ class PicoUploadFile
      * @param array $arguments The arguments passed to the method; typically unused in getter methods.
      * @return mixed The value of the requested property if it exists; otherwise, an instance of `PicoUploadFileContainer`.
      */
-    public function __call($method, $arguments) //NOSONAR
+    public function __call($method, $arguments) // NOSONAR
     {
         if (strncasecmp($method, "get", 3) === 0) {
             $var = substr($method, 3);

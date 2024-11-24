@@ -15,7 +15,7 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoSpecification //NOSONAR
+class PicoSpecification // NOSONAR
 {
     const LOGIC_AND = "and";
     const LOGIC_OR  = "or";

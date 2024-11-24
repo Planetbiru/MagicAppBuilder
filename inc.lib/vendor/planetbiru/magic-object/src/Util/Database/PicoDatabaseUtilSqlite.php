@@ -42,7 +42,7 @@ use PDO;
  * @package MagicObject\Util\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface //NOSONAR
+class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabaseUtilInterface // NOSONAR
 {
 
     /**
@@ -82,8 +82,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $pKeys = $tableInfo->getPrimaryKeys();
 
-        $pKeyArr = [];
-        $pKeyArrUsed = [];
+        $pKeyArr = array();
+        $pKeyArrUsed = array();
         if(isset($pKeys) && is_array($pKeys) && !empty($pKeys))
         {
             $pkVals = array_values($pKeys);
@@ -150,7 +150,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     private function getPkeyArrayFinal($pKeyArr, $pKeyArrUsed)
     {
-        $pKeyArrFinal = [];
+        $pKeyArrFinal = array();
         foreach($pKeyArr as $v)
         {
             if(!in_array($v, $pKeyArrUsed))
@@ -235,7 +235,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $stmt = $database->query("PRAGMA table_info($tableName)");
 
         // Fetch and display the column details
-        $rows = [];
+        $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $rows[] = array(
                 "Field" => $row['name'],
@@ -266,8 +266,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
     {
-        $query = [];
-        $columns = [];
+        $query = array();
+        $columns = array();
         if($dropIfExists)
         {
             $query[] = "-- DROP TABLE IF EXISTS $tableName;";
@@ -334,7 +334,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function createColumn($column)
     {
-        $col = [];
+        $col = array();
         $col[] = "\t";
         $col[] = "".$column[parent::KEY_NAME]."";
         $col[] = $column['type'];
@@ -462,7 +462,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             $databaseTarget->connect();
             $tables = $config->getTable();
 
-            $existingTables = [];
+            $existingTables = array();
             foreach($tables as $tb)
             {
                 $existingTables[] = $tb->getTarget();

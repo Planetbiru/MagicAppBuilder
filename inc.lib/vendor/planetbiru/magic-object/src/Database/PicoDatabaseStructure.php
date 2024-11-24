@@ -2,7 +2,6 @@
 namespace MagicObject\Database;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\MandatoryTableNameException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 
@@ -122,13 +121,13 @@ class PicoDatabaseStructure
      * @param string $queryString The string to be parsed.
      * @param string $parameter The parameter name for error reporting.
      * @return array The parsed key-value pairs.
-     * @throws InvalidAnnotationException If the annotation is invalid.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
     private function parseKeyValue($reflexClass, $queryString, $parameter)
     {
         try {
             return $reflexClass->parseKeyValue($queryString);
-        } catch (InvalidQueryInputException $e) {
+        } catch (InvalidAnnotationException $e) {
             throw new InvalidAnnotationException("Invalid annotation @" . $parameter);
         }
     }

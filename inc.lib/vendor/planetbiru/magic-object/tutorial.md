@@ -1508,11 +1508,11 @@ $cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true, true);
 $databaseCredentials = new PicoDatabaseCredentials($cfg->getDatabase());
 
 $database = new PicoDatabase($databaseCredentials, 
-    function($sql, $type) //NOSONAR
+    function($sql, $type) // NOSONAR
     {
         // callback when execute query that modify data
     }, 
-    function($sql) //NOSONAR
+    function($sql) // NOSONAR
     {
         // callback when execute all query
     }
@@ -3796,7 +3796,7 @@ class SpecificationUtil
      * $@param array|null $additional
      * @return PicoSpecification
      */
-    public static function createSongSpecification($inputGet, $additional = null) //NOSONAR
+    public static function createSongSpecification($inputGet, $additional = null) // NOSONAR
     {
         $spesification = new PicoSpecification();
 
@@ -4017,7 +4017,7 @@ class SpecificationUtil
      * $@param array|null $additional
      * @return PicoSpecification
      */
-    public static function createSongDraftSpecification($inputGet, $additional = null) //NOSONAR
+    public static function createSongDraftSpecification($inputGet, $additional = null) // NOSONAR
     {
         $spesification = new PicoSpecification();
 

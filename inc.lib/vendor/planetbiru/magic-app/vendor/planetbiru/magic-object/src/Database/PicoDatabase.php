@@ -110,9 +110,9 @@ class PicoDatabase // NOSONAR
     {
         $database = new self(new SecretObject());
         $database->databaseConnection = $pdo;
-        $database->databaseType = $database->getDbType($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+        $database->databaseType = self::getDbType($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+        $database->databaseCredentials = self::getDatabaseCredentialsFromPdo($pdo);
         $database->connected = true;
-        $database->databaseCredentials = $database->getDatabaseCredentialsFromPdo($pdo);
         return $database;
     }
 
@@ -129,7 +129,7 @@ class PicoDatabase // NOSONAR
      * 
      * @throws PDOException If there is an error with the PDO query or connection.
      */
-    private function getDatabaseCredentialsFromPdo($pdo)
+    private static function getDatabaseCredentialsFromPdo($pdo)
     {
         // Get the driver name (e.g., mysql, pgsql, sqlite)
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
@@ -152,38 +152,19 @@ class PicoDatabase // NOSONAR
         $timezone = null;
 
         // Determine the database type
-        $dbType = $this->getDbType($driver);
+        $dbType = self::getDbType($driver);
         
         // Retrieve the schema and time zone based on the database type
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // For PostgreSQL, fetch the current schema and time zone using queries
             $stmt = $pdo->query('SELECT current_schema()');
             $schema = $stmt->fetchColumn(); // Fetch the schema name
-            
-            $stmtTimezone = $pdo->query('SHOW timezone');
-            $systemTimeZone = $stmtTimezone->fetchColumn(); // Fetch the time zone
-
-            $timezone = $this->pgsqlToPhpTimezone($systemTimeZone);
+            $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
         }
         elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             // For MySQL, the schema is the same as the database name
             $schema = $databaseName; // MySQL schema is the database name
-            
-            // Retrieve the global time zone from MySQL
-            $stmtTimezone = $pdo->query('SELECT @@global.time_zone');
-            $timezone = $stmtTimezone->fetchColumn(); // Fetch the global time zone
-
-            // If the time zone is set to 'SYSTEM', retrieve the system's time zone and convert it
-            if ($timezone == 'SYSTEM') {
-                $stmtSystemTimeZone = $pdo->query('SELECT @@system_time_zone');
-                $systemTimeZone = $stmtSystemTimeZone->fetchColumn();
-
-                // Convert MySQL system time zone to PHP-compatible time zone (e.g., 'Asia/Jakarta')
-                // This conversion may require a lookup table, as MySQL system time zones
-                // (e.g., 'CST', 'PST') are not directly equivalent to PHP time zones (e.g., 'Asia/Jakarta').
-                // Here, we will simply return the system time zone as a placeholder:
-                $timezone = $this->mysqlToPhpTimezone($systemTimeZone);
-            }
+            $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
         }
         else {
             // For other drivers, set schema and time zone to null (or handle it as needed)
@@ -205,163 +186,98 @@ class PicoDatabase // NOSONAR
     }
 
     /**
-     * Map MySQL system time zone or abbreviations like 'WIB' to a valid PHP time zone.
+     * Retrieves the timezone offset from the database.
      *
-     * This function converts time zone abbreviations (like 'WIB', 'WITA', 'WIT') or system time zones
-     * to a recognized PHP time zone format (e.g., 'Asia/Jakarta').
+     * This function detects the database type (MySQL, MariaDB, or PostgreSQL) from the given PDO connection
+     * and executes the appropriate query to determine the timezone offset from UTC. It returns the
+     * offset as a string in the format "+HH:MM" or "-HH:MM". If the database type is unsupported or
+     * an error occurs, it defaults to "00:00".
      *
-     * @param string $timezoneAbbr The time zone abbreviation or system time zone (e.g., 'WIB', 'SYSTEM').
-     * @return string|null Returns a PHP-compatible time zone (e.g., 'Asia/Jakarta') or null if not recognized.
+     * @param PDO $pdo The PDO connection object.
+     * @return string The timezone offset as a string (e.g., "+08:00", "-05:30"), or "00:00" on failure.
      */
-    private function mysqlToPhpTimezone($timezoneAbbr)
+    private static function getTimeZoneOffset($pdo)
     {
-        $timezoneMapping = [
-            // Indonesia
-            'WIB'  => 'Asia/Jakarta',   // Western Indonesia Time (e.g., Jakarta, Bali)
-            'WITA' => 'Asia/Makassar',  // Central Indonesia Time (e.g., Bali, Sulawesi)
-            'WIT'  => 'Asia/Jayapura',  // Eastern Indonesia Time (e.g., Papua)
+        $defaultValue = '00:00';
+        try {
+            // Detect the database driver
+            $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-            // Common USA Time Zones
-            'PST'  => 'America/Los_Angeles', // Pacific Standard Time (Standard Time)
-            'PDT'  => 'America/Los_Angeles', // Pacific Daylight Time (Daylight Saving Time)
-            'MST'  => 'America/Denver',      // Mountain Standard Time
-            'MDT'  => 'America/Denver',      // Mountain Daylight Time
-            'CST'  => 'America/Chicago',     // Central Standard Time
-            'CDT'  => 'America/Chicago',     // Central Daylight Time
-            'EST'  => 'America/New_York',    // Eastern Standard Time
-            'EDT'  => 'America/New_York',    // Eastern Daylight Time
-            'AKST' => 'America/Anchorage',   // Alaska Standard Time
-            'AKDT' => 'America/Anchorage',   // Alaska Daylight Time
-            'HST'  => 'Pacific/Honolulu',    // Hawaii Standard Time
+            // Map the driver to a recognized database type
+            $dbType = self::getDbType($driver);
 
-            // United Kingdom
-            'GMT'  => 'Europe/London',      // Greenwich Mean Time (Standard Time)
-            'BST'  => 'Europe/London',      // British Summer Time (Daylight Saving Time)
+            // Prepare the query based on the database type
+            if ($dbType === PicoDatabaseType::DATABASE_TYPE_PGSQL) {
+                // Query to retrieve timezone offset in PostgreSQL
+                $query = "SELECT (EXTRACT(TIMEZONE FROM NOW()) / 3600)::TEXT || ':00' AS offset";
+            } elseif (
+                $dbType === PicoDatabaseType::DATABASE_TYPE_MYSQL ||
+                $dbType === PicoDatabaseType::DATABASE_TYPE_MARIADB
+            ) {
+                // Query to retrieve timezone offset in MySQL or MariaDB
+                $query = "SELECT TIMEDIFF(NOW(), UTC_TIMESTAMP()) AS offset";
+            } else {
+                // Return default offset for unsupported database types
+                return $defaultValue;
+            }
 
-            // Central Europe
-            'CET'  => 'Europe/Paris',       // Central European Time
-            'CEST' => 'Europe/Paris',       // Central European Summer Time (Daylight Saving Time)
+            // Execute the query and fetch the result
+            $stmt = $pdo->query($query);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Central Asia and Russia
-            'MSK'  => 'Europe/Moscow',      // Moscow Standard Time
-            'MSD'  => 'Europe/Moscow',      // Moscow Daylight Time (not used anymore)
-
-            // Australia
-            'AEST' => 'Australia/Sydney',   // Australian Eastern Standard Time
-            'AEDT' => 'Australia/Sydney',   // Australian Eastern Daylight Time
-            'ACST' => 'Australia/Adelaide', // Australian Central Standard Time
-            'ACDT' => 'Australia/Adelaide', // Australian Central Daylight Time
-            'AWST' => 'Australia/Perth',    // Australian Western Standard Time
-
-            // Africa
-            'CAT'  => 'Africa/Harare',      // Central Africa Time
-            'EAT'  => 'Africa/Nairobi',     // East Africa Time
-            'WAT'  => 'Africa/Algiers',     // West Africa Time
-
-            // India
-            'IST'  => 'Asia/Kolkata',       // Indian Standard Time
-
-            // China and East Asia
-            'CST'  => 'Asia/Shanghai',      // China Standard Time
-            'JST'  => 'Asia/Tokyo',         // Japan Standard Time
-            'KST'  => 'Asia/Seoul',         // Korea Standard Time
-
-            // Other time zones
-            'UTC'  => 'UTC',                // Coordinated Universal Time
-            'Z'    => 'UTC',                // Zulu time (same as UTC)
-            'ART'  => 'Africa/Argentina',   // Argentina Time
-            'NFT'  => 'Pacific/Norfolk',    // Norfolk Time Zone (Australia)
-
-            // Time zones used in specific areas
-            'NST'  => 'Asia/Kolkata',       // Newfoundland Standard Time (if used as an abbreviation)
-        ];
-
-        // Return the mapped PHP time zone or null if not found
-        return isset($timezoneMapping[$timezoneAbbr]) ? $timezoneMapping[$timezoneAbbr] : null;
+            // Return the offset value if available
+            return isset($result['offset']) ? $result['offset'] : $defaultValue;
+        } catch (Exception $e) {
+            // Handle any exceptions and return the default offset
+            return $defaultValue;
+        }
     }
 
     /**
-     * Converts a PostgreSQL timezone string to a PHP-compatible timezone identifier.
+     * Converts a timezone offset string to a corresponding PHP timezone name.
      *
-     * @param string $pgsqlTimezone The PostgreSQL timezone string (e.g., from SHOW timezone).
-     * @return string|null The PHP timezone identifier or null if no match is found.
+     * This method takes a timezone offset string (e.g., "+08:00" or "-05:30") and computes
+     * the total offset in seconds. It then attempts to map the offset to a standard PHP 
+     * timezone name. If no matching timezone is found, it falls back to returning a 
+     * UTC-based timezone string in the same offset format.
+     *
+     * Examples:
+     * - Input: "+07:00" -> Output: "Asia/Jakarta" (if mapping exists).
+     * - Input: "-05:30" -> Output: "UTC-05:30" (fallback if no mapping exists).
+     *
+     * @param string $offset The timezone offset string (e.g., "+07:00", "-05:30").
+     * @return string The corresponding PHP timezone name, or a fallback UTC offset string (e.g., "UTC+07:00").
      */
-    private function pgsqlToPhpTimezone($pgsqlTimezone)
+    private static function convertOffsetToTimeZone($offset)
     {
-        // Comprehensive map of PostgreSQL timezones to PHP-compatible timezone identifiers
-        $timezoneMap = [
-            // UTC and variants
-            'UTC' => 'UTC',
-            'Etc/UTC' => 'UTC',
-            'Etc/GMT' => 'UTC',
+        try {
+            // Extract the sign ('+' or '-') from the offset
+            $sign = substr($offset, 0, 1); // Get the first character ('+' or '-')
+            
+            // Split the offset into hours and minutes (e.g., "+08:00" -> [8, 0])
+            $parts = explode(':', substr($offset, 1)); // Remove the sign and split
+            $hours = (int)$parts[0]; // Parse the hours
+            $minutes = isset($parts[1]) ? (int)$parts[1] : 0; // Parse the minutes if available
+            
+            // Calculate the total offset in seconds
+            $totalOffsetSeconds = ($hours * 3600) + ($minutes * 60);
+            if ($sign === '-') {
+                $totalOffsetSeconds = -$totalOffsetSeconds; // Negate if the offset is negative
+            }
 
-            // Common regions
-            'US/Eastern' => 'America/New_York',
-            'US/Central' => 'America/Chicago',
-            'US/Mountain' => 'America/Denver',
-            'US/Pacific' => 'America/Los_Angeles',
-            'US/Alaska' => 'America/Anchorage',
-            'US/Hawaii' => 'Pacific/Honolulu',
-            'America/Chicago' => 'America/Chicago',
-            'America/New_York' => 'America/New_York',
-            'America/Los_Angeles' => 'America/Los_Angeles',
-            'America/Denver' => 'America/Denver',
-            'America/Anchorage' => 'America/Anchorage',
-            'Pacific/Honolulu' => 'Pacific/Honolulu',
+            // Attempt to retrieve the PHP timezone name using the offset
+            $timeZone = timezone_name_from_abbr("", $totalOffsetSeconds, 0);
 
-            // European timezones
-            'Europe/London' => 'Europe/London',
-            'Europe/Berlin' => 'Europe/Berlin',
-            'Europe/Paris' => 'Europe/Paris',
-            'Europe/Madrid' => 'Europe/Madrid',
-            'Europe/Rome' => 'Europe/Rome',
-            'Europe/Moscow' => 'Europe/Moscow',
+            // Fallback: if no matching timezone is found, use a UTC-based string
+            if ($timeZone === false) {
+                $timeZone = "UTC" . $offset; // Example: "UTC+08:00"
+            }
 
-            // Asia timezones
-            'Asia/Tokyo' => 'Asia/Tokyo',
-            'Asia/Shanghai' => 'Asia/Shanghai',
-            'Asia/Kolkata' => 'Asia/Kolkata',
-            'Asia/Dubai' => 'Asia/Dubai',
-            'Asia/Singapore' => 'Asia/Singapore',
-            'Asia/Hong_Kong' => 'Asia/Hong_Kong',
-            'Asia/Seoul' => 'Asia/Seoul',
-
-            // Australia timezones
-            'Australia/Sydney' => 'Australia/Sydney',
-            'Australia/Melbourne' => 'Australia/Melbourne',
-            'Australia/Brisbane' => 'Australia/Brisbane',
-            'Australia/Perth' => 'Australia/Perth',
-            'Australia/Adelaide' => 'Australia/Adelaide',
-
-            // Africa timezones
-            'Africa/Johannesburg' => 'Africa/Johannesburg',
-            'Africa/Cairo' => 'Africa/Cairo',
-            'Africa/Lagos' => 'Africa/Lagos',
-
-            // South America
-            'America/Sao_Paulo' => 'America/Sao_Paulo',
-            'America/Argentina/Buenos_Aires' => 'America/Argentina/Buenos_Aires',
-            'America/Santiago' => 'America/Santiago',
-
-            // Additional aliases or abbreviations
-            'EST' => 'America/New_York',
-            'CST' => 'America/Chicago',
-            'MST' => 'America/Denver',
-            'PST' => 'America/Los_Angeles',
-        ];
-
-        // Check for exact matches in the map
-        if (isset($timezoneMap[$pgsqlTimezone])) {
-            return $timezoneMap[$pgsqlTimezone];
+            return $timeZone;
+        } catch (Exception $e) {
+            // Handle any exceptions by returning an error message
+            return "UTC+00:00";
         }
-
-        // Use PHP's timezone database as a fallback for direct matches
-        if (in_array($pgsqlTimezone, timezone_identifiers_list(), true)) {
-            return $pgsqlTimezone;
-        }
-
-        // Return null if no match is found
-        return null;
     }
 
     /**
@@ -397,7 +313,7 @@ class PicoDatabase // NOSONAR
         if ($databaseTimeZone !== null && !empty($databaseTimeZone)) {
             date_default_timezone_set($this->databaseCredentials->getTimeZone());
         }
-        $this->databaseType = $this->getDbType($this->databaseCredentials->getDriver());
+        $this->databaseType = self::getDbType($this->databaseCredentials->getDriver());
         if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
             return $this->connectSqlite();
@@ -498,7 +414,7 @@ class PicoDatabase // NOSONAR
      *                - `PicoDatabaseType::DATABASE_TYPE_MARIADB`
      *                - `PicoDatabaseType::DATABASE_TYPE_MYSQL`
      */
-    private function getDbType($databaseType) // NOSONAR
+    private static function getDbType($databaseType) // NOSONAR
     {
         if(stripos($databaseType, 'sqlite') !== false)
         {

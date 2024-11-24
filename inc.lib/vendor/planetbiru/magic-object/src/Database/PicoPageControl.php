@@ -2,6 +2,7 @@
 
 namespace MagicObject\Database;
 use MagicObject\Pagination\PicoPagination;
+use MagicObject\SecretObject;
 
 /**
  * Class PicoPageControl
@@ -68,6 +69,27 @@ class PicoPageControl
     private $last;
 
     /**
+     * Template for rendering a specific page number in pagination.
+     *
+     * @var string
+     */
+    private $formatPageNumber = '<span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>';
+
+    /**
+     * Template for rendering navigation buttons like "next" or "prev" in pagination.
+     *
+     * @var string
+     */
+    private $formatStepOne = '<span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>';
+
+    /**
+     * Template for rendering navigation buttons like "first" or "last" in pagination.
+     *
+     * @var string
+     */
+    private $formatStartEnd = '<span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>';
+
+    /**
      * Constructor for the PicoPageControl class.
      *
      * Initializes pagination control with page data and optional parameter name and path.
@@ -87,6 +109,7 @@ class PicoPageControl
         {
             $this->path = $path;
         }
+        
     }
 
     /**
@@ -106,18 +129,30 @@ class PicoPageControl
     /**
      * Sets custom navigation symbols for pagination buttons.
      *
-     * @param string|null $prev Button symbol for the previous page (optional).
-     * @param string|null $next Button symbol for the next page (optional).
-     * @param string|null $first Button symbol for the first page (optional).
-     * @param string|null $last Button symbol for the last page (optional).
+     * This method allows you to define custom symbols for navigation buttons,
+     * including the previous, next, first, and last page buttons. Only non-null
+     * values will be assigned to their respective properties.
+     *
+     * @param string|null $prev The symbol to display for the "previous" page button (optional).
+     * @param string|null $next The symbol to display for the "next" page button (optional).
+     * @param string|null $first The symbol to display for the "first" page button (optional).
+     * @param string|null $last The symbol to display for the "last" page button (optional).
      * @return self Returns the current instance for method chaining.
      */
     public function setNavigation($prev = null, $next = null, $first = null, $last = null)
     {
-        $this->prev = $prev;
-        $this->next = $next;
-        $this->first = $first;
-        $this->last = $last;
+        if (isset($prev)) {
+            $this->prev = $prev;
+        }
+        if (isset($next)) {
+            $this->next = $next;
+        }
+        if (isset($first)) {
+            $this->first = $first;
+        }
+        if (isset($last)) {
+            $this->last = $last;
+        }
         return $this;
     }
 
@@ -132,6 +167,200 @@ class PicoPageControl
     }
 
     /**
+     * Gets the template for rendering specific page numbers.
+     *
+     * @return string The current format for rendering page numbers.
+     */
+    public function getFormatPageNumber()
+    {
+        return $this->formatPageNumber;
+    }
+
+    /**
+     * Sets the template for rendering specific page numbers.
+     *
+     * This format is used to generate the HTML for individual page numbers in the pagination.
+     * It includes a span with the `page-selector-number` class and a link (`<a>`) to the page.
+     * 
+     * Placeholders:
+     * - `%s`: Additional CSS classes, e.g., `page-selected`.
+     * - `%d`: Page number for the `data-page-number` attribute.
+     * - `%s`: URL for the link (`href` attribute).
+     * - `%s`: Text content of the link (usually the page number).
+     *
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * will be
+     * ```html
+     * <span class="page-selector page-selector-number page-selected" data-page-number="3">
+     *   <a href="/path?page=3">3</a>
+     * </span>
+     * ```
+     * 
+     * @param string $formatPageNumber The new format for rendering page numbers.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setFormatPageNumber($formatPageNumber)
+    {
+        $this->formatPageNumber = $formatPageNumber;
+        return $this;
+    }
+
+    /**
+     * Gets the template for rendering step navigation buttons.
+     *
+     * @return string The current format for step navigation buttons.
+     */
+    public function getFormatStepOne()
+    {
+        return $this->formatStepOne;
+    }
+
+    /**
+     * Sets the template for rendering step navigation buttons.
+     *
+     * This format generates the HTML for step navigation buttons, such as "previous" or "next."
+     * It includes a span with the `page-selector-step-one` class and a link (`<a>`) to the target page.
+     * 
+     * Placeholders:
+     * - `%s`: Additional CSS classes (e.g., active state).
+     * - `%d`: Page number for the `data-page-number` attribute.
+     * - `%s`: URL for the link (`href` attribute).
+     * - `%s`: Symbol or text for the button (e.g., "Next" or "Prev").
+     *
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * will be
+     * ```html
+     * <span class="page-selector page-selector-step-one" data-page-number="4">
+     *   <a href="/path?page=4">Next</a>
+     * </span>
+     * ```
+     *
+     * @param string $formatStepOne The new format for step navigation buttons.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setFormatStepOne($formatStepOne)
+    {
+        $this->formatStepOne = $formatStepOne;
+        return $this;
+    }
+
+    /**
+     * Gets the template for rendering end navigation buttons.
+     *
+     * @return string The current format for end navigation buttons.
+     */
+    public function getFormatStartEnd()
+    {
+        return $this->formatStartEnd;
+    }
+
+    /**
+     * Sets the template for rendering end navigation buttons.
+     *
+     *
+     * This format generates the HTML for step navigation buttons, such as "previous" or "next."
+     * It includes a span with the `page-selector-step-one` class and a link (`<a>`) to the target page.
+     * 
+     * Placeholders:
+     * - `%s`: Additional CSS classes (e.g., active state).
+     * - `%d`: Page number for the `data-page-number` attribute.
+     * - `%s`: URL for the link (`href` attribute).
+     * - `%s`: Symbol or text for the button (e.g., "Start" or "End").
+     *
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * will be
+     * ```html
+     * <span class="page-selector page-selector-end" data-page-number="4">
+     *   <a href="/path?page=4">End</a>
+     * </span>
+     * ```
+     *
+     * @param string $formatStartEnd The new format for end navigation buttons.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setFormatStartEnd($formatStartEnd)
+    {
+        $this->formatStartEnd = $formatStartEnd;
+        return $this;
+    }
+
+    /**
+     * Sets the button format templates for pagination controls.
+     *
+     * This method allows you to set custom templates for page numbers, step buttons 
+     * and start/end buttons.
+     *
+     * @param string $pageNumberFormat The format template for rendering page numbers.
+     * 
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * @param string $stepOneFormat The format template for rendering step buttons.
+     * 
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * @param string $startEndFormat The format template for rendering start and end buttons.
+     * 
+     * Example:
+     * ```html
+     * <span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>
+     * ```
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setButtonFormat($pageNumberFormat, $stepOneFormat, $startEndFormat)
+    {
+        $this->formatPageNumber = $pageNumberFormat;
+        $this->formatStepOne = $stepOneFormat;
+        $this->formatStartEnd = $startEndFormat;
+        return $this;
+    }
+
+    /**
+     * Applies the pagination configuration to the current instance.
+     *
+     * This method accepts a configuration object, typically sourced from a Yaml file, 
+     * and applies its settings to the pagination control. The object contains the following properties:
+     *
+     * @param SecretObject $paginationConfig The configuration object containing pagination settings.
+     *   - `button_prev`: Symbol for the "previous" button.
+     *   - `button_next`: Symbol for the "next" button.
+     *   - `button_first`: Symbol for the "first" button.
+     *   - `button_last`: Symbol for the "last" button.
+     *   - `template_page_number`: Format for page number buttons.
+     *   - `template_step_one`: Format for step-one navigation buttons.
+     *   - `template_start_end`: Format for start/end navigation buttons.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setPaginationConfig($paginationConfig)
+    {
+        return $this
+            ->setNavigation(
+                $paginationConfig->getButtonPrev(),
+                $paginationConfig->getButtonNext(),
+                $paginationConfig->getButtonFirst(),
+                $paginationConfig->getButtonLast()
+            )
+            ->setButtonFormat(
+                $paginationConfig->getTemplatePageNumber(),
+                $paginationConfig->getTemplateStepOne(),
+                $paginationConfig->getTemplateStartEnd()
+            );
+    }
+
+    /**
      * Generates the HTML for pagination controls.
      *
      * @return string HTML representation of the pagination controls.
@@ -139,20 +368,18 @@ class PicoPageControl
     public function __toString()
     {
         $lines = array();
-        $format1 = '<span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>';
-        $format2 = '<span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>';
-        $format3 = '<span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>';
+
         $lastNavPg = 1;
 
         if(isset($this->first) && $this->pageData->getPageNumber() > 2)
         {
-            $lines[] = sprintf($format3, '', 1, PicoPagination::getPageUrl(1, $this->parameterName, $this->path), $this->first);
+            $lines[] = sprintf($this->formatStartEnd, '', 1, PicoPagination::getPageUrl(1, $this->parameterName, $this->path), $this->first);
         }
 
         if(isset($this->prev) && $this->pageData->getPageNumber() > 1)
         {
             $prevPg = $this->pageData->getPageNumber() - 1;
-            $lines[] = sprintf($format2, '', $prevPg, PicoPagination::getPageUrl($prevPg, $this->parameterName, $this->path), $this->prev);
+            $lines[] = sprintf($this->formatStepOne, '', $prevPg, htmlspecialchars(PicoPagination::getPageUrl($prevPg, $this->parameterName, $this->path)), $this->prev);
         }
 
         $i = 0;
@@ -169,20 +396,20 @@ class PicoPageControl
             {
                 $selected = ' page-last'.$selected;
             }
-            $lines[] = sprintf($format1, $selected, $lastNavPg, PicoPagination::getPageUrl($lastNavPg, $this->parameterName, $this->path), $lastNavPg);
+            $lines[] = sprintf($this->formatPageNumber, $selected, $lastNavPg, htmlspecialchars(PicoPagination::getPageUrl($lastNavPg, $this->parameterName, $this->path)), $lastNavPg);
             $i++;
         }
 
         if(isset($this->next) && $this->pageData->getPageNumber() < ($this->pageData->getTotalPage()))
         {
             $nextPg = $this->pageData->getPageNumber() + 1;
-            $lines[] = sprintf($format2, '', $nextPg, PicoPagination::getPageUrl($nextPg, $this->parameterName, $this->path), $this->next);
+            $lines[] = sprintf($this->formatStepOne, '', $nextPg, htmlspecialchars(PicoPagination::getPageUrl($nextPg, $this->parameterName, $this->path)), $this->next);
         }
 
         if(isset($this->last) && $this->pageData->getPageNumber() < ($this->pageData->getTotalPage() - 1))
         {
             $lastPg = $this->pageData->getTotalPage();
-            $lines[] = sprintf($format3, '', $lastPg, PicoPagination::getPageUrl($lastPg, $this->parameterName, $this->path), $this->last);
+            $lines[] = sprintf($this->formatStartEnd, '', $lastPg, htmlspecialchars(PicoPagination::getPageUrl($lastPg, $this->parameterName, $this->path)), $this->last);
         }
 
         return implode('', $lines);

@@ -3,7 +3,6 @@
 namespace MagicObject;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Util\PicoEnvironmentVariable;
 use MagicObject\Secret\PicoSecret;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
@@ -40,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
  * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
-class SecretObject extends stdClass //NOSONAR
+class SecretObject extends stdClass // NOSONAR
 {
     const JSON = 'JSON';
     const YAML = 'Yaml';
@@ -56,59 +55,84 @@ class SecretObject extends stdClass //NOSONAR
 
     /**
      * List of properties to be encrypted when calling SET.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var string[]
      */
-    private $_encryptInProperties = array(); //NOSONAR
+    private $_encryptInProperties = array(); // NOSONAR
 
     /**
      * Class parameters.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    protected $_classParams = array(); //NOSONAR
+    protected $_classParams = array(); // NOSONAR
 
     /**
      * NULL properties.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    protected $_nullProperties = array(); //NOSONAR
+    protected $_nullProperties = array(); // NOSONAR
 
     /**
      * List of properties to be decrypted when calling GET.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var string[]
      */
-    private $_decryptOutProperties = array(); //NOSONAR
+    private $_decryptOutProperties = array(); // NOSONAR
 
     /**
      * List of properties to be encrypted when calling GET.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var string[]
      */
-    private $_encryptOutProperties = array(); //NOSONAR
+    private $_encryptOutProperties = array(); // NOSONAR
 
     /**
      * List of properties to be decrypted when calling SET.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var string[]
      */
-    private $_decryptInProperties = array(); //NOSONAR
+    private $_decryptInProperties = array(); // NOSONAR
 
     /**
      * Indicates if the object is read-only.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var boolean
      */
-    private $_readonly = false; //NOSONAR
+    private $_readonly = false; // NOSONAR
 
     /**
-     * Secure function to get encryption key
+     * Secure function to get encryption key.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var callable
      */
-    private $_secureFunction = null; //NOSONAR
+    private $_secureFunction = null; // NOSONAR
+
 
     /**
      * Constructor for initializing the object with data.
@@ -152,8 +176,7 @@ class SecretObject extends stdClass //NOSONAR
      *
      * @return void
      *
-     * @throws InvalidAnnotationException If an invalid annotation is encountered 
-     *                                    while processing class parameters or properties.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
     private function _objectInfo()
     {
@@ -167,7 +190,7 @@ class SecretObject extends stdClass //NOSONAR
             try {
                 $vals = $reflexClass->parseKeyValue($paramValue);
                 $this->_classParams[$paramName] = $vals;
-            } catch (InvalidQueryInputException $e) {
+            } catch (InvalidAnnotationException $e) {
                 throw new InvalidAnnotationException("Invalid annotation @" . $paramName);
             }
         }
@@ -527,7 +550,7 @@ class SecretObject extends stdClass //NOSONAR
         $iv = substr($ivHashCiphertext, 0, 16);
         $hash = substr($ivHashCiphertext, 16, 32);
         $ciphertext = substr($ivHashCiphertext, 48);
-        if (!hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash))
+        if (!$hash || !hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash))
         {
             return null;
         }

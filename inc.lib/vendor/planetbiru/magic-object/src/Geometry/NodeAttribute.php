@@ -20,7 +20,7 @@ class NodeAttribute
      *
      * @var string[]
      */
-    private $values = [];
+    private $values = array();
 
     /**
      * Constructor to initialize the NodeAttribute with values.
@@ -42,7 +42,7 @@ class NodeAttribute
      */
     public function __toString()
     {
-        $attributes = [];
+        $attributes = array();
         if (isset($this->values) && is_array($this->values)) {
             foreach ($this->values as $key => $value) {
                 $attributes[] = $key . '="' . htmlspecialchars($value) . '"';

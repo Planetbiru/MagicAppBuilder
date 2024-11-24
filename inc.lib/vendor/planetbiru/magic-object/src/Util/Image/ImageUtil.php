@@ -507,7 +507,7 @@ class ImageUtil
      * @param int $textAlignment The alignment of the text (left, center, right).
      * @throws ImageUtilException If the specified font is not found or if an error occurs.
      */
-    public function writeText($text, $point, $size, $angle, $font, $maxwidth = 0, $rgbAr = null, $textAlignment = 1) //NOSONAR
+    public function writeText($text, $point, $size, $angle, $font, $maxwidth = 0, $rgbAr = null, $textAlignment = 1) // NOSONAR
     {
         if (!is_readable($font)) {
             throw new ImageUtilException('Error: The specified font not found');

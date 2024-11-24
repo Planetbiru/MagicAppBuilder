@@ -32,7 +32,7 @@ class EntityUtil
             return [];
         }
         $columns = $tableInfo->getColumns();
-        $propertyColumns = [];
+        $propertyColumns = array();
         foreach($columns as $prop=>$column)
         {
             $propertyColumns[$prop] = $column['name'];
@@ -54,7 +54,7 @@ class EntityUtil
             return [];
         }
         $joinColumns = $tableInfo->getJoinColumns();
-        $propertyColumns = [];
+        $propertyColumns = array();
         foreach($joinColumns as $prop=>$column)
         {
             $propertyColumns[$prop] = $column['name'];
@@ -71,7 +71,7 @@ class EntityUtil
      */
     public static function getEntityData($data, $map)
     {
-        $newData = [];
+        $newData = array();
         if(isset($data))
         {
             if(is_array($data))
@@ -99,7 +99,7 @@ class EntityUtil
      */
     private static function fromArray($data, $map)
     {
-        $newData = [];
+        $newData = array();
         foreach($map as $key=>$value)
         {
             if(isset($data[$value]))
@@ -119,7 +119,7 @@ class EntityUtil
      */
     private static function fromStdClass($data, $map)
     {
-        $newData = [];
+        $newData = array();
         foreach($map as $key=>$value)
         {
             if(isset($data->{$value}))
@@ -139,7 +139,7 @@ class EntityUtil
      */
     private static function fromMagicObject($data, $map)
     {
-        $newData = [];
+        $newData = array();
         foreach($map as $key=>$value)
         {
             $newData[$key] = $data->get($value);

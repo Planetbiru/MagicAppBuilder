@@ -99,7 +99,7 @@ class PicoEntityGenerator
         $description = $this->getPropertyName($columnName);
         $type = $this->getDataType($typeMap, $columnType);
 
-        $docs = [];
+        $docs = array();
         $docStart = "\t/**";
         $docEnd = "\t */";
 
@@ -122,7 +122,7 @@ class PicoEntityGenerator
             $docs[] = "\t * @NotNull";
         }
 
-        $attrs = [];
+        $attrs = array();
         $attrs[] = "name=\"$columnName\"";
         $attrs[] = "type=\"$columnType\"";
         $length = $this->getDataLength($columnType);
@@ -267,7 +267,7 @@ class PicoEntityGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = [];
+        $attrs = array();
         if (is_array($rows)) {
             foreach ($rows as $row) {
                 $prop = $this->createProperty($typeMap, $row, $nonupdatables);
@@ -284,14 +284,19 @@ namespace ' . $this->baseNamespace . ';
 use MagicObject\MagicObject;
 
 /**
- * ' . $className . ' represents the entity for the table ' . $picoTableName . '.
- * You can join this entity to other entities using the @JoinColumn annotation.
+ * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ *
+ * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
- * @package ' . $this->baseNamespace . '
+ * 
+ * @package '.$this->baseNamespace.'
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=' . $prettify . ')
- * @Table(name="' . $picoTableName . '")
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
+ * @Table(name="'.$picoTableName.'")
  */
 class ' . $className . ' extends MagicObject
 {

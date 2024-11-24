@@ -38,14 +38,14 @@ class PicoSqlParser
      *
      * @var array
      */
-    private $typeList = [];
+    private $typeList = array();
 
     /**
      * Information about the parsed tables, including columns, data types, and primary keys.
      *
      * @var array
      */
-    private $tableInfo = [];
+    private $tableInfo = array();
 
     /**
      * Constructor to initialize the parser.
@@ -86,23 +86,23 @@ class PicoSqlParser
         $sql = $arr[0];
         
         $rg_tb = '/(create\s+table\s+if\s+not\s+exists|create\s+table)\s+(?<tb>.*)\s+\(/i';
-        $rg_fld = '/(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp .*)/i'; //NOSONAR
+        $rg_fld = '/(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp .*)/i'; // NOSONAR
         $rg_fld2 = '/(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/i';
         $rg_not_null = '/not\s+null/i';
         $rg_pk = '/primary\s+key/i';
         $rg_fld_def = '/default\s+(.+)/i';
-        $rg_pk2 = '/(PRIMARY|UNIQUE) KEY\s+[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/i'; //NOSONAR
+        $rg_pk2 = '/(PRIMARY|UNIQUE) KEY\s+[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/i'; // NOSONAR
 
         preg_match($rg_tb, $sql, $result);
         $tableName = $result['tb'];
 
-        $fldList = [];
+        $fldList = array();
         $primaryKey = null;
-        $columnList = [];
+        $columnList = array();
 
         preg_match_all($rg_fld, $sql, $matches);
         foreach ($matches[0] as $f) {
-            $rg_fld2_result = [];
+            $rg_fld2_result = array();
             preg_match($rg_fld2, $f, $rg_fld2_result);
             $dataType = $rg_fld2_result[2];
             $is_pk = false;
@@ -115,7 +115,7 @@ class PicoSqlParser
 
                 $def = null;
                 preg_match($rg_fld_def, $attr2, $def);
-                $comment = null; //NOSONAR
+                $comment = null; // NOSONAR
 
                 if ($def) {
                     $def = trim($def[1]);
@@ -148,7 +148,7 @@ class PicoSqlParser
             }
 
             if ($primaryKey !== null) {
-                foreach ($fldList as &$column) //NOSONAR
+                foreach ($fldList as &$column) // NOSONAR
                 {
                     if ($column[self::KEY_COLUMN_NAME] === $primaryKey) {
                         $column[self::KEY_PRIMARY_KEY] = true;
@@ -233,7 +233,7 @@ class PicoSqlParser
     public function parseAll($sql)
     {
         $sql = str_replace("`", "", $sql);
-        $inf = [];
+        $inf = array();
         $rg_tb = '/(create\s+table\s+if\s+not\s+exists|create\s+table)\s+(?<tb>.*)\s+\(/i';
         
         preg_match_all($rg_tb, $sql, $matches);

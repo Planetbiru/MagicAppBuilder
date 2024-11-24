@@ -25,7 +25,7 @@ use stdClass;
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoPageData //NOSONAR
+class PicoPageData // NOSONAR
 {
     const RESULT = 'result';
     const PAGEABLE = 'pageable';

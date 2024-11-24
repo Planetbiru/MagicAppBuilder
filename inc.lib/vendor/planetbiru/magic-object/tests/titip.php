@@ -25,10 +25,10 @@
      *               - instances of a specified class if the return type matches a class name.
      * 
      * @throws PDOException If there is an error executing the database query.
-     * @throws InvalidQueryInputException If there is no query to be executed.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      * @throws InvalidReturnTypeException If the return type specified is invalid.
      */
-    protected function executeNativeQuery() //NOSONAR
+    protected function executeNativeQuery() // NOSONAR
     {
         // Retrieve caller trace information
         $trace = debug_backtrace();
@@ -56,7 +56,7 @@
             $queryString = $matches ? $matches[1] : '';
             if(empty($queryString))
             {
-                throw new InvalidQueryInputException("No query found.\r\n".$docComment);
+                throw new InvalidAnnotationException("No query found.\r\n".$docComment);
             }
         }
 
@@ -80,7 +80,7 @@
             $returnType = $callerClassName;
         }
 
-        $params = [];
+        $params = array();
         $pageable = null;
         $sortable = null;
         try {
@@ -178,7 +178,7 @@
                         } 
                         else if($className == 'MagicObject') {
                             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-                            $ret = [];
+                            $ret = array();
                             foreach ($result as $row) {
                                 $ret[] = new MagicObject($row);
                             }

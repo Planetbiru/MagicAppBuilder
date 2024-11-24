@@ -53,7 +53,7 @@ class PicoYamlUtil
         $depth = 0;
         $iteIte = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
 
-        foreach ($iteIte as $ite) //NOSONAR
+        foreach ($iteIte as $ite) // NOSONAR
         {
             $d = $iteIte->getDepth();
             $depth = $d > $depth ? $d : $depth;

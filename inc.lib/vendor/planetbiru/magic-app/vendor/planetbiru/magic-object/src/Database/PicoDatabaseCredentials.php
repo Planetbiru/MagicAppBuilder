@@ -35,7 +35,7 @@ class PicoDatabaseCredentials extends SecretObject
      *
      * @var string
      */
-    protected $driver = 'mysql';
+    protected $driver;
 
     /**
      * Database file path for SQLite.

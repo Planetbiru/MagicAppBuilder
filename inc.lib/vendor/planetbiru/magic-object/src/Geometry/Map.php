@@ -19,7 +19,7 @@ class Map
      *
      * @var Area[]
      */
-    private $areas = [];
+    private $areas = array();
 
     /**
      * Constructor to initialize the Map with optional areas.

@@ -11,7 +11,6 @@ use MagicObject\Exceptions\EmptyResultException;
 use MagicObject\Exceptions\EntityException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidFilterException;
-use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\NoInsertableColumnException;
 use MagicObject\Exceptions\NoColumnMatchException;
 use MagicObject\Exceptions\NoDatabaseConnectionException;
@@ -297,7 +296,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param string $queryString The key-value string to parse
      * @param string $parameter The name of the parameter being parsed
      * @return array Parsed key-value pairs
-     * @throws InvalidAnnotationException If the query string is invalid
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
     private function parseKeyValue($reflexClass, $queryString, $parameter)
     {
@@ -305,7 +304,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             return $reflexClass->parseKeyValue($queryString);
         }
-        catch(InvalidQueryInputException $e)
+        catch(InvalidAnnotationException $e)
         {
             throw new InvalidAnnotationException("Invalid annotation @".$parameter);
         } 

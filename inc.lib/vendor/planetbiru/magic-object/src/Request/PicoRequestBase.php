@@ -18,38 +18,47 @@ use stdClass;
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/Request
  */
-class PicoRequestBase extends stdClass //NOSONAR
+class PicoRequestBase extends stdClass // NOSONAR
 {
     /**
      * Class parameters parsed from annotations.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var array
      */
-    private $classParams = array();
+    private $_classParams = array(); // NOSONAR
 
     /**
      * Flag to force input data to be scalar only.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var bool
      */
-    protected $forceScalar = false;
+    protected $_forceScalar = false; // NOSONAR
 
     /**
      * Flag for recursive data processing.
+     * 
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
      *
      * @var bool
      */
-    protected $_recursive = false;
+    protected $_recursive = false; // NOSONAR
 
     /**
      * Constructor to initialize the request handler and process class annotations.
      *
      * @param bool $forceScalar Indicates whether to accept only scalar values for data input.
-     * @throws InvalidAnnotationException If there are invalid annotations in the class.
+     * @throws InvalidAnnotationException If the annotations are invalid or cannot be parsed.
      */
     public function __construct($forceScalar = false)
     {
-        $this->forceScalar = $forceScalar;
+        $this->_forceScalar = $forceScalar;
         $jsonAnnot = new PicoAnnotationParser(get_class($this));
         $params = $jsonAnnot->getParameters();
         foreach($params as $paramName=>$paramValue)
@@ -59,7 +68,7 @@ class PicoRequestBase extends stdClass //NOSONAR
                 throw new InvalidAnnotationException("Invalid annotation @".$paramName);
             }
             $vals = $jsonAnnot->parseKeyValue($paramValue);
-            $this->classParams[$paramName] = $vals;
+            $this->_classParams[$paramName] = $vals;
         }
     }
 
@@ -246,7 +255,7 @@ class PicoRequestBase extends stdClass //NOSONAR
     {
         $ret = null;
 
-        if(($requireScalar || $this->forceScalar) && (isset($val) && !is_scalar($val)))
+        if(($requireScalar || $this->_forceScalar) && (isset($val) && !is_scalar($val)))
         {
             // If application require scalar but user give non-scalar, MagicObject will return null
             // It mean that application will not process invalid input type
@@ -284,7 +293,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * @param bool $nullIfEmpty Flag to return null if the value is empty.
      * @return mixed
      */
-    public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) //NOSONAR
+    public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) // NOSONAR
     {
         // add filter
         if($filter == PicoFilterConstant::FILTER_SANITIZE_EMAIL)
@@ -610,7 +619,7 @@ class PicoRequestBase extends stdClass //NOSONAR
      * @param array $params Parameters passed to the method.
      * @return mixed|null The result of the method call, or null if the method is not recognized.
      */
-    public function __call($method, $params) //NOSONAR
+    public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "countable", 9) === 0)
         {
@@ -720,9 +729,9 @@ class PicoRequestBase extends stdClass //NOSONAR
      */
     private function isSnake()
     {
-        return isset($this->classParams['JSON'])
-            && isset($this->classParams['JSON']['property-naming-strategy'])
-            && strcasecmp($this->classParams['JSON']['property-naming-strategy'], 'SNAKE_CASE') == 0
+        return isset($this->_classParams['JSON'])
+            && isset($this->_classParams['JSON']['property-naming-strategy'])
+            && strcasecmp($this->_classParams['JSON']['property-naming-strategy'], 'SNAKE_CASE') == 0
             ;
     }
 
@@ -749,9 +758,9 @@ class PicoRequestBase extends stdClass //NOSONAR
      */
     private function isPretty()
     {
-        return isset($this->classParams['JSON'])
-            && isset($this->classParams['JSON']['prettify'])
-            && strcasecmp($this->classParams['JSON']['prettify'], 'true') == 0
+        return isset($this->_classParams['JSON'])
+            && isset($this->_classParams['JSON']['prettify'])
+            && strcasecmp($this->_classParams['JSON']['prettify'], 'true') == 0
             ;
     }
 

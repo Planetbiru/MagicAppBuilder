@@ -41,7 +41,7 @@ class PicoDataLabels
      */
     public function generate()
     {
-        foreach ($this->data as $data) //NOSONAR
+        foreach ($this->data as $data) // NOSONAR
         {
             // Implementation for processing each data label goes here
         }

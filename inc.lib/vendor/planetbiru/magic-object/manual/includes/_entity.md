@@ -991,7 +991,7 @@ class SpecificationUtil
      * $@param array|null $additional
      * @return PicoSpecification
      */
-    public static function createSongSpecification($inputGet, $additional = null) //NOSONAR
+    public static function createSongSpecification($inputGet, $additional = null) // NOSONAR
     {
         $spesification = new PicoSpecification();
 
@@ -1212,7 +1212,7 @@ class SpecificationUtil
      * $@param array|null $additional
      * @return PicoSpecification
      */
-    public static function createSongDraftSpecification($inputGet, $additional = null) //NOSONAR
+    public static function createSongDraftSpecification($inputGet, $additional = null) // NOSONAR
     {
         $spesification = new PicoSpecification();
 
