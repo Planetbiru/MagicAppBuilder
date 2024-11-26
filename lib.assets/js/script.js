@@ -1185,10 +1185,11 @@ jQuery(function () {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     let workspace = modal.find('[name="workspace"]').val();
+    let php_path = modal.find('[name="php_path"]').val();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-update.php',
-      data: { workspace: workspace },
+      data: { workspace: workspace, php_path:php_path },
       success: function (data) {
         modal.modal('hide');
       }

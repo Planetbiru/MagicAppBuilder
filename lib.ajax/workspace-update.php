@@ -20,6 +20,7 @@ if(file_exists($builderConfigPath))
     $builderConfig->loadYamlFile($builderConfigPath, false, true, true);
 }
 $builderConfig->setWorkspaceDirectory($workspace);
+$builderConfig->setPhpPath($inputPost->getPhpPath());
 
 if(PicoStringUtil::startsWith($workspace, "./"))
 {

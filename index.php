@@ -990,6 +990,10 @@ $constSelected = ' selected';
                   <td>Workspace</td>
                   <td><input class="form-control" type="text" name="workspace" value="<?php echo $builderConfig->getWorkspaceDirectory();?>" autocomplete="off"></td>
                 </tr>
+                <tr>
+                  <td>PHP Path</td>
+                  <td><input class="form-control" type="text" name="php_path" value="<?php echo $builderConfig->getPhpPath();?>" autocomplete="off"></td>
+                </tr>
               </tbody>
             </table>
           </form>

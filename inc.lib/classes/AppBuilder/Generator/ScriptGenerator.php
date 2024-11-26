@@ -491,7 +491,7 @@ class ScriptGenerator //NOSONAR
         $moduleFile = $request->getModuleFile();
 
         $baseDir = $appConf->getBaseApplicationDirectory();
-        $this->prepareApplication($appConf, $baseDir);
+        $this->prepareApplication($builderConfig, $appConf, $baseDir);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
         
@@ -882,11 +882,12 @@ class ScriptGenerator //NOSONAR
      *
      * Creates necessary directories and prepares the application setup based on the configuration.
      *
+     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param string $baseDir Base directory for the application.
      * @return void
      */
-    public function prepareApplication($appConf, $baseDir)
+    public function prepareApplication($builderConfig, $appConf, $baseDir)
     {
         $composer = new MagicObject($appConf->getComposer());
         $magicApp = new MagicObject($appConf->getMagicApp());
@@ -898,7 +899,7 @@ class ScriptGenerator //NOSONAR
         if(!file_exists($libDir)) 
         {
             $this->prepareDir($libDir);
-            $this->prepareComposer($appConf, $composer, $magicApp);
+            $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp);
                   
             $baseAppBuilder = $appConf->getBaseEntityDirectory()."";
             $this->prepareDir($baseAppBuilder);
@@ -916,12 +917,13 @@ class ScriptGenerator //NOSONAR
      *
      * Sets up the composer configuration and copies the composer.phar file to the target directory.
      *
+     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param MagicObject $magicApp MagicApp configuration object.
      * @return void
      */
-    public function prepareComposer($appConf, $composer, $magicApp)
+    public function prepareComposer($builderConfig, $appConf, $composer, $magicApp)
     {
         $version = $magicApp->getVersion();
         if(!empty($version))
@@ -935,9 +937,14 @@ class ScriptGenerator //NOSONAR
         $success = copy($sourcePath, $targetPath);
         if($success)
         {
-            $cmd = "cd $targetDir"."&&"."php composer.phar require planetbiru/magic-app$version";
+            $phpPath = trim($builderConfig->getPhpPath());
+            if(empty($phpPath))
+            {
+                $phpPath = "php";
+            }
+            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar require planetbiru/magic-app$version";
             exec($cmd);     
-            $this->updateComposer($appConf, $composer);
+            $this->updateComposer($builderConfig, $appConf, $composer);
         }
     }
     
@@ -959,11 +966,12 @@ class ScriptGenerator //NOSONAR
      *
      * Modifies the composer.json file to include new autoload settings.
      *
+     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param SecretObject $composer Composer configuration object.
      * @return void
      */
-    public function updateComposer($appConf, $composer)
+    public function updateComposer($builderConfig, $appConf, $composer)
     {
         $composerJsonFile = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.json";   
         $composerJson = json_decode(file_get_contents($composerJsonFile));
@@ -992,7 +1000,12 @@ class ScriptGenerator //NOSONAR
         file_put_contents($composerJsonFile, json_encode($composerJson, JSON_PRETTY_PRINT));
 
         $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
-        $cmd = "cd $targetDir"."&&"."php composer.phar update";
+        $phpPath = trim($builderConfig->getPhpPath());
+        if(empty($phpPath))
+        {
+            $phpPath = "php";
+        }
+        $cmd = "cd $targetDir"."&&"."$phpPath composer.phar update";
         exec($cmd);
     }
     
