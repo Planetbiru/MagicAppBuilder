@@ -36,7 +36,7 @@ class PicoDateTimeUtil
         }
 
         // List of formats to parse
-        $formats = [
+        $formats = array(
             'Y-m-d',              // ISO 8601: 2024-10-24
             'Y-m-d H:i:s',        // ISO 8601: 2024-10-24 15:30:00
             'Y-m-d\TH:i:s',       // ISO 8601: 2024-10-24T15:30:00
@@ -45,7 +45,7 @@ class PicoDateTimeUtil
             'd/m/Y',              // Local format: 24/10/2024
             'd F Y',              // Format with month name: 24 October 2024
             'l, d F Y'            // Format with day of the week: Thursday, 24 October 2024
-        ];
+        );
 
         // Iterate over each format and attempt to create a DateTime object
         foreach ($formats as $format) {

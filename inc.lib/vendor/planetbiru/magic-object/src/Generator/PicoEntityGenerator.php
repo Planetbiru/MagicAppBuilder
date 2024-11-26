@@ -221,7 +221,7 @@ class PicoEntityGenerator
      */
     protected function getTypeMap()
     {
-        return [
+        return array(
             "double" => "double",
             "float" => "double",
             "bigint" => "integer",
@@ -242,7 +242,7 @@ class PicoEntityGenerator
             "datetime" => "string",
             "date" => "string",
             "time" => "string"
-        ];
+        );
     }
 
     /**

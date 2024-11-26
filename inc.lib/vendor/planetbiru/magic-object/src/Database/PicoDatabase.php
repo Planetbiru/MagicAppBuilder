@@ -108,32 +108,49 @@ class PicoDatabase // NOSONAR
      */
     public static function fromPdo($pdo)
     {
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $dbType = self::getDbType($driver);
         $database = new self(new SecretObject());
         $database->databaseConnection = $pdo;
-        $database->databaseType = self::getDbType($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-        $database->databaseCredentials = self::getDatabaseCredentialsFromPdo($pdo);
+        $database->databaseType = $dbType;
+        $database->databaseCredentials = self::getDatabaseCredentialsFromPdo($pdo, $driver, $dbType);
         $database->connected = true;
         return $database;
     }
 
     /**
-     * Get PDO connection details, including driver, host, port, database name, schema, and time zone.
+     * Retrieves detailed information about a PDO database connection.
      *
-     * This function retrieves information about the PDO connection, such as the database driver, host, port, 
-     * database name, schema, and time zone based on the type of database (e.g., MySQL, PostgreSQL, SQLite).
+     * This method extracts and organizes connection details, including:
+     * - Database driver (e.g., 'mysql', 'pgsql', 'sqlite').
+     * - Host and port (if available).
+     * - Database name (derived from the connection DSN).
+     * - Schema (for applicable databases like PostgreSQL).
+     * - Time zone (calculated from the database offset or default PHP time zone).
      *
-     * It uses the PDO connection's attributes and queries the database if necessary to obtain the schema name and time zone.
+     * The extraction process dynamically adapts to the type of database (e.g., MySQL, PostgreSQL, SQLite).
+     * For PostgreSQL, the schema is determined using a database query. Time zone information is calculated 
+     * by converting the database offset to a corresponding PHP time zone where possible.
      *
-     * @param PDO $pdo The PDO connection object.
-     * @return SecretObject Returns a SecretObject containing the connection details (driver, host, port, database name, schema, and time zone).
-     * 
-     * @throws PDOException If there is an error with the PDO query or connection.
+     * The resulting connection details are encapsulated in a `SecretObject` for secure handling and organized access.
+     *
+     * @param PDO    $pdo    The PDO connection object.
+     * @param string $driver The name of the database driver (e.g., 'mysql', 'pgsql', 'sqlite').
+     * @param string $dbType The database type constant as defined in `PicoDatabaseType`.
+     *
+     * @return SecretObject A `SecretObject` instance containing the following properties:
+     *                      - `driver`: The database driver (e.g., 'mysql', 'pgsql').
+     *                      - `host`: The database host (e.g., 'localhost').
+     *                      - `port`: The database port (e.g., 3306 for MySQL, 5432 for PostgreSQL).
+     *                      - `databaseName`: The name of the database.
+     *                      - `databaseSchema`: The schema name (if applicable, e.g., 'public' for PostgreSQL).
+     *                      - `timeZone`: The database time zone (e.g., 'UTC+02:00').
+     *
+     * @throws PDOException If an error occurs during database interaction, such as a query failure or
+     *                      attribute access issue.
      */
-    private static function getDatabaseCredentialsFromPdo($pdo)
+    private static function getDatabaseCredentialsFromPdo($pdo, $driver, $dbType)
     {
-        // Get the driver name (e.g., mysql, pgsql, sqlite)
-        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-
         // Get the connection status, which includes the DSN (Data Source Name)
         $dsn = $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
         $dsnParts = parse_url($dsn);
@@ -150,9 +167,6 @@ class PicoDatabase // NOSONAR
         // Initialize the schema and time zone
         $schema = null;
         $timezone = null;
-
-        // Determine the database type
-        $dbType = self::getDbType($driver);
         
         // Retrieve the schema and time zone based on the database type
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {

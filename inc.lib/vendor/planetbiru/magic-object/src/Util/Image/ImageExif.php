@@ -33,7 +33,7 @@ class ImageExif
                 $longDecimal = -$longDecimal;
             }
     
-            return [$latDecimal, $longDecimal];
+            return array($latDecimal, $longDecimal);
         }
     
         return null;

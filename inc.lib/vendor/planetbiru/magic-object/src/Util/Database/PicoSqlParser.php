@@ -132,14 +132,14 @@ class PicoSqlParser
                     {
                         $def = null;
                     }
-                    $fldList[] = [
+                    $fldList[] = array(
                         self::KEY_COLUMN_NAME => $columnName,
                         self::KEY_TYPE => trim($rg_fld2_result['ftype']),
                         self::KEY_LENGTH => $length,
                         self::KEY_PRIMARY_KEY => $is_pk,
                         self::KEY_NULLABLE => $nullable,
                         self::KEY_DEFAULT => $def
-                    ];
+                    );
                     $columnList[] = $columnName;
                 }
             } elseif (stripos($f, 'primary') !== false && stripos($f, 'key') !== false) {
@@ -158,7 +158,7 @@ class PicoSqlParser
 
             if (preg_match($rg_pk2, $f) && preg_match($rg_pk, $f)) {
                 $x = preg_replace('/(PRIMARY|UNIQUE) KEY\s+[a-zA-Z_0-9\s]+/', '', $f);
-                $x = str_replace(['(', ')'], '', $x);
+                $x = str_replace(array('(', ')'), '', $x);
                 $pkeys = array_map('trim', explode(',', $x));
                 foreach ($fldList as &$column) {
                     if ($this->inArray($pkeys, $column[self::KEY_COLUMN_NAME])) {
@@ -167,11 +167,11 @@ class PicoSqlParser
                 }
             }
         }
-        return [
+        return array(
             'tableName' => $tableName, 
             'columns' => $fldList, 
             'primaryKey' => $primaryKey
-        ];
+        );
     }
 
     /**

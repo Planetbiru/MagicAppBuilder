@@ -13,7 +13,7 @@ $constSelected = ' selected';
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <title>AppBuilder</title>
+  <title>MagicAppBuilder</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="shortcut icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">

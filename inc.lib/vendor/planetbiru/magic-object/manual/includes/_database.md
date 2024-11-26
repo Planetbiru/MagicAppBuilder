@@ -343,7 +343,7 @@ $db = new PicoDatabase($credentials);
 // Connect to the database
 if ($db->connect()) {
     // Fetch a user by ID
-    $user = $db->fetch("SELECT * FROM users WHERE id = ?", [1]);
+    $user = $db->fetch("SELECT * FROM users WHERE id = ?", 1);
     print_r($user);
     
     // Disconnect

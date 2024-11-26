@@ -223,7 +223,7 @@ class PicoEntityLabel
             // List primary keys
             foreach ($parameters as $param => $val) {
                 if (strcasecmp($param, self::ANNOTATION_ID) === 0 && isset($columns[$prop->name])) {
-                    $primaryKeys[$prop->name] = [self::KEY_NAME => $columns[$prop->name][self::KEY_NAME]];
+                    $primaryKeys[$prop->name] = array(self::KEY_NAME => $columns[$prop->name][self::KEY_NAME]);
                 }
             }
 
@@ -262,7 +262,7 @@ class PicoEntityLabel
             // List not null columns
             foreach ($parameters as $param => $val) {
                 if (strcasecmp($param, self::ANNOTATION_NOT_NULL) === 0 && isset($columns[$prop->name])) {
-                    $notNullColumns[$prop->name] = [self::KEY_NAME => $columns[$prop->name][self::KEY_NAME]];
+                    $notNullColumns[$prop->name] = array(self::KEY_NAME => $columns[$prop->name][self::KEY_NAME]);
                 }
             }
         }

@@ -201,7 +201,7 @@ class PicoDtoGenerator
      */
     protected function getTypeMap()
     {
-        return [
+        return array(
             "bigint"      => "int",
             "bool"        => "bool",
             "boolean"     => "bool",
@@ -223,7 +223,7 @@ class PicoDtoGenerator
             "mediumtext"  => "string",
             "longtext"    => "string",
             "time"        => "string",
-        ];
+        );
     }
 
     /**

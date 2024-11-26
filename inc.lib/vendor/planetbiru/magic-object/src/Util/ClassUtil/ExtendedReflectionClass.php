@@ -158,10 +158,10 @@ class ExtendedReflectionClass extends ReflectionClass {
 				if ($record) {
 					$useStatements[] = $currentUse;
 					$record = false;
-					$currentUse = [
+					$currentUse = array(
 						'class' => '',
 						'as' => ''
-					];
+					);
 				}
 
 				continue;

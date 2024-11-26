@@ -90,12 +90,12 @@ class Area
      */
     public function coordsFromRectangle($object)
     {
-        return [
+        return array(
             $object->a->x,
             $object->a->y,
             $object->b->x,
             $object->b->y
-        ];
+        );
     }
 
     /**
@@ -106,14 +106,14 @@ class Area
      */
     public function coordsFromTriangle($object)
     {
-        return [
+        return array(
             $object->a->x,
             $object->a->y,
             $object->b->x,
             $object->b->y,
             $object->c->x,
             $object->c->y
-        ];
+        );
     }
 
     /**
@@ -141,7 +141,7 @@ class Area
      */
     public function coordsFromCircle($object)
     {
-        return [$object->x, $object->y, $object->r];
+        return array($object->x, $object->y, $object->r);
     }
 
     /**

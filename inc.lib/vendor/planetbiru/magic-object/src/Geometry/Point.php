@@ -2,6 +2,8 @@
 
 namespace MagicObject\Geometry;
 
+use InvalidArgumentException;
+
 /**
  * Class representing a Point with x and y coordinates.
  *
@@ -48,13 +50,13 @@ class Point
      *
      * @param Point $p Another Point.
      * @return float The distance between the two Points.
-     * @throws \InvalidArgumentException If the argument is not of type Point.
+     * @throws InvalidArgumentException If the argument is not of type Point.
      */
     public function distanceFrom($p)
     {
         // Ensure $p is an instance of Point
         if (!$p instanceof Point) {
-            throw new \InvalidArgumentException('Argument must be of type Point.');
+            throw new InvalidArgumentException('Argument must be of type Point.');
         }
 
         $dx = $this->x - $p->x;

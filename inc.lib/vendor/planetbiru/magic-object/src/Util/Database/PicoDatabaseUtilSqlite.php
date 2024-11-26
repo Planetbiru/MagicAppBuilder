@@ -170,7 +170,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * @param array $pKeyArrUsed The array to store used primary key names.
      * @return array An array containing the determined SQL data type and the updated primary key array.
      */
-    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = [])
+    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = array())
     {
         $columnName = $column[parent::KEY_NAME];
         $columnType = strtolower($column['type']); // Assuming 'type' holds the column type
@@ -243,7 +243,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 "Null" => $row['notnull'] ? 'YES' : 'NO',
                 "Key" => $row['pk'] ? 'PRI' : null,
                 "Default" => $row['dflt_value'] ? $row['dflt_value'] : 'None',
-                "Extra" => ($row['pk'] == 1 && $row['type'] === 'INTEGER') ? 'auto_increment' : null
+                "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
         return $rows;

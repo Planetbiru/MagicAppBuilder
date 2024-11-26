@@ -117,7 +117,7 @@ class PicoSqlite extends PicoDatabase
      * @param array $conditions An associative array of conditions for the WHERE clause.
      * @return array Returns an array of fetched records as associative arrays.
      */
-    public function select($tableName, $conditions = []) {
+    public function select($tableName, $conditions = array()) {
         $sql = "SELECT * FROM $tableName";
         if (!empty($conditions)) {
             $conditionStr = implode(self::LOGIC_AND, array_map(function($key) {

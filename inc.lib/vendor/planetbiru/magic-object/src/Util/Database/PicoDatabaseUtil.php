@@ -342,6 +342,36 @@ class PicoDatabaseUtil
 		$random = sprintf('%06x', mt_rand(0, 16777215));
 		return sprintf('%s%s', $uuid, $random);
     }
+    
+    /**
+     * Filters out empty lines, comments (lines starting with "-- "), and lines that are exactly "--".
+     *
+     * This function is commonly used in contexts where a list of lines or strings needs to be processed
+     * and filtered by excluding empty lines, comment lines (starting with "-- "), and lines with only
+     * the string "--".
+     *
+     * @param string $line The line to be checked.
+     * @return bool Returns `true` if the line should be included, `false` otherwise.
+     */
+    private static function arrayFilterFunction($line)
+    {
+        return !(empty($line) || stripos($line, "-- ") === 0 || $line == "--");
+    }
+    
+    /**
+     * Determines the delimiter based on the second part of a trimmed line.
+     *
+     * This function splits the given line by spaces and checks the second part. If the second part exists,
+     * it returns a semicolon (`;`) as the delimiter. Otherwise, it returns `null`.
+     *
+     * @param string $line The line to be analyzed, which is trimmed and split by spaces.
+     * @return string|null Returns `';'` if there is a second part after splitting the line, otherwise `null`.
+     */
+    private static function getDelimiter($line)
+    {
+        $parts = explode(' ', trim($line));
+        return $parts[1] != null ? ';' : null;
+    }
 
     /**
      * Split a SQL string into separate queries.
@@ -362,7 +392,7 @@ class PicoDatabaseUtil
         
         // Clean up lines, remove comments, and empty lines
         $cleanedLines = array_filter(array_map('ltrim', $lines), function ($line) {
-            return !(empty($line) || stripos($line, "-- ") === 0 || $line == "--");
+            return self::arrayFilterFUnction($line);
         });
         
         // Initialize state variables
@@ -381,8 +411,7 @@ class PicoDatabaseUtil
 
             // Handle "delimiter" statements
             if (stripos(trim($line), 'delimiter ') === 0) {
-                $parts = explode(' ', trim($line));
-                $delimiter = $parts[1] != null ? ';' : null;
+                $delimiter = self::getDelimiter($line);
                 continue;
             }
 
@@ -390,7 +419,7 @@ class PicoDatabaseUtil
             if (!$isAppending) {
                 if (!empty($currentQuery)) {
                     // Store the previous query and reset for the next one
-                    $queries[] = ['query' => rtrim($currentQuery, self::INLINE_TRIM), 'delimiter' => $delimiter];
+                    $queries[] = array('query' => rtrim($currentQuery, self::INLINE_TRIM), 'delimiter' => $delimiter);
                 }
                 $currentQuery = '';
                 $isAppending = true;
@@ -407,7 +436,7 @@ class PicoDatabaseUtil
 
         // Add the last query if any
         if (!empty($currentQuery)) {
-            $queries[] = ['query' => rtrim($currentQuery, self::INLINE_TRIM), 'delimiter' => $delimiter];
+            $queries[] = array('query' => rtrim($currentQuery, self::INLINE_TRIM), 'delimiter' => $delimiter);
         }
 
         return $queries;
