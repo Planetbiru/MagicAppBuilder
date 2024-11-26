@@ -327,7 +327,7 @@ class ScriptGenerator //NOSONAR
      * @param EntityInfo $entityInfo Information about the main entity being processed.
      * @param EntityApvInfo $entityApvInfo Information about the approval process for the entity.
      *
-     * @return void This method does not return a value. It generates and writes the application module script
+     * @return int The number of entity files that were generated. It generates and writes the application module script
      * to the specified location, as defined in the request.
      */
     public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo)
@@ -500,17 +500,25 @@ class ScriptGenerator //NOSONAR
 
         $updateEntity = $request->getUpdateEntity() == '1' || $request->getUpdateEntity() == 'true';
         
+        $fileGenerated = 1;
         $appBuilder->setUpdateEntity($updateEntity);
+        if($updateEntity)
+        {
+            $fileGenerated++;
+        }
         $appBuilder->generateMainEntity($database, $appConf, $entityMain, $entityInfo, $referenceData);
-
+        
         if($approvalRequired) {
             $appBuilder->generateApprovalEntity($database, $appConf, $entityMain, $entityInfo, $entityApproval, $referenceData);
+            $fileGenerated++;
         }
         if($trashRequired) {
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
+            $fileGenerated++;
         }
-        $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
+        $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
         $this->updateMenu($appConf, $request);
+        return $fileGenerated;
     }
     
     /**
@@ -829,18 +837,21 @@ class ScriptGenerator //NOSONAR
     }
 
     /**
-     * Generate entities if they do not exist.
+     * Generate entity files if they do not exist.
      *
-     * Checks for the existence of entity files and generates them if they are missing.
+     * This method checks for the existence of entity class files corresponding to the provided 
+     * reference entities. If an entity file is missing, it generates the file using the 
+     * specified database schema and configuration settings.
      *
-     * @param PicoDatabase $database Database connection object.
-     * @param SecretObject $appConf Application configuration object.
-     * @param EntityInfo $entityInfo Information about the entity.
-     * @param MagicObject[] $referenceEntities Array of reference entities to check.
-     * @return void
+     * @param PicoDatabase $database Database connection object for schema queries.
+     * @param SecretObject $appConf Application configuration object containing paths and namespaces.
+     * @param EntityInfo $entityInfo Metadata about the entity being processed.
+     * @param MagicObject[] $referenceEntities Array of reference entities to validate and generate.
+     * @return int The number of entity files that were generated.
      */
     private function generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities)
     {
+        $fileGenerated = 0;
         $checked = array();
         foreach($referenceEntities as $entity)
         {
@@ -858,10 +869,12 @@ class ScriptGenerator //NOSONAR
                     $gen = new PicoEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
                     $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
                     $gen->generate($nonupdatables);
+                    $fileGenerated++;
                 }
                 $checked[] = $entityName;
             }
         }
+        return $fileGenerated;
     }
 
     /**
