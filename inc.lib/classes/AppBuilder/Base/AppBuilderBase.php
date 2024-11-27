@@ -1299,15 +1299,15 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 '."\t".'$headerFormat = new XLSXDataFormat($dataLoader, 3);
 '."\t".'$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
 '."\t".'$exporter->write($pageData, $fileName, $sheetName, array(
-'."\t".''."\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
-'."\t".''."\t".''.implode(",\n\t\t", $headers).'
+'."\t\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
+'."\t\t".implode(",\n\t\t", $headers).'
 '."\t".'), 
 '."\t".'function($index, $row, $appLanguage){
-'."\t".''."\t".''.implode(self::N_TAB2, $globals).'
-'."\t".''."\t".'return array(
-'."\t".''."\t".''."\t".'sprintf("%d", $index + 1),
-'."\t".''."\t".''."\t".''.implode(",\n\t\t\t", $data).'
-'."\t".''."\t".');
+'."\t\t".implode(self::N_TAB2, $globals).'
+'."\t\t".'return array(
+'."\t\t"."\t".'sprintf("%d", $index + 1),
+'."\t\t"."\t".implode(",\n\t\t\t", $data).'
+'."\t\t".');
 '."\t".'});
 '."\t".'exit();
 }';
@@ -1349,7 +1349,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         }
         if($this->ajaxSupport)
         {
-            $dataSection->appendChild($dom->createTextNode("\n\t".'<?php } /*ajaxSupport*/ ?>'));
+            $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG.' } /*ajaxSupport*/ '.self::PHP_CLOSE_TAG));
         }
         $dataSection->appendChild($dom->createTextNode("\n\t".self::PHP_OPEN_TAG)); 
                 
@@ -1413,7 +1413,7 @@ catch(Exception $e)
 
         if($this->ajaxSupport)
         {
-            $dataSection->appendChild($dom->createTextNode("".'<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>'."\n"));
+            $dataSection->appendChild($dom->createTextNode("".self::PHP_OPEN_TAG.' /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ '.self::PHP_CLOSE_TAG."\n"));
         }
         $dom->appendChild($dataSection);
         
@@ -1819,56 +1819,56 @@ $subqueryMap = '.$referece.';
 
         if($activate)
         {
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php if($userPermission->isAllowedUpdate()){ ?>'));
+        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG));
         $activate = $dom->createElement('button');
         $activate->setAttribute('type', 'submit');
         $activate->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $activate->setAttribute('name', 'user_action');
         $activate->setAttribute('value', 'activate');
-        $activate->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonActivate();?>'));
+        $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
 
         $deactivate = $dom->createElement('button');
         $deactivate->setAttribute('type', 'submit');
         $deactivate->setAttribute('class', 'btn btn-warning');
         $deactivate->setAttribute('name', 'user_action');
         $deactivate->setAttribute('value', 'deactivate');
-        $deactivate->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonDeactivate();?>'));
+        $deactivate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonDeactivate();'.self::PHP_CLOSE_TAG));
 
         
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
         $wrapper->appendChild($activate);
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
         $wrapper->appendChild($deactivate);
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php } ?>'));
+        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
         }
 
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php if($userPermission->isAllowedDelete()){ ?>'));
+        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' if($userPermission->isAllowedDelete()){ '.self::PHP_CLOSE_TAG));
         $delete = $dom->createElement('button');
         $delete->setAttribute('type', 'submit');
         $delete->setAttribute('class', 'btn btn-danger');
         $delete->setAttribute('name', 'user_action');
         $delete->setAttribute('value', 'delete');
-        $delete->setAttribute('data-onclik-message', '<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>');
-        $delete->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonDelete();?>'));
+        $delete->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.' echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());'.self::PHP_CLOSE_TAG);
+        $delete->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonDelete();'.self::PHP_CLOSE_TAG));
 
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
         $wrapper->appendChild($delete);
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php } ?>'));
+        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
 
         if($sortOrder)
         {
-            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php if($userPermission->isAllowedSortOrder()){ ?>'));
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG));
             $order = $dom->createElement('button');
             $order->setAttribute('type', 'submit');
             $order->setAttribute('class', ElementClass::BUTTON_PRIMARY);
             $order->setAttribute('name', 'user_action');
             $order->setAttribute('value', 'sort_order');
             $order->setAttribute('disabled', 'disabled');
-            $order->appendChild($dom->createTextNode('<?php echo $appLanguage->getSaveCurrentOrder();?>'));
+            $order->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getSaveCurrentOrder();'.self::PHP_CLOSE_TAG));
 
             $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
             $wrapper->appendChild($order);
-            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.'<?php } ?>'));
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
         }
         
         $wrapper->appendChild($dom->createTextNode(self::N_TAB3)); 
@@ -1926,18 +1926,18 @@ $subqueryMap = '.$referece.';
         if($this->appFeatures->isSortOrder())
         {
             // sort-control begin
-            $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedSortOrder()){ ?>')); 
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG)); 
             $td = $dom->createElement('td');
             $td->setAttribute('class', 'data-sort data-sort-header');
             $td->appendChild($dom->createTextNode(""));
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
-            $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
             // sort-control end
         }
 
         // checkbox begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedBatchAction()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedBatchAction()){ '.self::PHP_CLOSE_TAG)); 
         $td = $dom->createElement('td');
         $td->setAttribute('class', 'data-controll data-selector');
         $td->setAttribute('data-key', $primaryKey);
@@ -1954,11 +1954,11 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         // checkbox end
         
         // edit begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedUpdate()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG)); 
         $spanEdit = $dom->createElement('span');
         $spanEdit->setAttribute('class', 'fa fa-edit');
         $spanEdit->appendChild($dom->createTextNode(''));
@@ -1972,11 +1972,11 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         // edit end
         
         // detail begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedDetail()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG)); 
         $spanDetail = $dom->createElement('span');
         $spanDetail->setAttribute('class', 'fa fa-folder');
         $spanDetail->appendChild($dom->createTextNode(''));
@@ -1990,27 +1990,27 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         // detail end
         
         // approval begin
         if($approvalRequired && $this->appFeatures->getApprovalPosition() == AppFeatures::BEFORE_DATA)
         {
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedApprove()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); 
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
-        $td3->appendChild($dom->createTextNode('<?php echo $appLanguage->getApproval();?>')); 
+        $td3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getApproval();'.self::PHP_CLOSE_TAG)); 
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td3);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         }
         // approval end
 
         // no begin
         $td2 = $dom->createElement('td');
         $td2->setAttribute('class', 'data-controll data-number');
-        $td2->appendChild($dom->createTextNode('<?php echo $appLanguage->getNumero();?>')); 
+        $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getNumero();'.self::PHP_CLOSE_TAG)); 
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
@@ -2046,14 +2046,14 @@ $subqueryMap = '.$referece.';
         // approval begin
         if($approvalRequired && $this->appFeatures->getApprovalPosition() == AppFeatures::AFTER_DATA)
         {
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedApprove()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); 
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
-        $td3->appendChild($dom->createTextNode('<?php echo $appLanguage->getApproval();?>')); 
+        $td3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getApproval();'.self::PHP_CLOSE_TAG)); 
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td3);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         }
         // approval end
         
@@ -2084,13 +2084,13 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>');
+            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.' echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));'.self::PHP_CLOSE_TAG);
         }
         else
         {
-            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>');
+            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.' echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));'.self::PHP_CLOSE_TAG);
         }
-        $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
+        $buttonApprove->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonApproveTiny();'.self::PHP_CLOSE_TAG)); 
         return $buttonApprove;
     }
 
@@ -2109,14 +2109,14 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonReject = $dom->createTextNode('<?php echo UserAction::getWaitingForText($appLanguage, $supervisor->getWaitingFor());?>');
+            $buttonReject = $dom->createTextNode(self::PHP_OPEN_TAG.' echo UserAction::getWaitingForText($appLanguage, $supervisor->getWaitingFor());'.self::PHP_CLOSE_TAG);
         }
         else
         {
             $buttonReject = $dom->createElement('a');
             $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-            $buttonReject->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::REJECT));?>');
-            $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
+            $buttonReject->setAttribute('href', self::PHP_OPEN_TAG.' echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::REJECT));'.self::PHP_CLOSE_TAG);
+            $buttonReject->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonRejectTiny();'.self::PHP_CLOSE_TAG)); 
         }
         return $buttonReject;
     }
@@ -2145,21 +2145,21 @@ $subqueryMap = '.$referece.';
         if($this->appFeatures->isSortOrder())
         {
             // sort-control begin
-            $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedSortOrder()){ ?>')); 
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG)); 
             $td = $dom->createElement('td');
             $td->setAttribute('class', 'data-sort data-sort-body data-sort-handler');
             $td->appendChild($dom->createTextNode(""));
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
             
-            $trh->setAttribute("data-primary-key", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).self::BRACKETS.';?>');
-            $trh->setAttribute("data-sort-order", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).self::BRACKETS.';?>');
-            $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+            $trh->setAttribute("data-primary-key", self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).self::BRACKETS.';'.self::PHP_CLOSE_TAG);
+            $trh->setAttribute("data-sort-order", self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).self::BRACKETS.';'.self::PHP_CLOSE_TAG);
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
             // sort-control end
         }
         
         // checkbox begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedBatchAction()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedBatchAction()){ '.self::PHP_CLOSE_TAG)); 
         $td = $dom->createElement('td');
         $td->setAttribute('class', 'data-selector');
         $td->setAttribute('data-key', $primaryKey);
@@ -2178,14 +2178,14 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         // checkbox end
         
         // edit begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedUpdate()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG)); 
         $edit = $dom->createElement('a');
         $edit->setAttribute('class', 'edit-control');
-        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');?>';
+        $href = self::PHP_OPEN_TAG.' echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
         $edit->setAttribute('href', $href);
         $spanEdit = $dom->createElement('span');
         $spanEdit->setAttribute('class', 'fa fa-edit');
@@ -2200,14 +2200,14 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         // edit end
         
         // detail begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedDetail()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG)); 
         $detail = $dom->createElement('a');
         $detail->setAttribute('class', 'detail-control field-master');
-        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');?>';
+        $href = self::PHP_OPEN_TAG.' echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
         $detail->setAttribute('href', $href);
         $spanDetail = $dom->createElement('span');
         $spanDetail->setAttribute('class', 'fa fa-folder');
@@ -2222,13 +2222,13 @@ $subqueryMap = '.$referece.';
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>'));
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
         // detail end
         
         // approval begin
         if($approvalRequired && $this->appFeatures->getApprovalPosition() == AppFeatures::BEFORE_DATA)
         {
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedApprove()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); 
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
         
@@ -2236,23 +2236,23 @@ $subqueryMap = '.$referece.';
         $buttonReject = $this->createButtonReject($dom, $objectName, $primaryKey, $upperPkName);
         
         
-        $td3->appendChild($dom->createTextNode(self::N_TAB7.'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
+        $td3->appendChild($dom->createTextNode(self::N_TAB7.self::PHP_OPEN_TAG.' if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ '.self::PHP_CLOSE_TAG)); 
         $td3->appendChild($dom->createTextNode(self::N_TAB7)); 
         $td3->appendChild($buttonApprove); 
         $td3->appendChild($dom->createTextNode(self::N_TAB7));  
         $td3->appendChild($buttonReject); 
-        $td3->appendChild($dom->createTextNode(self::N_TAB7.'<?php } ?>')); 
+        $td3->appendChild($dom->createTextNode(self::N_TAB7.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         $td3->appendChild($dom->createTextNode(self::N_TAB6));  
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td3);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         }
         // approval end
 
         // no begin
         $td2 = $dom->createElement('td');
         $td2->setAttribute('class', 'data-number');
-        $td2->appendChild($dom->createTextNode('<?php echo $pageData->getDataOffset() + $dataIndex;?>')); 
+        $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $pageData->getDataOffset() + $dataIndex;'.self::PHP_CLOSE_TAG)); 
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td2);
@@ -2276,24 +2276,24 @@ $subqueryMap = '.$referece.';
         // approval begin
         if($approvalRequired && $this->appFeatures->getApprovalPosition() == AppFeatures::AFTER_DATA)
         {
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedApprove()){ ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); 
         $td3 = $dom->createElement('td');
         $td3->setAttribute('class', 'data-controll data-approval');
         
         $buttonApprove = $this->createButtonApprove($dom, $objectName, $primaryKey, $upperPkName);
         $buttonReject = $this->createButtonReject($dom, $objectName, $primaryKey, $upperPkName);
         
-        $td3->appendChild($dom->createTextNode(self::N_TAB7.'<?php if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ ?>')); 
+        $td3->appendChild($dom->createTextNode(self::N_TAB7.self::PHP_OPEN_TAG.' if(UserAction::isRequireApproval($'.$objectName.'->getWaitingFor())){ '.self::PHP_CLOSE_TAG)); 
         $td3->appendChild($dom->createTextNode(self::N_TAB7)); 
         $td3->appendChild($buttonApprove); 
         $td3->appendChild($dom->createTextNode(self::N_TAB7));  
         $td3->appendChild($buttonReject); 
-        $td3->appendChild($dom->createTextNode(self::N_TAB7.'<?php } ?>')); 
+        $td3->appendChild($dom->createTextNode(self::N_TAB7.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         $td3->appendChild($dom->createTextNode(self::N_TAB6));  
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
         $trh->appendChild($td3);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG)); 
         }
         // approval end
         
@@ -2312,8 +2312,8 @@ $subqueryMap = '.$referece.';
         
         $tbody->appendChild($dom->createTextNode("\n\n\t\t\t\t\t")); 
 
-        $trh->setAttribute('data-number', '<?php echo $pageData->getDataOffset() + $dataIndex;?>'); 
-        $tbody->setAttribute('data-offset', '<?php echo $pageData->getDataOffset();?>'); 
+        $trh->setAttribute('data-number', self::PHP_OPEN_TAG.' echo $pageData->getDataOffset() + $dataIndex;'.self::PHP_CLOSE_TAG); 
+        $tbody->setAttribute('data-offset', self::PHP_OPEN_TAG.' echo $pageData->getDataOffset();'.self::PHP_CLOSE_TAG); 
         $tbody->appendChild($trh);
         $tbody->appendChild($dom->createTextNode(self::N_TAB5)); 
         
@@ -2403,24 +2403,24 @@ $subqueryMap = '.$referece.';
 
         if($this->appFeatures->isApprovalRequired())
         {
-            $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php if($userPermission->isAllowedApprove()){ ?>'));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG));
             $form->appendChild($dom->createTextNode(self::NN_TAB2));
             $form->appendChild($approvalFilterWrapper);
-            $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php } ?>'));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
         }
 
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
-            $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php if($userPermission->isAllowedDetail()){ ?>'));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG));
             $form->appendChild($dom->createTextNode(self::NN_TAB2));
             $form->appendChild($exportFilterWrapper);
-            $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php } ?>'));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
         }
 
-        $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php if($userPermission->isAllowedCreate()){ ?>'));
+        $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' if($userPermission->isAllowedCreate()){ '.self::PHP_CLOSE_TAG));
         $form->appendChild($dom->createTextNode(self::NN_TAB2));
         $form->appendChild($addWrapper);
-        $form->appendChild($dom->createTextNode(self::N_TAB2.'<?php } ?>'));
+        $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG));
 
         $form->appendChild($dom->createTextNode("\n\t"));
 
@@ -2522,7 +2522,7 @@ $subqueryMap = '.$referece.';
                     $inputName = $field->getFieldName()."[]";
                     $select->setAttribute('name', $inputName);
                     
-                    $select->setAttribute('data-placeholder', '<?php echo $appLanguage->getSelectItems();?>');
+                    $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.' echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
                     $select->setAttributeNode($dom->createAttribute('multiple'));
                     $select->setAttributeNode($dom->createAttribute('multi-select'));
                 }
@@ -2706,9 +2706,9 @@ $subqueryMap = '.$referece.';
         $td2 = $dom->createElement('td');
         $td3 = $dom->createElement('td');
 
-        $td1->appendChild($dom->createTextNode('<?php echo $appLanguage->getColumnName();?>'));
-        $td2->appendChild($dom->createTextNode('<?php echo $appLanguage->getValueBefore();?>'));
-        $td3->appendChild($dom->createTextNode('<?php echo $appLanguage->getValueAfter();?>'));
+        $td1->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getColumnName();'.self::PHP_CLOSE_TAG));
+        $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getValueBefore();'.self::PHP_CLOSE_TAG));
+        $td3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getValueAfter();'.self::PHP_CLOSE_TAG));
 
         $trh->appendChild($td1);
         $trh->appendChild($td2);
@@ -3282,16 +3282,16 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'truefalse')
             {
                 $map = (new MagicObject())
-                    ->setValue2((new MagicObject())->setValue('true')->setLabel('<?php echo $appLanguage->getOptionLabelTrue();?>'))
-                    ->setValue3((new MagicObject())->setValue('false')->setLabel('<?php echo $appLanguage->getOptionLabelFalse();?>'));
+                    ->setValue2((new MagicObject())->setValue('true')->setLabel(self::PHP_OPEN_TAG.' echo $appLanguage->getOptionLabelTrue();'.self::PHP_CLOSE_TAG))
+                    ->setValue3((new MagicObject())->setValue('false')->setLabel(self::PHP_OPEN_TAG.' echo $appLanguage->getOptionLabelFalse();'.self::PHP_CLOSE_TAG));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
             else if($referenceData->getType() == 'yesno')
             {
                 $map = (new MagicObject())
-                    ->setValue2((new MagicObject())->setValue('yes')->setLabel('<?php echo $appLanguage->getOptionLabelYes();?>'))
-                    ->setValue3((new MagicObject())->setValue('no')->setLabel('<?php echo $appLanguage->getOptionLabelNo();?>'));
+                    ->setValue2((new MagicObject())->setValue('yes')->setLabel(self::PHP_OPEN_TAG.' echo $appLanguage->getOptionLabelYes();'.self::PHP_CLOSE_TAG))
+                    ->setValue3((new MagicObject())->setValue('no')->setLabel(self::PHP_OPEN_TAG.' echo $appLanguage->getOptionLabelNo();'.self::PHP_CLOSE_TAG));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
@@ -3397,9 +3397,9 @@ $subqueryMap = '.$referece.';
             {
                 $caption2 = trim($caption);
                 $caption2 = substr($caption2, 1, strlen($caption2) - 2);
-                return '<?php echo '.$caption2.'; ?>';
+                return self::PHP_OPEN_TAG.' echo '.$caption2.'; '.self::PHP_CLOSE_TAG;
             }
-            return '<?php echo "'.addslashes($caption).'"; ?>';
+            return self::PHP_OPEN_TAG.' echo "'.addslashes($caption).'"; '.self::PHP_CLOSE_TAG;
         }
         return $caption;
     }
@@ -3758,7 +3758,7 @@ $subqueryMap = '.$referece.';
         $pkInput = $dom->createElement('input');
         $pkInput->setAttribute("type", "hidden");
         $pkInput->setAttribute('name', $primaryKeyName);
-        $pkInput->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
+        $pkInput->setAttribute('value', self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn1);
@@ -3804,23 +3804,23 @@ $subqueryMap = '.$referece.';
         $btn3->setAttribute('type', 'submit');
         $btn3->setAttribute('class', 'btn btn-success');
         $btn3->setAttribute('name', 'user_action');
-        $btn3->setAttribute('value', '<?php echo UserAction::APPROVE;?>');
-        $btn3->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>'));
+        $btn3->setAttribute('value', self::PHP_OPEN_TAG.' echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
+        $btn3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonApprove();'.self::PHP_CLOSE_TAG));
         $btn32 = clone $btn3;
 
         $btn4 = $dom->createElement('button');
         $btn4->setAttribute('type', 'submit');
         $btn4->setAttribute('class', 'btn btn-warning');
         $btn4->setAttribute('name', 'user_action');
-        $btn4->setAttribute('value', '<?php echo UserAction::REJECT;?>');
-        $btn4->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
+        $btn4->setAttribute('value', self::PHP_OPEN_TAG.' echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
+        $btn4->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
         $btn42 = clone $btn4;
 
         $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
         $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, null, self::REDIRECT_TO_ITSELF);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
-        $td2->appendChild($dom->createTextNode('<?php '));
+        $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' '));
 
         $approvalType = $this->appFeatures->getApprovalType();
 
@@ -3829,38 +3829,38 @@ $subqueryMap = '.$referece.';
 
             if($approvalType == 2)
             {
-                $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+                $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG));
                 $td2->appendChild($dom->createTextNode(self::N_TAB5));
                 $td2->appendChild($btn32);
                 $td2->appendChild($dom->createTextNode(self::N_TAB5));
                 $td2->appendChild($btn42);
                 $td2->appendChild($dom->createTextNode(self::N_TAB5));
-                $td2->appendChild($dom->createTextNode('<?php } else '));
+                $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' } else '));
             }
 
-            $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+            $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG));
             $td2->appendChild($dom->createTextNode(self::N_TAB5));
             $td2->appendChild($btn3);
             $td2->appendChild($dom->createTextNode(self::N_TAB5));
-            $td2->appendChild($dom->createTextNode('<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>'));
+            $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG));
             $td2->appendChild($dom->createTextNode(self::N_TAB5));
             $td2->appendChild($btn4);
             $td2->appendChild($dom->createTextNode(self::N_TAB5));
-            $td2->appendChild($dom->createTextNode('<?php } else '));
+            $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' } else '));
         }
 
-        $td2->appendChild($dom->createTextNode('if($userPermission->isAllowedUpdate()){ ?>'));
+        $td2->appendChild($dom->createTextNode('if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG));
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn1);
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
-        $td2->appendChild($dom->createTextNode('<?php } ?>'."\n"));
+        $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' } '.self::PHP_CLOSE_TAG."\n"));
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn2);
 
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
-        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
+        $pkInputApprove->setAttribute('value', self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($pkInputApprove);
@@ -3903,8 +3903,8 @@ $subqueryMap = '.$referece.';
         $btn1->setAttribute('type', 'submit');
         $btn1->setAttribute('class', 'btn btn-success');
         $btn1->setAttribute('name', 'user_action');
-        $btn1->setAttribute('value', '<?php echo UserAction::APPROVE;?>');
-        $btn1->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApprove();?>'));
+        $btn1->setAttribute('value', self::PHP_OPEN_TAG.' echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
+        $btn1->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonApprove();'.self::PHP_CLOSE_TAG));
 
         $btn12 = clone $btn1;
 
@@ -3912,8 +3912,8 @@ $subqueryMap = '.$referece.';
         $btn2->setAttribute('type', 'submit');
         $btn2->setAttribute('class', 'btn btn-warning');
         $btn2->setAttribute('name', 'user_action');
-        $btn2->setAttribute('value', '<?php echo UserAction::REJECT;?>');
-        $btn2->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
+        $btn2->setAttribute('value', self::PHP_OPEN_TAG.' echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
+        $btn2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.' echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
 
         $btn22 = clone $btn2;
 
@@ -3924,14 +3924,14 @@ $subqueryMap = '.$referece.';
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
-        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
+        $pkInputApprove->setAttribute('value', self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
         $pkInputApprove2 = clone $pkInputApprove;
 
         $pkInputReject = $dom->createElement('input');
         $pkInputReject->setAttribute("type", "hidden");
         $pkInputReject->setAttribute('name', $primaryKeyName);
-        $pkInputReject->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
+        $pkInputReject->setAttribute('value', self::PHP_OPEN_TAG.' echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
@@ -4007,7 +4007,7 @@ $subqueryMap = '.$referece.';
         $start = stripos($xml, '<?xml');
         if($start !== false)
         {
-            $end = stripos($xml, '?>', $start);
+            $end = stripos($xml, ''.self::PHP_CLOSE_TAG, $start);
             if($end !== false)
             {
                 $xml = substr($xml, $end+2);
