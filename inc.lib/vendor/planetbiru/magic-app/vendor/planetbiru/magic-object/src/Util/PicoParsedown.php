@@ -835,7 +835,6 @@ class PicoParsedown // NOSONAR
                     'name' => 'hr'
                 ),
             );
-
         }
     }
 

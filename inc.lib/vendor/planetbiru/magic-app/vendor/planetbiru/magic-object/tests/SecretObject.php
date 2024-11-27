@@ -49,7 +49,7 @@ class ConfigSecret2 extends SecretObject
 }
 
 $secret1 = new ConfigSecret1(null, function(){
-    return bin2hex("This is your secure key for Scrt");
+    return bin2hex("You secret here");
 });
 
 $yaml1 = '
@@ -142,7 +142,7 @@ prop1:
 
 /*
 $secret2 = new ConfigSecret2(null, function(){
-    return bin2hex("This is your secure key for Scrt");
+    return bin2hex("You secret here");
 });
 
 $secret2->loadYamlString($yaml2, false, true, true);
@@ -202,7 +202,7 @@ global_variable_database: database
 ';
 
 $secret2 = new ConfigSecret2(null, function(){
-  return bin2hex("This is your secure key for Scrt");
+  return bin2hex("You secret here");
 });
 
 $secret2->loadYamlString($yaml4, false, true, true);

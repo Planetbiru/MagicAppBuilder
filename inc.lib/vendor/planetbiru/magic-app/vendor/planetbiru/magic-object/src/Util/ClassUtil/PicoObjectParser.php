@@ -182,11 +182,11 @@ class PicoObjectParser
         {
             foreach($data as $val)
             {
-                if (self::isObject($val))
+                if(self::isObject($val))
                 {
                     $result[] = self::parseRecursiveObject($val);
                 }
-                else if (is_array($val))
+                else if(is_array($val))
                 {
                     if(self::hasStringKeys($val))
                     {

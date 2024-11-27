@@ -28,7 +28,7 @@ class Polygon
      *
      * @param Point[] $points Initial points for the polygon.
      */
-    public function __construct($points = [])
+    public function __construct($points = array())
     {
         $this->points = $points;
     }

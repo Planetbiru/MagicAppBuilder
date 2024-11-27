@@ -176,7 +176,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
         $values = "";
 
         if ($isArray) {
-            $vals = array_map([$this, 'escapeValue'], $query);
+            $vals = array_map(array($this, 'escapeValue'), $query);
             $values = "(".implode(", ", $vals).")";
         } else {
             if ($count > 1) {
@@ -438,7 +438,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		$fields = array_keys($data);
 		$values = array_values($data);
 
-		$valuesFixed = array_map([$this, 'escapeValue'], $values);
+		$valuesFixed = array_map(array($this, 'escapeValue'), $values);
 		$fieldList = implode(", ", $fields);
 		$valueList = implode(", ", $valuesFixed);
 		return "INSERT INTO $table \r\n($fieldList)\r\nVALUES($valueList)\r\n";
@@ -640,13 +640,14 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false ||
 			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false ||
 			stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) {
-			return str_replace(["\r", "\n"], ["\\r", "\\n"], addslashes($query));
+			return str_replace(array("\r", "\n"), array("\\r", "\\n"), addslashes($query));
 		}
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) !== false) {
-			return str_replace(["\r", "\n"], ["\\r", "\\n"], $this->replaceQuote($query));
+			return str_replace(array("\r", "\n"), array("\\r", "\\n"), $this->replaceQuote($query));
 		}
 		return $query;
 	}
+
 	
 	/**
 	 * Escape a value for SQL queries.

@@ -78,7 +78,7 @@ class PicoCurlUtil {
      * @return string Response body
      * @throws CurlException If an error occurs during cURL execution
      */
-    public function get($url, $headers = []) {
+    public function get($url, $headers = array()) {
         $this->setOption(CURLOPT_URL, $url);
         $this->setOption(CURLOPT_HTTPHEADER, $headers);
         return $this->execute();
@@ -93,7 +93,7 @@ class PicoCurlUtil {
      * @return string Response body
      * @throws CurlException If an error occurs during cURL execution
      */
-    public function post($url, $data, $headers = []) {
+    public function post($url, $data, $headers = array()) {
         $this->setOption(CURLOPT_URL, $url);
         $this->setOption(CURLOPT_POST, true);
         $this->setOption(CURLOPT_POSTFIELDS, $data);
@@ -110,7 +110,7 @@ class PicoCurlUtil {
      * @return string Response body
      * @throws CurlException If an error occurs during cURL execution
      */
-    public function put($url, $data, $headers = []) {
+    public function put($url, $data, $headers = array()) {
         $this->setOption(CURLOPT_URL, $url);
         $this->setOption(CURLOPT_CUSTOMREQUEST, "PUT");
         $this->setOption(CURLOPT_POSTFIELDS, $data);
@@ -126,7 +126,7 @@ class PicoCurlUtil {
      * @return string Response body
      * @throws CurlException If an error occurs during cURL execution
      */
-    public function delete($url, $headers = []) {
+    public function delete($url, $headers = array()) {
         $this->setOption(CURLOPT_URL, $url);
         $this->setOption(CURLOPT_CUSTOMREQUEST, "DELETE");
         $this->setOption(CURLOPT_HTTPHEADER, $headers);

@@ -797,7 +797,7 @@ class MagicObject extends stdClass // NOSONAR
         $traceCaller = $trace[1];
 
         // Extract the caller's parameters
-        $callerParamValues = isset($traceCaller['args']) ? $traceCaller['args'] : [];
+        $callerParamValues = isset($traceCaller['args']) ? $traceCaller['args'] : array();
         
         // Get the caller's function and class names
         $callerFunctionName = $traceCaller['function'];

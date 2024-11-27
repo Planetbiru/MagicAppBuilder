@@ -6,7 +6,7 @@ use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoDatabaseType;
-use MagicObject\Database\PicoTableInfo;
+use MagicObject\Database\PicoTableInfoExtended;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
@@ -66,7 +66,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * including the option to include or exclude specific clauses such as "IF NOT EXISTS" and 
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
-     * @param PicoTableInfo $tableInfo         The information about the table, including column details and primary keys.
+     * @param PicoTableInfoExtended $tableInfo The information about the table, including column details and primary keys.
      * @param string        $tableName         The name of the table for which the structure is being generated.
      * @param bool          $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
      * @param bool          $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
@@ -95,9 +95,14 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
 
         $query[] = "$createStatement `$tableName` (";
 
-        foreach($tableInfo->getColumns() as $column)
+        $cols = $tableInfo->getColumns();
+
+        foreach($tableInfo->getSortedColumnName() as $columnName)
         {
-            $columns[] = $this->createColumn($column);
+            if(isset($cols[$columnName]))
+            {
+                $columns[] = $this->createColumn($cols[$columnName]);
+            }
         }
         $query[] = implode(",\r\n", $columns);
         $query[] = ") ENGINE=$engine DEFAULT CHARSET=$charset;";

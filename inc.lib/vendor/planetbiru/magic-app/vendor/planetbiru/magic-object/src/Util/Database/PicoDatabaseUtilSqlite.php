@@ -4,7 +4,7 @@ namespace MagicObject\Util\Database;
 
 use Exception;
 use MagicObject\Database\PicoDatabase;
-use MagicObject\Database\PicoTableInfo;
+use MagicObject\Database\PicoTableInfoExtended;
 use MagicObject\Exceptions\InvalidParameterException;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
@@ -170,7 +170,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * @param array $pKeyArrUsed The array to store used primary key names.
      * @return array An array containing the determined SQL data type and the updated primary key array.
      */
-    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = [])
+    private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = array())
     {
         $columnName = $column[parent::KEY_NAME];
         $columnType = strtolower($column['type']); // Assuming 'type' holds the column type
@@ -243,7 +243,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 "Null" => $row['notnull'] ? 'YES' : 'NO',
                 "Key" => $row['pk'] ? 'PRI' : null,
                 "Default" => $row['dflt_value'] ? $row['dflt_value'] : 'None',
-                "Extra" => ($row['pk'] == 1 && $row['type'] === 'INTEGER') ? 'auto_increment' : null
+                "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
         return $rows;
@@ -256,7 +256,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * including the option to include or exclude specific clauses such as "IF NOT EXISTS" and 
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
-     * @param PicoTableInfo $tableInfo         The information about the table, including column details and primary keys.
+     * @param PicoTableInfoExtended $tableInfo The information about the table, including column details and primary keys.
      * @param string        $tableName         The name of the table for which the structure is being generated.
      * @param bool          $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
      * @param bool          $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
@@ -285,10 +285,16 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $query[] = "$createStatement $tableName (";
 
-        foreach($tableInfo->getColumns() as $column)
+        $cols = $tableInfo->getColumns();
+
+        foreach($tableInfo->getSortedColumnName() as $columnName)
         {
-            $columns[] = $this->createColumn($column);
+            if(isset($cols[$columnName]))
+            {
+                $columns[] = $this->createColumn($cols[$columnName]);
+            }
         }
+
         $query[] = implode(",\r\n", $columns);
         $query[] = ") ";
 

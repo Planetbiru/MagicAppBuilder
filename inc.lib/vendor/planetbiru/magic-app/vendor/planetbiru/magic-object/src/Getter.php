@@ -40,7 +40,6 @@ class Getter extends stdClass
      */
     private $_classParams = array(); // NOSONAR
 
-
     /**
      * Constructor that initializes class parameters based on annotations.
      */

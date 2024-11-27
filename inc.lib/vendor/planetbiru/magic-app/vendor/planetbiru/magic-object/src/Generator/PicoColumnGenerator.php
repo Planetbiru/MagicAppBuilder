@@ -5,6 +5,8 @@ namespace MagicObject\Generator;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
+use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
+use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
 
 /**
  * Class for generating column information from a database.
@@ -27,13 +29,22 @@ class PicoColumnGenerator
     public static function getColumnList($database, $picoTableName)
     {
         // Check the database type and retrieve column list accordingly
+        $columns = array();
         if ($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MARIADB || 
             $database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MYSQL) 
         {
-            return (new PicoDatabaseUtilMySql())->getColumnList($database, $picoTableName);
+            $columns = (new PicoDatabaseUtilMySql())->getColumnList($database, $picoTableName);
+        }
+        else if($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $columns = (new PicoDatabaseUtilPostgreSql())->getColumnList($database, $picoTableName);
+        }
+        else if($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $columns = (new PicoDatabaseUtilSqlite())->getColumnList($database, $picoTableName);
         }
         
         // Return an empty array if the database type is not supported
-        return array();
+        return $columns;
     }
 }

@@ -12,6 +12,7 @@ use MagicObject\MagicObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
+use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
 
 /**
  * Database dump class for managing and generating SQL statements
@@ -95,6 +96,11 @@ class PicoDatabaseDump
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
+            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+        }
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
+        {
+            $tool = new PicoDatabaseUtilSqlite();
             return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
     }
@@ -243,6 +249,8 @@ class PicoDatabaseDump
     public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null)
     {
         $tableInfo = $this->getMergedTableInfo($entities);
+        $clumnNameList = $this->getColumnNameList($entities);
+        $tableInfo->setSortedColumnName($clumnNameList);
         $tableName = $this->getTableName($tableName, $tableInfo);
         $database = $this->getDatabase($database, $entities);
 
@@ -276,6 +284,27 @@ class PicoDatabaseDump
             }
         }
         return $queryAlter;
+    }
+
+    /**
+     * Get a list of column names from multiple entities.
+     *
+     * This method retrieves the table information for each entity, extracts the columns,
+     * and merges them into a single list.
+     *
+     * @param MagicObject[] $entities Array of entities to process.
+     * @return string[] List of column names from all entities.
+     */
+    public function getColumnNameList($entities)
+    {
+        $res = array();
+        foreach ($entities as $entity) {
+            $tableInfo = $this->getTableInfo($entity);
+            $columns = $tableInfo->getColumns();
+            $res = array_merge($res, array_keys($columns));
+        }
+        $res = array_unique($res);
+        return $res;
     }
 
     /**

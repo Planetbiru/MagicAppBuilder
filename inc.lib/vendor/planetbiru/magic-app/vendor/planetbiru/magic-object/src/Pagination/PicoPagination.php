@@ -198,7 +198,7 @@ class PicoPagination
         $path = $path === null ? trim($paths[0]) : $path;
         $urls[] = $path;
 
-        $urlParameters = isset($_GET) ? $_GET : [];
+        $urlParameters = isset($_GET) ? $_GET : array();
         $urlParameters[$parameterName] = $page; // Replace the page parameter
         
         // Build the query string

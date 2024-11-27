@@ -128,7 +128,7 @@ class PicoDownloadFile
             $end = $fileSize - 1;
         }
 
-        return [$start, $end];
+        return array($start, $end);
     }
 
     /**

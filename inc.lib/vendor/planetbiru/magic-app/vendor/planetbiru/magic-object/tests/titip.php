@@ -34,7 +34,7 @@
         $trace = debug_backtrace();
 
         // Get parameters from the caller function
-        $callerParamValues = isset($trace[1]['args']) ? $trace[1]['args'] : [];
+        $callerParamValues = isset($trace[1]['args']) ? $trace[1]['args'] : array();
         
         // Get the name of the caller function and class
         $callerFunctionName = $trace[1]['function'];

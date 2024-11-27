@@ -201,7 +201,7 @@ class PicoPageData // NOSONAR
         $this->stmt = $stmt;
         $this->entity = $entity;
         $this->className = $entity !== null ? get_class($entity) : null;
-        $this->subqueryMap = $subqueryMap !== null ? $subqueryMap : [];
+        $this->subqueryMap = $subqueryMap !== null ? $subqueryMap : array();
     }
 
     /**
@@ -265,7 +265,7 @@ class PicoPageData // NOSONAR
 
         $this->pagination = array();
         for ($i = $minPage; $i <= $maxPage; $i++) {
-            $this->pagination[] = ['page' => $i, 'selected' => $i === $curPage];
+            $this->pagination[] = array('page' => $i, 'selected' => $i === $curPage);
         }
         return $this;
     }
@@ -321,7 +321,7 @@ class PicoPageData // NOSONAR
     public function __toString()
     {
         $obj = new stdClass;
-        $exposedProps = [
+        $exposedProps = array(
             "pageable",
             "totalResult",
             "totalPage",
@@ -332,7 +332,7 @@ class PicoPageData // NOSONAR
             "endTime",
             "executionTime",
             "pagination"
-        ];
+        );
         
         foreach ($exposedProps as $key) {
             if (property_exists($this, $key)) {
@@ -340,10 +340,10 @@ class PicoPageData // NOSONAR
             }
         }
 
-        $obj->findOption = [
+        $obj->findOption = array(
             "FIND_OPTION_NO_COUNT_DATA" => $this->findOption & MagicObject::FIND_OPTION_NO_COUNT_DATA,
             "FIND_OPTION_NO_FETCH_DATA" => $this->findOption & MagicObject::FIND_OPTION_NO_FETCH_DATA,
-        ];
+        );
 
         return json_encode($obj);
     }

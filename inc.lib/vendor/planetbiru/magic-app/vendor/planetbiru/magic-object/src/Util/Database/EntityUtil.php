@@ -29,7 +29,7 @@ class EntityUtil
         $tableInfo = $entity->tableInfo();
         if($tableInfo == null)
         {
-            return [];
+            return array();
         }
         $columns = $tableInfo->getColumns();
         $propertyColumns = array();
@@ -51,7 +51,7 @@ class EntityUtil
         $tableInfo = $entity->tableInfo();
         if($tableInfo == null)
         {
-            return [];
+            return array();
         }
         $joinColumns = $tableInfo->getJoinColumns();
         $propertyColumns = array();

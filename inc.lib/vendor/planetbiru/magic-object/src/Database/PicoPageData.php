@@ -201,7 +201,7 @@ class PicoPageData // NOSONAR
         $this->stmt = $stmt;
         $this->entity = $entity;
         $this->className = $entity !== null ? get_class($entity) : null;
-        $this->subqueryMap = $subqueryMap !== null ? $subqueryMap : [];
+        $this->subqueryMap = $subqueryMap !== null ? $subqueryMap : array();
     }
 
     /**

@@ -6,7 +6,7 @@ use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoDatabaseType;
-use MagicObject\Database\PicoTableInfo;
+use MagicObject\Database\PicoTableInfoExtended;
 use MagicObject\Exceptions\ErrorConnectionException;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
@@ -77,17 +77,18 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
     /**
      * Dumps the structure of a table as a SQL statement.
      *
-     * This method generates a SQL CREATE TABLE statement based on the provided table information,
-     * including the option to include or exclude specific clauses such as "IF NOT EXISTS" and 
+     * This method generates a SQL `CREATE TABLE` statement based on the provided table information,
+     * including options to add or omit specific clauses such as "IF NOT EXISTS" and 
      * "DROP TABLE IF EXISTS". It also handles the definition of primary keys if present.
      *
-     * @param PicoTableInfo $tableInfo     The information about the table, including column details and primary keys.
-     * @param string        $tableName  The name of the table for which the structure is being generated.
-     * @param bool         $createIfNotExists Whether to add "IF NOT EXISTS" in the CREATE statement (default is false).
-     * @param bool         $dropIfExists      Whether to add "DROP TABLE IF EXISTS" before the CREATE statement (default is false).
-     * @param string|null  $engine            The storage engine to use for the table (optional, default is null).
-     * @param string|null  $charset           The character set to use for the table (optional, default is null).
-     * @return string                           The SQL statement to create the table, including column definitions and primary keys.
+     * @param PicoTableInfoExtended $tableInfo         The information about the table, including column details and primary keys.
+     * @param string                $tableName         The name of the table for which the structure is being generated.
+     * @param bool                  $createIfNotExists Whether to include "IF NOT EXISTS" in the `CREATE` statement (default is false).
+     * @param bool                  $dropIfExists      Whether to include "DROP TABLE IF EXISTS" before the `CREATE` statement (default is false).
+     * @param string|null           $engine            The storage engine to use for the table (optional, default is null).
+     * @param string|null           $charset           The character set to use for the table (optional, default is null).
+     *
+     * @return string                                  The SQL statement to create the table, including column definitions and primary keys.
      */
     public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = null, $charset = null)
     {
@@ -106,9 +107,16 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
 
         $query[] = "$createStatement \"$tableName\" (";
 
-        foreach ($tableInfo->getColumns() as $column) {
-            $query[] = $this->createColumnPostgre($column, $autoIncrementKeys);
+        $cols = $tableInfo->getColumns();
+        
+        foreach($tableInfo->getSortedColumnName() as $columnName)
+        {
+            if(isset($cols[$columnName]))
+            {
+                $query[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys);
+            }
         }
+
         $query[] = implode(",\r\n", $query);
         $query[] = ");";
 

@@ -214,14 +214,22 @@ class PicoSqlParser
 
     /**
      * Initializes the list of valid SQL data types supported by the parser.
-     * 
-     * This method sets the list of data types that the parser recognizes, such as `varchar`, `int`, `timestamp`, etc.
+     *
+     * This method sets the list of data types that the parser recognizes, such as `varchar`, `int`, `timestamp`, `boolean`, 
+     * `json`, `uuid`, etc. These data types correspond to common column types in various SQL-based databases like PostgreSQL, 
+     * MySQL, and SQLite. The list may be used to validate or process SQL statements when parsing or generating SQL.
+     *
+     * @return void
      */
     public function init()
     {
-        $typeList = 'timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,varchar,char,real,float,integer,int,datetime,date,double';
+        // List of valid SQL data types that the parser will recognize
+        $typeList = 'timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,varchar,char,real,float,integer,int,datetime,date,double,boolean,json,uuid,bytea,money,decimal,numeric,blob,clob';
+        
+        // Splitting the string into an array of data types
         $this->typeList = explode(',', $typeList);
     }
+
 
     /**
      * Parses all `CREATE TABLE` statements in the provided SQL text.

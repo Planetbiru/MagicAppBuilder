@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 use PDO;
 
-class PicoDatabaseUtilBase
+class PicoDatabaseUtilBase // NOSONAR
 {
     const KEY_NAME = "name";
     /**
@@ -35,6 +35,101 @@ class PicoDatabaseUtilBase
         }
         return $autoIncrementKeys;
     }
+    
+    /**
+     * Determines whether fetching data is not required based on the provided parameters.
+     *
+     * This method checks if fetching data is not necessary based on the specified conditions:
+     * - The `getFindOption()` of the `$data` object must have the `FIND_OPTION_NO_FETCH_DATA` flag set.
+     * - The `$maxRecord` must be greater than 0.
+     * - The `$callbackFunction` must be defined and callable.
+     *
+     * @param MagicObject $data The data object, typically an instance of `MagicObject` or similar.
+     * @param int $maxRecord The maximum number of records to fetch.
+     * @param callable|null $callbackFunction Optional callback function that should be callable.
+     * 
+     * @return bool Returns `true` if fetching data is not required, otherwise `false`.
+     */
+    private function isFetchingDataNotRequired($data, $maxRecord, $callbackFunction)
+    {
+        return $data->getFindOption() & MagicObject::FIND_OPTION_NO_FETCH_DATA && $maxRecord > 0 && isset($callbackFunction) && is_callable($callbackFunction);
+    }
+    
+    /**
+     * Checks if the given data is an array of MagicObject instances.
+     *
+     * This function checks whether the provided data is an array and whether the first element in the array
+     * is an instance of `MagicObject`. It is used to validate that the data structure is compatible with 
+     * operations expecting an array of `MagicObject` instances.
+     *
+     * @param mixed $data The data to be checked.
+     * @return bool Returns `true` if the data is an array and the first element is a `MagicObject` instance, otherwise `false`.
+     */
+    private function isArrayMagicObject($data)
+    {
+        return is_array($data) && isset($data[0]) && $data[0] instanceof MagicObject;
+    }
+    
+    /**
+     * Checks if the provided callback function is callable.
+     *
+     * This method checks whether the `$callbackFunction` is set and if it is a valid callable function.
+     * It ensures that the provided function can be invoked during the execution of the code.
+     *
+     * @param mixed $callbackFunction The callback function to be checked.
+     * @return bool Returns `true` if the function is callable, otherwise `false`.
+     */
+    private function isCallbackFunction($callbackFunction)
+    {
+        return isset($callbackFunction) && is_callable($callbackFunction);
+    }
+    
+    /**
+     * Fetches records from the provided data source and processes them in batches.
+     *
+     * This method retrieves records from the specified data source (using a PDO statement) in batches,
+     * processes each record by mapping it to the required columns, and buffers the records until the 
+     * specified maximum number is reached. When the batch size is met, the records are processed 
+     * using an optional callback function, and the buffer is reset for the next batch.
+     *
+     * @param string $picoTableName The name of the target table where data will be inserted.
+     * @param array $columns Array of columns to be used for processing each record.
+     * @param PicoPageData $data The data source containing records to be fetched, usually an instance of `PicoPageData`.
+     * @param int $maxRecord The maximum number of records to fetch in a single query (default is 100).
+     * @param callable|null $callbackFunction Optional callback function to process the generated SQL 
+     *                                         statements. If provided, the function will be called with the 
+     *                                         generated SQL statement as an argument when the batch size is reached.
+     * 
+     * @return array An array of records that are fetched and processed. This will return the remaining 
+     *               records if there are any after the batch processing.
+     */
+    private function getRecords($picoTableName, $columns, $data, $maxRecord, $callbackFunction)
+    {
+        $records = array();
+        $stmt = $data->getPDOStatement();
+        // Fetch records in batches
+        while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
+        {
+            // Ensure data has all required columns
+            $data = $this->processDataMapping($data, $columns);
+            if(count($records) < $maxRecord)
+            {
+                $records[] = $data;
+            }
+            else
+            {
+                if($this->isCallbackFunction($callbackFunction))
+                {
+                    // Call the callback function with the generated SQL
+                    $sql = $this->insert($picoTableName, $records);
+                    call_user_func($callbackFunction, $sql);
+                }
+                // Reset the records buffer
+                $records = array();
+            }
+        }
+        return $records;
+    }
 
     /**
      * Dumps data from various sources into SQL INSERT statements.
@@ -53,39 +148,18 @@ class PicoDatabaseUtilBase
      *                                         representing the SQL statement.
      * @return string|null SQL INSERT statements or null if no data was processed.
      */
-    public function dumpData($columns, $picoTableName, $data, $maxRecord = 100, $callbackFunction = null) // NOSONAR
+    public function dumpData($columns, $picoTableName, $data, $maxRecord = 100, $callbackFunction = null)
     {
         // Check if $data is an instance of PicoPageData
+        $result = null;
         if($data instanceof PicoPageData)
         {
             // Handle case where fetching data is not required
-            if($data->getFindOption() & MagicObject::FIND_OPTION_NO_FETCH_DATA && $maxRecord > 0 && isset($callbackFunction) && is_callable($callbackFunction))
+            if($this->isFetchingDataNotRequired($data, $maxRecord, $callbackFunction))
             {
-                $records = array();
-                $stmt = $data->getPDOStatement();
-                // Fetch records in batches
-                while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
-                {
-                    // Ensure data has all required columns
-                    $data = $this->processDataMapping($data, $columns);
-                    if(count($records) < $maxRecord)
-                    {
-                        $records[] = $data;
-                    }
-                    else
-                    {
-                        if(isset($callbackFunction) && is_callable($callbackFunction))
-                        {
-                            // Call the callback function with the generated SQL
-                            $sql = $this->insert($picoTableName, $records);
-                            call_user_func($callbackFunction, $sql);
-                        }
-                        // Reset the records buffer
-                        $records = array();
-                    }
-                }
+                $records = $this->getRecords($picoTableName, $columns, $data, $maxRecord, $callbackFunction);
                 // Handle any remaining records
-                if(!empty($records) && isset($callbackFunction) && is_callable($callbackFunction))
+                if(!empty($records) && $this->isCallbackFunction($callbackFunction))
                 {
                     $sql = $this->insert($picoTableName, $records);
                     call_user_func($callbackFunction, $sql);
@@ -94,20 +168,20 @@ class PicoDatabaseUtilBase
             else if(isset($data->getResult()[0]))
             {
                 // If data is available, dump records directly
-                return $this->dumpRecords($columns, $picoTableName, $data->getResult());
+                $result = $this->dumpRecords($columns, $picoTableName, $data->getResult());
             }
         }
         else if($data instanceof MagicObject)
         {
             // Handle a single MagicObject instance
-            return $this->dumpRecords($columns, $picoTableName, array($data));
+            $result = $this->dumpRecords($columns, $picoTableName, array($data));
         }
-        else if(is_array($data) && isset($data[0]) && $data[0] instanceof MagicObject)
+        else if($this->isArrayMagicObject($data))
         {
             // Handle an array of MagicObject instances
-            return $this->dumpRecords($columns, $picoTableName, $data);
+            $result = $this->dumpRecords($columns, $picoTableName, $data);
         }
-        return null; // Return null if no valid data was processed
+        return $result;
     }
 
     /**
@@ -634,7 +708,7 @@ class PicoDatabaseUtilBase
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery); // NOSONAR
         
         // Replace MariaDB data types with PostgreSQL data types
-        $replacements = [
+        $replacements = array(
             'int' => 'INTEGER',
             'tinyint(1)' => 'BOOLEAN', // MariaDB TINYINT(1) as BOOLEAN
             'tinyint' => 'SMALLINT',
@@ -655,7 +729,7 @@ class PicoDatabaseUtilBase
             'longtext' => 'TEXT', // No direct equivalent
             'json' => 'JSONB', // Use JSONB for better performance in PostgreSQL
             // Add more type conversions as needed
-        ];
+        );
 
         $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
 
@@ -693,7 +767,7 @@ class PicoDatabaseUtilBase
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery); // NOSONAR
         
         // Replace PostgreSQL data types with MySQL data types
-        $replacements = [
+        $replacements = array(
             'bigserial' => 'BIGINT AUTO_INCREMENT',
             'serial' => 'INT AUTO_INCREMENT',
             'character varying' => 'VARCHAR', // Added handling for character varying
@@ -712,7 +786,7 @@ class PicoDatabaseUtilBase
             'json' => 'JSON',
             'bytea' => 'BLOB', // Added handling for bytea
             // Add more type conversions as needed
-        ];
+        );
     
         $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
     

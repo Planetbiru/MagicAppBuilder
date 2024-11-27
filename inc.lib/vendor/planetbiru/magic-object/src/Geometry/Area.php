@@ -64,7 +64,7 @@ class Area
     public function __construct($object, $zoom = 1, $href = null, $attributes = null)
     {
         $this->href = $href;
-        $this->attributes = is_array($attributes) ? $attributes : [];
+        $this->attributes = is_array($attributes) ? $attributes : array();
         $this->zoom = $zoom;
 
         if ($object instanceof Rectangle) {

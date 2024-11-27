@@ -20,6 +20,15 @@ class PicoTableInfoExtended extends PicoTableInfo
     const ELEMENT   = "element"; // Key for the element
 
     /**
+     * List of sorted column names.
+     *
+     * This property stores an array of column names in their sorted order.
+     *
+     * @var array List of sorted column names.
+     */
+    private $sortedColumnName = array();
+
+    /**
      * Gets an instance of PicoTableInfoExtended.
      *
      * @return self A new instance of the class.
@@ -293,4 +302,33 @@ class PicoTableInfoExtended extends PicoTableInfo
         $this->notNullColumns = $tmp;
         return $this;
     }
+
+    /**
+     * Get the sorted column names.
+     *
+     * This method retrieves the list of sorted column names.
+     *
+     * @return array List of sorted column names.
+     */
+    public function getSortedColumnName()
+    {
+        return $this->sortedColumnName;
+    }
+
+    /**
+     * Set the sorted column names.
+     *
+     * This method sets the list of sorted column names.
+     *
+     * @param array $sortedColumnName List of sorted column names.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setSortedColumnName($sortedColumnName)
+    {
+        $this->sortedColumnName = $sortedColumnName;
+
+        return $this;
+    }
+
 }

@@ -35,6 +35,7 @@ class FileUtil
         if ($level == 0) {
             $origin = $directory;
         }
+        // Exclude the current (.) and parent (..) directory entries
         $files = array_diff(scandir($directory), array('.', '..'));
         $allFiles = array();
 
@@ -43,9 +44,16 @@ class FileUtil
             $fullPath = self::fixFilePath($fullPath);
             $file2add = $file;
             if ($level > 0) {
+                // Adjust the file path to be relative to the origin directory
                 $file2add = substr($fullPath, strlen($origin) + 1);
             }
-            is_dir($fullPath) ? array_push($allFiles, ...self::getFiles($fullPath, $level + 1, $origin)) : array_push($allFiles, $file2add);
+            if (is_dir($fullPath)) {
+                // Use array_merge to combine files from subdirectories
+                $allFiles = array_merge($allFiles, self::getFiles($fullPath, $level + 1, $origin));
+            } else {
+                // Add individual file to the result array
+                $allFiles[] = $file2add;
+            }
         }
         return $allFiles;
     }

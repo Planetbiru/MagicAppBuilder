@@ -2,6 +2,8 @@
 
 namespace MagicObject\Geometry;
 
+use InvalidArgumentException;
+
 /**
  * Class representing a Line with two Point objects.
  *
@@ -33,11 +35,11 @@ class Line {
      *
      * @param Point $a Point A.
      * @param Point $b Point B.
-     * @throws \InvalidArgumentException If the parameters are not instances of Point.
+     * @throws InvalidArgumentException If the parameters are not instances of Point.
      */
     public function __construct($a, $b) {
         if (!$a instanceof Point || !$b instanceof Point) {
-            throw new \InvalidArgumentException('Both parameters must be instances of Point.');
+            throw new InvalidArgumentException('Both parameters must be instances of Point.');
         }
         $this->a = $a;
         $this->b = $b;
