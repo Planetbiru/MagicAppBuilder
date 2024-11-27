@@ -53,6 +53,8 @@ class AppBuilderBase //NOSONAR
     const CALL_DELETE_END = "->delete();";
     const CALL_SET = "->set";
     const CALL_GET = "->get";
+    const CALL_ISSET = "->isset";
+    const BRACKETS = "()";
     
     const PHP_OPEN_TAG = '<'.'?'.'php ';
     const PHP_CLOSE_TAG = '?'.'>';
@@ -518,7 +520,7 @@ class AppBuilderBase //NOSONAR
         if($this->style == self::STYLE_SETTER_GETTER)
         {
             $param = PicoStringUtil::upperCamelize($id);
-            return self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->get$param"."();".self::PHP_CLOSE_TAG;
+            return self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->get$param".self::BRACKETS.";".self::PHP_CLOSE_TAG;
         }
         else
         {
@@ -624,8 +626,7 @@ class AppBuilderBase //NOSONAR
      * @return string Generated HTML and PHP code for the UPDATE form.
      */
     public function createGuiUpdate($mainEntity, $fields, $approvalRequired = false)
-    {
-        
+    {   
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
         $upperPkName = PicoStringUtil::upperCamelize($primaryKeyName);
@@ -661,8 +662,8 @@ class AppBuilderBase //NOSONAR
         $getData = array();
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
-        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
         $getData[] = $this->constructEntityLabel($entityName);
@@ -671,7 +672,7 @@ class AppBuilderBase //NOSONAR
         if($approvalRequired)
         {
             $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
-            $getData[] = self::TAB1.self::TAB1."if(!UserAction::isRequireApproval(".self::VAR.$objectName."->get".$upperWaitingFor."()))";
+            $getData[] = self::TAB1.self::TAB1."if(!UserAction::isRequireApproval(".self::VAR.$objectName."->get".$upperWaitingFor.self::BRACKETS."))";
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         }
 
@@ -868,14 +869,14 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.", ".self::VAR."subqueryMap);";
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
         }
         
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         $getData[] = self::TAB1.self::TAB1.self::TAB1.'// Define map here';
         $getData[] = $map;
@@ -976,14 +977,14 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."(), ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.", ".self::VAR."subqueryMap);";
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName."());";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
         }       
         
-        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName."->isset".$upperPkName."())";
+        $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
         $getData[] = $this->constructEntityLabel($entityName);
@@ -1177,7 +1178,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.'() ? $'.'row'.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $row'.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.'row'.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -1187,9 +1188,9 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             )
         {
             $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
-            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()])';
-            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()]["label"])';
-            $v4 = self::MAP_FOR.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.'()]["label"]';
+            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
+            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
+            $v4 = self::MAP_FOR.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]';
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
         }
@@ -1211,7 +1212,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName."()";
+            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
             $result = self::VAR.'row'.$val;
         }
         
@@ -1260,11 +1261,11 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
 
             if($field->getElementType() == 'text')
             {
-                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption."() => ".self::VAR."headerFormat".self::CALL_GET.$caption."()"; 
+                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
             }
             else
             {
-                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption."() => ".self::VAR."headerFormat->asString()";
+                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
             }
 
 
@@ -1901,8 +1902,6 @@ $subqueryMap = '.$referece.';
         $table->appendChild($tbody);
         $table->appendChild($dom->createTextNode(self::N_TAB3)); 
         
-        
-        
         return $table;
     }
     
@@ -2038,7 +2037,7 @@ $subqueryMap = '.$referece.';
                 $caption = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
             }
 
-            $a->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$caption."();".self::PHP_CLOSE_TAG)); 
+            $a->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS.";".self::PHP_CLOSE_TAG)); 
             $td->appendChild($a);
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
@@ -2085,11 +2084,11 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>');
+            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));?>');
         }
         else
         {
-            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>');
+            $buttonApprove->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));?>');
         }
         $buttonApprove->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonApproveTiny();?>')); 
         return $buttonApprove;
@@ -2116,7 +2115,7 @@ $subqueryMap = '.$referece.';
         {
             $buttonReject = $dom->createElement('a');
             $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-            $buttonReject->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'(), array(UserAction::NEXT_ACTION => UserAction::REJECT));?>');
+            $buttonReject->setAttribute('href', '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::REJECT));?>');
             $buttonReject->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonRejectTiny();?>')); 
         }
         return $buttonReject;
@@ -2153,8 +2152,8 @@ $subqueryMap = '.$referece.';
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
             
-            $trh->setAttribute("data-primary-key", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).'();?>');
-            $trh->setAttribute("data-sort-order", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).'();?>');
+            $trh->setAttribute("data-primary-key", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).self::BRACKETS.';?>');
+            $trh->setAttribute("data-sort-order", '<?php echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).self::BRACKETS.';?>');
             $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php } ?>')); 
             // sort-control end
         }
@@ -2171,7 +2170,7 @@ $subqueryMap = '.$referece.';
         $chekcbox->setAttribute('type', 'checkbox');
         $chekcbox->setAttribute('class', $className);
         $chekcbox->setAttribute('name', 'checked_row_id[]');
-        $chekcbox->setAttribute('value', self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.self::CALL_GET.$upperPkName."();".self::PHP_CLOSE_TAG);
+        $chekcbox->setAttribute('value', self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.";".self::PHP_CLOSE_TAG);
         
         $td->appendChild($dom->createTextNode(self::N_TAB7)); 
         $td->appendChild($chekcbox);
@@ -2186,7 +2185,7 @@ $subqueryMap = '.$referece.';
         $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedUpdate()){ ?>')); 
         $edit = $dom->createElement('a');
         $edit->setAttribute('class', 'edit-control');
-        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'());?>';
+        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');?>';
         $edit->setAttribute('href', $href);
         $spanEdit = $dom->createElement('span');
         $spanEdit->setAttribute('class', 'fa fa-edit');
@@ -2208,7 +2207,7 @@ $subqueryMap = '.$referece.';
         $trh->appendChild($dom->createTextNode(self::N_TAB6.'<?php if($userPermission->isAllowedDetail()){ ?>')); 
         $detail = $dom->createElement('a');
         $detail->setAttribute('class', 'detail-control field-master');
-        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.'());?>';
+        $href = '<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');?>';
         $detail->setAttribute('href', $href);
         $spanDetail = $dom->createElement('span');
         $spanDetail->setAttribute('class', 'fa fa-folder');
@@ -2455,7 +2454,7 @@ $subqueryMap = '.$referece.';
                 $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
             }
 
-            $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+            $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $label = $dom->createTextNode($labelStr);
             
             $labelWrapper = $dom->createElement('span');
@@ -2477,7 +2476,7 @@ $subqueryMap = '.$referece.';
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
 
                 
-                $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName."();".AppBuilderBase::PHP_CLOSE_TAG);
+                $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
                 $input->setAttribute('autocomplete', 'off');
                 
                 $filterGroup->appendChild($dom->createTextNode(self::N_TAB3));
@@ -2546,7 +2545,7 @@ $subqueryMap = '.$referece.';
                 $value->appendChild($textLabel);
                 $select->appendChild($dom->createTextNode(self::N_TAB6));
                 $select->appendChild($value);
-                $select = $this->appendOption($dom, $select, $referenceFilter, self::VAR."inputGet".self::CALL_GET.$inputGetName."()");
+                $select = $this->appendOption($dom, $select, $referenceFilter, self::VAR."inputGet".self::CALL_GET.$inputGetName.self::BRACKETS."");
 
                 $filterGroup->appendChild($dom->createTextNode(self::N_TAB3));               
                 $filterGroup->appendChild($labelWrapper);               
@@ -2760,7 +2759,7 @@ $subqueryMap = '.$referece.';
             $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
         }
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2807,7 +2806,7 @@ $subqueryMap = '.$referece.';
             $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
         }
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2852,7 +2851,7 @@ $subqueryMap = '.$referece.';
             $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
         }
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2908,7 +2907,7 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.$objectName.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -2918,9 +2917,9 @@ $subqueryMap = '.$referece.';
             )
         {
             $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
-            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()])';
-            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()]["label"])';
-            $v4 = self::MAP_FOR.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()]["label"]';
+            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
+            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
+            $v4 = self::MAP_FOR.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]';
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
         }
@@ -2942,7 +2941,7 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName."()";
+            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
             $result = self::VAR.$objectName.$val;
         }
         
@@ -2981,7 +2980,7 @@ $subqueryMap = '.$referece.';
         {
             $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
         }
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
         
         if($field->getElementType() == 'checkbox')
@@ -3003,8 +3002,8 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.'() ? $'.$objectName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
-            $val2 = '->isset'.$upperObjName.'() ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.'()->get'.$upperPropName.'() : ""';
+            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $val2 = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val2;
         }
@@ -3015,22 +3014,22 @@ $subqueryMap = '.$referece.';
             )
         {
             $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
-            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()])';
-            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()]["label"])';
-            $v4 = self::MAP_FOR.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.'()]["label"]';
+            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
+            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
+            $v4 = self::MAP_FOR.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]';
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
 
             $v12 = 'isset('.self::MAP_FOR.$upperFieldName.')';
-            $v22 = 'isset($mapFor'.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.'()])';
-            $v32 = 'isset($mapFor'.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.'()]["label"])';
-            $v42 = self::MAP_FOR.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.'()]["label"]';
+            $v22 = 'isset($mapFor'.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
+            $v32 = 'isset($mapFor'.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
+            $v42 = self::MAP_FOR.$upperFieldName.'[$'.$objectApprovalName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]';
             $val2 = "$v12 && $v22 && $v32 ? $v42 : \"\"";
             $result2 = $val2;
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName."()";
+            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val;
         }
@@ -3043,8 +3042,8 @@ $subqueryMap = '.$referece.';
         $valueWrapper1 = $dom->createElement('span');
         $valueWrapper2 = $dom->createElement('span');
         
-        $valueWrapper1->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri."()));".self::PHP_CLOSE_TAG);
-        $valueWrapper2->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri."()));".self::PHP_CLOSE_TAG);
+        $valueWrapper1->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri.self::BRACKETS."));".self::PHP_CLOSE_TAG);
+        $valueWrapper2->setAttribute('class', self::PHP_OPEN_TAG.self::ECHO."AppFormBuilder::classCompareData(".self::VAR.$objectName."->notEquals".$upperFieldNameOri."(".self::VAR.$objectApprovalName.self::CALL_GET.$upperFieldNameOri.self::BRACKETS."));".self::PHP_CLOSE_TAG);
 
         $valueWrapper1->appendChild($value);
         $valueWrapper2->appendChild($value2);
@@ -3137,7 +3136,7 @@ $subqueryMap = '.$referece.';
             $inputStrl = $this->addAttributeId($inputStrl, $id);
             $inputStrl->setAttribute('value', '1');
             $input->appendChild($inputStrl);
-            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $textLabel = $dom->createTextNode(' '.$caption);
             $input->appendChild($textLabel);
         }
@@ -3172,7 +3171,7 @@ $subqueryMap = '.$referece.';
 
             $input = $this->addAttributeId($input, $id);  
             
-            $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.'()'));
+            $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
             $input->setAttribute('autocomplete', 'off');
             if($field->getRequired())
             {
@@ -3191,7 +3190,7 @@ $subqueryMap = '.$referece.';
             
             $value = $dom->createTextNode('');
             $input->appendChild($value);
-            $value = $dom->createTextNode($this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.'()'));
+            $value = $dom->createTextNode($this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
             $input->appendChild($value);
             $input->setAttribute('spellcheck', 'false');
             if($field->getRequired())
@@ -3218,7 +3217,7 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $input->appendChild($value);
             $referenceData = $field->getReferenceData();
-            $input = $this->appendOption($dom, $input, $referenceData, self::VAR.$objectName.self::CALL_GET.$upperFieldName.'()');
+            $input = $this->appendOption($dom, $input, $referenceData, self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS);
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
@@ -3237,9 +3236,9 @@ $subqueryMap = '.$referece.';
             $inputStrl = $this->addAttributeId($inputStrl, $id);
              
             $inputStrl->setAttribute('value', '1');
-            $inputStrl->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.'->createChecked'.$upperFieldName.'();'.self::PHP_CLOSE_TAG));
+            $inputStrl->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.'->createChecked'.$upperFieldName.self::BRACKETS.';'.self::PHP_CLOSE_TAG));
             $input->appendChild($inputStrl);
-            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName."();".self::PHP_CLOSE_TAG;
+            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $textLabel = $dom->createTextNode(' '.$caption);
             $input->appendChild($textLabel);
         }
@@ -3759,7 +3758,7 @@ $subqueryMap = '.$referece.';
         $pkInput = $dom->createElement('input');
         $pkInput->setAttribute("type", "hidden");
         $pkInput->setAttribute('name', $primaryKeyName);
-        $pkInput->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
+        $pkInput->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($btn1);
@@ -3817,7 +3816,7 @@ $subqueryMap = '.$referece.';
         $btn4->appendChild($dom->createTextNode('<?php echo $appLanguage->getButtonReject();?>'));
         $btn42 = clone $btn4;
 
-        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'())');
+        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
         $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, null, self::REDIRECT_TO_ITSELF);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -3861,7 +3860,7 @@ $subqueryMap = '.$referece.';
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
-        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
+        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
 
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($pkInputApprove);
@@ -3925,14 +3924,14 @@ $subqueryMap = '.$referece.';
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
-        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
+        $pkInputApprove->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
 
         $pkInputApprove2 = clone $pkInputApprove;
 
         $pkInputReject = $dom->createElement('input');
         $pkInputReject->setAttribute("type", "hidden");
         $pkInputReject->setAttribute('name', $primaryKeyName);
-        $pkInputReject->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.'();?>');
+        $pkInputReject->setAttribute('value', '<?php echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';?>');
 
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5.self::PHP_OPEN_TAG));
