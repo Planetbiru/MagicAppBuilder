@@ -46,6 +46,22 @@ try {
     $cols = [];
     $primaryKeys = [];
 
+    $skipped = array();
+    $skipped[] = $appConfig->entityInfo->get('draft');
+    $skipped[] = $appConfig->entityInfo->get('waitingFor');
+    $skipped[] = $appConfig->entityInfo->get('approvalNote');
+    $skipped[] = $appConfig->entityInfo->get('approvalId');
+    $skipped[] = $appConfig->entityInfo->get('adminCreate');
+    $skipped[] = $appConfig->entityInfo->get('adminEdit');
+    $skipped[] = $appConfig->entityInfo->get('adminAskEdit');
+    $skipped[] = $appConfig->entityInfo->get('timeCreate');
+    $skipped[] = $appConfig->entityInfo->get('timeEdit');
+    $skipped[] = $appConfig->entityInfo->get('timeAskEdit');
+    $skipped[] = $appConfig->entityInfo->get('ipCreate');
+    $skipped[] = $appConfig->entityInfo->get('ipEdit');
+    $skipped[] = $appConfig->entityInfo->get('ipAskEdit');
+    
+
     foreach ($rows as $i => $data) {
         $cols[] = $data['column_name'];
         $fields[] = array(
@@ -62,6 +78,7 @@ try {
         'fields' => $fields,
         'columns' => $cols,
         'primary_keys' => $primaryKeys,
+        'skipped_insert_edit' => $skipped
     );
     ResponseUtil::sendJSON($json);
 } catch (Exception $e) {

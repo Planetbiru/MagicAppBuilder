@@ -2107,7 +2107,7 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonReject = $dom->createTextNode(self::PHP_OPEN_TAG.'echo UserAction::getWaitingForText($appLanguage, $supervisor->getWaitingFor());'.self::PHP_CLOSE_TAG);
+            $buttonReject = $dom->createTextNode(self::PHP_OPEN_TAG.'echo UserAction::getWaitingForText($appLanguage, $'.$objectName.'->getWaitingFor());'.self::PHP_CLOSE_TAG);
         }
         else
         {

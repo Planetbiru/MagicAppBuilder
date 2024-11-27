@@ -2940,11 +2940,11 @@ function loadColumn(tableName, selector) {
       let i;
       let field, args;
       let domHtml;
-      let skipedOnInsertEdit = getSkipedCol();
+      let skippedOnInsertEdit = answer.skipped_insert_edit;
       for (i in data) {
         field = data[i].column_name;
         args = { data_type: data[i].data_type, column_type: data[i].column_type };
-        domHtml = generateRow(field, args, skipedOnInsertEdit);
+        domHtml = generateRow(field, args, skippedOnInsertEdit);
         $(selector).append(domHtml);
       }
 
@@ -3165,35 +3165,6 @@ function loadSavedModuleData(moduleFile, target, clbk) {
       clbk();
     }
   });
-}
-
-/**
- * Retrieves a list of skipped columns based on predefined entity information fields.
- *
- * This function collects the values from various entity information fields 
- * that are considered skipped and returns them in an array. These fields 
- * are typically related to administrative and timestamp information that 
- * may not need to be included in certain operations.
- *
- * @returns {Array} An array of values from the skipped columns.
- */
-function getSkipedCol() {
-  let skiped = [];
-
-  skiped.push($('[name="entity_info_draft"]').val());
-  skiped.push($('[name="entity_info_waiting_for"]').val());
-  skiped.push($('[name="entity_info_approval_note"]').val());
-  skiped.push($('[name="entity_info_approval_id"]').val());
-  skiped.push($('[name="entity_info_admin_create"]').val());
-  skiped.push($('[name="entity_info_admin_edit"]').val());
-  skiped.push($('[name="entity_info_admin_ask_edit"]').val());
-  skiped.push($('[name="entity_info_time_create"]').val());
-  skiped.push($('[name="entity_info_time_edit"]').val());
-  skiped.push($('[name="entity_info_time_ask_edit"]').val());
-  skiped.push($('[name="entity_info_ip_create"]').val());
-  skiped.push($('[name="entity_info_ip_edit"]').val());
-  skiped.push($('[name="entity_info_ip_ask_edit"]').val());
-  return skiped;
 }
 
 /**
@@ -3460,10 +3431,10 @@ function isKeyWord(str) {
  *
  * @param {string} field - The name of the field for which the row is generated.
  * @param {object} args - Additional arguments that may influence the row's configuration.
- * @param {Array} skipedOnInsertEdit - An array of field names to be skipped for insert/edit checkboxes.
+ * @param {Array} skippedOnInsertEdit - An array of field names to be skipped for insert/edit checkboxes.
  * @returns {string} The HTML string representing a table row with input elements.
  */
-function generateRow(field, args, skipedOnInsertEdit)  //NOSONAR
+function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
 {
   // Check if the field is a reserved keyword
   let isKW = isKeyWord(field);
@@ -3478,7 +3449,7 @@ function generateRow(field, args, skipedOnInsertEdit)  //NOSONAR
   let editRow = "";
   let listRow = "";
   let exportRow = "";
-  if ($.inArray(field, skipedOnInsertEdit) != -1) {
+  if ($.inArray(field, skippedOnInsertEdit) != -1) {
     insertRow =
       '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
       field +
