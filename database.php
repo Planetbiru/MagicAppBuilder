@@ -3,6 +3,7 @@
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
+use MagicObject\Util\PicoStringUtil;
 
 require_once (__DIR__) . "/inc.app/app.php";
 require_once (__DIR__) . "/inc.app/sessions.php";
@@ -234,8 +235,9 @@ $pdo = $database->getDatabaseConnection();
 
             // Query execution form
             echo "<h3>Execute Query</h3>";
+            $lastQuery = strlen($query) > 0 && !PicoStringUtil::startsWith($query, '-- ') ? '-- '.$query : $query;
             echo "<form method='post'>
-                    <textarea name='query' rows='4' cols='50' spellcheck='false'></textarea><br>
+                    <textarea name='query' rows='4' cols='50' spellcheck='false'>".htmlspecialchars($lastQuery)."</textarea><br>
                     <input type='submit' value='Execute'>
                     <input type='reset' value='Reset'>
                   </form>";
