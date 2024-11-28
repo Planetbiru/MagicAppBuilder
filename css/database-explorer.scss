@@ -91,16 +91,28 @@ textarea {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-input[type="submit"] {
+[type="submit"], [type="button"], [type="reset"], button {
     padding: 10px 20px;
     border: none;
-    background-color: #007BFF;
-    color: #fff;
+
     cursor: pointer;
     border-radius: 4px;
 }
-input[type="submit"]:hover {
+[type="submit"]
+{
+    background-color: #007BFF;
+    color: #fff;
+}
+[type="submit"]:hover {
     background-color: #0056b3;
+}
+[type="reset"]
+{
+    background-color: #ffa600;
+    color: #333333;
+}
+[type="reset"]:hover {
+    background-color: #ffa600f1;
 }
 .sidebar form
 {
@@ -151,6 +163,10 @@ input[type="submit"]:hover {
 }
 .collapsible.open .button-toggle::before{
     content: attr(data-open);
+}
+.table-content
+{
+    margin-bottom: 10px;
 }
 .table-structure-inner, .table-content-inner
 {

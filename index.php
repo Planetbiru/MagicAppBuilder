@@ -1047,11 +1047,11 @@ $constSelected = ' selected';
     </div>
   </div>
   
-  <div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static">
+  <div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-fullscreen">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Dqtabase Explorer</h5>
+          <h5 class="modal-title">Database Explorer</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

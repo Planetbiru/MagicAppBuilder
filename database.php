@@ -196,7 +196,7 @@ $pdo = $database->getDatabaseConnection();
                         }
                         echo "</table>";
                         echo "</div>";
-                        echo "</div>";
+                        
                     
                         // Pagination navigation with a maximum of 7 pages
                         echo "<div class='pagination'>";
@@ -225,6 +225,7 @@ $pdo = $database->getDatabaseConnection();
                             echo "<a href='?applicationId=$applicationId&database={$databaseName}&table=$table&page=$totalPages'>Last</a>";
                         }
                         echo "</div>";
+                        echo "</div>";
                     }
                     
                     showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit);
@@ -236,6 +237,7 @@ $pdo = $database->getDatabaseConnection();
             echo "<form method='post'>
                     <textarea name='query' rows='4' cols='50' spellcheck='false'></textarea><br>
                     <input type='submit' value='Execute'>
+                    <input type='reset' value='Reset'>
                   </form>";
             
             if ($query) {

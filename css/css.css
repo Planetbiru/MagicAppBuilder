@@ -804,4 +804,6 @@ input[type=number][name=database_port] {
   border: none;
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
 }/*# sourceMappingURL=css.css.map */
