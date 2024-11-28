@@ -3,11 +3,45 @@
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicObject\Util\PicoStringUtil;
+use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once (__DIR__) . "/inc.app/app.php";
 require_once (__DIR__) . "/inc.app/sessions.php";
 require_once (__DIR__) . "/inc.app/database.php";
+
+function splitSQL($sqlString) {
+    $statements = [];
+    $currentStatement = '';
+    $inSingleQuote = false;
+    $inDoubleQuote = false;
+
+    for ($i = 0; $i < strlen($sqlString); $i++) {
+        $char = $sqlString[$i];
+
+        // Toggle quote context
+        if ($char === "'" && !$inDoubleQuote) {
+            $inSingleQuote = !$inSingleQuote;
+        } elseif ($char === '"' && !$inSingleQuote) {
+            $inDoubleQuote = !$inDoubleQuote;
+        }
+
+        // Check for semicolon outside of quotes
+        if ($char === ';' && !$inSingleQuote && !$inDoubleQuote) {
+            $statements[] = trim($currentStatement);
+            $currentStatement = '';
+        } else {
+            $currentStatement .= $char;
+        }
+    }
+
+    // Add the last statement if exists
+    if (trim($currentStatement) !== '') {
+        $statements[] = trim($currentStatement);
+    }
+
+    return $statements;
+}
+
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
@@ -22,6 +56,7 @@ if($page < 1)
 }
 $limit = 20; // Rows per page
 $query = $inputPost->getQuery();
+
 
 $appConfigPath = $workspaceDirectory."/applications/$applicationId/default.yml";
 if(file_exists($appConfigPath))
@@ -233,11 +268,37 @@ $pdo = $database->getDatabaseConnection();
                 }
             }
 
+            $queries = array();
+            $lastQueries = "";
+            if($query)
+            {
+                $arr = splitSQL($query);
+                $query = implode(";\r\n", $arr);
+                $queryArray = PicoDatabaseUtil::splitSql($query);
+                if(isset($queryArray) && is_array($queryArray) && !empty($queryArray))
+                {
+                    $q2 = array();
+                    foreach($queryArray as $q)
+                    {
+                        $queries[] = $q['query'];
+                        $q2[] = "-- ".$q['query'];
+                    }
+                    $lastQueries = implode("\r\n", $q2);
+                }
+                else
+                {
+                    $lastQueries = $query;
+                }
+            }
+            else
+            {
+                $queryArray = null;
+            }
+
             // Query execution form
             echo "<h3>Execute Query</h3>";
-            $lastQuery = strlen($query) > 0 && !PicoStringUtil::startsWith($query, '-- ') ? '-- '.$query : $query;
             echo "<form method='post'>
-                    <textarea name='query' rows='4' cols='50' spellcheck='false'>".htmlspecialchars($lastQuery)."</textarea><br>
+                    <textarea name='query' rows='4' cols='50' spellcheck='false'>$lastQueries</textarea><br>
                     <input type='submit' value='Execute'>
                     <input type='reset' value='Reset'>
                   </form>";
@@ -261,12 +322,25 @@ $pdo = $database->getDatabaseConnection();
                         }
                         echo "</table>";
                     } catch (PDOException $e) {
-                        echo "Error: " . $e->getMessage();
+                        echo "<div class='sql-error'><strong>Error:</strong> " . $e->getMessage()."</div>";
                     }
                 }
-                echo "<div class='query-result'>";
-                executeQuery($pdo, $query);
-                echo "</div>";
+            
+                foreach($queries as $i=>$q)
+                {
+                    $j = $i + 1;
+                    $query2Executed = $q;
+                    echo "<div class='query-executed'>";
+                    echo "<div class='query-title'>Query $j</div>";
+                    echo "<div class='query-raw' contenteditable='true' spellcheck='false'>";
+                    echo htmlspecialchars($q);
+                    echo "</div>";
+                    echo "<div class='query-title'>Result</div>";
+                    echo "<div class='query-result'>";
+                    executeQuery($pdo, $q);
+                    echo "</div>";
+                    echo "</div>";
+                }
             }
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
