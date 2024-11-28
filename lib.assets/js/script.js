@@ -1065,6 +1065,14 @@ jQuery(function () {
       }
     });
   });
+  
+  $(document).on('click', '.button-application-database', function (e) {
+    e.preventDefault();
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-database-explorer .database-explorer').html('<iframe src="database.php?applicationId='+applicationId+'"></iframe>');
+    $('#modal-database-explorer').modal('show');
+    
+  });
 
   $(document).on('click', '.button-application-menu', function (e) {
     e.preventDefault();

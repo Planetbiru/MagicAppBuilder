@@ -908,3 +908,27 @@ input[type=number][name="database_port"] {
 {
 	z-index: 1200;
 }
+
+.modal-dialog.modal-fullscreen
+{
+	width: calc(100vw - 2rem);
+	max-width: calc(100vw - 2rem);
+	.modal-body{
+		overflow-y: auto;
+		.database-explorer
+		{
+			max-height: calc(100vh - 120px);
+			height: calc(100vh - 120px);
+		}
+	}
+}
+
+.database-explorer {
+	position: relative;
+	height: calc(100vh - 100px);
+	iframe{
+		border: none;
+		width: 100%;
+		height: 100%;
+	}
+}

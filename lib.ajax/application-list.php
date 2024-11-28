@@ -24,6 +24,7 @@ foreach ($arr as $app) {
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $app['id']; ?></h6>
             <p class="card-text"><?php echo $app['description']; ?></p>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-setting">Setting</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-database">Database</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-menu">Menu</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-open">VS Code</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-default">Default</a>

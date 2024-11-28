@@ -171,4 +171,4 @@ $newApp->loadYamlFile($path2, false, true, true);
 
 $appConf = $newApp->getApplication();
 $baseDir = $appConf->getBaseApplicationDirectory();
-$scriptGenerator->prepareApplication($newApp->getApplication(), $baseDir);
+$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir);
