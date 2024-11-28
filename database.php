@@ -54,7 +54,7 @@ if($page < 1)
 {
     $page = 1;
 }
-$limit = 20; // Rows per page
+$limit = $builderConfig->getDataLimit(); // Rows per page
 $query = $inputPost->getQuery();
 
 
