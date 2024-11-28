@@ -564,6 +564,19 @@ h3.entity-table-name {
   background-color: #FF0000;
 }
 
+.form-control.invalid-input {
+  border-color: #FF0000;
+}
+.form-control.invalid-input:focus {
+  border-color: #FF0000;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.1764705882);
+}
+.form-control.invalid-input:focus-visible {
+  border-color: #FF0000;
+  outline: rgba(255, 0, 0, 0.1764705882);
+}
+
 @keyframes anim-wave {
   0% {
     top: 1px;

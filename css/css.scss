@@ -667,7 +667,22 @@ h3.entity-table-name {
     }
 }
 
-
+.form-control {
+	&.invalid-input {
+	  border-color: #FF0000;
+  
+	  &:focus {
+		border-color: #FF0000;
+		outline: 0;
+		box-shadow: 0 0 0 .2rem #ff00002d;
+	  }
+  
+	  &:focus-visible {
+		border-color: #FF0000;
+		outline: #ff00002d;
+	  }
+	}
+  }  
 @keyframes anim-wave{
 	0%{
 		top:1px;

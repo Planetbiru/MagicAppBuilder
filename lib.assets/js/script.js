@@ -467,7 +467,7 @@ jQuery(function () {
 
   });
 
-  $('#modal-update-path').on('show.bs.modal', function () {
+  $('#modal-update-path').on('show.bs.modal', function (e) {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
@@ -600,7 +600,7 @@ jQuery(function () {
     });
   });
 
-  $(document).on('click', '.generate_entity', function () {
+  $(document).on('click', '.generate_entity', function (e) {
     let entityName = $('.rd-entity-name').val();
     let tableName = $('.rd-table-name').val();
 
@@ -679,21 +679,21 @@ jQuery(function () {
     $('.erd-image').empty().append(img);
   });
 
-  $(document).on('click', '.btn-move-up', function () {
+  $(document).on('click', '.btn-move-up', function (e) {
     let row = $(this).closest('tr');
     if (row.prev().length) {
       row.insertBefore(row.prev());
     }
   });
 
-  $(document).on('click', '.btn-move-down', function () {
+  $(document).on('click', '.btn-move-down', function (e) {
     let row = $(this).closest('tr');
     if (row.next().length) {
       row.insertAfter(row.next());
     }
   });
 
-  $(document).on('click', 'table.path-manager .path-remover', function () {
+  $(document).on('click', 'table.path-manager .path-remover', function (e) {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
       // Display the alert when the page loads
@@ -722,15 +722,28 @@ jQuery(function () {
     fixPathForm();
   });
 
-  $(document).on('click', 'table.path-manager .add-path', function () {
+  $(document).on('click', 'table.path-manager .add-path', function (e) {
     let clone = $(this).closest('table').find('tbody tr:first').clone();
     clone.find('input[type="text"]').val('');
     clone.find('input[type="checkbox"]').removeAttr('checked');
     $(this).closest('table').find('tbody').append(clone);
     fixPathForm();
   });
+  
+  $(document).on('change', '[name="application_namespace"]', function(e){
+    let ctrl = $(this);
+    let val = ctrl.val();
+    if(val == 'MagicObject' || val == 'MagicApp')
+    {
+      ctrl.addClass('invalid-input');
+    }
+    else
+    {
+      ctrl.removeClass('invalid-input');
+    }
+  });
 
-  $(document).on('click', '.create-new-application', function () {
+  $(document).on('click', '.create-new-application', function (e) {
     let createBtn = $('#modal-create-application #create_new_app');
     createBtn[0].disabled = true;
     $('[name="application_name"]').val('');
@@ -774,7 +787,7 @@ jQuery(function () {
     });
   });
 
-  $(document).on('click', '#button-save-entity-translation', function () {
+  $(document).on('click', '#button-save-entity-translation', function (e) {
     let translated = transEd2.getDoc().getValue();
     let entityName = $('.entity-name').val();
     let propertyNames = $('.entity-property-name').val();
@@ -789,7 +802,7 @@ jQuery(function () {
     });
   });
 
-  $(document).on('click', '#button-save-module-translation', function () {
+  $(document).on('click', '#button-save-module-translation', function (e) {
     let translated = transEd4.getDoc().getValue();
     let propertyNames = $('.module-property-name').val();
     let targetLanguage = $('.target-language').val();
@@ -803,21 +816,21 @@ jQuery(function () {
     });
   });
 
-  $(document).on('change', '.target-language', function () {
+  $(document).on('change', '.target-language', function (e) {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
 
-  $(document).on('change', '.filter-translate', function () {
+  $(document).on('change', '.filter-translate', function (e) {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
     $('.filter-translate').val(val);
     reloadTranslate(translateFor);
   });
 
-  $(document).on('change', '.select-module', function () {
+  $(document).on('change', '.select-module', function (e) {
     let checked = $(this)[0].checked;
     $(this).closest('.module-group').find('ul li').each(function (e) {
       $(this).find('input[type="checkbox"]')[0].checked = checked;
@@ -825,11 +838,11 @@ jQuery(function () {
     translateModule();
   });
 
-  $(document).on('change', '.module-for-translate', function () {
+  $(document).on('change', '.module-for-translate', function (e) {
     translateModule();
   });
 
-  $(document).on('click', 'table.language-manager .add-language', function () {
+  $(document).on('click', 'table.language-manager .add-language', function (e) {
     let clone = $(this).closest('table').find('tbody tr:first').clone();
     clone.find('input[type="text"]').val('');
     clone.find('input[type="checkbox"]').removeAttr('checked');
@@ -837,7 +850,7 @@ jQuery(function () {
     fixLanguageForm();
   });
 
-  $(document).on('click', 'table.language-manager .language-remover', function () {
+  $(document).on('click', 'table.language-manager .language-remover', function (e) {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
       // Display the alert when the page loads
@@ -865,7 +878,7 @@ jQuery(function () {
     fixLanguageForm();
   });
 
-  $('#modal-update-language').on('show.bs.modal', function () {
+  $('#modal-update-language').on('show.bs.modal', function (e) {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
@@ -1229,7 +1242,7 @@ jQuery(function () {
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
 
-  $(document).on('blur keyup', 'input[type="number"]', function () {
+  $(document).on('blur keyup', 'input[type="number"]', function (e) {
     if (isNaN($(this).val()) || $(this).val().trim() === '') {
       $(this).addClass('input-invalid-value');
     } else {
@@ -1957,7 +1970,7 @@ function loadDiagramMultiple() {
   let params = [];
   params = addDiagramOption(params);
 
-  $('.entity-container-relationship .entity-checkbox').each(function () {
+  $('.entity-container-relationship .entity-checkbox').each(function (e) {
     if ($(this)[0].checked) {
       params.push('entity[]=' + $(this).val());
     }
@@ -1969,7 +1982,7 @@ function loadDiagramMultiple() {
   img.attr('src', urlImage);
   $('.erd-image').empty().append(img);
 
-  $('[name="erd-map"]').load(urlMap, function () {
+  $('[name="erd-map"]').load(urlMap, function (e) {
     img.attr('usemap', '#erd-map');
   });
 
