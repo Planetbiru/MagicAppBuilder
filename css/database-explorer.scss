@@ -46,8 +46,12 @@ body {
     overflow: auto;
     max-height: calc(100vh - 0px);
 }
-h1, h3 {
+h1, h2 {
     margin-bottom: 20px;
+    font-weight: normal;
+}
+h3 {
+    margin-bottom: 5px;
     font-weight: normal;
 }
 table {
@@ -83,7 +87,7 @@ th {
     color: #fff;
 }
 form {
-    margin-top: 20px;
+    margin-top: 5px;
 }
 textarea {
     width: 100%;
@@ -176,7 +180,7 @@ textarea {
 }
 .table-content-inner
 {
-    height: calc(100vh - 340px);
+    height: calc(100vh - 295px);
 }
 .table-content-inner table td{
     white-space: nowrap;
@@ -212,10 +216,20 @@ textarea:focus-visible{
     font-family: "Courier New", Courier, monospace;
     margin-bottom: 16px;
 }
+
 .query-raw:focus-visible{
     outline: none;
     border: 1px solid #c89027;
     box-shadow: inset 0px 0px 2px #c8902754;
+}
+
+.sql-error
+{
+    padding: 8px 16px;
+    border: 1px solid #e86835;
+    background-color: #ffd3c1;
+    font-family: "Courier New", Courier, monospace;
+    margin-bottom: 16px;
 }
 
 .query-result

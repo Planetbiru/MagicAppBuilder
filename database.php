@@ -322,7 +322,7 @@ $pdo = $database->getDatabaseConnection();
                         }
                         echo "</table>";
                     } catch (PDOException $e) {
-                        echo "Error: " . $e->getMessage();
+                        echo "<div class='sql-error'><strong>Error:</strong> " . $e->getMessage()."</div>";
                     }
                 }
             
