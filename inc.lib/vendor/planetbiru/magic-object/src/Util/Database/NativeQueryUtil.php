@@ -7,6 +7,7 @@ use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoSortable;
+use MagicObject\Database\PicoSqlJson;
 use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\InvalidReturnTypeException;
 use MagicObject\MagicObject;
@@ -293,25 +294,30 @@ class NativeQueryUtil
 
 
     /**
-     * Maps PHP types to PDO parameter types.
+     * Maps PHP types to the corresponding PDO parameter types.
      *
-     * This function determines the appropriate PDO parameter type based on the given value.
-     * It handles various PHP data types and converts them to the corresponding PDO parameter types
-     * required for executing prepared statements in PDO.
+     * This method determines the appropriate PDO parameter type based on the type of the given value.
+     * It handles various PHP data types, such as `null`, `boolean`, `integer`, `string`, `DateTime`, 
+     * and objects like `PicoSqlJson`, and maps them to the appropriate PDO parameter types required 
+     * for executing prepared statements in PDO.
      *
-     * @param mixed $value The value to determine the type for. This can be of any type, including
-     *                     null, boolean, integer, string, DateTime, or other types.
-     * @return stdClass An object containing:
-     *                  - type: The PDO parameter type (PDO::PARAM_STR, PDO::PARAM_NULL, 
-     *                          PDO::PARAM_BOOL, PDO::PARAM_INT).
-     *                  - value: The corresponding value formatted as needed for the PDO parameter.
+     * @param mixed $value The value to determine the PDO parameter type for. This can be of any type,
+     *                     including `null`, `boolean`, `integer`, `string`, `DateTime`, or other types.
+     * 
+     * @return stdClass An object containing the following properties:
+     *                  - `type`: The corresponding PDO parameter type (e.g., `PDO::PARAM_STR`, 
+     *                            `PDO::PARAM_NULL`, `PDO::PARAM_BOOL`, `PDO::PARAM_INT`).
+     *                  - `value`: The value formatted as required for the PDO parameter.
      */
     public function mapToPdoParamType($value)
     {
         $type = PDO::PARAM_STR; // Default type is string
         $finalValue = $value; // Initialize final value to the original value
-
-        if ($value instanceof DateTime) {
+        if ($value instanceof PicoSqlJson) {
+            $type = PDO::PARAM_STR; // Treat as string
+            $finalValue = $value; // Keep the PicoSqlJson object itself
+        }
+        else if ($value instanceof DateTime) {
             $type = PDO::PARAM_STR; // DateTime should be treated as a string
             $finalValue = $value->format("Y-m-d H:i:s");
         } else if (is_null($value)) {

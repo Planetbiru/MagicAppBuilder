@@ -2,7 +2,6 @@
 
 namespace MagicApp\XLSX;
 
-use MagicApp\AppLanguage;
 use MagicObject\Database\PicoPageData;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;

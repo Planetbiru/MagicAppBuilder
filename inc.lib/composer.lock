@@ -142,16 +142,16 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "2.8.3",
+            "version": "2.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "5077e35a0b82bcb705786c6f3f6afe0085c4c8fa"
+                "reference": "a6b97b595abcefd3abfe99266e672ccf5d5fac3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/5077e35a0b82bcb705786c6f3f6afe0085c4c8fa",
-                "reference": "5077e35a0b82bcb705786c6f3f6afe0085c4c8fa",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/a6b97b595abcefd3abfe99266e672ccf5d5fac3f",
+                "reference": "a6b97b595abcefd3abfe99266e672ccf5d5fac3f",
                 "shasum": ""
             },
             "require": {
@@ -175,22 +175,22 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/2.8.3"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/2.8.5"
             },
-            "time": "2024-11-27T08:13:51+00:00"
+            "time": "2024-11-28T03:28:36+00:00"
         },
         {
             "name": "planetbiru/magic-object",
-            "version": "2.8.3",
+            "version": "2.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "813ec91cb2a01911dfea54816ff6cfb99d404258"
+                "reference": "0e57d7cbc7e5cdb704fff6d53c668f82cde84307"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/813ec91cb2a01911dfea54816ff6cfb99d404258",
-                "reference": "813ec91cb2a01911dfea54816ff6cfb99d404258",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/0e57d7cbc7e5cdb704fff6d53c668f82cde84307",
+                "reference": "0e57d7cbc7e5cdb704fff6d53c668f82cde84307",
                 "shasum": ""
             },
             "require": {
@@ -215,9 +215,9 @@
             "description": "Magic object",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/2.8.3"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/2.8.4"
             },
-            "time": "2024-11-27T08:12:00+00:00"
+            "time": "2024-11-28T03:19:33+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -378,5 +378,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }

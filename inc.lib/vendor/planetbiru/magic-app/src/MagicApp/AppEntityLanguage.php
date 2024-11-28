@@ -109,7 +109,7 @@ class AppEntityLanguage extends PicoEntityLanguage
      * @param int $parent Number of parent classes to consider
      * @return string The base class name
      */
-    private function baseClassName($className, $prefix, $parent = 0)
+    private function baseClassName($className, $prefix, $parent = 0) //NOSONAR
     {
         $result = null;
         if (!isset($prefix)) {

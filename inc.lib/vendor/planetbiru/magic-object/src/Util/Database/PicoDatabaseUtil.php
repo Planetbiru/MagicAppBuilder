@@ -270,8 +270,7 @@ class PicoDatabaseUtil
                 else
                 {
                     $array[$key] = "'".self::fixValue($value, $type)."'";
-                }
-                
+                }       
             }
             else
             {
