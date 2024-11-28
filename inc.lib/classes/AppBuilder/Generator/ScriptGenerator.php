@@ -831,8 +831,8 @@ class ScriptGenerator //NOSONAR
         }
         $uses[] = "use MagicApp\\UserAction;";
         $uses[] = "use MagicApp\\AppUserPermission;";
-        $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
         $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
+        $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
         return $uses;
     }
 
