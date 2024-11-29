@@ -536,6 +536,7 @@ $constSelected = ' selected';
                   <div class="button-area">
                     <button class="btn btn-success" id="button_save_entity_query" type="button" disabled>Save Query</button>
                     <button class="btn btn-primary" id="button_execute_entity_query" type="button">Execute Query</button>
+                    <button class="btn btn-primary" id="button_explore_database" type="button">Explore Database</button>
                   </div>
                 </div>
               </div>

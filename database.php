@@ -46,6 +46,10 @@ function splitSQL($sqlString) {
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 $applicationId = $inputGet->getApplicationId();
+if(empty($applicationId))
+{
+    $applicationId = $curApp->getId();
+}
 $databaseName = $inputGet->getDatabase();
 $table = $inputGet->getTable();
 
@@ -118,7 +122,6 @@ $pdo = $database->getDatabaseConnection();
 </head>
 <body>
     <div class="sidebar">
-        <h3>Navigation</h3>
         <?php
         // Database connection configuration
 
@@ -132,9 +135,10 @@ $pdo = $database->getDatabaseConnection();
             // Show available databases
             function showSidebarDatabases($pdo, $applicationId, $databaseName) {
                 // Form for selecting database
+                echo "<h3>Database</h3>";
                 echo "<form method='GET' action=''>";
                 echo "<input type='hidden' name='applicationId' value='$applicationId'>";
-                echo "<label for='database-select'>Select Database:</label>";
+                
                 echo "<select name='database' id='database-select' onchange='this.form.submit()'>";
                 echo "<option value=''>-- Choose Database --</option>";
                 $stmt = $pdo->query("SHOW DATABASES");
@@ -320,13 +324,13 @@ $pdo = $database->getDatabaseConnection();
                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             echo "<tr>";
                             foreach ($row as $value) {
-                                echo "<td>$value</td>";
+                                echo "<td>".htmlspecialchars($value)."</td>";
                             }
                             echo "</tr>";
                         }
                         echo "</table>";
                     } catch (PDOException $e) {
-                        echo "<div class='sql-error'><strong>Error:</strong> " . $e->getMessage()."</div>";
+                        echo "<div class='sql-error'><strong>Error:</strong> " . $e->getMessage() . "</div>";
                     }
                 }
             

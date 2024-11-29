@@ -1074,6 +1074,12 @@ jQuery(function () {
     
   });
 
+  $(document).on('click', '#button_explore_database', function (e) {
+    e.preventDefault();
+    $('#modal-database-explorer .database-explorer').html('<iframe src="database.php"></iframe>');
+    $('#modal-database-explorer').modal('show');
+  });
+
   $(document).on('click', '.button-application-menu', function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-menu .button-save-menu');
@@ -1243,6 +1249,10 @@ jQuery(function () {
     $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
     $('#modal-query-executor').modal('show');
   });
+
+  
+
+  
 
 
   $(document).on('change', 'table select[name=database_driver]', function (e) {
