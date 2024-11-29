@@ -112,6 +112,8 @@ textarea {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 3px;
+    margin-bottom: 5px;
+    transition: background-color ease-in-out 0.2s;
 }
 
 [type="submit"],
@@ -217,11 +219,6 @@ button {
     white-space: nowrap;
 }
 
-textarea {
-    margin-bottom: 5px;
-    transition: background-color ease-in-out 0.2s;
-}
-
 textarea:focus-visible {
     outline: none;
     border: 1px solid #007BFF
@@ -232,7 +229,6 @@ textarea:focus-visible {
     border: 1px solid #DDDDDD;
     margin-top: 20px;
     background-color: #FAFAFA;
-
 }
 
 .query-title {
