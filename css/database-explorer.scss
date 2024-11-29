@@ -19,27 +19,24 @@ body {
     height: 100vh;
     overflow-y: auto;
     position: relative;
-}
 
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.sidebar ul li {
-    margin-bottom: 10px;
-}
-
-.sidebar ul li a {
-    color: #fff;
-    text-decoration: none;
-    padding: 5px 10px;
-    display: block;
-    border-radius: 3px;
-}
-
-.sidebar ul li a:hover {
-    background-color: #495057;
+    ul {
+        list-style-type: none;
+        padding: 0;
+        li {
+            margin-bottom: 10px;
+            a {
+                color: #fff;
+                text-decoration: none;
+                padding: 5px 10px;
+                display: block;
+                border-radius: 3px;
+                &:hover {
+                    background-color: #495057;
+                }
+            }
+        }
+    }
 }
 
 .content {
@@ -76,7 +73,7 @@ td {
 
 th,
 td {
-    padding: 8px;
+    padding: 6px 8px;
     text-align: left;
 }
 
@@ -87,20 +84,19 @@ th {
 
 .pagination {
     padding: 10px 0;
-}
-
-.pagination a {
-    text-decoration: none;
-    color: #007BFF;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    margin-right: 5px;
-    border-radius: 3px;
-}
-
-.pagination a:hover {
-    background-color: #007BFF;
-    color: #fff;
+    a {
+        text-decoration: none;
+        color: #007BFF;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        margin-right: 5px;
+        border-radius: 3px;
+    }
+    
+    a:hover {
+        background-color: #007BFF;
+        color: #fff;
+    }
 }
 
 form {
@@ -114,6 +110,11 @@ textarea {
     border-radius: 3px;
     margin-bottom: 5px;
     transition: background-color ease-in-out 0.2s;
+    &:focus-visible{
+        outline: none;
+        box-shadow: inset 0 0 1px #007bffb7;
+        border-color: #007bffdc;
+    }
 }
 
 [type="submit"],
@@ -163,37 +164,35 @@ button {
 .table-list {
     max-height: calc(100vh - 108px);
     overflow: auto;
+    li a {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
-.table-list li a {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.collapsible
+{
+    .button-toggle {
+        float: right;
+        width: 20px;
+        padding: 1px 5px;
+        border: 1px solid #DDDDDD;
+        background-color: #EEEEEE;
+        cursor: pointer;
+    }
+    .button-toggle::before {
+        content: attr(data-close);
+    }
 }
 
-.button-toggle {
-    width: 20px;
-    padding: 1px 5px;
-    border: 1px solid #DDDDDD;
-    background-color: #EEEEEE;
-    cursor: pointer;
-}
-
-.collapsible>div {
+.collapsible > div {
     display: none;
 }
 
 .collapsible.open>div {
     display: block;
-}
-
-.collapsible .button-toggle {
-    float: right;
-}
-
-.collapsible .button-toggle::before {
-    content: attr(data-close);
 }
 
 .collapsible.open .button-toggle::before {
@@ -219,47 +218,46 @@ button {
     white-space: nowrap;
 }
 
-textarea:focus-visible {
-    outline: none;
-    border: 1px solid #007BFF
-}
+
 
 .query-executed {
     padding: 12px 16px 16px 16px;
     border: 1px solid #DDDDDD;
     margin-top: 20px;
     background-color: #FAFAFA;
+
+    .query-title {
+        font-weight: bold;
+        padding: 0px 0px 4px 0;
+        color: #555555;
+    }
+    
+    .query-raw {
+        padding: 8px 16px;
+        border: 1px solid #e8aa35;
+        background-color: #fff8ea;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 16px;
+        border-radius: 3px;
+    }
+    
+    .query-raw:focus-visible {
+        outline: none;
+        border: 1px solid #c89027;
+        box-shadow: inset 0px 0px 2px #c8902754;
+    }
+    
+    .sql-error {
+        padding: 8px 16px;
+        border: 1px solid #e86835;
+        background-color: #ffd3c1;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 16px;
+    }
+    
+    .query-result {
+        padding-top: 4px;
+        overflow-x: auto;
+    }
 }
 
-.query-title {
-    font-weight: bold;
-    padding: 0px 0px 4px 0;
-    color: #555555;
-}
-
-.query-raw {
-    padding: 8px 16px;
-    border: 1px solid #e8aa35;
-    background-color: #fff8ea;
-    font-family: "Courier New", Courier, monospace;
-    margin-bottom: 16px;
-}
-
-.query-raw:focus-visible {
-    outline: none;
-    border: 1px solid #c89027;
-    box-shadow: inset 0px 0px 2px #c8902754;
-}
-
-.sql-error {
-    padding: 8px 16px;
-    border: 1px solid #e86835;
-    background-color: #ffd3c1;
-    font-family: "Courier New", Courier, monospace;
-    margin-bottom: 16px;
-}
-
-.query-result {
-    padding-top: 4px;
-    overflow-x: auto;
-}
