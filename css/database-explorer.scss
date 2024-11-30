@@ -15,7 +15,7 @@ body {
     width: 250px;
     background-color: #343a40;
     color: #fff;
-    padding: 20px;
+    padding: 16px;
     height: 100vh;
     overflow-y: auto;
     position: relative;
@@ -41,7 +41,7 @@ body {
 
 .content {
     flex: 1;
-    padding: 20px;
+    padding: 16px;
     background-color: #f8f9fa;
     max-width: calc(100vw - 250px);
     overflow: auto;
@@ -71,9 +71,11 @@ td {
     border: 1px solid #ddd;
 }
 
-th,
-td {
+th{
     padding: 6px 8px;
+}
+td {
+    padding: 4px 8px;
     text-align: left;
 }
 
@@ -105,6 +107,7 @@ form {
 
 textarea {
     width: 100%;
+    height: 72px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -162,8 +165,9 @@ button {
 }
 
 .table-list {
-    max-height: calc(100vh - 108px);
+    max-height: calc(100vh - 138px);
     overflow: auto;
+    
     li a {
         width: 100%;
         overflow: hidden;
@@ -171,7 +175,10 @@ button {
         white-space: nowrap;
     }
 }
-
+[data-from-default-app="true"] .table-list
+{
+    max-height: calc(100vh - 72px);
+}
 .collapsible
 {
     .button-toggle {
@@ -211,7 +218,7 @@ button {
 }
 
 .table-content-inner {
-    height: calc(100vh - 295px);
+    height: calc(100vh - 275px);
 }
 
 .table-content-inner table td {

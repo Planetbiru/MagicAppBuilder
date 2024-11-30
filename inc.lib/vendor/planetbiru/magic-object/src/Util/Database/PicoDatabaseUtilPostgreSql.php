@@ -68,9 +68,22 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         {
             $schema = "public";
         }
-        $sql = "SELECT column_name, data_type, is_nullable, column_default 
-                FROM information_schema.columns 
-                WHERE table_schema = '$schema' AND table_name = '$tableName'";
+        $sql = "SELECT 
+        column_name AS \"Field\", 
+        data_type AS \"Type\", 
+        is_nullable AS \"Null\", 
+        CASE 
+            WHEN column_default IS NOT NULL THEN 'DEFAULT' 
+            ELSE '' 
+        END AS \"Key\", 
+        column_default AS \"Default\", 
+        CASE 
+            WHEN is_identity = 'YES' THEN 'AUTO_INCREMENT' 
+            ELSE '' 
+        END AS \"Extra\"
+        FROM information_schema.columns
+        WHERE table_name = '$tableName'
+        AND table_schema = '$schema'";
         return $database->fetchAll($sql);
     }
 

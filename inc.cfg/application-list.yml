@@ -4,16 +4,16 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: false
+    selected: true
     type: fullstack
     architecture: monolith
 -
     id: sipro
-    name: SIPRO
+    name: 'Nama Aplikasi'
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
-    description: 'Sipro Baru'
-    selected: true
+    description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
+    selected: false
     type: api
     architecture: monolith
 -
@@ -23,4 +23,12 @@
     description: 'Music Production Manager'
     documentRoot: 'D:/xampp/htdocs/0673c952cb576d077460'
     author: Kamshory
+    selected: false
+-
+    id: 06749b6839b630d9e33f
+    name: ApplicationName
+    architecture: monolith
+    description: ApplicationName
+    documentRoot: 'D:/xampp/htdocs/06749b6839b630d9e33f'
+    author: 'Your Name'
     selected: false

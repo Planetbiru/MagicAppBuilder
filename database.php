@@ -3,12 +3,16 @@
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
+use MagicObject\SecretObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once (__DIR__) . "/inc.app/app.php";
 require_once (__DIR__) . "/inc.app/sessions.php";
-require_once (__DIR__) . "/inc.app/database.php";
 
+if(isset($databaseConfig))
+{
+    require_once (__DIR__) . "/inc.app/database.php";
+}
 /**
  * Splits a SQL string into individual SQL statements.
  *
@@ -64,7 +68,7 @@ function splitSQL($sqlString)
  * @param string $databaseName The currently selected database name.
  * @return void
  */
-function showSidebarDatabases($pdo, $applicationId, $databaseName)
+function showSidebarDatabases($pdo, $applicationId, $databaseName, $databaseConfig)
 {
     echo '<h3>Database</h3>';
     echo '<form method="GET" action="">';
@@ -72,10 +76,15 @@ function showSidebarDatabases($pdo, $applicationId, $databaseName)
 
     echo '<select name="database" id="database-select" onchange="this.form.submit()">';
     echo '<option value="">-- Choose Database --</option>';
+    $dbNameFromConfig = "";
+    if($databaseConfig != null)
+    {
+        $dbNameFromConfig = $databaseConfig->getDatabaseName();
+    }
     $stmt = $pdo->query('SHOW DATABASES');
     while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
         $dbName = $row[0];
-        $selected = $databaseName === $dbName ? 'selected' : '';
+        $selected = $dbName === $databaseName  || $dbName === $dbNameFromConfig ? 'selected' : '';
         echo '<option value="' . $dbName . '" ' . $selected . '>' . $dbName . '</option>';
     }
     echo '</select>';
@@ -87,8 +96,10 @@ function showSidebarDatabases($pdo, $applicationId, $databaseName)
  *
  * This function retrieves and displays the list of tables in the selected database.
  * The tables are displayed as links, and the selected table is highlighted in bold.
+ * 
+ * Supports MySQL, PostgreSQL, and SQLite databases.
  *
- * @param PDO $pdo A PDO instance connected to the MySQL server.
+ * @param PDO $pdo A PDO instance connected to the database.
  * @param string $applicationId The application identifier.
  * @param string $databaseName The name of the selected database.
  * @param string $table The currently selected table.
@@ -96,15 +107,95 @@ function showSidebarDatabases($pdo, $applicationId, $databaseName)
  */
 function showSidebarTables($pdo, $applicationId, $databaseName, $table)
 {
-    $pdo->exec("USE `$databaseName`");
-    $stmt = $pdo->query("SHOW TABLES");
+    // Menentukan tipe database (MySQL, PostgreSQL, atau SQLite) berdasarkan PDO
+    $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    echo '<h3>Table</h3>';
     echo '<ul class="table-list">';
-    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-        $tableName = $row[0];
-        echo '<li><a href="?applicationId=' . $applicationId . '&database=' . $databaseName . '&table=' . $tableName . '"' .
-            ($table == $tableName ? ' style="font-weight: bold;"' : '') . '>' . $tableName . '</a></li>';
+    
+    if ($dbType == 'mysql' || $dbType == 'pgsql') {
+        // Query untuk MySQL dan PostgreSQL untuk mengambil daftar tabel
+        $stmt = $pdo->query("SHOW TABLES");
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $tableName = $row[0];
+            echo '<li><a href="?applicationId=' . $applicationId . '&database=' . $databaseName . '&table=' . $tableName . '"' .
+                ($table == $tableName ? ' style="font-weight: bold;"' : '') . '>' . $tableName . '</a></li>';
+        }
+    } elseif ($dbType == 'sqlite') {
+        // Query untuk SQLite untuk mengambil daftar tabel
+        $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $row['name'];
+            echo '<li><a href="?applicationId=' . $applicationId . '&database=' . $databaseName . '&table=' . $tableName . '"' .
+                ($table == $tableName ? ' style="font-weight: bold;"' : '') . '>' . $tableName . '</a></li>';
+        }
+    } else {
+        // Jika tipe database tidak didukung
+        echo '<li>No tables found for this database.</li>';
     }
+    
     echo '</ul>';
+}
+
+/**
+ * Generates a SQL query to retrieve the columns and structure of a table based on the database type (MySQL, PostgreSQL, or SQLite).
+ *
+ * This function automatically detects the type of the database (MySQL, PostgreSQL, or SQLite) 
+ * and constructs the appropriate SQL query to retrieve the columns and metadata of a table.
+ * The query syntax differs depending on the database type.
+ *
+ * @param PDO $pdo The PDO instance connected to the database.
+ * @param string $tableName The name of the table whose column information is to be retrieved.
+ *
+ * @return string|null The SQL query to retrieve the table columns:
+ *                     - For MySQL, it returns "SHOW COLUMNS FROM `$tableName`".
+ *                     - For PostgreSQL, it returns a query using "information_schema.columns".
+ *                     - For SQLite, it returns a "PRAGMA table_info($tableName)" query.
+ *                     - Returns `null` if the database type is unsupported.
+ */
+function getQueryShowColumns($pdo, $tableName)
+{
+    // Menentukan tipe database (MySQL, PostgreSQL, atau SQLite) berdasarkan PDO
+    $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+    // Mendapatkan schema atau database aktif
+    if ($dbType == 'mysql') {
+        // Mengambil nama database di MySQL
+        $stmt = $pdo->query("SELECT DATABASE()");
+        $schema = $stmt->fetchColumn();
+        
+        // Query untuk MySQL
+        $sql = "SHOW COLUMNS FROM `$tableName`";
+    } elseif ($dbType == 'pgsql') {
+        // Mengambil nama schema di PostgreSQL
+        $stmt = $pdo->query("SELECT current_schema()");
+        $schema = $stmt->fetchColumn();
+        
+        // Query untuk PostgreSQL
+        $sql = "SELECT 
+            column_name AS \"Field\", 
+            data_type AS \"Type\", 
+            is_nullable AS \"Null\", 
+            CASE 
+                WHEN column_default IS NOT NULL THEN 'DEFAULT' 
+                ELSE '' 
+            END AS \"Key\", 
+            column_default AS \"Default\", 
+            CASE 
+                WHEN is_identity = 'YES' THEN 'AUTO_INCREMENT' 
+                ELSE '' 
+            END AS \"Extra\"
+            FROM information_schema.columns
+            WHERE table_name = '$tableName'
+            AND table_schema = '$schema'";
+    } elseif ($dbType == 'sqlite') {
+        // SQLite tidak memiliki schema, jadi hanya menggunakan query untuk menampilkan kolom
+        $sql = "PRAGMA table_info($tableName)";
+    } else {
+        // Jika tipe database tidak didukung
+        return null;
+    }
+
+    return $sql;
 }
 
 /**
@@ -123,16 +214,37 @@ function showTableStructure($pdo, $table)
     echo '<button class="button-toggle toggle-structure" data-open="-" data-close="+"></button>';
     echo '<h3>Structure of ' . $table . '</h3>';
     echo '<div class="table-structure-inner">';
-    $stmt = $pdo->query("DESCRIBE `$table`");
-    echo '<table><tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>';
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo '<tr>';
-        foreach ($row as $value) {
-            echo '<td>' . $value . '</td>';
+
+    $query = getQueryShowColumns($pdo, $table);
+
+    if(isset($query))
+    {
+        $stmt = $pdo->query($query);
+
+        // Untuk SQLite, hasilnya berbeda, jadi kita harus menangani output yang lebih spesifik
+        echo '<table><tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>';
+        if ($stmt) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo '<tr>';
+                if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                    // Khusus untuk SQLite, field ini akan lebih sederhana
+                    echo '<td>' . $row['name'] . '</td>'; // Nama kolom di SQLite
+                    echo '<td>' . $row['type'] . '</td>'; // Tipe data di SQLite
+                    echo '<td>' . ($row['notnull'] ? 'NO' : 'YES') . '</td>'; // Nullability
+                    echo '<td></td>'; // Tidak ada informasi untuk "Key"
+                    echo '<td>' . ($row['dflt_value'] ? $row['dflt_value'] : 'NULL') . '</td>'; // Default value
+                    echo '<td></td>'; // Tidak ada informasi untuk "Extra"
+                } else {
+                    // Untuk MySQL atau PostgreSQL
+                    foreach ($row as $value) {
+                        echo '<td>' . $value . '</td>';
+                    }
+                }
+                echo '</tr>';
+            }
         }
-        echo '</tr>';
+        echo '</table>';
     }
-    echo '</table>';
     echo '</div>';
     echo '</div>';
 }
@@ -248,7 +360,13 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 $applicationId = $inputGet->getApplicationId();
 if (empty($applicationId)) {
-    $applicationId = $curApp->getId();
+    $appId = $curApp->getId();
+    $fromDefaultApp = true;
+}
+else
+{
+    $appId = $applicationId;
+    $fromDefaultApp = false;
 }
 $databaseName = $inputGet->getDatabase();
 $table = $inputGet->getTable();
@@ -262,14 +380,16 @@ if ($limit < 1) {
     $limit = 20;
 }
 $query = $inputPost->getQuery();
-
-$appConfigPath = $workspaceDirectory . "/applications/$applicationId/default.yml";
+$databaseConfig = new SecretObject();
+$appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
 if (file_exists($appConfigPath)) {
     $appConfig->loadYamlFile($appConfigPath, false, true, true);
     $databaseConfig = $appConfig->getDatabase();
-    if (empty($databaseName)) {
-        $databaseName = $databaseConfig->getDatabaseName();
-    } else {
+    if(!isset($databaseConfig))
+    {
+        exit();
+    }
+    if (!empty($databaseName)) {
         $databaseConfig->setDatabaseName($databaseName);
     }
     $database = new PicoDatabase($databaseConfig);
@@ -310,7 +430,7 @@ $pdo = $database->getDatabaseConnection();
     </script>
 </head>
 
-<body>
+<body data-from-default-app="<?php echo $fromDefaultApp?'true':'false';?>">
     <div class="sidebar">
         <?php
         // Database connection configuration
@@ -319,7 +439,12 @@ $pdo = $database->getDatabaseConnection();
 
             // Variables to control navigation
             // Render sidebar
-            showSidebarDatabases($pdo, $applicationId, $databaseName);
+            $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if(!$fromDefaultApp && $dbType != 'sqlite')
+            {
+                showSidebarDatabases($pdo, $applicationId, $databaseName, $databaseConfig);
+            }
+
             showSidebarTables($pdo, $applicationId, $databaseName, $table);
         } catch (PDOException $e) {
             if ($e->getCode() == 0x3D000 || strpos($e->getMessage(), '1046') !== false) {
@@ -334,14 +459,12 @@ $pdo = $database->getDatabaseConnection();
         <?php
         try {
             // Load table structure or data based on navigation
-            if ($databaseName) {
-                $pdo->exec("USE `$databaseName`");
-                if ($table) {
-                    // Show table structure
-                    showTableStructure($pdo, $table);
-                    showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit);
-                }
+            if ($table) {
+                // Show table structure
+                showTableStructure($pdo, $table);
+                showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit);
             }
+            
 
             $queries = array();
             $lastQueries = "";

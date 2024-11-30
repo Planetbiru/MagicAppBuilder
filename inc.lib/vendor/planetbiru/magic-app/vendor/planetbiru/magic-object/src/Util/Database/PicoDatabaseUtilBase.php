@@ -13,6 +13,7 @@ use PDO;
 class PicoDatabaseUtilBase // NOSONAR
 {
     const KEY_NAME = "name";
+    
     /**
      * Gets the auto-increment keys from the provided table information.
      *
@@ -542,7 +543,7 @@ class PicoDatabaseUtilBase // NOSONAR
         else
         {
             // Convert the value to a boolean (true if 1, false otherwise)
-            $data[$name] = $data[$name] == 1 ? true : false;
+            $data[$name] = $data[$name] == 1;
         }
         return $data; // Return the updated array
     }
