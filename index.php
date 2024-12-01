@@ -704,7 +704,7 @@ $constSelected = ' selected';
                 </tr>
                 <tr>
                   <td>Description</td>
-                  <td><textarea class="form-control" name="application_description"></textarea></td>
+                  <td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
                 </tr>
                 <tr>
                   <td>MagicApp Version</td>
