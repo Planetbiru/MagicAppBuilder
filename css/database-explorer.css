@@ -82,7 +82,7 @@ td {
 }
 
 .pagination {
-  padding: 10px 0;
+  padding: 10px 0 5px 0;
 }
 .pagination a {
   text-decoration: none;
@@ -109,6 +109,7 @@ textarea {
   border-radius: 3px;
   margin-bottom: 5px;
   transition: background-color ease-in-out 0.2s;
+  resize: vertical;
 }
 textarea:focus-visible {
   outline: none;
@@ -210,9 +211,8 @@ button {
 }
 
 .table-content-inner {
-  height: calc(100vh - 275px);
+  height: calc(100vh - 265px);
 }
-
 .table-content-inner table td {
   white-space: nowrap;
 }
