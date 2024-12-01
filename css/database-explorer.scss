@@ -73,15 +73,12 @@ td {
 
 th{
     padding: 6px 8px;
+    background-color: #f0f0f0;
+    color: #2e2e2e;
 }
 td {
     padding: 4px 8px;
     text-align: left;
-}
-
-th {
-    background-color: #f4f4f4;
-    color: #2e2e2e;
 }
 
 .pagination {
@@ -221,10 +218,22 @@ button {
     height: calc(100vh - 275px);
 }
 
-.table-content-inner table td {
-    white-space: nowrap;
+.table-content-inner table {
+    td {
+        white-space: nowrap;
+    }
+    tbody
+    {
+        tr {
+            &:nth-child(odd) td{
+                background-color: #F8F8F8;
+            }
+            &:nth-child(even) td{
+                background-color: #FEFEFE;
+            }
+        }
+    }
 }
-
 
 
 .query-executed {
