@@ -36,9 +36,7 @@ class ResponseUtil
     public static function sendJSON($data, $prettify = false, $async = false)
     {
         $body = self::getBody($data, $prettify);
-
         header("Content-type: application/json");
-
         if ($async) {
             if (function_exists('ignore_user_abort')) {
                 ignore_user_abort(true);
@@ -48,9 +46,7 @@ class ResponseUtil
                 echo $body;
             }
         }
-
         header("Connection: close");
-
         if ($async) {
             if ($body !== null) {
                 ob_end_flush();
@@ -63,6 +59,7 @@ class ResponseUtil
             }
         } else if ($body !== null) {
             header("Content-Length: " . strlen($body));
+            
             echo $body;
         }
     }
@@ -82,18 +79,19 @@ class ResponseUtil
      */
     private static function getBody($data, $prettify = false)
     {
-        $body = null;
-        if ($data != null) {
-            if (is_string($data)) {
-                $body = $data;
-            } else {
-                if ($prettify) {
-                    $body = json_encode($data, JSON_PRETTY_PRINT);
-                } else {
-                    $body = json_encode($data);
-                }
-            }
+        // Jika $data adalah null, kembalikan string kosong
+        if ($data === null) {
+            return '';
         }
-        return $body;
+
+        // Jika $data adalah string, kembalikan langsung
+        if (is_string($data)) {
+            return $data;
+        }
+
+        // Jika $data adalah array atau object, encode sebagai JSON
+        $options = $prettify ? JSON_PRETTY_PRINT : 0;
+        return json_encode($data, $options);
     }
+
 }

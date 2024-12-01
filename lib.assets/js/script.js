@@ -818,7 +818,7 @@ jQuery(function () {
 
   $(document).on('change', '.target-language', function (e) {
     let val = $(this).val();
-    let translateFor = $(this).attr('data-translate-for');
+    let translateFor = $(this).attr('data-translate-for');   
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
@@ -1732,6 +1732,7 @@ function translateEntity(clbk) {
           textOut2.push(data[i].translated);
           propertyNames.push(data[i].propertyName);
         }
+        console.log(propertyNames)
         transEd1.getDoc().setValue(textOut1.join('\r\n'));
         transEd2.getDoc().setValue(textOut2.join('\r\n'));
         $('.entity-property-name').val(propertyNames.join('|'));
@@ -1741,6 +1742,10 @@ function translateEntity(clbk) {
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
         lastLine1 = -1; //NOSONAR
       },
+      error: function(e1, e2)
+      {
+        console.error(e1, e2)
+      }
     });
   }
   if (typeof clbk != 'undefined') {

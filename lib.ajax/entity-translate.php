@@ -39,8 +39,9 @@ if($inputPost->getUserAction() == 'get')
             if(file_exists($path))
             {
                 $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+                
                 if($return_var == 0)
-                {
+                {  
                     include_once $path;
                     $entity = new $className(null);
                     $entityLabel = new PicoEntityLanguage($entity);
@@ -62,6 +63,7 @@ if($inputPost->getUserAction() == 'get')
                         }
                     }
                     ResponseUtil::sendJSON($response);
+                    exit();
                 }
             }
         }
@@ -69,7 +71,9 @@ if($inputPost->getUserAction() == 'get')
     catch(Exception $e)
     {
         // do nothing
+        error_log($e->getMessage());
     }
+    ResponseUtil::sendJSON([]);
 }
 if($inputPost->getUserAction() == 'set')
 {
@@ -92,7 +96,6 @@ if($inputPost->getUserAction() == 'set')
     {
         unset($keys[count($keys) - 1]);
     }
-    
     $translatedLabel = array_combine($keys, $values);
 
     try
@@ -112,7 +115,12 @@ if($inputPost->getUserAction() == 'set')
             {
                 mkdir($dir, 0755, true);
             }
-            PicoIniUtil::writeIniFile($translatedLabel, $path);
+            $original = PicoIniUtil::parseIniFile($path);
+            foreach($translatedLabel as $key=>$value)
+            {
+                $original[$key] = $value;
+            }
+            PicoIniUtil::writeIniFile($original, $path);
         }
     }
     catch(Exception $e)

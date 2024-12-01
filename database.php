@@ -164,7 +164,7 @@ function getQueryShowColumns($pdo, $tableName)
         $schema = $stmt->fetchColumn();
         
         // Query untuk MySQL
-        $sql = "SHOW COLUMNS FROM `$tableName`";
+        $sql = "DESCRIBE `$tableName`";
     } elseif ($dbType == 'pgsql') {
         // Mengambil nama schema di PostgreSQL
         $stmt = $pdo->query("SELECT current_schema()");
@@ -299,7 +299,7 @@ function executeQuery($pdo, $query)
 function showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit)
 {
     $offset = ($page - 1) * $limit;
-    $stmt = $pdo->query("SELECT COUNT(*) AS total FROM `$table`");
+    $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
     $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     $totalPages = ceil($total / $limit);
 
@@ -308,7 +308,7 @@ function showTableData($pdo, $applicationId, $databaseName, $table, $page, $limi
     echo '<button class="button-toggle toggle-structure" data-open="-" data-close="+"></button>';
     echo '<h3>Data in ' . htmlspecialchars($table) . ' (Page ' . htmlspecialchars($page) . ')</h3>';
     echo '<div class="table-content-inner">';
-    $stmt = $pdo->query("SELECT * FROM `$table` LIMIT $limit OFFSET $offset");
+    $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
     echo '<table><tr>';
     for ($i = 0; $i < $stmt->columnCount(); $i++) {
         $col = $stmt->getColumnMeta($i);
@@ -404,6 +404,8 @@ if (file_exists($appConfigPath)) {
 }
 
 $pdo = $database->getDatabaseConnection();
+$pdo->query("SET NAMES 'utf8'"); 
+$pdo->query("SET CHARACTER SET 'utf8'");
 
 ?>
 <!DOCTYPE html>
@@ -411,6 +413,7 @@ $pdo = $database->getDatabaseConnection();
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.css">
