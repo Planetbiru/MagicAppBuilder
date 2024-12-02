@@ -159,10 +159,6 @@ function getQueryShowColumns($pdo, $tableName)
 
     // Mendapatkan schema atau database aktif
     if ($dbType == 'mysql') {
-        // Mengambil nama database di MySQL
-        $stmt = $pdo->query("SELECT DATABASE()");
-        $schema = $stmt->fetchColumn();
-        
         // Query untuk MySQL
         $sql = "DESCRIBE `$tableName`";
     } elseif ($dbType == 'pgsql') {
@@ -467,7 +463,6 @@ $pdo->query("SET CHARACTER SET 'utf8'");
                 showTableStructure($pdo, $table);
                 showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit);
             }
-            
 
             $queries = array();
             $lastQueries = "";

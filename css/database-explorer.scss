@@ -235,12 +235,12 @@ button {
     }
 }
 
-
 .query-executed {
     padding: 12px 16px 16px 16px;
     border: 1px solid #DDDDDD;
     margin-top: 20px;
     background-color: #FAFAFA;
+    border-radius: 3px;
 
     .query-title {
         font-weight: bold;
@@ -276,4 +276,3 @@ button {
         overflow-x: auto;
     }
 }
-

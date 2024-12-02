@@ -228,6 +228,7 @@ button {
   border: 1px solid #DDDDDD;
   margin-top: 20px;
   background-color: #FAFAFA;
+  border-radius: 3px;
 }
 .query-executed .query-title {
   font-weight: bold;
