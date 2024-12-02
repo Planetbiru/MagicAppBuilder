@@ -86,7 +86,7 @@ class DatabaseExplorer
      * @param string $databaseName The currently selected database name.
      * @param string $schemaname The currently selected schema name (for PostgreSQL).
      * @param object $databaseConfig The database configuration object.
-     * @return string
+     * @return string The generated HTML.
      */
     public static function showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaname, $databaseConfig)
     {
@@ -184,7 +184,7 @@ class DatabaseExplorer
      * @param string $databaseName The name of the selected database.
      * @param string $schemaName The name of the selected schema.
      * @param string $table The currently selected table.
-     * @return string
+     * @return string The generated HTML.
      */
     public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
     {
@@ -321,7 +321,7 @@ class DatabaseExplorer
      * @param PDO $pdo A PDO instance connected to the database.
      * @param string $schemaName The name of the schema (for PostgreSQL).
      * @param string $table The name of the table whose structure is to be shown.
-     * @return string
+     * @return string The generated HTML.
      */
     public static function showTableStructure($pdo, $schemaName, $table) //NOSONAR
     {
@@ -409,7 +409,7 @@ class DatabaseExplorer
      *
      * @param PDO $pdo A PDO instance connected to the database.
      * @param string $query The SQL query to be executed.
-     * @return string
+     * @return string The generated HTML.
      */
     public static function executeQuery($pdo, $query)
     {
@@ -474,7 +474,7 @@ class DatabaseExplorer
      * @param string $table The name of the selected table.
      * @param int $page The current page number.
      * @param int $limit The number of rows to display per page.
-     * @return string
+     * @return string The generated HTML.
      */
     public static function showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit)
     {
@@ -714,6 +714,7 @@ class DatabaseExplorer
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
+// Get application ID, database name, schema name, table, page, and query from input
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $schemaName = $inputGet->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
@@ -721,8 +722,10 @@ $table = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, 
 $page = $inputGet->getPage(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 $query = $inputPost->getQuery();
 
+// Get the row limit per page
 $limit = $builderConfig->getDataLimit(); // Rows per page
 
+// Determine application ID and check if it is from the default application
 if (empty($applicationId)) {
     $appId = $curApp->getId();
     $fromDefaultApp = true;
@@ -731,14 +734,17 @@ if (empty($applicationId)) {
     $fromDefaultApp = false;
 }
 
+// Ensure the page number is at least 1
 if ($page < 1) {
     $page = 1;
 }
 
+// Ensure the row limit is at least 20
 if ($limit < 1) {
     $limit = 20;
 }
 
+// Load the database configuration
 $databaseConfig = new SecretObject();
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
 
@@ -759,6 +765,7 @@ if (file_exists($appConfigPath)) {
     $database = new PicoDatabase($databaseConfig);
 
     try {
+        // Connect to the database and set schema for PostgreSQL
         $database->connect();
         $dbType = $database->getDatabaseType();
         if ($dbType == 'pgsql') {
@@ -772,6 +779,7 @@ if (file_exists($appConfigPath)) {
     exit();
 }
 
+// Get the PDO instance and set error mode
 $pdo = $database->getDatabaseConnection();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // End database preparation
@@ -798,13 +806,15 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         };
     </script>
 </head>
-<body data-from-default-app="<?php echo $fromDefaultApp?'true':'false'; ?>">
+<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>">
     <div class="sidebar">
         <?php
         try {
-            
+            // Initialize variables for query processing
             $queries = array();
             $lastQueries = "";
+            
+            // Split and sanitize the query if it exists
             if ($query) {
                 $arr = DatabaseExplorer::splitSQL($query);
                 $query = implode(";\r\n", $arr);
@@ -823,25 +833,26 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $queryArray = null;
             }
 
+            // Execute queries and handle results
             if ($query && !empty($queries)) {
-                try
-                {
+                try {
                     $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
-                }
-                catch(Exception $e)
-                {
+                } catch (Exception $e) {
                     $queryResult = "Error: " . $e->getMessage();
                 }
             } else {
                 $queryResult = "";
             }
 
+            // Show the sidebar with databases if not from default app and not using SQLite
             if (!$fromDefaultApp && $dbType != 'sqlite') {
                 echo DatabaseExplorer::showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaName, $databaseConfig);
             }
 
+            // Show the sidebar with tables
             echo DatabaseExplorer::showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table);
         } catch (PDOException $e) {
+            // Handle connection errors
             if ($e->getCode() == 0x3D000 || strpos($e->getMessage(), '1046') !== false) {
                 echo "Please choose one database";
             } else {
@@ -852,16 +863,15 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     </div>
     <div class="content">
         <?php
-        
+        // Display table structure and data if a table is selected
         if ($table) {
-            // Show table structure
             echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
             echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
         }
 
+        // Display the query executor form and results
         echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
         echo $queryResult;
-
         ?>
     </div>
 </body>
