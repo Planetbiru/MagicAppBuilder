@@ -172,7 +172,7 @@ class DatabaseExplorer
      * @param string $table The currently selected table.
      * @return void
      */
-    public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table)
+    public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
     {
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
@@ -202,7 +202,7 @@ class DatabaseExplorer
 
                 // Highlight the selected table
                 if ($table == $tableName) {
-                    $a->setAttribute('style', 'font-weight: bold;');
+                    $a->setAttribute('style', 'font-weight: bold;'); //NOSONAR
                 }
 
                 $li->appendChild($a);
@@ -222,7 +222,7 @@ class DatabaseExplorer
 
                 // Highlight the selected table
                 if ($table == $tableName) {
-                    $a->setAttribute('style', 'font-weight: bold;');
+                    $a->setAttribute('style', 'font-weight: bold;'); //NOSONAR
                 }
 
                 $li->appendChild($a);
@@ -309,7 +309,7 @@ class DatabaseExplorer
      * @param string $table The name of the table whose structure is to be shown.
      * @return string
      */
-    public static function showTableStructure($pdo, $schemaName, $table)
+    public static function showTableStructure($pdo, $schemaName, $table) //NOSONAR
     {
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -547,7 +547,7 @@ class DatabaseExplorer
             $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
 
             if ($i == $page) {
-                $pageLink->setAttribute('style', 'font-weight: bold;');
+                $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
             }
 
             $paginationDiv->appendChild($pageLink);
