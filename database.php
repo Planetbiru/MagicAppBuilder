@@ -15,6 +15,20 @@ if(isset($databaseConfig))
     require_once (__DIR__) . "/inc.app/database.php";
 }
 
+/**
+ * Class DatabaseExplorer
+ * 
+ * This class provides various methods to interact with a database and render the data in HTML format.
+ * It supports different database operations such as displaying table structures, data with pagination,
+ * executing SQL queries, and creating forms for query execution.
+ * 
+ * Key functionalities include:
+ * - Rendering a sidebar with available databases, schemas, and tables.
+ * - Displaying the structure of tables and their data.
+ * - Displaying table data with pagination.
+ * - Executing a series of SQL queries and displaying their results.
+ * - Creating a query execution form with pre-populated SQL queries.
+ */
 class DatabaseExplorer
 {
     /**
@@ -72,7 +86,7 @@ class DatabaseExplorer
      * @param string $databaseName The currently selected database name.
      * @param string $schemaname The currently selected schema name (for PostgreSQL).
      * @param object $databaseConfig The database configuration object.
-     * @return void
+     * @return string
      */
     public static function showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaname, $databaseConfig)
     {
@@ -153,7 +167,7 @@ class DatabaseExplorer
         $dom->appendChild($form);
 
         // Output the HTML
-        echo $dom->saveHTML();
+        return $dom->saveHTML();
     }
 
 
@@ -170,7 +184,7 @@ class DatabaseExplorer
      * @param string $databaseName The name of the selected database.
      * @param string $schemaName The name of the selected schema.
      * @param string $table The currently selected table.
-     * @return void
+     * @return string
      */
     public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
     {
@@ -238,7 +252,7 @@ class DatabaseExplorer
         $dom->appendChild($ul);
 
         // Output the HTML
-        echo $dom->saveHTML();
+        return $dom->saveHTML();
     }
 
 
@@ -699,7 +713,16 @@ class DatabaseExplorer
 // Begin database preparation
 $inputGet = new InputGet();
 $inputPost = new InputPost();
-$applicationId = $inputGet->getApplicationId();
+
+$applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$schemaName = $inputGet->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$table = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$page = $inputGet->getPage(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+$query = $inputPost->getQuery();
+
+$limit = $builderConfig->getDataLimit(); // Rows per page
+
 if (empty($applicationId)) {
     $appId = $curApp->getId();
     $fromDefaultApp = true;
@@ -708,21 +731,14 @@ if (empty($applicationId)) {
     $fromDefaultApp = false;
 }
 
-$databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$schemaName = $inputGet->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$table = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$page = $inputGet->getPage(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
-
 if ($page < 1) {
     $page = 1;
 }
 
-$limit = $builderConfig->getDataLimit(); // Rows per page
 if ($limit < 1) {
     $limit = 20;
 }
 
-$query = $inputPost->getQuery();
 $databaseConfig = new SecretObject();
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
 
@@ -808,16 +824,23 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
 
             if ($query && !empty($queries)) {
-                $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
+                try
+                {
+                    $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
+                }
+                catch(Exception $e)
+                {
+                    $queryResult = "Error: " . $e->getMessage();
+                }
             } else {
                 $queryResult = "";
             }
 
             if (!$fromDefaultApp && $dbType != 'sqlite') {
-                DatabaseExplorer::showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaName, $databaseConfig);
+                echo DatabaseExplorer::showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaName, $databaseConfig);
             }
 
-            DatabaseExplorer::showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table);
+            echo DatabaseExplorer::showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table);
         } catch (PDOException $e) {
             if ($e->getCode() == 0x3D000 || strpos($e->getMessage(), '1046') !== false) {
                 echo "Please choose one database";
@@ -829,19 +852,16 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     </div>
     <div class="content">
         <?php
-        try {
-            if ($table) {
-                // Show table structure
-                echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
-                echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
-            }
-
-            echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
-            echo $queryResult;
-
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+        
+        if ($table) {
+            // Show table structure
+            echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
+            echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
         }
+
+        echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
+        echo $queryResult;
+
         ?>
     </div>
 </body>
