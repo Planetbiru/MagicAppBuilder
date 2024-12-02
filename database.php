@@ -81,7 +81,14 @@ function showSidebarDatabases($pdo, $applicationId, $databaseName, $databaseConf
     {
         $dbNameFromConfig = $databaseConfig->getDatabaseName();
     }
-    $stmt = $pdo->query('SHOW DATABASES');
+    $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if ($dbType == 'pgsql') {
+        $stmt = $pdo->query('SELECT datname FROM pg_database');
+    }
+    else
+    {
+        $stmt = $pdo->query('SHOW DATABASES');
+    }
     while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
         $dbName = $row[0];
         $selected = $dbName === $databaseName  || $dbName === $dbNameFromConfig ? 'selected' : '';
