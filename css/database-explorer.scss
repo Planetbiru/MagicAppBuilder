@@ -214,10 +214,15 @@ button {
     overflow-x: auto;
     max-width: 100%;
     margin-bottom: 10px;
+    height: calc(100vh - 265px);
+}
+
+.query-result
+{
+    height: calc(100vh - 365px);
 }
 
 .table-structure-inner, .table-content-inner, .query-result {
-    height: calc(100vh - 265px);
     table {
         td {
             white-space: nowrap;
