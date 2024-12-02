@@ -68,6 +68,7 @@ table,
 th,
 td {
   border: 1px solid #ddd;
+  white-space: nowrap;
 }
 
 th {
@@ -210,16 +211,16 @@ button {
   margin-bottom: 10px;
 }
 
-.table-content-inner {
+.table-structure-inner, .table-content-inner, .query-result {
   height: calc(100vh - 265px);
 }
-.table-content-inner table td {
+.table-structure-inner table td, .table-content-inner table td, .query-result table td {
   white-space: nowrap;
 }
-.table-content-inner table tbody tr:nth-child(odd) td {
+.table-structure-inner table tbody tr:nth-child(odd) td, .table-content-inner table tbody tr:nth-child(odd) td, .query-result table tbody tr:nth-child(odd) td {
   background-color: #F8F8F8;
 }
-.table-content-inner table tbody tr:nth-child(even) td {
+.table-structure-inner table tbody tr:nth-child(even) td, .table-content-inner table tbody tr:nth-child(even) td, .query-result table tbody tr:nth-child(even) td {
   background-color: #FEFEFE;
 }
 

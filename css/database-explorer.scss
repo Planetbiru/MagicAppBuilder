@@ -69,6 +69,7 @@ table,
 th,
 td {
     border: 1px solid #ddd;
+    white-space: nowrap;
 }
 
 th{
@@ -215,7 +216,7 @@ button {
     margin-bottom: 10px;
 }
 
-.table-content-inner {
+.table-structure-inner, .table-content-inner, .query-result {
     height: calc(100vh - 265px);
     table {
         td {
