@@ -32,3 +32,11 @@
     documentRoot: 'D:/xampp/htdocs/06749b6839b630d9e33f'
     author: 'Your Name'
     selected: false
+-
+    id: 0674d7bd2bafbf935994
+    name: ApplicationName
+    architecture: ''
+    description: Description
+    documentRoot: 'C:/bitbucket/0674d7bd2bafbf935994'
+    author: 'Your Name'
+    selected: false

@@ -151,7 +151,7 @@ button {
   padding-bottom: 10px;
 }
 
-#database-select {
+#database-select, #schema-select {
   padding: 4px 8px;
   background-color: #ECECEC;
   border: 1px solid #ddd;
@@ -161,7 +161,7 @@ button {
 }
 
 .table-list {
-  max-height: calc(100vh - 138px);
+  max-height: calc(100vh - 170px);
   overflow: auto;
 }
 .table-list li a {
