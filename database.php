@@ -739,9 +739,9 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Ensure the row limit is at least 20
+// Ensure the row limit is at least 1
 if ($limit < 1) {
-    $limit = 20;
+    $limit = 1;
 }
 
 // Load the database configuration
