@@ -3,6 +3,7 @@
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
@@ -461,7 +462,7 @@ class DatabaseExplorer
      * @param int $limit The number of rows to display per page.
      * @return string
      */
-    public static function showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit)
+    public static function showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit)
     {
         $offset = ($page - 1) * $limit;
         $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
@@ -475,7 +476,7 @@ class DatabaseExplorer
         
         // Create the outer div
         $divOuter = $dom->createElement('div');
-        $divOuter->setAttribute('class', 'table-content collapsible' . htmlspecialchars($cls));
+        $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
 
         // Create the toggle button
         $button = $dom->createElement('button');
@@ -485,7 +486,7 @@ class DatabaseExplorer
         $divOuter->appendChild($button);
 
         // Create the heading
-        $h3 = $dom->createElement('h3', 'Data in ' . htmlspecialchars($table) . ' (Page ' . htmlspecialchars($page) . ')');
+        $h3 = $dom->createElement('h3', "Data in $table (Page $page)");
         $divOuter->appendChild($h3);
 
         // Create the inner div
@@ -532,7 +533,7 @@ class DatabaseExplorer
 
         if ($startPage > 1) {
             $firstPage = $dom->createElement('a', 'First');
-            $firstPage->setAttribute('href', "?applicationId=" . htmlspecialchars($applicationId) . "&database=" . htmlspecialchars($databaseName) . "&table=" . htmlspecialchars($table) . "&page=1");
+            $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
             $paginationDiv->appendChild($firstPage);
 
             if ($startPage > 2) {
@@ -543,7 +544,7 @@ class DatabaseExplorer
 
         for ($i = $startPage; $i <= $endPage; $i++) {
             $pageLink = $dom->createElement('a', htmlspecialchars($i));
-            $pageLink->setAttribute('href', "?applicationId=" . htmlspecialchars($applicationId) . "&database=" . htmlspecialchars($databaseName) . "&table=" . htmlspecialchars($table) . "&page=" . htmlspecialchars($i));
+            $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
 
             if ($i == $page) {
                 $pageLink->setAttribute('style', 'font-weight: bold;');
@@ -559,7 +560,7 @@ class DatabaseExplorer
             }
 
             $lastPage = $dom->createElement('a', 'Last');
-            $lastPage->setAttribute('href', "?applicationId=" . htmlspecialchars($applicationId) . "&database=" . htmlspecialchars($databaseName) . "&table=" . htmlspecialchars($table) . "&page=" . htmlspecialchars($totalPages));
+            $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
             $paginationDiv->appendChild($lastPage);
         }
 
@@ -707,11 +708,11 @@ if (empty($applicationId)) {
     $fromDefaultApp = false;
 }
 
-$databaseName = $inputGet->getDatabase();
-$schemaName = $inputGet->getSchema();
-$table = $inputGet->getTable();
+$databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$schemaName = $inputGet->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$table = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$page = $inputGet->getPage(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 
-$page = $inputGet->getPage();
 if ($page < 1) {
     $page = 1;
 }
@@ -832,7 +833,7 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             if ($table) {
                 // Show table structure
                 echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
-                echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $table, $page, $limit);
+                echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
             }
 
             echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
