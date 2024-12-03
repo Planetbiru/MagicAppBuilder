@@ -121,27 +121,18 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         $query[] = "$createStatement \"$tableName\" (";
 
         $cols = $tableInfo->getColumns();
-        
+        $columns = [];
+
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
             {
-                $query[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys);
+                $columns[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys, $tableInfo->getPrimaryKeys());
             }
         }
 
-        $query[] = implode(",\r\n", $query);
+        $query[] = implode(",\r\n", $columns);
         $query[] = ");";
-
-        $pk = $tableInfo->getPrimaryKeys();
-        if (isset($pk) && is_array($pk) && !empty($pk)) {
-            $query[] = "";
-            $query[] = "ALTER TABLE \"$tableName\"";
-            foreach ($pk as $primaryKey) {
-                $query[] = "\tADD PRIMARY KEY (\"$primaryKey[name]\")";
-            }
-            $query[] = ";";
-        }
 
         return implode("\r\n", $query);
     }
@@ -246,11 +237,15 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      * @return string The SQL column definition formatted as a string, suitable for 
      *                inclusion in a CREATE TABLE statement.
      */
-    public function createColumnPostgre($column, $autoIncrementKeys = null)
+    public function createColumnPostgre($column, $autoIncrementKeys, $primaryKey)
     {
+        $pkCols = array();
+        foreach($primaryKey as $col)
+        {
+            $pkCols[] = $col['name'];
+        }
         $col = array();
-        $col[] = "\t";
-        $col[] = "\"" . $column[parent::KEY_NAME] . "\"";
+       
 
         // Check if the column should be auto-incrementing.
         if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
@@ -258,16 +253,27 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             // Determine the appropriate serial type based on the column's type.
             if(stripos($column['type'], 'big'))
             {
-                $col[] = "BIGSERIAL"; // Use BIGSERIAL for large integers.
+                $columnType = "BIGSERIAL"; // Use BIGSERIAL for large integers.
             }
             else
             {
-                $col[] = "SERIAL"; // Use SERIAL for standard integers.
+                $columnType = "SERIAL"; // Use SERIAL for standard integers.
             }
         }
         else
         {
-            $col[] = $column['type']; // Use the specified type if not auto-incrementing.
+            $columnType = $this->getColumnType($column['type']); // Use the specified type if not auto-incrementing.
+        }
+
+        $columnName = $column[parent::KEY_NAME];
+
+        $col[] = "\t";
+        $col[] = $columnName;
+        $col[] = $columnType;
+
+        if(in_array($columnName, $pkCols))
+        {
+            $col[] = 'PRIMARY KEY';
         }
 
         // Determine nullability and add it to the definition.
@@ -280,7 +286,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         // Handle default value if provided, using a helper method to format it.
         if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
+            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);
             $col[] = "DEFAULT $defaultValue";
         }
 
@@ -303,11 +309,14 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if (strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null') {
+        if(stripos($type, 'bool') === 0)
+        {
+            return $defaultValue != 0 ? 'true' : 'false';
+        }
+        else if (strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null') {
             return $defaultValue;
         }
-
-        if (stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
+        else if (stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
             return "'" . addslashes($defaultValue) . "'";
         }
 
@@ -479,7 +488,38 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function getColumnType($columnType)
     {
-        return $this->convertMySqlToPostgreSql($columnType);
+        if(stripos($columnType, 'tinyint(1)') === 0)
+        {
+            return 'BOOLEAN';
+        }
+        $type = $this->convertMySqlToPostgreSql($columnType);
+        if(stripos($type, 'integer(') === 0)
+        {
+            $type = 'INTEGER';
+        }
+        else if(stripos($type, 'smallinteger(') === 0)
+        {
+            $type = 'INTEGER';
+        }
+        else if(stripos($type, 'biginteger(') === 0)
+        {
+            $type = 'INTEGER';
+        }
+        else if (stripos($type, 'enum(') === 0) {
+            // Extract the enum values between the parentheses
+            if (preg_match('/^enum\((.+)\)$/i', $type, $matches)) {
+                // Get the enum values as an array by splitting the string
+                $enumValues = array_map('trim', explode(',', $matches[1]));
+                // Find the maximum length of the enum values
+                $maxLength = max(array_map('strlen', $enumValues));
+                // Set the NVARCHAR length to the max length of enum values + 2
+                $type = 'CHARACTER VARYING(' . ($maxLength + 2) . ')';
+            }
+        } else if (stripos($type, 'year(') === 0) {
+            // Extract the enum values between the parentheses
+            $type = "INTEGER";
+        } 
+        return $type;
     }
 
 }

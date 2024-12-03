@@ -42,7 +42,7 @@ supportedDatabase:
   mysql: 
     name: MySQL
     base: nonfile-base
-  postgresql: 
+  pgsql: 
     name: PostgreSQL
     base: nonfile-base
   sqlite: 

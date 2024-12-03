@@ -385,32 +385,62 @@ class PicoDatabase // NOSONAR
         $timeZoneOffset = date("P");
         try {
             $connectionString = $this->constructConnectionString($withDatabase);
+
+            // Check for database username configuration
             if (!$this->databaseCredentials->issetUsername()) {
                 throw new InvalidDatabaseConfiguration("Database username may not be empty. Please check your database configuration!");
             }
+
+            // Initialize the query to set the timezone
             $initialQueries = "SET time_zone = '$timeZoneOffset';";
-            if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL &&
-                $this->databaseCredentials->getDatabaseSchema() != null && 
-                $this->databaseCredentials->getDatabaseSchema() != "") {
-                $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema();
+            
+            // Handle PostgreSQL-specific connection settings
+            if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
+                
+                // Set schema for PostgreSQL if it is provided
+                if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
+                    $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema();
+                }
+                // PostgreSQL connection setup
+                $this->databaseConnection = new PDO(
+                    $connectionString,
+                    $this->databaseCredentials->getUsername(),
+                    $this->databaseCredentials->getPassword(),
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+                    ]
+                );
             }
-            $this->databaseConnection = new PDO(
-                $connectionString,
-                $this->databaseCredentials->getUsername(),
-                $this->databaseCredentials->getPassword(),
-                [
-                    PDO::MYSQL_ATTR_INIT_COMMAND => $initialQueries,
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::MYSQL_ATTR_FOUND_ROWS => true
-                ]
-            );
+            // Handle MySQL-specific connection settings
+            elseif ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+                // MySQL connection setup
+                $this->databaseConnection = new PDO(
+                    $connectionString,
+                    $this->databaseCredentials->getUsername(),
+                    $this->databaseCredentials->getPassword(),
+                    [
+                        PDO::MYSQL_ATTR_INIT_COMMAND => $initialQueries,
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::MYSQL_ATTR_FOUND_ROWS => true
+                    ]
+                );
+            }
+            // If the database type is neither MySQL nor PostgreSQL, throw an exception
+            else {
+                throw new PDOException("Unsupported database type: " . $this->getDatabaseType());
+            }
+
+            // Log successful connection
             $connected = true;
             $this->connected = $connected;
         } catch (Exception $e) {
+            error_log('ERR '.$e->getMessage());
+            // Handle connection errors
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
         return $connected;
     }
+
     
     /**
      * Determine the database type based on the provided database type string.
@@ -498,12 +528,12 @@ class PicoDatabase // NOSONAR
                 $emptyValue .= $emptyName ? "{database_name}" : "";
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . '; port=' . ((int) $this->databaseCredentials->getPort()) . '; dbname=' . $this->databaseCredentials->getDatabaseName();
+            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort()) . ';dbname=' . $this->databaseCredentials->getDatabaseName();
         } else {
             if ($invalidParam1) {
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . '; port=' . ((int) $this->databaseCredentials->getPort());
+            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort());
         }
     }
 
