@@ -83,14 +83,11 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
             $query[] = "";
         }
-        $createStatement = "";
-
         $createStatement = "CREATE TABLE";
         if($createIfNotExists)
         {
             $createStatement .= " IF NOT EXISTS";
         }
-
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
 
         $query[] = "$createStatement `$tableName` (";
@@ -101,33 +98,11 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         {
             if(isset($cols[$columnName]))
             {
-                $columns[] = $this->createColumn($cols[$columnName]);
+                $columns[] = $this->createColumn($cols[$columnName], $autoIncrementKeys, $tableInfo->getPrimaryKeys());
             }
         }
         $query[] = implode(",\r\n", $columns);
         $query[] = ") ENGINE=$engine DEFAULT CHARSET=$charset;";
-
-        $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
-            $query[] = "";
-            $query[] = "ALTER TABLE `$tableName`";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY (`$primaryKey[name]`)";
-            }
-            $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE `$tableName` \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
-        }
 
         return implode("\r\n", $query);
     }
@@ -147,12 +122,32 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      *
      * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
      */
-    public function createColumn($column)
+    public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
+        $pkCols = array();
+        foreach($primaryKeys as $col)
+        {
+            $pkCols[] = $col['name'];
+        }
+        
         $col = array();
         $col[] = "\t";
-        $col[] = "`".$column[parent::KEY_NAME]."`";
-        $col[] = $column['type'];
+        $columnName = $column[parent::KEY_NAME];
+        $columnType = $column['type'];
+
+        $col[] = "`".$columnName."`";
+        $col[] = $columnType;
+
+        if(in_array($columnName, $pkCols))
+        {
+            $col[] = 'PRIMARY KEY';
+        }
+
+        if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+        {
+            $col[] = 'AUTO_INCREMENT';
+        }
+
         if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
         {
             $col[] = "NULL";
@@ -185,13 +180,21 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
+        if(stripos($type, 'bool') !== false || stripos($type, 'tinyint(1)') !== false)
+        {
+            return $defaultValue != 0 ? 'true' : 'false';
+        }
+        else if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false || stripos($type, 'int') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
+        else if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false)
         {
             return "'".$defaultValue."'";
+        }
+        else if(stripos($type, 'int') !== false || stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
+        {
+            return $defaultValue * 1;
         }
         return $defaultValue;
     }

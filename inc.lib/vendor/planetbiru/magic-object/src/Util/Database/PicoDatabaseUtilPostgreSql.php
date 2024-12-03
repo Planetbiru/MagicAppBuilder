@@ -237,10 +237,10 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      * @return string The SQL column definition formatted as a string, suitable for 
      *                inclusion in a CREATE TABLE statement.
      */
-    public function createColumnPostgre($column, $autoIncrementKeys, $primaryKey)
+    public function createColumnPostgre($column, $autoIncrementKeys, $primaryKeys)
     {
         $pkCols = array();
-        foreach($primaryKey as $col)
+        foreach($primaryKeys as $col)
         {
             $pkCols[] = $col['name'];
         }
@@ -309,17 +309,23 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') === 0)
+        if(stripos($type, 'bool') !== false)
         {
             return $defaultValue != 0 ? 'true' : 'false';
         }
         else if (strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null') {
             return $defaultValue;
-        }
+        }     
         else if (stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
             return "'" . addslashes($defaultValue) . "'";
         }
-
+        else if(stripos($type, 'int') !== false 
+        || stripos($type, 'real') !== false 
+        || stripos($type, 'float') !== false 
+        || stripos($type, 'double') !== false)
+        {
+            return $defaultValue + 0;
+        }
         return $defaultValue;
     }
 

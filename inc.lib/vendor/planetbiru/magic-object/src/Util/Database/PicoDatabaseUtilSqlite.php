@@ -471,26 +471,28 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') === 0)
+        if(stripos($type, 'bool') !== false)
         {
             return $defaultValue != 0 ? 'true' : 'false';
         }
-        if(strtolower($defaultValue) == 'true' 
+        else if(strtolower($defaultValue) == 'true' 
         || strtolower($defaultValue) == 'false' 
         || strtolower($defaultValue) == 'null'
         )
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false 
-        || stripos($type, 'char') !== false 
+        else if(stripos($type, 'char') !== false 
         || stripos($type, 'text') !== false 
-        || stripos($type, 'int') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false
         )
         {
             return "'".$defaultValue."'";
+        }
+        else if(stripos($type, 'int') !== false 
+        || stripos($type, 'float') !== false 
+        || stripos($type, 'double') !== false)
+        {
+            return $defaultValue + 0;
         }
         return $defaultValue;
     }
