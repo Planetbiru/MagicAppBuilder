@@ -287,6 +287,25 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $cols = $tableInfo->getColumns();
 
+        error_log(print_r($cols, true));
+
+        $pk = $tableInfo->getPrimaryKeys();
+        if(isset($pk) && is_array($pk) && !empty($pk))
+        {
+            foreach($pk as $primaryKey)
+            {
+                $cols[$primaryKey['name']]['primary_keys'] = true;
+            }
+        }
+
+        foreach($tableInfo->getColumns() as $column)
+        {
+            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+            {
+                $cols[$column['name']]['auto_increment'] = true;
+            }
+        }
+
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
@@ -298,27 +317,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $query[] = implode(",\r\n", $columns);
         $query[] = ") ";
 
-        $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
-            $query[] = "";
-            $query[] = "ALTER TABLE $tableName";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY ($primaryKey[name])";
-            }
-            $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE $tableName \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
-        }
+        
 
         return implode("\r\n", $query);
     }
@@ -340,10 +339,23 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function createColumn($column)
     {
+        error_log(print_r($column, true));
         $col = array();
         $col[] = "\t";
         $col[] = "".$column[parent::KEY_NAME]."";
-        $col[] = $column['type'];
+        
+        if(isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment'])
+        {
+            $column['type'] = 'INTEGER';
+            $col[] = $column['type'];
+            $col[] = 'PRIMARY KEY AUTO_INCREMENT';
+        }
+        else if(isset($column['primary_key']) && $column['primary_key'])
+        {
+            $col[] = $column['type'];
+            $col[] = 'PRIMARY KEY';
+        }
+
         if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
         {
             $col[] = "NULL";
