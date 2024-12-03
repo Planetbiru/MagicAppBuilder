@@ -87,8 +87,8 @@ else
                                 <td>Architecture</td>
                                 <td>
                                     <select class="form-control" name="application_architecture">
-                                        <option value="<?php echo AppArchitecture::MONOLITH;?>"<?php echo $app->getArchitecture() == AppArchitecture::MONOLITH ? ' selected' : ''; ?>>Monolith Application</option>
-                                        <option value="<?php echo AppArchitecture::MICROSERVICES;?>"<?php echo $app->getArchitecture() == AppArchitecture::MICROSERVICES ? ' selected' : ''; ?>>Microservices Application</option>
+                                        <option value="<?php echo AppArchitecture::MONOLITH;?>"<?php echo $app->getArchitecture() == AppArchitecture::MONOLITH ? $constSelected : ''; ?>>Monolith Application</option>
+                                        <option value="<?php echo AppArchitecture::MICROSERVICES;?>"<?php echo $app->getArchitecture() == AppArchitecture::MICROSERVICES ? $constSelected : ''; ?>>Microservices Application</option>
                                     </select>
                                 </td>
                             </tr>
