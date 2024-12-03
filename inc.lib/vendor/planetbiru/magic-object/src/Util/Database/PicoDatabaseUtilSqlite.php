@@ -196,6 +196,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             // Check if the column type exists in the mapping
             if (array_key_exists($columnType, $typeMapping)) {
                 $sqlType = $typeMapping[$columnType];
+            } else if(stripos($columnType, 'int(') === 0) {
+                $sqlType = strtoupper($columnType);
             } else {
                 $sqlType = strtoupper($columnType);
                 if ($sqlType !== 'TINYINT(1)' && $sqlType !== 'FLOAT' && $sqlType !== 'TEXT' && 
@@ -377,7 +379,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         } elseif (stripos($typeCheck, 'char(') === 0) {
             // Convert 'char()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
-        } elseif (stripos($typeCheck, 'char(') === 0) {
+        } elseif (stripos($typeCheck, 'int(') === 0) {
             // Convert 'int()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
         } elseif (stripos($typeCheck, 'bigint(') === 0) {
@@ -627,7 +629,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function getColumnType($columnType)
     {
-        return $this->mysqlToSqliteType($columnType);
+        $columnType = $this->mysqlToSqliteType($columnType);
+        if(stripos($columnType, 'int') === 0)
+        {
+            $columnType = strtoupper($columnType);
+        }
+        return $columnType;
     }
 
 }
