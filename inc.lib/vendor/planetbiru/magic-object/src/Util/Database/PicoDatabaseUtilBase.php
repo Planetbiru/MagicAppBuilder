@@ -695,23 +695,23 @@ class PicoDatabaseUtilBase // NOSONAR
     }
 
     /**
-     * Converts a MariaDB CREATE TABLE query to a PostgreSQL compatible query.
+     * Converts a MySQL CREATE TABLE query to a PostgreSQL compatible query.
      *
-     * This function takes a SQL CREATE TABLE statement written for MariaDB 
+     * This function takes a SQL CREATE TABLE statement written for MySQL 
      * and transforms it into a format compatible with PostgreSQL. It handles 
      * common data types and syntax differences between the two databases.
      *
-     * @param string $mariadbQuery The MariaDB CREATE TABLE query to be converted.
+     * @param string $mariadbQuery The MySQL CREATE TABLE query to be converted.
      * @return string The converted PostgreSQL CREATE TABLE query.
      */
-    public function convertMariaDbToPostgreSql($mariadbQuery) {
+    public function convertMySqlToPostgreSql($mariadbQuery) {
         // Remove comments
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery); // NOSONAR
         
-        // Replace MariaDB data types with PostgreSQL data types
+        // Replace MySQL data types with PostgreSQL data types
         $replacements = array(
             'int' => 'INTEGER',
-            'tinyint(1)' => 'BOOLEAN', // MariaDB TINYINT(1) as BOOLEAN
+            'tinyint(1)' => 'BOOLEAN', // MySQL TINYINT(1) as BOOLEAN
             'tinyint' => 'SMALLINT',
             'smallint' => 'SMALLINT',
             'mediumint' => 'INTEGER', // No direct equivalent, use INTEGER
@@ -807,5 +807,10 @@ class PicoDatabaseUtilBase // NOSONAR
         $query = preg_replace('/USING BTREE/', '', $query); // NOSONAR
     
         return $query;
+    }
+    
+    public function getColumnType($columnType)
+    {
+        return $this->convertMySqlToPostgreSql($columnType);
     }
 }

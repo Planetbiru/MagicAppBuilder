@@ -256,6 +256,21 @@ class PicoDatabaseDump
 
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
+        
+        $databaseType = $database->getDatabaseType();
+        
+        if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
+        {
+            $tool = new PicoDatabaseUtilPostgreSql();
+        }
+        else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) 
+        {
+            $tool = new PicoDatabaseUtilMySql();
+        } 
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $tool = new PicoDatabaseUtilSqlite();
+        }
 
         if (!empty($tableInfo->getColumns())) {
             $dbColumnNames = array();
@@ -269,7 +284,7 @@ class PicoDatabaseDump
                 foreach ($tableInfo->getColumns() as $entityColumn) {
                     if (!in_array($entityColumn['name'], $dbColumnNames)) {
                         $createdColumns[] = $entityColumn['name'];
-                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $entityColumn['type']);
+                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $tool->getColumnType($entityColumn['type']));
                         $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
                         $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
                         $query = $this->updateQueryAlterTableAddColumn($query, $lastColumn, $database->getDatabaseType());
@@ -318,6 +333,21 @@ class PicoDatabaseDump
         $tableInfo = $this->getTableInfo($entity);
         $tableName = $tableInfo->getTableName();
         $database = $entity->currentDatabase();
+        
+        $databaseType = $database->getDatabaseType();
+        
+        if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
+        {
+            $tool = new PicoDatabaseUtilPostgreSql();
+        }
+        else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) 
+        {
+            $tool = new PicoDatabaseUtilMySql();
+        } 
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $tool = new PicoDatabaseUtilSqlite();
+        }
 
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
@@ -334,7 +364,7 @@ class PicoDatabaseDump
                 foreach ($tableInfo->getColumns() as $entityColumn) {
                     if (!in_array($entityColumn['name'], $dbColumnNames)) {
                         $createdColumns[] = $entityColumn['name'];
-                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $entityColumn['type']);
+                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $tool->getColumnType($entityColumn['type']));
                         $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
                         $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
                         $query = $this->updateQueryAlterTableAddColumn($query, $lastColumn, $database->getDatabaseType());

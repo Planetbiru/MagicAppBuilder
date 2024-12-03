@@ -344,5 +344,18 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         return $data;
     }
 
-    
+    /**
+     * Returns the given column type without modification.
+     *
+     * This method simply returns the column type passed as an argument. It is useful 
+     * when no conversion is needed, and you want to retrieve the column type as-is.
+     *
+     * @param string $columnType The column type to be returned.
+     * @return string The same column type passed as input.
+     */
+    public function getColumnType($columnType)
+    {
+        return $columnType;
+    }
+
 }
