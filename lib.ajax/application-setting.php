@@ -62,8 +62,7 @@ else
     $databases->setSelectedBase('nonfile-base');
 }
 
-?>
-<form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
         <div id="accordion" class="accordion">
         <div class="card">

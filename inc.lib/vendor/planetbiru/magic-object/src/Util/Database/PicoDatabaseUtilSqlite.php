@@ -377,7 +377,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         } elseif (stripos($typeCheck, 'char(') === 0) {
             // Convert 'char()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
-        } elseif (stripos($typeCheck, 'int(') === 0) {
+        } elseif (stripos($typeCheck, 'char(') === 0) {
             // Convert 'int()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
         } elseif (stripos($typeCheck, 'bigint(') === 0) {
@@ -469,6 +469,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
+        if(stripos($type, 'bool') === 0)
+        {
+            return $defaultValue != 0 ? 'true' : 'false';
+        }
         if(strtolower($defaultValue) == 'true' 
         || strtolower($defaultValue) == 'false' 
         || strtolower($defaultValue) == 'null'
