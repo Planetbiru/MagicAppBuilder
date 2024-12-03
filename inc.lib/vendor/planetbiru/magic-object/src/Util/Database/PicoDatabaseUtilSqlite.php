@@ -374,6 +374,9 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 // If it's just 'varchar', convert it to 'NVARCHAR' without a length
                 $type = 'NVARCHAR';
             }
+        } elseif (stripos($typeCheck, 'char(') === 0) {
+            // Convert 'char()' to uppercase (MySQL int type conversion)
+            $type = strtoupper($type);
         } elseif (stripos($typeCheck, 'int(') === 0) {
             // Convert 'int()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
