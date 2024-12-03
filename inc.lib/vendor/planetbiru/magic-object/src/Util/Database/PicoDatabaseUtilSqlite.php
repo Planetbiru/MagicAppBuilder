@@ -287,6 +287,24 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $cols = $tableInfo->getColumns();
 
+
+        $pk = $tableInfo->getPrimaryKeys();
+        if(isset($pk) && is_array($pk) && !empty($pk))
+        {
+            foreach($pk as $prop=>$primaryKey)
+            {
+                $cols[$prop]['primary_key'] = true;
+            }
+        }
+
+        foreach($tableInfo->getColumns() as $k=>$column)
+        {
+            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+            {
+                $cols[$k]['auto_increment'] = true;
+            }
+        }
+
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
@@ -296,32 +314,44 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         $query[] = implode(",\r\n", $columns);
-        $query[] = ") ";
+        $query[] = "); ";
 
-        $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
-            $query[] = "";
-            $query[] = "ALTER TABLE $tableName";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY ($primaryKey[name])";
-            }
-            $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE $tableName \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
-        }
+        
 
         return implode("\r\n", $query);
     }
+
+    private function mysqlToSqliteType($type)
+    {
+        $typeCheck = trim(strtolower($type));
+        $map = array(
+            'tinyint(1)' => 'BOOLEAN',
+            'enum(' => 'TEXT',
+            'integer' => 'INTEGER'
+        );
+
+        // Add logic to handle 'varchar' and convert it to 'nvarchar'
+        if (stripos($typeCheck, 'varchar') === 0) {
+            // Match VARCHAR(N) and convert to NVARCHAR(N)
+            if (preg_match('/^varchar\((\d+)\)$/i', $typeCheck, $matches)) {
+                $type = 'NVARCHAR(' . $matches[1] . ')';
+            } else {
+                // Handle generic VARCHAR, convert to NVARCHAR without length
+                $type = 'NVARCHAR';
+            }
+        } {
+            // Check the original map for other types
+            foreach ($map as $key => $val) {
+                if (stripos($typeCheck, $key) === 0) {
+                    $type = $val;
+                    break;
+                }
+            }
+        }
+        
+        return $type;
+    }
+
 
     /**
      * Creates a column definition for a SQL statement.
@@ -340,10 +370,27 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function createColumn($column)
     {
+        $columnType = $this->mysqlToSqliteType($column['type']);
         $col = array();
         $col[] = "\t";
         $col[] = "".$column[parent::KEY_NAME]."";
-        $col[] = $column['type'];
+        
+        if(isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment'])
+        {
+            $columnType = 'INTEGER';
+            $col[] = $columnType;
+            $col[] = 'PRIMARY KEY';
+        }
+        else if(isset($column['primary_key']) && $column['primary_key'])
+        {
+            $col[] = $columnType;
+            $col[] = 'PRIMARY KEY';
+        }
+        else
+        {
+            $col[] = $columnType;
+        }
+
         if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
         {
             $col[] = "NULL";
@@ -355,7 +402,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         if(isset($column['default_value']))
         {
             $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
+            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);
             $col[] = "DEFAULT $defaultValue";
         }
         return implode(" ", $col);
