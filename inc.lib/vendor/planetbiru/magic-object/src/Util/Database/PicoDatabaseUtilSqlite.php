@@ -315,40 +315,80 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $query[] = implode(",\r\n", $columns);
         $query[] = "); ";
-
         
-
         return implode("\r\n", $query);
     }
 
+    /**
+     * Converts MySQL data types to SQLite-compatible types.
+     *
+     * This function maps MySQL data types to their equivalent SQLite types. It supports:
+     * - `tinyint(1)` to `BOOLEAN`,
+     * - `integer` to `INTEGER`,
+     * - `enum()` to `NVARCHAR(N)` with a length based on the maximum length of the enum values plus 2,
+     * - `varchar(N)` to `NVARCHAR(N)` (or `varchar` to `NVARCHAR` without a length),
+     * - `float`, `double` to `REAL`,
+     * - `decimal` to `NUMERIC`,
+     * - `text` and `longtext` to `TEXT`,
+     * - `date`, `datetime`, `timestamp` to `TEXT` (as SQLite does not have dedicated date/time types).
+     *
+     * @param string $type The MySQL data type to convert (e.g., 'tinyint(1)', 'varchar(255)', 'enum(', 'decimal(10,2)').
+     * 
+     * @return string The corresponding SQLite data type (e.g., 'BOOLEAN', 'NVARCHAR(255)', 'REAL', 'NUMERIC', 'TEXT').
+     */
     private function mysqlToSqliteType($type)
     {
+        // Trim any whitespace and convert to lowercase for easier comparison
         $typeCheck = trim(strtolower($type));
+        
+        // Define a mapping of common MySQL types to SQLite types
         $map = array(
-            'tinyint(1)' => 'BOOLEAN',
-            'enum(' => 'TEXT',
-            'integer' => 'INTEGER'
+            'tinyint(1)' => 'BOOLEAN',  // MySQL 'tinyint(1)' maps to SQLite 'BOOLEAN'
+            'integer' => 'INTEGER',     // MySQL 'integer' maps to SQLite 'INTEGER'
+            'float' => 'REAL',          // MySQL 'float' maps to SQLite 'REAL'
+            'double' => 'REAL',         // MySQL 'double' maps to SQLite 'REAL'
+            'decimal' => 'NUMERIC',     // MySQL 'decimal' maps to SQLite 'NUMERIC'
+            'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
+            'longtext' => 'TEXT',       // MySQL 'longtext' maps to SQLite 'TEXT'
+            'date' => 'TEXT',           // MySQL 'date' maps to SQLite 'TEXT'
+            'datetime' => 'TEXT',       // MySQL 'datetime' maps to SQLite 'TEXT'
+            'timestamp' => 'TEXT'       // MySQL 'timestamp' maps to SQLite 'TEXT'
         );
 
-        // Add logic to handle 'varchar' and convert it to 'nvarchar'
-        if (stripos($typeCheck, 'varchar') === 0) {
-            // Match VARCHAR(N) and convert to NVARCHAR(N)
+        // Handle 'enum' types and convert them to 'NVARCHAR' with length based on max enum value length + 2
+        if (stripos($typeCheck, 'enum(') === 0) {
+            // Extract the enum values between the parentheses
+            if (preg_match('/^enum\((.+)\)$/i', $typeCheck, $matches)) {
+                // Get the enum values as an array by splitting the string
+                $enumValues = array_map('trim', explode(',', $matches[1]));
+                // Find the maximum length of the enum values
+                $maxLength = max(array_map('strlen', $enumValues));
+                // Set the NVARCHAR length to the max length of enum values + 2
+                $type = 'NVARCHAR(' . ($maxLength + 2) . ')';
+            }
+        } elseif (stripos($typeCheck, 'varchar') === 0) {
+            // Handle 'varchar' types and convert them to 'nvarchar' in SQLite
             if (preg_match('/^varchar\((\d+)\)$/i', $typeCheck, $matches)) {
                 $type = 'NVARCHAR(' . $matches[1] . ')';
             } else {
-                // Handle generic VARCHAR, convert to NVARCHAR without length
+                // If it's just 'varchar', convert it to 'NVARCHAR' without a length
                 $type = 'NVARCHAR';
             }
-        } {
-            // Check the original map for other types
+        } elseif (stripos($typeCheck, 'int(') === 0) {
+            // Convert 'int()' to uppercase (MySQL int type conversion)
+            $type = strtoupper($type);
+        } else {
+            // For all other types, check the predefined map
             foreach ($map as $key => $val) {
                 if (stripos($typeCheck, $key) === 0) {
+                    // If a match is found, use the mapped SQLite type
                     $type = $val;
                     break;
                 }
             }
         }
         
+        // Return the mapped SQLite data type
         return $type;
     }
 
