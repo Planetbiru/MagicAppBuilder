@@ -1250,11 +1250,6 @@ jQuery(function () {
     $('#modal-query-executor').modal('show');
   });
 
-  
-
-  
-
-
   $(document).on('change', 'table select[name=database_driver]', function (e) {
     let base = $(this).find('option:selected').attr('data-base');
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
@@ -1338,6 +1333,15 @@ jQuery(function () {
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
     })
+  });
+
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-language-list.php',
+    dataType: 'json',
+    success: function (data) {
+      setLanguage(data);
+    }
   });
 
   reloadApplicationList();
@@ -1672,6 +1676,15 @@ function reloadApplicationList() {
       for (let i in data) {
         $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
       }
+    }
+  });
+
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-language-list.php',
+    dataType: 'json',
+    success: function (data) {
+      setLanguage(data);
     }
   });
 }
