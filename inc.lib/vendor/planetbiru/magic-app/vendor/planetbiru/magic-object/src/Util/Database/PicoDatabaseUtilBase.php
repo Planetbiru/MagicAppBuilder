@@ -716,24 +716,24 @@ class PicoDatabaseUtilBase // NOSONAR
         
         // Replace MySQL data types with PostgreSQL data types
         $replacements = array(
-            'int' => 'INTEGER',
             'tinyint(1)' => 'BOOLEAN', // MySQL TINYINT(1) as BOOLEAN
-            'tinyint' => 'SMALLINT',
-            'smallint' => 'SMALLINT',
+            'tinyint' => 'INTEGER',
+            'smallint' => 'INTEGER',
             'mediumint' => 'INTEGER', // No direct equivalent, use INTEGER
-            'bigint' => 'BIGINT',
+            'bigint' => 'INTEGER',
+            'int' => 'INTEGER',
             'float' => 'REAL',
             'double' => 'DOUBLE PRECISION',
             'decimal' => 'NUMERIC', // Decimal types
+            'datetime' => 'TIMESTAMP', // Use TIMESTAMP for datetime
+            'timestamp' => 'TIMESTAMP WITH TIME ZONE',
             'date' => 'DATE',
             'time' => 'TIME',
-            'datetime' => 'TIMESTAMP', // Use TIMESTAMP for datetime
-            'timestamp' => 'TIMESTAMP',
             'varchar' => 'VARCHAR', // Variable-length string
-            'text' => 'TEXT',
             'blob' => 'BYTEA', // Binary data
             'mediumtext' => 'TEXT', // No direct equivalent
             'longtext' => 'TEXT', // No direct equivalent
+            'text' => 'TEXT',
             'json' => 'JSONB', // Use JSONB for better performance in PostgreSQL
             // Add more type conversions as needed
         );

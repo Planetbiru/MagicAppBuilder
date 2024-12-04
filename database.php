@@ -313,17 +313,21 @@ class DatabaseExplorer
     }
 
     /**
-     * Displays the structure of a table.
+     * Displays the structure of a table, including column details like name, type, nullability, key, default value, and extra information.
      *
-     * This function fetches the table structure (columns, types, keys, etc.) from the database
-     * and displays it in an HTML table.
+     * This function fetches the structure of a table (such as columns, types, nullability, primary keys, default values, etc.)
+     * from the database and displays it in an HTML table format. If the table is not found, it will show an error message with
+     * a link to navigate back to the previous page.
      *
      * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $applicationId The application identifier.
+     * @param string $databaseName The name of the database.
      * @param string $schemaName The name of the schema (for PostgreSQL).
      * @param string $table The name of the table whose structure is to be shown.
-     * @return string The generated HTML.
+     * 
+     * @return string The generated HTML displaying the table structure or an error message if the table is not found.
      */
-    public static function showTableStructure($pdo, $schemaName, $table) //NOSONAR
+    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
     {
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -359,6 +363,8 @@ class DatabaseExplorer
         }
         $thead->appendChild($tr);
         $tableElem->appendChild($thead);
+
+        $columnCount = 0;
         
         // Fetch the columns
         $query = self::getQueryShowColumns($pdo, $schemaName, $table);
@@ -368,6 +374,7 @@ class DatabaseExplorer
             if ($stmt) {
                 $tbody = $dom->createElement('tbody');
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $columnCount++;
                     $tr = $dom->createElement('tr');
                     if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
                         // For SQLite
@@ -393,8 +400,44 @@ class DatabaseExplorer
             }
         }
         
-        $divInner->appendChild($tableElem);
-        $dom->appendChild($divOuter);
+        if($columnCount > 0)
+        {
+            $divInner->appendChild($tableElem);
+            $dom->appendChild($divOuter);
+        }
+        else
+        {
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'sql-error');
+
+            // Prepare the URL for the back link
+            $url = "?applicationId=$applicationId&database=$databaseName&schema=$schemaName";
+
+            // Create the message text (without brackets) as a span
+            $message = $dom->createElement('span', "Table \"{$table}\" is not found.");
+
+            // Create the <a> element for the back link
+            $backLink = $dom->createElement('a', 'Back');
+            $backLink->setAttribute('href', $url);
+
+            // Create a text node for the brackets
+            $leftBracket = $dom->createTextNode(' [');
+            $rightBracket = $dom->createTextNode(']');
+
+            // Append the text nodes (left bracket and right bracket) around the link
+            $message->appendChild($leftBracket);
+            $message->appendChild($backLink);
+            $message->appendChild($rightBracket);
+
+            // Append the message to the div
+            $divInner->appendChild($message);
+
+            // Append the div to the document
+            $dom->appendChild($divInner);
+
+
+        }
+
         
         // Output the HTML
         return $dom->saveHTML();
@@ -478,109 +521,127 @@ class DatabaseExplorer
      */
     public static function showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit)
     {
-        $offset = ($page - 1) * $limit;
-        $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
-        $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($total / $limit);
-
-        $cls = isset($_POST['query']) ? '' : ' open';
-
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
+
+        $cls = isset($_POST['query']) ? '' : ' open';
         
         // Create the outer div
         $divOuter = $dom->createElement('div');
-        $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
+        
+        try
+        {
 
-        // Create the toggle button
-        $button = $dom->createElement('button');
-        $button->setAttribute('class', 'button-toggle toggle-structure');
-        $button->setAttribute('data-open', '-');
-        $button->setAttribute('data-close', '+');
-        $divOuter->appendChild($button);
+            $offset = ($page - 1) * $limit;
+            $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
+            $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalPages = ceil($total / $limit);
 
-        // Create the heading
-        $h3 = $dom->createElement('h3', "Data in $table (Page $page)");
-        $divOuter->appendChild($h3);
+            $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
 
-        // Create the inner div
-        $divInner = $dom->createElement('div');
-        $divInner->setAttribute('class', 'table-content-inner');
-        $divOuter->appendChild($divInner);
+            
+            // Create the toggle button
+            $button = $dom->createElement('button');
+            $button->setAttribute('class', 'button-toggle toggle-structure');
+            $button->setAttribute('data-open', '-');
+            $button->setAttribute('data-close', '+');
+            $divOuter->appendChild($button);
 
-        // Create the table
-        $tableElem = $dom->createElement('table');
-        $thead = $dom->createElement('thead');
-        $tr = $dom->createElement('tr');
+            // Create the heading
+            $h3 = $dom->createElement('h3', "Data in $table (Page $page)");
+            $divOuter->appendChild($h3);
 
-        // Add table headers
-        $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
-        for ($i = 0; $i < $stmt->columnCount(); $i++) {
-            $col = $stmt->getColumnMeta($i);
-            $th = $dom->createElement('th', htmlspecialchars($col['name']));
-            $tr->appendChild($th);
-        }
-        $thead->appendChild($tr);
-        $tableElem->appendChild($thead);
+            // Create the inner div
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'table-content-inner');
+            $divOuter->appendChild($divInner);
 
-        // Add table rows
-        $tbody = $dom->createElement('tbody');
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Create the table
+            $tableElem = $dom->createElement('table');
+            $thead = $dom->createElement('thead');
             $tr = $dom->createElement('tr');
-            foreach ($row as $value) {
-                $td = $dom->createElement('td', htmlspecialchars($value));
-                $tr->appendChild($td);
+
+            // Add table headers
+            $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
+            for ($i = 0; $i < $stmt->columnCount(); $i++) {
+                $col = $stmt->getColumnMeta($i);
+                $th = $dom->createElement('th', htmlspecialchars($col['name']));
+                $tr->appendChild($th);
             }
-            $tbody->appendChild($tr);
-        }
-        $tableElem->appendChild($tbody);
-        $divInner->appendChild($tableElem);
+            $thead->appendChild($tr);
+            $tableElem->appendChild($thead);
 
-        // Append the outer div to the DOM
-        $dom->appendChild($divOuter);
-
-        // Pagination navigation with a maximum of 7 pages
-        $paginationDiv = $dom->createElement('div');
-        $paginationDiv->setAttribute('class', 'pagination');
-        $startPage = max(1, $page - 3);
-        $endPage = min($totalPages, $page + 3);
-
-        if ($startPage > 1) {
-            $firstPage = $dom->createElement('a', 'First');
-            $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
-            $paginationDiv->appendChild($firstPage);
-
-            if ($startPage > 2) {
-                $ellipsis = $dom->createElement('span', '...');
-                $paginationDiv->appendChild($ellipsis);
+            // Add table rows
+            $tbody = $dom->createElement('tbody');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $tr = $dom->createElement('tr');
+                foreach ($row as $value) {
+                    $td = $dom->createElement('td', htmlspecialchars($value));
+                    $tr->appendChild($td);
+                }
+                $tbody->appendChild($tr);
             }
-        }
+            $tableElem->appendChild($tbody);
+            $divInner->appendChild($tableElem);
 
-        for ($i = $startPage; $i <= $endPage; $i++) {
-            $pageLink = $dom->createElement('a', htmlspecialchars($i));
-            $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
+            // Append the outer div to the DOM
+            $dom->appendChild($divOuter);
 
-            if ($i == $page) {
-                $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
-            }
+            // Pagination navigation with a maximum of 7 pages
+            $paginationDiv = $dom->createElement('div');
+            $paginationDiv->setAttribute('class', 'pagination');
+            $startPage = max(1, $page - 3);
+            $endPage = min($totalPages, $page + 3);
 
-            $paginationDiv->appendChild($pageLink);
-        }
+            if ($startPage > 1) {
+                $firstPage = $dom->createElement('a', 'First');
+                $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
+                $paginationDiv->appendChild($firstPage);
 
-        if ($endPage < $totalPages) {
-            if ($endPage < $totalPages - 1) {
-                $ellipsis = $dom->createElement('span', '...');
-                $paginationDiv->appendChild($ellipsis);
+                if ($startPage > 2) {
+                    $ellipsis = $dom->createElement('span', '...');
+                    $paginationDiv->appendChild($ellipsis);
+                }
             }
 
-            $lastPage = $dom->createElement('a', 'Last');
-            $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
-            $paginationDiv->appendChild($lastPage);
-        }
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                $pageLink = $dom->createElement('a', htmlspecialchars($i));
+                $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
 
-        // Append the pagination div to the DOM
-        $divOuter->appendChild($paginationDiv);
-        $dom->appendChild($divOuter);
+                if ($i == $page) {
+                    $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
+                }
+
+                $paginationDiv->appendChild($pageLink);
+            }
+
+            if ($endPage < $totalPages) {
+                if ($endPage < $totalPages - 1) {
+                    $ellipsis = $dom->createElement('span', '...');
+                    $paginationDiv->appendChild($ellipsis);
+                }
+
+                $lastPage = $dom->createElement('a', 'Last');
+                $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
+                $paginationDiv->appendChild($lastPage);
+            }
+
+            // Append the pagination div to the DOM
+            $divOuter->appendChild($paginationDiv);
+            $dom->appendChild($divOuter);
+        }
+        catch(Exception $e)
+        {
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'sql-error');
+
+            // Add the exception message to the div
+            $message = $dom->createTextNode('Error: ' . $e->getMessage());
+            $divInner->appendChild($message);
+            
+            $divOuter->appendChild($divInner);
+            $dom->appendChild($divOuter);
+        }
 
         // Output the HTML with pagination
         return $dom->saveHTML();
@@ -865,7 +926,7 @@ if ($query && !empty($queries)) {
         <?php
         // Display table structure and data if a table is selected
         if ($table) {
-            echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
+            echo DatabaseExplorer::showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table);
             echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
         }
 

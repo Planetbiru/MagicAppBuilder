@@ -11,6 +11,11 @@ body {
   font-size: 0.85rem;
 }
 
+a {
+  text-decoration: none;
+  color: #1c73cf;
+}
+
 .sidebar {
   width: 250px;
   background-color: #343a40;
@@ -234,12 +239,14 @@ button {
   background-color: #FAFAFA;
   border-radius: 3px;
 }
-.query-executed .query-title {
+
+.query-title {
   font-weight: bold;
   padding: 0px 0px 4px 0;
   color: #555555;
 }
-.query-executed .query-raw {
+
+.query-raw {
   padding: 8px 16px;
   border: 1px solid #e8aa35;
   background-color: #fff8ea;
@@ -247,19 +254,31 @@ button {
   margin-bottom: 16px;
   border-radius: 3px;
 }
-.query-executed .query-raw:focus-visible {
+
+.query-raw:focus-visible {
   outline: none;
   border: 1px solid #c89027;
   box-shadow: inset 0px 0px 2px rgba(200, 144, 39, 0.3294117647);
 }
-.query-executed .sql-error {
+
+.sql-error {
   padding: 8px 16px;
   border: 1px solid #e86835;
   background-color: #ffd3c1;
   font-family: "Courier New", Courier, monospace;
   margin-bottom: 16px;
 }
-.query-executed .query-result {
+
+.query-result {
   padding-top: 4px;
   overflow-x: auto;
+}
+
+.alert {
+  margin: 10px 0;
+  padding: 8px 16px;
+  border: 1px solid #e86835;
+  background-color: #ffd3c1;
+  font-family: "Courier New", Courier, monospace;
+  border-radius: 3px;
 }/*# sourceMappingURL=database-explorer.css.map */

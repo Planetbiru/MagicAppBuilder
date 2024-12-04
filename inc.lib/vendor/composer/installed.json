@@ -147,18 +147,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "20de3dfa691c0516e7dc16c46cad3852e0df0dc8"
+                "reference": "4d51e518587eed7720c1706419f275f521bc6434"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/20de3dfa691c0516e7dc16c46cad3852e0df0dc8",
-                "reference": "20de3dfa691c0516e7dc16c46cad3852e0df0dc8",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/4d51e518587eed7720c1706419f275f521bc6434",
+                "reference": "4d51e518587eed7720c1706419f275f521bc6434",
                 "shasum": ""
             },
             "require": {
                 "planetbiru/magic-object": "^2.9"
             },
-            "time": "2024-12-04T03:08:12+00:00",
+            "time": "2024-12-04T12:28:10+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -189,19 +189,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "d5013c09e4478d6b5792efe0d67b63a2d69297b4"
+                "reference": "8fb47c13182a8b505ed525bd1493547b4fcef7b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/d5013c09e4478d6b5792efe0d67b63a2d69297b4",
-                "reference": "d5013c09e4478d6b5792efe0d67b63a2d69297b4",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/8fb47c13182a8b505ed525bd1493547b4fcef7b3",
+                "reference": "8fb47c13182a8b505ed525bd1493547b4fcef7b3",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "symfony/yaml": "^3.4"
             },
-            "time": "2024-12-04T03:04:47+00:00",
+            "time": "2024-12-04T11:27:18+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
