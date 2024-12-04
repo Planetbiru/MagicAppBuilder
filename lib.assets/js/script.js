@@ -1644,7 +1644,7 @@ function moveDown(element) {
  * This function performs two AJAX GET requests:
  * 1. It fetches the application list from `lib.ajax/application-list.php`
  *    and updates the content of elements with the class `application-card`.
- * 2. It retrieves the path list from `lib.ajax/path-list.php`, expecting
+ * 2. It retrieves the path list from `lib.ajax/application-path-list.php`, expecting
  *    a JSON response, and populates a select element named
  *    `current_module_location` with options based on the retrieved data.
  *
@@ -1665,7 +1665,7 @@ function reloadApplicationList() {
 
   $.ajax({
     type: 'GET',
-    url: 'lib.ajax/path-list.php',
+    url: 'lib.ajax/application-path-list.php',
     dataType: 'json',
     success: function (data) {
       $('[name="current_module_location"]').empty();
