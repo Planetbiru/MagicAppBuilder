@@ -34,7 +34,7 @@ class Txt
      * Returns a new instance of the Txt class.
      *
      * This method allows you to retrieve an instance of the Txt class for non-static operations.
-     * This instance can be used to access dynamic properties via the __get() magic method.
+     * This instance can be used to access dynamic properties via the `__get()` magic method.
      *
      * @return Txt A new instance of the Txt class.
      */
@@ -47,7 +47,7 @@ class Txt
      * Creates and returns a new instance of the Txt class.
      *
      * Similar to getInstance(), this method allows you to retrieve an instance of the Txt class 
-     * for non-static operations, such as dynamic property access using the __get() magic method.
+     * for non-static operations, such as dynamic property access using the `__get()` magic method.
      *
      * @return Txt A new instance of the Txt class.
      */

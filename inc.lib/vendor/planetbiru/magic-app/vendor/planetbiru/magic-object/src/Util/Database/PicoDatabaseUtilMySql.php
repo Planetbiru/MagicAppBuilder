@@ -83,14 +83,11 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             $query[] = "-- DROP TABLE IF EXISTS `$tableName`;";
             $query[] = "";
         }
-        $createStatement = "";
-
         $createStatement = "CREATE TABLE";
         if($createIfNotExists)
         {
             $createStatement .= " IF NOT EXISTS";
         }
-
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
 
         $query[] = "$createStatement `$tableName` (";
@@ -101,33 +98,11 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         {
             if(isset($cols[$columnName]))
             {
-                $columns[] = $this->createColumn($cols[$columnName]);
+                $columns[] = $this->createColumn($cols[$columnName], $autoIncrementKeys, $tableInfo->getPrimaryKeys());
             }
         }
         $query[] = implode(",\r\n", $columns);
         $query[] = ") ENGINE=$engine DEFAULT CHARSET=$charset;";
-
-        $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
-            $query[] = "";
-            $query[] = "ALTER TABLE `$tableName`";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY (`$primaryKey[name]`)";
-            }
-            $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE `$tableName` \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
-        }
 
         return implode("\r\n", $query);
     }
@@ -136,39 +111,63 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * Creates a column definition for a SQL statement.
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement.
+     * including the column name, data type, nullability, default value, primary key status, 
+     * and auto-increment settings. The resulting definition is formatted for use in a CREATE TABLE statement.
      *
      * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
+     *                      - string 'name': The name of the column.
+     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
+     *                      - bool|string 'nullable': Indicates if the column allows NULL values 
+     *                        ('true' or true for NULL; otherwise, NOT NULL).
+     *                      - mixed 'default_value': The default value for the column (optional).
+     * @param array $autoIncrementKeys An array of column names that should have AUTO_INCREMENT property.
+     * @param array $primaryKeys An array of primary key columns, each being an associative array 
+     *                           with at least a 'name' key.
      *
      * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
      */
-    public function createColumn($column)
+    public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
-        $col = array();
-        $col[] = "\t";
-        $col[] = "`".$column[parent::KEY_NAME]."`";
-        $col[] = $column['type'];
-        if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
-        {
-            $col[] = "NULL";
+        $pkCols = array();
+        foreach ($primaryKeys as $col) {
+            $pkCols[] = $col['name'];
         }
-        else
-        {
+
+        $col = array();
+        $col[] = "\t";  // Adding indentation for readability in SQL statements
+        $columnName = $column[parent::KEY_NAME];
+        $columnType = $column['type'];
+
+        $col[] = "`" . $columnName . "`";  // Enclose column name in backticks
+        $col[] = $columnType;  // Add the column type (e.g., INT, VARCHAR)
+
+        // Check if the column is part of primary keys
+        if (in_array($columnName, $pkCols)) {
+            $col[] = 'PRIMARY KEY';
+        }
+
+        // Check if the column should auto-increment
+        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
+            $col[] = 'AUTO_INCREMENT';
+        }
+
+        // Determine if the column allows NULL values
+        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+            $col[] = "NULL";
+        } else {
             $col[] = "NOT NULL";
         }
-        if(isset($column['default_value']))
-        {
+
+        // Set default value if specified
+        if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
             $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
             $col[] = "DEFAULT $defaultValue";
         }
+
         return implode(" ", $col);
     }
+
 
     /**
      * Fixes the default value for SQL insertion based on its type.
@@ -185,13 +184,21 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
+        if(stripos($type, 'bool') !== false || stripos($type, 'tinyint(1)') !== false)
+        {
+            return $defaultValue != 0 ? 'true' : 'false';
+        }
+        else if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false || stripos($type, 'int') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
+        else if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false)
         {
             return "'".$defaultValue."'";
+        }
+        else if(stripos($type, 'int') !== false || stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false)
+        {
+            return $defaultValue * 1;
         }
         return $defaultValue;
     }
@@ -344,5 +351,18 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         return $data;
     }
 
-    
+    /**
+     * Returns the given column type without modification.
+     *
+     * This method simply returns the column type passed as an argument. It is useful 
+     * when no conversion is needed, and you want to retrieve the column type as-is.
+     *
+     * @param string $columnType The column type to be returned.
+     * @return string The same column type passed as input.
+     */
+    public function getColumnType($columnType)
+    {
+        return $columnType;
+    }
+
 }

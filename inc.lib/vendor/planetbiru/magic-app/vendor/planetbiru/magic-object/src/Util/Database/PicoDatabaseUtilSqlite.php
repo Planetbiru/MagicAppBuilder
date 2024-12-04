@@ -196,6 +196,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             // Check if the column type exists in the mapping
             if (array_key_exists($columnType, $typeMapping)) {
                 $sqlType = $typeMapping[$columnType];
+            } else if(stripos($columnType, 'int(') === 0) {
+                $sqlType = strtoupper($columnType);
             } else {
                 $sqlType = strtoupper($columnType);
                 if ($sqlType !== 'TINYINT(1)' && $sqlType !== 'FLOAT' && $sqlType !== 'TEXT' && 
@@ -374,6 +376,9 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 // If it's just 'varchar', convert it to 'NVARCHAR' without a length
                 $type = 'NVARCHAR';
             }
+        } elseif (stripos($typeCheck, 'char(') === 0) {
+            // Convert 'char()' to uppercase (MySQL int type conversion)
+            $type = strtoupper($type);
         } elseif (stripos($typeCheck, 'int(') === 0) {
             // Convert 'int()' to uppercase (MySQL int type conversion)
             $type = strtoupper($type);
@@ -395,59 +400,66 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         return $type;
     }
 
-
     /**
-     * Creates a column definition for a SQL statement.
+     * Creates a column definition for a SQL statement (SQLite).
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement.
-     *
+     * including the column name, data type, nullability, default value, and primary key constraints.
+     * The resulting definition is formatted for use in a CREATE TABLE statement, suitable for SQLite.
+     * 
+     * If the column is specified as a primary key with auto-increment, the column type is set to INTEGER,
+     * and the PRIMARY KEY constraint is added with auto-increment behavior (SQLite uses INTEGER PRIMARY KEY AUTOINCREMENT).
+     * 
      * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
-     *
-     * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
+     *                      - string 'name': The name of the column.
+     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
+     *                      - bool|string 'nullable': Indicates if the column allows NULL values
+     *                        ('true' or true for NULL; otherwise, NOT NULL).
+     *                      - mixed 'default_value': The default value for the column (optional).
+     *                      - bool 'primary_key': Whether the column is a primary key (optional).
+     *                      - bool 'auto_increment': Whether the column is auto-incrementing (optional).
+     * 
+     * @return string The SQL column definition formatted as a string, suitable for inclusion 
+     *                in a CREATE TABLE statement.
      */
     public function createColumn($column)
     {
-        $columnType = $this->mysqlToSqliteType($column['type']);
+        $columnType = $this->mysqlToSqliteType($column['type']);  // Convert MySQL type to SQLite type
         $col = array();
-        $col[] = "\t";
-        $col[] = "".$column[parent::KEY_NAME]."";
+        $col[] = "\t";  // Indentation for readability
+        $col[] = "" . $column[parent::KEY_NAME] . "";  // Column name
         
-        if(isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment'])
-        {
-            $columnType = 'INTEGER';
+        // Handle primary key and auto-increment columns
+        if (isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment']) {
+            $columnType = 'INTEGER';  // Use INTEGER for auto-incrementing primary keys in SQLite
             $col[] = $columnType;
             $col[] = 'PRIMARY KEY';
         }
-        else if(isset($column['primary_key']) && $column['primary_key'])
-        {
+        // Handle primary key only
+        else if (isset($column['primary_key']) && $column['primary_key']) {
             $col[] = $columnType;
             $col[] = 'PRIMARY KEY';
         }
-        else
-        {
+        // Handle regular column (non-primary key)
+        else {
             $col[] = $columnType;
         }
 
-        if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
-        {
-            $col[] = "NULL";
+        // Handle nullability
+        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+            $col[] = "NULL";  // Allow NULL values
+        } else {
+            $col[] = "NOT NULL";  // Disallow NULL values
         }
-        else
-        {
-            $col[] = "NOT NULL";
-        }
-        if(isset($column['default_value']))
-        {
+
+        // Handle default value if provided
+        if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);
+            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);  // Format the default value
             $col[] = "DEFAULT $defaultValue";
         }
+
+        // Join all parts into a single string for the final SQL column definition
         return implode(" ", $col);
     }
 
@@ -466,26 +478,28 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') === 0)
+        if(stripos($type, 'bool') !== false)
         {
             return $defaultValue != 0 ? 'true' : 'false';
         }
-        if(strtolower($defaultValue) == 'true' 
+        else if(strtolower($defaultValue) == 'true' 
         || strtolower($defaultValue) == 'false' 
         || strtolower($defaultValue) == 'null'
         )
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false 
-        || stripos($type, 'char') !== false 
+        else if(stripos($type, 'char') !== false 
         || stripos($type, 'text') !== false 
-        || stripos($type, 'int') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false
         )
         {
             return "'".$defaultValue."'";
+        }
+        else if(stripos($type, 'int') !== false 
+        || stripos($type, 'float') !== false 
+        || stripos($type, 'double') !== false)
+        {
+            return $defaultValue + 0;
         }
         return $defaultValue;
     }
@@ -624,7 +638,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function getColumnType($columnType)
     {
-        return $this->mysqlToSqliteType($columnType);
+        $columnType = $this->mysqlToSqliteType($columnType);
+        if(stripos($columnType, 'int') === 0)
+        {
+            $columnType = strtoupper($columnType);
+        }
+        return $columnType;
     }
 
 }

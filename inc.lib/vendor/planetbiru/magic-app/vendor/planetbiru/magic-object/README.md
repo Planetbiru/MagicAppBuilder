@@ -132,7 +132,6 @@ class ConfigApp extends MagicObject
         }
         $this->readOnly($readonly);
     }
-    
 }
 ```
 
