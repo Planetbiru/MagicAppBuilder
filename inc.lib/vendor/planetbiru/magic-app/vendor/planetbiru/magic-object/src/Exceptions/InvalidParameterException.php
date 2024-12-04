@@ -32,7 +32,7 @@ class InvalidParameterException extends Exception
      * @param int $code        Exception code
      * @param Throwable|null $previous Previous exception
      */
-    public function __construct($message, $code = 0, Throwable $previous = null)
+    public function __construct($message, $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->previous = $previous;

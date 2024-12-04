@@ -175,7 +175,7 @@ class PicoDatabase // NOSONAR
             $schema = $stmt->fetchColumn(); // Fetch the schema name
             $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
         }
-        elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
+        else if ($dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
             // For MySQL, the schema is the same as the database name
             $schema = $databaseName; // MySQL schema is the database name
             $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
@@ -435,9 +435,9 @@ class PicoDatabase // NOSONAR
 
             }
             // Handle MySQL-specific connection settings
-            elseif ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+            else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
                 // Set time zone for MySQL
-                $initialQueries = "SET time_zone = '$timeZoneOffset';";
+                $initialQueries = "SET time_zone='$timeZoneOffset';";
                 
                 // Add charset to the initial queries for MySQL
                 if ($charset) {
@@ -590,8 +590,17 @@ class PicoDatabase // NOSONAR
      */
     public function setTimeZoneOffset($timeZoneOffset)
     {
-        $sql = "SET time_zone='$timeZoneOffset';";
-        $this->execute($sql);
+        if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $sql = "SET TIMEZONE TO '$timeZoneOffset'";
+            $this->execute($sql);
+        }
+        else if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL)
+        {
+            $sql = "SET time_zone='$timeZoneOffset';";
+            $this->execute($sql);
+        }
+        
         return $this;
     }
 
