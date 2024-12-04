@@ -372,7 +372,7 @@ class PicoDatabase // NOSONAR
      *
      * Establishes a connection to an RDMS database using the provided credentials and optionally selects 
      * a specific database based on the provided flag. Sets the time zone for the connection and handles 
-     * schema settings for PostgreSQL.
+     * schema settings for PostgreSQL. Charset is also set based on the provided configuration.
      *
      * @param bool $withDatabase Flag to select the database when connected (default is true).
      * @return bool True if the connection is successful, false if it fails.
@@ -393,14 +393,23 @@ class PicoDatabase // NOSONAR
 
             // Initialize the query to set the timezone
             $initialQueries = "SET time_zone = '$timeZoneOffset';";
+
+            // Get charset from database credentials
+            $charset = addslashes($this->databaseCredentials->getCharset());
             
             // Handle PostgreSQL-specific connection settings
             if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-                
+
+                // Set charset for PostgreSQL if provided (PostgreSQL does not use `SET NAMES`, but you can set the encoding)
+                if ($charset) {
+                    $initialQueries .= "SET CLIENT_ENCODING TO '$charset';";
+                }
+
                 // Set schema for PostgreSQL if it is provided
                 if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
-                    $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema();
+                    $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
                 }
+
                 // PostgreSQL connection setup
                 $this->databaseConnection = new PDO(
                     $connectionString,
@@ -410,9 +419,21 @@ class PicoDatabase // NOSONAR
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
                     ]
                 );
+
+                // Execute the initial queries (timezone, charset, schema) in PostgreSQL
+                if (!empty($initialQueries)) {
+                    $this->databaseConnection->exec($initialQueries);
+                }
+
             }
             // Handle MySQL-specific connection settings
             elseif ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+                
+                // Add charset to the initial queries for MySQL
+                if ($charset) {
+                    $initialQueries .= "SET NAMES '$charset';";  // Set charset for MySQL
+                }
+
                 // MySQL connection setup
                 $this->databaseConnection = new PDO(
                     $connectionString,
@@ -434,7 +455,7 @@ class PicoDatabase // NOSONAR
             $connected = true;
             $this->connected = $connected;
         } catch (Exception $e) {
-            error_log('ERR '.$e->getMessage());
+            error_log('ERR ' . $e->getMessage());
             // Handle connection errors
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }

@@ -7,6 +7,7 @@ database_target:
   database_name: db1
   databaseSchema: public
   timeZone: Asia/Jakarta
+  charset: utf8
 database_source:
   driver: mysql
   host: localhost
@@ -16,6 +17,7 @@ database_source:
   database_name: db1_ori
   databaseSchema: public
   timeZone: Asia/Jakarta
+  charset: utf8
 maximum_record: 100
 table:
   - source: modul

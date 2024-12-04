@@ -220,59 +220,55 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      * Creates a column definition for a PostgreSQL SQL statement.
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement. If the column is specified
-     * as auto-increment, it will use SERIAL or BIGSERIAL data types as appropriate.
+     * including the column name, data type, nullability, default value, and whether the column 
+     * should be auto-incrementing. If the column is specified as auto-increment, it will use 
+     * PostgreSQL's SERIAL or BIGSERIAL data types, depending on the column type.
      *
      * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values 
+     *                      - string 'name': The name of the column.
+     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
+     *                      - bool|string 'nullable': Indicates if the column allows NULL values 
      *                        ('true' or true for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
+     *                      - mixed 'default_value': The default value for the column (optional).
      *
      * @param array|null $autoIncrementKeys An optional array of column names that should 
      *                                       be treated as auto-incrementing.
      *
-     * @return string The SQL column definition formatted as a string, suitable for 
-     *                inclusion in a CREATE TABLE statement.
+     * @param array $primaryKeys An array of primary key columns, each being an associative 
+     *                            array with at least a 'name' key. This is used to identify 
+     *                            if the column is a primary key.
+     *
+     * @return string The SQL column definition formatted as a string, suitable for inclusion 
+     *                in a CREATE TABLE statement.
      */
     public function createColumnPostgre($column, $autoIncrementKeys, $primaryKeys)
     {
         $pkCols = array();
-        foreach($primaryKeys as $col)
-        {
-            $pkCols[] = $col['name'];
+        foreach ($primaryKeys as $col) {
+            $pkCols[] = $col['name']; // Collect primary key column names.
         }
+
         $col = array();
-       
+        $columnName = $column[parent::KEY_NAME]; // Get the column name.
 
         // Check if the column should be auto-incrementing.
-        if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-        {
+        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
             // Determine the appropriate serial type based on the column's type.
-            if(stripos($column['type'], 'big'))
-            {
+            if (stripos($column['type'], 'big') !== false) {
                 $columnType = "BIGSERIAL"; // Use BIGSERIAL for large integers.
-            }
-            else
-            {
+            } else {
                 $columnType = "SERIAL"; // Use SERIAL for standard integers.
             }
-        }
-        else
-        {
+        } else {
             $columnType = $this->getColumnType($column['type']); // Use the specified type if not auto-incrementing.
         }
 
-        $columnName = $column[parent::KEY_NAME];
+        $col[] = "\t";  // Add tab indentation for readability.
+        $col[] = $columnName;  // Add the column name.
+        $col[] = $columnType;  // Add the column type (SERIAL or BIGSERIAL, or custom type).
 
-        $col[] = "\t";
-        $col[] = $columnName;
-        $col[] = $columnType;
-
-        if(in_array($columnName, $pkCols))
-        {
+        // Add PRIMARY KEY constraint if the column is part of the primary keys.
+        if (in_array($columnName, $pkCols)) {
             $col[] = 'PRIMARY KEY';
         }
 
@@ -286,13 +282,13 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         // Handle default value if provided, using a helper method to format it.
         if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);
+            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType); // Format the default value.
             $col[] = "DEFAULT $defaultValue";
         }
 
-        return implode(" ", $col); // Join all parts into a single string.
+        // Join all parts into a single string to form the complete column definition.
+        return implode(" ", $col);
     }
-
 
     /**
      * Fixes the default value for SQL insertion based on its type.

@@ -111,59 +111,63 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      * Creates a column definition for a SQL statement.
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement.
+     * including the column name, data type, nullability, default value, primary key status, 
+     * and auto-increment settings. The resulting definition is formatted for use in a CREATE TABLE statement.
      *
      * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
+     *                      - string 'name': The name of the column.
+     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
+     *                      - bool|string 'nullable': Indicates if the column allows NULL values 
+     *                        ('true' or true for NULL; otherwise, NOT NULL).
+     *                      - mixed 'default_value': The default value for the column (optional).
+     * @param array $autoIncrementKeys An array of column names that should have AUTO_INCREMENT property.
+     * @param array $primaryKeys An array of primary key columns, each being an associative array 
+     *                           with at least a 'name' key.
      *
      * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
      */
     public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
         $pkCols = array();
-        foreach($primaryKeys as $col)
-        {
+        foreach ($primaryKeys as $col) {
             $pkCols[] = $col['name'];
         }
-        
+
         $col = array();
-        $col[] = "\t";
+        $col[] = "\t";  // Adding indentation for readability in SQL statements
         $columnName = $column[parent::KEY_NAME];
         $columnType = $column['type'];
 
-        $col[] = "`".$columnName."`";
-        $col[] = $columnType;
+        $col[] = "`" . $columnName . "`";  // Enclose column name in backticks
+        $col[] = $columnType;  // Add the column type (e.g., INT, VARCHAR)
 
-        if(in_array($columnName, $pkCols))
-        {
+        // Check if the column is part of primary keys
+        if (in_array($columnName, $pkCols)) {
             $col[] = 'PRIMARY KEY';
         }
 
-        if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-        {
+        // Check if the column should auto-increment
+        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
             $col[] = 'AUTO_INCREMENT';
         }
 
-        if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
-        {
+        // Determine if the column allows NULL values
+        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
             $col[] = "NULL";
-        }
-        else
-        {
+        } else {
             $col[] = "NOT NULL";
         }
-        if(isset($column['default_value']))
-        {
+
+        // Set default value if specified
+        if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
             $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
             $col[] = "DEFAULT $defaultValue";
         }
+
         return implode(" ", $col);
     }
+
 
     /**
      * Fixes the default value for SQL insertion based on its type.

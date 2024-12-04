@@ -37,7 +37,6 @@ interface PicoDatabaseUtilInterface // NOSONAR
     public function isNotEmpty($array);
     public function importDataTable($databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget, $tableInfo, $maxRecord, $callbackFunction);
     public function getMaxRecord($tableInfo, $maxRecord);
-    public function getColumnType($columnType);
     public function processDataMapping($data, $columns, $maps = null);
     public function fixImportData($data, $columns);
     public function fixData($value);
