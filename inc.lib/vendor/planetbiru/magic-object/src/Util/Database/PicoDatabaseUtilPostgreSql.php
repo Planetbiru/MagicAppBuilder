@@ -495,15 +495,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             return 'BOOLEAN';
         }
         $type = $this->convertMySqlToPostgreSql($columnType);
-        if(stripos($type, 'integer(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'smallinteger(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'biginteger(') === 0)
+        if(stripos($type, 'biginteger(') === 0 || stripos($type, 'smallinteger(') === 0 || stripos($type, 'integer(') === 0 || stripos($type, 'int(') === 0)
         {
             $type = 'INTEGER';
         }
@@ -517,6 +509,8 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
                 // Set the NVARCHAR length to the max length of enum values + 2
                 $type = 'CHARACTER VARYING(' . ($maxLength + 2) . ')';
             }
+        } else if (stripos($type, 'varchar(') === 0) {
+            $type = str_ireplace('varchar', 'CHARACTER VARYING', $columnType);
         } else if (stripos($type, 'year(') === 0) {
             // Extract the enum values between the parentheses
             $type = "INTEGER";
