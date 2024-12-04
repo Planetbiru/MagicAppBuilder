@@ -29,12 +29,6 @@ $constSelected = ' selected';
   <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
-  <script>
-    let languages = <?php echo json_encode($appConfig->getLanguages());?>;
-    jQuery(function(){
-      setLanguage(languages);
-    });
-  </script>
 </head>
 
 <body>
@@ -791,9 +785,6 @@ $constSelected = ' selected';
     </div>
   </div>
 
-
-  
-
   <div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
       <div class="modal-content">
@@ -1129,7 +1120,6 @@ $constSelected = ' selected';
           </div>
       </div>
   </div>
-
 
 </body>
 </html>
