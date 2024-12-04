@@ -5,7 +5,6 @@ use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
-require_once dirname(__DIR__) . "/inc.app/database.php";
 
 $inputGet = new InputGet();
 try
@@ -27,7 +26,7 @@ try
             if($return_var == 0)
             {
                 include_once $path;                  
-                $entity = new $className(null, $database);
+                $entity = new $className(null, null);
                 $tableInfo = $entity->tableInfo();
                 $columns = $tableInfo->getColumns();
                 ?>
