@@ -818,18 +818,18 @@ h3.entity-table-name {
 	}
 }
 
-#query_to_execute{
+#query_to_execute {
 	width: 100%;
 	padding: 10px;
 	border: 1px solid #DDDDDD;
 	box-sizing: border-box;
-	min-height: calc(100vh - 175px);
+	height: calc(100vh - 175px);
+	max-height: calc(100vh - 175px);
 }
-.nonfile-base, .file-base
-{
+.nonfile-base, .file-base {
 	display: none;
 }
-.nonfile-base[data-current-database-type="nonfile-base"], .file-base[data-current-database-type="file-base"]{
+.nonfile-base[data-current-database-type="nonfile-base"], .file-base[data-current-database-type="file-base"] {
 	display: table-row;
 }
 
