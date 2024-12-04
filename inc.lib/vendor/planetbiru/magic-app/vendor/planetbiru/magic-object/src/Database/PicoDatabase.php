@@ -435,7 +435,7 @@ class PicoDatabase // NOSONAR
 
             }
             // Handle MySQL-specific connection settings
-            elseif ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+            elseif ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
                 // Set time zone for MySQL
                 $initialQueries = "SET time_zone = '$timeZoneOffset';";
                 
