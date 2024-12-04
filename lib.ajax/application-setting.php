@@ -42,7 +42,7 @@ supportedDatabase:
   mysql: 
     name: MySQL
     base: nonfile-base
-  postgresql: 
+  pgsql: 
     name: PostgreSQL
     base: nonfile-base
   sqlite: 
@@ -62,8 +62,7 @@ else
     $databases->setSelectedBase('nonfile-base');
 }
 
-?>
-<form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
         <div id="accordion" class="accordion">
         <div class="card">
@@ -87,8 +86,8 @@ else
                                 <td>Architecture</td>
                                 <td>
                                     <select class="form-control" name="application_architecture">
-                                        <option value="<?php echo AppArchitecture::MONOLITH;?>"<?php echo $app->getArchitecture() == AppArchitecture::MONOLITH ? ' selected' : ''; ?>>Monolith Application</option>
-                                        <option value="<?php echo AppArchitecture::MICROSERVICES;?>"<?php echo $app->getArchitecture() == AppArchitecture::MICROSERVICES ? ' selected' : ''; ?>>Microservices Application</option>
+                                        <option value="<?php echo AppArchitecture::MONOLITH;?>"<?php echo $app->getArchitecture() == AppArchitecture::MONOLITH ? $constSelected : ''; ?>>Monolith Application</option>
+                                        <option value="<?php echo AppArchitecture::MICROSERVICES;?>"<?php echo $app->getArchitecture() == AppArchitecture::MICROSERVICES ? $constSelected : ''; ?>>Microservices Application</option>
                                     </select>
                                 </td>
                             </tr>

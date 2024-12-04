@@ -215,35 +215,85 @@ class PicoEntityGenerator
     }
 
     /**
-     * Get a mapping of database types to PHP types.
+     * Get a mapping of database types to PHP types for MySQL, PostgreSQL and SQLite.
      *
      * @return array Associative array of type mappings
      */
     protected function getTypeMap()
     {
         return array(
-            "double" => "double",
-            "float" => "double",
-            "bigint" => "integer",
-            "smallint" => "integer",
-            "tinyint(1)" => "boolean",
-            "tinyint" => "integer",
-            "int" => "integer",
-            "varchar" => "string",
-            "char" => "string",
-            "tinytext" => "string",
-            "mediumtext" => "string",
-            "longtext" => "string",
-            "text" => "string",
-            "enum" => "string",
-            "bool" => "boolean",
-            "boolean" => "boolean",
-            "timestamp" => "string",
-            "datetime" => "string",
-            "date" => "string",
-            "time" => "string"
+            // Numeric types
+            "double" => "float",             // PostgreSQL: double precision
+            "float" => "float",              // PostgreSQL: float
+            "bigint" => "int",               // PostgreSQL: bigint
+            "smallint" => "int",             // PostgreSQL: smallint
+            "tinyint(1)" => "bool",          // MySQL-style, use boolean for tinyint(1)
+            "tinyint" => "int",              // PostgreSQL/SQLite: tinyint, handled as INT
+            "int" => "int",                  // PostgreSQL/SQLite: integer
+            "serial" => "int",               // PostgreSQL: auto-increment integer (equivalent to INT)
+            "bigserial" => "int",            // PostgreSQL: bigserial (auto-incrementing large integer, mapped to int in PHP)
+            "mediumint" => "int",            // MySQL: mediumint (3-byte integer)
+            "smallserial" => "int",          // PostgreSQL: smallserial (auto-incrementing small integer)
+            "unsigned" => "int",             // MySQL: unsigned integer (mapped to int in PHP)
+
+            // String types
+            "varchar" => "string",           // PostgreSQL: variable-length string
+            "character varying" => "string", // PostgreSQL: character varying (same as varchar)
+            "char" => "string",              // PostgreSQL: fixed-length string
+            "text" => "string",              // PostgreSQL/SQLite: unlimited length string
+            "varchar(255)" => "string",      // PostgreSQL: same as varchar without length
+            "citext" => "string",            // PostgreSQL: case-insensitive text (equivalent to string)
+            
+            // MySQL-style text types (these types are similar to `text`)
+            "tinytext" => "string",          // MySQL: tinytext
+            "mediumtext" => "string",        // MySQL: mediumtext
+            "longtext" => "string",          // MySQL: longtext
+            "text" => "string",              // PostgreSQL/SQLite: text (string)
+
+            // Boolean types
+            "bool" => "bool",                // PostgreSQL: boolean
+            "boolean" => "bool",             // PostgreSQL: boolean (same as bool)
+
+            // Date/Time types
+            "timestamp" => "string",         // PostgreSQL: timestamp (datetime)
+            "datetime" => "string",          // PostgreSQL/SQLite: datetime
+            "date" => "string",              // PostgreSQL/SQLite: date
+            "time" => "string",              // PostgreSQL/SQLite: time
+            "timestamp with time zone" => "string", // PostgreSQL: timestamp with time zone
+            "timestamp without time zone" => "string", // PostgreSQL: timestamp without time zone
+            "date" => "string",              // PostgreSQL/SQLite: date
+            "time" => "string",              // PostgreSQL/SQLite: time
+            "interval" => "string",          // PostgreSQL: interval (for durations)
+            "year" => "int",                 // MySQL: year type (usually stored as an integer)
+
+            // SQLite-specific types
+            "integer" => "int",              // SQLite: integer
+            "real" => "float",               // SQLite: real (floating-point)
+            "text" => "string",              // SQLite: text (string)
+            "blob" => "resource",            // SQLite: blob (binary data)
+            
+            // SQLite's special handling
+            "BOOLEAN" => "bool",             // SQLite: boolean (same as PostgreSQL)
+            
+            // Special cases
+            "json" => "array",               // PostgreSQL: JSON type, mapped to PHP array
+            "jsonb" => "array",              // PostgreSQL: JSONB (binary JSON), mapped to PHP array
+            "uuid" => "string",              // PostgreSQL/SQLite: UUID
+            "xml" => "string",               // PostgreSQL: XML type
+            "cidr" => "string",              // PostgreSQL: CIDR type (IPv4/IPv6)
+            "inet" => "string",              // PostgreSQL: Inet type (IPv4/IPv6)
+            "macaddr" => "string",           // PostgreSQL: MAC address type
+            "point" => "string",             // PostgreSQL: point type (coordinates)
+            "polygon" => "string",           // PostgreSQL: polygon type
+            "line" => "string",              // PostgreSQL: line type
+            "lseg" => "string",              // PostgreSQL: line segment type
+            "path" => "string",              // PostgreSQL: path type (geometric shapes)
+            "circle" => "string",            // PostgreSQL: circle type (geometric shapes)
+            "json" => "array",               // PostgreSQL: JSON data type
+            "jsonb" => "array",              // PostgreSQL: Binary JSON type (faster)
         );
     }
+
 
     /**
      * Generate the entity class and save it to a file.

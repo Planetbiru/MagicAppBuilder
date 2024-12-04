@@ -602,6 +602,13 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @var string
 	 */
 	protected $timeZone = "Asia/Jakarta";
+
+	/**
+	 * Charset
+	 *
+	 * @var string
+	 */
+	protected $charset = "utf8";
 }
 
 $cfg = new ConfigApp(null, true);

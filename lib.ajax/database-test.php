@@ -25,7 +25,7 @@ if($inputPost->issetTestConnection())
     $databaseUsername = $inputPost->getDatabaseUsername();
     $databasePassword = $inputPost->getDatabasePassword();
     $databaseName = $inputPost->getDatabaseDatabaseName();
-    $databaseSchema = $inputPost->getDatabaseSchema();
+    $databaseSchema = $inputPost->getDatabaseDatabaseSchema();
     $databaseTimeZone = $inputPost->getDatabaseTimeZone();
 
     $databaseConfig = new SecretObject([
@@ -39,7 +39,6 @@ if($inputPost->issetTestConnection())
         'databaseSchema'=>$databaseSchema,
         'timeZone'=>$databaseTimeZone
     ]);
-
     $database = new PicoDatabase($databaseConfig);
     try
     {

@@ -201,9 +201,9 @@ class DatabaseExplorer
         $ul = $dom->createElement('ul');
         $ul->setAttribute('class', 'table-list');
 
-        if ($dbType == 'mysql' || $dbType == 'pgsql') {
+        if ($dbType == 'mysql' || $dbType == 'mariadb' || $dbType == 'pgsql') {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == 'mysql' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == 'mysql' || $dbType == 'mariadb' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -278,7 +278,7 @@ class DatabaseExplorer
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         // Mendapatkan schema atau database aktif
-        if ($dbType == 'mysql') {
+        if ($dbType == 'mysql' || $dbType == 'mariadb') {
             // Query untuk MySQL
             $sql = "DESCRIBE `$tableName`";
         } elseif ($dbType == 'pgsql') {
@@ -375,9 +375,9 @@ class DatabaseExplorer
                             $row['name'], 
                             $row['type'], 
                             $row['notnull'] ? 'NO' : 'YES', 
-                            '', 
+                            $row['pk'] == 1 ? 'PRI' : '', 
                             $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                            ''
+                            strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
                         ];
                     } else {
                         // For MySQL or PostgreSQL
