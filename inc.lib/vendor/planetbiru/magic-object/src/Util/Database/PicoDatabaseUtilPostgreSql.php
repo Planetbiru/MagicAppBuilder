@@ -121,16 +121,18 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         $query[] = "$createStatement \"$tableName\" (";
 
         $cols = $tableInfo->getColumns();
+
+        $columns = [];
         
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
             {
-                $query[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys);
+                $columns[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys);
             }
         }
 
-        $query[] = implode(",\r\n", $query);
+        $query[] = implode(",\r\n", $columns);
         $query[] = ");";
 
         $pk = $tableInfo->getPrimaryKeys();
