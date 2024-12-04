@@ -494,20 +494,17 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         {
             return 'BOOLEAN';
         }
+        else if(stripos($columnType, 'biginteger(') === 0 
+        || stripos($columnType, 'smallinteger') === 0 
+        || stripos($columnType, 'integer') === 0 
+        || stripos($columnType, 'bigint') === 0 
+        || stripos($columnType, 'smallint') === 0 
+        || stripos($columnType, 'int') === 0)
+        {
+            return 'INTEGER';
+        }
         $type = $this->convertMySqlToPostgreSql($columnType);
-        if(stripos($type, 'integer(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'smallinteger(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'biginteger(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if (stripos($type, 'enum(') === 0) {
+        if (stripos($type, 'enum(') === 0) {
             // Extract the enum values between the parentheses
             if (preg_match('/^enum\((.+)\)$/i', $type, $matches)) {
                 // Get the enum values as an array by splitting the string
@@ -517,6 +514,8 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
                 // Set the NVARCHAR length to the max length of enum values + 2
                 $type = 'CHARACTER VARYING(' . ($maxLength + 2) . ')';
             }
+        } else if (stripos($type, 'varchar(') === 0) {
+            $type = str_ireplace('varchar', 'CHARACTER VARYING', $columnType);
         } else if (stripos($type, 'year(') === 0) {
             // Extract the enum values between the parentheses
             $type = "INTEGER";

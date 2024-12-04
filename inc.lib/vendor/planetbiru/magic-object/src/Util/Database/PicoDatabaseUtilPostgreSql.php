@@ -494,12 +494,17 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         {
             return 'BOOLEAN';
         }
-        $type = $this->convertMySqlToPostgreSql($columnType);
-        if(stripos($type, 'biginteger(') === 0 || stripos($type, 'smallinteger(') === 0 || stripos($type, 'integer(') === 0 || stripos($type, 'int(') === 0)
+        else if(stripos($columnType, 'biginteger(') === 0 
+        || stripos($columnType, 'smallinteger') === 0 
+        || stripos($columnType, 'integer') === 0 
+        || stripos($columnType, 'bigint') === 0 
+        || stripos($columnType, 'smallint') === 0 
+        || stripos($columnType, 'int') === 0)
         {
-            $type = 'INTEGER';
+            return 'INTEGER';
         }
-        else if (stripos($type, 'enum(') === 0) {
+        $type = $this->convertMySqlToPostgreSql($columnType);
+        if (stripos($type, 'enum(') === 0) {
             // Extract the enum values between the parentheses
             if (preg_match('/^enum\((.+)\)$/i', $type, $matches)) {
                 // Get the enum values as an array by splitting the string
