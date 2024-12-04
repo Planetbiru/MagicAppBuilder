@@ -201,9 +201,9 @@ class DatabaseExplorer
         $ul = $dom->createElement('ul');
         $ul->setAttribute('class', 'table-list');
 
-        if ($dbType == 'mysql' || $dbType == 'pgsql') {
+        if ($dbType == 'mysql' || $dbType == 'mariadb' || $dbType == 'pgsql') {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == 'mysql' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == 'mysql' || $dbType == 'mariadb' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -278,7 +278,7 @@ class DatabaseExplorer
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         // Mendapatkan schema atau database aktif
-        if ($dbType == 'mysql') {
+        if ($dbType == 'mysql' || $dbType == 'mariadb') {
             // Query untuk MySQL
             $sql = "DESCRIBE `$tableName`";
         } elseif ($dbType == 'pgsql') {
@@ -375,9 +375,9 @@ class DatabaseExplorer
                             $row['name'], 
                             $row['type'], 
                             $row['notnull'] ? 'NO' : 'YES', 
-                            '', 
+                            $row['pk'] == 1 ? 'PRI' : '', 
                             $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                            ''
+                            strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
                         ];
                     } else {
                         // For MySQL or PostgreSQL
@@ -784,6 +784,40 @@ $pdo = $database->getDatabaseConnection();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // End database preparation
 
+// Initialize variables for query processing
+$queries = array();
+$lastQueries = "";
+
+// Split and sanitize the query if it exists
+if ($query) {
+    $arr = DatabaseExplorer::splitSQL($query);
+    $query = implode(";\r\n", $arr);
+    $queryArray = PicoDatabaseUtil::splitSql($query);
+    if (isset($queryArray) && is_array($queryArray) && !empty($queryArray)) {
+        $q2 = array();
+        foreach ($queryArray as $q) {
+            $queries[] = $q['query'];
+            $q2[] = "-- " . $q['query'];
+        }
+        $lastQueries = implode("\r\n", $q2);
+    } else {
+        $lastQueries = $query;
+    }
+} else {
+    $queryArray = null;
+}
+
+// Execute queries and handle results
+if ($query && !empty($queries)) {
+    try {
+        $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
+    } catch (Exception $e) {
+        $queryResult = "Error: " . $e->getMessage();
+    }
+} else {
+    $queryResult = "";
+}
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -810,40 +844,6 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     <div class="sidebar">
         <?php
         try {
-            // Initialize variables for query processing
-            $queries = array();
-            $lastQueries = "";
-            
-            // Split and sanitize the query if it exists
-            if ($query) {
-                $arr = DatabaseExplorer::splitSQL($query);
-                $query = implode(";\r\n", $arr);
-                $queryArray = PicoDatabaseUtil::splitSql($query);
-                if (isset($queryArray) && is_array($queryArray) && !empty($queryArray)) {
-                    $q2 = array();
-                    foreach ($queryArray as $q) {
-                        $queries[] = $q['query'];
-                        $q2[] = "-- " . $q['query'];
-                    }
-                    $lastQueries = implode("\r\n", $q2);
-                } else {
-                    $lastQueries = $query;
-                }
-            } else {
-                $queryArray = null;
-            }
-
-            // Execute queries and handle results
-            if ($query && !empty($queries)) {
-                try {
-                    $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
-                } catch (Exception $e) {
-                    $queryResult = "Error: " . $e->getMessage();
-                }
-            } else {
-                $queryResult = "";
-            }
-
             // Show the sidebar with databases if not from default app and not using SQLite
             if (!$fromDefaultApp && $dbType != 'sqlite') {
                 echo DatabaseExplorer::showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaName, $databaseConfig);

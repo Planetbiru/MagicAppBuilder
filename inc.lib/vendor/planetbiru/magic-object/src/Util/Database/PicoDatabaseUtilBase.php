@@ -763,7 +763,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * @param string $postgresqlQuery The PostgreSQL CREATE TABLE query to be converted.
      * @return string The converted MySQL CREATE TABLE query.
      */ 
-    public function convertPostgreSqlToMySql($postgresqlQuery) {
+    public function convertMySqlToPostgreSql($postgresqlQuery) {
         // Remove comments
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery); // NOSONAR
         

@@ -1500,6 +1500,13 @@ class PicoDatabaseCredentials extends SecretObject
 	 * @var string
 	 */
 	protected $timeZone = "Asia/Jakarta";
+
+	/**
+	 * Charset
+	 *
+	 * @var string
+	 */
+	protected $charset = "utf8";
 }
 
 $cfg = new ConfigApp(null, true);
@@ -2564,6 +2571,13 @@ class PicoDatabaseCredentials extends SecretObject
      * @var string
      */
     protected $timeZone = "Asia/Jakarta";
+
+    /**
+     * Charset
+     *
+     * @var string
+     */
+    protected $charset = "utf8";
 }
 ```
 
@@ -12645,6 +12659,7 @@ database_target:
   database_name: sipro
   databaseSchema: public
   timeZone: Asia/Jakarta
+  charset: utf8
 database_source:
   driver: mysql
   host: server1.domain.tld
@@ -12654,6 +12669,7 @@ database_source:
   database_name: sipro_ori
   databaseSchema: public
   timeZone: Asia/Jakarta
+  charset: utf8
 maximum_record: 100
 ```
 

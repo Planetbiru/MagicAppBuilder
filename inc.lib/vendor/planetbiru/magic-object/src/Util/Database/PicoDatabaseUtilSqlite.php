@@ -178,16 +178,16 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         // Check for auto-increment primary key
         if (is_array($autoIncrementKeys) && in_array($columnName, $autoIncrementKeys)) {
-            $sqlType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+            $sqlType = 'INTEGER PRIMARY KEY';
             $pKeyArrUsed[] = $columnName; // Add to used primary keys
         } else {
             // Default mapping of column types to SQL types
             $typeMapping = array(
-                'varchar' => "VARCHAR($length)",
-                'tinyint(1)' => 'TINYINT(1)',
-                'float' => 'FLOAT',
+                'varchar' => "NVARCHAR($length)",
+                'tinyint(1)' => 'BOOLEAN',
+                'float' => 'REAL',
                 'text' => 'TEXT',
-                'longtext' => 'LONGTEXT',
+                'longtext' => 'TEXT',
                 'date' => 'DATE',
                 'timestamp' => 'TIMESTAMP',
                 'blob' => 'BLOB',
@@ -196,13 +196,15 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             // Check if the column type exists in the mapping
             if (array_key_exists($columnType, $typeMapping)) {
                 $sqlType = $typeMapping[$columnType];
+            } else if(stripos($columnType, 'int(') === 0) {
+                $sqlType = strtoupper($columnType);
             } else {
                 $sqlType = strtoupper($columnType);
                 if ($sqlType !== 'TINYINT(1)' && $sqlType !== 'FLOAT' && $sqlType !== 'TEXT' && 
                     $sqlType !== 'LONGTEXT' && $sqlType !== 'DATE' && $sqlType !== 'TIMESTAMP' && 
                     $sqlType !== 'BLOB') 
                 {
-                    $sqlType = 'VARCHAR(255)'; // Fallback type for unknown types
+                    $sqlType = 'NVARCHAR(255)'; // Fallback type for unknown types
                 }
             }
         }
@@ -287,6 +289,24 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $cols = $tableInfo->getColumns();
 
+
+        $pk = $tableInfo->getPrimaryKeys();
+        if(isset($pk) && is_array($pk) && !empty($pk))
+        {
+            foreach($pk as $prop=>$primaryKey)
+            {
+                $cols[$prop]['primary_key'] = true;
+            }
+        }
+
+        foreach($tableInfo->getColumns() as $k=>$column)
+        {
+            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+            {
+                $cols[$k]['auto_increment'] = true;
+            }
+        }
+
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
@@ -296,68 +316,150 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         $query[] = implode(",\r\n", $columns);
-        $query[] = ") ";
-
-        $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
-        {
-            $query[] = "";
-            $query[] = "ALTER TABLE $tableName";
-            foreach($pk as $primaryKey)
-            {
-                $query[] = "\tADD PRIMARY KEY ($primaryKey[name])";
-            }
-            $query[] = ";";
-        }
-
-        foreach($tableInfo->getColumns() as $column)
-        {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
-            {
-                $query[] = "";
-                $query[] = "ALTER TABLE $tableName \r\n\tMODIFY ".trim($this->createColumn($column), " \r\n\t ")." AUTO_INCREMENT";
-                $query[] = ";";
-            }
-        }
-
+        $query[] = "); ";
+        
         return implode("\r\n", $query);
     }
 
     /**
-     * Creates a column definition for a SQL statement.
+     * Converts MySQL data types to SQLite-compatible types.
+     *
+     * This function maps MySQL data types to their equivalent SQLite types. It supports:
+     * - `tinyint(1)` to `BOOLEAN`,
+     * - `integer` to `INTEGER`,
+     * - `enum()` to `NVARCHAR(N)` with a length based on the maximum length of the enum values plus 2,
+     * - `varchar(N)` to `NVARCHAR(N)` (or `varchar` to `NVARCHAR` without a length),
+     * - `float`, `double` to `REAL`,
+     * - `decimal` to `NUMERIC`,
+     * - `text` and `longtext` to `TEXT`,
+     * - `date`, `datetime`, `timestamp` to `TEXT` (as SQLite does not have dedicated date/time types).
+     *
+     * @param string $type The MySQL data type to convert (e.g., 'tinyint(1)', 'varchar(255)', 'enum(', 'decimal(10,2)').
+     * 
+     * @return string The corresponding SQLite data type (e.g., 'BOOLEAN', 'NVARCHAR(255)', 'REAL', 'NUMERIC', 'TEXT').
+     */
+    private function mysqlToSqliteType($type)
+    {
+        // Trim any whitespace and convert to lowercase for easier comparison
+        $typeCheck = trim(strtolower($type));
+        
+        // Define a mapping of common MySQL types to SQLite types
+        $map = array(
+            'tinyint(1)' => 'BOOLEAN',  // MySQL 'tinyint(1)' maps to SQLite 'BOOLEAN'
+            'integer' => 'INTEGER',     // MySQL 'integer' maps to SQLite 'INTEGER'
+            'float' => 'REAL',          // MySQL 'float' maps to SQLite 'REAL'
+            'double' => 'REAL',         // MySQL 'double' maps to SQLite 'REAL'
+            'decimal' => 'NUMERIC',     // MySQL 'decimal' maps to SQLite 'NUMERIC'
+            'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
+            'longtext' => 'TEXT',       // MySQL 'longtext' maps to SQLite 'TEXT'
+            'date' => 'TEXT',           // MySQL 'date' maps to SQLite 'TEXT'
+            'datetime' => 'TEXT',       // MySQL 'datetime' maps to SQLite 'TEXT'
+            'timestamp' => 'TEXT'       // MySQL 'timestamp' maps to SQLite 'TEXT'
+        );
+
+        // Handle 'enum' types and convert them to 'NVARCHAR' with length based on max enum value length + 2
+        if (stripos($typeCheck, 'enum(') === 0) {
+            // Extract the enum values between the parentheses
+            if (preg_match('/^enum\((.+)\)$/i', $typeCheck, $matches)) {
+                // Get the enum values as an array by splitting the string
+                $enumValues = array_map('trim', explode(',', $matches[1]));
+                // Find the maximum length of the enum values
+                $maxLength = max(array_map('strlen', $enumValues));
+                // Set the NVARCHAR length to the max length of enum values + 2
+                $type = 'NVARCHAR(' . ($maxLength + 2) . ')';
+            }
+        } elseif (stripos($typeCheck, 'varchar') === 0) {
+            // Handle 'varchar' types and convert them to 'nvarchar' in SQLite
+            if (preg_match('/^varchar\((\d+)\)$/i', $typeCheck, $matches)) {
+                $type = 'NVARCHAR(' . $matches[1] . ')';
+            } else {
+                // If it's just 'varchar', convert it to 'NVARCHAR' without a length
+                $type = 'NVARCHAR';
+            }
+        } elseif (stripos($typeCheck, 'char(') === 0) {
+            // Convert 'char()' to uppercase (MySQL int type conversion)
+            $type = strtoupper($type);
+        } elseif (stripos($typeCheck, 'int(') === 0) {
+            // Convert 'int()' to uppercase (MySQL int type conversion)
+            $type = strtoupper($type);
+        } elseif (stripos($typeCheck, 'bigint(') === 0) {
+            // Convert 'bigint()' to INTEGER
+            $type = 'INTEGER';
+        } else {
+            // For all other types, check the predefined map
+            foreach ($map as $key => $val) {
+                if (stripos($typeCheck, $key) === 0) {
+                    // If a match is found, use the mapped SQLite type
+                    $type = $val;
+                    break;
+                }
+            }
+        }
+        
+        // Return the mapped SQLite data type
+        return $type;
+    }
+
+    /**
+     * Creates a column definition for a SQL statement (SQLite).
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement.
-     *
+     * including the column name, data type, nullability, default value, and primary key constraints.
+     * The resulting definition is formatted for use in a CREATE TABLE statement, suitable for SQLite.
+     * 
+     * If the column is specified as a primary key with auto-increment, the column type is set to INTEGER,
+     * and the PRIMARY KEY constraint is added with auto-increment behavior (SQLite uses INTEGER PRIMARY KEY AUTOINCREMENT).
+     * 
      * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
-     *
-     * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
+     *                      - string 'name': The name of the column.
+     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
+     *                      - bool|string 'nullable': Indicates if the column allows NULL values
+     *                        ('true' or true for NULL; otherwise, NOT NULL).
+     *                      - mixed 'default_value': The default value for the column (optional).
+     *                      - bool 'primary_key': Whether the column is a primary key (optional).
+     *                      - bool 'auto_increment': Whether the column is auto-incrementing (optional).
+     * 
+     * @return string The SQL column definition formatted as a string, suitable for inclusion 
+     *                in a CREATE TABLE statement.
      */
     public function createColumn($column)
     {
+        $columnType = $this->mysqlToSqliteType($column['type']);  // Convert MySQL type to SQLite type
         $col = array();
-        $col[] = "\t";
-        $col[] = "".$column[parent::KEY_NAME]."";
-        $col[] = $column['type'];
-        if(isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true')
-        {
-            $col[] = "NULL";
+        $col[] = "\t";  // Indentation for readability
+        $col[] = "" . $column[parent::KEY_NAME] . "";  // Column name
+        
+        // Handle primary key and auto-increment columns
+        if (isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment']) {
+            $columnType = 'INTEGER';  // Use INTEGER for auto-incrementing primary keys in SQLite
+            $col[] = $columnType;
+            $col[] = 'PRIMARY KEY';
         }
-        else
-        {
-            $col[] = "NOT NULL";
+        // Handle primary key only
+        else if (isset($column['primary_key']) && $column['primary_key']) {
+            $col[] = $columnType;
+            $col[] = 'PRIMARY KEY';
         }
-        if(isset($column['default_value']))
-        {
+        // Handle regular column (non-primary key)
+        else {
+            $col[] = $columnType;
+        }
+
+        // Handle nullability
+        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+            $col[] = "NULL";  // Allow NULL values
+        } else {
+            $col[] = "NOT NULL";  // Disallow NULL values
+        }
+
+        // Handle default value if provided
+        if (isset($column['default_value'])) {
             $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
+            $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);  // Format the default value
             $col[] = "DEFAULT $defaultValue";
         }
+
+        // Join all parts into a single string for the final SQL column definition
         return implode(" ", $col);
     }
 
@@ -376,22 +478,28 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(strtolower($defaultValue) == 'true' 
+        if(stripos($type, 'bool') !== false)
+        {
+            return $defaultValue != 0 ? 'true' : 'false';
+        }
+        else if(strtolower($defaultValue) == 'true' 
         || strtolower($defaultValue) == 'false' 
         || strtolower($defaultValue) == 'null'
         )
         {
             return $defaultValue;
         }
-        if(stripos($type, 'enum') !== false 
-        || stripos($type, 'char') !== false 
+        else if(stripos($type, 'char') !== false 
         || stripos($type, 'text') !== false 
-        || stripos($type, 'int') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false
         )
         {
             return "'".$defaultValue."'";
+        }
+        else if(stripos($type, 'int') !== false 
+        || stripos($type, 'float') !== false 
+        || stripos($type, 'double') !== false)
+        {
+            return $defaultValue + 0;
         }
         return $defaultValue;
     }
@@ -517,4 +625,25 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         return $stmt->fetch() !== false;
     }
     
+    /**
+     * Converts a MySQL column type to its equivalent SQLite column type.
+     *
+     * This method uses the `mysqlToSqliteType` function to convert a MySQL column type 
+     * to the appropriate SQLite column type. It helps facilitate database migration or 
+     * compatibility between MySQL and SQLite.
+     *
+     * @param string $columnType The MySQL column type to be converted.
+     * @return string The equivalent SQLite column type.
+     * @throws InvalidArgumentException If the column type is not recognized or unsupported.
+     */
+    public function getColumnType($columnType)
+    {
+        $columnType = $this->mysqlToSqliteType($columnType);
+        if(stripos($columnType, 'int') === 0)
+        {
+            $columnType = strtoupper($columnType);
+        }
+        return $columnType;
+    }
+
 }

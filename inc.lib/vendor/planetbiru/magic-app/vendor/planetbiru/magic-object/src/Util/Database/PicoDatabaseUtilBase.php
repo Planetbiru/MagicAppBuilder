@@ -704,7 +704,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * @param string $mariadbQuery The MariaDB CREATE TABLE query to be converted.
      * @return string The converted PostgreSQL CREATE TABLE query.
      */
-    public function convertMariaDbToPostgreSql($mariadbQuery) {
+    public function convertMySqlToPostgreSql($mariadbQuery) {
         // Remove comments
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery); // NOSONAR
         

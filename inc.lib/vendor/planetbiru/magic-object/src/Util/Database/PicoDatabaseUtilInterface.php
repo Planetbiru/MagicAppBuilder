@@ -25,7 +25,6 @@ interface PicoDatabaseUtilInterface // NOSONAR
     public function getColumnList($database, $picoTableName);
     public function getAutoIncrementKey($tableInfo);
     public function dumpStructure($tableInfo, $picoTableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4');
-    public function createColumn($column);
     public function fixDefaultValue($defaultValue, $type);
     public function dumpData($columns, $picoTableName, $data, $maxRecord = 100, $callbackFunction = null);
     public function dumpRecords($columns, $picoTableName, $data);
