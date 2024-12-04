@@ -696,7 +696,7 @@ h3.entity-table-name {
   padding: 10px;
   border: 1px solid #DDDDDD;
   box-sizing: border-box;
-  min-height: 200px;
+  min-height: calc(100vh - 175px);
 }
 
 .nonfile-base, .file-base {
