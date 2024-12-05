@@ -274,6 +274,7 @@ class AppEntityGenerator extends PicoEntityGenerator
     public function generateCustomEntity($realEntityName = null, $realTableName = null, $predecessorField = null, $successorField = null, $removePk = false, $referenceData = null, $nonupdatables = null)
     {
         $typeMap = $this->getTypeMap();
+        $columnMap = $this->getColumnMap();
         $picoTableName = $this->tableName;
         
         $className = $this->getClassName($realEntityName, $picoTableName);
@@ -302,7 +303,7 @@ class AppEntityGenerator extends PicoEntityGenerator
             {
                 $columnName = $row['Field'];
 
-                $prop = $this->createProperty($typeMap, $row, $nonupdatables);
+                $prop = $this->createProperty($typeMap, $columnMap, $row, $nonupdatables);
 
                 if(!in_array($columnName, $reservedColumns))
                 {
