@@ -140,17 +140,20 @@ if($inputPost->getUserAction() == 'set')
     $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
-
-    $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
-    if(!is_array($storedTranslatedLabel))
+    $dirname = dirname($pathTrans);
+    if (!file_exists($dirname)) { 
+        mkdir($dirname, 0755, true); 
+    }
+    if(file_exists($pathTrans))
+    {
+        $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
+    }
+    if(!isset($storedTranslatedLabel) || !is_array($storedTranslatedLabel))
     {
         $storedTranslatedLabel = [];
     }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
-    if(!file_exists(dirname($pathTrans)))
-    {
-        mkdir(dirname($pathTrans), 0755, true);
-    }
+    
     PicoIniUtil::writeIniFile($storedTranslatedLabel, $pathTrans);
 }
