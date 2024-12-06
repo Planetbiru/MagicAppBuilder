@@ -332,8 +332,6 @@ textarea {
     margin-top: 20px;
     background-color: #FAFAFA;
     border-radius: 3px;
-
-    
 }
 
 .query-title {
@@ -380,31 +378,27 @@ textarea {
     border-radius: 3px;
 }
 
-
-/* Modal background */
 .modal {
-    display: none; /* Modal tidak tampil secara default */
-    position: fixed; /* Tetap di tempat */
-    z-index: 1; /* Di atas konten lain */
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Agar konten modal tidak melampaui area modal */
+    overflow: hidden;
 }
 
-/* Latar belakang transparan yang menutupi seluruh halaman */
 .modal-backdrop {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Efek transparansi */
+    background-color: rgba(0, 0, 0, 0.5); 
     z-index: 0;
 }
 
-/* Konten modal */
 .modal-content {
     position: relative;
     margin: 20px auto;
@@ -416,7 +410,6 @@ textarea {
     z-index: 1;
 }
 
-/* Header modal */
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -430,7 +423,6 @@ textarea {
     margin: 0;
 }
 
-/* Tombol close */
 .close-btn {
     font-size: 30px;
     color: #aaa;
@@ -442,12 +434,10 @@ textarea {
     color: #000;
 }
 
-/* Body modal */
 .modal-body {
     padding: 10px 0 5px 0px;
 }
 
-/* Footer modal */
 .modal-footer {
     border-top: 1px solid #ddd;
     display: flex;

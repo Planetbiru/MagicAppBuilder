@@ -33,6 +33,7 @@ if(isset($databaseConfig))
 class DatabaseExplorer
 {
     const ERROR = "Error: ";
+    
     /**
      * Splits a SQL string into individual SQL statements.
      *
@@ -172,7 +173,6 @@ class DatabaseExplorer
         return $dom->saveHTML();
     }
 
-
     /**
      * Displays a sidebar with tables in the selected database.
      *
@@ -256,7 +256,6 @@ class DatabaseExplorer
         // Output the HTML
         return $dom->saveHTML();
     }
-
 
     /**
      * Generates a SQL query to retrieve the columns and structure of a table based on the database type (MySQL, PostgreSQL, or SQLite).
@@ -436,15 +435,11 @@ class DatabaseExplorer
 
             // Append the div to the document
             $dom->appendChild($divInner);
-
-
         }
-
         
         // Output the HTML
         return $dom->saveHTML();
     }
-
 
     /**
      * Executes a SQL query and displays the result in a table.
@@ -505,7 +500,6 @@ class DatabaseExplorer
             return $dom->saveHTML();
         }
     }
-
 
     /**
      * Displays table data with pagination.
@@ -739,7 +733,6 @@ class DatabaseExplorer
         return $dom->saveHTML();
     }
 
-
     /**
      * Executes a series of SQL queries and displays the results.
      *
@@ -938,6 +931,7 @@ if ($query && !empty($queries)) {
         };
     </script>
 </head>
+
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
     <div class="sidebar">
         <?php
@@ -986,14 +980,12 @@ if ($query && !empty($queries)) {
                 <textarea name="original" id="original" class="original"></textarea>
             </div>
 
-            <div class="modal-footer">
-                
+            <div class="modal-footer">            
                 <button class="btn btn-primary translate-structure">Import</button>
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
                 <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                
             </div>
         </div>
     </div>
