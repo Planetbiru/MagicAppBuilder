@@ -10,6 +10,7 @@ class SqliteConverter {
             "float": "REAL",
             "double": "REAL",
             "decimal": "REAL",  // SQLite doesn't have DECIMAL, treated as REAL
+            "nvarchar": "NVARCHAR",
             "varchar": "NVARCHAR",
             "character varying": "NVARCHAR",
             "char": "TEXT",
@@ -95,9 +96,9 @@ class SqliteConverter {
     convertQuery(table, targetType) {
         if (targetType === 'sqlite') {
             return this.toSqliteOut(table, targetType);
-        } else if (targetType === 'mysql') {
+        } else if (targetType === 'mysql' || targetType === 'mariadb') {
             return this.toMySQLOut(table, targetType);
-        } else if (targetType === 'pgsql') {
+        } else if (targetType === 'pgsql' || targetType === 'postgresql') {
             return this.toPostgreSQLOut(table, targetType);
         }
     }
@@ -160,11 +161,11 @@ class SqliteConverter {
             tableName = tableName.split('.')[1];
         }
         let lines = [];
-        if(targetType == 'mysql')
+        if(targetType === 'mysql' || targetType === 'mariadb')
         {
             tableName = '`' + tableName + '`';
         }
-        else if(targetType == 'postgresql')
+        else if(targetType === 'pgsql' || targetType === 'postgresql')
         {
             tableName = '"' + tableName + '"';
         }
@@ -199,7 +200,7 @@ class SqliteConverter {
     }
     
     fixDefaultValue(defaultValue, targetType) {
-        if(targetType == 'sqlite')
+        if(targetType === 'sqlite')
         {
             if(defaultValue.toLowerCase().indexOf('now(') !== -1)
             {
@@ -270,10 +271,12 @@ function init() {
     var cancelButton = document.getElementById("cancelBtn");
     var translateButton  = document.querySelector(".translate-structure");
     var clearButton  = document.querySelector(".clear");
+    var original = document.querySelector('#original');
 
     // Menampilkan modal saat tombol di klik
     openModalButton.onclick = function() {
         modal.style.display = "block";
+        original.focus();
     }
 
     // Menutup modal saat tombol close di klik
@@ -288,14 +291,15 @@ function init() {
     
     // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
-        document.querySelector('#original').value = "";
+        original.value = "";
     }
     
     translateButton.onclick = function()
     {
-        let sql = document.querySelector('#original').value;
+        let sql = original.value;
         let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        document.querySelector('[name="query"]').value = converter.translate(sql, type)
+        let converted = converter.translate(sql, type);
+        document.querySelector('[name="query"]').value = converted;
         modal.style.display = "none";
     }
     window.onclick = function(event) {

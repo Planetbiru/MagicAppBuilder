@@ -1,5 +1,5 @@
 function TableParser() {
-    this.inArray = function(haystack, needle) {
+    this.inArray = function (haystack, needle) {
         for (let i in haystack) {
             if (haystack[i] == needle) {
                 return true;
@@ -8,13 +8,13 @@ function TableParser() {
         return false;
     }
 
-    this.parseTable = function(sql) {
+    this.parseTable = function (sql) {
         let arr = sql.split(";");
         sql = arr[0];
-        
+
         // The regex for each component:
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*)/gim;
+        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*)/gim;
 
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_not_null = /not\s+null/i
@@ -27,19 +27,19 @@ function TableParser() {
         let tableName = result.groups.tb;
 
         let fld_list = [];
-        let primaryKey;
+        let primaryKey = null;
         let columnList = [];
         let pk = null;
         let pkLine = "";
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
-            
+
             // reset
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
             let dataType = fld_def[2];
             let is_pk = false;
-            
+
             if (this.isValidType(dataType.toString())) {
                 // remove the field definition terminator.
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
@@ -55,7 +55,7 @@ function TableParser() {
 
                 // look for DEFAULT
                 let def = rg_fld_def.exec(attr2);
-                
+
                 let comment = null;
                 if (def && def.length > 0) {
                     def = def[1].trim();
@@ -66,10 +66,14 @@ function TableParser() {
                     def = null;
                 }
 
-                let length = this.getLength(attr);        
+                let length = this.getLength(attr);
+
 
                 // append to the arr
                 let columnName = fld_def.groups.fname.trim();
+                if (primaryKey == null && result[0].toLocaleLowerCase().indexOf('primary key') != -1) {
+                    primaryKey = columnName;
+                }
                 if (!this.inArray(columnList, columnName)) {
                     fld_list.push({
                         'Field': columnName,
@@ -84,7 +88,10 @@ function TableParser() {
             } else if (result[1].toLowerCase().indexOf('primary') != -1 && result[1].toLowerCase().indexOf('key') != -1) {
                 let text = result[1];
                 let re = /\((.*)\)/;
-                primaryKey = typeof text.match(re)[1] != 'undefined' ? text.match(re)[1] : null;
+                let matched = text.match(re);
+                if (primaryKey == null) {
+                    primaryKey = matched != null && typeof matched[1] != 'undefined' ? matched[1] : null;
+                }
             }
 
             if (primaryKey != null) {
@@ -113,28 +120,29 @@ function TableParser() {
         return { tableName: tableName, columns: fld_list, primaryKey: primaryKey };
     }
 
-    this.getLength = function(text) {
+    this.getLength = function (text) {
         if (text.indexOf('(') != -1 && text.indexOf(')') != -1) {
             let re = /\((.*)\)/;
-            return typeof text.match(re)[1] != 'undefined' ? text.match(re)[1] : null;
+            let match = text.match(re);
+            return match ? match[1] : ''; // Check if match exists
         }
         return '';
     }
 
-    this.isValidType = function(dataType) {
+    this.isValidType = function (dataType) {
         return this.typeList.includes(dataType.toLowerCase());
     }
 
-    this.getResult = function() {
+    this.getResult = function () {
         return this.tableInfo;
     }
 
-    this.init = function() {
-        let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,varchar,char,real,float,integer,int,datetime,date,double,boolean,bool';
+    this.init = function () {
+        let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,char,real,float,integer,int,datetime,date,double,boolean,bool';
         this.typeList = typeList.split(',');
     }
 
-    this.parseAll = function(sql) {
+    this.parseAll = function (sql) {
         let inf = [];
         let result;
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gi;
