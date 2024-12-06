@@ -267,11 +267,12 @@ class SqliteConverter {
 // Move init() outside of the class
 function init() {
     // Mendapatkan elemen-elemen modal dan tombol
-    var modal = document.getElementById("myModal");
+    var modal = document.getElementById("translatorModal");
     var openModalButton = document.querySelector(".import-structure");
     var closeModalButton = document.getElementById("closeBtn");
     var cancelButton = document.getElementById("cancelBtn");
     var translateButton  = document.querySelector(".translate-structure");
+    var clearButton  = document.querySelector(".clear");
 
     // Menampilkan modal saat tombol di klik
     openModalButton.onclick = function() {
@@ -286,6 +287,11 @@ function init() {
     // Menutup modal saat tombol 'Close' di footer di klik
     cancelButton.onclick = function() {
         modal.style.display = "none";
+    }
+    
+    // Menutup modal saat tombol 'Close' di footer di klik
+    clearButton.onclick = function() {
+        document.querySelector('#original').value = "";
     }
     
     translateButton.onclick = function()

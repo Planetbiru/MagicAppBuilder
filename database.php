@@ -708,7 +708,7 @@ class DatabaseExplorer
         // Create importStructure button
         $importStructure = $dom->createElement('input');
         $importStructure->setAttribute('type', 'button');
-        $importStructure->setAttribute('value', 'Import');
+        $importStructure->setAttribute('value', 'Import Structure');
         $importStructure->setAttribute('class', 'btn btn-primary import-structure');
         $form->appendChild($importStructure);
 
@@ -953,29 +953,24 @@ if ($query && !empty($queries)) {
         ?>
     </div>
     
-    
-    <!-- Modal dengan latar belakang transparan -->
-    <div class="modal" id="myModal">
-        <!-- Latar belakang transparan -->
+    <div class="modal" id="translatorModal">
         <div class="modal-backdrop"></div>
 
-        <!-- Konten modal -->
         <div class="modal-content">
-            <!-- Modal Header -->
             <div class="modal-header">
-                <h2>Modal Header</h2>
+                <h2>Import Structure</h2>
                 <span class="close-btn" id="closeBtn">&times;</span>
             </div>
             
-            <!-- Modal Body -->
             <div class="modal-body">
                 <textarea name="original" id="original" class="original"></textarea>
             </div>
 
-            <!-- Modal Footer -->
             <div class="modal-footer">
                 
                 <button class="btn btn-primary translate-structure">Import</button>
+                &nbsp;
+                <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
                 <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
                 
