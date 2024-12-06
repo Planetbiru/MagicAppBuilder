@@ -74,13 +74,11 @@ class SqliteConverter {
     }
 
     translate(value, targetType) {
-        console.log(targetType);
         value = this.replaceAll(value, '`', '');
         value = this.replaceAll(value, ' timestamp with time zone', ' timestamptz');
         value = this.replaceAll(value, ' timestamp without time zone', ' timestamp');
         value = this.replaceAll(value, ' character varying', ' varchar');
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
-        console.log(value);
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -229,7 +227,6 @@ class SqliteConverter {
     }
 
     toMySQLType(type, length) {
-        console.log(type)
         let mysqlType = 'TEXT';
         for (let i in this.dbToMySQL) {
             if (this.dbToMySQL.hasOwnProperty(i)) {
