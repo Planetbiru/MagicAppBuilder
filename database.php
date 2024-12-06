@@ -31,6 +31,7 @@ if(isset($databaseConfig))
  */
 class DatabaseExplorer
 {
+    const ERROR = "Error: ";
     /**
      * Splits a SQL string into individual SQL statements.
      *
@@ -493,7 +494,7 @@ class DatabaseExplorer
             $dom = new DOMDocument('1.0', 'utf-8');
 
             // Create error div
-            $div = $dom->createElement('div', "Error: " . $e->getMessage());
+            $div = $dom->createElement('div', self::ERROR . $e->getMessage());
             $div->setAttribute('class', 'sql-error');
 
             // Append error div to DOM
@@ -636,7 +637,7 @@ class DatabaseExplorer
             $divInner->setAttribute('class', 'sql-error');
 
             // Add the exception message to the div
-            $message = $dom->createTextNode('Error: ' . $e->getMessage());
+            $message = $dom->createTextNode(self::ERROR . $e->getMessage());
             $divInner->appendChild($message);
             
             $divOuter->appendChild($divInner);
@@ -686,6 +687,7 @@ class DatabaseExplorer
         $submit = $dom->createElement('input');
         $submit->setAttribute('type', 'submit');
         $submit->setAttribute('value', 'Execute');
+        $submit->setAttribute('class', 'btn btn-success execute');
         $form->appendChild($submit);
 
         // Add space between buttons
@@ -696,7 +698,19 @@ class DatabaseExplorer
         $reset = $dom->createElement('input');
         $reset->setAttribute('type', 'reset');
         $reset->setAttribute('value', 'Reset');
+        $reset->setAttribute('class', 'btn btn-warning reset');
         $form->appendChild($reset);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+        
+        // Create importStructure button
+        $importStructure = $dom->createElement('input');
+        $importStructure->setAttribute('type', 'button');
+        $importStructure->setAttribute('value', 'Import');
+        $importStructure->setAttribute('class', 'btn btn-primary import-structure');
+        $form->appendChild($importStructure);
 
         // Append form to DOM
         $dom->appendChild($form);
@@ -804,7 +818,7 @@ if ($page < 1) {
 if ($limit < 1) {
     $limit = 1;
 }
-
+$dbType = "mysql";
 // Load the database configuration
 $databaseConfig = new SecretObject();
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
@@ -873,7 +887,7 @@ if ($query && !empty($queries)) {
     try {
         $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
     } catch (Exception $e) {
-        $queryResult = "Error: " . $e->getMessage();
+        $queryResult = self::ERROR . $e->getMessage();
     }
 } else {
     $queryResult = "";
@@ -884,8 +898,11 @@ if ($query && !empty($queries)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.css">
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
@@ -934,6 +951,36 @@ if ($query && !empty($queries)) {
         echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
         echo $queryResult;
         ?>
+    </div>
+    
+    
+    <!-- Modal dengan latar belakang transparan -->
+    <div class="modal" id="myModal">
+        <!-- Latar belakang transparan -->
+        <div class="modal-backdrop"></div>
+
+        <!-- Konten modal -->
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2>Modal Header</h2>
+                <span class="close-btn" id="closeBtn">&times;</span>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <textarea name="original" id="original" class="original"></textarea>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                
+                <button class="btn btn-primary translate-structure">Import</button>
+                &nbsp;
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                
+            </div>
+        </div>
     </div>
 </body>
 </html>
