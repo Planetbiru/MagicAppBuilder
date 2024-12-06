@@ -527,14 +527,12 @@ class DatabaseExplorer
         
         try
         {
-
             $offset = ($page - 1) * $limit;
             $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
             $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
             $totalPages = ceil($total / $limit);
 
             $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
-
             
             // Create the toggle button
             $button = $dom->createElement('button');
@@ -605,11 +603,9 @@ class DatabaseExplorer
             for ($i = $startPage; $i <= $endPage; $i++) {
                 $pageLink = $dom->createElement('a', htmlspecialchars($i));
                 $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
-
                 if ($i == $page) {
                     $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
                 }
-
                 $paginationDiv->appendChild($pageLink);
             }
 
@@ -645,7 +641,6 @@ class DatabaseExplorer
 
         // Output the HTML with pagination
         return $dom->saveHTML();
-
     }
 
     /**
@@ -688,8 +683,6 @@ class DatabaseExplorer
         // Create textarea
         $textarea = $dom->createElement('textarea', htmlspecialchars($lastQueries));
         $textarea->setAttribute('name', 'query');
-        $textarea->setAttribute('rows', '4');
-        $textarea->setAttribute('cols', '50');
         $textarea->setAttribute('spellcheck', 'false');
         $form->appendChild($textarea);
 
@@ -972,7 +965,7 @@ if ($query && !empty($queries)) {
 
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Import Structure</h2>
+                <h2>Import Database Structure</h2>
                 <span class="close-btn" id="closeBtn">&times;</span>
             </div>
             
