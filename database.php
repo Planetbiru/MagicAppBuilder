@@ -934,7 +934,7 @@ if ($query && !empty($queries)) {
         };
     </script>
 </head>
-<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>">
+<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
     <div class="sidebar">
         <?php
         try {

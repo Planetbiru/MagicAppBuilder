@@ -251,8 +251,13 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-[data-from-default-app=true] .table-list {
+[data-from-default-app=true] .table-list, [database-type=sqlite] .table-list {
   max-height: calc(100vh - 72px);
+}
+
+[data-from-default-app=false][database-type=mysql] .table-list,
+[data-from-default-app=false][database-type=mariadb] .table-list {
+  max-height: calc(100vh - 120px);
 }
 
 .collapsible .button-toggle {

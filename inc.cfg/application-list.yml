@@ -23,7 +23,7 @@
     description: 'Music Planetbiru'
     documentRoot: 'D:/xampp/htdocs/0673c952cb576d077460'
     author: Kamshory
-    selected: true
+    selected: false
 -
     id: 06749b6839b630d9e33f
     name: ApplicationName
@@ -39,4 +39,4 @@
     description: Description
     documentRoot: 'C:/bitbucket/0674d7bd2bafbf935994'
     author: 'Your Name'
-    selected: false
+    selected: true
