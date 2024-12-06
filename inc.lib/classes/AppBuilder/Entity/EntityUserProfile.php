@@ -5,27 +5,27 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUserSession is entity of table user_session. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityUserProfile is entity of table user_profile. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user_session")
+ * @Table(name="user_profile")
  */
-class EntityUserSession extends MagicObject
+class EntityUserProfile extends MagicObject
 {
 	/**
-	 * User ID
+	 * User Profile ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_session_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="user_profile_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User ID")
 	 * @var string
 	 */
-	protected $userSessionId;
+	protected $userProfileId;
 
     /**
 	 * User ID
@@ -35,6 +35,24 @@ class EntityUserSession extends MagicObject
 	 * @var string
 	 */
 	protected $userId;
+    
+    /**
+	 * Profile Name
+	 * 
+	 * @Column(name="profile_name", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Profile Name")
+	 * @var string
+	 */
+	protected $profileName;
+    
+    /**
+	 * Profile Value
+	 * 
+	 * @Column(name="profile_value", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Profile Value")
+	 * @var string
+	 */
+	protected $profileValue;
 
     /**
      * User
@@ -43,23 +61,6 @@ class EntityUserSession extends MagicObject
      * @var EntityUser
      */
     protected $user;
-    
-    /**
-	 * Application ID
-	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application ID")
-	 * @var string
-	 */
-	protected $applicationId;
-
-    /**
-     * Application
-     *
-     * @JoinColumn(name="application_id" referenceColumnName="application_id")
-     * @var EntityApplication
-     */
-    protected $application;
 
 	/**
 	 * User Agent

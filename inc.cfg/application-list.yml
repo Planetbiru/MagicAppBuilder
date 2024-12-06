@@ -13,7 +13,7 @@
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
     description: 'Sipro Baru'
-    selected: false
+    selected: true
     type: api
     architecture: monolith
 -
@@ -39,4 +39,4 @@
     description: Description
     documentRoot: 'C:/bitbucket/0674d7bd2bafbf935994'
     author: 'Your Name'
-    selected: true
+    selected: false

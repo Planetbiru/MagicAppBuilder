@@ -11,7 +11,7 @@ use MagicObject\MagicObject;
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user")
+ * @Table(name="error_cache")
  */
 class EntityErrorCache extends MagicObject
 {
@@ -24,7 +24,7 @@ class EntityErrorCache extends MagicObject
 	 * @Label(content="Error Cache ID")
 	 * @var string
 	 */
-	protected $userId;
+	protected $errorCacheId;
 
 	/**
 	 * File Name
