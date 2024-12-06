@@ -603,6 +603,8 @@ class DatabaseExplorer
                 if ($startPage > 2) {
                     $ellipsis = $dom->createElement('span', '...');
                     $paginationDiv->appendChild($ellipsis);
+                    $space = $dom->createTextNode(" ");
+                    $paginationDiv->appendChild($space);
                 }
             }
 
@@ -621,6 +623,8 @@ class DatabaseExplorer
                 if ($endPage < $totalPages - 1) {
                     $ellipsis = $dom->createElement('span', '...');
                     $paginationDiv->appendChild($ellipsis);
+                    $space = $dom->createTextNode(" ");
+                    $paginationDiv->appendChild($space);
                 }
 
                 $lastPage = $dom->createElement('a', 'Last');
