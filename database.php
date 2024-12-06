@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -124,7 +125,7 @@ class DatabaseExplorer
         // Fetch databases
         $dbNameFromConfig = $databaseConfig ? $databaseConfig->getDatabaseName() : '';
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $stmt = ($dbType == 'pgsql') ? $pdo->query('SELECT datname FROM pg_database') : $pdo->query('SHOW DATABASES');
+        $stmt = ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) ? $pdo->query('SELECT datname FROM pg_database') : $pdo->query('SHOW DATABASES');
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $dbName = $row[0];
@@ -138,7 +139,7 @@ class DatabaseExplorer
         $form->appendChild($selectDb);
 
         // If PostgreSQL, add schema selection
-        if ($dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $selectSchema = $dom->createElement('select');
             $selectSchema->setAttribute('name', 'schema');
             $selectSchema->setAttribute('id', 'schema-select');
@@ -202,9 +203,9 @@ class DatabaseExplorer
         $ul = $dom->createElement('ul');
         $ul->setAttribute('class', 'table-list');
 
-        if ($dbType == 'mysql' || $dbType == 'mariadb' || $dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == 'mysql' || $dbType == 'mariadb' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -279,10 +280,10 @@ class DatabaseExplorer
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         // Mendapatkan schema atau database aktif
-        if ($dbType == 'mysql' || $dbType == 'mariadb') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             // Query untuk MySQL
             $sql = "DESCRIBE `$tableName`";
-        } elseif ($dbType == 'pgsql') {
+        } elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Mengambil nama schema di PostgreSQL
             
             // Query untuk PostgreSQL
@@ -652,19 +653,34 @@ class DatabaseExplorer
     /**
      * Creates a query execution form.
      *
-     * This function generates an HTML form for executing SQL queries. The form includes a textarea
-     * pre-populated with the last executed queries, and buttons to submit or reset the form.
+     * This function generates an HTML form that allows users to execute SQL queries. The form includes a textarea
+     * pre-populated with the last executed queries, and buttons to submit or reset the form. The form is tailored 
+     * to the type of database selected (PostgreSQL, SQLite, or MySQL).
      *
      * @param string $lastQueries The last executed SQL queries to be pre-populated in the textarea.
-     * @return string The generated HTML.
+     * @param string $dbType The type of the database (e.g., 'pgsql', 'sqlite', 'mysql').
+     * 
+     * @return string The generated HTML of the form as a string.
      */
-    public static function createQueryExecutorForm($lastQueries)
+    public static function createQueryExecutorForm($lastQueries, $dbType)
     {
+        if($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $label = 'Execute Query (PostgreSQL)';
+        }
+        else if($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $label = 'Execute Query (SQLite)';
+        }
+        else
+        {
+            $label = 'Execute Query (MySQL)';
+        }
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
 
         // Create heading
-        $h3 = $dom->createElement('h3', 'Execute Query');
+        $h3 = $dom->createElement('h3', $label);
         $dom->appendChild($h3);
 
         // Create form
@@ -843,7 +859,7 @@ if (file_exists($appConfigPath)) {
         // Connect to the database and set schema for PostgreSQL
         $database->connect();
         $dbType = $database->getDatabaseType();
-        if ($dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $database->query("SET search_path TO $schemaName;");
         }
     } catch (Exception $e) {
@@ -948,7 +964,7 @@ if ($query && !empty($queries)) {
         }
 
         // Display the query executor form and results
-        echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
+        echo DatabaseExplorer::createQueryExecutorForm($lastQueries, $dbType);
         echo $queryResult;
         ?>
     </div>
