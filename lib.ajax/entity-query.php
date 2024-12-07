@@ -40,9 +40,11 @@ try
     $allQueries[] = "-- -------------------------------------------------------------";
     $allQueries[] = "-- Database Stucture for $applicationName";
     $allQueries[] = "-- Generator       : MagicAppBuilder";
-    $allQueries[] = "-- Database Driver : ".$dbType;
+    $allQueries[] = "-- Database Type   : ".$dbType;
+    $allQueries[] = "-- Database Driver : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
     $allQueries[] = "-- Time Generation : ".date('j F Y H:i:s');
-    $allQueries[] = "-- Time Zone       : ".date('P');
+    $allQueries[] = "-- Time Zone       : ".date('P'); 
+    $allQueries[] = "-- Line Endings    : CRLF";
     $allQueries[] = "-- -------------------------------------------------------------";
     $allQueries[] = "";
 
@@ -140,8 +142,20 @@ try
             }
         }
     }
-    $allQueries[] = "-- End of query";
-    echo implode("\r\n", $allQueries);
+    $allQueries[] = "-- -------------------------------------------------------------";
+    $allQueries[] = "-- End of Query";
+    $allQueries[] = "-- -------------------------------------------------------------";
+    $sqlQuery = implode("\r\n", $allQueries);
+
+    $lines = explode("\r\n", $sqlQuery);
+    $trimmedLines = array_map('rtrim', $lines);
+    $sqlQuery = implode("\r\n", $trimmedLines);
+
+    $md5 = hash('md5', $sqlQuery);
+    $sha1 = hash('sha1', $sqlQuery);
+    echo $sqlQuery;
+    echo "\r\n-- MD5 Hash        :  ".$md5;
+    echo "\r\n-- SHA1 Hash       :  ".$sha1;
 }
 catch(Exception $e)
 {
