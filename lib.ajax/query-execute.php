@@ -8,16 +8,15 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
 $inputPost = new InputPost();
-
 $queries = PicoDatabaseUtil::splitSql($inputPost->getQuery());
-try
+foreach($queries as $query)
 {
-    foreach($queries as $query)
+    try
     {
         $database->execute($query['query']);
     }
-}
-catch(Exception $e)
-{
-    error_log($e->getMessage());
+    catch(Exception $e)
+    {
+        error_log($e->getMessage());
+    }
 }

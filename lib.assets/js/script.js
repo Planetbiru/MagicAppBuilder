@@ -949,7 +949,7 @@ jQuery(function () {
         {
           'caption': 'Yes',  // Caption for the button
           'fn': () => {
-            let query = modal.find('textarea').val();
+            let query = cmEditorSQLExecute.getValue();
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
