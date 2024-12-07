@@ -385,36 +385,43 @@ class DatabaseExplorer
         
         // Fetch the columns
         $query = self::getQueryShowColumns($pdo, $schemaName, $table);
-        if (isset($query)) {
-            $stmt = $pdo->query($query);
-            
-            if ($stmt) {
-                $tbody = $dom->createElement('tbody');
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $columnCount++;
-                    $tr = $dom->createElement('tr');
-                    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
-                        // For SQLite
-                        $columns = [
-                            $row['name'], 
-                            $row['type'], 
-                            $row['notnull'] ? 'NO' : 'YES', 
-                            $row['pk'] == 1 ? 'PRI' : '', 
-                            $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                            strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
-                        ];
-                    } else {
-                        // For MySQL or PostgreSQL
-                        $columns = $row;
+        try
+        {
+            if (isset($query)) {
+                $stmt = $pdo->query($query);
+                
+                if ($stmt) {
+                    $tbody = $dom->createElement('tbody');
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $columnCount++;
+                        $tr = $dom->createElement('tr');
+                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                            // For SQLite
+                            $columns = [
+                                $row['name'], 
+                                $row['type'], 
+                                $row['notnull'] ? 'NO' : 'YES', 
+                                $row['pk'] == 1 ? 'PRI' : '', 
+                                $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
+                                strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
+                            ];
+                        } else {
+                            // For MySQL or PostgreSQL
+                            $columns = $row;
+                        }
+                        foreach ($columns as $value) {
+                            $td = $dom->createElement('td', $value);
+                            $tr->appendChild($td);
+                        }
+                        $tbody->appendChild($tr);
                     }
-                    foreach ($columns as $value) {
-                        $td = $dom->createElement('td', $value);
-                        $tr->appendChild($td);
-                    }
-                    $tbody->appendChild($tr);
+                    $tableElem->appendChild($tbody);
                 }
-                $tableElem->appendChild($tbody);
             }
+        }
+        catch(Exception $e)
+        {
+            // Do nothing
         }
         
         if($columnCount > 0)
