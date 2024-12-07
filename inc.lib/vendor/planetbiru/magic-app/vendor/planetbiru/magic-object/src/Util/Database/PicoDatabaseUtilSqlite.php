@@ -495,11 +495,15 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         {
             return "'".$defaultValue."'";
         }
-        else if(stripos($type, 'int') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false)
+        else if(stripos($type, 'int') !== false)
         {
-            return $defaultValue + 0;
+            $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
+            return (int)$defaultValue;
+        }
+        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        {
+            $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
+            return (float)$defaultValue;
         }
         return $defaultValue;
     }

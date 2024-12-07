@@ -333,12 +333,15 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         else if (stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
             return "'" . addslashes($defaultValue) . "'";
         }
-        else if(stripos($type, 'int') !== false 
-        || stripos($type, 'real') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false)
+        else if(stripos($type, 'int') !== false)
         {
-            return $defaultValue + 0;
+            $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
+            return (int)$defaultValue;
+        }
+        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        {
+            $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
+            return (float)$defaultValue;
         }
         return $defaultValue;
     }
