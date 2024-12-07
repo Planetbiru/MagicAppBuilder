@@ -100,6 +100,13 @@ $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
 $application->setBaseEntityDirectory("inc.lib/classes");
 $application->setBaseLanguageDirectory("inc.lang");
 
+$databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
+$databaseDirectory = dirname($databaseFilePath);
+if(!file_exists($databaseDirectory))
+{
+    mkdir($databaseDirectory, 0755, true);
+}
+
 $paths = $inputPost->getPaths();
 foreach ($paths as $idx => $val) {
     $paths[$idx]['active'] = $paths[$idx]['active'] == 'true';
@@ -153,12 +160,25 @@ $entityInfo = [
     'approval_status' => 'approval_status'
 ];
 
+$databaseConfig = [
+    'driver' => 'sqlite',
+    'database_file_path' => $databaseFilePath,
+    'host' => '',
+    'port' => 0,
+    'username' => '',
+    'password' => '',
+    'database_name' => '',
+    'database_schema' => '',
+    'time_zone' => 'Asia/Jakarta'
+];
+
 $newApp->setEntityInfo($entityInfo);
 $newApp->setCurrentAction([
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
 ]);
+$newApp->setDatabase($databaseConfig);
 $newApp->setGlobalVariableDatabase('database');
 
 file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());

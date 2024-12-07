@@ -102,10 +102,7 @@ class PicoEntityGenerator
 
         $propertyName = PicoStringUtil::camelize($columnName);
         $description = $this->getPropertyName($columnName);
-
-        error_log($columnType);
         $columnType = $this->getColumnType($columnMap, $columnType);
-        error_log($columnType);
         $type = $this->getDataType($typeMap, $columnType);
 
         $docs = array();
@@ -280,6 +277,7 @@ class PicoEntityGenerator
             "unsigned" => "int",             // MySQL: unsigned integer (mapped to int in PHP)
 
             // String types
+            "nvarchar" => "string",          // SQLite: variable-length string
             "varchar" => "string",           // PostgreSQL: variable-length string
             "character varying" => "string", // PostgreSQL: character varying (same as varchar)
             "char" => "string",              // PostgreSQL: fixed-length string
@@ -366,6 +364,7 @@ class PicoEntityGenerator
             "unsigned" => "unsigned",        // MySQL: UNSIGNED integer
 
             // String types
+            "nvarchar" => "varchar",         // SQLite: VARCHAR
             "varchar" => "varchar",          // MySQL: VARCHAR
             "character varying" => "varchar", // MySQL: CHARACTER VARYING (same as VARCHAR)
             "char" => "char",                // MySQL: CHAR

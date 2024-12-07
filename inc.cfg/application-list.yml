@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: true
+    selected: false
     type: fullstack
     architecture: monolith
 -
@@ -13,7 +13,7 @@
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
     description: 'Sipro Baru'
-    selected: true
+    selected: false
     type: api
     architecture: monolith
 -
@@ -40,3 +40,27 @@
     documentRoot: 'C:/bitbucket/0674d7bd2bafbf935994'
     author: 'Your Name'
     selected: false
+-
+    id: musik
+    name: Musik
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/musik'
+    author: 'Your Name'
+    selected: false
+-
+    id: lagu
+    name: Lagu
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/lagu'
+    author: 'Your Name'
+    selected: false
+-
+    id: lagu2
+    name: lagu2
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/lagu2'
+    author: 'Your Name'
+    selected: true

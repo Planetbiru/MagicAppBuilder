@@ -92,7 +92,7 @@ try
             if($return_var == 0)
             {
                 include_once $path2;                  
-                $entity = new $className(null, $database);
+                $entity = new $className(null, null);
                 $tableInfo = $entity->tableInfo();
                 $columns = $tableInfo->getColumns();
                 ?>

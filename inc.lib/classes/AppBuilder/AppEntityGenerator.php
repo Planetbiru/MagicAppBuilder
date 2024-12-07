@@ -282,6 +282,7 @@ class AppEntityGenerator extends PicoEntityGenerator
         $fileName = $this->baseNamespace."/".$className;
         $path = $this->baseDir."/".$fileName.".php";
         $path = str_replace("\\", "/", $path); 
+        
         $dir = dirname($path);
         
         $this->prepareDir($dir);
