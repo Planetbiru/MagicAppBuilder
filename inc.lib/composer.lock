@@ -142,16 +142,16 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "2.9.3",
+            "version": "2.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "9d7e11b4506bc4abe4831d5224b1aec219aa460b"
+                "reference": "b369dd88416018496732bc08b9077b62ea67b875"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/9d7e11b4506bc4abe4831d5224b1aec219aa460b",
-                "reference": "9d7e11b4506bc4abe4831d5224b1aec219aa460b",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/b369dd88416018496732bc08b9077b62ea67b875",
+                "reference": "b369dd88416018496732bc08b9077b62ea67b875",
                 "shasum": ""
             },
             "require": {
@@ -175,13 +175,13 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/2.9.3"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/2.9.4"
             },
-            "time": "2024-12-07T11:50:58+00:00"
+            "time": "2024-12-07T15:40:01+00:00"
         },
         {
             "name": "planetbiru/magic-object",
-            "version": "2.9.3",
+            "version": "2.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
@@ -215,7 +215,7 @@
             "description": "Magic object",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/2.9.3"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/2.9.4"
             },
             "time": "2024-12-07T11:48:29+00:00"
         },
