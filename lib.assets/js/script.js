@@ -950,6 +950,7 @@ jQuery(function () {
           'caption': 'Yes',  // Caption for the button
           'fn': () => {
             let query = cmEditorSQLExecute.getValue();
+            $('.button-execute-query')[0].disabled = true;
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
