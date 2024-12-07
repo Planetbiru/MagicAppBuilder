@@ -58,9 +58,9 @@
     selected: false
 -
     id: lagu2
-    name: lagu2
-    architecture: ''
-    description: Description
+    name: 'Music Production Manager'
+    architecture: monolith
+    description: ''
     documentRoot: 'D:/xampp/htdocs/lagu2'
     author: 'Your Name'
     selected: true

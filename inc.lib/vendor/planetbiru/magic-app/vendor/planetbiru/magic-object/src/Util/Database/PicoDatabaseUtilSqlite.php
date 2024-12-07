@@ -244,7 +244,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 "Type" => $row['type'],
                 "Null" => $row['notnull'] ? 'YES' : 'NO',
                 "Key" => $row['pk'] ? 'PRI' : null,
-                "Default" => $row['dflt_value'] ? $row['dflt_value'] : 'None',
+                "Default" => $row['dflt_value'] ? $row['dflt_value'] : null,
                 "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
