@@ -18,12 +18,12 @@ function TableParser() {
 
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i; // Regex to match ENUM values inside parentheses
-        let rg_not_null = /not\s+null/i
-        let rg_pk = /primary\s+key/i
-        let rg_fld_def = /default\s(.+)/gi
-        let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi
+        let rg_not_null = /not\s+null/i;
+        let rg_pk = /primary\s+key/i;
+        let rg_fld_def = /default\s(.+)/gi;
+        let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi;
 
-        // look for table name
+        // Look for table name
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
 
@@ -36,26 +36,38 @@ function TableParser() {
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
 
-            // reset
+            // Reset
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
             let dataType = fld_def[2];
             let is_pk = false;
 
-            if (this.isValidType(dataType.toString()) || rg_enum.test(dataType)) {
-                // remove the field definition terminator.
+            // If it's an ENUM type, convert it to VARCHAR or equivalent based on the database
+            if (rg_enum.test(dataType)) {
+                let enumValues = rg_enum.exec(dataType)[1]; // Extract values inside ENUM parentheses
+                let enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, '')); // Remove quotes
+                let maxLength = Math.max(...enumArray.map(val => val.length)); // Find the max length
+                let length = maxLength + 2; // Add 2 characters as per requirement
+                
+                // Use target database type (example: 'VARCHAR' or 'NVARCHAR')
+                let targetType = "VARCHAR";  // You can dynamically change this to 'NVARCHAR' or 'CHARACTER VARYING' based on the DB target
+                dataType = `${targetType}(${length})`; // Convert ENUM to VARCHAR with length
+            }
+
+            if (this.isValidType(dataType.toString())) {
+                // Remove the field definition terminator.
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
 
-                // look for NOT NULL.
+                // Look for NOT NULL.
                 let nullable = !rg_not_null.test(attr);
 
-                // remove NOT NULL.
+                // Remove NOT NULL.
                 let attr2 = attr.replace(rg_not_null, '');
 
-                // look for PRIMARY KEY
+                // Look for PRIMARY KEY
                 is_pk = rg_pk.test(attr2);
 
-                // look for DEFAULT
+                // Look for DEFAULT
                 let def = rg_fld_def.exec(attr2);
 
                 let comment = null;
@@ -70,20 +82,8 @@ function TableParser() {
 
                 let length = this.getLength(attr);
 
-                // Check if the data type is ENUM and parse the possible values
-                if (rg_enum.test(dataType)) {
-                    let enumValues = dataType.match(rg_enum);
-                    if (enumValues && enumValues[1]) {
-                        length = enumValues[1].split(',').map(value => value.trim());
-                    }
-                    dataType = 'enum';
-                }
-
-                // append to the arr
+                // Append to the arr only if not already present in the columnList
                 let columnName = fld_def.groups.fname.trim();
-                if (primaryKey == null && result[0].toLocaleLowerCase().indexOf('primary key') != -1) {
-                    primaryKey = columnName;
-                }
                 if (!this.inArray(columnList, columnName)) {
                     fld_list.push({
                         'Field': columnName,
@@ -93,7 +93,7 @@ function TableParser() {
                         'Nullable': nullable,
                         'Default': def
                     });
-                    columnList.push(columnName);
+                    columnList.push(columnName); // Mark this column as processed
                 }
             } else if (result[1].toLowerCase().indexOf('primary') != -1 && result[1].toLowerCase().indexOf('key') != -1) {
                 let text = result[1];
@@ -107,8 +107,8 @@ function TableParser() {
             if (primaryKey != null) {
                 primaryKey = primaryKey.split('(').join('').split(')').join('');
                 for (let i in fld_list) {
-                    if (fld_list[i]['Column Name'] == primaryKey) {
-                        fld_list[i]['Primary Key'] = true;
+                    if (fld_list[i]['Field'] == primaryKey) {
+                        fld_list[i]['Key'] = true;
                     }
                 }
             }
@@ -121,8 +121,8 @@ function TableParser() {
                     pkeys[i] = pkeys[i].trim();
                 }
                 for (let i in fld_list) {
-                    if (this.inArray(pkeys, fld_list[i]['Column Name'])) {
-                        fld_list[i]['Primary Key'] = true;
+                    if (this.inArray(pkeys, fld_list[i]['Field'])) {
+                        fld_list[i]['Key'] = true;
                     }
                 }
             }
@@ -148,7 +148,7 @@ function TableParser() {
     }
 
     this.init = function () {
-        let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,char,real,float,integer,int,datetime,date,double,boolean,bool';
+        let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,enum,char,real,float,integer,int,datetime,date,double,boolean,bool';
         this.typeList = typeList.split(',');
     }
 
