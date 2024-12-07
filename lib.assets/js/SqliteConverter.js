@@ -179,6 +179,7 @@ class SqliteConverter {
             let colDef = '\t' + columnName + ' ' + table.columns[i].Type;
             if (primaryKey) {
                 colDef += ' PRIMARY KEY';
+                colDef += ' NOT NULL';
                 table.columns[i].Nullable = false;
             }
             else {
