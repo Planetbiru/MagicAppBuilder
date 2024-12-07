@@ -125,6 +125,7 @@ try
             }
         }
     }
+    $allQueries[] = "-- End of query";
     echo implode("\r\n", $allQueries);
 }
 catch(Exception $e)
