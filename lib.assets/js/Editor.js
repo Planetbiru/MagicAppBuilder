@@ -2,6 +2,7 @@ let modified = true;
 let cmEditorModule = null;
 let cmEditorFile = null;
 let cmEditorSQL = null;
+let cmEditorSQLExecute = null;
 let transEd1 = null;
 let transEd2 = null;
 let transEd3 = null;
@@ -20,6 +21,9 @@ function format() {
 
   let totalLinesSql = cmEditorFile.lineCount();
   cmEditorSQL.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesSql });
+
+  let totalLinesSqlExecute = cmEditorSQLExecute.lineCount();
+  cmEditorSQLExecute.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesSqlExecute });
 
   let totalLinesEntityTran1 = transEd1.lineCount();
   let totalLinesEntityTran2 = transEd2.lineCount();
@@ -41,6 +45,11 @@ function isHidden(el) {
 
 $(document).ready(function () {
 
+  $('#modal-query-executor').on('shown.bs.modal', function () {
+    cmEditorSQLExecute.refresh();
+    cmEditorSQLExecute.focus();
+    $('.button-execute-query')[0].disabled = false;
+  });
   $('#maintab').on("shown.bs.tab", function (e) {
     var currId = $(e.target).attr("id");
     currentTab = currId;
@@ -111,6 +120,17 @@ $(document).ready(function () {
 
   cmEditorSQL = CodeMirror.fromTextArea(
     document.querySelector(".entity-query"),
+    {
+      lineNumbers: true,
+      lineWrapping: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      indentWithTabs: true,
+    }
+  );
+
+  cmEditorSQLExecute = CodeMirror.fromTextArea(
+    document.querySelector("#query_to_execute"),
     {
       lineNumbers: true,
       lineWrapping: true,
@@ -248,6 +268,12 @@ $(document).ready(function () {
     CodeMirror.autoLoadMode(cmEditorSQL, modeSQL);
     setTimeout(function () {
       cmEditorSQL.refresh();
+    }, 1);
+
+    cmEditorSQLExecute.setOption("mode", specSQL);
+    CodeMirror.autoLoadMode(cmEditorSQLExecute, modeSQL);
+    setTimeout(function () {
+      cmEditorSQLExecute.refresh();
     }, 1);
   }
 

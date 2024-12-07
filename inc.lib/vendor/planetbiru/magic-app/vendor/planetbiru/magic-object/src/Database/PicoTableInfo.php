@@ -88,6 +88,15 @@ class PicoTableInfo // NOSONAR
     protected $package;
 
     /**
+     * List of sorted column names.
+     *
+     * This property stores an array of column names in their sorted order.
+     *
+     * @var array List of sorted column names.
+     */
+    private $sortedColumnName = array();
+
+    /**
      * Gets an instance of PicoTableInfo.
      *
      * @return self A new instance of the class.
@@ -123,6 +132,13 @@ class PicoTableInfo // NOSONAR
         $this->notNullColumns = $notNullColumns;
         $this->noCache = $noCache;
         $this->package = $package;
+
+        // Store sorted column list
+        $res = array();
+        $res = array_merge($res, array_keys($columns));
+        $res = array_unique($res);
+
+        $this->sortedColumnName = $res;
     }
 
     /**
@@ -381,6 +397,34 @@ class PicoTableInfo // NOSONAR
     public function setPackage($package)
     {
         $this->package = $package;
+
+        return $this;
+    }
+
+    /**
+     * Get the sorted column names.
+     *
+     * This method retrieves the list of sorted column names.
+     *
+     * @return array List of sorted column names.
+     */
+    public function getSortedColumnName()
+    {
+        return $this->sortedColumnName;
+    }
+
+    /**
+     * Set the sorted column names.
+     *
+     * This method sets the list of sorted column names.
+     *
+     * @param array $sortedColumnName List of sorted column names.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setSortedColumnName($sortedColumnName)
+    {
+        $this->sortedColumnName = $sortedColumnName;
 
         return $this;
     }

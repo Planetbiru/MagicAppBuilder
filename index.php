@@ -51,7 +51,6 @@ $constSelected = ' selected';
 
         <?php
         $nav = $appNavs->item(0);
-        $cfgDatabase = new SecretObject($builderConfig->getDatabase());
         $cfgSession = new SecretObject($builderConfig->getSessions());
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
@@ -62,7 +61,6 @@ $constSelected = ' selected';
 
         <?php
         $nav = $appNavs->item(1);
-        $cfgDatabase = new SecretObject($appConfig->getDatabase());
         $cfgSession = new SecretObject($appConfig->getSessions());
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">

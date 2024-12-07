@@ -68,27 +68,29 @@ if($inputPost->getUserAction() == 'get')
             
             $parsedLanguage = new MagicObject($parsed);   
             $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory() . "/" . $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
-            $langs = [];
-            
+            $langs = new MagicObject();
             if(file_exists($pathTrans))
             {
-                $langs = new MagicObject(PicoIniUtil::parseIniFile($pathTrans));
+                $langs->loadData(PicoIniUtil::parseIniFile($pathTrans));
             }
             
             $keys = array_keys($parsed);
             
-            foreach($keys as $key)
+            if(!$langs->empty())
             {
-                $original = $parsedLanguage->get($key);
-                $translated = $langs->get($key);
-                if($translated == null)
+                foreach($keys as $key)
                 {
-                    $translated = $original;
-                    $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
-                }  
-                else if($filter == 'all') 
-                {
-                    $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                    $original = $parsedLanguage->get($key);
+                    $translated = $langs->get($key);
+                    if($translated == null)
+                    {
+                        $translated = $original;
+                        $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                    }  
+                    else if($filter == 'all') 
+                    {
+                        $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                    }
                 }
             }
         }
@@ -138,17 +140,20 @@ if($inputPost->getUserAction() == 'set')
     $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
-
-    $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
-    if(!is_array($storedTranslatedLabel))
+    $dirname = dirname($pathTrans);
+    if (!file_exists($dirname)) { 
+        mkdir($dirname, 0755, true); 
+    }
+    if(file_exists($pathTrans))
+    {
+        $storedTranslatedLabel = PicoIniUtil::parseIniFile($pathTrans);
+    }
+    if(!isset($storedTranslatedLabel) || !is_array($storedTranslatedLabel))
     {
         $storedTranslatedLabel = [];
     }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
-    if(!file_exists(dirname($pathTrans)))
-    {
-        mkdir(dirname($pathTrans), 0755, true);
-    }
+    
     PicoIniUtil::writeIniFile($storedTranslatedLabel, $pathTrans);
 }

@@ -90,14 +90,22 @@ $application->setId($newAppId);
 $application->setName(trim($inputPost->getName()));
 $application->setType(trim($inputPost->getType()));
 
-$namespace = preg_replace('/[^A-Za-z0-9]/', '', trim($inputPost->getNamespace()));
+$appBaseNamespace = trim($inputPost->getNamespace());
+$namespace = preg_replace('/[^A-Za-z0-9]/', '', $appBaseNamespace);
 $application->setBaseApplicationNamespace($namespace);
 $application->setBaseApplicationDirectory(trim($baseApplicationDirectory));
-$application->setBaseEntityNamespace(trim($inputPost->getNamespace()) . "\\Entity");
-$application->setBaseEntityDataNamespace(trim($inputPost->getNamespace()) . "\\Entity\\Data");
-$application->setBaseEntityAppNamespace(trim($inputPost->getNamespace()) . "\\Entity\\App");
-$application->setBaseEntityDirectory(trim($baseApplicationDirectory) . "/inc.lib/classes");
-$application->setBaseLanguageDirectory(trim($baseApplicationDirectory) . "/inc.lang");
+$application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
+$application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
+$application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
+$application->setBaseEntityDirectory("inc.lib/classes");
+$application->setBaseLanguageDirectory("inc.lang");
+
+$databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
+$databaseDirectory = dirname($databaseFilePath);
+if(!file_exists($databaseDirectory))
+{
+    mkdir($databaseDirectory, 0755, true);
+}
 
 $paths = $inputPost->getPaths();
 foreach ($paths as $idx => $val) {
@@ -116,7 +124,7 @@ $composer->setPsr4(false);
 $psr4BaseDirectory = new SecretObject();
 $psr4BaseDirectory = array(
     array(
-        'namespace' => trim($inputPost->getNamespace()),
+        'namespace' => $appBaseNamespace,
         'directory' => 'classes'
     )
 );
@@ -152,12 +160,25 @@ $entityInfo = [
     'approval_status' => 'approval_status'
 ];
 
+$databaseConfig = [
+    'driver' => 'sqlite',
+    'database_file_path' => $databaseFilePath,
+    'host' => '',
+    'port' => 0,
+    'username' => '',
+    'password' => '',
+    'database_name' => '',
+    'database_schema' => '',
+    'time_zone' => 'Asia/Jakarta'
+];
+
 $newApp->setEntityInfo($entityInfo);
 $newApp->setCurrentAction([
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
 ]);
+$newApp->setDatabase($databaseConfig);
 $newApp->setGlobalVariableDatabase('database');
 
 file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());

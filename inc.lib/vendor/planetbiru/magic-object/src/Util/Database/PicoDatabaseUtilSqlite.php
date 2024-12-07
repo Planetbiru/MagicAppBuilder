@@ -244,7 +244,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 "Type" => $row['type'],
                 "Null" => $row['notnull'] ? 'YES' : 'NO',
                 "Key" => $row['pk'] ? 'PRI' : null,
-                "Default" => $row['dflt_value'] ? $row['dflt_value'] : 'None',
+                "Default" => $row['dflt_value'] ? $row['dflt_value'] : null,
                 "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
@@ -495,11 +495,15 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         {
             return "'".$defaultValue."'";
         }
-        else if(stripos($type, 'int') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false)
+        else if(stripos($type, 'int') !== false)
         {
-            return $defaultValue + 0;
+            $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
+            return (int)$defaultValue;
+        }
+        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        {
+            $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
+            return (float)$defaultValue;
         }
         return $defaultValue;
     }

@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: true
+    selected: false
     type: fullstack
     architecture: monolith
 -
@@ -18,9 +18,9 @@
     architecture: monolith
 -
     id: 0673c952cb576d077460
-    name: 'Music Production Manager'
+    name: 'Music Planetbiru'
     architecture: monolith
-    description: 'Music Production Manager'
+    description: 'Music Planetbiru'
     documentRoot: 'D:/xampp/htdocs/0673c952cb576d077460'
     author: Kamshory
     selected: false
@@ -40,3 +40,27 @@
     documentRoot: 'C:/bitbucket/0674d7bd2bafbf935994'
     author: 'Your Name'
     selected: false
+-
+    id: musik
+    name: Musik
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/musik'
+    author: 'Your Name'
+    selected: false
+-
+    id: lagu
+    name: Lagu
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/lagu'
+    author: 'Your Name'
+    selected: false
+-
+    id: lagu2
+    name: 'Music Production Manager'
+    architecture: monolith
+    description: ''
+    documentRoot: 'D:/xampp/htdocs/lagu2'
+    author: 'Your Name'
+    selected: true

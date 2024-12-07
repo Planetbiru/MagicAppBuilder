@@ -695,39 +695,45 @@ class PicoDatabaseUtilBase // NOSONAR
     }
 
     /**
-     * Converts a MariaDB CREATE TABLE query to a PostgreSQL compatible query.
+     * Converts a MySQL CREATE TABLE query to a PostgreSQL compatible query.
      *
-     * This function takes a SQL CREATE TABLE statement written for MariaDB 
+     * This function takes a SQL CREATE TABLE statement written for MySQL 
      * and transforms it into a format compatible with PostgreSQL. It handles 
-     * common data types and syntax differences between the two databases.
+     * common data types, constraints, and syntax differences between the two databases, 
+     * such as converting data types, removing unsupported clauses (e.g., AUTO_INCREMENT, ENGINE), 
+     * and adjusting default values and column types.
      *
-     * @param string $mariadbQuery The MariaDB CREATE TABLE query to be converted.
-     * @return string The converted PostgreSQL CREATE TABLE query.
+     * @param string $mysqlQuery The MySQL CREATE TABLE query to be converted.
+     * 
+     * @return string The converted PostgreSQL CREATE TABLE query, with MySQL-specific syntax 
+     *         replaced by PostgreSQL equivalents, including type conversions and other adjustments.
+     *
+     * @throws InvalidArgumentException If the input query is not a valid MySQL CREATE TABLE query.
      */
-    public function convertMariaDbToPostgreSql($mariadbQuery) {
+    public function convertMySqlToPostgreSql($mysqlQuery) {
         // Remove comments
-        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mariadbQuery); // NOSONAR
+        $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $mysqlQuery); // NOSONAR
         
-        // Replace MariaDB data types with PostgreSQL data types
+        // Replace MySQL data types with PostgreSQL data types
         $replacements = array(
-            'int' => 'INTEGER',
-            'tinyint(1)' => 'BOOLEAN', // MariaDB TINYINT(1) as BOOLEAN
-            'tinyint' => 'SMALLINT',
-            'smallint' => 'SMALLINT',
+            'tinyint(1)' => 'BOOLEAN', // MySQL TINYINT(1) as BOOLEAN
+            'tinyint' => 'INTEGER',
+            'smallint' => 'INTEGER',
             'mediumint' => 'INTEGER', // No direct equivalent, use INTEGER
-            'bigint' => 'BIGINT',
+            'bigint' => 'INTEGER',
+            'int' => 'INTEGER',
             'float' => 'REAL',
             'double' => 'DOUBLE PRECISION',
             'decimal' => 'NUMERIC', // Decimal types
+            'datetime' => 'TIMESTAMP', // Use TIMESTAMP for datetime
+            'timestamp' => 'TIMESTAMP WITH TIME ZONE',
             'date' => 'DATE',
             'time' => 'TIME',
-            'datetime' => 'TIMESTAMP', // Use TIMESTAMP for datetime
-            'timestamp' => 'TIMESTAMP',
             'varchar' => 'VARCHAR', // Variable-length string
-            'text' => 'TEXT',
             'blob' => 'BYTEA', // Binary data
             'mediumtext' => 'TEXT', // No direct equivalent
             'longtext' => 'TEXT', // No direct equivalent
+            'text' => 'TEXT',
             'json' => 'JSONB', // Use JSONB for better performance in PostgreSQL
             // Add more type conversions as needed
         );
@@ -758,12 +764,18 @@ class PicoDatabaseUtilBase // NOSONAR
      *
      * This function takes a SQL CREATE TABLE statement written for PostgreSQL 
      * and transforms it into a format compatible with MySQL. It handles common 
-     * data types and syntax differences between the two databases.
+     * data types, constraints, and syntax differences between the two databases.
+     * The function adjusts data types, removes PostgreSQL-specific clauses, 
+     * and makes necessary adjustments for MySQL compatibility.
      *
      * @param string $postgresqlQuery The PostgreSQL CREATE TABLE query to be converted.
-     * @return string The converted MySQL CREATE TABLE query.
-     */ 
-    public function convertMySqlToPostgreSql($postgresqlQuery) {
+     * 
+     * @return string The converted MySQL CREATE TABLE query, with PostgreSQL-specific syntax 
+     *         replaced by MySQL equivalents, including type conversions and other adjustments.
+     *
+     * @throws InvalidArgumentException If the input query is not a valid PostgreSQL CREATE TABLE query.
+     */
+    public function convertPostgreSqlToMySql($postgresqlQuery) {
         // Remove comments
         $query = preg_replace('/--.*?\n|\/\*.*?\*\//s', '', $postgresqlQuery); // NOSONAR
         
@@ -788,24 +800,25 @@ class PicoDatabaseUtilBase // NOSONAR
             'bytea' => 'BLOB', // Added handling for bytea
             // Add more type conversions as needed
         );
-    
+        
         $query = str_ireplace(array_keys($replacements), array_values($replacements), $query);
-    
+        
         // Replace DEFAULT on columns with strings to NULL in MySQL
         $query = preg_replace('/DEFAULT (\'[^\']*\')/', 'DEFAULT $1', $query);
-    
+        
         // Replace SERIAL with INT AUTO_INCREMENT
         $query = preg_replace('/\bSERIAL\b/', 'INT AUTO_INCREMENT', $query);
         
         // Modify "IF NOT EXISTS" for MySQL
         $query = preg_replace('/CREATE TABLE IF NOT EXISTS/', 'CREATE TABLE IF NOT EXISTS', $query); // NOSONAR
-    
+        
         // Remove UNIQUE constraints if necessary (optional)
         $query = preg_replace('/UNIQUE\s*\(.*?\),?\s*/i', '', $query); // NOSONAR
         
         // Remove 'USING BTREE' if present
         $query = preg_replace('/USING BTREE/', '', $query); // NOSONAR
-    
+        
         return $query;
     }
+
 }

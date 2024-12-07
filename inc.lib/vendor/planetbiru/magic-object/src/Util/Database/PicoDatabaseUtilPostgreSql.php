@@ -69,21 +69,39 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             $schema = "public";
         }
         $sql = "SELECT 
-        column_name AS \"Field\", 
-        data_type AS \"Type\", 
-        is_nullable AS \"Null\", 
-        CASE 
-            WHEN column_default IS NOT NULL THEN 'DEFAULT' 
-            ELSE '' 
-        END AS \"Key\", 
-        column_default AS \"Default\", 
-        CASE 
-            WHEN is_identity = 'YES' THEN 'AUTO_INCREMENT' 
-            ELSE '' 
-        END AS \"Extra\"
-        FROM information_schema.columns
-        WHERE table_name = '$tableName'
-        AND table_schema = '$schema'";
+            c.column_name AS \"Field\", 
+            c.data_type AS \"ColumnType\", 
+            c.is_nullable AS \"Null\", 
+            CASE 
+                WHEN c.column_default IS NOT NULL THEN 'DEFAULT' 
+                ELSE '' 
+            END AS \"Key\", 
+            c.column_default AS \"Default\", 
+            CASE 
+                WHEN c.is_identity = 'YES' THEN 'AUTO_INCREMENT' 
+                ELSE '' 
+            END AS \"Extra\",
+            CASE 
+                WHEN kcu.constraint_name IS NOT NULL THEN 'PRI' 
+                ELSE '' 
+            END AS \"Key\", 
+            CASE 
+                WHEN c.data_type IN ('character varying', 'character', 'char') 
+                    THEN CONCAT(c.data_type, '(', c.character_maximum_length, ')') 
+                ELSE c.data_type
+            END AS \"Type\" 
+        FROM information_schema.columns c
+        LEFT JOIN information_schema.key_column_usage kcu
+            ON c.column_name = kcu.column_name 
+            AND c.table_name = kcu.table_name
+            AND c.table_schema = kcu.table_schema
+        LEFT JOIN information_schema.table_constraints tc
+            ON kcu.constraint_name = tc.constraint_name
+            AND tc.constraint_type = 'PRIMARY KEY' 
+        WHERE c.table_name = '$tableName'
+        AND c.table_schema = '$schema'";
+
+
         return $database->fetchAll($sql);
     }
 
@@ -315,12 +333,15 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         else if (stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
             return "'" . addslashes($defaultValue) . "'";
         }
-        else if(stripos($type, 'int') !== false 
-        || stripos($type, 'real') !== false 
-        || stripos($type, 'float') !== false 
-        || stripos($type, 'double') !== false)
+        else if(stripos($type, 'int') !== false)
         {
-            return $defaultValue + 0;
+            $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
+            return (int)$defaultValue;
+        }
+        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        {
+            $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
+            return (float)$defaultValue;
         }
         return $defaultValue;
     }
@@ -494,20 +515,18 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         {
             return 'BOOLEAN';
         }
+        else if(stripos($columnType, 'biginteger') === 0 
+        || stripos($columnType, 'smallinteger') === 0 
+        || stripos($columnType, 'integer') === 0 
+        || stripos($columnType, 'bigint') === 0 
+        || stripos($columnType, 'smallint') === 0 
+        || stripos($columnType, 'tinyint') === 0 
+        || stripos($columnType, 'int') === 0)
+        {
+            return 'INTEGER';
+        }
         $type = $this->convertMySqlToPostgreSql($columnType);
-        if(stripos($type, 'integer(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'smallinteger(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if(stripos($type, 'biginteger(') === 0)
-        {
-            $type = 'INTEGER';
-        }
-        else if (stripos($type, 'enum(') === 0) {
+        if (stripos($type, 'enum(') === 0) {
             // Extract the enum values between the parentheses
             if (preg_match('/^enum\((.+)\)$/i', $type, $matches)) {
                 // Get the enum values as an array by splitting the string
@@ -517,6 +536,8 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
                 // Set the NVARCHAR length to the max length of enum values + 2
                 $type = 'CHARACTER VARYING(' . ($maxLength + 2) . ')';
             }
+        } else if (stripos($type, 'varchar(') === 0) {
+            $type = str_ireplace('varchar', 'CHARACTER VARYING', $columnType);
         } else if (stripos($type, 'year(') === 0) {
             // Extract the enum values between the parentheses
             $type = "INTEGER";

@@ -106,6 +106,13 @@ class PicoDatabaseCredentials extends SecretObject
     protected $timeZone;
 
     /**
+     * Charset
+     *
+     * @var string
+     */
+    protected $charset;
+
+    /**
      * Get the database driver.
      *
      * @return string Returns the database driver.
@@ -184,4 +191,27 @@ class PicoDatabaseCredentials extends SecretObject
     {
         return $this->timeZone;
     }
+
+    /**
+     * Get the charset.
+     *
+     * @return string The charset currently set.
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    /**
+     * Set the charset.
+     *
+     * @param string $charset The charset to set.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+        return $this;
+    }
+
 }

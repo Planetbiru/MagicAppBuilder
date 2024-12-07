@@ -2,6 +2,7 @@
 
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\Request\InputPost;
 
@@ -15,11 +16,39 @@ header("Content-type: text/plain");
 
 try
 {
+    $applicationName = $appConfig->getApplication()->getName();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = [];
+
+    $dbType = "";
+    if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+    {
+        $dbType = "PostgreSQL";
+    }
+    else if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+    {
+        $dbType = "SQLite";
+    }
+    else
+    {
+        $dbType = "MySQL";
+    }
+
+    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = "-- Application Name : $applicationName";
+    $allQueries[] = "-- Description      : Queries for table creation and alteration ";
+    $allQueries[] = "-- Generator        : MagicAppBuilder";
+    $allQueries[] = "-- Database Type    : ".$dbType;
+    $allQueries[] = "-- Database Driver  : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+    $allQueries[] = "-- Time Generation  : ".date('j F Y H:i:s');
+    $allQueries[] = "-- Time Zone        : ".date('P'); 
+    $allQueries[] = "-- Line Endings     : CRLF";
+    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = "";
+
     $merged = $inputPost->getMerged();
     if($merged)
     {
@@ -66,14 +95,14 @@ try
                 }
                 if(!empty($entityQueries))
                 {
-                    $entityName = implode(", ", $entityNames[$tableName]);
+                    $entNames = array_unique($entityNames[$tableName]);
+                    $entityName = implode(", ", $entNames);
                     $allQueries[] = "-- SQL for $entityName begin";
-                    $allQueries[] = implode("\r\n", $entityQueries);
+                    $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                     $allQueries[] = "-- SQL for $entityName end\r\n";
                 }           
             }
         }
-        echo implode("\r\n\r\n", $allQueries);
     }
     else
     {
@@ -114,8 +143,21 @@ try
                 }
             }
         }
-        echo implode("\r\n\r\n", $allQueries);
     }
+    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = "-- End of Query";
+    $allQueries[] = "-- ------------------------------------------------------------";
+    $sqlQuery = implode("\r\n", $allQueries);
+
+    $lines = explode("\r\n", $sqlQuery);
+    $trimmedLines = array_map('rtrim', $lines);
+    $sqlQuery = implode("\r\n", $trimmedLines);
+
+    $md5 = hash('md5', $sqlQuery);
+    $sha1 = hash('sha1', $sqlQuery);
+    echo $sqlQuery;
+    echo "\r\n-- MD5 Hash         :  ".$md5;
+    echo "\r\n-- SHA1 Hash        :  ".$sha1;
 }
 catch(Exception $e)
 {

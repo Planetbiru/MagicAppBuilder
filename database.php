@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -31,6 +32,8 @@ if(isset($databaseConfig))
  */
 class DatabaseExplorer
 {
+    const ERROR = "Error: ";
+    
     /**
      * Splits a SQL string into individual SQL statements.
      *
@@ -123,7 +126,7 @@ class DatabaseExplorer
         // Fetch databases
         $dbNameFromConfig = $databaseConfig ? $databaseConfig->getDatabaseName() : '';
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $stmt = ($dbType == 'pgsql') ? $pdo->query('SELECT datname FROM pg_database') : $pdo->query('SHOW DATABASES');
+        $stmt = ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) ? $pdo->query('SELECT datname FROM pg_database') : $pdo->query('SHOW DATABASES');
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $dbName = $row[0];
@@ -137,7 +140,7 @@ class DatabaseExplorer
         $form->appendChild($selectDb);
 
         // If PostgreSQL, add schema selection
-        if ($dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $selectSchema = $dom->createElement('select');
             $selectSchema->setAttribute('name', 'schema');
             $selectSchema->setAttribute('id', 'schema-select');
@@ -170,7 +173,6 @@ class DatabaseExplorer
         return $dom->saveHTML();
     }
 
-
     /**
      * Displays a sidebar with tables in the selected database.
      *
@@ -201,9 +203,9 @@ class DatabaseExplorer
         $ul = $dom->createElement('ul');
         $ul->setAttribute('class', 'table-list');
 
-        if ($dbType == 'mysql' || $dbType == 'mariadb' || $dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == 'mysql' || $dbType == 'mariadb' ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -255,7 +257,6 @@ class DatabaseExplorer
         return $dom->saveHTML();
     }
 
-
     /**
      * Generates a SQL query to retrieve the columns and structure of a table based on the database type (MySQL, PostgreSQL, or SQLite).
      *
@@ -278,29 +279,45 @@ class DatabaseExplorer
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         // Mendapatkan schema atau database aktif
-        if ($dbType == 'mysql' || $dbType == 'mariadb') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             // Query untuk MySQL
             $sql = "DESCRIBE `$tableName`";
-        } elseif ($dbType == 'pgsql') {
+        } elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Mengambil nama schema di PostgreSQL
             
             // Query untuk PostgreSQL
             $sql = "SELECT 
-                column_name AS \"Field\", 
-                data_type AS \"Type\", 
-                is_nullable AS \"Null\", 
-                CASE 
-                    WHEN column_default IS NOT NULL THEN 'DEFAULT' 
-                    ELSE '' 
-                END AS \"Key\", 
-                column_default AS \"Default\", 
-                CASE 
-                    WHEN is_identity = 'YES' THEN 'AUTO_INCREMENT' 
-                    ELSE '' 
-                END AS \"Extra\"
-                FROM information_schema.columns
-                WHERE table_name = '$tableName'
-                AND table_schema = '$schemaName'";
+                    c.column_name AS \"Field\", 
+                    CASE 
+                        WHEN c.data_type IN ('character varying', 'character', 'char') 
+                            THEN CONCAT(c.data_type, '(', c.character_maximum_length, ')') 
+                        ELSE c.data_type
+                    END AS \"Type\", 
+                    c.is_nullable AS \"Null\", 
+                    CASE 
+                        WHEN c.column_default IS NOT NULL THEN 'DEFAULT' 
+                        ELSE '' 
+                    END || 
+                    CASE 
+                        WHEN kcu.constraint_name IS NOT NULL THEN 'PRI' 
+                        ELSE '' 
+                    END AS \"Key\", 
+                    c.column_default AS \"Default\", 
+                    CASE 
+                        WHEN c.is_identity = 'YES' THEN 'AUTO_INCREMENT' 
+                        ELSE '' 
+                    END AS \"Extra\"
+                    
+                FROM information_schema.columns c
+                LEFT JOIN information_schema.key_column_usage kcu
+                    ON c.column_name = kcu.column_name 
+                    AND c.table_name = kcu.table_name
+                    AND c.table_schema = kcu.table_schema
+                LEFT JOIN information_schema.table_constraints tc
+                    ON kcu.constraint_name = tc.constraint_name
+                    AND tc.constraint_type = 'PRIMARY KEY' 
+                WHERE c.table_name = '$tableName'
+                AND c.table_schema = '$schemaName'";
         } elseif ($dbType == 'sqlite') {
             // SQLite tidak memiliki schema, jadi hanya menggunakan query untuk menampilkan kolom
             $sql = "PRAGMA table_info($tableName)";
@@ -313,17 +330,21 @@ class DatabaseExplorer
     }
 
     /**
-     * Displays the structure of a table.
+     * Displays the structure of a table, including column details like name, type, nullability, key, default value, and extra information.
      *
-     * This function fetches the table structure (columns, types, keys, etc.) from the database
-     * and displays it in an HTML table.
+     * This function fetches the structure of a table (such as columns, types, nullability, primary keys, default values, etc.)
+     * from the database and displays it in an HTML table format. If the table is not found, it will show an error message with
+     * a link to navigate back to the previous page.
      *
      * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $applicationId The application identifier.
+     * @param string $databaseName The name of the database.
      * @param string $schemaName The name of the schema (for PostgreSQL).
      * @param string $table The name of the table whose structure is to be shown.
-     * @return string The generated HTML.
+     * 
+     * @return string The generated HTML displaying the table structure or an error message if the table is not found.
      */
-    public static function showTableStructure($pdo, $schemaName, $table) //NOSONAR
+    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
     {
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -359,47 +380,89 @@ class DatabaseExplorer
         }
         $thead->appendChild($tr);
         $tableElem->appendChild($thead);
+
+        $columnCount = 0;
         
         // Fetch the columns
         $query = self::getQueryShowColumns($pdo, $schemaName, $table);
-        if (isset($query)) {
-            $stmt = $pdo->query($query);
-            
-            if ($stmt) {
-                $tbody = $dom->createElement('tbody');
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $tr = $dom->createElement('tr');
-                    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
-                        // For SQLite
-                        $columns = [
-                            $row['name'], 
-                            $row['type'], 
-                            $row['notnull'] ? 'NO' : 'YES', 
-                            $row['pk'] == 1 ? 'PRI' : '', 
-                            $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                            strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
-                        ];
-                    } else {
-                        // For MySQL or PostgreSQL
-                        $columns = $row;
+        try
+        {
+            if (isset($query)) {
+                $stmt = $pdo->query($query);
+                
+                if ($stmt) {
+                    $tbody = $dom->createElement('tbody');
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $columnCount++;
+                        $tr = $dom->createElement('tr');
+                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                            // For SQLite
+                            $columns = [
+                                $row['name'], 
+                                $row['type'], 
+                                $row['notnull'] ? 'NO' : 'YES', 
+                                $row['pk'] == 1 ? 'PRI' : '', 
+                                $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
+                                strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
+                            ];
+                        } else {
+                            // For MySQL or PostgreSQL
+                            $columns = $row;
+                        }
+                        foreach ($columns as $value) {
+                            $td = $dom->createElement('td', $value);
+                            $tr->appendChild($td);
+                        }
+                        $tbody->appendChild($tr);
                     }
-                    foreach ($columns as $value) {
-                        $td = $dom->createElement('td', $value);
-                        $tr->appendChild($td);
-                    }
-                    $tbody->appendChild($tr);
+                    $tableElem->appendChild($tbody);
                 }
-                $tableElem->appendChild($tbody);
             }
         }
+        catch(Exception $e)
+        {
+            // Do nothing
+        }
         
-        $divInner->appendChild($tableElem);
-        $dom->appendChild($divOuter);
+        if($columnCount > 0)
+        {
+            $divInner->appendChild($tableElem);
+            $dom->appendChild($divOuter);
+        }
+        else
+        {
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'sql-error');
+
+            // Prepare the URL for the back link
+            $url = "?applicationId=$applicationId&database=$databaseName&schema=$schemaName";
+
+            // Create the message text (without brackets) as a span
+            $message = $dom->createElement('span', "Table \"{$table}\" is not found.");
+
+            // Create the <a> element for the back link
+            $backLink = $dom->createElement('a', 'Back');
+            $backLink->setAttribute('href', $url);
+
+            // Create a text node for the brackets
+            $leftBracket = $dom->createTextNode(' [');
+            $rightBracket = $dom->createTextNode(']');
+
+            // Append the text nodes (left bracket and right bracket) around the link
+            $message->appendChild($leftBracket);
+            $message->appendChild($backLink);
+            $message->appendChild($rightBracket);
+
+            // Append the message to the div
+            $divInner->appendChild($message);
+
+            // Append the div to the document
+            $dom->appendChild($divInner);
+        }
         
         // Output the HTML
         return $dom->saveHTML();
     }
-
 
     /**
      * Executes a SQL query and displays the result in a table.
@@ -450,7 +513,7 @@ class DatabaseExplorer
             $dom = new DOMDocument('1.0', 'utf-8');
 
             // Create error div
-            $div = $dom->createElement('div', "Error: " . $e->getMessage());
+            $div = $dom->createElement('div', self::ERROR . $e->getMessage());
             $div->setAttribute('class', 'sql-error');
 
             // Append error div to DOM
@@ -460,7 +523,6 @@ class DatabaseExplorer
             return $dom->saveHTML();
         }
     }
-
 
     /**
      * Displays table data with pagination.
@@ -478,131 +540,163 @@ class DatabaseExplorer
      */
     public static function showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit)
     {
-        $offset = ($page - 1) * $limit;
-        $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
-        $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($total / $limit);
-
-        $cls = isset($_POST['query']) ? '' : ' open';
-
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
+
+        $cls = isset($_POST['query']) ? '' : ' open';
         
         // Create the outer div
         $divOuter = $dom->createElement('div');
-        $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
+        
+        try
+        {
+            $offset = ($page - 1) * $limit;
+            $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
+            $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalPages = ceil($total / $limit);
 
-        // Create the toggle button
-        $button = $dom->createElement('button');
-        $button->setAttribute('class', 'button-toggle toggle-structure');
-        $button->setAttribute('data-open', '-');
-        $button->setAttribute('data-close', '+');
-        $divOuter->appendChild($button);
+            $divOuter->setAttribute('class', 'table-content collapsible' . $cls);
+            
+            // Create the toggle button
+            $button = $dom->createElement('button');
+            $button->setAttribute('class', 'button-toggle toggle-structure');
+            $button->setAttribute('data-open', '-');
+            $button->setAttribute('data-close', '+');
+            $divOuter->appendChild($button);
 
-        // Create the heading
-        $h3 = $dom->createElement('h3', "Data in $table (Page $page)");
-        $divOuter->appendChild($h3);
+            // Create the heading
+            $h3 = $dom->createElement('h3', "Data in $table (Page $page)");
+            $divOuter->appendChild($h3);
 
-        // Create the inner div
-        $divInner = $dom->createElement('div');
-        $divInner->setAttribute('class', 'table-content-inner');
-        $divOuter->appendChild($divInner);
+            // Create the inner div
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'table-content-inner');
+            $divOuter->appendChild($divInner);
 
-        // Create the table
-        $tableElem = $dom->createElement('table');
-        $thead = $dom->createElement('thead');
-        $tr = $dom->createElement('tr');
-
-        // Add table headers
-        $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
-        for ($i = 0; $i < $stmt->columnCount(); $i++) {
-            $col = $stmt->getColumnMeta($i);
-            $th = $dom->createElement('th', htmlspecialchars($col['name']));
-            $tr->appendChild($th);
-        }
-        $thead->appendChild($tr);
-        $tableElem->appendChild($thead);
-
-        // Add table rows
-        $tbody = $dom->createElement('tbody');
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Create the table
+            $tableElem = $dom->createElement('table');
+            $thead = $dom->createElement('thead');
             $tr = $dom->createElement('tr');
-            foreach ($row as $value) {
-                $td = $dom->createElement('td', htmlspecialchars($value));
-                $tr->appendChild($td);
+
+            // Add table headers
+            $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
+            for ($i = 0; $i < $stmt->columnCount(); $i++) {
+                $col = $stmt->getColumnMeta($i);
+                $th = $dom->createElement('th', htmlspecialchars($col['name']));
+                $tr->appendChild($th);
             }
-            $tbody->appendChild($tr);
-        }
-        $tableElem->appendChild($tbody);
-        $divInner->appendChild($tableElem);
+            $thead->appendChild($tr);
+            $tableElem->appendChild($thead);
 
-        // Append the outer div to the DOM
-        $dom->appendChild($divOuter);
-
-        // Pagination navigation with a maximum of 7 pages
-        $paginationDiv = $dom->createElement('div');
-        $paginationDiv->setAttribute('class', 'pagination');
-        $startPage = max(1, $page - 3);
-        $endPage = min($totalPages, $page + 3);
-
-        if ($startPage > 1) {
-            $firstPage = $dom->createElement('a', 'First');
-            $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
-            $paginationDiv->appendChild($firstPage);
-
-            if ($startPage > 2) {
-                $ellipsis = $dom->createElement('span', '...');
-                $paginationDiv->appendChild($ellipsis);
+            // Add table rows
+            $tbody = $dom->createElement('tbody');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $tr = $dom->createElement('tr');
+                foreach ($row as $value) {
+                    $td = $dom->createElement('td', htmlspecialchars($value));
+                    $tr->appendChild($td);
+                }
+                $tbody->appendChild($tr);
             }
-        }
+            $tableElem->appendChild($tbody);
+            $divInner->appendChild($tableElem);
 
-        for ($i = $startPage; $i <= $endPage; $i++) {
-            $pageLink = $dom->createElement('a', htmlspecialchars($i));
-            $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
+            // Append the outer div to the DOM
+            $dom->appendChild($divOuter);
 
-            if ($i == $page) {
-                $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
-            }
+            // Pagination navigation with a maximum of 7 pages
+            $paginationDiv = $dom->createElement('div');
+            $paginationDiv->setAttribute('class', 'pagination');
+            $startPage = max(1, $page - 3);
+            $endPage = min($totalPages, $page + 3);
 
-            $paginationDiv->appendChild($pageLink);
-        }
+            if ($startPage > 1) {
+                $firstPage = $dom->createElement('a', 'First');
+                $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
+                $paginationDiv->appendChild($firstPage);
 
-        if ($endPage < $totalPages) {
-            if ($endPage < $totalPages - 1) {
-                $ellipsis = $dom->createElement('span', '...');
-                $paginationDiv->appendChild($ellipsis);
+                if ($startPage > 2) {
+                    $ellipsis = $dom->createElement('span', '...');
+                    $paginationDiv->appendChild($ellipsis);
+                    $space = $dom->createTextNode(" ");
+                    $paginationDiv->appendChild($space);
+                }
             }
 
-            $lastPage = $dom->createElement('a', 'Last');
-            $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
-            $paginationDiv->appendChild($lastPage);
-        }
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                $pageLink = $dom->createElement('a', htmlspecialchars($i));
+                $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
+                if ($i == $page) {
+                    $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
+                }
+                $paginationDiv->appendChild($pageLink);
+            }
 
-        // Append the pagination div to the DOM
-        $divOuter->appendChild($paginationDiv);
-        $dom->appendChild($divOuter);
+            if ($endPage < $totalPages) {
+                if ($endPage < $totalPages - 1) {
+                    $ellipsis = $dom->createElement('span', '...');
+                    $paginationDiv->appendChild($ellipsis);
+                    $space = $dom->createTextNode(" ");
+                    $paginationDiv->appendChild($space);
+                }
+
+                $lastPage = $dom->createElement('a', 'Last');
+                $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
+                $paginationDiv->appendChild($lastPage);
+            }
+
+            // Append the pagination div to the DOM
+            $divOuter->appendChild($paginationDiv);
+            $dom->appendChild($divOuter);
+        }
+        catch(Exception $e)
+        {
+            $divInner = $dom->createElement('div');
+            $divInner->setAttribute('class', 'sql-error');
+
+            // Add the exception message to the div
+            $message = $dom->createTextNode(self::ERROR . $e->getMessage());
+            $divInner->appendChild($message);
+            
+            $divOuter->appendChild($divInner);
+            $dom->appendChild($divOuter);
+        }
 
         // Output the HTML with pagination
         return $dom->saveHTML();
-
     }
 
     /**
      * Creates a query execution form.
      *
-     * This function generates an HTML form for executing SQL queries. The form includes a textarea
-     * pre-populated with the last executed queries, and buttons to submit or reset the form.
+     * This function generates an HTML form that allows users to execute SQL queries. The form includes a textarea
+     * pre-populated with the last executed queries, and buttons to submit or reset the form. The form is tailored 
+     * to the type of database selected (PostgreSQL, SQLite, or MySQL).
      *
      * @param string $lastQueries The last executed SQL queries to be pre-populated in the textarea.
-     * @return string The generated HTML.
+     * @param string $dbType The type of the database (e.g., 'pgsql', 'sqlite', 'mysql').
+     * 
+     * @return string The generated HTML of the form as a string.
      */
-    public static function createQueryExecutorForm($lastQueries)
+    public static function createQueryExecutorForm($lastQueries, $dbType)
     {
+        if($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $label = 'Execute Query (PostgreSQL)';
+        }
+        else if($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $label = 'Execute Query (SQLite)';
+        }
+        else
+        {
+            $label = 'Execute Query (MySQL)';
+        }
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
 
         // Create heading
-        $h3 = $dom->createElement('h3', 'Execute Query');
+        $h3 = $dom->createElement('h3', $label);
         $dom->appendChild($h3);
 
         // Create form
@@ -612,8 +706,6 @@ class DatabaseExplorer
         // Create textarea
         $textarea = $dom->createElement('textarea', htmlspecialchars($lastQueries));
         $textarea->setAttribute('name', 'query');
-        $textarea->setAttribute('rows', '4');
-        $textarea->setAttribute('cols', '50');
         $textarea->setAttribute('spellcheck', 'false');
         $form->appendChild($textarea);
 
@@ -625,6 +717,7 @@ class DatabaseExplorer
         $submit = $dom->createElement('input');
         $submit->setAttribute('type', 'submit');
         $submit->setAttribute('value', 'Execute');
+        $submit->setAttribute('class', 'btn btn-success execute');
         $form->appendChild($submit);
 
         // Add space between buttons
@@ -635,7 +728,19 @@ class DatabaseExplorer
         $reset = $dom->createElement('input');
         $reset->setAttribute('type', 'reset');
         $reset->setAttribute('value', 'Reset');
+        $reset->setAttribute('class', 'btn btn-warning reset');
         $form->appendChild($reset);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+        
+        // Create importStructure button
+        $importStructure = $dom->createElement('input');
+        $importStructure->setAttribute('type', 'button');
+        $importStructure->setAttribute('value', 'Import Structure');
+        $importStructure->setAttribute('class', 'btn btn-primary import-structure');
+        $form->appendChild($importStructure);
 
         // Append form to DOM
         $dom->appendChild($form);
@@ -643,7 +748,6 @@ class DatabaseExplorer
         // Output the HTML
         return $dom->saveHTML();
     }
-
 
     /**
      * Executes a series of SQL queries and displays the results.
@@ -743,7 +847,7 @@ if ($page < 1) {
 if ($limit < 1) {
     $limit = 1;
 }
-
+$dbType = "mysql";
 // Load the database configuration
 $databaseConfig = new SecretObject();
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
@@ -768,7 +872,7 @@ if (file_exists($appConfigPath)) {
         // Connect to the database and set schema for PostgreSQL
         $database->connect();
         $dbType = $database->getDatabaseType();
-        if ($dbType == 'pgsql') {
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $database->query("SET search_path TO $schemaName;");
         }
     } catch (Exception $e) {
@@ -812,7 +916,7 @@ if ($query && !empty($queries)) {
     try {
         $queryResult = DatabaseExplorer::executeQueryResult($pdo, $q, $query, $queries);
     } catch (Exception $e) {
-        $queryResult = "Error: " . $e->getMessage();
+        $queryResult = self::ERROR . $e->getMessage();
     }
 } else {
     $queryResult = "";
@@ -823,8 +927,12 @@ if ($query && !empty($queries)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.css">
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
@@ -840,7 +948,8 @@ if ($query && !empty($queries)) {
         };
     </script>
 </head>
-<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>">
+
+<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
     <div class="sidebar">
         <?php
         try {
@@ -865,14 +974,37 @@ if ($query && !empty($queries)) {
         <?php
         // Display table structure and data if a table is selected
         if ($table) {
-            echo DatabaseExplorer::showTableStructure($pdo, $schemaName, $table);
+            echo DatabaseExplorer::showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table);
             echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
         }
 
         // Display the query executor form and results
-        echo DatabaseExplorer::createQueryExecutorForm($lastQueries);
+        echo DatabaseExplorer::createQueryExecutorForm($lastQueries, $dbType);
         echo $queryResult;
         ?>
+    </div>
+    
+    <div class="modal" id="translatorModal">
+        <div class="modal-backdrop"></div>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import Database Structure</h2>
+                <span class="close-btn" id="closeBtn">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <textarea name="original" id="original" class="original"></textarea>
+            </div>
+
+            <div class="modal-footer">            
+                <button class="btn btn-primary translate-structure">Import</button>
+                &nbsp;
+                <button class="btn btn-warning clear">Clear</button>
+                &nbsp;
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>

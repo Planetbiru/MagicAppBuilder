@@ -79,14 +79,19 @@ class PicoEntityGenerator
     }
 
     /**
-     * Create a property with appropriate documentation.
+     * Create a property with appropriate documentation based on database metadata.
+     *
+     * This method generates a PHP property with a docblock based on the given column information 
+     * from the database. It includes annotations for the column attributes such as whether it is 
+     * a primary key, auto-increment, nullable, etc.
      *
      * @param array $typeMap Mapping of database types to PHP types
-     * @param array $row Data row from the database
-     * @param string[]|null $nonupdatables Non-updateable columns
-     * @return string PHP code for the property with docblock
+     * @param array $columnMap Mapping of database column types to MySQL column types
+     * @param array $row Data row from the database, typically from information_schema.columns
+     * @param string[]|null $nonupdatables List of column names that are non-updatable, or null
+     * @return string PHP code for the property with a docblock, including column attributes and annotations
      */
-    protected function createProperty($typeMap, $row, $nonupdatables = null)
+    protected function createProperty($typeMap, $columnMap, $row, $nonupdatables = null)
     {
         $columnName = $row['Field'];
         $columnType = $row['Type'];
@@ -97,6 +102,7 @@ class PicoEntityGenerator
 
         $propertyName = PicoStringUtil::camelize($columnName);
         $description = $this->getPropertyName($columnName);
+        $columnType = $this->getColumnType($columnMap, $columnType);
         $type = $this->getDataType($typeMap, $columnType);
 
         $docs = array();
@@ -182,6 +188,31 @@ class PicoEntityGenerator
      * @param string $columnType Database column type
      * @return string Corresponding PHP data type
      */
+    protected function getColumnType($typeMap, $columnType)
+    {
+        $length = "";
+        $pos = strpos($columnType, "(");
+        if($pos !== false)
+        {
+            $length = substr($columnType, $pos);
+        }
+        $type = "";
+        foreach ($typeMap as $key => $val) {
+            if (stripos($columnType, $key) === 0) {
+                $type = $val;
+                break;
+            }
+        }
+        return empty($type) ? "text" : $type.$length;
+    }
+
+    /**
+     * Get the corresponding PHP data type based on the column type.
+     *
+     * @param array $typeMap Mapping of database types to PHP types
+     * @param string $columnType Database column type
+     * @return string Corresponding PHP data type
+     */
     protected function getDataType($typeMap, $columnType)
     {
         $type = "";
@@ -215,35 +246,168 @@ class PicoEntityGenerator
     }
 
     /**
-     * Get a mapping of database types to PHP types.
+     * Get a mapping of database types to PHP types for MySQL, PostgreSQL, and SQLite.
      *
-     * @return array Associative array of type mappings
+     * This method returns an associative array that maps common database column types
+     * from MySQL, PostgreSQL, and SQLite to their corresponding PHP types. This mapping
+     * is useful for handling database type conversions when interacting with data in PHP.
+     *
+     * The array provides mappings for numeric types, string types, boolean types, 
+     * date/time types, and special cases such as JSON and UUID. It helps in ensuring 
+     * proper handling of database types across different database systems.
+     *
+     * @return array Associative array of type mappings where the keys are database column types
+     *               and the values are corresponding PHP types.
      */
     protected function getTypeMap()
     {
         return array(
-            "double" => "double",
-            "float" => "double",
-            "bigint" => "integer",
-            "smallint" => "integer",
-            "tinyint(1)" => "boolean",
-            "tinyint" => "integer",
-            "int" => "integer",
-            "varchar" => "string",
-            "char" => "string",
-            "tinytext" => "string",
-            "mediumtext" => "string",
-            "longtext" => "string",
-            "text" => "string",
-            "enum" => "string",
-            "bool" => "boolean",
-            "boolean" => "boolean",
-            "timestamp" => "string",
-            "datetime" => "string",
-            "date" => "string",
-            "time" => "string"
+            // Numeric types
+            "double" => "float",             // PostgreSQL: double precision
+            "float" => "float",              // PostgreSQL: float
+            "bigint" => "int",               // PostgreSQL: bigint
+            "smallint" => "int",             // PostgreSQL: smallint
+            "tinyint(1)" => "bool",          // MySQL-style, use boolean for tinyint(1)
+            "tinyint" => "int",              // PostgreSQL/SQLite: tinyint, handled as INT
+            "int" => "int",                  // PostgreSQL/SQLite: integer
+            "serial" => "int",               // PostgreSQL: auto-increment integer (equivalent to INT)
+            "bigserial" => "int",            // PostgreSQL: bigserial (auto-incrementing large integer, mapped to int in PHP)
+            "mediumint" => "int",            // MySQL: mediumint (3-byte integer)
+            "smallserial" => "int",          // PostgreSQL: smallserial (auto-incrementing small integer)
+            "unsigned" => "int",             // MySQL: unsigned integer (mapped to int in PHP)
+
+            // String types
+            "nvarchar" => "string",          // SQLite: variable-length string
+            "varchar" => "string",           // PostgreSQL: variable-length string
+            "character varying" => "string", // PostgreSQL: character varying (same as varchar)
+            "char" => "string",              // PostgreSQL: fixed-length string
+            "text" => "string",              // PostgreSQL/SQLite: unlimited length string
+            "varchar(255)" => "string",      // PostgreSQL: same as varchar without length
+            "citext" => "string",            // PostgreSQL: case-insensitive text (equivalent to string)
+            
+            // MySQL-style text types (these types are similar to `text`)
+            "tinytext" => "string",          // MySQL: tinytext
+            "mediumtext" => "string",        // MySQL: mediumtext
+            "longtext" => "string",          // MySQL: longtext
+            "text" => "string",              // PostgreSQL/SQLite: text (string)
+
+            // Boolean types
+            "bool" => "bool",                // PostgreSQL: boolean
+            "boolean" => "bool",             // PostgreSQL: boolean (same as bool)
+
+            // Date/Time types
+            "timestamp" => "string",         // PostgreSQL: timestamp (datetime)
+            "datetime" => "string",          // PostgreSQL/SQLite: datetime
+            "date" => "string",              // PostgreSQL/SQLite: date
+            "time" => "string",              // PostgreSQL/SQLite: time
+            "timestamp with time zone" => "string", // PostgreSQL: timestamp with time zone
+            "timestamp without time zone" => "string", // PostgreSQL: timestamp without time zone
+            "date" => "string",              // PostgreSQL/SQLite: date
+            "time" => "string",              // PostgreSQL/SQLite: time
+            "interval" => "string",          // PostgreSQL: interval (for durations)
+            "year" => "int",                 // MySQL: year type (usually stored as an integer)
+
+            // SQLite-specific types
+            "integer" => "int",              // SQLite: integer
+            "real" => "float",               // SQLite: real (floating-point)
+            "text" => "string",              // SQLite: text (string)
+            "blob" => "resource",            // SQLite: blob (binary data)
+            
+            // SQLite's special handling
+            "BOOLEAN" => "bool",             // SQLite: boolean (same as PostgreSQL)
+            
+            // Special cases
+            "json" => "array",               // PostgreSQL: JSON type, mapped to PHP array
+            "jsonb" => "array",              // PostgreSQL: JSONB (binary JSON), mapped to PHP array
+            "uuid" => "string",              // PostgreSQL/SQLite: UUID
+            "xml" => "string",               // PostgreSQL: XML type
+            "cidr" => "string",              // PostgreSQL: CIDR type (IPv4/IPv6)
+            "inet" => "string",              // PostgreSQL: Inet type (IPv4/IPv6)
+            "macaddr" => "string",           // PostgreSQL: MAC address type
+            "point" => "string",             // PostgreSQL: point type (coordinates)
+            "polygon" => "string",           // PostgreSQL: polygon type
+            "line" => "string",              // PostgreSQL: line type
+            "lseg" => "string",              // PostgreSQL: line segment type
+            "path" => "string",              // PostgreSQL: path type (geometric shapes)
+            "circle" => "string",            // PostgreSQL: circle type (geometric shapes)
+            "json" => "array",               // PostgreSQL: JSON data type
+            "jsonb" => "array",              // PostgreSQL: Binary JSON type (faster)
         );
     }
+
+    /**
+     * Returns a mapping of database column types to MySQL equivalents.
+     *
+     * This method provides a conversion map from various database column types 
+     * (such as those from PostgreSQL or SQLite) to MySQL-compatible column types.
+     * The mapping is useful for normalizing column types when migrating data 
+     * between different database systems or for general type compatibility.
+     *
+     * @return array An associative array where keys are column types from other databases 
+     *               and values are the corresponding MySQL column types.
+     */
+    public function getColumnMap()
+    {
+        return array(
+            // Numeric types
+            "double" => "float",             // MySQL: DOUBLE precision
+            "float" => "float",              // MySQL: FLOAT
+            "bigint" => "bigint",            // MySQL: BIGINT
+            "smallint" => "smallint",        // MySQL: SMALLINT
+            "tinyint(1)" => "bool",          // MySQL-style, use boolean for tinyint(1)
+            "tinyint" => "tinyint",          // MySQL: TINYINT
+            "int" => "int",                  // MySQL: INT
+            "serial" => "int",               // MySQL: auto-increment integer (equivalent to INT)
+            "bigserial" => "bigint",         // MySQL: Big serial equivalent (use BIGINT)
+            "mediumint" => "mediumint",      // MySQL: MEDIUMINT
+            "smallserial" => "smallint",     // MySQL: smallserial equivalent (use SMALLINT)
+            "unsigned" => "unsigned",        // MySQL: UNSIGNED integer
+
+            // String types
+            "nvarchar" => "varchar",         // SQLite: VARCHAR
+            "varchar" => "varchar",          // MySQL: VARCHAR
+            "character varying" => "varchar", // MySQL: CHARACTER VARYING (same as VARCHAR)
+            "char" => "char",                // MySQL: CHAR
+            "text" => "text",                // MySQL: TEXT
+            "varchar(255)" => "varchar",     // MySQL: VARCHAR with specific length (equivalent to varchar)
+            "citext" => "text",              // MySQL: case-insensitive text (MySQL does not have direct CITEXT type)
+            
+            // MySQL-style text types
+            "tinytext" => "tinytext",        // MySQL: TINYTEXT
+            "mediumtext" => "mediumtext",    // MySQL: MEDIUMTEXT
+            "longtext" => "longtext",        // MySQL: LONGTEXT
+
+            // Boolean types
+            "bool" => "tinyint(1)",          // MySQL: BOOLEAN (stored as TINYINT(1))
+            "boolean" => "tinyint(1)",       // MySQL: BOOLEAN (same as TINYINT(1))
+
+            // Date/Time types
+            "timestamp" => "timestamp",      // MySQL: TIMESTAMP
+            "datetime" => "datetime",        // MySQL: DATETIME
+            "date" => "date",                // MySQL: DATE
+            "time" => "time",                // MySQL: TIME
+            "timestamp with time zone" => "timestamp", // MySQL does not support time zone, use regular timestamp
+            "timestamp without time zone" => "timestamp", // Same for MySQL (no time zone info)
+            "year" => "year",                // MySQL: YEAR type
+
+            // MySQL-specific types
+            "json" => "json",                // MySQL: JSON type
+            "uuid" => "char(36)",            // MySQL: UUID (store as CHAR(36) string)
+            "xml" => "text",                 // MySQL: XML (stored as TEXT)
+            "inet" => "varchar(45)",         // MySQL: Inet (for IPv4 and IPv6, store as VARCHAR)
+            "macaddr" => "varchar(17)",      // MySQL: MAC address (store as VARCHAR)
+            "point" => "point",              // MySQL: POINT (geometric type)
+            "polygon" => "polygon",          // MySQL: POLYGON (geometric type)
+            "line" => "line",                // MySQL: LINE (geometric type)
+
+            // MySQL also uses the TEXT type for handling large objects
+            "blob" => "blob",                // MySQL: BLOB (binary data)
+
+            // Special cases
+            "jsonb" => "json",               // MySQL: JSONB can be treated as JSON
+        );
+    }
+
 
     /**
      * Generate the entity class and save it to a file.
@@ -254,8 +418,9 @@ class PicoEntityGenerator
     public function generate($nonupdatables = null)
     {
         $typeMap = $this->getTypeMap();
-        $picoTableName = $this->tableName;
-        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
+        $columnMap = $this->getColumnMap();
+        $tableName = $this->tableName;
+        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($tableName));
         $fileName = $this->baseNamespace . "/" . $className;
         $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);
@@ -265,12 +430,14 @@ class PicoEntityGenerator
             mkdir($dir, 0755, true);
         }
 
-        $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
+        $rows = PicoColumnGenerator::getColumnList($this->database, $tableName);
+        error_log("ROWS");
+        error_log(print_r($rows, true));
 
         $attrs = array();
         if (is_array($rows)) {
             foreach ($rows as $row) {
-                $prop = $this->createProperty($typeMap, $row, $nonupdatables);
+                $prop = $this->createProperty($typeMap, $columnMap, $row, $nonupdatables);
                 $attrs[] = $prop;
             }
         }
@@ -284,9 +451,9 @@ namespace ' . $this->baseNamespace . ';
 use MagicObject\MagicObject;
 
 /**
- * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ * The '.$className.' class represents an entity in the "'.$tableName.'" table.
  *
- * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "'.$tableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -296,7 +463,7 @@ use MagicObject\MagicObject;
  * @package '.$this->baseNamespace.'
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
- * @Table(name="'.$picoTableName.'")
+ * @Table(name="'.$tableName.'")
  */
 class ' . $className . ' extends MagicObject
 {

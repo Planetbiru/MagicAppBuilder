@@ -13,6 +13,7 @@ use PDOException;
 class PicoSqlite extends PicoDatabase
 {
     const LOGIC_AND = " and ";
+    
     /**
      * Database file path
      *

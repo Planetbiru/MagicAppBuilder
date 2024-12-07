@@ -6,7 +6,6 @@ use AppBuilder\Util\ResponseUtil;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/database.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 try

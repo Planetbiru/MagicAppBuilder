@@ -249,8 +249,8 @@ class PicoDatabaseDump
     public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null)
     {
         $tableInfo = $this->getMergedTableInfo($entities);
-        $clumnNameList = $this->getColumnNameList($entities);
-        $tableInfo->setSortedColumnName($clumnNameList);
+        $columnNameList = $this->getColumnNameList($entities);
+        $tableInfo->setSortedColumnName($columnNameList);
         $tableName = $this->getTableName($tableName, $tableInfo);
         $database = $this->getDatabase($database, $entities);
 

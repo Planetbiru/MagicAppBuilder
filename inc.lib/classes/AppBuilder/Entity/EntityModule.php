@@ -11,7 +11,7 @@ use MagicObject\MagicObject;
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user")
+ * @Table(name="module")
  */
 class EntityModule extends MagicObject
 {

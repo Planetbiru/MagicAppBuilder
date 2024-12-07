@@ -26,6 +26,15 @@ class EntityApplication extends MagicObject
 	 * @var string
 	 */
 	protected $applicationId;
+	
+	/**
+	 * Architecture
+	 * 
+	 * @Column(name="architecture", type="varchar(40)", length=40, nullable=false, extra="auto_increment")
+	 * @Label(content="Architecture")
+	 * @var string
+	 */
+	protected $architecture;
 
 	/**
 	 * Name

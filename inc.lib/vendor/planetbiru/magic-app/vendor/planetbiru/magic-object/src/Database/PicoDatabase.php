@@ -175,7 +175,7 @@ class PicoDatabase // NOSONAR
             $schema = $stmt->fetchColumn(); // Fetch the schema name
             $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
         }
-        elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
+        else if ($dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
             // For MySQL, the schema is the same as the database name
             $schema = $databaseName; // MySQL schema is the database name
             $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
@@ -370,14 +370,20 @@ class PicoDatabase // NOSONAR
     /**
      * Connect to the RDMS (Relational Database Management System).
      *
-     * Establishes a connection to an RDMS database using the provided credentials and optionally selects 
-     * a specific database based on the provided flag. Sets the time zone for the connection and handles 
-     * schema settings for PostgreSQL.
+     * Establishes a connection to an RDMS database using the provided credentials. Optionally, a specific 
+     * database is selected based on the provided flag. This method also configures the time zone, character set, 
+     * and schema settings (for PostgreSQL) after the connection is established.
      *
-     * @param bool $withDatabase Flag to select the database when connected (default is true).
-     * @return bool True if the connection is successful, false if it fails.
-     * @throws InvalidDatabaseConfiguration If the database username is empty.
-     * @throws PDOException If the connection fails with an error.
+     * - The time zone is set based on the current offset (`date("P")`), or a configured value.
+     * - For PostgreSQL, the client encoding (charset) is set using `SET CLIENT_ENCODING`, and the schema is set 
+     *   using `SET search_path`.
+     * - For MySQL, the time zone and charset are set using `SET time_zone` and `SET NAMES`.
+     *
+     * @param bool $withDatabase Flag to specify whether to select a database upon connection (default is true).
+     *                            If true, the database is selected; otherwise, only the connection is made.
+     * @return bool True if the connection is successfully established, false otherwise.
+     * @throws InvalidDatabaseConfiguration If the database username is missing from the configuration.
+     * @throws PDOException If an error occurs during the connection process.
      */
     private function connectRDMS($withDatabase = true)
     {
@@ -385,28 +391,82 @@ class PicoDatabase // NOSONAR
         $timeZoneOffset = date("P");
         try {
             $connectionString = $this->constructConnectionString($withDatabase);
+
+            // Check if the database username is provided
             if (!$this->databaseCredentials->issetUsername()) {
                 throw new InvalidDatabaseConfiguration("Database username may not be empty. Please check your database configuration!");
             }
-            $initialQueries = "SET time_zone = '$timeZoneOffset';";
-            if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL &&
-                $this->databaseCredentials->getDatabaseSchema() != null && 
-                $this->databaseCredentials->getDatabaseSchema() != "") {
-                $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema();
+
+            $initialQueries = "";
+
+            // Get charset from the database credentials
+            $charset = addslashes($this->databaseCredentials->getCharset());
+
+            // Handle PostgreSQL-specific connection settings
+            if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
+
+                // Set time zone for PostgreSQL
+                $initialQueries = "SET TIMEZONE TO '$timeZoneOffset';";
+
+                // Set the client encoding (charset) for PostgreSQL
+                if ($charset) {
+                    $initialQueries .= "SET CLIENT_ENCODING TO '$charset';";
+                }
+
+                // Set schema if provided for PostgreSQL
+                if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
+                    $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
+                }
+
+                // PostgreSQL connection setup
+                $this->databaseConnection = new PDO(
+                    $connectionString,
+                    $this->databaseCredentials->getUsername(),
+                    $this->databaseCredentials->getPassword(),
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+                    ]
+                );
+
+                // Execute the initial queries (timezone, charset, schema) in PostgreSQL
+                if (!empty($initialQueries)) {
+                    $this->databaseConnection->exec($initialQueries);
+                }
+
             }
-            $this->databaseConnection = new PDO(
-                $connectionString,
-                $this->databaseCredentials->getUsername(),
-                $this->databaseCredentials->getPassword(),
-                [
-                    PDO::MYSQL_ATTR_INIT_COMMAND => $initialQueries,
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::MYSQL_ATTR_FOUND_ROWS => true
-                ]
-            );
+            // Handle MySQL-specific connection settings
+            else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+                // Set time zone for MySQL
+                $initialQueries = "SET time_zone='$timeZoneOffset';";
+                
+                // Add charset to the initial queries for MySQL
+                if ($charset) {
+                    $initialQueries .= "SET NAMES '$charset';";  // Set charset for MySQL
+                }
+
+                // MySQL connection setup
+                $this->databaseConnection = new PDO(
+                    $connectionString,
+                    $this->databaseCredentials->getUsername(),
+                    $this->databaseCredentials->getPassword(),
+                    [
+                        PDO::MYSQL_ATTR_INIT_COMMAND => $initialQueries,
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::MYSQL_ATTR_FOUND_ROWS => true
+                    ]
+                );
+            }
+            // If the database type is neither MySQL nor PostgreSQL, throw an exception
+            else {
+                throw new PDOException("Unsupported database type: " . $this->getDatabaseType());
+            }
+
+            // Log successful connection
             $connected = true;
             $this->connected = $connected;
         } catch (Exception $e) {
+            error_log('ERR ' . $e->getMessage());
+            // Handle connection errors
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
         return $connected;
@@ -498,12 +558,12 @@ class PicoDatabase // NOSONAR
                 $emptyValue .= $emptyName ? "{database_name}" : "";
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . '; port=' . ((int) $this->databaseCredentials->getPort()) . '; dbname=' . $this->databaseCredentials->getDatabaseName();
+            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort()) . ';dbname=' . $this->databaseCredentials->getDatabaseName();
         } else {
             if ($invalidParam1) {
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . '; port=' . ((int) $this->databaseCredentials->getPort());
+            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort());
         }
     }
 
@@ -530,8 +590,17 @@ class PicoDatabase // NOSONAR
      */
     public function setTimeZoneOffset($timeZoneOffset)
     {
-        $sql = "SET time_zone='$timeZoneOffset';";
-        $this->execute($sql);
+        if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $sql = "SET TIMEZONE TO '$timeZoneOffset'";
+            $this->execute($sql);
+        }
+        else if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL)
+        {
+            $sql = "SET time_zone='$timeZoneOffset';";
+            $this->execute($sql);
+        }
+        
         return $this;
     }
 

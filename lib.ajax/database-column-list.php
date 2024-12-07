@@ -29,7 +29,7 @@ try {
 
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
-    if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+    if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
         // MySQL Query for column details
         $queryBuilder->newQuery()
             ->select("column_name, column_type, data_type, column_key")

@@ -42,7 +42,7 @@ try {
                     kcu.ordinal_position ASC";
         $rs = $database->executeQuery($sql, [$schemaName]);
     } 
-    else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+    else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
         // MySQL query to get column information including primary keys
         $queryBuilder->newQuery()
             ->select("table_name, column_name, data_type, column_key")

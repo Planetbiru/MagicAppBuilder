@@ -53,6 +53,15 @@ class EntityUser extends MagicObject
 	 * @var string
 	 */
 	protected $password;
+	
+	/**
+	 * User Level
+	 * 
+	 * @Column(name="userLevel", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="User Level")
+	 * @var string
+	 */
+	protected $userLevel;
     
     /**
 	 * Gender
