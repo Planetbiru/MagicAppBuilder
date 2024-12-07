@@ -115,7 +115,7 @@ try
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);
-                $path = $baseDir."/".$entityName.".php";               
+                $path = $baseDir."/".$entityName.".php"; 
                 if(file_exists($path))
                 {
                     $return_var = ErrorChecker::errorCheck($cacheDir, $path);
@@ -138,7 +138,7 @@ try
                         if(!empty($entityQueries))
                         {
                             $allQueries[] = "-- SQL for $entityName begin";
-                            $allQueries[] = implode("\r\n", $entityQueries);
+                            $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                             $allQueries[] = "-- SQL for $entityName end\r\n";
                         }
                     }

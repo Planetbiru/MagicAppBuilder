@@ -17,7 +17,7 @@ try
 
     echo "<div>\r\n";
     echo '<div style="white-space:nowrap"><input type="checkbox" id="entity-check-controll"'.$chk.'> <label for="entity-check-controll">Select all</label></div>';
-    echo '<div style="white-space:nowrap"><input type="checkbox" id="entity-merge" class="entity-merge" checked> <label for="entity-merge">Merge queries for each table</label></div>';
+    echo '<div style="white-space:nowrap"><input type="checkbox" id="entity-merge" class="entity-merge" checked> <label for="entity-merge">Merge queries by table</label></div>';
   
     echo "<h4>Data</h4>\r\n";
 
