@@ -123,7 +123,7 @@ class SqliteConverter {
         mysqlTable.columns = [];
         for (let i in table.columns) {
             let column = Object.assign({}, table.columns[i]);
-            column.Field = "`"+column.Field+"`"
+            column.Field = column.Field
             column.Type = this.toMySQLType(column.Type, column.Length);
             mysqlTable.columns.push(column);
         }
@@ -161,28 +161,32 @@ class SqliteConverter {
             tableName = tableName.split('.')[1];
         }
         let lines = [];
-        if(targetType === 'mysql' || targetType === 'mariadb')
-        {
+        if (targetType === 'mysql' || targetType === 'mariadb') {
             tableName = '`' + tableName + '`';
         }
-        else if(targetType === 'pgsql' || targetType === 'postgresql')
-        {
+        else if (targetType === 'pgsql' || targetType === 'postgresql') {
             tableName = '"' + tableName + '"';
         }
         lines.push('CREATE TABLE ' + tableName);
         lines.push('(');
         let linesCol = [];
         for (let i in table.columns) {
+            let columnName = table.columns[i].Field;
+            if (targetType === 'mysql' || targetType === 'mariadb') {
+                columnName = '`' + columnName + '`';
+            }
             let primaryKey = table.columns[i].Field === table.primaryKey;
-            let colDef = '\t' + table.columns[i].Field + ' ' + table.columns[i].Type;
+            let colDef = '\t' + columnName + ' ' + table.columns[i].Type;
             if (primaryKey) {
                 colDef += ' PRIMARY KEY';
                 table.columns[i].Nullable = false;
             }
-            if (table.columns[i].Nullable) {
-                colDef += ' NULL';
-            } else {
-                colDef += ' NOT NULL';
+            else {
+                if (table.columns[i].Nullable) {
+                    colDef += ' NULL';
+                } else {
+                    colDef += ' NOT NULL';
+                }
             }
             let defaultValue = table.columns[i].Default;
             if (defaultValue !== '' && defaultValue !== null) {
@@ -198,12 +202,10 @@ class SqliteConverter {
         lines.push(');');
         return lines.join('\r\n');
     }
-    
+
     fixDefaultValue(defaultValue, targetType) {
-        if(targetType === 'sqlite')
-        {
-            if(defaultValue.toLowerCase().indexOf('now(') !== -1)
-            {
+        if (targetType === 'sqlite') {
+            if (defaultValue.toLowerCase().indexOf('now(') !== -1) {
                 defaultValue = '';
             }
         }
@@ -222,10 +224,9 @@ class SqliteConverter {
                 }
             }
         }
-        if(type.toUpperCase().indexOf('ENUM') != -1)
-        {
-            const {resultArray, maxLength} = this.parseEnumValue(length);
-            sqliteType = 'NVARCHAR(' + (maxLength+2) + ')';
+        if (type.toUpperCase().indexOf('ENUM') != -1) {
+            const { resultArray, maxLength } = this.parseEnumValue(length);
+            sqliteType = 'NVARCHAR(' + (maxLength + 2) + ')';
         }
         else if ((sqliteType === 'NVARCHAR' || sqliteType === 'INT') && length > 0) {
             sqliteType = sqliteType + '(' + length + ')';
@@ -245,9 +246,8 @@ class SqliteConverter {
             }
         }
         mysqlType = this.replaceAll(mysqlType, 'TIMESTAMPTZ', 'TIMESTAMP')
-        if(type.toUpperCase().indexOf('ENUM') != -1)
-        {
-            const {resultArray, maxLength} = this.parseEnumValue(length);
+        if (type.toUpperCase().indexOf('ENUM') != -1) {
+            const { resultArray, maxLength } = this.parseEnumValue(length);
             mysqlType = 'enum(\'' + (resultArray.join('\',\'')) + '\')';
         }
         if (mysqlType === 'VARCHAR' && length > 0) {
@@ -267,10 +267,9 @@ class SqliteConverter {
                 }
             }
         }
-        if(type.toUpperCase().indexOf('ENUM') != -1)
-        {
-            const {resultArray, maxLength} = this.parseEnumValue(length);
-            pgType = 'CHARACTER VARYING(' + (maxLength+2) + ')';
+        if (type.toUpperCase().indexOf('ENUM') != -1) {
+            const { resultArray, maxLength } = this.parseEnumValue(length);
+            pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }
         else if (pgType === 'CHARACTER VARYING' && length > 0) {
             pgType = pgType + '(' + length + ')';
@@ -283,17 +282,17 @@ class SqliteConverter {
         const regex = /'([^']+)'/g;
         let matches;
         let resultArray = [];
-    
+
         // Menangkap semua kecocokan
         while ((matches = regex.exec(inputString)) !== null) {
             resultArray.push(matches[1]); // matches[1] adalah isi di dalam single quotes
         }
-    
+
         // Menentukan panjang maksimum dari array hasil
         let maxLength = resultArray.reduce((max, current) => {
             return current.length > max ? current.length : max;
         }, 0);
-    
+
         return { resultArray, maxLength };
     }
 }
