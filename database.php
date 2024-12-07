@@ -931,7 +931,7 @@ if ($query && !empty($queries)) {
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.css">
     <script src="lib.assets/js/TableParser.js"></script>
-    <script src="lib.assets/js/SqliteConverter.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {

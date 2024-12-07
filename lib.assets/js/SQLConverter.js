@@ -1,8 +1,21 @@
-class SqliteConverter {
+/**
+ * SQLConverter is a class that provides methods for converting SQL schema definitions
+ * between different database management systems (DBMS). It supports conversion between
+ * SQLite, MySQL/MariaDB, and PostgreSQL schemas by mapping data types and structure.
+ * The class allows parsing and modifying SQL definitions to match the syntax and data types
+ * of the target DBMS.
+ */
+class SQLConverter {
+
+    /**
+     * Creates an instance of SQLConverter.
+     * Initializes the mappings for each database type (SQLite, MySQL, PostgreSQL).
+     */
     constructor() {
         this.dbToSqlite = {
             // MySQL and PostgreSQL types to SQLite mapping
             "int": "INTEGER",
+            "tinyint": "INTEGER",  // MySQL treats tinyint as integer
             "tinyint": "INTEGER",  // MySQL treats tinyint as integer
             "smallint": "INTEGER",
             "mediumint": "INTEGER",
@@ -42,6 +55,7 @@ class SqliteConverter {
             "NVARCHAR": "VARCHAR",
             "VARCHAR": "VARCHAR",
             "CHARACTER VARYING": "VARCHAR",
+            "TINYINT(1)": "TINYINT(1)",
             "BOOLEAN": "TINYINT(1)",
             "DATETIME": "DATETIME",
             "DATE": "DATE",
@@ -69,17 +83,31 @@ class SqliteConverter {
         };
     }
 
+    /**
+     * Replaces all occurrences of a substring with a replacement string in the provided string.
+     * @param {string} str The string to modify.
+     * @param {string} search The substring to search for.
+     * @param {string} replacement The string to replace the found substring.
+     * @returns {string} The modified string with replacements.
+     */
     replaceAll(str, search, replacement) {
         const regex = new RegExp(search, 'gi'); // 'i' for case-insensitive, 'g' for global
         return str.replace(regex, replacement);
     }
 
+    /**
+     * Translates the SQL schema from one database type to another (e.g., SQLite to MySQL).
+     * @param {string} value The SQL schema to translate.
+     * @param {string} targetType The target database type (e.g., 'sqlite', 'mysql', 'pgsql').
+     * @returns {string} The translated SQL schema.
+     */
     translate(value, targetType) {
         value = this.replaceAll(value, '`', '');
         value = this.replaceAll(value, ' timestamp with time zone', ' timestamptz');
         value = this.replaceAll(value, ' timestamp without time zone', ' timestamp');
         value = this.replaceAll(value, ' character varying', ' varchar');
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
+        value = this.replaceAll(value, ' TINYINT(1)', ' boolean');
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -93,6 +121,12 @@ class SqliteConverter {
         return resultTable;
     }
 
+    /**
+     * Converts a table schema to the target database type format (SQLite, MySQL, PostgreSQL).
+     * @param {Object} table The table object to convert.
+     * @param {string} targetType The target database type ('sqlite', 'mysql', 'pgsql').
+     * @returns {string} The converted table schema as a string.
+     */
     convertQuery(table, targetType) {
         if (targetType === 'sqlite') {
             return this.toSqliteOut(table, targetType);
@@ -103,6 +137,12 @@ class SqliteConverter {
         }
     }
 
+    /**
+     * Converts a table schema to SQLite format.
+     * @param {Object} table The table object to convert.
+     * @param {string} targetType The target database type.
+     * @returns {string} The converted SQLite table schema as a string.
+     */
     toSqliteOut(table, targetType) {
         let sqliteTable = {};
         sqliteTable.tableName = table.tableName;
@@ -116,6 +156,12 @@ class SqliteConverter {
         return this.toSqliteTable(sqliteTable, targetType);
     }
 
+    /**
+     * Converts a table schema to MySQL format.
+     * @param {Object} table The table object to convert.
+     * @param {string} targetType The target database type.
+     * @returns {string} The converted MySQL table schema as a string.
+     */
     toMySQLOut(table, targetType) {
         let mysqlTable = {};
         mysqlTable.tableName = table.tableName;
@@ -130,6 +176,12 @@ class SqliteConverter {
         return this.toMySQLTable(mysqlTable, targetType);
     }
 
+    /**
+     * Converts a table schema to PostgreSQL format.
+     * @param {Object} table The table object to convert.
+     * @param {string} targetType The target database type.
+     * @returns {string} The converted PostgreSQL table schema as a string.
+     */
     toPostgreSQLOut(table, targetType) {
         let pgTable = {};
         pgTable.tableName = table.tableName;
@@ -142,19 +194,43 @@ class SqliteConverter {
         }
         return this.toPostgreSQLTable(pgTable, targetType);
     }
-
+    
+    /**
+     * Converts a table schema to SQLite format.
+     * @param {Object} sqliteTable The table object in SQLite format.
+     * @param {string} targetType The target database type ('sqlite').
+     * @returns {string} The converted SQLite table schema as a string.
+     */
     toSqliteTable(sqliteTable, targetType) {
         return this.toTable(sqliteTable, targetType);
     }
 
+    /**
+     * Converts a table schema to MySQL format.
+     * @param {Object} mysqlTable The table object in MySQL format.
+     * @param {string} targetType The target database type ('mysql' or 'mariadb').
+     * @returns {string} The converted MySQL table schema as a string.
+     */
     toMySQLTable(mysqlTable, targetType) {
         return this.toTable(mysqlTable, targetType);
     }
 
+    /**
+     * Converts a table schema to PostgreSQL format.
+     * @param {Object} pgTable The table object in PostgreSQL format.
+     * @param {string} targetType The target database type ('pgsql' or 'postgresql').
+     * @returns {string} The converted PostgreSQL table schema as a string.
+     */
     toPostgreSQLTable(pgTable, targetType) {
         return this.toTable(pgTable, targetType);
     }
 
+    /**
+     * Converts a table schema to a common table format for SQLite, MySQL, or PostgreSQL.
+     * @param {Object} table The table object to convert.
+     * @param {string} targetType The target database type.
+     * @returns {string} The converted table schema as a string.
+     */
     toTable(table, targetType) {
         let tableName = table.tableName;
         if (tableName.indexOf('.') !== -1) {
@@ -204,6 +280,12 @@ class SqliteConverter {
         return lines.join('\r\n');
     }
 
+    /**
+     * Fixes default value for SQLite.
+     * @param {string} defaultValue The default value to fix.
+     * @param {string} targetType The target database type.
+     * @returns {string} The fixed default value.
+     */
     fixDefaultValue(defaultValue, targetType) {
         if (targetType === 'sqlite') {
             if (defaultValue.toLowerCase().indexOf('now(') !== -1) {
@@ -213,8 +295,13 @@ class SqliteConverter {
         return defaultValue;
     }
 
+    /**
+     * Converts a column type to the SQLite type format.
+     * @param {string} type The original column type.
+     * @param {number} length The column length (optional).
+     * @returns {string} The converted SQLite column type.
+     */
     toSqliteType(type, length) {
-        console.log(type, length)
         let sqliteType = 'TEXT';
         for (let i in this.dbToSqlite) {
             if (this.dbToSqlite.hasOwnProperty(i)) {
@@ -235,8 +322,18 @@ class SqliteConverter {
         return sqliteType;
     }
 
+    /**
+     * Converts a column type to the MySQL type format.
+     * @param {string} type The original column type.
+     * @param {number} length The column length (optional).
+     * @returns {string} The converted MySQL column type.
+     */
     toMySQLType(type, length) {
         let mysqlType = 'TEXT';
+        if(type.toUpperCase() === 'TINYINT' && length == 1)
+        {
+            return 'TINYINT(1)';
+        }
         for (let i in this.dbToMySQL) {
             if (this.dbToMySQL.hasOwnProperty(i)) {
                 let key = i.toString();
@@ -257,6 +354,12 @@ class SqliteConverter {
         return mysqlType;
     }
 
+    /**
+     * Converts a column type to the PostgreSQL type format.
+     * @param {string} type The original column type.
+     * @param {number} length The column length (optional).
+     * @returns {string} The converted PostgreSQL column type.
+     */
     toPostgreSQLType(type, length) {
         let pgType = 'TEXT';
         for (let i in this.dbToPostgreSQL) {
@@ -278,6 +381,11 @@ class SqliteConverter {
         return pgType;
     }
 
+    /**
+     * Parses an ENUM type value and extracts the values in single quotes, also calculating the maximum length.
+     * @param {string} inputString The ENUM values in a string format.
+     * @returns {Object} An object containing the result array and maximum length of ENUM values.
+     */
     parseEnumValue(inputString) {
         // Regex untuk menangkap teks di dalam single quotes (misalnya, 'A', 'BB', 'CCC')
         const regex = /'([^']+)'/g;

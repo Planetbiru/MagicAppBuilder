@@ -1,5 +1,21 @@
+/**
+ * Class to parse SQL CREATE TABLE statements and extract information about tables and columns.
+ * It handles various SQL types and constraints such as primary keys, data types, not null, default values, and more.
+ */
 class TableParser {
+    
+    /**
+     * Constructor initializes the type list and parses the given SQL if provided.
+     * @param {string} [sql] Optional SQL string to parse upon initialization.
+     */
     constructor() {
+
+        /**
+         * Helper function to check if an element exists in an array.
+         * @param {Array} haystack The array to search in.
+         * @param {string} needle The element to search for.
+         * @returns {boolean} Returns true if the element exists in the array, otherwise false.
+         */
         this.inArray = function (haystack, needle) {
             for (let i in haystack) {
                 if (haystack[i] == needle) {
@@ -9,6 +25,11 @@ class TableParser {
             return false;
         };
 
+        /**
+         * Parses a CREATE TABLE SQL statement and extracts table and column information.
+         * @param {string} sql The SQL string representing a CREATE TABLE statement.
+         * @returns {Object} An object containing table name and columns, along with primary key information.
+         */
         this.parseTable = function (sql) {
             let arr = sql.split(";");
             sql = arr[0];
@@ -131,6 +152,11 @@ class TableParser {
             return { tableName: tableName, columns: fld_list, primaryKey: primaryKey };
         };
 
+        /**
+         * Extracts the length of a column type if specified (e.g., VARCHAR(255)).
+         * @param {string} text The attribute text containing the length (e.g., VARCHAR(255)).
+         * @returns {string} The length of the column type or an empty string if no length is found.
+         */
         this.getLength = function (text) {
             if (text.indexOf('(') != -1 && text.indexOf(')') != -1) {
                 let re = /\((.*)\)/;
@@ -140,19 +166,35 @@ class TableParser {
             return '';
         };
 
+        /**
+         * Checks if the given data type is valid according to the predefined type list.
+         * @param {string} dataType The data type to check (e.g., 'varchar', 'int').
+         * @returns {boolean} True if the data type is valid, otherwise false.
+         */
         this.isValidType = function (dataType) {
             return this.typeList.includes(dataType.toLowerCase());
         };
 
+        /**
+         * Returns the parsed result containing table and column information.
+         * @returns {Array} The parsed table information.
+         */
         this.getResult = function () {
             return this.tableInfo;
         };
 
+        /**
+         * Initializes the type list for valid SQL column types.
+         */
         this.init = function () {
             let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,enum,char,real,float,integer,int,datetime,date,double,boolean,bool';
             this.typeList = typeList.split(',');
         };
 
+        /**
+         * Parses all CREATE TABLE statements from a SQL string and collects the information.
+         * @param {string} sql The SQL string containing multiple CREATE TABLE statements.
+         */
         this.parseAll = function (sql) {
             let inf = [];
             let result;
