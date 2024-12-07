@@ -334,6 +334,17 @@ class SQLConverter {
         {
             return 'TINYINT(1)';
         }
+        if((
+            type.toUpperCase() === 'TINYINT'
+            || type.toUpperCase() === 'SMALLINT'
+            || type.toUpperCase() === 'MEDIUMINT'
+            || type.toUpperCase() === 'BIGINT'
+            || type.toUpperCase() === 'INTEGER'
+            || type.toUpperCase() === 'INT'
+            ) && length > 0)
+        {
+            return `${type}(${length})`;
+        }
         for (let i in this.dbToMySQL) {
             if (this.dbToMySQL.hasOwnProperty(i)) {
                 let key = i.toString();
