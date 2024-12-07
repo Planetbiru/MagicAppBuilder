@@ -189,7 +189,7 @@ class SqliteConverter {
                 }
             }
             let defaultValue = table.columns[i].Default;
-            if (defaultValue !== '' && defaultValue !== null) {
+            if (!primaryKey && defaultValue !== '' && defaultValue !== null) {
                 defaultValue = this.replaceAll(defaultValue, '::character varying', '');
                 defaultValue = this.fixDefaultValue(defaultValue, targetType);
                 if (defaultValue !== '' && defaultValue !== null) {
