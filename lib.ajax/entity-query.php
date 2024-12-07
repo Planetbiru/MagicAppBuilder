@@ -2,6 +2,7 @@
 
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\Request\InputPost;
 
@@ -22,10 +23,24 @@ try
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = [];
 
+    $dbType = "";
+    if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+    {
+        $dbType = "PostgreSQL";
+    }
+    else if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+    {
+        $dbType = "SQLite";
+    }
+    else
+    {
+        $dbType = "MySQL";
+    }
+
     $allQueries[] = "-- -------------------------------------------------------------";
     $allQueries[] = "-- Database Stucture for $applicationName";
     $allQueries[] = "-- Generator       : MagicAppBuilder";
-    $allQueries[] = "-- Database Driver : ".$database->getDatabaseType();
+    $allQueries[] = "-- Database Driver : ".$dbType;
     $allQueries[] = "-- Time Generation : ".date('j F Y H:i:s');
     $allQueries[] = "-- Time Zone       : ".date('P');
     $allQueries[] = "-- -------------------------------------------------------------";
