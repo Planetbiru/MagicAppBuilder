@@ -15,11 +15,22 @@ header("Content-type: text/plain");
 
 try
 {
+    $applicationName = $appConfig->getApplication()->getName();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
     $allQueries = [];
+
+    $allQueries[] = "-- -------------------------------------------------------------";
+    $allQueries[] = "-- Database Stucture for $applicationName";
+    $allQueries[] = "-- Generator       : MagicAppBuilder";
+    $allQueries[] = "-- Database Driver : ".$database->getDatabaseType();
+    $allQueries[] = "-- Time Generation : ".date('j F Y H:i:s');
+    $allQueries[] = "-- Time Zone       : ".date('P');
+    $allQueries[] = "-- -------------------------------------------------------------";
+    $allQueries[] = "";
+
     $merged = $inputPost->getMerged();
     if($merged)
     {
@@ -68,12 +79,11 @@ try
                 {
                     $entityName = implode(", ", $entityNames[$tableName]);
                     $allQueries[] = "-- SQL for $entityName begin";
-                    $allQueries[] = implode("\r\n", $entityQueries);
+                    $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                     $allQueries[] = "-- SQL for $entityName end\r\n";
                 }           
             }
         }
-        echo implode("\r\n\r\n", $allQueries);
     }
     else
     {
@@ -114,8 +124,8 @@ try
                 }
             }
         }
-        echo implode("\r\n\r\n", $allQueries);
     }
+    echo implode("\r\n", $allQueries);
 }
 catch(Exception $e)
 {
