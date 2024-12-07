@@ -14,9 +14,10 @@ function TableParser() {
 
         // The regex for each component:
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*)/gim;
+        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\))/gim;
 
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
+        let rg_enum = /enum\s*\(([^)]+)\)/i; // Regex to match ENUM values inside parentheses
         let rg_not_null = /not\s+null/i
         let rg_pk = /primary\s+key/i
         let rg_fld_def = /default\s(.+)/gi
@@ -31,6 +32,7 @@ function TableParser() {
         let columnList = [];
         let pk = null;
         let pkLine = "";
+
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
 
@@ -40,7 +42,7 @@ function TableParser() {
             let dataType = fld_def[2];
             let is_pk = false;
 
-            if (this.isValidType(dataType.toString())) {
+            if (this.isValidType(dataType.toString()) || rg_enum.test(dataType)) {
                 // remove the field definition terminator.
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
 
@@ -68,6 +70,14 @@ function TableParser() {
 
                 let length = this.getLength(attr);
 
+                // Check if the data type is ENUM and parse the possible values
+                if (rg_enum.test(dataType)) {
+                    let enumValues = dataType.match(rg_enum);
+                    if (enumValues && enumValues[1]) {
+                        length = enumValues[1].split(',').map(value => value.trim());
+                    }
+                    dataType = 'enum';
+                }
 
                 // append to the arr
                 let columnName = fld_def.groups.fname.trim();
@@ -77,7 +87,7 @@ function TableParser() {
                 if (!this.inArray(columnList, columnName)) {
                     fld_list.push({
                         'Field': columnName,
-                        'Type': fld_def.groups.ftype.trim(),
+                        'Type': dataType.trim(),
                         'Length': length,
                         'Key': is_pk,
                         'Nullable': nullable,
