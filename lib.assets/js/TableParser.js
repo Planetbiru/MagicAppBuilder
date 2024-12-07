@@ -21,7 +21,7 @@ class TableParser {
             let rg_enum = /enum\s*\(([^)]+)\)/i; // Regex untuk menangkap isi enum
             let rg_not_null = /not\s+null/i;
             let rg_pk = /primary\s+key/i;
-            let rg_fld_def = /default\s(.+)/gi;
+            let rg_fld_def = /default\s+(.+)/i;
             let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi;
 
             // Look for table name
@@ -49,7 +49,6 @@ class TableParser {
                     let enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, '')); // Remove quotes
                     let maxLength = Math.max(...enumArray.map(val => val.length)); // Find the max length
                     let length = maxLength + 2; // Add 2 characters as per requirement
-
 
                     // Use target database type (example: 'VARCHAR' or 'NVARCHAR')
                     let targetType = "VARCHAR"; // You can dynamically change this to 'NVARCHAR' or 'CHARACTER VARYING' based on the DB target
