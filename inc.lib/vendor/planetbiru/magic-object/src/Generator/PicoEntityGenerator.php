@@ -419,8 +419,8 @@ class PicoEntityGenerator
     {
         $typeMap = $this->getTypeMap();
         $columnMap = $this->getColumnMap();
-        $picoTableName = $this->tableName;
-        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
+        $tableName = $this->tableName;
+        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($tableName));
         $fileName = $this->baseNamespace . "/" . $className;
         $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);
@@ -430,7 +430,7 @@ class PicoEntityGenerator
             mkdir($dir, 0755, true);
         }
 
-        $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
+        $rows = PicoColumnGenerator::getColumnList($this->database, $tableName);
         error_log("ROWS");
         error_log(print_r($rows, true));
 
@@ -451,9 +451,9 @@ namespace ' . $this->baseNamespace . ';
 use MagicObject\MagicObject;
 
 /**
- * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ * The '.$className.' class represents an entity in the "'.$tableName.'" table.
  *
- * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "'.$tableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -463,7 +463,7 @@ use MagicObject\MagicObject;
  * @package '.$this->baseNamespace.'
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
- * @Table(name="'.$picoTableName.'")
+ * @Table(name="'.$tableName.'")
  */
 class ' . $className . ' extends MagicObject
 {

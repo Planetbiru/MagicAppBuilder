@@ -6,13 +6,13 @@ use Exception;
 use Throwable;
 
 /**
- * Class ZipDownloadException
+ * Class ZipDownloaderException
  *
  * Custom exception class for handling errors related to cURL operations.
  * This exception is typically thrown when there is an issue with a cURL request,
  * such as network failure, timeouts, or invalid responses from the server.
  * 
- * The `ZipDownloadException` class allows you to capture and manage errors related to
+ * The `ZipDownloaderException` class allows you to capture and manage errors related to
  * cURL requests, providing detailed information about the error message, code,
  * and the previous exception if any. It extends the built-in `Exception` class,
  * and can be caught and handled just like any other exception in PHP.
@@ -21,7 +21,7 @@ use Throwable;
  * @package MagicObject\Exceptions
  * @link https://github.com/Planetbiru/MagicObject
  */
-class ZipDownloadException extends Exception
+class ZipDownloaderException extends Exception
 {
     /**
      * Previous exception
@@ -31,7 +31,7 @@ class ZipDownloadException extends Exception
     private $previous;
 
     /**
-     * Constructor for ZipDownloadException.
+     * Constructor for ZipDownloaderException.
      *
      * @param string $message  Exception message
      * @param int $code        Exception code

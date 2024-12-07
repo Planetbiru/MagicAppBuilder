@@ -69,21 +69,39 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             $schema = "public";
         }
         $sql = "SELECT 
-        column_name AS \"Field\", 
-        data_type AS \"Type\", 
-        is_nullable AS \"Null\", 
-        CASE 
-            WHEN column_default IS NOT NULL THEN 'DEFAULT' 
-            ELSE '' 
-        END AS \"Key\", 
-        column_default AS \"Default\", 
-        CASE 
-            WHEN is_identity = 'YES' THEN 'AUTO_INCREMENT' 
-            ELSE '' 
-        END AS \"Extra\"
-        FROM information_schema.columns
-        WHERE table_name = '$tableName'
-        AND table_schema = '$schema'";
+            c.column_name AS \"Field\", 
+            c.data_type AS \"ColumnType\", 
+            c.is_nullable AS \"Null\", 
+            CASE 
+                WHEN c.column_default IS NOT NULL THEN 'DEFAULT' 
+                ELSE '' 
+            END AS \"Key\", 
+            c.column_default AS \"Default\", 
+            CASE 
+                WHEN c.is_identity = 'YES' THEN 'AUTO_INCREMENT' 
+                ELSE '' 
+            END AS \"Extra\",
+            CASE 
+                WHEN kcu.constraint_name IS NOT NULL THEN 'PRI' 
+                ELSE '' 
+            END AS \"Key\", 
+            CASE 
+                WHEN c.data_type IN ('character varying', 'character', 'char') 
+                    THEN CONCAT(c.data_type, '(', c.character_maximum_length, ')') 
+                ELSE c.data_type
+            END AS \"Type\" 
+        FROM information_schema.columns c
+        LEFT JOIN information_schema.key_column_usage kcu
+            ON c.column_name = kcu.column_name 
+            AND c.table_name = kcu.table_name
+            AND c.table_schema = kcu.table_schema
+        LEFT JOIN information_schema.table_constraints tc
+            ON kcu.constraint_name = tc.constraint_name
+            AND tc.constraint_type = 'PRIMARY KEY' 
+        WHERE c.table_name = '$tableName'
+        AND c.table_schema = '$schema'";
+
+
         return $database->fetchAll($sql);
     }
 
