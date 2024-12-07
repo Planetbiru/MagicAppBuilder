@@ -1247,6 +1247,9 @@ jQuery(function () {
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
     $('#modal-query-executor').find('textarea').val(cmEditorSQL.getSelection());
+    cmEditorSQLExecute.setValue(cmEditorSQL.getSelection());
+    cmEditorSQLExecute.refresh();
+    $('.button-execute-query')[0].disabled = true;
     $('#modal-query-executor').modal('show');
   });
 
