@@ -9,7 +9,6 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 $inputPost = new InputPost();
 
 try {
-    header("Content-type: application/json");
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);

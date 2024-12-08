@@ -25,8 +25,6 @@ try
     $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
 
-    
-    
     foreach($list as $idx=>$file)
     {
         $entity = basename($file, '.php');

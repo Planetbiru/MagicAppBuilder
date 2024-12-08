@@ -127,5 +127,4 @@ if($inputPost->getUserAction() == 'set')
     {
         // do nothing
     }
-    
 }
