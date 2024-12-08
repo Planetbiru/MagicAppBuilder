@@ -334,6 +334,9 @@ textarea:focus-visible {
   font-family: "Courier New", Courier, monospace;
   margin-bottom: 16px;
   border-radius: 3px;
+  -moz-tab-size: 4;
+    -o-tab-size: 4;
+       tab-size: 4;
 }
 
 .query-raw:focus-visible {
