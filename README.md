@@ -105,6 +105,10 @@ Whether you are building a monolithic application or developing a microservices-
 
 The system is built with localization in mind. It supports multiple languages, allowing you to easily translate the interface and error messages into various languages. Whether your application is being used by a global audience or by users from different regions, this feature ensures that the system can adapt to various language preferences, improving accessibility and user engagement.
 
+**16. Advanced Data Filters**
+
+The system provides dynamic filters that adapt to the data type, ensuring accurate and efficient data querying based on user-defined criteria.
+
 Apart from the features above, the module is also equipped with data filters that are adjusted to the data type.
 
 ## Using MagicAppBuilder
