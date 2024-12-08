@@ -38,7 +38,7 @@ MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for
 
 ## Advantages
 
-In just under five minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
+In just under 30 minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
 
 ## Features Overview
 
