@@ -141,7 +141,7 @@ Steps to create an application with MagicAppBuilder
     d. If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
     c. Columns with the same purpose of use must have the same name in all tables.
     d. Application features should be determined before the entity relationship diagram is created.
-    2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
+2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
 3. Install MagicAppBuilder on your server.
 4. Create MagicAppBuilder settings.
 5. Add the application to be created in MagicAppBuilder.
