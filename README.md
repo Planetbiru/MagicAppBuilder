@@ -136,12 +136,11 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 Steps to create an application with MagicAppBuilder
 
 1. Create a complete entity relationship diagram with the following rules:
-    
-    a. The column for the primary key of a table must be the same as the table name and added with the suffix _id.
-    b. Columns that are foreign keys that refer to other tables are strongly recommended to be given the same name as the primary key of the table in question.
-    d. If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
-    c. Columns with the same purpose of use must have the same name in all tables.
-    d. Application features should be determined before the entity relationship diagram is created.
+    - The column for the primary key of a table must be the same as the table name and added with the suffix _id.
+    - Columns that are foreign keys that refer to other tables are strongly recommended to be given the same name as the primary key of the table in question.
+    - If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
+    - Columns with the same purpose of use must have the same name in all tables.
+    - Application features should be determined before the entity relationship diagram is created.
 2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
 3. Install MagicAppBuilder on your server.
 4. Create MagicAppBuilder settings.
