@@ -4278,7 +4278,7 @@ $subqueryMap = '.$referece.';
     {
         return array(
 
-            array('Field'=>$entityApproval->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'PRI', 'Default'=>'NULL', 'Extra'=>'')
+            array('Field'=>$entityApproval->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'NO', 'Key'=>'PRI', 'Default'=>null, 'Extra'=>'')
         );
     }
     
@@ -4330,7 +4330,7 @@ $subqueryMap = '.$referece.';
     {
         return array(
 
-            array('Field'=>$entityTrash->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'PRI', 'Default'=>'NULL', 'Extra'=>'')
+            array('Field'=>$entityTrash->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'NO', 'Key'=>'PRI', 'Default'=>null, 'Extra'=>'')
         );
     }
     

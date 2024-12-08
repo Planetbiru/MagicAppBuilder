@@ -63,7 +63,7 @@ class DatabaseExplorer
 
             // Check for semicolon outside of quotes
             if ($char === ';' && !$inSingleQuote && !$inDoubleQuote) {
-                $statements[] = trim($currentStatement);
+                $statements[] = $currentStatement;
                 $currentStatement = '';
             } else {
                 $currentStatement .= $char;
@@ -72,7 +72,7 @@ class DatabaseExplorer
 
         // Add the last statement if exists
         if (trim($currentStatement) !== '') {
-            $statements[] = trim($currentStatement);
+            $statements[] = $currentStatement;
         }
 
         return $statements;
@@ -780,10 +780,15 @@ class DatabaseExplorer
                 $queryDiv->appendChild($queryTitleDiv);
 
                 // Create the raw query div
-                $queryRawDiv = $dom->createElement('div', htmlspecialchars($q));
-                $queryRawDiv->setAttribute('class', 'query-raw');
-                $queryRawDiv->setAttribute('contenteditable', 'true');
-                $queryRawDiv->setAttribute('spellcheck', 'false');
+
+                $queryRawDiv = $dom->createElement('div');
+
+                $queryRawPre = $dom->createElement('pre', htmlspecialchars($q));
+                $queryRawPre->setAttribute('class', 'query-raw');
+                $queryRawPre->setAttribute('contenteditable', 'true');
+                $queryRawPre->setAttribute('spellcheck', 'false');
+
+                $queryRawDiv->appendChild($queryRawPre);
                 $queryDiv->appendChild($queryRawDiv);
 
                 // Create the result title div
@@ -812,6 +817,106 @@ class DatabaseExplorer
         }
         return "";
     }
+
+    /**
+     * Split a SQL string into separate queries.
+     *
+     * This method takes a raw SQL string and splits it into individual
+     * queries based on delimiters, handling comments and whitespace.
+     *
+     * @param string $sqlText The raw SQL string containing one or more queries.
+     * @return array An array of queries with their respective delimiters.
+     */
+    public static function splitSqlNoLeftTrim($sqlText)
+    {
+        // Normalize newlines and clean up any redundant line breaks
+        $sqlText = str_replace("\r\r\n", "\r\n", str_replace("\n", "\r\n", $sqlText));
+
+        // Split the SQL text by newlines
+        $lines = explode("\r\n", $sqlText);
+
+        // Clean up lines, remove comments, and empty lines, without trimming leading whitespaces
+        $cleanedLines = array_filter($lines, function ($line) {
+            return self::arrayFilterFunction($line); // Custom filter function to check for valid lines
+        });
+
+        // Initialize state variables
+        $queries = array();
+        $currentQuery = '';
+        $isAppending = false;
+        $delimiter = ';';
+        $skip = false;
+
+        foreach ($cleanedLines as $line) {
+            // Skip lines if needed
+            if ($skip) {
+                $skip = false;
+                continue;
+            }
+
+            // Handle "delimiter" statements
+            if (stripos(trim($line), 'delimiter ') === 0) {
+                $delimiter = self::getDelimiter($line);
+                continue;
+            }
+
+            // Start a new query if necessary
+            if (!$isAppending) {
+                if (!empty($currentQuery)) {
+                    // Store the previous query and reset for the next one
+                    $queries[] = array('query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 'delimiter' => $delimiter);
+                }
+                $currentQuery = '';
+                $isAppending = true;
+            }
+
+            // Append current line to the current query
+            $currentQuery .= $line . "\r\n";
+
+            // Check if the query ends with the delimiter
+            if (substr(rtrim($line), -strlen($delimiter)) === $delimiter) {
+                $isAppending = false; // End of query, so we stop appending
+            }
+        }
+
+        // Add the last query if any
+        if (!empty($currentQuery)) {
+            $queries[] = array('query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 'delimiter' => $delimiter);
+        }
+
+        return $queries;
+    }
+
+    /**
+     * Filters out empty lines, comments (lines starting with "-- "), and lines that are exactly "--".
+     *
+     * This function is commonly used in contexts where a list of lines or strings needs to be processed
+     * and filtered by excluding empty lines, comment lines (starting with "-- "), and lines with only
+     * the string "--".
+     *
+     * @param string $line The line to be checked.
+     * @return bool Returns `true` if the line should be included, `false` otherwise.
+     */
+    private static function arrayFilterFunction($line)
+    {
+        return !(empty($line) || stripos($line, "-- ") === 0 || $line == "--");
+    }
+    
+    /**
+     * Determines the delimiter based on the second part of a trimmed line.
+     *
+     * This function splits the given line by spaces and checks the second part. If the second part exists,
+     * it returns a semicolon (`;`) as the delimiter. Otherwise, it returns `null`.
+     *
+     * @param string $line The line to be analyzed, which is trimmed and split by spaces.
+     * @return string|null Returns `';'` if there is a second part after splitting the line, otherwise `null`.
+     */
+    private static function getDelimiter($line)
+    {
+        $parts = explode(' ', trim($line));
+        return $parts[1] != null ? ';' : null;
+    }
+
 }
 
 // Begin database preparation
@@ -896,7 +1001,7 @@ $lastQueries = "";
 if ($query) {
     $arr = DatabaseExplorer::splitSQL($query);
     $query = implode(";\r\n", $arr);
-    $queryArray = PicoDatabaseUtil::splitSql($query);
+    $queryArray = DatabaseExplorer::splitSqlNoLeftTrim($query);
     if (isset($queryArray) && is_array($queryArray) && !empty($queryArray)) {
         $q2 = array();
         foreach ($queryArray as $q) {
@@ -929,10 +1034,10 @@ if ($query && !empty($queries)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
-    <link rel="stylesheet" href="css/database-explorer.css">
-    <script src="lib.assets/js/TableParser.js"></script>
-    <script src="lib.assets/js/SQLConverter.js"></script>
-    <script src="lib.assets/js/import-structure.js"></script>
+    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <script src="lib.assets/js/TableParser.min.js"></script>
+    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/import-structure.min.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
