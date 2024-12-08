@@ -20,6 +20,7 @@ class SQLConverter {
             "smallint": "INTEGER",
             "mediumint": "INTEGER",
             "bigint": "INTEGER",
+            "real": "REAL",
             "float": "REAL",
             "double": "REAL",
             "decimal": "REAL",  // SQLite doesn't have DECIMAL, treated as REAL
@@ -71,6 +72,7 @@ class SQLConverter {
             "INTEGER": "INTEGER",
             "REAL": "REAL",
             "TEXT": "TEXT",
+            "TINYINT(1)": "BOOLEAN",
             "NVARCHAR": "CHARACTER VARYING",
             "VARCHAR": "CHARACTER VARYING",
             "BOOLEAN": "BOOLEAN",
@@ -265,8 +267,9 @@ class SQLConverter {
             if (targetType === 'mysql' || targetType === 'mariadb') {
                 columnName = '`' + columnName + '`';
             }
+            let columnType = table.columns[i].Type;
             let primaryKey = table.columns[i].Field === table.primaryKey;
-            let colDef = '\t' + columnName + ' ' + table.columns[i].Type;
+            let colDef = '\t' + columnName + ' ' + columnType;
             if (primaryKey) {
                 colDef += ' PRIMARY KEY';
                 colDef += ' NOT NULL';
@@ -283,8 +286,27 @@ class SQLConverter {
             if (!primaryKey && defaultValue !== '' && defaultValue !== null) {
                 defaultValue = this.replaceAll(defaultValue, '::character varying', '');
                 defaultValue = this.fixDefaultValue(defaultValue, targetType);
-                if (defaultValue !== '' && defaultValue !== null) {
-                    colDef += ' DEFAULT ' + defaultValue;
+                if (defaultValue != '' && defaultValue != null) {
+                    if(defaultValue.toUpperCase() == 'NULL')
+                    {
+                        colDef += ' DEFAULT NULL';
+                    }
+                    else if(columnType.toUpperCase() == 'BOOLEAN' || columnType.toUpperCase() == 'TINYINT(1)')
+                    {
+                        colDef += ' DEFAULT ' + ((defaultValue.indexOf('1') != -1) ? 'TRUE' : 'FALSE');
+                    }
+                    else if(columnType.toUpperCase().indexOf('INT') != -1)
+                    {
+                        colDef += ' DEFAULT ' + this.convertToInteger(defaultValue);
+                    }
+                    else if(columnType.toUpperCase().indexOf('FLOAT') != -1 || columnType.toUpperCase().indexOf('DOUBLE') != -1 || columnType.toUpperCase().indexOf('REAL') != -1 | columnType.toUpperCase().indexOf('DECIMAL') != -1)
+                    {
+                        colDef += ' DEFAULT ' + this.convertToReal(defaultValue);
+                    }
+                    else
+                    {
+                        colDef += ' DEFAULT ' + defaultValue;
+                    }
                 }
             }
             linesCol.push(colDef);
@@ -292,6 +314,44 @@ class SQLConverter {
         lines.push(linesCol.join(',\r\n'));
         lines.push(');');
         return lines.join('\r\n');
+    }
+
+    /**
+     * Converts a string value (within single quotes) to an integer.
+     * If the value is empty or not a valid integer, it returns 0.
+     *
+     * @param {string} value - The string value to be converted, possibly enclosed in single quotes.
+     * @returns {number} The converted integer value, or 0 if conversion is not possible.
+     */
+    convertToInteger(value) {
+        // Remove single quotes if they exist
+        let trimmedValue = value.replace(/^'|'$/g, '');
+        
+        // If the string is empty, return 0, else convert to integer
+        return trimmedValue === '' ? 0 : parseInt(trimmedValue, 10);
+    }
+
+    /**
+     * Converts a string value (within single quotes) to a floating-point number.
+     * If the value is empty or not a valid number, it returns 0.
+     *
+     * @param {string} value - The string value to be converted, possibly enclosed in single quotes.
+     * @returns {number} The converted floating-point value, or 0 if conversion is not possible.
+     */
+    convertToReal(value) {
+        // Remove single quotes if they exist
+        let trimmedValue = value.replace(/^'|'$/g, '');
+        
+        // If the string is empty, return 0
+        if (trimmedValue === '') {
+            return 0;
+        }
+        
+        // Convert to a floating-point number
+        let result = parseFloat(trimmedValue);
+        
+        // If conversion failed (NaN), return 0
+        return isNaN(result) ? 0 : result;
     }
 
     /**
@@ -396,7 +456,10 @@ class SQLConverter {
                 }
             }
         }
-        if (type.toUpperCase().indexOf('ENUM') != -1) {
+        if (type.toUpperCase().indexOf('TINYINT') != -1 && length == 1) {
+            pgType = 'BOOLEAN';
+        }
+        else if (type.toUpperCase().indexOf('ENUM') != -1) {
             const { resultArray, maxLength } = this.parseEnumValue(length);
             pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }
@@ -458,7 +521,6 @@ class SQLConverter {
             } else if(targetType === 'mysql' || targetType === 'mariadb') {
                 tableName = '`' + tableName + '`';
             }
-            console.log(tableName);
             result.push({
                 table: tableName    // Table name
             });
