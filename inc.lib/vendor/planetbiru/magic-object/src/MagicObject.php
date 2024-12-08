@@ -535,7 +535,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if database is connected or not
      *
-     * @return bool
+     * @return bool Returns `true` if the database is connected, `false` otherwise.
      */
     private function _databaseConnected()
     {
@@ -650,11 +650,18 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Save to database.
+     * Save the current object to the database.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PDOStatement
-     * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
+     * This method persists the current object to the database. If `$includeNull` is TRUE, 
+     * all properties of the object, including those with null values, will be saved. 
+     * If FALSE, only the properties with non-null values will be saved.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be saved. 
+     *                          If FALSE, only non-null values will be saved.
+     * @return PDOStatement Returns a PDOStatement object for further database interaction.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws NoRecordFoundException If no corresponding record is found.
+     * @throws PDOException If a database error occurs.
      */
     public function save($includeNull = false)
     {
@@ -670,11 +677,17 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Query to save data.
+     * Generate a query to save data to the database.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PicoDatabaseQueryBuilder
-     * @throws NoDatabaseConnectionException|NoRecordFoundException
+     * This method prepares a query to persist the current object to the database. 
+     * If `$includeNull` is TRUE, properties with null values will be included in the query. 
+     * If FALSE, only properties with non-null values will be included.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be saved. 
+     *                          If FALSE, only non-null values will be included in the query.
+     * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for query construction.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws NoRecordFoundException If no corresponding record is found.
      */
     public function saveQuery($includeNull = false)
     {
@@ -692,8 +705,13 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select data from the database.
      *
+     * This method retrieves data from the database. If no data is found, a `NoRecordFoundException` will be thrown. 
+     * The retrieved data is then loaded into the current instance for further use.
+     *
      * @return self Returns the current instance for method chaining.
-     * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws NoRecordFoundException If no records are found in the database.
+     * @throws PDOException If a database error occurs.
      */
     public function select()
     {
@@ -717,8 +735,13 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select all data from the database.
      *
+     * This method retrieves all data from the database. If no data is found, a `NoRecordFoundException` will be thrown. 
+     * The retrieved data is then loaded into the current instance for further use.
+     *
      * @return self Returns the current instance for method chaining.
-     * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws NoRecordFoundException If no records are found in the database.
+     * @throws PDOException If a database error occurs.
      */
     public function selectAll()
     {
@@ -740,10 +763,14 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Query to select data.
+     * Generate a query to select data.
      *
-     * @return PicoDatabaseQueryBuilder
-     * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
+     * This method prepares a query to select data from the database. The query can then be used to execute the retrieval 
+     * of data manually if needed.
+     *
+     * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for building the select query.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws PDOException If a database error occurs.
      */
     public function selectQuery()
     {
@@ -861,11 +888,15 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Insert into the database.
+     * Insert data into the database.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PDOStatement
-     * @throws NoDatabaseConnectionException|PDOException
+     * This method inserts the current object’s data into the database. If `$includeNull` is TRUE, 
+     * properties with null values will also be included in the insert query. If FALSE, only properties with non-null values will be inserted.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be inserted. If FALSE, only non-null values will be inserted.
+     * @return PDOStatement Returns a PDOStatement object for further database interaction.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws PDOException If there is an error executing the insert query.
      */
     public function insert($includeNull = false)
     {
@@ -883,9 +914,12 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get the query for inserting data.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PicoDatabaseQueryBuilder
-     * @throws NoDatabaseConnectionException
+     * This method prepares a query to insert data into the database. It can be used to manually execute the query.
+     * If `$includeNull` is TRUE, properties with null values will be included in the query. If FALSE, only non-null properties will be inserted.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be included in the insert query. If FALSE, only non-null properties will be included.
+     * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for building the insert query.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
      */
     public function insertQuery($includeNull = false)
     {
@@ -903,9 +937,13 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Update data in the database.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PDOStatement
-     * @throws NoDatabaseConnectionException|PDOException
+     * This method updates the current object's data in the database. If `$includeNull` is TRUE, 
+     * properties with null values will be included in the update query. If FALSE, only properties with non-null values will be updated.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be updated. If FALSE, only non-null values will be updated.
+     * @return PDOStatement Returns a PDOStatement object for further database interaction.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws PDOException If there is an error executing the update query.
      */
     public function update($includeNull = false)
     {
@@ -923,9 +961,12 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get the query for updating data.
      *
-     * @param bool $includeNull If TRUE, all properties will be saved to the database, including null. If FALSE, only columns with non-null values will be saved.
-     * @return PicoDatabaseQueryBuilder
-     * @throws NoDatabaseConnectionException
+     * This method prepares a query to update data in the database. It can be used to manually execute the query.
+     * If `$includeNull` is TRUE, properties with null values will be included in the update query. If FALSE, only non-null properties will be updated.
+     *
+     * @param bool $includeNull If TRUE, all properties, including null, will be included in the update query. If FALSE, only non-null properties will be included.
+     * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for building the update query.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
      */
     public function updateQuery($includeNull = false)
     {
@@ -943,8 +984,11 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Delete data from the database.
      *
-     * @return PDOStatement
-     * @throws NoDatabaseConnectionException|PDOException
+     * This method deletes data associated with the current object from the database.
+     *
+     * @return PDOStatement Returns a PDOStatement object for further database interaction.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
+     * @throws PDOException If there is an error executing the delete query.
      */
     public function delete()
     {
@@ -962,8 +1006,10 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Get the query for deleting data.
      *
-     * @return PicoDatabaseQueryBuilder
-     * @throws NoDatabaseConnectionException
+     * This method prepares a query to delete data from the database. It can be used to manually execute the query.
+     *
+     * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for building the delete query.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
      */
     public function deleteQuery()
     {
@@ -1073,10 +1119,15 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Get MagicObject with WHERE specification.
+     * Get a MagicObject with a WHERE specification.
      *
-     * @param PicoSpecification $specification Specification
-     * @return PicoDatabasePersistenceExtended
+     * This method applies a WHERE condition to the database query using the provided specification.
+     * The specification is an instance of `PicoSpecification` which defines the filtering criteria.
+     *
+     * @param PicoSpecification $specification The specification to define the WHERE condition.
+     * @return PicoDatabasePersistenceExtended Returns an instance of `PicoDatabasePersistenceExtended` 
+     *         that applies the WHERE condition based on the provided specification.
+     * @throws NoDatabaseConnectionException If there is no active database connection.
      */
     public function where($specification)
     {
@@ -1092,11 +1143,14 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Modify null properties.
+     * Modify properties with null values.
      *
-     * @param string $propertyName Property name
-     * @param mixed $propertyValue Property value
-     * @return self
+     * This method tracks properties that are assigned a null value, storing them in a `_nullProperties` array. 
+     * If a property is set to null, it is added to the `_nullProperties` array; if it's set to a non-null value, it is removed from the array.
+     *
+     * @param string $propertyName The name of the property to check and modify.
+     * @param mixed $propertyValue The value to be assigned to the property.
+     * @return self Returns the current instance for method chaining.
      */
     private function modifyNullProperties($propertyName, $propertyValue)
     {
@@ -1191,10 +1245,13 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Remove the last element of an array property and return it.
+     * Remove and return the last element of an array property.
      *
-     * @param string $propertyName Property name
-     * @return mixed
+     * This method removes the last element from an array property and returns it.
+     * If the specified property is not an array or does not exist, null is returned.
+     *
+     * @param string $propertyName The name of the property (array) from which the last element will be removed.
+     * @return mixed The last element of the array, or null if the property is not an array or doesn't exist.
      */
     public function pop($propertyName)
     {
@@ -1207,10 +1264,13 @@ class MagicObject extends stdClass // NOSONAR
     }
     
     /**
-     * Remove the first element of an array property and return it.
+     * Remove and return the first element of an array property.
      *
-     * @param string $propertyName Property name
-     * @return mixed
+     * This method removes the first element from an array property and returns it.
+     * If the specified property is not an array or does not exist, null is returned.
+     *
+     * @param string $propertyName The name of the property (array) from which the first element will be removed.
+     * @return mixed The first element of the array, or null if the property is not an array or doesn't exist.
      */
     public function shift($propertyName)
     {
@@ -1223,10 +1283,12 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Get property value.
+     * Get the value of a property.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null
+     * This method retrieves the value of the specified property. If the property does not exist, it returns null.
+     *
+     * @param string $propertyName The name of the property to retrieve.
+     * @return mixed|null The value of the property, or null if the property is not set.
      */
     public function get($propertyName)
     {
@@ -1235,11 +1297,13 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Get property value or a default value if not set.
+     * Get the value of a property or a default value if the property is not set.
      *
-     * @param string $propertyName Property name
-     * @param mixed|null $defaultValue Default value
-     * @return mixed|null
+     * This method retrieves the value of the specified property. If the property is not set, the provided default value is returned.
+     *
+     * @param string $propertyName The name of the property to retrieve.
+     * @param mixed|null $defaultValue The default value to return if the property is not set.
+     * @return mixed|null The value of the property, or the default value if the property is not set.
      */
     public function getOrDefault($propertyName, $defaultValue = null)
     {
@@ -1259,10 +1323,14 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Get property value (magic getter).
+     * Magic method to get the value of a property.
      *
-     * @param string $propertyName Property name
-     * @return mixed|null
+     * This method is automatically called when an undefined or inaccessible property is accessed.
+     * It checks if the property has been set (including null values) using the `__isset` method and
+     * retrieves its value via the `get` method if it exists.
+     *
+     * @param string $propertyName The name of the property to retrieve.
+     * @return mixed|null The value of the property if it is set, or null if the property is not set or accessible.
      */
     public function __get($propertyName)
     {
@@ -1274,10 +1342,13 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Check if a property has been set or not (including null).
+     * Magic method to check if a property is set (including null).
      *
-     * @param string $propertyName Property name
-     * @return bool
+     * This method is automatically called when checking if an undefined or inaccessible property is set
+     * using `isset()`. It checks if the property exists and is set (even if its value is null).
+     *
+     * @param string $propertyName The name of the property to check.
+     * @return bool True if the property is set (including null), false otherwise.
      */
     public function __isset($propertyName)
     {
@@ -1286,9 +1357,12 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Unset property value.
+     * Magic method to unset a property.
      *
-     * @param string $propertyName Property name
+     * This method is automatically called when a property is unset using `unset()`.
+     * It unsets the specified property from the object.
+     *
+     * @param string $propertyName The name of the property to unset.
      * @return void
      */
     public function __unset($propertyName)
@@ -1298,12 +1372,15 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Copy values from another object.
+     * Copy values from another object to the current instance.
      *
-     * @param self|mixed $source Source data
-     * @param array|null $filter Filter
-     * @param bool $includeNull Flag to include null values
-     * @return self
+     * This method copies property values from the provided source object to the current instance.
+     * Optionally, a filter can be applied to specify which properties to copy, and whether null values should be included.
+     *
+     * @param self|mixed $source The source object or data from which values will be copied. If a non-object is provided, this may result in unexpected behavior.
+     * @param array|null $filter An optional array of property names to filter which properties are copied. If null, all properties are copied.
+     * @param bool $includeNull Flag indicating whether to include properties with null values. If false, properties with null values will be excluded from the copy.
+     * @return self Returns the current instance for method chaining after copying the values.
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
     {
@@ -1346,9 +1423,13 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Get table information
+     * Retrieve table information for the current instance.
      *
-     * @return PicoTableInfo
+     * This method retrieves the table information (e.g., schema, columns) associated with the current
+     * object. It lazily loads the table information, meaning it will be fetched only once and cached
+     * for future calls to improve performance.
+     *
+     * @return PicoTableInfo Returns an instance of the `PicoTableInfo` class containing the table schema and other related metadata.
      */
     public function tableInfo()
     {

@@ -828,26 +828,37 @@ class MagicDto extends stdClass // NOSONAR
         }
     }
 
+    /**
+     * Check if a method is overridden in a child class.
+     *
+     * This method uses reflection to determine if a given method is overridden in the specified child class.
+     * It compares the methods of the child class with those of its parent class, checking if the method
+     * is present in both classes but has been redefined in the child class.
+     *
+     * @param string $childClass The child class name or instance to check for method override.
+     * @param string $methodName The name of the method to check for overriding.
+     * @return bool Returns true if the method is overridden in the child class, false otherwise.
+     */
     private function isMethodOverridden($childClass, $methodName) {
-        // Buat instance ReflectionClass untuk kelas anak
+        // Create a ReflectionClass instance for the child class
         $childReflection = new ReflectionClass($childClass);
         
-        // Dapatkan kelas induk
+        // Get the parent class
         $parentClass = $childReflection->getParentClass();
         
         if ($parentClass) {
-            // Dapatkan metode dari kelas anak
+            // Get the public methods of the child class
             $childMethods = $childReflection->getMethods(ReflectionMethod::IS_PUBLIC);
             
-            // Dapatkan metode dari kelas induk
+            // Get the public methods of the parent class
             $parentMethods = $parentClass->getMethods(ReflectionMethod::IS_PUBLIC);
             
-            // Ambil nama metode dari metode induk
+            // Get the method names of the parent class
             $parentMethodNames = array_map(function($method) {
                 return $method->getName();
             }, $parentMethods);
             
-            // Cek apakah metode ada di kelas anak dan juga di kelas induk
+            // Check if the method is present in both the child and parent class
             foreach ($childMethods as $method) {
                 if ($method->getName() === $methodName && in_array($methodName, $parentMethodNames)) {
                     return true; // Metode telah di-override
@@ -855,7 +866,7 @@ class MagicDto extends stdClass // NOSONAR
             }
         }
         
-        return false; // Jika tidak ada kelas induk atau metode tidak di-override
+        return false;// No parent class or method is not overridden
     }
 
 }
