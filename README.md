@@ -172,31 +172,31 @@ If the application is built in a language other than English, it would be strang
 
 The following is an example of column mapping into Indonesian.
 
-| Original Key    | Translated Key |
-| --------------- | -------------- | 
-| name            | nama |
-| sort_order      | sort_order |
-| active          | aktif |
-| draft           | draft |
-| waiting_for     | waiting_for |
-| admin_create    | admin_buat |
-| admin_edit      | admin_ubah |
+| Original Key    | Translated Key   |
+| --------------- | ---------------- | 
+| name            | nama             |
+| sort_order      | sort_order       |
+| active          | aktif            |
+| draft           | draft            |
+| waiting_for     | waiting_for      |
+| admin_create    | admin_buat       |
+| admin_edit      | admin_ubah       |
 | admin_ask_edit  | admin_minta_ubah |
-| time_create     | waktu_buat |
-| time_edit       | waktu_ubah |
+| time_create     | waktu_buat       |
+| time_edit       | waktu_ubah       |
 | time_ask_edit   | waktu_minta_ubah |
-| ip_create       | ip_buat |
-| ip_edit         | ip_ubah |
-| ip_ask_edit     | ip_minta_ubah |
-| approval_id     | approval_id |
-| approval_note   | approval_note |
-| approval_status | approval_status |
+| ip_create       | ip_buat          |
+| ip_edit         | ip_ubah          |
+| ip_ask_edit     | ip_minta_ubah    |
+| approval_id     | approval_id      |
+| approval_note   | approval_note    |
+| approval_status | approval_status  |
 
 Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
 
 Here is an explanation of the reserved columns above.
 
-| Original Key    | Description |
+| Original Key    | Description    |
 | --------------- | -------------- | 
 | name            | A column that will represent a single row as a whole in an entity. |
 | sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
