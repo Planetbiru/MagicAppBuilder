@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -19,15 +20,11 @@ try
     $path = $workspaceDirectory."/applications/".$curApp->getId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
     if(isset($moduleFile) && !empty($moduleFile) && file_exists($path))
     {
-        header("Content-type: application/json");
-        header("Content-lenght: ".filesize($path));
-        echo file_get_contents($path);
+        ResponseUtil::sendJSON(file_get_contents($path));
     }
     else
     {
-        header("Content-type: application/json");
-        header("Content-lenght: 2");
-        echo "{}"; 
+        ResponseUtil::sendJSON(new stdClass());
     }
 }
 catch(Exception $e)

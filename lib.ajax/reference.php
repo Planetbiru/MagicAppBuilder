@@ -59,7 +59,6 @@ try
         $referenceConfig->setReferenceData($reference);
         file_put_contents($referenceConfigPath, $referenceConfig->dumpYaml());
     }
-    header("Content-type: application/json");
     ResponseUtil::sendJSON($fieldReference);
 }
 catch(Exception $e)

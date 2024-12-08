@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Util\PicoArrayUtil;
@@ -99,11 +100,8 @@ if($inputPost->getUserAction() == 'get')
     {
         // do nothing
     }
-    $responseStr = json_encode($response);
-    header("Content-type: application/json");
-    header("Content-length: ".strlen($responseStr));
 
-    echo $responseStr;
+    ResponseUtil::sendJSON($response);
 }
 
 if($inputPost->getUserAction() == 'set')
