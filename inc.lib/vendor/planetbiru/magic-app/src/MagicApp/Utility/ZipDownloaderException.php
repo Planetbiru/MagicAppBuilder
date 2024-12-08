@@ -3,7 +3,6 @@
 namespace MagicApp\Utility;
 
 use Exception;
-use Throwable;
 
 /**
  * Class ZipDownloaderException

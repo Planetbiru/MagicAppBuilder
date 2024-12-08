@@ -39,11 +39,11 @@ try
 
     $allQueries[] = "-- ------------------------------------------------------------";
     $allQueries[] = "-- Application Name : $applicationName";
-    $allQueries[] = "-- Description      : Queries for table creation and alteration ";
+    $allQueries[] = "-- Description      : Queries for table creation and modification ";
     $allQueries[] = "-- Generator        : MagicAppBuilder";
     $allQueries[] = "-- Database Type    : ".$dbType;
     $allQueries[] = "-- Database Driver  : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
-    $allQueries[] = "-- Time Generation  : ".date('j F Y H:i:s');
+    $allQueries[] = "-- Time Generated   : ".date('j F Y H:i:s');
     $allQueries[] = "-- Time Zone        : ".date('P'); 
     $allQueries[] = "-- Line Endings     : CRLF";
     $allQueries[] = "-- ------------------------------------------------------------";
@@ -108,12 +108,14 @@ try
     {
         if($inputPost->getEntity() != null && $inputPost->countableEntity())
         {
-            $allQueries[] = "-- Important to understand!\r\n-- Queries must be run one by one manually because there may be duplicate columns from different entities for the same table.";
+            $allQueries[] = "-- Important Notes:";
+            $allQueries[] = "-- Queries must be executed one by one manually, as there may be duplicate columns from different entities in the same table.";
+            $allQueries[] = "-- Consider merging queries by table to avoid duplication.";
             $inputEntity = $inputPost->getEntity();
             foreach($inputEntity as $entityName)
             {
                 $entityName = trim($entityName);
-                $path = $baseDir."/".$entityName.".php";               
+                $path = $baseDir."/".$entityName.".php"; 
                 if(file_exists($path))
                 {
                     $return_var = ErrorChecker::errorCheck($cacheDir, $path);
@@ -136,7 +138,7 @@ try
                         if(!empty($entityQueries))
                         {
                             $allQueries[] = "-- SQL for $entityName begin";
-                            $allQueries[] = implode("\r\n", $entityQueries);
+                            $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                             $allQueries[] = "-- SQL for $entityName end\r\n";
                         }
                     }
