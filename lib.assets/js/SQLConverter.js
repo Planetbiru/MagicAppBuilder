@@ -102,6 +102,14 @@ class SQLConverter {
      * @returns {string} The translated SQL schema.
      */
     translate(value, targetType) {
+
+        let dropTables = [];
+        let tableInfo = this.extractDropTableQueries(value, targetType);
+        for(let i in tableInfo)
+        {
+            dropTables.push("-- DROP TABLE IF EXISTS "+tableInfo[i].table+";");
+        }
+
         value = this.replaceAll(value, '`', '');
         value = this.replaceAll(value, ' timestamp with time zone', ' timestamptz');
         value = this.replaceAll(value, ' timestamp without time zone', ' timestamp');
@@ -117,7 +125,13 @@ class SQLConverter {
             lines.push(table);
             lines.push('');
         }
-        let resultTable = lines.join('\r\n');
+
+        if(dropTables.length > 0)
+        {
+            dropTables.push("\r\n\r\n");
+        }
+
+        let resultTable = dropTables.join("\r\n") + lines.join('\r\n');
         return resultTable;
     }
 
@@ -243,7 +257,7 @@ class SQLConverter {
         else if (targetType === 'pgsql' || targetType === 'postgresql') {
             tableName = '"' + tableName + '"';
         }
-        lines.push('CREATE TABLE ' + tableName);
+        lines.push('CREATE TABLE IF NOT EXISTS ' + tableName);
         lines.push('(');
         let linesCol = [];
         for (let i in table.columns) {
@@ -415,4 +429,58 @@ class SQLConverter {
 
         return { resultArray, maxLength };
     }
+
+    /**
+     * Extracts the DROP TABLE IF EXISTS queries from the provided SQL string.
+     * 
+     * @param {string} sql - The SQL string to be processed.
+     * @param {string} targetType - The type of database ('pgsql', 'mysql', or 'mariadb') to format the table names accordingly.
+     * @returns {Array} - An array of objects, each containing the name of a table to be dropped.
+     */
+    extractDropTableQueries(sql, targetType) {
+        // Remove backticks (`) from the entire SQL string before processing
+        const sqlWithoutBackticks = sql.replace(/`/g, '');
+    
+        // Regular expression to capture DROP TABLE IF EXISTS command
+        const regex = /DROP TABLE IF EXISTS ([^\s]+)/gi;
+        let match;
+        const result = [];
+    
+        // Loop through all matches found
+        while ((match = regex.exec(sqlWithoutBackticks)) !== null) {
+            // Store the result in the desired format
+
+            let tableName = this.extractTableName(match[1]);
+            
+            // Format the table name based on the target database type
+            if(targetType === 'pgsql') {
+                tableName = '"' + tableName + '"';
+            } else if(targetType === 'mysql' || targetType === 'mariadb') {
+                tableName = '`' + tableName + '`';
+            }
+            console.log(tableName);
+            result.push({
+                table: tableName    // Table name
+            });
+        }
+    
+        return result;
+    }
+
+    /**
+     * Extracts the table name from the input string, removing schema if present.
+     * 
+     * @param {string} input - The input string (may contain schema.table or just table).
+     * @returns {string} - The extracted table name without schema.
+     */
+    extractTableName(input) {
+        // Check if the input contains a dot (indicating a schema)
+        if (input.includes('.')) {
+            // If there is a dot, take the part after the dot as the table name
+            return input.split('.')[1];
+        }
+        // If there is no dot, it means the input is just the table name
+        return input;
+    }
+
 }
