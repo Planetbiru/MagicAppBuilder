@@ -116,11 +116,6 @@ String.prototype.prettify = function ()  //NOSONAR
  * @param {string} search - The substring to search for in the string.
  * @param {string} replacement - The string to replace each occurrence of the search substring.
  * @returns {string} A new string with all occurrences of the search substring replaced by the replacement string.
- *
- * @example
- * const str = "Hello, world! Hello again!";
- * const result = str.replaceAll("Hello", "Hi");
- * console.log(result); // Output: "Hi, world! Hi again!"
  */
 String.prototype.replaceAll = function (search, replacement)  //NOSONAR
 {
@@ -583,6 +578,11 @@ jQuery(function () {
     saveEntity();
   });
 
+  $(document).on("click", "#button_save_entity_file_as", function (e) {
+    e.preventDefault();
+    saveEntityAs();
+  });
+
   $(document).on("click", "#button_save_entity_query", function (e) {
     e.preventDefault();
     saveQuery();
@@ -949,7 +949,7 @@ jQuery(function () {
         {
           'caption': 'Yes',  // Caption for the button
           'fn': () => {
-            let query = cmEditorSQLExecute.getValue();
+            let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
             $.ajax({
               method: "POST",
@@ -1448,6 +1448,65 @@ function showModal(message, title, buttons, onHideCallback) {
   });
 }
 
+// Function to display a prompt modal with a text input
+function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
+  return new Promise((resolve, reject) => {
+    const modal = $('#customAlert');
+    const alertOverlay = $('#alertOverlay');
+    const alertMessage = $('#alertMessage');
+    const alertTitle = $('#alertTitle');
+    const modalFooter = $('#modalFooter');
+
+    // Clear previous buttons in the modal footer
+    modalFooter.empty();
+
+    // Create an input element for the user to enter text
+    const inputElement = $('<input>')
+      .addClass('form-control')  // Bootstrap class for styling input
+      .addClass('prompt-input')
+      .attr('type', 'text')
+      .attr('placeholder', 'Enter your text here')
+      .val(initialValue);  // Optional: Set a default value if needed
+
+    // Display modal and alertOverlay
+    alertOverlay.show();
+    modal.modal('show');
+
+    // Set the modal message and title
+    let messageDom = $('<div />').addClass('input-label').text(message);
+    alertMessage.empty().append(messageDom);
+    alertMessage.append(inputElement);
+    alertTitle.html(title);
+
+    
+
+    // Dynamically create buttons
+    buttons.forEach(button => {
+      const buttonElement = $('<button>')
+        .addClass(`btn ${button.class || 'btn-secondary'}`)  // Default to 'btn-secondary' if no class is provided
+        .text(button.caption)
+        .on('click', () => {
+          modal.modal('hide');
+          alertOverlay.hide();
+          if (button.caption === 'OK') {
+            resolve(inputElement.val());  // Resolve promise with the value of the input field
+          } else {
+            resolve(button.caption);  // In case of other buttons, resolve with their caption
+          }
+          button.fn();  // Execute the callback for this button
+        });
+      modalFooter.append(buttonElement);
+    });
+
+    // Add a listener for when the modal is hidden (after it is closed)
+    modal.on('hidden.bs.modal', () => {
+      if (onHideCallback) {
+        onHideCallback(); // Execute the callback when modal is closed
+      }
+    });
+  });
+}
+
 // Async function to wait for the result of the modal (any button press)
 async function asyncAlert(message, title, buttons) {
   const result = await showModal(
@@ -1459,9 +1518,19 @@ async function asyncAlert(message, title, buttons) {
       $('.modal').css({ 'overflow': '', 'overflow-y': 'auto' })
     }
   );
+}
 
-  // Log the result (the caption of the button clicked)
-  console.log(result);
+async function getUserInput(message, title, buttons, initialValue) {
+  const result = await asyncPrompt(
+    message, 
+    title, 
+    buttons,
+    initialValue, 
+    function(){
+      $('#alertOverlay').css({ 'display': 'none' });
+      $('.modal').css({ 'overflow': '', 'overflow-y': 'auto' })
+    }
+  );
 }
 
 
@@ -1521,7 +1590,6 @@ function editMenu(el) {
 
 function editSubmenu(el) {
   let menu = $(el).siblings('.app-submenu');
-  console.log(menu.text())
 }
 
 let draggedItem = null;
@@ -1749,7 +1817,6 @@ function translateEntity(clbk) {
           textOut2.push(data[i].translated);
           propertyNames.push(data[i].propertyName);
         }
-        console.log(propertyNames)
         transEd1.getDoc().setValue(textOut1.join('\r\n'));
         transEd2.getDoc().setValue(textOut2.join('\r\n'));
         $('.entity-property-name').val(propertyNames.join('|'));
@@ -2169,10 +2236,64 @@ function saveEntity() {
         addHilightLineError(data.error_line - 1)
         if (!data.success) {
           showAlertUI(data.title, data.message);
-          setTimeout(function () { closeAlertUI() }, 2000);
+          setTimeout(function () { closeAlertUI() }, 5000);
         }
       },
     });
+  } else {
+    showAlertUI("Alert", "No file open");
+  }
+}
+
+/**
+ * Saves the current entity to the server.
+ *
+ * This function checks if an entity is currently open. If so, it disables the
+ * save button and retrieves the content from the editor. It then sends an AJAX
+ * POST request to update the entity's content on the server. Upon successful 
+ * completion, it re-enables the save button, updates various UI components,
+ * and highlights any error lines. If no entity is open, it shows an alert to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
+function saveEntityAs() {
+  if (currentEntity != "") {
+    //$("#button_save_entity_file_as").attr("disabled", "disabled");
+    let fileContent = cmEditorFile.getDoc().getValue();
+
+    getUserInput('New Entity', 'Save Entity As', [
+      {
+        'caption': 'Yes',  // Caption for the button
+        'fn': () => {
+          let newEntity = $('.prompt-input').val();        
+          $.ajax({
+            type: "POST",
+            url: "lib.ajax/entity-save-as.php",
+            dataType: "json",
+            data: { content: fileContent, entity: currentEntity, newEntity: newEntity },
+            success: function (data) {
+              updateEntityFile();
+              updateEntityQuery(true);
+              updateEntityRelationshipDiagram();
+              removeHilightLineError();
+              addHilightLineError(data.error_line - 1)
+              if (!data.success) {
+                showAlertUI(data.title, data.message);
+                setTimeout(function () { closeAlertUI() }, 5000);
+              }
+            },
+          });
+          
+        },  // Callback for OK button
+        'class': 'btn-primary'  // Bootstrap class for styling
+      },
+      {
+        'caption': 'No',  // Caption for the button
+        'fn': () => { },  // Callback for Cancel button
+        'class': 'btn-secondary'  // Bootstrap class for styling
+      }
+    ], 
+    currentEntity);
   } else {
     showAlertUI("Alert", "No file open");
   }

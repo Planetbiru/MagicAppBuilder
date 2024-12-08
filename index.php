@@ -438,7 +438,7 @@ $constSelected = ' selected';
                 <div class="column-body">
                   <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
                   <div class="button-area">
-                    <button class="btn btn-success" id="button_save_module_file" type="button" disabled>Save File</button>
+                    <button class="btn btn-success" id="button_save_module_file" type="button" disabled>Save Module</button>
                   </div>
                 </div>
               </div>
@@ -464,7 +464,8 @@ $constSelected = ' selected';
                 <div class="column-body">
                   <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
                   <div class="button-area">
-                    <button class="btn btn-success" id="button_save_entity_file" type="button" disabled>Save File</button>
+                    <button class="btn btn-success" id="button_save_entity_file" type="button" disabled>Save Entity</button>
+                    <button class="btn btn-success" id="button_save_entity_file_as" type="button">Save Entity</button>
                   </div>
                 </div>
               </div>
