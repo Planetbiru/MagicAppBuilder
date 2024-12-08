@@ -133,7 +133,6 @@ class SecretObject extends stdClass // NOSONAR
      */
     private $_secureFunction = null; // NOSONAR
 
-
     /**
      * Constructor for initializing the object with data.
      *

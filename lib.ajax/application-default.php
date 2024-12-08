@@ -28,7 +28,6 @@ try
     }
 
     $currentApplication = new AppSecretObject();
-
     $currentApplication->setId($appId);
 
     $builderConfig->setCurrentApplication($currentApplication);
