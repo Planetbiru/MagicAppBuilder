@@ -352,7 +352,7 @@ jQuery(function () {
       let row = $(this).closest('tr');
       asyncAlert(
         'Do you want to remove this row?',  // Message to display in the modal
-        'Delete Confirmation',  // Modal title
+        'Deletion Confirmation',  // Modal title
         [
           {
             'caption': 'Yes',  // Caption for the button
@@ -606,7 +606,7 @@ jQuery(function () {
 
     asyncAlert(
       'Are you sure you want to generate entity and replace existing file?',  // Message to display in the modal
-      'Confirmation',  // Modal title
+      'Entity Generation Confirmation',  // Modal title
       [
         {
           'caption': 'Yes',  // Caption for the button
@@ -701,7 +701,7 @@ jQuery(function () {
       let row = $(this).closest('tr');
       asyncAlert(
         'Deleting this path will not remove the directory or its files. <br>Do you want to delete this path?',  // Message to display in the modal
-        'Delete Confirmation',  // Modal title
+        'Deletion Confirmation',  // Modal title
         [
           {
             'caption': 'Yes',  // Caption for the button
@@ -858,7 +858,7 @@ jQuery(function () {
       let row = $(this).closest('tr');
       asyncAlert(
         'Deleting this language will not remove the directory or its files. <br>Do you want to delete this language?',  // Message to display in the modal
-        'Delete Confirmation',  // Modal title
+        'Deletion Confirmation',  // Modal title
         [
           {
             'caption': 'Yes',  // Caption for the button
@@ -944,7 +944,7 @@ jQuery(function () {
     let modal = $(this).closest('.modal');
     asyncAlert(
       'Do you want to execute the queries on the current database?',  // Message to display in the modal
-      'Confirmation',  // Modal title
+      'Query Execution Confirmation',  // Modal title
       [
         {
           'caption': 'Yes',  // Caption for the button
