@@ -31,6 +31,7 @@ class PicoArrayUtil
      * 
      * Example:
      * ```php
+     * <?php
      * $data = ['first_name' => 'John', 'last_name' => 'Doe'];
      * $camelized = PicoArrayUtil::camelize($data);
      * // $camelized is ['firstName' => 'John', 'lastName' => 'Doe']
@@ -58,6 +59,7 @@ class PicoArrayUtil
      * 
      * Example:
      * ```php
+     * <?php
      * $data = ['firstName' => 'John', 'lastName' => 'Doe'];
      * $snakeized = PicoArrayUtil::snakeize($data);
      * // $snakeized is ['first_name' => 'John', 'last_name' => 'Doe']

@@ -33,6 +33,7 @@ class AttrUtil
      *
      * Example:
      * ```php
+     * <?php
      * echo AttrUtil::selected($currentValue, $optionValue);
      * // Outputs: selected="selected" if they match
      * ```
@@ -55,6 +56,7 @@ class AttrUtil
      *
      * Example:
      * ```php
+     * <?php
      * echo AttrUtil::checked($currentValue, $inputValue);
      * // Outputs: checked="checked" if they match
      * ```

@@ -51,6 +51,7 @@ class Dms
      *
      * Example:
      * ```php
+     * <?php
      * $dms = new Dms();
      * $dms->dmsToDd(34, 15, 30);
      * echo $dms->printDd(); // Outputs: 34.258333
@@ -82,6 +83,7 @@ class Dms
      *
      * Example:
      * ```php
+     * <?php
      * $dms = new Dms();
      * $dms->ddToDms(34.258333);
      * echo $dms->printDms(); // Outputs: 34:15:30

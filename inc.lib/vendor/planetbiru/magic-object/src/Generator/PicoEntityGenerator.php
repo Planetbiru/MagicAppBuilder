@@ -3,6 +3,7 @@
 namespace MagicObject\Generator;
 
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\PicoStringUtil;
 
 /**
@@ -354,7 +355,7 @@ class PicoEntityGenerator
             "float" => "float",              // MySQL: FLOAT
             "bigint" => "bigint",            // MySQL: BIGINT
             "smallint" => "smallint",        // MySQL: SMALLINT
-            "tinyint(1)" => "bool",          // MySQL-style, use boolean for tinyint(1)
+            "tinyint(1)" => "tinyint",    // MySQL-style, use boolean for tinyint(1)
             "tinyint" => "tinyint",          // MySQL: TINYINT
             "int" => "int",                  // MySQL: INT
             "serial" => "int",               // MySQL: auto-increment integer (equivalent to INT)
@@ -408,6 +409,204 @@ class PicoEntityGenerator
         );
     }
 
+    /**
+     * Returns a mapping of database column types to the target database type equivalents.
+     *
+     * This method provides a conversion map from various database column types 
+     * (such as those from PostgreSQL or SQLite) to the target database column types.
+     * The mapping is useful for normalizing column types when migrating data 
+     * between different database systems or for general type compatibility.
+     *
+     * @param string $targetDb The target database type ('mysql', 'postgresql', or 'sqlite').
+     * @return array An associative array where keys are column types from other databases 
+     *               and values are the corresponding target database column types.
+     */
+    public function getColumnMapByType($targetDb)
+    {
+        $map = array();
+
+        // MySQL column types
+        if ($targetDb == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
+            $map = array(
+                // Numeric types
+                "double" => "float",
+                "float" => "float",
+                "bigint" => "bigint",
+                "smallint" => "smallint",
+                "tinyint(1)" => "bool",
+                "tinyint" => "tinyint",
+                "int" => "int",
+                "serial" => "int",
+                "bigserial" => "bigint",
+                "mediumint" => "mediumint",
+                "smallserial" => "smallint",
+                "unsigned" => "unsigned",
+                
+                // String types
+                "nvarchar" => "varchar",
+                "varchar" => "varchar",
+                "character varying" => "varchar",
+                "char" => "char",
+                "text" => "text",
+                "varchar(255)" => "varchar",
+                "citext" => "text",
+                
+                // MySQL-style text types
+                "tinytext" => "tinytext",
+                "mediumtext" => "mediumtext",
+                "longtext" => "longtext",
+                
+                // Boolean types
+                "bool" => "tinyint(1)",
+                "boolean" => "tinyint(1)",
+                
+                // Date/Time types
+                "timestamp" => "timestamp",
+                "datetime" => "datetime",
+                "date" => "date",
+                "time" => "time",
+                "timestamp with time zone" => "timestamp",
+                "timestamp without time zone" => "timestamp",
+                "year" => "year",
+                
+                // MySQL-specific types
+                "json" => "json",
+                "uuid" => "char(36)",
+                "xml" => "text",
+                "inet" => "varchar(45)",
+                "macaddr" => "varchar(17)",
+                "point" => "point",
+                "polygon" => "polygon",
+                "line" => "line",
+                "blob" => "blob",
+                
+                // Special cases
+                "jsonb" => "json",
+            );
+        }
+
+        // PostgreSQL column types
+        elseif ($targetDb == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
+            $map = array(
+                // Numeric types
+                "double" => "double precision",
+                "float" => "real",
+                "bigint" => "bigint",
+                "smallint" => "smallint",
+                "tinyint(1)" => "boolean",
+                "tinyint" => "smallint",
+                "int" => "integer",
+                "serial" => "serial",
+                "bigserial" => "bigserial",
+                "mediumint" => "integer",
+                "smallserial" => "smallint",
+                "unsigned" => "integer",
+                
+                // String types
+                "nvarchar" => "varchar",
+                "varchar" => "varchar",
+                "character varying" => "varchar",
+                "char" => "char",
+                "text" => "text",
+                "varchar(255)" => "varchar",
+                "citext" => "citext",
+                
+                // PostgreSQL-style text types
+                "tinytext" => "text",
+                "mediumtext" => "text",
+                "longtext" => "text",
+                
+                // Boolean types
+                "bool" => "boolean",
+                "boolean" => "boolean",
+                
+                // Date/Time types
+                "timestamp" => "timestamp",
+                "datetime" => "timestamp",
+                "date" => "date",
+                "time" => "time",
+                "timestamp with time zone" => "timestamptz",
+                "timestamp without time zone" => "timestamp",
+                "year" => "date",
+                
+                // PostgreSQL-specific types
+                "json" => "jsonb",
+                "uuid" => "uuid",
+                "xml" => "xml",
+                "inet" => "inet",
+                "macaddr" => "macaddr",
+                "point" => "point",
+                "polygon" => "polygon",
+                "line" => "line",
+                "blob" => "bytea",
+                
+                // Special cases
+                "jsonb" => "jsonb",
+            );
+        }
+
+        // SQLite column types
+        elseif ($targetDb == PicoDatabaseType::DATABASE_TYPE_SQLITE) {
+            $map = array(
+                // Numeric types
+                "double" => "real",
+                "float" => "real",
+                "bigint" => "integer",
+                "smallint" => "integer",
+                "tinyint(1)" => "integer",
+                "tinyint" => "integer",
+                "int" => "integer",
+                "serial" => "integer",
+                "bigserial" => "integer",
+                "mediumint" => "integer",
+                "smallserial" => "integer",
+                "unsigned" => "integer",
+                
+                // String types
+                "nvarchar" => "text",
+                "varchar" => "text",
+                "character varying" => "text",
+                "char" => "text",
+                "text" => "text",
+                "varchar(255)" => "text",
+                "citext" => "text",
+                
+                // SQLite-style text types
+                "tinytext" => "text",
+                "mediumtext" => "text",
+                "longtext" => "text",
+                
+                // Boolean types
+                "bool" => "integer",
+                "boolean" => "integer",
+                
+                // Date/Time types
+                "timestamp" => "datetime",
+                "datetime" => "datetime",
+                "date" => "date",
+                "time" => "time",
+                "timestamp with time zone" => "datetime",
+                "timestamp without time zone" => "datetime",
+                "year" => "integer",
+                
+                // SQLite-specific types
+                "json" => "text",
+                "uuid" => "text",
+                "xml" => "text",
+                "inet" => "text",
+                "macaddr" => "text",
+                "point" => "text",
+                "polygon" => "text",
+                "line" => "text",
+                "blob" => "blob",
+                
+                // Special cases
+                "jsonb" => "json",
+            );
+        }
+
+        return $map;
+    }
 
     /**
      * Generate the entity class and save it to a file.

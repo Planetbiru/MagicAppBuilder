@@ -34,7 +34,8 @@ class PicoYamlUtil
      * This method recursively calculates how deep the given array is.
      * 
      * Example:
-     * ```
+     * ```php
+     * <?php
      * $array = [1, [2, [3, 4]]];
      * $depth = PicoYamlUtil::arrayDepth($array); // Returns 3
      * ```
@@ -72,7 +73,8 @@ class PicoYamlUtil
      * serialization.
      *
      * Example:
-     * ```
+     * ```php
+     * <?php
      * $data = ['name' => 'John', 'age' => 30];
      * $yaml = PicoYamlUtil::dump($data, null, 4, 0);
      * ```
