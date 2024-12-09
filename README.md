@@ -177,20 +177,22 @@ Steps to create an application with MagicAppBuilder
 7.   Click the "Reload Table" button to load all tables from the specified database.
     
 8.   Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
+
+9.   Select the path where the module will be located.
     
-9   Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
+10.    Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
     
-10.   Check the checkboxes and radio buttons according to how the module will be created.
+12.   Check the checkboxes and radio buttons according to how the module will be created.
     
-11.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
+13.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
     
-12.   Click the "Data Filter" button to define the data filter.
+14.   Click the "Data Filter" button to define the data filter.
     
-13.   Click the "Data Order" button to define the order of the data.
+15.   Click the "Data Order" button to define the order of the data.
     
-14.   Click the "Module Filter" button to configure the module features.
+16.   Click the "Module Filter" button to configure the module features.
     
-14.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
+17.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
 
 ### Reserved Column Mapping
 
