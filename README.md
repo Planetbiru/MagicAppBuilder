@@ -165,10 +165,10 @@ Steps to create an application with MagicAppBuilder
     
 4.   Update application settings consisting of:
 
-    - Application
-    - Database
-    - Session
-    - Reserved columns
+- Application
+- Database
+- Session
+- Reserved columns
     
 5.   Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
     
