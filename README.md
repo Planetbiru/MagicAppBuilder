@@ -155,9 +155,14 @@ Steps to create an application with MagicAppBuilder
     -   Application features should be defined before creating the entity relationship diagram.
 2.   Export the entity relationship diagram into SQL.
     
-3.   Add the application to be created in MagicAppBuilder.
+3.   Create new application on MagicAppBuilder and set as default application.
     
-4.   Create application settings and column mapping.
+4.   Update application settings consisting of:
+
+    - Application
+    - Database
+    - Session
+    - Reserved columns
     
 5.   Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
     
