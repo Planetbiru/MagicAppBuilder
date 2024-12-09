@@ -43,6 +43,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $obj = new PicoGenericObject();
      * $obj->loadData(['first_name' => 'John', 'last_name' => 'Doe']);
      * echo $obj->get('firstName'); // Outputs: John
@@ -70,6 +71,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $obj = new PicoGenericObject();
      * $obj->set('first_name', 'John');
      * echo $obj->get('firstName'); // Outputs: John
@@ -93,6 +95,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $value = $obj->get('firstName'); // Retrieves the value of 'firstName'
      * ```
      *
@@ -112,6 +115,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $obj->firstName = 'John'; // Calls __set() internally
      * ```
      *
@@ -131,6 +135,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $value = $obj->firstName; // Calls __get() internally
      * ```
      *
@@ -150,6 +155,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * if ($obj->issetFirstName()) {
      *     // Do something
      * }
@@ -168,6 +174,7 @@ class PicoGenericObject extends stdClass
      *
      * Example:
      * ```php
+     * <?php
      * $obj->unsetFirstName(); // Removes the property 'firstName'
      * ```
      *

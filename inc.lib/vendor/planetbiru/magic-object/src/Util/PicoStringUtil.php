@@ -15,6 +15,7 @@ use stdClass;
  *
  * Example usage:
  * ```
+ * <?php
  * $camelCase = PicoStringUtil::camelize('example_string');
  * $kebabCase = PicoStringUtil::kebapize('exampleString');
  * $isNotEmpty = PicoStringUtil::isNotNullAndNotEmpty('Some Value');
