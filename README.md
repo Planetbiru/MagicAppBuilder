@@ -174,7 +174,8 @@ Steps to create an application with MagicAppBuilder
 11.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
     
 12.   Click the "Data Filter" button to define the data filter.
-    13.   Click the "Data Order" button to define the order of the data.
+    
+13.   Click the "Data Order" button to define the order of the data.
     
 14.   Click the "Module Filter" button to configure the module features.
     
