@@ -17,7 +17,7 @@ In this situation, the project owner definitely needs a tool to create applicati
 
 MagicAppBuilder is the answer to all this.
 
-Of course. Because with MagicAppBuilder, a CRUD module that has the features mentioned above can be created in less than 30 minutes. Yes, you didn't read it wrong and I didn't write it wrong. 30 minutes is the time needed for developers to select columns from a module. Is the input in the form of inline text, textarea, select or checkbox and what filter is appropriate for that column. Of course, there is still plenty of time left and enough to edit the program code manually if necessary.
+Of course. Because with MagicAppBuilder, a CRUD module that has the features mentioned above can be created in **less than 30 minutes**. Yes, you didn't read it wrong and I didn't write it wrong. 30 minutes is the time needed for developers to select columns from a module. Is the input in the form of inline text, textarea, select or checkbox and what filter is appropriate for that column. Of course, there is still plenty of time left and enough to edit the program code manually if necessary.
 
 If a module can be created in 30 minutes, then in one day, a developer can create at least 16 new CRUD modules. Within 2 weeks, a developer can create 160 standard CRUD modules with the features above.
 
@@ -134,28 +134,57 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 
 ### Steps
 
+#### MagicAppBuilder Preparation
+
+1. Prepare the server, which should include:
+	    -   A Web Server, such as Apache Server
+	    -   PHP
+	    -   A Database, such as MySQL, MariaDB, or PostgreSQL For Windows users, it is recommended to use XAMPP or Wamp Server, but a portable web server that includes the web server, PHP, and the database can also be used.
+2. Download the MagicAppBuilder source code.
+3. Place the MagicAppBuilder source code into a directory under the document root in a separate folder, as the document root will also contain the directories for the applications to be created.
+4. Open MagicAppBuilder in a browser using the appropriate server name, port, and path.
+5. Ensure that MagicAppBuilder is running correctly.
+6. Create MagicAppBuilder settings.
+
+#### Project Preparation
+
 Steps to create an application with MagicAppBuilder
 
-1. Create a complete entity relationship diagram with the following rules:
-    - The column for the primary key of a table must be the same as the table name and added with the suffix _id.
-    - Columns that are foreign keys that refer to other tables are strongly recommended to be given the same name as the primary key of the table in question.
-    - If there are several columns that must be given a specific name that refers to the primary key of a table, then this is a note when creating a module.
-    - Columns with the same purpose of use must have the same name in all tables.
-    - Application features should be determined before the entity relationship diagram is created.
-2. Export the entity relationship diagram into a database. Currently only supports MySQL and MariaDB.
-3. Install MagicAppBuilder on your server.
-4. Create MagicAppBuilder settings.
-5. Add the application to be created in MagicAppBuilder.
-6. Create application settings and column mapping.
-7. Click the "Reload Table" button to load all tables from the specified database.
-8. Select a table from one of the tables. MagicAppBuilder will automatically fill in some inputs from the form. You can change some inputs before continuing.
-9. Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
-10. Check the check boxes and radio buttons according to how the module will be created.
-11. If you choose "select" in the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to determine the reference you will create. This section will be explained separately.
-12. Click the "Data Filter" button to determine the data filter.
-13. Click the "Data Order" button to determine the order of the data.
-14. Click the "Module Filter" button to determine the module features.
-15. Click the "Generate Script" button to create a script automatically. MagicAppBuilder will create a module script and some entity scripts required by the module. If in step number 8 you check "Update Entity", then MagicAppBuilder will update the existing entity. Be careful if you have defined the entity before.
+
+1.   Create a complete entity relationship diagram (ERD) with the following rules:
+    
+    -   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
+    -   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
+    -   If there are multiple columns that refer to a primary key of a table, this should be noted when creating a module.
+    -   Columns with the same purpose across different tables must have the same name.
+    -   Application features should be defined before creating the entity relationship diagram.
+2.   Export the entity relationship diagram into SQL.
+    
+3.   Add the application to be created in MagicAppBuilder.
+    
+4.   Create application settings and column mapping.
+    
+5.   Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
+    
+6.   Execute the SQL that has been converted.
+    
+7.   Click the "Reload Table" button to load all tables from the specified database.
+    
+8.   Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
+    
+9   Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
+    
+10.   Check the checkboxes and radio buttons according to how the module will be created.
+    
+11.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
+    
+12.   Click the "Data Filter" button to define the data filter.
+    
+13.   Click the "Data Order" button to define the order of the data.
+    
+14.   Click the "Module Filter" button to configure the module features.
+    
+14.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
 
 ### Reserved Column Mapping
 
@@ -197,8 +226,8 @@ Developers for applications that use Indonesian as the native language of the ap
 
 Here is an explanation of the reserved columns above.
 
-| Original Key    | Description    |
-| --------------- | -------------- | 
+| Original Key    | Description      |
+| --------------- | ---------------- | 
 | name            | A column that will represent a single row as a whole in an entity. |
 | sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
 | active          | Columns to activate and deactivate data |
