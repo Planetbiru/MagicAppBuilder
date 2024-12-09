@@ -33,8 +33,9 @@ MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for
 
 ## Dependency
 
--   **MagicObject:** The library for creating entities from database tables.
--   **MagicApp:** The core application that facilitates rapid CRUD module generation.
+-   **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
+-   **MagicObject:** A library for creating entities from database tables.
+-   **Symfony/Yaml:** A library for serializing and deserializing YAML strings and files.
 
 ## Advantages of MagicAppBuilder
 

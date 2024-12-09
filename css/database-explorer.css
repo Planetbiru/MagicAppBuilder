@@ -436,4 +436,8 @@ textarea:focus-visible {
 
 .original {
   height: calc(100vh - 176px);
+}
+
+.input-label {
+  padding-bottom: 2px;
 }/*# sourceMappingURL=database-explorer.css.map */
