@@ -213,5 +213,9 @@ $baseDir = $appConf->getBaseApplicationDirectory();
 $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir);
 
 $dir3 = $baseDir."/inc.cfg";
+if(!file_exists($dir3))
+{
+    mkdir($dir3, 0755, true);
+}
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
