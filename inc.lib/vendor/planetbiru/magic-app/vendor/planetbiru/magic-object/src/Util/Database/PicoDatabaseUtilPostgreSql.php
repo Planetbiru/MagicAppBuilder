@@ -323,27 +323,28 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') !== false)
+        $result = $defaultValue;
+        if(self::isTypeBoolean($type))
         {
-            return $defaultValue != 0 ? 'true' : 'false';
+            $result = $defaultValue != 0 ? 'true' : 'false';
         }
-        else if (strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null') {
-            return $defaultValue;
+        else if(self::isNativeValue($defaultValue)) {
+            $result = $defaultValue;
         }     
-        else if (stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false) {
-            return "'" . addslashes($defaultValue) . "'";
+        else if(self::isTypeText($type)) {
+            $result = "'" . addslashes($defaultValue) . "'";
         }
-        else if(stripos($type, 'int') !== false)
+        else if(self::isTypeInteger($type))
         {
             $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
-            return (int)$defaultValue;
+            $result = (int)$defaultValue;
         }
-        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        else if(self::isTypeFloat($type))
         {
             $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
-            return (float)$defaultValue;
+            $result = (float)$defaultValue;
         }
-        return $defaultValue;
+        return $result;
     }
 
     /**

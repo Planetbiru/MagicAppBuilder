@@ -24,7 +24,7 @@ class PicoDatabaseUtilBase // NOSONAR
     {
         $autoIncrement = $tableInfo->getAutoIncrementKeys();
         $autoIncrementKeys = array();
-        if(is_array($autoIncrement) && !empty($autoIncrement))
+        if(self::isArray($autoIncrement) && !empty($autoIncrement))
         {
             foreach($autoIncrement as $col)
             {
@@ -68,7 +68,7 @@ class PicoDatabaseUtilBase // NOSONAR
      */
     private function isArrayMagicObject($data)
     {
-        return is_array($data) && isset($data[0]) && $data[0] instanceof MagicObject;
+        return self::isArray($data) && isset($data[0]) && $data[0] instanceof MagicObject;
     }
     
     /**
@@ -247,7 +247,7 @@ class PicoDatabaseUtilBase // NOSONAR
     public function processDataMapping($data, $columns, $maps = null)
     {
         // Check if mappings are provided and are in array format
-        if(isset($maps) && is_array($maps))
+        if(self::isArray($maps))
         {
             foreach($maps as $map)
             {
@@ -337,19 +337,6 @@ class PicoDatabaseUtilBase // NOSONAR
             $tables[] = $tableInfo;
         }
         return $tables;
-    }
-
-    /**
-     * Checks if the provided array is not empty.
-     *
-     * This method verifies that the input is an array and contains at least one element.
-     *
-     * @param array $array The array to be checked.
-     * @return bool True if the array is not empty; otherwise, false.
-     */
-    public function isNotEmpty($array)
-    {
-        return $array != null && is_array($array) && !empty($array);
     }
 
     /**
@@ -820,5 +807,100 @@ class PicoDatabaseUtilBase // NOSONAR
         
         return $query;
     }
+    
+    /**
+     * Checks if the given value is a native value (true, false, or null).
+     *
+     * This function checks if the provided `$defaultValue` is a string representing
+     * one of the native values: "true", "false", or "null".
+     *
+     * @param string $defaultValue The value to check.
+     * @return bool True if the value is "true", "false", or "null", false otherwise.
+     */
+    public static function isNativeValue($defaultValue)
+    {
+        return strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null';
+    }
 
+    /**
+     * Checks if the given type is a boolean type.
+     *
+     * This function checks if the provided `$type` contains the word "bool", 
+     * indicating it is a boolean type (e.g., bool, boolean).
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type contains "bool", false otherwise.
+     */
+    public static function isTypeBoolean($type)
+    {
+        return stripos($type, 'bool') !== false;
+    }
+
+    /**
+     * Checks if the given type is a text-based type.
+     *
+     * This function checks if the provided `$type` contains the word "enum", "varchar", 
+     * "char", or "text", indicating it is a text-based type (e.g., enum, varchar, char, text).
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type contains "enum", "varchar", "char", or "text", false otherwise.
+     */
+    public static function isTypeText($type)
+    {
+        return stripos($type, 'enum') !== false || stripos($type, 'varchar') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false;
+    }
+
+    /**
+     * Checks if the given type is an integer type.
+     *
+     * This function checks if the provided `$type` contains the word "int",
+     * indicating it is an integer type (e.g., int, integer).
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type contains "int", false otherwise.
+     */
+    public static function isTypeInteger($type)
+    {
+        return stripos($type, 'int') !== false;
+    }
+
+    /**
+     * Checks if the given type is a float type.
+     *
+     * This function checks if the provided `$type` contains any of the words
+     * "decimal", "float", "double", or "real", indicating it is a floating-point type.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type contains "decimal", "float", "double", or "real", false otherwise.
+     */
+    public static function isTypeFloat($type)
+    {
+        return stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false;
+    }
+
+    /**
+     * Checks if the given value is an array.
+     *
+     * This function checks if the provided `$value` is set and is an array.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value is an array, false otherwise.
+     */
+    public static function isArray($value)
+    {
+        return isset($value) && is_array($value);
+    }
+
+    /**
+     * Checks if the provided array is not empty.
+     *
+     * This method verifies that the input is an array and contains at least one element.
+     *
+     * @param array $array The array to be checked.
+     * @return bool True if the array is not empty; otherwise, false.
+     */
+    public function isNotEmpty($array)
+    {
+        return self::isArray($array) && !empty($array);
+    }
 }

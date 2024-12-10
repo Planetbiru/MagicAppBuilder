@@ -66,7 +66,7 @@ class NativeQueryUtil
             else if (isset($callerParams[$index])) {
                 // Format parameter name according to the query
                 $paramName = $callerParams[$index]->getName();
-                if(is_array($paramValue))
+                if(PicoDatabaseUtil::isArray($paramValue))
                 {
                     $queryString = str_replace(":".$paramName, PicoDatabaseUtil::toList($paramValue, true, true), $queryString);
                 }

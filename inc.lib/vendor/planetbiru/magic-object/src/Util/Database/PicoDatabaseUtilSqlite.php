@@ -84,7 +84,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         $pKeyArr = array();
         $pKeyArrUsed = array();
-        if(isset($pKeys) && is_array($pKeys) && !empty($pKeys))
+        if(self::isArray($pKeys) && !empty($pKeys))
         {
             $pkVals = array_values($pKeys);
             foreach($pkVals as $pk)
@@ -177,14 +177,14 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $sqlType = '';
 
         // Check for auto-increment primary key
-        if (is_array($autoIncrementKeys) && in_array($columnName, $autoIncrementKeys)) {
+        if (self::isArray($autoIncrementKeys) && in_array($columnName, $autoIncrementKeys)) {
             $sqlType = 'INTEGER PRIMARY KEY';
             $pKeyArrUsed[] = $columnName; // Add to used primary keys
         } else {
             // Default mapping of column types to SQL types
             $typeMapping = array(
                 'varchar' => "NVARCHAR($length)",
-                'tinyint(1)' => 'BOOLEAN',
+                'tinyint(1)' => 'BOOLEAN', // NOSONAR
                 'float' => 'REAL',
                 'text' => 'TEXT',
                 'longtext' => 'TEXT',
@@ -276,22 +276,19 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             $query[] = "";
         }
         $createStatement = "";
-
         $createStatement = "CREATE TABLE";
         if($createIfNotExists)
         {
             $createStatement .= " IF NOT EXISTS";
         }
 
-        $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
-
         $query[] = "$createStatement $tableName (";
 
         $cols = $tableInfo->getColumns();
 
-
         $pk = $tableInfo->getPrimaryKeys();
-        if(isset($pk) && is_array($pk) && !empty($pk))
+        
+        if(self::isArray($pk) && !empty($pk))
         {
             foreach($pk as $prop=>$primaryKey)
             {
@@ -299,9 +296,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             }
         }
 
+        $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
         foreach($tableInfo->getColumns() as $k=>$column)
         {
-            if(isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+            if(self::isArray($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
             {
                 $cols[$k]['auto_increment'] = true;
             }
@@ -338,7 +336,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * 
      * @return string The corresponding SQLite data type (e.g., 'BOOLEAN', 'NVARCHAR(255)', 'REAL', 'NUMERIC', 'TEXT').
      */
-    private function mysqlToSqliteType($type)
+    private function mysqlToSqliteType($type) // NOSONAR
     {
         // Trim any whitespace and convert to lowercase for easier comparison
         $typeCheck = trim(strtolower($type));
@@ -350,8 +348,11 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             'float' => 'REAL',          // MySQL 'float' maps to SQLite 'REAL'
             'double' => 'REAL',         // MySQL 'double' maps to SQLite 'REAL'
             'decimal' => 'NUMERIC',     // MySQL 'decimal' maps to SQLite 'NUMERIC'
-            'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
+            'tinytext' => 'TEXT',       // MySQL 'tinytext' maps to SQLite 'TEXT'
+            'smalltext' => 'TEXT',      // MySQL 'smalltext' maps to SQLite 'TEXT'
+            'mediumtext' => 'TEXT',     // MySQL 'mediumtext' maps to SQLite 'TEXT'
             'longtext' => 'TEXT',       // MySQL 'longtext' maps to SQLite 'TEXT'
+            'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
             'date' => 'TEXT',           // MySQL 'date' maps to SQLite 'TEXT'
             'datetime' => 'TEXT',       // MySQL 'datetime' maps to SQLite 'TEXT'
             'timestamp' => 'TEXT'       // MySQL 'timestamp' maps to SQLite 'TEXT'
@@ -478,34 +479,30 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') !== false)
+        $result = $defaultValue;
+        if(self::isTypeBoolean($type))
         {
-            return $defaultValue != 0 ? 'true' : 'false';
+            $result = $defaultValue != 0 ? 'true' : 'false';
         }
-        else if(strtolower($defaultValue) == 'true' 
-        || strtolower($defaultValue) == 'false' 
-        || strtolower($defaultValue) == 'null'
-        )
+        else if(self::isNativeValue($defaultValue))
         {
-            return $defaultValue;
+            $result = $defaultValue;
         }
-        else if(stripos($type, 'char') !== false 
-        || stripos($type, 'text') !== false 
-        )
+        else if(self::isTypeText($type))
         {
-            return "'".$defaultValue."'";
+            $result = "'".$defaultValue."'";
         }
-        else if(stripos($type, 'int') !== false)
+        else if(self::isTypeInteger($type))
         {
             $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
-            return (int)$defaultValue;
+            $result = (int)$defaultValue;
         }
-        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        else if(self::isTypeFloat($type))
         {
             $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
-            return (float)$defaultValue;
+            $result = (float)$defaultValue;
         }
-        return $defaultValue;
+        return $result;
     }
 
     /**

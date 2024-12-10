@@ -65,9 +65,8 @@ class PicoSpecification // NOSONAR
      * are set, adds a PicoPredicate condition using the given field and value.
      *
      * @param string|null $field The name of the field to be used in the predicate. 
-     *                            If null, no predicate is added.
+     *                           If null, no predicate is added.
      * @param mixed|null  $value The value to compare against the field in the predicate. 
-     *                            If null, no predicate is added.
      * 
      * @return self A new instance of the class with the optionally added predicate.
      */
@@ -99,8 +98,7 @@ class PicoSpecification // NOSONAR
      */
     public function add($predicate)
     {
-        $this->addAnd($predicate);
-        return $this;
+        return $this->addAnd($predicate);
     }
 
     /**
@@ -185,7 +183,7 @@ class PicoSpecification // NOSONAR
      */
     private function addFilterByArray($predicate, $logic)
     {
-        if(isset($predicate) && is_array($predicate))
+        if(self::isArray($predicate))
         {
             foreach ($predicate as $key => $value) {
                 $pred = new PicoPredicate($key, $value);
@@ -235,6 +233,17 @@ class PicoSpecification // NOSONAR
     public function isEmpty()
     {
         return empty($this->specifications);
+    }
+    
+    /**
+     * Check if the given input is an array.
+     *
+     * @param mixed $array The input to check.
+     * @return bool True if the input is an array, false otherwise.
+     */
+    public static function isArray($array)
+    {
+        return isset($array) && is_array($array);
     }
 
     /**
@@ -289,14 +298,14 @@ class PicoSpecification // NOSONAR
     private function getWhere($specifications)
     {
         $arr = array();
-        if(isset($specifications) && is_array($specifications))
+        if(self::isArray($specifications))
         {
             foreach ($specifications as $spec) {
                 if (isset($spec) && $spec instanceof PicoPredicate) {
                     $entityField = new PicoEntityField($spec->getField());
                     $field = $entityField->getField();
                     $parentField = $entityField->getParentField();
-                    $column = ($parentField === null) ? $field : $parentField . "." . $field;
+                    $column = $this->getColumnName($field, $parentField);
                     if ($spec->getComparation() !== null) {
                         $where = $spec->getFilterLogic() . " " . $column . " " . $spec->getComparation()->getComparison() . " " . PicoDatabaseUtil::escapeValue($spec->getValue());
                         $arr[] = $where;
@@ -308,6 +317,21 @@ class PicoSpecification // NOSONAR
             }
         }
         return $arr;
+    }
+    
+    /**
+     * Retrieves the full column name, including any parent field.
+     * 
+     * This method returns the column name formatted as "parentField.field" if the parent field is provided; otherwise, it returns just the field name.
+     * 
+     * @param string $field The field name of the entity.
+     * @param string|null $parentField The parent field name, if applicable.
+     * 
+     * @return string The full column name, either just the field name or the parent field concatenated with the field.
+     */
+    private function getColumnName($field, $parentField)
+    {
+       return ($parentField === null) ? $field : $parentField . "." . $field;
     }
 
     /**
@@ -441,7 +465,7 @@ class PicoSpecification // NOSONAR
     public static function fromUserInput($request, $map = null)
     {
         $specification = new self;
-        if (isset($map) && is_array($map)) {
+        if (self::isArray($map)) {
             foreach ($map as $key => $filter) {
                 $filterValue = $request->get($key);
                 if ($filterValue !== null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter) {

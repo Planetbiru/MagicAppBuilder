@@ -184,29 +184,30 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      */
     public function fixDefaultValue($defaultValue, $type)
     {
-        if(stripos($type, 'bool') !== false || stripos($type, 'tinyint(1)') !== false)
+        $result = $defaultValue;
+        if(stripos($type, 'tinyint(1)') !== false || self::isTypeBoolean($type))
         {
-            return $defaultValue != 0 ? 'true' : 'false';
+            $result =  $defaultValue != 0 ? 'true' : 'false';
         }
-        else if(strtolower($defaultValue) == 'true' || strtolower($defaultValue) == 'false' || strtolower($defaultValue) == 'null')
+        else if(self::isNativeValue($defaultValue))
         {
-            return $defaultValue;
+            $result =  $defaultValue;
         }
-        else if(stripos($type, 'enum') !== false || stripos($type, 'char') !== false || stripos($type, 'text') !== false)
+        else if(self::isTypeText($type))
         {
-            return "'".$defaultValue."'";
+            $result =  "'".$defaultValue."'";
         }
-        else if(stripos($type, 'int') !== false)
+        else if(self::isTypeInteger($type))
         {
             $defaultValue = preg_replace('/[^\d]/', '', $defaultValue);
-            return (int)$defaultValue;
+            $result =  (int)$defaultValue;
         }
-        else if(stripos($type, 'decimal') !== false || stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false)
+        else if(self::isTypeFloat($type))
         {
             $defaultValue = preg_replace('/[^\d.]/', '', $defaultValue);
-            return (float)$defaultValue;
+            $result =  (float)$defaultValue;
         }
-        return $defaultValue;
+        return $result;
     }
 
     /**
@@ -337,17 +338,17 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
             {
                 $type = $columns[$name];
                 
-                if(strtolower($type) == 'tinyint(1)' || strtolower($type) == 'boolean' || strtolower($type) == 'bool')
+                if(strtolower($type) == 'tinyint(1)' || self::isTypeBoolean($type))
                 {
                     // Process boolean types
                     $data = $this->fixBooleanData($data, $name, $value);
                 }
-                else if(stripos($type, 'integer') !== false || stripos($type, 'int(') !== false)
+                else if(self::isTypeInteger($type))
                 {
                     // Process integer types
                     $data = $this->fixIntegerData($data, $name, $value);
                 }
-                else if(stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'decimal') !== false)
+                else if(self::isTypeFloat($type))
                 {
                     // Process float types
                     $data = $this->fixFloatData($data, $name, $value);
