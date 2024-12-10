@@ -111,8 +111,8 @@ $paths = $inputPost->getPaths();
 foreach ($paths as $idx => $val) {
     $paths[$idx]['active'] = $paths[$idx]['active'] == 'true';
 }
-$application->setBaseModuleDirectory($paths);
 
+$application->setBaseModuleDirectory($paths);
 $application->setBaseIncludeDirectory("inc.app");
 $application->setBaseAssetDirectory("lib.assets");
 
@@ -160,6 +160,10 @@ $entityInfo = [
     'approval_status' => 'approval_status'
 ];
 
+$entityApvInfo = [
+    'approval_status' => 'approval_status'
+];
+
 $databaseConfig = [
     'driver' => 'sqlite',
     'database_file_path' => $databaseFilePath,
@@ -173,6 +177,8 @@ $databaseConfig = [
 ];
 
 $newApp->setEntityInfo($entityInfo);
+$newApp->setEntityApvInfo($entityApvInfo);
+
 $newApp->setCurrentAction([
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
@@ -192,7 +198,8 @@ $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
 
-file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());
+$configYaml = (new SecretObject($newApp))->dumpYaml();
+file_put_contents($path2, $configYaml);
 
 PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
@@ -204,3 +211,7 @@ $newApp->loadYamlFile($path2, false, true, true);
 $appConf = $newApp->getApplication();
 $baseDir = $appConf->getBaseApplicationDirectory();
 $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir);
+
+$dir3 = $baseDir."/inc.cfg";
+$path3 = $dir3."/application.yml";
+file_put_contents($path3, $configYaml);
