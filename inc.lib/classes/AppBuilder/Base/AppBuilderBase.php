@@ -1397,7 +1397,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $dataSection->appendChild($dom->createTextNode(self::N_TAB2.self::CURLY_BRACKET_OPEN)); 
 
         $paginationVar = '
-    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+    $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
     ->setNavigation(
     \'<i class="fa-solid fa-angle-left"></i>\', \'<i class="fa-solid fa-angle-right"></i>\',
     \'<i class="fa-solid fa-angles-left"></i>\', \'<i class="fa-solid fa-angles-right"></i>\'
