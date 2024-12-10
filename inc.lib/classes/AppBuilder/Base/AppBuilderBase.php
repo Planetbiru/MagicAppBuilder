@@ -74,6 +74,7 @@ class AppBuilderBase //NOSONAR
     const PHP_TRY = "try";
     const MAP_FOR = '$mapFor';
     const REDIRECT_TO_ITSELF = 'currentModule->getRedirectUrl()';
+    const CALL_FIND_ONE = '->findOne';
     const CALL_FIND_ONE_BY = '->findOneBy';
     const CALL_FIND_ONE_WITH = '->findOneWith';
     const CALL_FIND_ONE_WITH_PRIMARY_KEY = '->findOneWithPrimaryKeyValue';
