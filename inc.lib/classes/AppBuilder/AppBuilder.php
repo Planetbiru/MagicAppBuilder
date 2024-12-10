@@ -65,18 +65,18 @@ class AppBuilder extends AppBuilderBase
         if($this->isCallable($callbackSuccess))
         {
             
-            $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+            $lines[] = call_user_func($callbackSuccess, $objectName, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()));
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);'; //NOSONAR
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()).', $newId);'; //NOSONAR
         }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1."catch(Exception \$e)"; //NOSONAR
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))
         {
-            $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+            $lines[] = call_user_func($callbackFailed, $objectName, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
         else
         {
@@ -150,7 +150,7 @@ class AppBuilder extends AppBuilderBase
         {
             $lines[] = ''; 
             $lines[] = parent::TAB1.parent::TAB1.'// update primary key value';      
-            $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.$this->getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
+            $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.AppBuilderBase::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
                 
             $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
@@ -159,11 +159,11 @@ class AppBuilder extends AppBuilderBase
             if($this->isCallable($callbackSuccess))
             {
                 
-                $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+                $lines[] = call_user_func($callbackSuccess, $objectName, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()));
             }
             else
             {
-                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()).', $newId);';
             }  
         }
         else
@@ -172,11 +172,11 @@ class AppBuilder extends AppBuilderBase
             if($this->isCallable($callbackSuccess))
             {
                 
-                $lines[] = call_user_func($callbackSuccess, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()));
+                $lines[] = call_user_func($callbackSuccess, $objectName, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()));
             }
             else
             {
-                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.$this->getStringOf($mainEntity->getPrimaryKey()).', $newId);';
+                $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()).', $newId);';
             }
         }
         
@@ -185,7 +185,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))
         {
-            $lines[] = call_user_func($callbackFailed, $objectName, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+            $lines[] = call_user_func($callbackFailed, $objectName, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
         else
         {
@@ -247,7 +247,8 @@ class AppBuilder extends AppBuilderBase
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->where(PicoSpecification::getInstance()";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".$this->getStringOf($pkName).", ".parent::VAR."rowId))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->delete();";
         }   
@@ -324,16 +325,17 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
             
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".$this->getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
-
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
+        
         if($activationValue)
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".$this->getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
         }
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
         
@@ -359,7 +361,7 @@ class AppBuilder extends AppBuilderBase
         
         if($this->isCallable($callbackException))
         {
-            $lines[] = call_user_func($callbackException, $objectName, $userAction, $this->getStringOf($mainEntity->getPrimaryKey()), '$e');
+            $lines[] = call_user_func($callbackException, $objectName, $userAction, AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()), '$e');
         }
         else
         {
