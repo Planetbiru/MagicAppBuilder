@@ -41,7 +41,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
         foreach($appFields as $field)
         {
-            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter());
+            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
             if($line != null)
             {
                 $lines[] = $line;
@@ -135,10 +135,24 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == UserAction::UPDATE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName);
+
+        $lines[] = parent::TAB1."try";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        
+        $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.parent::TAB1.'$specification->addAnd($dataFilter);';
+        
+        $lines[] = "";
+        
+        $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->findOne($specification);';
+        $lines[] = "";
+        
+        $lines[] = parent::TAB1. parent::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName);
+
         foreach($appFields as $field)
         {
-            $line = $this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true);
+            $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true).";";
             if($line != null)
             {
                 $lines[] = $line;
@@ -149,13 +163,10 @@ class AppBuilderApproval extends AppBuilderBase
         $upperIpEdit = PicoStringUtil::upperCamelize($this->entityInfo->getIpEdit());
 
 
-        $lines[] = parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
-        $lines[] = parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
-        $lines[] = parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
 
-        $lines[] = "";
-        $lines[] = parent::TAB1."try";
-        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;
 
         $lines[] = "";
@@ -165,11 +176,10 @@ class AppBuilderApproval extends AppBuilderBase
         $upperIpAskEdit = PicoStringUtil::upperCamelize($this->entityInfo->getIpAskEdit());
         $upperPkeyApprovalName = PicoStringUtil::upperCamelize($pkeyApprovalName);
 
-        $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperAdminAskEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperTimeAskEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperIpAskEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR."inputPost".parent::CALL_GET.$upperPrimaryKeyName."())".parent::CALL_SET.$approvalId."(".parent::VAR.$objectApprovalName.parent::CALL_GET.$upperPkeyApprovalName."())".parent::CALL_SET.$upperWaitingFor."(WaitingFor::UPDATE)->update();";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$approvalId."(".parent::VAR.$objectApprovalName.parent::CALL_GET.$upperPkeyApprovalName."())".parent::CALL_SET.$upperWaitingFor."(WaitingFor::UPDATE)->update();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
         if($this->isCallable($callbackSuccess))

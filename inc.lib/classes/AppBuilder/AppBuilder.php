@@ -35,7 +35,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
         foreach($appFields as $field)
         {
-            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter());
+            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
             if($line != null)
             {
                 $lines[] = $line;
@@ -114,7 +114,12 @@ class AppBuilder extends AppBuilderBase
         
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == UserAction::UPDATE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
+                
+        $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.'$specification->addAnd($dataFilter);';
+        
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
+        $lines[] = parent::TAB1.'$updater = '.parent::VAR.$objectName.'->where($specification)';
         
         foreach($appFields as $field)
         {
@@ -122,40 +127,33 @@ class AppBuilder extends AppBuilderBase
             {
                 $updatePk = true;
             }
-            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter());
+            $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter());
             if($line != null)
             {
                 $lines[] = $line;
             }
         }
-
         $upperAdminEdit = PicoStringUtil::upperCamelize($this->entityInfo->getAdminEdit());
         $upperTimeEdit = PicoStringUtil::upperCamelize($this->entityInfo->getTimeEdit());
         $upperIpEdit = PicoStringUtil::upperCamelize($this->entityInfo->getIpEdit());
+        $lines[] = parent::TAB1.';';
 
-        $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
-        $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
-        $lines[] = parent::TAB1.parent::VAR.$objectName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
-
-        if(!$updatePk)
-        {
-            $line = $this->createSetter($objectName, $primaryKeyName, $this->getInputFilter($primaryKeyName));
-            $lines[] = $line;
-        }
+        $lines[] = parent::TAB1.parent::VAR.'updater'.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
+        $lines[] = parent::TAB1.parent::VAR.'updater'.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
+        $lines[] = parent::TAB1.parent::VAR.'updater'.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
 
         $lines[] = parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_UPDATE_END;
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'updater->update();';
         if($updatePk)
         {
             $lines[] = ''; 
             $lines[] = parent::TAB1.parent::TAB1.'// update primary key value';      
-            $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate('.AppBuilderBase::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName.'()));';
                 
-            $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'())'.parent::CALL_UPDATE_END;
-
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
+            $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.'->where($specification)->set'.$upperPrimaryKeyName.'($newId)'.parent::CALL_UPDATE_END;
+
             if($this->isCallable($callbackSuccess))
             {
                 
@@ -168,7 +166,7 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName).");";
             if($this->isCallable($callbackSuccess))
             {
                 

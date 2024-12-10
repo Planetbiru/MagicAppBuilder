@@ -301,6 +301,14 @@ class AppBuilderBase //NOSONAR
      */
     protected function createSetter($objectName, $fieldName, $fieldFilter, $primaryKeyName = null, $updatePk = false)
     {
+        if(!isset($objectName) || empty($objectName))
+        {
+            $objectName = "";
+        }
+        else
+        {
+            $objectName = self::VAR . $objectName;
+        }
         if (in_array($fieldName, $this->skipedAutoSetter)) {
             return null;
         }
@@ -314,9 +322,9 @@ class AppBuilderBase //NOSONAR
                 $methodSource = PicoStringUtil::upperCamelize($fieldName);
             }
             $methodTarget = PicoStringUtil::upperCamelize($fieldName);
-            return self::TAB1 . self::VAR . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true));";
+            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true))";
         } else {
-            return self::TAB1 . self::VAR . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "));";
+            return self::TAB1 . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "))";
         }
     }
 
@@ -846,7 +854,7 @@ class AppBuilderBase //NOSONAR
      * @param int $ntab The number of indentation levels (default is 0).
      * @return string The generated specification code as a formatted string.
      */
-    private function getSpecs($primaryKeyName, $ntab = 0)
+    public function getSpecs($primaryKeyName, $ntab = 0)
     {
         $pnName = PicoStringUtil::camelize($primaryKeyName);
         $upperPkName = ucfirst($pnName);
