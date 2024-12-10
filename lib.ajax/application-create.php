@@ -19,7 +19,7 @@ if (!file_exists($dir))
 $newAppId = trim($inputPost->getId());
 
 $baseApplicationDirectory = $inputPost->getDirectory();
-$baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\/\\\\]/', '', $baseApplicationDirectory);
+$baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseApplicationDirectory);
 $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
 $baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
@@ -97,8 +97,8 @@ $application->setBaseApplicationDirectory(trim($baseApplicationDirectory));
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
-$application->setBaseEntityDirectory("inc.lib/classes");
-$application->setBaseLanguageDirectory("inc.lang");
+$application->setBaseEntityDirectory($baseApplicationDirectory."/inc.lib/classes");
+$application->setBaseLanguageDirectory($baseApplicationDirectory."/inc.lang");
 
 $databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
 $databaseDirectory = dirname($databaseFilePath);
