@@ -178,7 +178,18 @@ $newApp->setCurrentAction([
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
 ]);
+
+$paginationConfig = new SecretObject([
+    'page_size' => 20,
+    'page_margin' => 30,
+    'prev' => '<i class="fa-solid fa-angle-left"></i>',
+    'next' => '<i class="fa-solid fa-angle-right"></i>',
+    'first' => '<i class="fa-solid fa-angles-left"></i>',
+    'last' => '<i class="fa-solid fa-angles-right"></i>'
+]);
+
 $newApp->setDatabase($databaseConfig);
+$newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
 
 file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());

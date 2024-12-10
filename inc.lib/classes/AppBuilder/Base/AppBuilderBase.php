@@ -1399,8 +1399,8 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $paginationVar = '
     $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
     ->setNavigation(
-    \'<i class="fa-solid fa-angle-left"></i>\', \'<i class="fa-solid fa-angle-right"></i>\',
-    \'<i class="fa-solid fa-angles-left"></i>\', \'<i class="fa-solid fa-angles-right"></i>\'
+    $appConfig->getData()->getPrev(), $appConfig->getData()->getNext(),
+    $appConfig->getData()->getFirst(), $appConfig->getData()->getLast()
     )
     ->setMargin($appConfig->getData()->getPageMargin())
     ;';

@@ -64,3 +64,11 @@
     documentRoot: 'D:/xampp/htdocs/lagu2'
     author: 'Your Name'
     selected: false
+-
+    id: 06758588eb8c076b16a7
+    name: ApplicationName
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/06758588eb8c076b16a7'
+    author: 'Your Name'
+    selected: false
