@@ -673,7 +673,7 @@ class AppBuilderBase //NOSONAR
         $getData[] = $this->getSpecs($primaryKeyName, 1);
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
-        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE."(".self::VAR."specs);";
+        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);';
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
