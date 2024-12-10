@@ -19,6 +19,43 @@ use MagicObject\MagicObject;
 class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
 {
     /**
+     * @var array An array of property-value pairs where each entry contains the name of a property and its corresponding value.
+     */
+    private $map = array();
+
+    /**
+     * Sets a property value and adds it to the internal map.
+     *
+     * This method sets a value to a property of the associated object and adds the property name and value 
+     * to an internal map for further processing.
+     *
+     * @param string $propertyName The name of the property to set.
+     * @param mixed $propertyValue The value to assign to the property.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function set($propertyName, $propertyValue)
+    {
+        $this->object->set($propertyName, $propertyValue);
+        $this->addToMap($propertyName, $propertyValue);
+        return $this;
+    }
+
+    /**
+     * Adds the property name and value to the internal map.
+     *
+     * This method adds the given property name and value as an entry in the internal `$map` array.
+     *
+     * @param string $propertyName The name of the property.
+     * @param mixed $propertyValue The value of the property.
+     * @return self Returns the current instance for method chaining.
+     */
+    private function addToMap($propertyName, $propertyValue)
+    {
+        $this->map[] = array('property' => $propertyName, 'value' => $propertyValue);
+        return $this;
+    }
+
+    /**
      * Magic method to handle undefined methods for setting properties.
      *
      * This method dynamically handles method calls that start with "set".
@@ -46,6 +83,7 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
                 $params[0] = null;
             }
             $this->object->set($var, $params[0]);
+            $this->addToMap($var, $params[0]);
             return $this;
         }
     }
@@ -123,5 +161,18 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
             $collection[] = $entity;
         }
         return $collection;
+    }
+
+    /**
+     * Convert the object to a JSON string representation for debugging.
+     *
+     * This method is intended for debugging purposes only and provides 
+     * a JSON representation of the object's state.
+     *
+     * @return string The JSON representation of the object.
+     */
+    public function __toString()
+    {
+        return json_encode($this->map);
     }
 }
