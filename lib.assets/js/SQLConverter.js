@@ -28,10 +28,10 @@ class SQLConverter {
             "varchar": "NVARCHAR",
             "character varying": "NVARCHAR",
             "char": "TEXT",
-            "text": "TEXT",
             "tinytext": "TEXT",
             "mediumtext": "TEXT",
             "longtext": "TEXT",
+            "text": "TEXT",
             "date": "TEXT",  // SQLite stores dates as TEXT in ISO 8601 format
             "datetime": "TEXT", // SQLite stores datetime as TEXT in ISO 8601 format
             "timestamp": "TEXT", // Same as datetime for SQLite
@@ -50,39 +50,44 @@ class SQLConverter {
 
         this.dbToMySQL = {
             // SQLite types to MySQL mapping
-            "INTEGER": "INT",
-            "REAL": "FLOAT",
-            "TEXT": "TEXT",
-            "NVARCHAR": "VARCHAR",
-            "VARCHAR": "VARCHAR",
-            "CHARACTER VARYING": "VARCHAR",
-            "TINYINT(1)": "TINYINT(1)",
-            "BOOLEAN": "TINYINT(1)",
-            "DATETIME": "DATETIME",
-            "DATE": "DATE",
-            "TIMESTAMPTZ": "TIMESTAMP",
-            "TIMESTAMP WITH TIME ZONE": "TIMESTAMP",
-            "TIMESTAMP WITHOUT TIME ZONE": "DATETIME",
-            "TIMESTAMP": "TIMESTAMPTZ",
-            "JSON": "JSON"
+            "integer": "INT",
+            "int": "INT",
+            "real": "FLOAT",
+            "tinytext": "TINYTEXT",
+            "mediumtext": "MEDIUMTEXT",
+            "longtext": "LONGTEXT",
+            "text": "TEXT",
+            "nvarchar": "VARCHAR",
+            "varchar": "VARCHAR",
+            "character varying": "VARCHAR",
+            "tinyint(1)": "TINYINT(1)",
+            "boolean": "TINYINT(1)",
+            "datetime": "DATETIME",
+            "date": "DATE",
+            "timestamptz": "TIMESTAMP",
+            "timestamp with time zone": "TIMESTAMP",
+            "timestamp without time zone": "DATETIME",
+            "timestamp": "TIMESTAMPTZ",
+            "json": "JSON"
         };
-
+        
         this.dbToPostgreSQL = {
             // SQLite types to PostgreSQL mapping
-            "INTEGER": "INTEGER",
-            "REAL": "REAL",
-            "TEXT": "TEXT",
-            "TINYINT(1)": "BOOLEAN",
-            "NVARCHAR": "CHARACTER VARYING",
-            "VARCHAR": "CHARACTER VARYING",
-            "BOOLEAN": "BOOLEAN",
-            "DATETIME": "TIMESTAMP",
-            "DATE": "DATE",
-            "TIMESTAMPTZ": "TIMESTAMP WITH TIME ZONE",
-            "TIMESTAMP": "TIMESTAMP WITH TIME ZONE",
-            "DATETIME": "TIMESTAMP WITHOUT TIME ZONE",
-            "JSON": "JSONB"
+            "integer": "INTEGER",
+            "real": "REAL",
+            "text": "TEXT",
+            "tinyint(1)": "BOOLEAN",
+            "nvarchar": "CHARACTER VARYING",
+            "varchar": "CHARACTER VARYING",
+            "boolean": "BOOLEAN",
+            "datetime": "TIMESTAMP",
+            "date": "DATE",
+            "timestamptz": "TIMESTAMP WITH TIME ZONE",
+            "timestamp": "TIMESTAMP WITH TIME ZONE",
+            "datetime": "TIMESTAMP WITHOUT TIME ZONE",
+            "json": "JSONB"
         };
+        
     }
 
     /**

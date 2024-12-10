@@ -1035,9 +1035,9 @@ if ($query && !empty($queries)) {
     <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.min.css">
-    <script src="lib.assets/js/TableParser.min.js"></script>
-    <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/import-structure.min.js"></script>
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements

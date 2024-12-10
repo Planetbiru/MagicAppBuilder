@@ -36,7 +36,7 @@ class TableParser {
 
             // The regex for each component:
             let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-            let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\))/gim;
+            let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+smalltext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\))/gim;
 
             let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
             let rg_enum = /enum\s*\(([^)]+)\)/i; // Regex untuk menangkap isi enum
@@ -187,7 +187,7 @@ class TableParser {
          * Initializes the type list for valid SQL column types.
          */
         this.init = function () {
-            let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,enum,char,real,float,integer,int,datetime,date,double,boolean,bool';
+            let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,smallint,mediumint,bigint,tinytext,smalltext,mediumtext,longtext,longtext,text,nvarchar,varchar,enum,char,real,float,integer,int,datetime,date,double,boolean,bool';
             this.typeList = typeList.split(',');
         };
 
