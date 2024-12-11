@@ -795,6 +795,26 @@ class DatabaseExplorer
             
             $columnNames = [];
 
+            $tr = $dom->createElement('tr');
+
+            // First column - Label
+            $tdLabel = $dom->createElement('td');
+            $label = $dom->createElement('label', htmlspecialchars($primaryKeyValue));
+            $label->setAttribute('for', htmlspecialchars($primaryKeyValue));
+            $tdLabel->appendChild($label);
+            $tr->appendChild($tdLabel);
+
+            // Second column - Textarea field
+            $tdInput = $dom->createElement('td');
+            $textarea = $dom->createElement('div');
+            $textarea->setAttribute('class', 'data-editor');
+            $textarea->nodeValue = htmlspecialchars($primaryKeyValue);  
+            $tdInput->appendChild($textarea);
+            $tr->appendChild($tdInput);
+
+            // Append row to the table
+            $tableElem->appendChild($tr);
+
             // Loop through the row data to create form fields
             foreach ($row as $key => $value) {
                 if ($key != $primaryKeyName) {  // Skip the primary key field in the form
@@ -812,7 +832,7 @@ class DatabaseExplorer
                     $tdInput = $dom->createElement('td');
                     $textarea = $dom->createElement('textarea');
                     $textarea->setAttribute('name', htmlspecialchars($key));
-                    $textarea->setAttribute('class', 'editor');
+                    $textarea->setAttribute('class', 'data-editor');
                     $textarea->setAttribute('spellcheck', 'false');
                     $textarea->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
                     $tdInput->appendChild($textarea);

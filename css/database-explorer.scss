@@ -493,19 +493,19 @@ table.two-side-table thead tr > th:nth-child(2), table.two-side-table tbody tr t
         width: auto;
     }
 }
-textarea.editor {
+textarea.data-editor, div.data-editor {
     border-radius: 0;
     height: 44px;
     padding: 6px;
     display: block;
     margin: 0;
     border: none;
-  }
+}
   
-  form.edit-form{
+form.edit-form{
     padding-bottom: 20px;
-  }
+}
 
-  th.cell-edit, td.cell-edit{
+th.cell-edit, td.cell-edit{
     padding: 1px 8px;
-  }
+}

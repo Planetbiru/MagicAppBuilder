@@ -479,7 +479,7 @@ table.two-side-table thead tr > th:nth-child(2), table.two-side-table tbody tr t
     width: auto;
   }
 }
-textarea.editor {
+textarea.data-editor, div.data-editor {
   border-radius: 0;
   height: 44px;
   padding: 6px;
