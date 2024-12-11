@@ -436,4 +436,57 @@ textarea:focus-visible {
 
 .original {
   height: calc(100vh - 176px);
+}
+
+/* CSS untuk kelas two-side-table */
+table.two-side-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-bottom: 8px;
+}
+
+/* Styling default untuk tabel, untuk layar yang lebih kecil dari 600px */
+table.two-side-table th, table.two-side-table td {
+  width: 100%; /* Setiap kolom memiliki lebar 100% untuk layar kecil */
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+  display: block; /* Ubah setiap kolom menjadi block-level untuk responsif */
+}
+
+table.two-side-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+table.two-side-table thead tr > th:nth-child(2), table.two-side-table tbody tr td:nth-child(2) {
+  padding: 0px;
+}
+
+/* Styling untuk layar yang lebih besar dari 600px */
+@media (min-width: 800px) {
+  table.two-side-table th, table.two-side-table td {
+    display: table-cell; /* Kembali ke tampilan tabel biasa */
+  }
+  /* Lebar kolom pertama 30% */
+  table.two-side-table td:first-child, table.two-side-table th:first-child {
+    width: 30%; /* Lebar kolom pertama 30% */
+  }
+  /* Set kolom lainnya untuk memiliki lebar yang seimbang */
+  table.two-side-table td:not(:first-child), table.two-side-table th:not(:first-child) {
+    width: auto;
+  }
+}
+textarea.editor {
+  border-radius: 0;
+  height: 44px;
+  padding: 6px;
+  display: block;
+  margin: 0;
+  border: none;
+}
+
+form.edit-form {
+  padding-bottom: 20px;
 }/*# sourceMappingURL=database-explorer.css.map */

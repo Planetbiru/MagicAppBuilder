@@ -62,9 +62,9 @@
     selected: false
 -
     id: sipro-gitlab
-    name: 'SIPRO GITLAB'
+    name: SIPRO
     architecture: monolith
     description: ''
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
-    author: 'Kamshory'
+    author: Kamshory
     selected: false
