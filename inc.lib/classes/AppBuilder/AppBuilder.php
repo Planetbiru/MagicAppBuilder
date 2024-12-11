@@ -115,7 +115,7 @@ class AppBuilder extends AppBuilderBase
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == UserAction::UPDATE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
                 
-        $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
         $lines[] = parent::TAB1.'$specification->addAnd($dataFilter);';
         
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
@@ -166,7 +166,7 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName).");";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).");";
             if($this->isCallable($callbackSuccess))
             {
                 
@@ -262,7 +262,7 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'error_log($e->getMessage());';
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.'error_log($e->getMessage());';
         }
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;    
@@ -363,7 +363,7 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'error_log($e->getMessage());';
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.'error_log($e->getMessage());';
         }
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;

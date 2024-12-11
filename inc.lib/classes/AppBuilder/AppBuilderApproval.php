@@ -139,7 +139,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1."try";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         
-        $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
         $lines[] = parent::TAB1.parent::TAB1.'$specification->addAnd($dataFilter);';
         
         $lines[] = "";

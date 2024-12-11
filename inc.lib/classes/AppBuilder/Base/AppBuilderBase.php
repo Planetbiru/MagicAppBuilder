@@ -862,7 +862,7 @@ class AppBuilderBase //NOSONAR
         $tabs = str_repeat(self::TAB1, $ntab);
 
         // Create the $specsVar1 with the correct indentation based on $ntab
-        $specsVar1 = $tabs . '$specification = PicoSpecification::getInstanceOf(' . AppBuilderBase::getStringOf($pnName) . ', ' . self::VAR . "inputGet" . self::CALL_GET . $upperPkName . self::BRACKETS . ');';
+        $specsVar1 = $tabs . '$specification = PicoSpecification::getInstanceOf(' . AppBuilderBase::getStringOf($pnName) . ', ' . self::VAR . "inputGet" . self::CALL_GET . $upperPkName . '(PicoFilterConstant::'.$this->getInputFilter($primaryKeyName).'));';
         $specsVar1 .= self::NEW_LINE . $tabs . '$specification->addAnd($dataFilter);';
         
         return $specsVar1;
