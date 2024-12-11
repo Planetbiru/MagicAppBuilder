@@ -326,7 +326,7 @@ textarea {
     }
 }
 
-.query-executed {
+.last-query {
     padding: 12px 16px 16px 16px;
     border: 1px solid #DDDDDD;
     margin-top: 20px;
@@ -348,6 +348,7 @@ textarea {
     margin-bottom: 16px;
     border-radius: 3px;
     tab-size: 4;
+    overflow: auto;
 }
 
 .query-raw:focus-visible {
@@ -450,7 +451,6 @@ textarea {
     height: calc(100vh - 176px);
 }
 
-
 /* CSS untuk kelas two-side-table */
 table.two-side-table {
     width: 100%;
@@ -504,4 +504,8 @@ textarea.editor {
   
   form.edit-form{
     padding-bottom: 20px;
+  }
+
+  th.cell-edit, td.cell-edit{
+    padding: 1px 8px;
   }

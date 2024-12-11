@@ -481,31 +481,57 @@ class DatabaseExplorer
 
             // Create the DOM document
             $dom = new DOMDocument('1.0', 'utf-8');
-            
-            // Create table element
-            $tableElem = $dom->createElement('table');
-            $tr = $dom->createElement('tr');
-            
-            // Add table headers
-            for ($i = 0; $i < $stmt->columnCount(); $i++) {
-                $col = $stmt->getColumnMeta($i);
-                $th = $dom->createElement('th', htmlspecialchars($col['name']));
-                $tr->appendChild($th);
-            }
-            $tableElem->appendChild($tr);
-
-            // Add table rows
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            try
+            {
+                // Create table element
+                $tableElem = $dom->createElement('table');
                 $tr = $dom->createElement('tr');
-                foreach ($row as $value) {
-                    $td = $dom->createElement('td', htmlspecialchars($value));
-                    $tr->appendChild($td);
+
+                // Add table headers
+                for ($i = 0; $i < $stmt->columnCount(); $i++) {
+                    $col = $stmt->getColumnMeta($i);
+                    $th = $dom->createElement('th', htmlspecialchars($col['name']));
+                    $tr->appendChild($th);
                 }
                 $tableElem->appendChild($tr);
+                $countResult = 0;
+
+                // Add table rows
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $tr = $dom->createElement('tr');
+                    foreach ($row as $value) {
+                        $td = $dom->createElement('td', htmlspecialchars($value));
+                        $tr->appendChild($td);
+                    }
+                    $tableElem->appendChild($tr);
+                    $countResult++;
+                }
+
+                if($countResult > 0)
+                {
+                    // Create the result title div
+                    $resultTitleDiv = $dom->createElement('div', 'Result');
+                    $resultTitleDiv->setAttribute('class', 'query-title');
+                    $dom->appendChild($resultTitleDiv);
+
+                    $queryResultDiv = $dom->createElement('div');
+                    $queryResultDiv->setAttribute('class', 'query-result');
+                    $queryResultDiv->appendChild($tableElem);
+                    $dom->appendChild($queryResultDiv);
+                }
+                else
+                {
+                    $resultTitleDiv = $dom->createElement('div', 'No results to display');
+                    $resultTitleDiv->setAttribute('class', 'query-title');
+                    $dom->appendChild($resultTitleDiv);
+                }
             }
-
-            $dom->appendChild($tableElem);
-
+            catch(Exception $e)
+            {
+                $resultTitleDiv = $dom->createElement('div', 'No results to display');
+                $resultTitleDiv->setAttribute('class', 'query-title');
+                $dom->appendChild($resultTitleDiv);
+            }
             // Output the HTML
             return $dom->saveHTML();
         } catch (PDOException $e) {
@@ -582,8 +608,9 @@ class DatabaseExplorer
 
             // Add table headers
             $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
-            $th = $dom->createElement('th', 'EDIT');
+            $th = $dom->createElement('th', '');
             $th->setAttribute('width', '40');
+            $th->setAttribute('class', 'cell-edit');
             $tr->appendChild($th);
             for ($i = 0; $i < $stmt->columnCount(); $i++) {
                 $col = $stmt->getColumnMeta($i);
@@ -600,8 +627,9 @@ class DatabaseExplorer
                 $id = isset($primaryKeyName) && isset($row[$primaryKeyName]) ? $row[$primaryKeyName] : '';
                 $a = $dom->createElement('a');
                 $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=edit-form&id=$id");
-                $a->appendChild($dom->createTextNode("EDIT"));
+                $a->appendChild($dom->createTextNode("✏️"));
                 $td = $dom->createElement('td');
+                $td->setAttribute('class', 'cell-edit');
                 $td->appendChild($a);
                 $tr->appendChild($td);
                 foreach ($row as $value) {
@@ -785,7 +813,6 @@ class DatabaseExplorer
                     $textarea = $dom->createElement('textarea');
                     $textarea->setAttribute('name', htmlspecialchars($key));
                     $textarea->setAttribute('class', 'editor');
-                    $textarea->setAttribute('required', 'true');
                     $textarea->setAttribute('spellcheck', 'false');
                     $textarea->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
                     $tdInput->appendChild($textarea);
@@ -1016,6 +1043,9 @@ class DatabaseExplorer
             foreach ($queries as $i => $q) {
                 $j = $i + 1;
 
+                $queryDivContainer = $dom->createElement('div');
+                $queryDivContainer->setAttribute('class', 'last-query');
+
                 // Create the container div for each query
                 $queryDiv = $dom->createElement('div');
                 $queryDiv->setAttribute('class', 'query-executed');
@@ -1024,6 +1054,8 @@ class DatabaseExplorer
                 $queryTitleDiv = $dom->createElement('div', 'Query ' . $j);
                 $queryTitleDiv->setAttribute('class', 'query-title');
                 $queryDiv->appendChild($queryTitleDiv);
+
+                $queryDivContainer->appendChild($queryDiv);
 
                 // Create the raw query div
 
@@ -1037,14 +1069,9 @@ class DatabaseExplorer
                 $queryRawDiv->appendChild($queryRawPre);
                 $queryDiv->appendChild($queryRawDiv);
 
-                // Create the result title div
-                $resultTitleDiv = $dom->createElement('div', 'Result');
-                $resultTitleDiv->setAttribute('class', 'query-title');
-                $queryDiv->appendChild($resultTitleDiv);
-
                 // Create the result div
                 $resultDiv = $dom->createElement('div');
-                $resultDiv->setAttribute('class', 'query-result');
+                $resultDiv->setAttribute('class', 'query-result-container');
 
                 // Execute the query and append the result (HTML content)
                 $resultHTML = new DOMDocument();
@@ -1052,10 +1079,10 @@ class DatabaseExplorer
                 foreach ($resultHTML->getElementsByTagName('body')->item(0)->childNodes as $child) {
                     $resultDiv->appendChild($dom->importNode($child, true));
                 }
-                $queryDiv->appendChild($resultDiv);
+                $queryDivContainer->appendChild($resultDiv);
 
                 // Append the queryDiv to the DOM
-                $dom->appendChild($queryDiv);
+                $dom->appendChild($queryDivContainer);
             }
 
             // Output the HTML
@@ -1255,7 +1282,7 @@ if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) 
     {
         $values[] = "$key = '".addslashes($_POST[$key])."'";
     }
-    $query = "UPDATE $tableName SET ".implode(", ", $values)." WHERE $primaryKeyName = '".$primaryKeyValue."'; ";
+    $query = "UPDATE $tableName SET \r\n\t".implode(", \r\n\t", $values)." \r\nWHERE $primaryKeyName = '".$primaryKeyValue."';";
 }
 
 // Split and sanitize the query if it exists
@@ -1296,9 +1323,9 @@ else {
     <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
     <link rel="stylesheet" href="css/database-explorer.min.css">
-    <script src="lib.assets/js/TableParser.js"></script>
-    <script src="lib.assets/js/SQLConverter.js"></script>
-    <script src="lib.assets/js/import-structure.js"></script>
+    <script src="lib.assets/js/TableParser.min.js"></script>
+    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/import-structure.min.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
