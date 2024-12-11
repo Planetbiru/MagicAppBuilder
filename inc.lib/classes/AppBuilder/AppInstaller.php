@@ -26,10 +26,12 @@ class AppInstaller {
      *
      * @param string $database The database connection or database name to be used for generating queries.
      * @param string $cacheDir The directory path used for error checking and validation.
+     * @param bool $createIfNotExists Flag to indicate whether to create the table if it doesn't exist.
+     * @param bool $dropIfExists Flag to indicate whether to drop existing columns before adding new ones.
      * 
      * @return string The generated SQL queries for installing or altering the database schema.
      */
-    public function generateInstallerQuery($database, $cacheDir)
+    public function generateInstallerQuery($database, $cacheDir, $createIfNotExists = false, $dropIfExists = false)
     {
         $entities = [];
         $entityNames = [];
@@ -71,35 +73,38 @@ class AppInstaller {
         }
         
         // Generate and return the SQL queries
-        return $this->generateQuery($database, $entities, $entityNames);
+        return $this->generateQuery($database, $entities, $entityNames, $createIfNotExists, $dropIfExists);
     }
     
     /**
      * Generates the SQL queries for each table based on the provided entities.
      *
-     * This method generates the SQL queries for creating or altering tables by processing
-     * the provided entities. It uses a `PicoDatabaseDump` object to create the queries 
-     * and groups them by table names.
+     * This method processes the provided entities to generate SQL queries for creating or altering tables. 
+     * It uses a `PicoDatabaseDump` object to create the queries and groups them by table names. 
+     * The method handles multiple tables, generating the SQL for each and formatting the output with comments indicating the beginning and end of each table's SQL.
      *
      * @param string $database The database connection or database name to be used for generating queries.
-     * @param array $entities An associative array of entities grouped by their table names.
-     * @param array $entityNames An associative array of entity names grouped by their table names.
+     * @param array $entities An associative array of entities grouped by their table names. The key is the table name, and the value is an array of entities for that table.
+     * @param array $entityNames An associative array of entity names grouped by their table names. The key is the table name, and the value is an array of entity names for that table.
+     * @param bool $createIfNotExists Flag to indicate whether to create the table if it doesn't exist.
+     * @param bool $dropIfExists Flag to indicate whether to drop existing columns before adding new ones.
      * 
-     * @return string The generated SQL queries for each table.
+     * @return string The generated SQL queries for each table, formatted with comments and grouped by table name.
      */
-    private function generateQuery($database, $entities, $entityNames)
+    private function generateQuery($database, $entities, $entityNames, $createIfNotExists = false, $dropIfExists = false)
     {
+       
         $allQueries = [];
 
         // Iterate over each table and generate the queries for its entities
         foreach($entities as $tableName=>$entity)
         {
+            
             $entityQueries = [];
             $dumper = new PicoDatabaseDump();   
             
             // Generate the SQL queries for the entity
-            $queryArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database);
-            
+            $queryArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database, $createIfNotExists, $dropIfExists);
             // Add non-empty queries to the list
             foreach($queryArr as $sql)
             {

@@ -8,3 +8,9 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
     $sessionConfig = $builderConfig->getSessions();
     $sessions = new PicoSession($sessionConfig);
 }
+else
+{
+    $sessions = new PicoSession();
+}
+
+$sessions->startSession();

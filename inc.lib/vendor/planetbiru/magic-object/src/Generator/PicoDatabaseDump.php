@@ -180,14 +180,21 @@ class PicoDatabaseDump
     /**
      * Create an ALTER TABLE ADD COLUMN query for the specified entity or entities.
      *
-     * @param MagicObject|MagicObject[] $entity Entity or array of entities
-     * @param PicoDatabase|null $database Database connection
-     * @return string[] Array of SQL ALTER TABLE queries
+     * This method generates SQL queries to add new columns to a table. It supports adding columns
+     * either from a single entity or an array of entities. The method calls a helper method based
+     * on whether a single entity or multiple entities are passed.
+     *
+     * @param MagicObject|MagicObject[] $entity A single entity or an array of entities representing the columns to be added.
+     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, the default database will be used.
+     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
+     * @param bool $dropIfExists Flag to indicate if existing columns should be dropped before adding new ones.
+     * 
+     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
-    public function createAlterTableAdd($entity, $database = null)
+    public function createAlterTableAdd($entity, $database = null, $createIfNotExists = false, $dropIfExists = false)
     {
         if (is_array($entity)) {
-            return $this->createAlterTableAddFromEntities($entity, $database);
+            return $this->createAlterTableAddFromEntities($entity, $database, $createIfNotExists, $dropIfExists);
         } else {
             return $this->createAlterTableAddFromEntity($entity);
         }
@@ -248,13 +255,21 @@ class PicoDatabaseDump
     /**
      * Create a list of ALTER TABLE ADD COLUMN queries from multiple entities.
      *
-     * @param MagicObject[] $entities Entities
-     * @param string|null $tableName Table name
-     * @param PicoDatabase|null $database Database connection
-     * @return string[] List of SQL ALTER TABLE queries
+     * This method generates SQL queries to add new columns to an existing table based on the provided entities.
+     * It checks the current database schema, compares it with the provided entity information, and generates
+     * the necessary ALTER TABLE queries.
+     *
+     * @param MagicObject[] $entities An array of entities representing the columns to be added.
+     * @param string|null $tableName The name of the table to alter. If null, the table name is derived from the entities.
+     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, it will be inferred from the entities.
+     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
+     * @param bool $dropIfExists Flag to indicate if existing columns should be dropped before adding new ones.
+     * 
+     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
-    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null)
+    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null, $createIfNotExists = false, $dropIfExists = false)
     {
+        
         $tableInfo = $this->getMergedTableInfo($entities);
         $columnNameList = $this->getColumnNameList($entities);
         $tableInfo->setSortedColumnName($columnNameList);
@@ -263,7 +278,7 @@ class PicoDatabaseDump
 
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
-
+        
         if (!empty($tableInfo->getColumns())) {
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
@@ -287,7 +302,7 @@ class PicoDatabaseDump
                 $queryAlter = $this->addPrimaryKey($queryAlter, $tableInfo, $tableName, $createdColumns);
                 $queryAlter = $this->addAutoIncrement($queryAlter, $tableInfo, $tableName, $createdColumns, $database->getDatabaseType());
             } else if ($numberOfColumn > 0) {
-                $queryAlter[] = $this->dumpStructureTable($tableInfo, $database->getDatabaseType());
+                $queryAlter[] = $this->dumpStructureTable($tableInfo, $database->getDatabaseType(), $createIfNotExists, $dropIfExists);
             }
         }
         return $queryAlter;
