@@ -731,12 +731,27 @@ class DatabaseExplorer
             $form->setAttribute('action', $referer);
             $form->setAttribute('class', 'edit-form');
 
-            // Add hidden input for primary key
-            $inputId = $dom->createElement('input');
-            $inputId->setAttribute('type', 'hidden');
-            $inputId->setAttribute('name', 'id');
-            $inputId->setAttribute('value', htmlspecialchars($primaryKeyValue));
-            $form->appendChild($inputId);
+            // Add hidden input for table name
+            $inputId1 = $dom->createElement('input');
+            $inputId1->setAttribute('type', 'hidden');
+            $inputId1->setAttribute('name', '___table_name___');
+            $inputId1->setAttribute('value', htmlspecialchars($table));
+
+            // Add hidden input for primary key name
+            $inputId2 = $dom->createElement('input');
+            $inputId2->setAttribute('type', 'hidden');
+            $inputId2->setAttribute('name', '___primary_key_name___');
+            $inputId2->setAttribute('value', htmlspecialchars($primaryKeyName));
+            
+            // Add hidden input for primary key value
+            $inputId3 = $dom->createElement('input');
+            $inputId3->setAttribute('type', 'hidden');
+            $inputId3->setAttribute('name', '___primary_key_value___');
+            $inputId3->setAttribute('value', htmlspecialchars($primaryKeyValue));
+            
+            $form->appendChild($inputId1);
+            $form->appendChild($inputId2);
+            $form->appendChild($inputId3);
 
             // Add title
             $h3 = $dom->createElement('h3', "Edit Data for $table");
@@ -749,10 +764,13 @@ class DatabaseExplorer
             $tableElem->setAttribute('cellpadding', '10');
             $tableElem->setAttribute('cellspacing', '0');
             $tableElem->setAttribute('style', 'border-collapse: collapse;');
+            
+            $columnNames = [];
 
             // Loop through the row data to create form fields
             foreach ($row as $key => $value) {
                 if ($key != $primaryKeyName) {  // Skip the primary key field in the form
+                    $columnNames[] = $key;
                     $tr = $dom->createElement('tr');
 
                     // First column - Label
@@ -781,6 +799,14 @@ class DatabaseExplorer
             // Append the table to the form
             $form->appendChild($tableElem);
 
+            
+            // Add hidden input for primary key value
+            $inputId4 = $dom->createElement('input');
+            $inputId4->setAttribute('type', 'hidden');
+            $inputId4->setAttribute('name', '___column_list___');
+            $inputId4->setAttribute('value', htmlspecialchars(implode(",", $columnNames)));
+            $form->appendChild($inputId4);
+            
             // Add the submit button
             $inputSubmit = $dom->createElement('input');
             $inputSubmit->setAttribute('type', 'submit');
@@ -1217,6 +1243,21 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $queries = array();
 $lastQueries = "";
 
+if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___primary_key_value___']) && isset($_POST['___column_list___']))
+{
+    $tableName = $_POST['___table_name___'];
+    $primaryKeyName = $_POST['___primary_key_name___'];
+    $primaryKeyValue = addslashes($_POST['___primary_key_value___']);
+    $columnList = $_POST['___column_list___'];
+    $columnNames = explode(",", $columnList);
+    $values = [];
+    foreach($columnNames as $key)
+    {
+        $values[] = "$key = '".addslashes($_POST[$key])."'";
+    }
+    $query = "UPDATE $tableName SET ".implode(", ", $values)." WHERE $primaryKeyName = '".$primaryKeyValue."'; ";
+}
+
 // Split and sanitize the query if it exists
 if ($query) {
     $arr = DatabaseExplorer::splitSQL($query);
@@ -1235,7 +1276,6 @@ if ($query) {
 } else {
     $queryArray = null;
 }
-
 // Execute queries and handle results
 if ($query && !empty($queries)) {
     try {
@@ -1243,7 +1283,8 @@ if ($query && !empty($queries)) {
     } catch (Exception $e) {
         $queryResult = self::ERROR . $e->getMessage();
     }
-} else {
+}
+else {
     $queryResult = "";
 }
 
