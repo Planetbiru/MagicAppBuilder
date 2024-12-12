@@ -465,7 +465,7 @@ $constSelected = ' selected';
                   <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
                   <div class="button-area">
                     <button class="btn btn-success" id="button_save_entity_file" type="button" disabled>Save Entity</button>
-                    <button class="btn btn-success" id="button_save_entity_file_as" type="button">Save Entity</button>
+                    <button class="btn btn-success" id="button_save_entity_file_as" type="button">Save Entity As</button>
                   </div>
                 </div>
               </div>

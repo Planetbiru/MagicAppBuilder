@@ -1,6 +1,6 @@
-# MagicAppBuilder
+# MagicAppBuilder: Revolutionizing Fast Application Development
 
-## History
+## History and Introduction
 
 Imagine a large application consisting of dozens of CRUD (Create, Read, Update, Delete) modules. Each module has the following mechanism:
 
@@ -25,22 +25,23 @@ Of course, an application cannot contain only simple CRUD modules. But at least,
 
 MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for creating entities from a table without having to type code. Just select the table and specify the name of the entity to be created. Entities will be created automatically by MagicAppBuilder according to the names and column types of a table.
 
-## Requirement
+## System Requirements
 
-1. Apache Server
-2. PHP Runtime version 5.6 or above
-3. MariaDB or MySQL database
+-   **Web Server:** Apache Server
+-   **PHP Runtime Version:** 5.6 or above
+-   **Database:** MariaDB or MySQL
 
 ## Dependency
 
-1. MagicObject
-2. MagicApp
+-   **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
+-   **MagicObject:** A library for creating entities from database tables.
+-   **Symfony/Yaml:** A library for serializing and deserializing YAML strings and files.
 
-## Advantages
+## Advantages of MagicAppBuilder
 
-In just under five minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
+In just under 30 minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
 
-## Features Overview
+## Key Features Overview
 
 **1. Create New Data**
 
@@ -105,6 +106,10 @@ Whether you are building a monolithic application or developing a microservices-
 
 The system is built with localization in mind. It supports multiple languages, allowing you to easily translate the interface and error messages into various languages. Whether your application is being used by a global audience or by users from different regions, this feature ensures that the system can adapt to various language preferences, improving accessibility and user engagement.
 
+**16. Advanced Data Filters**
+
+The system provides dynamic filters that adapt to the data type, ensuring accurate and efficient data querying based on user-defined criteria.
+
 Apart from the features above, the module is also equipped with data filters that are adjusted to the data type.
 
 ## Using MagicAppBuilder
@@ -148,21 +153,22 @@ Steps to create an application with MagicAppBuilder
 
 1.   Create a complete entity relationship diagram (ERD) with the following rules:
     
-    -   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
-    -   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
-    -   If there are multiple columns that refer to a primary key of a table, this should be noted when creating a module.
-    -   Columns with the same purpose across different tables must have the same name.
-    -   Application features should be defined before creating the entity relationship diagram.
+- The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
+- Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
+- If there are multiple columns that refer to a primary key of a table, this should be noted when creating a module.
+- Columns with the same purpose across different tables must have the same name.
+- Application features should be defined before creating the entity relationship diagram.
+
 2.   Export the entity relationship diagram into SQL.
     
 3.   Create new application on MagicAppBuilder and set as default application.
     
 4.   Update application settings consisting of:
 
-    - Application
-    - Database
-    - Session
-    - Reserved columns
+- Application
+- Database
+- Session
+- Reserved columns
     
 5.   Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
     
@@ -171,20 +177,22 @@ Steps to create an application with MagicAppBuilder
 7.   Click the "Reload Table" button to load all tables from the specified database.
     
 8.   Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
+
+9.   Select the path where the module will be located.
     
-9   Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
+10.    Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
     
-10.   Check the checkboxes and radio buttons according to how the module will be created.
+12.   Check the checkboxes and radio buttons according to how the module will be created.
     
-11.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
+13.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
     
-12.   Click the "Data Filter" button to define the data filter.
+14.   Click the "Data Filter" button to define the data filter.
     
-13.   Click the "Data Order" button to define the order of the data.
+15.   Click the "Data Order" button to define the order of the data.
     
-14.   Click the "Module Filter" button to configure the module features.
+16.   Click the "Module Filter" button to configure the module features.
     
-14.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
+17.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
 
 ### Reserved Column Mapping
 
@@ -246,9 +254,9 @@ Here is an explanation of the reserved columns above.
 | approval_note   | Column for approval note |
 | approval_status | Column for approval status |
 
-# User Plan
+## User Plan
 
-| Object                                  | Free       | Pro        |
+| Object                                  | Community  | Pro        |
 | --------------------------------------- | ---------- | ---------- |
 | Application starter                     | Yes        | Yes        |
 | Module generator                        | Yes        | Yes        |
@@ -268,5 +276,11 @@ Here is an explanation of the reserved columns above.
 | User management                         | No         | Yes        |
 | Collaboration                           | No         | Yes        |
 | Push notification                       | No         | Yes        |
+
+## Conclusion
+
+MagicAppBuilder is a game-changer for developers, enabling them to quickly build data management systems with powerful CRUD functionalities. It automates much of the routine coding required for building applications, drastically reducing development time while maintaining flexibility for further customization. Whether you are creating simple CRUD modules or building complex data-driven systems, MagicAppBuilder accelerates the development process, allowing you to meet project deadlines without compromising on quality.
+
+In the fast-paced world of application development, MagicAppBuilder ensures that developers can focus on building great products, rather than getting bogged down by repetitive coding tasks.
 
 Subscribe to our YouTube channel https://www.youtube.com/@maliktamvan 

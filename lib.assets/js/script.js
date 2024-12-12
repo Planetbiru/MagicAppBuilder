@@ -2261,7 +2261,7 @@ function saveEntityAs() {
     //$("#button_save_entity_file_as").attr("disabled", "disabled");
     let fileContent = cmEditorFile.getDoc().getValue();
 
-    getUserInput('New Entity', 'Save Entity As', [
+    getUserInput('New Etity Name', 'Save Entity As', [
       {
         'caption': 'Yes',  // Caption for the button
         'fn': () => {
