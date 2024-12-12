@@ -404,26 +404,13 @@ textarea {
 
 .modal-content {
     position: relative;
-    margin: 20px auto;
+    margin: 20px auto 0px auto;
     background-color: #fff;
-    padding: 16px;
+    padding: 0px;
     border-radius: 3px;
-    width: calc(100vw - 40px);
+    width: calc(100vw - 32px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding: 0px 0px 5px 0px;
-    margin-top: -5px;
-}
-
-.modal-header h2 {
-    margin: 0;
 }
 
 .close-btn {
@@ -437,19 +424,40 @@ textarea {
     color: #000;
 }
 
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 16px 16px 5px 16px;
+    margin-top: -5px;
+
+    .close-btn {
+        margin-top: -8px;
+    }
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+
 .modal-body {
-    padding: 10px 0 5px 0px;
+    padding: 16px 16px 10px 16px;
+    position: relative;
 }
 
 .modal-footer {
     border-top: 1px solid #ddd;
     display: flex;
     justify-content: flex-end;
-    padding-top: 10px;
+    padding: 10px 16px 16px 16px;
 }
 
 .original {
     height: calc(100vh - 176px);
+    max-height: calc(100vh - 176px);
 }
 
 /* CSS untuk kelas two-side-table */
