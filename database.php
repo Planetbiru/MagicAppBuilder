@@ -397,14 +397,7 @@ class DatabaseExplorer
                         $tr = $dom->createElement('tr');
                         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
                             // For SQLite
-                            $columns = [
-                                $row['name'], 
-                                $row['type'], 
-                                $row['notnull'] ? 'NO' : 'YES', 
-                                $row['pk'] == 1 ? 'PRI' : '', 
-                                $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                                strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
-                            ];
+                            $columns = self::createSqliteColumn($row);
                         } else {
                             // For MySQL or PostgreSQL
                             $columns = $row;
