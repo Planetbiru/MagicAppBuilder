@@ -196,7 +196,7 @@ class DatabaseExplorer
         $dom = new DOMDocument('1.0', 'utf-8');
         
         // Create heading
-        $h3 = $dom->createElement('h3', 'Table');
+        $h3 = $dom->createElement('h3', 'Table List');
         $dom->appendChild($h3);
 
         // Create unordered list
@@ -789,9 +789,6 @@ class DatabaseExplorer
             $tableElem = $dom->createElement('table');
             $tableElem->setAttribute('class', 'two-side-table');
             $tableElem->setAttribute('border', '1');
-            $tableElem->setAttribute('cellpadding', '10');
-            $tableElem->setAttribute('cellspacing', '0');
-            $tableElem->setAttribute('style', 'border-collapse: collapse;');
             
             $columnNames = [];
 
@@ -1339,9 +1336,11 @@ else {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.min.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
@@ -1411,7 +1410,7 @@ else {
 
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Import Database Structure</h2>
+                <h3>Import Database Structure</h3>
                 <span class="close-btn" id="closeBtn">&times;</span>
             </div>
             
