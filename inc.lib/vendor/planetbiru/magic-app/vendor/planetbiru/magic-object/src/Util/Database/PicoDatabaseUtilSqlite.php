@@ -13,30 +13,19 @@ use PDO;
 /**
  * Class PicoDatabaseUtilSqlite
  *
- * This class extends the PicoDatabaseUtilBase and implements the PicoDatabaseUtilInterface specifically 
- * for SQLite database operations. It provides specialized utility methods tailored to leverage SQLite's 
- * features and syntax while ensuring compatibility with the general database utility interface.
+ * Provides utility methods for SQLite database operations, extending PicoDatabaseUtilBase 
+ * and implementing PicoDatabaseUtilInterface. This class includes functions for retrieving 
+ * column information, generating CREATE TABLE statements, dumping data to SQL insert statements, 
+ * facilitating data imports, and ensuring data integrity during the import process.
  *
- * Key functionalities include:
+ * Key features:
+ * - Retrieve column info from SQLite tables.
+ * - Generate CREATE TABLE statements.
+ * - Convert data to SQL INSERT statements.
+ * - Facilitate data import between databases.
+ * - Ensure data integrity during imports.
  *
- * - **Retrieve and display column information for tables:** Methods to fetch detailed column data, 
- *   including types and constraints, from SQLite tables.
- * - **Generate SQL statements to create tables based on existing structures:** Automated generation 
- *   of CREATE TABLE statements to replicate existing table schemas.
- * - **Dump data from various sources into SQL insert statements:** Convert data from different formats 
- *   into valid SQL INSERT statements for efficient data insertion.
- * - **Facilitate the import of data between source and target databases:** Streamlined processes for 
- *   transferring data, including handling pre and post-import scripts to ensure smooth operations.
- * - **Ensure data integrity by fixing types during the import process:** Validation and correction of 
- *   data types to match SQLite's requirements, enhancing data quality during imports.
- *
- * This class is designed for developers who are working with SQLite databases and need a robust set of tools 
- * to manage database operations efficiently. By adhering to the PicoDatabaseUtilInterface, it provides 
- * a consistent API for database utilities while taking advantage of SQLite-specific features.
- *
- * Usage:
- * To use this class, instantiate it with a SQLite database connection and utilize its methods to perform 
- * various database tasks, ensuring efficient data management and manipulation.
+ * Designed for developers working with SQLite to streamline database management tasks.
  *
  * @author Kamshory
  * @package MagicObject\Util\Database
@@ -95,11 +84,11 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
 
         foreach ($tableInfo->getColumns() as $column) {
         
-            $columnName = $column['name'];
-            $columnType = $column['type'];
-            $length = isset($column['length']) ? $column['length'] : null;
-            $nullable = (isset($column['nullable']) && $column['nullable'] === 'true') ? ' NULL' : ' NOT NULL';
-            $defaultValue = isset($column['default_value']) ? " DEFAULT '{$column['default_value']}'" : '';
+            $columnName = $column[MagicObject::KEY_NAME];
+            $columnType = $column[MagicObject::KEY_TYPE];
+            $length = isset($column[MagicObject::KEY_LENGTH]) ? $column[MagicObject::KEY_LENGTH] : null;
+            $nullable = (isset($column[self::KEY_NULLABLE]) && $column[self::KEY_NULLABLE] === 'true') ? ' NULL' : ' NOT NULL';
+            $defaultValue = isset($column[MagicObject::KEY_DEFAULT_VALUE]) ? " DEFAULT ".$column[MagicObject::KEY_DEFAULT_VALUE] : '';
 
             // Convert column type for SQL
             $columnType = strtolower($columnType); // Convert to lowercase for case-insensitive comparison
@@ -172,8 +161,8 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     private function determineSqlType($column, $autoIncrementKeys = null, $length = 255, $pKeyArrUsed = array())
     {
-        $columnName = $column[parent::KEY_NAME];
-        $columnType = strtolower($column['type']); // Assuming 'type' holds the column type
+        $columnName = $column[MagicObject::KEY_NAME];
+        $columnType = strtolower($column[MagicObject::KEY_TYPE]); // Assuming 'type' holds the column type
         $sqlType = '';
 
         // Check for auto-increment primary key
@@ -292,14 +281,14 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         {
             foreach($pk as $prop=>$primaryKey)
             {
-                $cols[$prop]['primary_key'] = true;
+                $cols[$prop][self::KEY_PRIMARY_KEY] = true;
             }
         }
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
         foreach($tableInfo->getColumns() as $k=>$column)
         {
-            if(self::isArray($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys))
+            if(self::isArray($autoIncrementKeys) && in_array($column[MagicObject::KEY_NAME], $autoIncrementKeys))
             {
                 $cols[$k]['auto_increment'] = true;
             }
@@ -416,7 +405,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
      *                      - bool|string 'nullable': Indicates if the column allows NULL values
      *                        ('true' or true for NULL; otherwise, NOT NULL).
-     *                      - mixed 'default_value': The default value for the column (optional).
+     *                      - mixed 'defaultValue': The default value for the column (optional).
      *                      - bool 'primary_key': Whether the column is a primary key (optional).
      *                      - bool 'auto_increment': Whether the column is auto-incrementing (optional).
      * 
@@ -425,19 +414,19 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      */
     public function createColumn($column)
     {
-        $columnType = $this->mysqlToSqliteType($column['type']);  // Convert MySQL type to SQLite type
+        $columnType = $this->mysqlToSqliteType($column[MagicObject::KEY_TYPE]);  // Convert MySQL type to SQLite type
         $col = array();
         $col[] = "\t";  // Indentation for readability
-        $col[] = "" . $column[parent::KEY_NAME] . "";  // Column name
+        $col[] = "" . $column[MagicObject::KEY_NAME] . "";  // Column name
         
         // Handle primary key and auto-increment columns
-        if (isset($column['primary_key']) && isset($column['auto_increment']) && $column['primary_key'] && $column['auto_increment']) {
+        if (isset($column[self::KEY_PRIMARY_KEY]) && isset($column[self::KEY_AUTO_INCREMENT]) && $column[self::KEY_PRIMARY_KEY] && $column[self::KEY_AUTO_INCREMENT]) {
             $columnType = 'INTEGER';  // Use INTEGER for auto-incrementing primary keys in SQLite
             $col[] = $columnType;
             $col[] = 'PRIMARY KEY';
         }
         // Handle primary key only
-        else if (isset($column['primary_key']) && $column['primary_key']) {
+        else if (isset($column[self::KEY_PRIMARY_KEY]) && $column[self::KEY_PRIMARY_KEY]) {
             $col[] = $columnType;
             $col[] = 'PRIMARY KEY';
         }
@@ -447,15 +436,15 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         // Handle nullability
-        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
             $col[] = "NULL";  // Allow NULL values
         } else {
             $col[] = "NOT NULL";  // Disallow NULL values
         }
 
         // Handle default value if provided
-        if (isset($column['default_value'])) {
-            $defaultValue = $column['default_value'];
+        if (isset($column[MagicObject::KEY_DEFAULT_VALUE])) {
+            $defaultValue = $column[MagicObject::KEY_DEFAULT_VALUE];
             $defaultValue = $this->fixDefaultValue($defaultValue, $columnType);  // Format the default value
             $col[] = "DEFAULT $defaultValue";
         }

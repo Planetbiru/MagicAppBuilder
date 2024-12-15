@@ -23,8 +23,6 @@ class PicoDatabaseStructure
     const KEY_NOT_NULL = "notnull";
     const KEY_NULLABLE = "nullable";
     const KEY_PRIMARY = "primary";
-    const DATABASE_TYPE_MYSQL = "mysql";
-    const DATABASE_TYPE_MARIADB = "mariadb";
 
     /**
      * The associated MagicObject instance.
@@ -86,7 +84,7 @@ class PicoDatabaseStructure
         $createStrArr = array();
         $pk = array();
         
-        if ($databaseType == self::DATABASE_TYPE_MYSQL) {
+        if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             foreach ($info->getColumns() as $column) {
                 $createStrArr[] = $column[self::KEY_NAME] . " " . $column[self::KEY_TYPE] . " " . $this->nullable($column[self::KEY_NULLABLE]);
             }

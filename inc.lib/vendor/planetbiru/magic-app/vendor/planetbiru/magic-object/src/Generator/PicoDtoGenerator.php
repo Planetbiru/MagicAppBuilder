@@ -100,19 +100,26 @@ class PicoDtoGenerator
     /**
      * Create a property with appropriate documentation.
      *
-     * @param array $typeMap Mapping of database types to PHP types
-     * @param string $columnName Name of the column
-     * @param string $columnType Type of the column
-     * @return string PHP code for the property with docblock
+     * This method generates a PHP property with a docblock based on the provided column name and type. 
+     * The docblock includes annotations like `@Label` to describe the property and `@var` to specify the 
+     * data type of the property. It is used to automatically generate well-documented properties based 
+     * on database column information.
+     *
+     * @param array $typeMap Mapping of database types to PHP types (e.g., 'int' => 'integer').
+     * @param string $columnName Name of the column from the database.
+     * @param string $columnType Type of the column from the database (e.g., 'varchar', 'int').
+     * @param bool $prettifyLabel Whether to modify the column name into a more readable label (default is true).
+     * @return string PHP code for the property with a docblock, including the appropriate annotations like 
+     *                `@Label` and `@var`, ready to be inserted into a class.
      */
-    protected function createProperty($typeMap, $columnName, $columnType)
+    protected function createProperty($typeMap, $columnName, $columnType, $prettifyLabel = true)
     {
         $propertyName = PicoStringUtil::camelize($columnName);
         $docs = array();
         $docStart = "\t/**";
         $docEnd = "\t */";
 
-        $description = $this->getPropertyName($columnName);
+        $description = $this->getPropertyName($columnName, $prettifyLabel);
         $type = $this->getDataType($typeMap, $columnType);
 
         $docs[] = $docStart;
@@ -127,18 +134,24 @@ class PicoDtoGenerator
     }
 
     /**
-     * Get a descriptive name for the property from the column name.
+     * Get a descriptive name for the property based on the column name.
+     * The column name is converted to a formatted property name, where each part
+     * of the column name (split by underscores) is capitalized. Special cases such as 
+     * "Id" and "Ip" are handled to be formatted as "ID" and "IP", respectively.
      *
-     * @param string $name Original column name
-     * @return string Formatted property name
+     * @param string $name Original column name (e.g., 'user_id', 'user_ip')
+     * @param bool $prettifyLabel Whether to replace 'Id' with 'ID' and 'Ip' with 'IP'
+     * @return string Formatted property name (e.g., 'User ID', 'User IP')
      */
-    protected function getPropertyName($name)
+    protected function getPropertyName($name, $prettifyLabel = true)
     {
         $arr = explode("_", $name);
         foreach ($arr as $k => $v) {
-            $arr[$k] = ucfirst($v);
-            $arr[$k] = str_replace("Id", "ID", $arr[$k]);
-            $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
+            $arr[$k] = ucwords($v);
+            if ($prettifyLabel) {
+                $arr[$k] = str_replace("Id", "ID", $arr[$k]);
+                $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
+            }
         }
         return implode(" ", $arr);
     }
@@ -203,26 +216,26 @@ class PicoDtoGenerator
     {
         return array(
             "bigint"      => "int",
-            "bool"        => "bool",
             "boolean"     => "bool",
+            "bool"        => "bool",
             "datetime"    => "string",
             "date"        => "string",
+            "time"        => "string",
             "double"      => "double",
             "enum"        => "string",
             "float"       => "double",
-            "int"         => "int",
             "smallint"    => "int",
             "string"      => "string",
-            "text"        => "string",
             "timestamp"   => "string",
-            "tinyint"     => "int",
             "tinyint(1)"  => "bool",
+            "tinyint"     => "int",
+            "int"         => "int",
             "varchar"     => "string",
             "char"        => "string",
             "tinytext"    => "string",
             "mediumtext"  => "string",
             "longtext"    => "string",
-            "time"        => "string",
+            "text"        => "string"
         );
     }
 
@@ -274,7 +287,7 @@ use MagicObject\\SetterGetter;
  * ' . $classNameDto . ' is a Data Transfer Object used to transfer ' . $entityName . ' via API or to serialize into files or databases.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md
  *
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=' . $prettify . ')
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify='.$prettify.')
  */
 class ' . $classNameDto . ' extends SetterGetter
 {

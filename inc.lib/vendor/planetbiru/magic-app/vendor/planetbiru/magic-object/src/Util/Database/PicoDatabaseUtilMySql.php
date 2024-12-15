@@ -14,30 +14,19 @@ use PDO;
 /**
  * Class PicoDatabaseUtilMySql
  *
- * This class extends the PicoDatabaseUtilBase and implements the PicoDatabaseUtilInterface specifically 
- * for MySQL database operations. It provides specialized utility methods tailored to leverage MySQL's 
- * features and syntax while ensuring compatibility with the general database utility interface.
+ * Provides utility methods for MySQL database operations, extending PicoDatabaseUtilBase 
+ * and implementing PicoDatabaseUtilInterface. This class includes functions for retrieving 
+ * column information, generating CREATE TABLE statements, dumping data to SQL insert statements, 
+ * facilitating data imports, and ensuring data integrity during the import process.
  *
- * Key functionalities include:
+ * Key features:
+ * - Retrieve column info from MySQL tables.
+ * - Generate CREATE TABLE statements.
+ * - Convert data to SQL INSERT statements.
+ * - Facilitate data import between databases.
+ * - Ensure data integrity during imports.
  *
- * - **Retrieve and display column information for tables:** Methods to fetch detailed column data, 
- *   including types and constraints, from MySQL tables.
- * - **Generate SQL statements to create tables based on existing structures:** Automated generation 
- *   of CREATE TABLE statements to replicate existing table schemas.
- * - **Dump data from various sources into SQL insert statements:** Convert data from different formats 
- *   into valid SQL INSERT statements for efficient data insertion.
- * - **Facilitate the import of data between source and target databases:** Streamlined processes for 
- *   transferring data, including handling pre and post-import scripts to ensure smooth operations.
- * - **Ensure data integrity by fixing types during the import process:** Validation and correction of 
- *   data types to match MySQL's requirements, enhancing data quality during imports.
- *
- * This class is designed for developers who are working with MySQL databases and need a robust set of tools 
- * to manage database operations efficiently. By adhering to the PicoDatabaseUtilInterface, it provides 
- * a consistent API for database utilities while taking advantage of MySQL-specific features.
- *
- * Usage:
- * To use this class, instantiate it with a MySQL database connection and utilize its methods to perform 
- * various database tasks, ensuring efficient data management and manipulation.
+ * Designed for developers working with MySQL to streamline database management tasks.
  *
  * @author Kamshory
  * @package MagicObject\Util\Database
@@ -119,7 +108,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
      *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
      *                      - bool|string 'nullable': Indicates if the column allows NULL values 
      *                        ('true' or true for NULL; otherwise, NOT NULL).
-     *                      - mixed 'default_value': The default value for the column (optional).
+     *                      - mixed MagicObject::KEY_DEFAULT_VALUE: The default value for the column (optional).
      * @param array $autoIncrementKeys An array of column names that should have AUTO_INCREMENT property.
      * @param array $primaryKeys An array of primary key columns, each being an associative array 
      *                           with at least a 'name' key.
@@ -135,8 +124,8 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
 
         $col = array();
         $col[] = "\t";  // Adding indentation for readability in SQL statements
-        $columnName = $column[parent::KEY_NAME];
-        $columnType = $column['type'];
+        $columnName = $column[MagicObject::KEY_NAME];
+        $columnType = $column[MagicObject::KEY_TYPE];
 
         $col[] = "`" . $columnName . "`";  // Enclose column name in backticks
         $col[] = $columnType;  // Add the column type (e.g., INT, VARCHAR)
@@ -147,21 +136,21 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         }
 
         // Check if the column should auto-increment
-        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
+        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[MagicObject::KEY_NAME], $autoIncrementKeys)) {
             $col[] = 'AUTO_INCREMENT';
         }
 
         // Determine if the column allows NULL values
-        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
             $col[] = "NULL";
         } else {
             $col[] = "NOT NULL";
         }
 
         // Set default value if specified
-        if (isset($column['default_value'])) {
-            $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
+        if (isset($column[MagicObject::KEY_DEFAULT_VALUE])) {
+            $defaultValue = $column[MagicObject::KEY_DEFAULT_VALUE];
+            $defaultValue = $this->fixDefaultValue($defaultValue, $column[MagicObject::KEY_TYPE]);
             $col[] = "DEFAULT $defaultValue";
         }
 
@@ -232,7 +221,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         {
             if(isset($columns[$key]))
             {
-                $rec[$columns[$key][parent::KEY_NAME]] = $val;
+                $rec[$columns[$key][MagicObject::KEY_NAME]] = $val;
             }
         }
         $queryBuilder = new PicoDatabaseQueryBuilder(PicoDatabaseType::DATABASE_TYPE_MYSQL);

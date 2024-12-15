@@ -62,22 +62,23 @@ class PicoDatabaseDump
         $tableInfo = $databasePersist->getTableInfo();
         $picoTableName = $tableInfo->getTableName();
 
+        $result = "";
         if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) 
         {
             $tool = new PicoDatabaseUtilMySql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
         {
             $tool = new PicoDatabaseUtilSqlite();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
-        return "";
+        return $result;
     }
 
     /**
@@ -95,21 +96,22 @@ class PicoDatabaseDump
     {
         $picoTableName = $tableInfo->getTableName();
 
+        $result = "";
         if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
             $tool = new PicoDatabaseUtilMySql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
         {
             $tool = new PicoDatabaseUtilSqlite();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
-        return "";
+        return $result;
     }
 
     /**

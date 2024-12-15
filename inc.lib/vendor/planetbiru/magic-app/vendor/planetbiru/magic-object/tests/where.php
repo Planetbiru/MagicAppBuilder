@@ -182,7 +182,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
 	 * @var boolean
@@ -192,7 +192,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * As Draft
 	 * 
-	 * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @var boolean
 	 */
@@ -405,7 +405,7 @@ class Producer extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
 	 * @var boolean

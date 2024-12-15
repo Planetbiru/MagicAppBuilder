@@ -15,30 +15,19 @@ use PDO;
 /**
  * Class PicoDatabaseUtilPostgreSql
  *
- * This class extends the PicoDatabaseUtilBase and implements the PicoDatabaseUtilInterface specifically 
- * for PostgreSQL database operations. It provides specialized utility methods tailored to leverage PostgreSQL's 
- * features and syntax while ensuring compatibility with the general database utility interface.
+ * Provides utility methods for PostgreSQL database operations, extending PicoDatabaseUtilBase 
+ * and implementing PicoDatabaseUtilInterface. It includes functions for retrieving column information, 
+ * generating CREATE TABLE statements, dumping data to SQL insert statements, importing data, and 
+ * ensuring data integrity during imports.
  *
- * Key functionalities include:
+ * Key features:
+ * - Retrieve column info from PostgreSQL tables.
+ * - Generate CREATE TABLE statements.
+ * - Convert data to SQL INSERT statements.
+ * - Facilitate data import between databases.
+ * - Fix data types for integrity during imports.
  *
- * - **Retrieve and display column information for tables:** Methods to fetch detailed column data, 
- *   including types and constraints, from PostgreSQL tables.
- * - **Generate SQL statements to create tables based on existing structures:** Automated generation 
- *   of CREATE TABLE statements to replicate existing table schemas.
- * - **Dump data from various sources into SQL insert statements:** Convert data from different formats 
- *   into valid SQL INSERT statements for efficient data insertion.
- * - **Facilitate the import of data between source and target databases:** Streamlined processes for 
- *   transferring data, including handling pre and post-import scripts to ensure smooth operations.
- * - **Ensure data integrity by fixing types during the import process:** Validation and correction of 
- *   data types to match PostgreSQL's requirements, enhancing data quality during imports.
- *
- * This class is designed for developers who are working with PostgreSQL databases and need a robust set of tools 
- * to manage database operations efficiently. By adhering to the PicoDatabaseUtilInterface, it provides 
- * a consistent API for database utilities while taking advantage of PostgreSQL-specific features.
- *
- * Usage:
- * To use this class, instantiate it with a PostgreSQL database connection and utilize its methods to perform 
- * various database tasks, ensuring efficient data management and manipulation.
+ * Designed for developers working with PostgreSQL to manage database tasks efficiently.
  *
  * @author Kamshory
  * @package MagicObject\Util\Database
@@ -166,7 +155,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      *                      - string name: The name of the column.
      *                      - string type: The data type of the column (e.g., VARCHAR, INT).
      *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed default_value: The default value for the column (optional).
+     *                      - mixed defaultValue: The default value for the column (optional).
      *
      * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
      */
@@ -174,21 +163,21 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
     {
         $col = array();
         $col[] = "\t";
-        $col[] = "\"" . $column[parent::KEY_NAME] . "\"";
+        $col[] = "\"" . $column[MagicObject::KEY_NAME] . "\"";
         
-        $type = $this->fixAutoIncrementType($column, $column['type'], $autoIncrementKeys);
+        $type = $this->fixAutoIncrementType($column, $column[MagicObject::KEY_TYPE], $autoIncrementKeys);
         
         $col[] = $type;
 
-        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
             $col[] = "NULL";
         } else {
             $col[] = "NOT NULL";
         }
 
-        if (isset($column['default_value'])) {
-            $defaultValue = $column['default_value'];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column['type']);
+        if (isset($column[MagicObject::KEY_DEFAULT_VALUE])) {
+            $defaultValue = $column[MagicObject::KEY_DEFAULT_VALUE];
+            $defaultValue = $this->fixDefaultValue($defaultValue, $column[MagicObject::KEY_TYPE]);
             $col[] = "DEFAULT $defaultValue";
         }
 
@@ -247,7 +236,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
      *                      - bool|string 'nullable': Indicates if the column allows NULL values 
      *                        ('true' or true for NULL; otherwise, NOT NULL).
-     *                      - mixed 'default_value': The default value for the column (optional).
+     *                      - mixed MagicObject::KEY_DEFAULT_VALUE: The default value for the column (optional).
      *
      * @param array|null $autoIncrementKeys An optional array of column names that should 
      *                                       be treated as auto-incrementing.
@@ -267,18 +256,18 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         }
 
         $col = array();
-        $columnName = $column[parent::KEY_NAME]; // Get the column name.
+        $columnName = $column[MagicObject::KEY_NAME]; // Get the column name.
 
         // Check if the column should be auto-incrementing.
-        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[parent::KEY_NAME], $autoIncrementKeys)) {
+        if (isset($autoIncrementKeys) && is_array($autoIncrementKeys) && in_array($column[MagicObject::KEY_NAME], $autoIncrementKeys)) {
             // Determine the appropriate serial type based on the column's type.
-            if (stripos($column['type'], 'big') !== false) {
+            if (stripos($column[MagicObject::KEY_TYPE], 'big') !== false) {
                 $columnType = "BIGSERIAL"; // Use BIGSERIAL for large integers.
             } else {
                 $columnType = "SERIAL"; // Use SERIAL for standard integers.
             }
         } else {
-            $columnType = $this->getColumnType($column['type']); // Use the specified type if not auto-incrementing.
+            $columnType = $this->getColumnType($column[MagicObject::KEY_TYPE]); // Use the specified type if not auto-incrementing.
         }
 
         $col[] = "\t";  // Add tab indentation for readability.
@@ -291,15 +280,15 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         }
 
         // Determine nullability and add it to the definition.
-        if (isset($column['nullable']) && strtolower(trim($column['nullable'])) == 'true') {
+        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
             $col[] = "NULL"; // Allow NULL values.
         } else {
             $col[] = "NOT NULL"; // Disallow NULL values.
         }
 
         // Handle default value if provided, using a helper method to format it.
-        if (isset($column['default_value'])) {
-            $defaultValue = $column['default_value'];
+        if (isset($column[MagicObject::KEY_DEFAULT_VALUE])) {
+            $defaultValue = $column[MagicObject::KEY_DEFAULT_VALUE];
             $defaultValue = $this->fixDefaultValue($defaultValue, $columnType); // Format the default value.
             $col[] = "DEFAULT $defaultValue";
         }
@@ -367,7 +356,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         $rec = array();
         foreach ($value as $key => $val) {
             if (isset($columns[$key])) {
-                $rec[$columns[$key][parent::KEY_NAME]] = $val;
+                $rec[$columns[$key][MagicObject::KEY_NAME]] = $val;
             }
         }
 

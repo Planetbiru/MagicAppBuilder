@@ -66,8 +66,8 @@ class PicoDatabasePersistence // NOSONAR
     const ORDER_ASC = "asc";
     const ORDER_DESC = "desc";
 
-    const MESSAGE_NO_PRIMARY_KEY_DEFINED = "No primaru key defined";
-    const MESSAGE_NO_RECORD_FOUND = "No record found";
+    const MESSAGE_NO_PRIMARY_KEY_DEFINED = "No primary key is defined.";
+    const MESSAGE_NO_RECORD_FOUND = "No records found.";
     const MESSAGE_INVALID_FILTER = "Invalid filter";
     const SQL_DATETIME_FORMAT = "Y-m-d H:i:s";
     const DATE_TIME_FORMAT = "datetimeformat";
@@ -328,6 +328,11 @@ class PicoDatabasePersistence // NOSONAR
                 $values = $this->parseKeyValue($reflexProp, $val, $param);
                 if(!empty($values))
                 {
+                    if(isset($values['default_value']))
+                    {
+                        // Add defaultValue
+                        $values[MagicObject::KEY_DEFAULT_VALUE] = $values['default_value'];
+                    }
                     $columns[$prop->name] = $values;
                 }
             }

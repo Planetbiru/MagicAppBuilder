@@ -12,8 +12,10 @@ use PDO;
 
 class PicoDatabaseUtilBase // NOSONAR
 {
-    const KEY_NAME = "name";
-    
+    const KEY_PRIMARY_KEY = "primary_key";
+    const KEY_NULLABLE = "nullable";
+    const KEY_AUTO_INCREMENT = "auto_increment";
+
     /**
      * Gets the auto-increment keys from the provided table information.
      *
@@ -30,7 +32,7 @@ class PicoDatabaseUtilBase // NOSONAR
             {
                 if($col["strategy"] == 'GenerationType.IDENTITY')
                 {
-                    $autoIncrementKeys[] = $col["name"];
+                    $autoIncrementKeys[] = $col[MagicObject::KEY_NAME];
                 }
             }
         }

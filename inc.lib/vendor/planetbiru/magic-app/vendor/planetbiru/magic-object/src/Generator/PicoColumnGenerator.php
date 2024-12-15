@@ -33,18 +33,21 @@ class PicoColumnGenerator
         if ($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MARIADB || 
             $database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_MYSQL) 
         {
+            // Use MySQL-specific utility to get column list
             $columns = (new PicoDatabaseUtilMySql())->getColumnList($database, $picoTableName);
         }
         else if($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_PGSQL)
         {
+            // Use PostgreSQL-specific utility to get column list
             $columns = (new PicoDatabaseUtilPostgreSql())->getColumnList($database, $picoTableName);
         }
         else if($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
+            // Use SQLite-specific utility to get column list
             $columns = (new PicoDatabaseUtilSqlite())->getColumnList($database, $picoTableName);
         }
         
-        // Return an empty array if the database type is not supported
+         // Return the column list, or an empty array if the database type is not supported
         return $columns;
     }
 }

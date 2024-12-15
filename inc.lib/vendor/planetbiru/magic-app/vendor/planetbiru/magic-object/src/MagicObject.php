@@ -10,6 +10,7 @@ use MagicObject\Database\PicoDatabaseEntity;
 use MagicObject\Database\PicoDatabasePersistence;
 use MagicObject\Database\PicoDatabasePersistenceExtended;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
+use MagicObject\Database\PicoDatabaseQueryTemplate;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoSort;
@@ -56,12 +57,15 @@ class MagicObject extends stdClass // NOSONAR
     
     // Property naming strategy
     const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
+    const PROPERTY_NAMING_STRATEGY_CAMEL = "propertyNamingStrategy";
     
     // Key constants
     const KEY_PROPERTY_TYPE = "propertyType";
-    const KEY_DEFAULT_VALUE = "default_value";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
+    const KEY_TYPE = "type";
+    const KEY_LENGTH = "length";
+    const KEY_DEFAULT_VALUE = "defaultValue";
 
     // Format constants
     const JSON = 'JSON';
@@ -75,6 +79,9 @@ class MagicObject extends stdClass // NOSONAR
     const FIND_OPTION_DEFAULT = 0;
     const FIND_OPTION_NO_COUNT_DATA = 1;
     const FIND_OPTION_NO_FETCH_DATA = 2;
+
+    const SNAKE_CASE = 'SNAKE_CASE';
+    const UPPER_CAMEL_CASE = 'UPPER_CAMEL_CASE';
 
     /**
      * Indicates whether the object is read-only.
@@ -842,7 +849,7 @@ class MagicObject extends stdClass // NOSONAR
         $nativeQueryUtil = new NativeQueryUtil();
 
         // Extract the query string and return type from the docblock
-        $queryString = $nativeQueryUtil->extractQueryString($docComment);
+        $queryString = $nativeQueryUtil->extractQueryString($docComment, $callerParamValues);
         $returnType = $nativeQueryUtil->extractReturnType($docComment, $callerClassName);    
         
         $params = array();
@@ -857,7 +864,7 @@ class MagicObject extends stdClass // NOSONAR
 
             // Bind the parameters to the prepared statement
             foreach ($callerParamValues as $index => $paramValue) {
-                if (isset($callerParams[$index]) && !($paramValue instanceof PicoPageable) && !($paramValue instanceof PicoSortable)) {
+                if (isset($callerParams[$index]) && !($paramValue instanceof PicoPageable) && !($paramValue instanceof PicoSortable) && !($paramValue instanceof PicoDatabaseQueryTemplate)) {
                     // Bind the parameter name and type to the statement
                     $paramName = $callerParams[$index]->getName();
                     if (!is_array($paramValue)) {
@@ -1579,9 +1586,12 @@ class MagicObject extends stdClass // NOSONAR
     protected function _snakeJson()
     {
         return isset($this->_classParams[self::JSON])
-            && isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], 'SNAKE_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], self::SNAKE_CASE) == 0
+            || isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::SNAKE_CASE) == 0
+            );
     }
 
     /**
@@ -1592,9 +1602,12 @@ class MagicObject extends stdClass // NOSONAR
     protected function _snakeYaml()
     {
         return isset($this->_classParams[self::YAML])
-            && isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY], 'SNAKE_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY], self::SNAKE_CASE) == 0
+            || isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::SNAKE_CASE) == 0
+            );
     }
 
     /**
@@ -1605,9 +1618,12 @@ class MagicObject extends stdClass // NOSONAR
     protected function _upperCamel()
     {
         return isset($this->_classParams[self::JSON])
-            && isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], 'UPPER_CAMEL_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], self::UPPER_CAMEL_CASE) == 0
+            || isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::UPPER_CAMEL_CASE) == 0
+            );
     }
 
     /**

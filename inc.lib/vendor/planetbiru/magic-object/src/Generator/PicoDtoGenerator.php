@@ -143,7 +143,7 @@ class PicoDtoGenerator
      * @param bool $prettifyLabel Whether to replace 'Id' with 'ID' and 'Ip' with 'IP'
      * @return string Formatted property name (e.g., 'User ID', 'User IP')
      */
-    protected function getPropertyName($name, $prettifyLabel)
+    protected function getPropertyName($name, $prettifyLabel = true)
     {
         $arr = explode("_", $name);
         foreach ($arr as $k => $v) {
@@ -216,26 +216,26 @@ class PicoDtoGenerator
     {
         return array(
             "bigint"      => "int",
-            "bool"        => "bool",
             "boolean"     => "bool",
+            "bool"        => "bool",
             "datetime"    => "string",
             "date"        => "string",
+            "time"        => "string",
             "double"      => "double",
             "enum"        => "string",
             "float"       => "double",
-            "int"         => "int",
             "smallint"    => "int",
             "string"      => "string",
-            "text"        => "string",
             "timestamp"   => "string",
-            "tinyint"     => "int",
             "tinyint(1)"  => "bool",
+            "tinyint"     => "int",
+            "int"         => "int",
             "varchar"     => "string",
             "char"        => "string",
             "tinytext"    => "string",
             "mediumtext"  => "string",
             "longtext"    => "string",
-            "time"        => "string",
+            "text"        => "string"
         );
     }
 

@@ -62,22 +62,23 @@ class PicoDatabaseDump
         $tableInfo = $databasePersist->getTableInfo();
         $picoTableName = $tableInfo->getTableName();
 
+        $result = "";
         if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) 
         {
             $tool = new PicoDatabaseUtilMySql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
         {
             $tool = new PicoDatabaseUtilSqlite();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
-        return "";
+        return $result;
     }
 
     /**
@@ -95,21 +96,22 @@ class PicoDatabaseDump
     {
         $picoTableName = $tableInfo->getTableName();
 
+        $result = "";
         if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
             $tool = new PicoDatabaseUtilMySql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         } 
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
         {
             $tool = new PicoDatabaseUtilPostgreSql();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
         {
             $tool = new PicoDatabaseUtilSqlite();
-            return $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
-        return "";
+        return $result;
     }
 
     /**
@@ -167,11 +169,11 @@ class PicoDatabaseDump
      */
     public function updateQueryAlterTableDefaultValue($query, $entityColumn)
     {
-        if (isset($entityColumn['default_value'])) {
-            if ($entityColumn['default_value'] == 'NULL' || $entityColumn['default_value'] == 'null') {
+        if (isset($entityColumn[MagicObject::KEY_DEFAULT_VALUE])) {
+            if ($entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'NULL' || $entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'null') {
                 $query .= " DEFAULT NULL";
             } else {
-                $query .= " DEFAULT " . PicoDatabaseUtil::escapeValue($entityColumn['default_value'], true);
+                $query .= " DEFAULT " . PicoDatabaseUtil::escapeValue($entityColumn[MagicObject::KEY_DEFAULT_VALUE], true);
             }
         }
         return $query;
@@ -180,14 +182,21 @@ class PicoDatabaseDump
     /**
      * Create an ALTER TABLE ADD COLUMN query for the specified entity or entities.
      *
-     * @param MagicObject|MagicObject[] $entity Entity or array of entities
-     * @param PicoDatabase|null $database Database connection
-     * @return string[] Array of SQL ALTER TABLE queries
+     * This method generates SQL queries to add new columns to a table. It supports adding columns
+     * either from a single entity or an array of entities. The method calls a helper method based
+     * on whether a single entity or multiple entities are passed.
+     *
+     * @param MagicObject|MagicObject[] $entity A single entity or an array of entities representing the columns to be added.
+     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, the default database will be used.
+     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
+     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
+     * 
+     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
-    public function createAlterTableAdd($entity, $database = null)
+    public function createAlterTableAdd($entity, $database = null, $createIfNotExists = false, $dropIfExists = false)
     {
         if (is_array($entity)) {
-            return $this->createAlterTableAddFromEntities($entity, $database);
+            return $this->createAlterTableAddFromEntities($entity, $database, $createIfNotExists, $dropIfExists);
         } else {
             return $this->createAlterTableAddFromEntity($entity);
         }
@@ -248,12 +257,19 @@ class PicoDatabaseDump
     /**
      * Create a list of ALTER TABLE ADD COLUMN queries from multiple entities.
      *
-     * @param MagicObject[] $entities Entities
-     * @param string|null $tableName Table name
-     * @param PicoDatabase|null $database Database connection
-     * @return string[] List of SQL ALTER TABLE queries
+     * This method generates SQL queries to add new columns to an existing table based on the provided entities.
+     * It checks the current database schema, compares it with the provided entity information, and generates
+     * the necessary ALTER TABLE queries.
+     *
+     * @param MagicObject[] $entities An array of entities representing the columns to be added.
+     * @param string|null $tableName The name of the table to alter. If null, the table name is derived from the entities.
+     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, it will be inferred from the entities.
+     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
+     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
+     * 
+     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
-    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null)
+    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null, $createIfNotExists = false, $dropIfExists = false)
     {
         $tableInfo = $this->getMergedTableInfo($entities);
         $columnNameList = $this->getColumnNameList($entities);
@@ -287,7 +303,7 @@ class PicoDatabaseDump
                 $queryAlter = $this->addPrimaryKey($queryAlter, $tableInfo, $tableName, $createdColumns);
                 $queryAlter = $this->addAutoIncrement($queryAlter, $tableInfo, $tableName, $createdColumns, $database->getDatabaseType());
             } else if ($numberOfColumn > 0) {
-                $queryAlter[] = $this->dumpStructureTable($tableInfo, $database->getDatabaseType());
+                $queryAlter[] = $this->dumpStructureTable($tableInfo, $database->getDatabaseType(), $createIfNotExists, $dropIfExists);
             }
         }
         return $queryAlter;
