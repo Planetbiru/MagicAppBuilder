@@ -68,7 +68,7 @@ class DataMap extends ToString
     public function setField($field)
     {
         $this->field = $field;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -90,6 +90,6 @@ class DataMap extends ToString
     public function setMap($map)
     {
         $this->map = $map;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

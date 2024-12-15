@@ -167,11 +167,11 @@ class PicoDatabaseDump
      */
     public function updateQueryAlterTableDefaultValue($query, $entityColumn)
     {
-        if (isset($entityColumn['default_value'])) {
-            if ($entityColumn['default_value'] == 'NULL' || $entityColumn['default_value'] == 'null') {
+        if (isset($entityColumn[MagicObject::KEY_DEFAULT_VALUE])) {
+            if ($entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'NULL' || $entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'null') {
                 $query .= " DEFAULT NULL";
             } else {
-                $query .= " DEFAULT " . PicoDatabaseUtil::escapeValue($entityColumn['default_value'], true);
+                $query .= " DEFAULT " . PicoDatabaseUtil::escapeValue($entityColumn[MagicObject::KEY_DEFAULT_VALUE], true);
             }
         }
         return $query;
@@ -187,7 +187,7 @@ class PicoDatabaseDump
      * @param MagicObject|MagicObject[] $entity A single entity or an array of entities representing the columns to be added.
      * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, the default database will be used.
      * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
-     * @param bool $dropIfExists Flag to indicate if existing columns should be dropped before adding new ones.
+     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
      * 
      * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
@@ -263,13 +263,12 @@ class PicoDatabaseDump
      * @param string|null $tableName The name of the table to alter. If null, the table name is derived from the entities.
      * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, it will be inferred from the entities.
      * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
-     * @param bool $dropIfExists Flag to indicate if existing columns should be dropped before adding new ones.
+     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
      * 
      * @return string[] An array of SQL ALTER TABLE queries to add the columns.
      */
     public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null, $createIfNotExists = false, $dropIfExists = false)
     {
-        
         $tableInfo = $this->getMergedTableInfo($entities);
         $columnNameList = $this->getColumnNameList($entities);
         $tableInfo->setSortedColumnName($columnNameList);
@@ -278,7 +277,7 @@ class PicoDatabaseDump
 
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
-        
+
         if (!empty($tableInfo->getColumns())) {
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());

@@ -67,7 +67,7 @@ class RowDto extends ToString
     public function setData($data)
     {
         $this->data = $data;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -89,6 +89,6 @@ class RowDto extends ToString
     public function setMetadata($metadata)
     {
         $this->metadata = $metadata;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

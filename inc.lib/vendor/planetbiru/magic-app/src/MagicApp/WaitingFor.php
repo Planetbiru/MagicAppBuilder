@@ -16,26 +16,44 @@ class WaitingFor
     /**
      * Get the description of the waiting status.
      *
-     * @param int $status The waiting status.
+     * This method provides a human-readable description of the given waiting status.
+     * Each constant in the class represents a specific status, and this method
+     * returns the corresponding description based on the value passed.
+     *
+     * @param int $status The waiting status constant (e.g., `WaitingFor::CREATE`).
+     * 
      * @return string The description of the waiting status.
+     *               Returns a message indicating no action pending if the status is unknown.
      */
     public static function getDescription($status)
     {
+        $description = ''; // Initialize an empty variable for the description.
+
         switch ($status) {
             case self::CREATE:
-                return 'Waiting for creation approval.';
+                $description = 'Waiting for creation approval.';
+                break;
             case self::UPDATE:
-                return 'Waiting for update approval.';
+                $description = 'Waiting for update approval.';
+                break;
             case self::ACTIVATE:
-                return 'Waiting for activation approval.';
+                $description = 'Waiting for activation approval.';
+                break;
             case self::DEACTIVATE:
-                return 'Waiting for deactivation approval.';
+                $description = 'Waiting for deactivation approval.';
+                break;
             case self::DELETE:
-                return 'Waiting for deletion approval.';
+                $description = 'Waiting for deletion approval.';
+                break;
             case self::SORT_ORDER:
-                return 'Waiting for sort order approval.';
+                $description = 'Waiting for sort order approval.';
+                break;
             default:
-                return 'No actions pending.';
+                $description = 'No actions pending.';
+                break;
         }
+
+        return $description; // Return the final description.
     }
+
 }

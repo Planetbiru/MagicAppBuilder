@@ -165,7 +165,7 @@ class Album extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -174,7 +174,7 @@ class Album extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -185,7 +185,7 @@ class Album extends MagicObject
 /**
  * AcuanPengawasan is entity of table acuan_pengawasan. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
- * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @package Sipro\Entity\Data
  * @Entity
@@ -236,7 +236,7 @@ class AcuanPengawasan extends MagicObject
 	/**
 	 * Aktif
 	 * 
-	 * @Column(name="aktif", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @Column(name="aktif", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Aktif")
 	 * @var boolean

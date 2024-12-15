@@ -10,6 +10,10 @@ use MagicObject\SecretObject;
  * Class CurrentAction
  *
  * Captures the current user action details, including user information and IP address.
+ *
+ * This class is responsible for capturing and providing the details of the current user's action,
+ * including the user's identity and IP address. It handles retrieving the user's IP address, 
+ * accounting for the use of proxy services like Cloudflare, and formatting the current timestamp.
  */
 class CurrentAction
 {
@@ -30,6 +34,10 @@ class CurrentAction
     /**
      * Constructor
      *
+     * Initializes the `CurrentAction` object with the user's information and their IP address.
+     * The constructor expects a configuration object for retrieving proxy settings and a string 
+     * representing the current user.
+     *
      * @param MagicObject|SecretObject $cfg Configuration object for getting IP settings.
      * @param string $user Current user.
      */
@@ -41,6 +49,10 @@ class CurrentAction
 
     /**
      * Get remote address.
+     *
+     * Retrieves the user's remote IP address. If a proxy service like Cloudflare is used,
+     * it fetches the client's IP address from the Cloudflare header. Otherwise, it returns the 
+     * address from the `REMOTE_ADDR` server variable.
      *
      * @param MagicObject|SecretObject|null $cfg Configuration object for proxy settings.
      * @return string The remote address of the user.
@@ -58,6 +70,8 @@ class CurrentAction
     /**
      * Get the current timestamp.
      *
+     * Returns the current time in the format `Y-m-d H:i:s` for logging or tracking user actions.
+     *
      * @return string Formatted current time.
      */
     public function getTime()
@@ -68,6 +82,8 @@ class CurrentAction
     /**
      * Get the current user.
      *
+     * Returns the current user, which was set during object construction.
+     *
      * @return string The current user.
      */
     public function getUser()
@@ -77,6 +93,8 @@ class CurrentAction
 
     /**
      * Get the current IP address.
+     *
+     * Returns the IP address of the user, which was retrieved during object construction.
      *
      * @return string The current IP address.
      */

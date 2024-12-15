@@ -5,6 +5,7 @@ namespace MagicObject\Util\Database;
 use DateTime;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
+use MagicObject\Database\PicoDatabaseQueryTemplate;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSqlJson;
@@ -34,19 +35,17 @@ use stdClass;
 class NativeQueryUtil
 {
     /**
-     * Replaces array parameters in the query string and applies pagination and sorting if necessary.
+     * Replaces array parameters and applies pagination and sorting to the query string.
      *
-     * This method iterates over the provided caller parameters and their values, replacing any array-type 
-     * parameters with their string equivalents in the query string. Additionally, if any pagination or sorting 
-     * objects (e.g., `PicoPageable` or `PicoSortable`) are detected in the parameters, it modifies the query 
-     * string to include pagination and sorting clauses.
+     * This method processes the caller's parameters, replacing array-type parameters with string equivalents. 
+     * It also adds pagination and sorting clauses if `PicoPageable` or `PicoSortable` objects are detected.
      *
-     * @param string $databaseType Database type
-     * @param string $queryString The SQL query string that may contain placeholders for parameters.
+     * @param string $databaseType The database type.
+     * @param string $queryString The SQL query string with placeholders.
      * @param ReflectionParameter[] $callerParams The parameters of the calling method (reflection objects).
-     * @param array $callerParamValues The actual values of the parameters passed to the calling method.
+     * @param array $callerParamValues The actual values of the parameters.
      * @return string The modified query string with array parameters replaced and pagination/sorting applied.
-     * @throws InvalidArgumentException If the provided parameters are not in the expected format.
+     * @throws InvalidArgumentException If parameters are in an unexpected format.
      */
     public function applyQueryParameters($databaseType, $queryString, $callerParams, $callerParamValues)
     {
@@ -55,7 +54,11 @@ class NativeQueryUtil
         
         // Replace array
         foreach ($callerParamValues as $index => $paramValue) {
-            if($paramValue instanceof PicoPageable)
+            if($paramValue instanceof PicoDatabaseQueryTemplate)
+            {
+                // Do nothing
+            }
+            else if($paramValue instanceof PicoPageable)
             {
                 $pageable = $paramValue;
             }
@@ -84,17 +87,14 @@ class NativeQueryUtil
     }
 
     /**
-     * Handles the return of data based on the specified return type.
+     * Processes and returns data based on the specified return type.
      *
-     * This method processes the data returned from a PDO statement and returns it in the format
-     * specified by the caller's `@return` docblock annotation. It supports various return types 
-     * such as `void`, `PDOStatement`, `int`, `object`, `array`, `string`, or any specific class 
-     * name (including array-type hinting).
+     * This method handles various return types like `void`, `PDOStatement`, `int`, `object`, `array`, 
+     * `string`, or any specific class name (including array-type hinting).
      *
      * @param PDOStatement $stmt The executed PDO statement.
-     * @param string $returnType The return type as specified in the caller function's docblock.
-     * @return mixed The processed return data, which can be a single value, object, array, 
-     *               PDOStatement, or a JSON string, based on the return type.
+     * @param string $returnType The return type from the caller's docblock annotation.
+     * @return mixed The processed return data (e.g., value, object, array, PDOStatement, or JSON string).
      * @throws InvalidReturnTypeException If the return type is invalid or unrecognized.
      */
     public function handleReturnObject($stmt, $returnType) // NOSONAR
@@ -232,14 +232,13 @@ class NativeQueryUtil
     
     /**
      * Extracts the return type from the docblock of the caller function.
-     * 
-     * The method processes the `@return` annotation in the docblock of the caller function,
-     * and adjusts for `self` to return the actual caller class name. It also handles array type 
-     * return values.
      *
-     * @param string $docComment The docblock comment of the caller function.
+     * This method processes the `@return` annotation, handling `self` and array types, 
+     * and returns the appropriate type, such as the caller class name or `void`.
+     *
+     * @param string $docComment The docblock of the caller function.
      * @param string $callerClassName The name of the class where the caller function is defined.
-     * @return string The processed return type, which could be a class name, `self`, or `void`.
+     * @return string The processed return type (class name, `self`, or `void`).
      */
     public function extractReturnType($docComment, $callerClassName)
     {
@@ -261,53 +260,78 @@ class NativeQueryUtil
     }
 
     /**
-     * Extracts the query string from the docblock of the caller function.
+     * Extracts the SQL query string from the docblock or caller's parameters.
      *
-     * The method looks for the `@query` annotation in the docblock and extracts the query string.
-     * It tries to handle different formats for the annotation, throwing an exception if no query is found.
+     * This method checks the caller's parameters for a `PicoDatabaseQueryTemplate` object to extract 
+     * the query string. If not found, it looks for the `@query` annotation in the docblock.
      *
-     * @param string $docComment The docblock comment of the caller function.
-     * @return string The SQL query string extracted from the `@query` annotation.
-     * @throws InvalidQueryInputException If no query string is found in the docblock.
+     * @param string $docComment The docblock of the caller function.
+     * @param array $callerParamValues The parameters passed to the caller.
+     * @return string The extracted SQL query string.
+     * @throws InvalidQueryInputException If no query string is found.
      */
-    public function extractQueryString($docComment)
+    public function extractQueryString($docComment, $callerParamValues)
     {
-        // Get the query from the @query annotation
-        preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
-        $queryString = $matches ? $matches[1] : '';
+        $queryString = $this->getQueryStringFromCallerParams($callerParamValues);
         
-        // Trim the query string of whitespace and line breaks
-        $queryString = trim($queryString, " \r\n\t ");
+        if(empty($queryString))
+        {
+            // Get the query from the @query annotation
+            preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
+            $queryString = $matches ? $matches[1] : '';
+            
+            // Trim the query string of whitespace and line breaks
+            $queryString = trim($queryString, " \r\n\t ");
+        }
         
         if (empty($queryString)) {
             // Try reading the query in another way
             preg_match('/@query\s*\(\s*"(.*?)"\s*\)/s', $docComment, $matches);
             $queryString = $matches ? $matches[1] : '';
-            
-            if (empty($queryString)) {
-                throw new InvalidQueryInputException("No query found.\r\n" . $docComment);
-            }
         }
-        
+        if (empty($queryString)) {
+            throw new InvalidQueryInputException("No query found.\r\n" . $docComment);
+        }
         return $queryString;
     }
 
+    /**
+     * Extracts the query string from the caller's parameters.
+     *
+     * This method looks for a `PicoDatabaseQueryTemplate` object in the caller's parameters
+     * and returns the query string representation of that object.
+     *
+     * @param array $callerParamValues The parameters passed to the caller function.
+     * @return string The SQL query string or an empty string if no valid object is found.
+     */
+    private function getQueryStringFromCallerParams($callerParamValues)
+    {
+        $queryString = "";
+        if(isset($callerParamValues) && is_array($callerParamValues) && !empty($callerParamValues))
+        {
+            foreach($callerParamValues as $param)
+            {
+                if($param instanceof PicoDatabaseQueryTemplate)
+                {
+                    $queryString = (string) $param;
+                    break;
+                }
+            }
+        }
+        return $queryString;
+    }
 
     /**
-     * Maps PHP types to the corresponding PDO parameter types.
+     * Maps a value to the corresponding PDO parameter type.
      *
-     * This method determines the appropriate PDO parameter type based on the type of the given value.
-     * It handles various PHP data types, such as `null`, `boolean`, `integer`, `string`, `DateTime`, 
-     * and objects like `PicoSqlJson`, and maps them to the appropriate PDO parameter types required 
-     * for executing prepared statements in PDO.
+     * This method determines the appropriate PDO parameter type based on the given value's type 
+     * (e.g., `null`, `boolean`, `integer`, `string`, `DateTime`, or `PicoSqlJson`).
      *
-     * @param mixed $value The value to determine the PDO parameter type for. This can be of any type,
-     *                     including `null`, `boolean`, `integer`, `string`, `DateTime`, or other types.
-     * 
-     * @return stdClass An object containing the following properties:
-     *                  - `type`: The corresponding PDO parameter type (e.g., `PDO::PARAM_STR`, 
-     *                            `PDO::PARAM_NULL`, `PDO::PARAM_BOOL`, `PDO::PARAM_INT`).
-     *                  - `value`: The value formatted as required for the PDO parameter.
+     * @param mixed $value The value to determine the PDO parameter type for.
+     *
+     * @return stdClass An object with:
+     *                  - `type`: The corresponding PDO parameter type (e.g., `PDO::PARAM_STR`).
+     *                  - `value`: The formatted value for the PDO parameter.
      */
     public function mapToPdoParamType($value)
     {
@@ -339,16 +363,15 @@ class NativeQueryUtil
     }
     
     /**
-     * Debugs an SQL query by sending it to a logger callback function.
-     * 
-     * This method retrieves the callback function for debugging queries from the database object
-     * and invokes it with the final SQL query string, which is generated by combining the SQL 
-     * statement with the provided parameters.
+     * Sends an SQL query to a logger callback for debugging.
      *
-     * @param PicoDatabase $database The database instance that contains the callback function.
-     * @param PDOStatement $stmt The PDO statement object that holds the prepared query.
-     * @param array $params The parameters that are bound to the SQL statement.
-     * 
+     * This method invokes the callback function defined in the database object,
+     * passing the final SQL query generated by combining the statement and parameters.
+     *
+     * @param PicoDatabase $database The database instance containing the callback.
+     * @param PDOStatement $stmt The prepared PDO statement.
+     * @param array $params The parameters bound to the query.
+     *
      * @return void
      */
     public function debugQuery($database, $stmt, $params)

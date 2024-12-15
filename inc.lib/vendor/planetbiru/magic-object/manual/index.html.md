@@ -27,7 +27,7 @@ includes:
   - session
   - database
   - with-pdo
-  - entity
+  - orm
   - specification
   - pagable
   - pagination

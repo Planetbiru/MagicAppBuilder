@@ -328,6 +328,11 @@ class PicoDatabasePersistence // NOSONAR
                 $values = $this->parseKeyValue($reflexProp, $val, $param);
                 if(!empty($values))
                 {
+                    if(isset($values['default_value']))
+                    {
+                        // Add defaultValue
+                        $values[MagicObject::KEY_DEFAULT_VALUE] = $values['default_value'];
+                    }
                     $columns[$prop->name] = $values;
                 }
             }

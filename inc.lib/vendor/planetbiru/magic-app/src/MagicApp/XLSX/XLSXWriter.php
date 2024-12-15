@@ -49,7 +49,7 @@ class XLSXWriter //NOSONAR
 	 * Set title
 	 *
 	 * @param string $title
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setTitle($title = '')
 	{
@@ -61,7 +61,7 @@ class XLSXWriter //NOSONAR
 	 * Set subject
 	 *
 	 * @param string $subject
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setSubject($subject = '')
 	{
@@ -73,7 +73,7 @@ class XLSXWriter //NOSONAR
 	 * Set author
 	 *
 	 * @param string $author
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setAuthor($author = '')
 	{
@@ -85,7 +85,7 @@ class XLSXWriter //NOSONAR
 	 * Set company
 	 *
 	 * @param string $company
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setCompany($company = '')
 	{
@@ -97,7 +97,7 @@ class XLSXWriter //NOSONAR
 	 * Set keywords
 	 *
 	 * @param string $keywords
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setKeywords($keywords = '')
 	{
@@ -109,7 +109,7 @@ class XLSXWriter //NOSONAR
 	 * Set description
 	 *
 	 * @param string $description
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setDescription($description = '')
 	{
@@ -121,7 +121,7 @@ class XLSXWriter //NOSONAR
 	 * Set temporary directory
 	 *
 	 * @param string $tempdir
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setTempDir($tempdir = '')
 	{
@@ -133,7 +133,7 @@ class XLSXWriter //NOSONAR
 	 * Set right to left
 	 *
 	 * @param boolean $isRightToLeft
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function setRightToLeft($isRightToLeft = false)
 	{
@@ -176,7 +176,7 @@ class XLSXWriter //NOSONAR
 	/**
 	 * Read file and write it to sdtout
 	 *
-	 * @return self
+	 * @return self The current instance, allowing method chaining
 	 */
 	public function writeToStdOut()
 	{

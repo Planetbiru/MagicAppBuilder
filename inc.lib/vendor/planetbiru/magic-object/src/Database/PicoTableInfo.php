@@ -2,6 +2,7 @@
 
 namespace MagicObject\Database;
 
+use MagicObject\MagicObject;
 use stdClass;
 
 /**
@@ -157,7 +158,7 @@ class PicoTableInfo // NOSONAR
         $stdClass->autoIncrementKeys = $this->autoIncrementKeys;
         $stdClass->defaultValue = $this->defaultValue;
         $stdClass->notNullColumns = $this->notNullColumns;
-        $stdClass->this->noCache = $this->noCache;
+        $stdClass->noCache = $this->noCache;
         $stdClass->package = $this->package;
         return json_encode($stdClass);
     }
@@ -172,7 +173,7 @@ class PicoTableInfo // NOSONAR
         $columns = $this->getColumns();
         $propertyColumns = array();
         foreach ($columns as $prop => $column) {
-            $propertyColumns[$prop] = $column['name'];
+            $propertyColumns[$prop] = $column[MagicObject::KEY_NAME];
         }
         return $propertyColumns;
     }
@@ -187,7 +188,7 @@ class PicoTableInfo // NOSONAR
         $columns = $this->getJoinColumns();
         $propertyColumns = array();
         foreach ($columns as $prop => $column) {
-            $propertyColumns[$prop] = $column['name'];
+            $propertyColumns[$prop] = $column[MagicObject::KEY_NAME];
         }
         return $propertyColumns;
     }

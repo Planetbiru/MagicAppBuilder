@@ -44,14 +44,18 @@ class SecretObject extends stdClass // NOSONAR
     const JSON = 'JSON';
     const YAML = 'Yaml';
     const PROPERTY_NAMING_STRATEGY = "property-naming-strategy";
+    const PROPERTY_NAMING_STRATEGY_CAMEL = "propertyNamingStrategy";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
     const KEY_PROPERTY_TYPE = "propertyType";
-    const KEY_DEFAULT_VALUE = "default_value";
+    const KEY_DEFAULT_VALUE = "defaultValue";
     const ANNOTATION_ENCRYPT_IN = "EncryptIn";
     const ANNOTATION_DECRYPT_IN = "DecryptIn";
     const ANNOTATION_ENCRYPT_OUT = "EncryptOut";
     const ANNOTATION_DECRYPT_OUT = "DecryptOut";
+
+    const SNAKE_CASE = 'SNAKE_CASE';
+    const UPPER_CAMEL_CASE = 'UPPER_CAMEL_CASE';
 
     /**
      * List of properties to be encrypted when calling SET.
@@ -1041,9 +1045,12 @@ class SecretObject extends stdClass // NOSONAR
     protected function _snakeJson()
     {
         return isset($this->_classParams[self::JSON])
-            && isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], 'SNAKE_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], self::SNAKE_CASE) == 0
+            || isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::SNAKE_CASE) == 0
+            );
     }
 
     /**
@@ -1054,9 +1061,12 @@ class SecretObject extends stdClass // NOSONAR
     protected function _snakeYaml()
     {
         return isset($this->_classParams[self::YAML])
-            && isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY], 'SNAKE_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY], self::SNAKE_CASE) == 0
+            || isset($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::YAML][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::SNAKE_CASE) == 0
+            );
     }
 
     /**
@@ -1067,8 +1077,24 @@ class SecretObject extends stdClass // NOSONAR
     protected function isUpperCamel()
     {
         return isset($this->_classParams[self::JSON])
-            && isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY])
-            && strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], 'UPPER_CAMEL_CASE') == 0
+            && (
+                isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY]) &&
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY], self::UPPER_CAMEL_CASE) == 0
+            || isset($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL]) && 
+                strcasecmp($this->_classParams[self::JSON][self::PROPERTY_NAMING_STRATEGY_CAMEL], self::UPPER_CAMEL_CASE) == 0
+            );
+    }
+
+    /**
+     * Check if the JSON output should be prettified
+     *
+     * @return bool True if JSON output is set to be prettified; otherwise, false
+     */
+    protected function _pretty()
+    {
+        return isset($this->_classParams[self::JSON])
+            && isset($this->_classParams[self::JSON]['prettify'])
+            && strcasecmp($this->_classParams[self::JSON]['prettify'], 'true') == 0
             ;
     }
 
@@ -1215,6 +1241,8 @@ class SecretObject extends stdClass // NOSONAR
     public function __toString()
     {
         $obj = clone $this;
-        return json_encode($obj->value($this->_snakeJson()), JSON_PRETTY_PRINT);
+        $pretty = $this->_pretty();
+        $flag = $pretty ? JSON_PRETTY_PRINT : 0;
+        return json_encode($obj->value($this->_snakeJson()), $flag);
     }
 }

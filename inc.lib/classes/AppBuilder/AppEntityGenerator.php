@@ -114,7 +114,7 @@ class AppEntityGenerator extends PicoEntityGenerator
      */
     public function createPropertyReference($joinColumn, $entityName, $objectName, $propertyName, $referenceColumnName)
     {
-        $description = $this->getPropertyName(PicoStringUtil::snakeize($objectName));
+        $description = $this->getPropertyName(PicoStringUtil::snakeize($objectName), true);
         $objectName = PicoStringUtil::camelize($objectName);
 
         $docs = array();

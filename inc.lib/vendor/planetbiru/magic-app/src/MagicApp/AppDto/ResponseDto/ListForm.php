@@ -95,7 +95,7 @@ class ListForm extends ToString
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -117,7 +117,7 @@ class ListForm extends ToString
     public function setModuleId($moduleId)
     {
         $this->moduleId = $moduleId;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -139,7 +139,7 @@ class ListForm extends ToString
     public function setModuleName($moduleName)
     {
         $this->moduleName = $moduleName;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -161,7 +161,7 @@ class ListForm extends ToString
     public function setModuleTitle($moduleTitle)
     {
         $this->moduleTitle = $moduleTitle;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -183,7 +183,7 @@ class ListForm extends ToString
     public function setResponseCode($responseCode)
     {
         $this->responseCode = $responseCode;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -205,7 +205,7 @@ class ListForm extends ToString
     public function setResponseMessage($responseMessage)
     {
         $this->responseMessage = $responseMessage;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -227,6 +227,6 @@ class ListForm extends ToString
     public function setData($data)
     {
         $this->data = $data;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

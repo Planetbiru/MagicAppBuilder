@@ -88,7 +88,8 @@ class PicoDatabaseCredentials extends SecretObject
 `@JSON` is parameter to inform how the object will be serialized.
 
 Attributes:
-`property-naming-strategy`
+
+1. `propertyNamingStrategy`
 
 Allowed value:
 
@@ -110,7 +111,7 @@ Default value: `false`
 `@JSON` is parameter to inform how the object will be serialized.
 
 Attributes:
-`property-naming-strategy`
+`propertyNamingStrategy`
 
 Allowed value:
 

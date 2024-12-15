@@ -128,8 +128,17 @@ class PicoModule
     /**
      * Parse user roles to determine allowed modules and user role.
      *
-     * @param MagicObject[] $appUserRoles List of user roles.
-     * @return self
+     * This method processes the list of user roles and identifies which modules the user
+     * is allowed to access based on their roles. It also determines the user's specific role
+     * by matching the module name.
+     *
+     * The method populates the `allowedModules` array with the IDs of the modules the user
+     * has access to, and sets the `userRole` property to the role that corresponds to the 
+     * current module.
+     *
+     * @param MagicObject[] $appUserRoles List of user roles to be processed.
+     * 
+     * @return self Returns the current instance for method chaining.
      */
     public function parseRole($appUserRoles)
     {

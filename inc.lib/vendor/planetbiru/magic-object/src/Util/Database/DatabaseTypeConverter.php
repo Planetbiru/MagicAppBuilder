@@ -2,18 +2,65 @@
 
 namespace MagicObject\Util\Database;
 
+/**
+ * Class DatabaseTypeConverter
+ *
+ * Provides methods for converting database schema types between MySQL, PostgreSQL, and SQLite. 
+ * It maps column data types from one database system to another to facilitate schema migration.
+ * 
+ * Conversion mappings are provided for:
+ * - MySQL to PostgreSQL and SQLite
+ * - PostgreSQL to MySQL and SQLite
+ * - SQLite to MySQL and PostgreSQL
+ *
+ * Use the conversion methods (`mysqlToPostgresql`, `postgresqlToSQLite`, etc.) to convert schema dumps 
+ * from one format to another.
+ *
+ * Example:
+ * ```php
+ * $converter = new DatabaseTypeConverter();
+ * $postgresqlSchema = $converter->mysqlToPostgresql($mysqlSchema);
+ * ```
+ *
+ * @package MagicObject\Util\Database
+ */
 class DatabaseTypeConverter
 {
-    // Map MySQL types to PostgreSQL and SQLite
+    /**
+     * MySQL type "tinyint(1)" mapped to PostgreSQL and SQLite boolean.
+     *
+     * @var string
+     */
+    const TYPE_TINYINT_1 = "tinyint(1)";
+    
+    /**
+     * MySQL type "double precision" mapped to PostgreSQL and SQLite "double precision".
+     *
+     * @var string
+     */
+    const TYPE_DOUBLE_PRECISION = "double precision";
+    
+    /**
+     * MySQL type "character varying" mapped to PostgreSQL and SQLite "character varying".
+     *
+     * @var string
+     */
+    const TYPE_CHARACTER_VARYING = "character varying";
+
+    /**
+     * Map of MySQL types to PostgreSQL types.
+     *
+     * @var array
+     */
     private $mysqlToPostgresql = [
-        "tinyint(1)" => "boolean",  // MySQL tinyint(1) to PostgreSQL boolean
+        self::TYPE_TINYINT_1 => "boolean",  // MySQL tinyint(1) to PostgreSQL boolean
         "tinyint" => "smallint",    // MySQL tinyint to PostgreSQL smallint
         "smallint" => "smallint",   // MySQL smallint to PostgreSQL smallint
         "int" => "integer",         // MySQL int to PostgreSQL integer
         "bigint" => "bigint",       // MySQL bigint to PostgreSQL bigint
         "float" => "real",          // MySQL float to PostgreSQL real
-        "double" => "double precision", // MySQL double to PostgreSQL double precision
-        "varchar" => "character varying", // MySQL varchar to PostgreSQL character varying
+        "double" => self::TYPE_DOUBLE_PRECISION, // MySQL double to PostgreSQL double precision
+        "varchar" => self::TYPE_CHARACTER_VARYING, // MySQL varchar to PostgreSQL character varying
         "char" => "character",      // MySQL char to PostgreSQL character
         "text" => "text",           // MySQL text to PostgreSQL text
         "datetime" => "timestamp",  // MySQL datetime to PostgreSQL timestamp
@@ -24,9 +71,13 @@ class DatabaseTypeConverter
         "uuid" => "uuid"            // MySQL uuid to PostgreSQL uuid
     ];
 
-    // Map MySQL types to SQLite
+    /**
+     * Map of MySQL types to SQLite types.
+     *
+     * @var array
+     */
     private $mysqlToSQLite = [
-        "tinyint(1)" => "INTEGER",  // MySQL tinyint(1) to SQLite INTEGER (boolean)
+        self::TYPE_TINYINT_1 => "INTEGER",  // MySQL tinyint(1) to SQLite INTEGER (boolean)
         "tinyint" => "INTEGER",     // MySQL tinyint to SQLite INTEGER
         "smallint" => "INTEGER",    // MySQL smallint to SQLite INTEGER
         "int" => "INTEGER",         // MySQL int to SQLite INTEGER
@@ -44,15 +95,19 @@ class DatabaseTypeConverter
         "uuid" => "TEXT"            // MySQL uuid to SQLite TEXT
     ];
 
-    // Map PostgreSQL types to MySQL
+    /**
+     * Map of PostgreSQL types to MySQL types.
+     *
+     * @var array
+     */
     private $postgresqlToMySQL = [
-        "boolean" => "tinyint(1)",  // PostgreSQL boolean to MySQL tinyint(1)
+        "boolean" => self::TYPE_TINYINT_1,  // PostgreSQL boolean to MySQL tinyint(1)
         "smallint" => "smallint",   // PostgreSQL smallint to MySQL smallint
         "integer" => "int",         // PostgreSQL integer to MySQL int
         "bigint" => "bigint",       // PostgreSQL bigint to MySQL bigint
         "real" => "float",          // PostgreSQL real to MySQL float
-        "double precision" => "double", // PostgreSQL double precision to MySQL double
-        "character varying" => "varchar", // PostgreSQL character varying to MySQL varchar
+        self::TYPE_DOUBLE_PRECISION => "double", // PostgreSQL double precision to MySQL double
+        self::TYPE_CHARACTER_VARYING => "varchar", // PostgreSQL character varying to MySQL varchar
         "character" => "char",      // PostgreSQL character to MySQL char
         "text" => "text",           // PostgreSQL text to MySQL text
         "timestamp" => "datetime",  // PostgreSQL timestamp to MySQL datetime
@@ -64,15 +119,19 @@ class DatabaseTypeConverter
         "uuid" => "uuid"            // PostgreSQL uuid to MySQL uuid
     ];
 
-    // Map PostgreSQL types to SQLite
+    /**
+     * Map of PostgreSQL types to SQLite types.
+     *
+     * @var array
+     */
     private $postgresqlToSQLite = [
         "boolean" => "INTEGER",     // PostgreSQL boolean to SQLite INTEGER (boolean)
         "smallint" => "INTEGER",    // PostgreSQL smallint to SQLite INTEGER
         "integer" => "INTEGER",     // PostgreSQL integer to SQLite INTEGER
         "bigint" => "INTEGER",      // PostgreSQL bigint to SQLite INTEGER
         "real" => "REAL",           // PostgreSQL real to SQLite REAL
-        "double precision" => "REAL", // PostgreSQL double precision to SQLite REAL
-        "character varying" => "TEXT", // PostgreSQL character varying to SQLite TEXT
+        self::TYPE_DOUBLE_PRECISION => "REAL", // PostgreSQL double precision to SQLite REAL
+        self::TYPE_CHARACTER_VARYING => "TEXT", // PostgreSQL character varying to SQLite TEXT
         "character" => "TEXT",      // PostgreSQL character to SQLite TEXT
         "text" => "TEXT",           // PostgreSQL text to SQLite TEXT
         "timestamp" => "TEXT",      // PostgreSQL timestamp to SQLite TEXT
@@ -82,16 +141,26 @@ class DatabaseTypeConverter
         "uuid" => "TEXT"            // PostgreSQL uuid to SQLite TEXT
     ];
 
-    // Map SQLite types to MySQL
+    /**
+     * Map of SQLite types to MySQL types.
+     *
+     * @var array
+     */
     private $sqliteToMySQL = [
+        "NVARCHAR" => "varchar",    // SQLite NVARCHAR to MySQL varchar
         "INTEGER" => "int",         // SQLite INTEGER to MySQL int
         "REAL" => "float",          // SQLite REAL to MySQL float
         "TEXT" => "text",           // SQLite TEXT to MySQL text
         "BLOB" => "blob",           // SQLite BLOB to MySQL blob
     ];
 
-    // Map SQLite types to PostgreSQL
+    /**
+     * Map of SQLite types to PostgreSQL types.
+     *
+     * @var array
+     */
     private $sqliteToPostgresql = [
+        "NVARCHAR" => "character varying", // SQLite NVARCHAR to PostgreSQL character varying
         "INTEGER" => "integer",     // SQLite INTEGER to PostgreSQL integer
         "REAL" => "real",           // SQLite REAL to PostgreSQL real
         "TEXT" => "text",           // SQLite TEXT to PostgreSQL text

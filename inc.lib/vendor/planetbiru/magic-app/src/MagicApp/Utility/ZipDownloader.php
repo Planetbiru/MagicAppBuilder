@@ -3,6 +3,7 @@
 namespace MagicApp\Utility;
 
 use Exception;
+use MagicApp\Exception\ZipDownloadException;
 use ZipArchive;
 
 /**

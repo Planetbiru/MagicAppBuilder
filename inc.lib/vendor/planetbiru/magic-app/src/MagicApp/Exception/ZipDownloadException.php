@@ -1,6 +1,6 @@
 <?php
 
-namespace MagicApp\Utility;
+namespace MagicApp\Exception;
 
 use Exception;
 use Throwable;

@@ -121,7 +121,7 @@ class ListDataDto extends ToString
         }   
         $this->primaryKeyName[] = $primaryKeyName; // Append the primary key name
         $this->primaryKeyDataType[] = new NameValueDto($primaryKeyName, $primaryKeyDataType); // Append the primary key data type
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**
@@ -138,7 +138,7 @@ class ListDataDto extends ToString
         
         $this->title[] = $title; // Append the column title
         
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**
@@ -155,7 +155,7 @@ class ListDataDto extends ToString
         
         $this->dataMap[] = $dataMap; // Append the data map
         
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**
@@ -176,7 +176,7 @@ class ListDataDto extends ToString
         
         $this->row[] = new RowDto($data, $metadata); // Create and append new RowDto
         
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -197,7 +197,7 @@ class ListDataDto extends ToString
     public function resetTitle()
     {
         $this->title = array(); // Resetting title array
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -218,7 +218,7 @@ class ListDataDto extends ToString
     public function resetDataMap()
     {
         $this->dataMap = array(); // Resetting data map array
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**
@@ -239,7 +239,7 @@ class ListDataDto extends ToString
     public function resetRow()
     {
         $this->row = array(); // Resetting row array
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**

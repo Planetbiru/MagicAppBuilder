@@ -118,7 +118,7 @@ class SelectOptionDto extends ToString
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**

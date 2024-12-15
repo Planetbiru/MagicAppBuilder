@@ -65,7 +65,7 @@ class ResponseDto extends ToString
         if ($this->data && method_exists($this->data, 'setMetadata')) {
             $this->data->setMetadata($metadata);
         }
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**

@@ -5,20 +5,17 @@ namespace MagicObject\Util\Database;
 /**
  * Interface PicoDatabaseUtilInterface
  *
- * This interface defines a set of methods for manipulating and managing the structure and data within a database.
- * It provides a contract for classes that implement it to offer functionality related to table and column management,
- * data importing, and database configuration settings.
+ * Defines methods for managing database structures and data, including table and column management,
+ * data import/export, and database configuration.
  * 
- * The available methods in this interface include, but are not limited to:
- * 
- * - Retrieving the list of columns from a specific table.
- * - Obtaining the auto-increment key from table information.
- * - Generating the table structure in SQL format, with options to create or drop tables.
- * - Configuring columns, fixing default values, and importing data from source tables to target tables.
- * - Processing and mapping imported data, as well as fixing data types according to the desired format.
- * 
- * Implementations of this interface should consider validation and error handling to ensure data integrity 
- * and security during database operations.
+ * Key methods include:
+ * - Retrieving column lists from tables.
+ * - Handling auto-increment keys.
+ * - Generating SQL for creating/dropping tables.
+ * - Configuring columns, fixing defaults, and importing data.
+ * - Mapping and correcting data types during import.
+ *
+ * Implementations must ensure data integrity, validation, and error handling during operations.
  */
 interface PicoDatabaseUtilInterface // NOSONAR
 {

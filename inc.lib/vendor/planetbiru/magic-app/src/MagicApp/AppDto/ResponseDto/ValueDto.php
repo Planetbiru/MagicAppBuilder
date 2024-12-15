@@ -67,7 +67,7 @@ class ValueDto extends ToString
     public function setDisplay($display)
     {
         $this->display = $display;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -89,6 +89,6 @@ class ValueDto extends ToString
     public function setRaw($raw)
     {
         $this->raw = $raw;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

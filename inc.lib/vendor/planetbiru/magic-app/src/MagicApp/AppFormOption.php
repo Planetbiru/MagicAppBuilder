@@ -91,6 +91,9 @@ class AppFormOption
     /**
      * Create HTML data attributes for the option.
      *
+     * This method generates a string of HTML data attributes from the attributes array.
+     * It formats each key into a data- attribute (e.g., `data-attribute-name="value"`).
+     *
      * @return string Formatted string of data attributes for HTML
      */
     public function createAttributes()
@@ -108,9 +111,12 @@ class AppFormOption
     /**
      * Set a format for the text node with parameters for dynamic content.
      *
+     * This method allows you to set a dynamic format for the text of the option.
+     * The format string can contain placeholders that will be replaced with the provided parameters.
+     *
      * @param string $format The format string
      * @param string[] $params The parameters for the format
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function textNodeFormat($format, $params)
     {
@@ -121,6 +127,9 @@ class AppFormOption
 
     /**
      * Retrieve the values of the parameters used in the format.
+     *
+     * This method returns an array of parameter values by evaluating each one 
+     * through the `getValue()` method, which may fetch data from the associated `MagicObject`.
      *
      * @return string[] Array of parameter values
      */
@@ -137,6 +146,9 @@ class AppFormOption
 
     /**
      * Get the value associated with a given parameter.
+     *
+     * This method retrieves the value of a parameter, which could be a property 
+     * of the associated `MagicObject` (if it exists) or simply the parameter name.
      *
      * @param string $param The parameter name
      * @return string|null The value associated with the parameter, or null if not found
@@ -163,8 +175,11 @@ class AppFormOption
     /**
      * Set padding for the option, typically for nested structures.
      *
+     * This method allows you to specify padding to be applied to the option, 
+     * typically useful for nested option elements.
+     *
      * @param string $pad The padding string (default is a tab character)
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function setPad($pad = "\t")
     {
@@ -174,6 +189,9 @@ class AppFormOption
 
     /**
      * Get the HTML representation of the option as a string.
+     *
+     * This method generates the HTML markup for the option element. It includes
+     * the value, display text, selection state, and any additional attributes.
      *
      * @return string The HTML option element
      */
@@ -193,6 +211,9 @@ class AppFormOption
     /**
      * Alias for the __toString() method.
      *
+     * This method is an alias for `__toString()` to provide a more intuitive 
+     * method name for rendering the option as a string.
+     *
      * @return string The HTML option element
      */
     public function toString()
@@ -202,6 +223,8 @@ class AppFormOption
 
     /**
      * Get the text node for the option.
+     *
+     * This method retrieves the text content associated with the option.
      *
      * @return string The text node
      */ 
@@ -213,8 +236,10 @@ class AppFormOption
     /**
      * Set the text node for the option.
      *
+     * This method allows setting a new text value for the option.
+     *
      * @param string $textNode The text node to set
-     * @return self
+     * @return self The current instance, allowing method chaining
      */ 
     public function setTextNode($textNode)
     {
@@ -224,6 +249,9 @@ class AppFormOption
 
     /**
      * Get the associated data for the option.
+     *
+     * This method retrieves the associated `MagicObject` that holds additional data
+     * for dynamic value retrieval.
      *
      * @return MagicObject|null The associated data object, or null if not set
      */ 

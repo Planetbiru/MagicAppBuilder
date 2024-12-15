@@ -104,7 +104,7 @@ class MetadataDetailDto extends MetadataDto
     public function setPrimaryKey($primaryKey)
     {
         $this->primaryKey = $primaryKey;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -126,7 +126,7 @@ class MetadataDetailDto extends MetadataDto
     public function setActive($active)
     {
         $this->active = $active;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -148,7 +148,7 @@ class MetadataDetailDto extends MetadataDto
     public function setWaitingFor($waitingFor)
     {
         $this->waitingFor = $waitingFor;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -170,7 +170,7 @@ class MetadataDetailDto extends MetadataDto
     public function setWaitingForCode($waitingForCode)
     {
         $this->waitingForCode = $waitingForCode;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -192,6 +192,6 @@ class MetadataDetailDto extends MetadataDto
     public function setWaitingForMessage($waitingForMessage)
     {
         $this->waitingForMessage = $waitingForMessage;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

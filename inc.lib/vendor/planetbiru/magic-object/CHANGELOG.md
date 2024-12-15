@@ -132,3 +132,26 @@ This improvement enhances the flexibility of native queries, as the logic for pa
 -   **rollback()**: Rolls back the current transaction, undoing any changes made since the transaction began.
 
 These methods are designed to work seamlessly with an active database connection, allowing developers to handle transactions directly within the context of their application. Whether you're managing financial transactions or ensuring data consistency during batch processing, these functions streamline the management of transaction-based operations.
+
+
+# MagicObject Version 2.11
+
+## What's New
+
+1.  **Dynamic Query Template for Native Queries**
+    MagicObject now supports dynamic query templates for native SQL queries. This feature allows developers to build SQL queries dynamically, providing flexibility and improving code reusability. The dynamic query template can be customized to suit specific use cases, making it easier to construct complex queries while maintaining cleaner and more maintainable code.
+    
+2.  **Added `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS` to SQL Code Generation**  
+    MagicObject now generates SQL code with `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS` statements when creating tables from entities. This ensures that the table creation process is more robust, preventing errors when a table already exists.
+
+3.  **Standardization of Annotation Attribute Naming with Camel Case Strategy**  
+    The annotation attributes in MagicObject have been standardized to follow the camel case naming convention, ensuring consistency and better readability throughout the codebase.
+    
+4.  **Refactoring of Methods with Constant Usage**  
+    To prevent duplication and errors in the code, several methods have been refactored to utilize constants. This improves maintainability and reduces the chances of mistakes during development.
+
+5.  **Option to Prettify Serialize for `SecretObject`**  
+    A new option has been added to allow `SecretObject` to be serialized with pretty formatting. This makes it easier to read and inspect serialized `SecretObject` data, especially useful during development or debugging. The `prettify` flag can be enabled when serializing the object, ensuring the output is more human-readable with proper indentation.
+
+6.  **Updated Documentation**  
+    The documentation has been updated to reflect the latest changes in MagicObject. This includes clarifications, examples, and explanations to assist developers in understanding and utilizing the library effectively.

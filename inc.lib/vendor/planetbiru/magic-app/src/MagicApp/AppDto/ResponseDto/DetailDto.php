@@ -96,7 +96,7 @@ class DetailDto extends ToString
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -126,7 +126,7 @@ class DetailDto extends ToString
     public function addData($field, $value, $type = null, $label = null, $readonly = false, $hidden = false, $valueDraft = null)
     {
         $this->data->addData($field, $value, $type, $label, $readonly, $hidden, $valueDraft);
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -146,7 +146,7 @@ class DetailDto extends ToString
             $this->data->setPrimaryKeyDataType([]); // Initialize as an array if not set
         }   
         $this->data->addPrimaryKeyName($primaryKeyName, $primaryKeyDataType); // Append the primary key name
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -158,7 +158,7 @@ class DetailDto extends ToString
     public function setMetadata($metadata)
     {
         $this->data->getColumn()->setMetadata($metadata);
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**

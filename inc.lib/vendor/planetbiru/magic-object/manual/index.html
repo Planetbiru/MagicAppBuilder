@@ -23,8 +23,8 @@
 <p>The library simplifies property management with <strong>automatic setters and getters</strong>. This feature streamlines how properties are accessed and modified, promoting cleaner code and reducing boilerplate.</p>
 <h3>Multi-Level Objects</h3>
 <p>Support for <strong>multi-level objects</strong> enables developers to create nested structures seamlessly. This capability is essential for representing complex data models that mirror real-world relationships.</p>
-<h3>Entity Access</h3>
-<p>MagicObject streamlines interactions with entities, making it easier to manage and manipulate data models. This feature is particularly beneficial in applications with multiple entities, as it promotes organized and efficient access.</p>
+<h3>Object-Relational Mapping</h3>
+<p>MagicObject streamlines interactions with databases through <strong>ORM (Object-Relational Mapping)</strong>, making it easier to manage and manipulate data models. This feature is particularly beneficial in applications with complex relationships between entities, as it promotes organized and efficient access.</p>
 <h3>Filtering and Pagination</h3>
 <p>With built-in methods for <strong>filtering and pagination</strong>, developers can manage data display effectively. This feature enhances user experience by allowing the retrieval of specific data sets and controlling how much information is presented at once.</p>
 <h3>Native Query</h3>
@@ -48,7 +48,13 @@
 <h3>Session Management</h3>
 <p>Integrating with <strong>PHP sessions</strong> allows MagicObject to maintain state effectively across user interactions. This functionality is crucial for applications that rely on user sessions for personalized experiences.</p>
 <h3>Object Labeling</h3>
-<p>Enhancing object identification through <strong>object labeling</strong> improves the clarity of code and debugging processes. Labels allow developers to categorize and reference objects more easily.</p>
+<p><strong>Object labeling</strong> refers to the metadata or description of an entity's properties, making it easier to identify and manage them. For example, an entity like &quot;Client&quot; might have properties such as <strong>Name</strong>, <strong>Address</strong>, and <strong>Phone</strong>. The labels here would be:</p>
+<ul>
+<li><strong>Name</strong> is the label for the &quot;name&quot; field,</li>
+<li><strong>Address</strong> is the label for the &quot;address&quot; field,</li>
+<li><strong>Phone</strong> is the label for the &quot;phone&quot; field.</li>
+</ul>
+<p>These labels can <strong>easily be modified</strong> to meet specific needs without changing the field names themselves. For example, you could display &quot;Full Name&quot; instead of &quot;Name&quot; or &quot;Contact Number&quot; instead of &quot;Phone&quot; without altering the underlying database schema or object structure.</p>
 <h3>Multi-Language Support</h3>
 <p>Facilitating <strong>localization</strong> is a key feature of MagicObject, allowing developers to create applications that can serve multiple languages and regions. This capability is essential for reaching a global audience.</p>
 <h3>File Uploads</h3>
@@ -356,7 +362,7 @@ class MyObject extends MagicObject
 <p><code>@JSON</code> is parameter to inform how the object will be serialized.</p>
 <p>Attributes:</p>
 <ol>
-<li><code>property-naming-strategy</code></li>
+<li><code>propertyNamingStrategy</code></li>
 </ol>
 <p>Allowed value:</p>
 <ul>
@@ -365,7 +371,7 @@ class MyObject extends MagicObject
 <li><code>UPPER_CAMEL_CASE</code> all properties will be camel case with capitalize first character when <code>__toString()</code> method called.</li>
 </ul>
 <p>Default value: <code>CAMEL_CASE</code></p>
-<ol>
+<ol start="2">
 <li><code>prettify</code></li>
 </ol>
 <p>Allowed value:</p>
@@ -378,7 +384,7 @@ class MyObject extends MagicObject
 <p><code>@Yaml</code> is parameter to inform how the object will be serialized.</p>
 <p>Attributes:</p>
 <ol>
-<li><code>property-naming-strategy</code></li>
+<li><code>propertyNamingStrategy</code></li>
 </ol>
 <p>Allowed value:</p>
 <ul>
@@ -817,8 +823,10 @@ class PicoDatabaseCredentials extends SecretObject
 <h3>Class Parameters</h3>
 <p><strong>@JSON</strong></p>
 <p><code>@JSON</code> is parameter to inform how the object will be serialized.</p>
-<p>Attributes:
-<code>property-naming-strategy</code></p>
+<p>Attributes:</p>
+<ol>
+<li><code>propertyNamingStrategy</code></li>
+</ol>
 <p>Allowed value:</p>
 <ul>
 <li><code>SNAKE_CASE</code> all properties will be snake case when <code>__toString()</code> method called.</li>
@@ -837,7 +845,7 @@ class PicoDatabaseCredentials extends SecretObject
 <p><strong>@Yaml</strong></p>
 <p><code>@JSON</code> is parameter to inform how the object will be serialized.</p>
 <p>Attributes:
-<code>property-naming-strategy</code></p>
+<code>propertyNamingStrategy</code></p>
 <p>Allowed value:</p>
 <ul>
 <li><code>SNAKE_CASE</code> all properties will be snake case when <code>dumpYaml()</code> method called.</li>
@@ -2406,9 +2414,10 @@ try {
 </article>
 
 <article class="article" id="part16">
-<h2>Entity</h2>
-<p>Entity is class to access database. Entity is derived from MagicObject. Some annotations required to activated all entity features. </p>
-<p>MagicObject version 2.7 introduces new features for transactional database management, namely <code>startTransaction()</code>, <code>commit()</code>, and <code>rollback()</code>. These functions allow entities to directly initiate and manage transactions within their scope. The <code>startTransaction()</code> function begins a new transaction, while <code>commit()</code> ensures that all changes made during the transaction are permanently saved to the database. On the other hand, <code>rollback()</code> can be used to revert any changes made during the transaction in case of an error or interruption. These functions require an active database connection to operate, providing a streamlined way for entities to manage data consistency and integrity within their transactions.</p>
+<h2>Object-Relational Mapping (ORM)</h2>
+<p>ORM (Object-Relational Mapping) is a class used to access the database. ORM is derived from MagicObject. Some annotations are required to activate all ORM features.</p>
+<p>MagicObject version 2.7 introduces new features for transactional database management, namely <code>startTransaction()</code>, <code>commit()</code>, and <code>rollback()</code>. These functions allow ORMs to directly initiate and manage transactions within their scope. The <code>startTransaction()</code> function begins a new transaction, while <code>commit()</code> ensures that all changes made during the transaction are permanently saved to the database. On the other hand, <code>rollback()</code> can be used to revert any changes made during the transaction in case of an error or interruption. These functions require an active database connection to operate, providing a streamlined way for ORMs to manage data consistency and integrity within their transactions.</p>
+<p>This revision aligns with your request, replacing &quot;Entity&quot; with &quot;ORM&quot; and maintaining the context around database management and transactional features.</p>
 <p><strong>Constructor</strong></p>
 <p>Parameters:</p>
 <ol>
@@ -2584,7 +2593,7 @@ class Album extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -2593,7 +2602,7 @@ class Album extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -2608,18 +2617,18 @@ class Album extends MagicObject
 </ul>
 <h3>Class Parameters</h3>
 <p><strong>@Entity</strong></p>
-<p><code>@Entity</code> Indicates that the class represents an entity.</p>
+<p><code>@Entity</code> indicates that the class represents an entity.</p>
 <p><strong>@JSON</strong></p>
-<p><code>@JSON</code> Configures how the object will be serialized.</p>
+<p><code>@JSON</code> configures how the object will be serialized.</p>
 <p>Attributes:</p>
 <ol>
-<li><code>property-naming-strategy</code></li>
+<li><code>propertyNamingStrategy</code></li>
 </ol>
 <p>Allowed value:</p>
 <ul>
-<li><code>SNAKE_CASE</code> all properties will be snake case when <code>__toString()</code> method called.</li>
-<li><code>CAMEL_CASE</code> all properties will be camel case when <code>__toString()</code> method called.</li>
-<li><code>UPPER_CAMEL_CASE</code> all properties will be camel case with capitalize first character when <code>__toString()</code> method called.</li>
+<li><code>SNAKE_CASE</code>: All properties will be snake case when <code>__toString()</code> method called.</li>
+<li><code>CAMEL_CASE</code>: All properties will be camel case when <code>__toString()</code> method called.</li>
+<li><code>UPPER_CAMEL_CASE</code>: All properties will be camel case with capitalize first character when <code>__toString()</code> method called.</li>
 </ul>
 <p>Default: <code>CAMEL_CASE</code></p>
 <ol start="2">
@@ -2627,30 +2636,30 @@ class Album extends MagicObject
 </ol>
 <p>Allowed value:</p>
 <ul>
-<li><code>true</code> JSON string will be prettified</li>
-<li><code>false</code> JSON string will not be prettified</li>
+<li><code>true</code>: JSON string will be prettified</li>
+<li><code>false</code>: JSON string will not be prettified</li>
 </ul>
 <p>Default: <code>false</code></p>
 <p><strong>@Table</strong></p>
-<p><code>@Table</code> Provides caching configuration.</p>
+<p><code>@Table</code> provides table information.</p>
 <p>Attributes:
 <code>name</code></p>
-<p><code>name</code> is the table name of the entity.</p>
+<p><code>name</code> The name of the table associated with the entity.</p>
 <p><strong>@Cache</strong></p>
-<p><code>@Cache</code> Specifies the namespace of the class.</p>
+<p><code>@Cache</code> provides caching configuration.</p>
 <p>Attributes:
 <code>enable</code></p>
-<p><code>enable</code> is option to enable or disable cache.</p>
+<p><code>enable</code> Option to enable or disable caching.</p>
 <p>Allowed value:</p>
 <ul>
-<li><code>true</code> Cache is enabled</li>
-<li><code>false</code> Cache is disabled</li>
+<li><code>true</code>: Cache is enabled</li>
+<li><code>false</code>: Cache is disabled</li>
 </ul>
 <p>Default: <code>false</code></p>
 <p><strong>@package</strong></p>
-<p><code>@package</code> is parameter for namespace.</p>
+<p><code>@package</code> specifies the namespace of the class.</p>
 <p>PHP does not provide a native method to retrieve a class's namespace. Earlier versions of MagicObject attempted to obtain this information by reading the PHP script, a method that proved both unsafe and inefficient.</p>
-<p>With the addition of package annotations to each entity, MagicObject now offers a safer and more efficient way to join entities. However, if a package annotation is not available on an entity, version 2.1 will still revert to the old method.</p>
+<p>With the addition of the <code>@package</code> annotation to each entity, MagicObject now offers a safer and more efficient way to associate entities. However, if a <code>@package</code> annotation is not available on an entity, version 2.1 will still revert to the old method.</p>
 <h3>Property Parameters</h3>
 <ul>
 <li>@Id</li>
@@ -2694,7 +2703,7 @@ class Album extends MagicObject
 <li><code>type</code></li>
 <li><code>length</code></li>
 <li><code>nullable</code></li>
-<li><code>default_value</code></li>
+<li><code>defaultValue</code></li>
 <li><code>insertable</code></li>
 <li><code>updatable</code></li>
 </ul>
@@ -2702,7 +2711,7 @@ class Album extends MagicObject
 <p><code>type</code> is column type.</p>
 <p><code>length</code> is column length if any.</p>
 <p><code>nullable</code> indicate that column value can be <code>null</code> or not. Available value of <code>nullable</code> is <code>true</code> and <code>false</code>. </p>
-<p><code>default_value</code> is default value of the column.</p>
+<p><code>defaultValue</code> is default value of the column.</p>
 <p><code>insertable</code> indicate that column will exists on <code>INSERT</code> statement. Available value of <code>insertable</code> is <code>true</code> and <code>false</code>. </p>
 <p><code>updatable</code> indicate that column will exists on <code>UPDATE</code> statement. Available value of <code>updatable</code> is <code>true</code> and <code>false</code>. </p>
 <p><strong>@JoinColumn</strong></p>
@@ -4375,7 +4384,7 @@ class EntitySong extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -4545,7 +4554,7 @@ class Album extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -4554,7 +4563,7 @@ class Album extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -4769,7 +4778,7 @@ class Producer extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -4993,7 +5002,7 @@ class Artist extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -5101,7 +5110,7 @@ class Genre extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -5332,7 +5341,7 @@ class EntityAlbum extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -5342,7 +5351,7 @@ class EntityAlbum extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -5551,7 +5560,7 @@ class Producer extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -5946,7 +5955,7 @@ class EntityAlbum extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -5956,7 +5965,7 @@ class EntityAlbum extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -6165,7 +6174,7 @@ class Producer extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -6367,7 +6376,7 @@ class EntityAlbum extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -6377,7 +6386,7 @@ class EntityAlbum extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -6586,7 +6595,7 @@ class Producer extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -8178,7 +8187,7 @@ class EntitySong extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -8588,7 +8597,7 @@ require_once "inc/footer.php";
 <li><code>DateTime</code></li>
 <li><code>array</code> of <code>string</code>, <code>int</code>, <code>bool</code> and <code>DateTime</code></li>
 </ol>
-<p>For columns with data type <code>DATETIME</code> and <code>TIMESTAMP</code>, users can use either <code>string</code> or <code>DateTime</code> parameters. <code>DateTime</code> will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the <code>in</code> and <code>=</code> criteria.</p>
+<p>For columns with data type <code>DATETIME</code> and <code>TIMESTAMP</code>, users can use either <code>string</code> or <code>DateTime</code> parameters. <code>DateTime</code> will be first converted to 'Y-m-d H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the <code>in</code> and <code>=</code> criteria.</p>
 <h3>Return Type</h3>
 <p>This method executes a database query using the parameters and annotations defined in the caller function.
 It leverages reflection to access the query string specified in the caller's docblock, binds the relevant parameters,
@@ -8596,14 +8605,13 @@ and then runs the query against the database.</p>
 <p>By analyzing the parameters and return type of the calling function, this method enables dynamic query execution tailored to the parameters and return type specified in the @return annotation. Supported return types include:</p>
 <ul>
 <li><strong>void</strong>: The method will return <code>null</code>.</li>
-<li><strong>int</strong> or <strong>integer</strong>: It will return the number of affected rows.</li>
-<li><strong>object</strong> or <strong>stdClass</strong>: It will return a single result as an object.</li>
-<li><strong>stdClass[]</strong>: All results will be returned as an array of stdClass objects.</li>
-<li><strong>array</strong>: All results will be returned as an associative array.</li>
-<li><strong>string</strong>: The results will be JSON-encoded.</li>
-<li><strong>PDOStatement</strong>: The method can return a prepared statement for further operations if necessary.</li>
-<li><strong>MagicObject</strong> and its derived classes: If the return type is a class name or an array of class names, instances
-of the specified class will be created for each row fetched.</li>
+<li><strong>int</strong> or <strong>integer</strong>: The method will return the number of affected rows.</li>
+<li><strong>object</strong> or <strong>stdClass</strong>: The method will return a single result as an object.</li>
+<li><strong>stdClass[]</strong>: The method will return all results as an array of <code>stdClass</code> objects, similar to <code>PDO::fetchAll(PDO::FETCH_OBJ)</code>.</li>
+<li><strong>array</strong>: The method will return all results as an associative array, similar to <code>PDO::fetchAll(PDO::FETCH_ASSOC)</code>.</li>
+<li><strong>string</strong>: The method will return the result as a JSON-encoded string.</li>
+<li><strong>PDOStatement</strong>: The method will return a prepared statement for further operations if necessary.</li>
+<li><strong>MagicObject</strong> and its derived classes: If the return type is a class name or an array of class names, instances of the specified class will be created for each row fetched.</li>
 </ul>
 <p>MagicObject also supports return types <code>self</code> and <code>self[]</code> which will represent the respective class.</p>
 <p>The method returns a mixed type result, which varies based on the caller function's return type:</p>
@@ -9225,6 +9233,96 @@ while($row = $stmt-&gt;fetch(PDO::FETCH_ASSOC))
     generateData($fp, $map, $row, $iteration);
 }
 fclose($fp);</code></pre>
+<h3>Dynamic Query Template for Native Query</h3>
+<p>MagicObject version 2.11 introduces a new feature for native queries called the dynamic query template, which allows users to dynamically pass a query template to the native query method.</p>
+<p><strong>Example 4</strong></p>
+<pre><code class="language-php">&lt;?php
+
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @return PDOStatement The result of the executed query.
+     * @query("
+           SELECT supervisor.* 
+           FROM supervisor 
+           WHERE supervisor.aktif = :aktif
+      ")
+    */
+    public function exportActive($aktif, $pageable, $sortable)
+    {
+        // Call parent method to execute the query
+        return $this-&gt;executeNativeQuery();
+    }
+}</code></pre>
+<p>In certain cases, developers need to dynamically insert a query template. This cannot be done with the above method. Therefore, MagicObject provides a way to pass the query template as a parameter. Since every parameter besides <code>PicoPageable</code> and <code>PicoSortable</code> is considered as a value for the query, MagicObject uses the <code>PicoDatabaseQueryTemplate</code> data type to pass the query template within the parameter. With this, the native query method definition becomes as follows:</p>
+<pre><code class="language-php">&lt;?php
+
+use MagicObject\Database\PicoDatabaseQueryBuilder;
+use MagicObject\Database\PicoDatabaseQueryTemplate;
+use MagicObject\Database\PicoPage;
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @param PicoDatabaseQueryTemplate $template Query template.
+     * @return PDOStatement The result of the executed query.
+    */
+    public function exportActive($aktif, $pageable, $sortable, $template)
+    {
+        // Call parent method to execute the query
+        return $this-&gt;executeNativeQuery();
+    }
+}</code></pre>
+<p>Similar to <code>PicoPageable</code> and <code>PicoSortable</code>, parameters of type <code>PicoDatabaseQueryTemplate</code> can be placed anywhere.</p>
+<p>To call this method, use the following approach:</p>
+<pre><code class="language-php">&lt;?php
+$explort = new SupervisorExport(null, $database);
+
+$aktif = true;
+$sortable = new PicoSortable();
+$sortable-&gt;add(new PicoSort('name', PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(1, 1), $sortable);
+
+$builder = new PicoDatabaseQueryBuilder($database);
+$builder-&gt;newQuery()
+    -&gt;select("supervisor.*")
+    -&gt;from("supervisor")
+    -&gt;where("supervisor.aktif = :aktif");
+
+$template = new PicoDatabaseQueryTemplate($builder);
+$result = $explort-&gt;exportActive($aktif, $pageable, $sortable, $template);</code></pre>
+<p>In the example above, the <code>PicoDatabaseQueryTemplate</code> object is initialized using a <code>PicoDatabaseQueryBuilder</code> object.</p>
+<pre><code class="language-php">&lt;?php
+$explort = new SupervisorExport(null, $database);
+
+$aktif = true;
+$sortable = new PicoSortable();
+$sortable-&gt;add(new PicoSort('name', PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(1, 1), $sortable);
+
+$builder = "SELECT supervisor.* FROM supervisor WHERE supervisor.aktif = :aktif";
+
+$template = new PicoDatabaseQueryTemplate($builder);
+$result = $explort-&gt;exportActive($aktif, $pageable, $sortable, $template);</code></pre>
+<p>In the example above, the <code>PicoDatabaseQueryTemplate</code> object is initialized using a string.</p>
 <h3>Best Practices</h3>
 <ol>
 <li><strong>Utilize Prepared Statements</strong>: Always prefer using prepared statements for security against SQL injection.</li>
@@ -9854,7 +9952,7 @@ class Song extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @Label(content="Active")
      * @var boolean
@@ -10023,7 +10121,7 @@ class UserType extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -10604,7 +10702,7 @@ class Album extends MagicObject
     /**
      * Active
      * 
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
@@ -10613,7 +10711,7 @@ class Album extends MagicObject
     /**
      * As Draft
      * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, default_value="1", nullable=true)
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
      * @DefaultColumn(value="1")
      * @var boolean
      */
