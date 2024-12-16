@@ -913,7 +913,7 @@ class DatabaseExplorer
             $space = $dom->createTextNode(' ');
             $form->appendChild($space);
             
-            // Add the submit back
+            // Add the back button
             $inputBack = $dom->createElement('input');
             $inputBack->setAttribute('type', 'button');
             $inputBack->setAttribute('name', 'back');
@@ -1064,12 +1064,12 @@ class DatabaseExplorer
     public static function createSqliteColumn($row)
     {
         return [
-            'Field'=>$row['name'], 
-            'Type'=>$row['type'], 
-            'Null'=>$row['notnull'] ? 'NO' : 'YES', 
-            'Key'=>$row['pk'] == 1 ? 'PRI' : '', 
-            'Default'=>$row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-            'Extra'=>strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
+            'Field'   => $row['name'], 
+            'Type'    => $row['type'], 
+            'Null'    => $row['notnull'] ? 'NO' : 'YES', 
+            'Key'     => $row['pk'] == 1 ? 'PRI' : '', 
+            'Default' => $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
+            'Extra'   => strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
         ];
     }
 
