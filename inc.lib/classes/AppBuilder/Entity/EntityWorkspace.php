@@ -5,7 +5,7 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityApplication is entity of table application. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityWorkspace is entity of table wokspace. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
@@ -13,46 +13,19 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="application")
  */
-class EntityApplication extends MagicObject
+class EntityWorkspace extends MagicObject
 {
 	/**
-	 * Application ID
+	 * Workspace ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=false, extra="auto_increment")
-	 * @Label(content="Application ID")
-	 * @var string
-	 */
-	protected $applicationId;
-
-	/**
-	 * Workspace ID
-	 * 
-	 * @Column(name="workspace_id", type="varchar(255)", length=255, nullable=true)
+	 * @Column(name="workspace_id", type="varchar(255)", length=255, nullable=false, extra="auto_increment")
 	 * @Label(content="Workspace ID")
 	 * @var string
 	 */
 	protected $workspaceId;
-
-	/**
-	 * Workspace
-	 *
-	 * @JoinColumn(name="workspace_id", referenceColumnName="workspace_id")
-	 * @Label(content="Workspace")
-	 * @var EntityWorkspace
-	 */
-	protected $workspace;
-	
-	/**
-	 * Architecture
-	 * 
-	 * @Column(name="architecture", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Architecture")
-	 * @var string
-	 */
-	protected $architecture;
 
 	/**
 	 * Name

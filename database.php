@@ -789,8 +789,8 @@ class DatabaseExplorer
 
             // First column - Label
             $tdLabel = $dom->createElement('td');
-            $label = $dom->createElement('label', htmlspecialchars($primaryKeyValue));
-            $label->setAttribute('for', htmlspecialchars($primaryKeyValue));
+            $label = $dom->createElement('label', htmlspecialchars($primaryKeyName));
+            $label->setAttribute('for', htmlspecialchars($primaryKeyName));
             $tdLabel->appendChild($label);
             $tr->appendChild($tdLabel);
 
