@@ -670,46 +670,7 @@ class DatabaseExplorer
             // Append the outer div to the DOM
             $dom->appendChild($divOuter);
 
-            // Pagination navigation with a maximum of 7 pages
-            $paginationDiv = $dom->createElement('div');
-            $paginationDiv->setAttribute('class', 'pagination');
-            $startPage = max(1, $page - 3);
-            $endPage = min($totalPages, $page + 3);
-
-            if ($startPage > 1) {
-                $firstPage = $dom->createElement('a', 'First');
-                $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
-                $paginationDiv->appendChild($firstPage);
-
-                if ($startPage > 2) {
-                    $ellipsis = $dom->createElement('span', '...');
-                    $paginationDiv->appendChild($ellipsis);
-                    $space = $dom->createTextNode(" ");
-                    $paginationDiv->appendChild($space);
-                }
-            }
-
-            for ($i = $startPage; $i <= $endPage; $i++) {
-                $pageLink = $dom->createElement('a', htmlspecialchars($i));
-                $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
-                if ($i == $page) {
-                    $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
-                }
-                $paginationDiv->appendChild($pageLink);
-            }
-
-            if ($endPage < $totalPages) {
-                if ($endPage < $totalPages - 1) {
-                    $ellipsis = $dom->createElement('span', '...');
-                    $paginationDiv->appendChild($ellipsis);
-                    $space = $dom->createTextNode(" ");
-                    $paginationDiv->appendChild($space);
-                }
-
-                $lastPage = $dom->createElement('a', 'Last');
-                $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
-                $paginationDiv->appendChild($lastPage);
-            }
+            $paginationDiv = self::createPagination($dom, $applicationId, $databaseName, $schemaName, $table, $page, $totalPages);
 
             // Append the pagination div to the DOM
             $divOuter->appendChild($paginationDiv);
@@ -732,6 +693,67 @@ class DatabaseExplorer
         return $dom->saveHTML();
     }
     
+    /**
+     * Generates pagination controls for navigating between pages.
+     * 
+     * This function creates a pagination navigation bar with links to specific pages. It ensures that the displayed page range is centered around the current page, with a maximum of 7 visible page numbers. It also includes links for "First" and "Last" pages with ellipses for skipped pages when necessary.
+     * 
+     * @param DOMDocument $dom The DOMDocument object used to create HTML elements.
+     * @param string $applicationId The application identifier.
+     * @param string $databaseName The name of the database.
+     * @param string $schemaName The name of the schema (for PostgreSQL).
+     * @param string $table The name of the table being paginated.
+     * @param int $page The current page number.
+     * @param int $totalPages The total number of pages available.
+     * 
+     * @return DOMElement The DOM element representing the pagination controls.
+     */
+    public static function createPagination($dom, $applicationId, $databaseName, $schemaName, $table, $page, $totalPages)
+    {
+        // Pagination navigation with a maximum of 7 pages
+        $paginationDiv = $dom->createElement('div');
+        $paginationDiv->setAttribute('class', 'pagination');
+        $startPage = max(1, $page - 3);
+        $endPage = min($totalPages, $page + 3);
+
+        if ($startPage > 1) {
+            $firstPage = $dom->createElement('a', 'First');
+            $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
+            $paginationDiv->appendChild($firstPage);
+
+            if ($startPage > 2) {
+                $ellipsis = $dom->createElement('span', '...');
+                $paginationDiv->appendChild($ellipsis);
+                $space = $dom->createTextNode(" ");
+                $paginationDiv->appendChild($space);
+            }
+        }
+
+        for ($i = $startPage; $i <= $endPage; $i++) {
+            $pageLink = $dom->createElement('a', htmlspecialchars($i));
+            $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
+            if ($i == $page) {
+                $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
+            }
+            $paginationDiv->appendChild($pageLink);
+        }
+
+        if ($endPage < $totalPages) {
+            if ($endPage < $totalPages - 1) {
+                $ellipsis = $dom->createElement('span', '...');
+                $paginationDiv->appendChild($ellipsis);
+                $space = $dom->createTextNode(" ");
+                $paginationDiv->appendChild($space);
+            }
+
+            $lastPage = $dom->createElement('a', 'Last');
+            $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
+            $paginationDiv->appendChild($lastPage);
+        }
+
+        return $paginationDiv;
+    }
+
     /**
      * Generates an HTML form to edit data for a specific row in the table.
      *
@@ -768,7 +790,7 @@ class DatabaseExplorer
                 throw new DataException("Data not found for ID: $primaryKeyValue");
             }
             
-            $referer = $_SERVER['HTTP_REFERER'];
+            $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
             if(!isset($referer) || empty($referer))
             {
                 $referer = '';
