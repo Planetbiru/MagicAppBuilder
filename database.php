@@ -787,7 +787,7 @@ class DatabaseExplorer
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$row) {
-                throw new DataException("Data not found for ID: $primaryKeyValue");
+                throw new DataException("No data found for ID: $primaryKeyValue");
             }
             
             $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
@@ -931,17 +931,20 @@ class DatabaseExplorer
     }
 
     /**
-     * Undocumented function
-     *
-     * @param DOMDocument $dom
-     * @param string $key
-     * @param mixed $value
-     * @param string $type
-     * @return DOMElement|false
+     * Generates an HTML editor element (input or textarea) based on the provided type.
+     * 
+     * This function creates an appropriate form element for editing data based on the column's data type. It returns an `<input>` element for numeric types (`int`, `float`, `double`, etc.) and a `<textarea>` element for other types such as strings. The function adjusts the input's attributes according to the data type, such as `step` for numeric inputs and `spellcheck` for text areas.
+     * 
+     * @param DOMDocument $dom The DOMDocument object used to create HTML elements.
+     * @param string $key The name or identifier for the input field (usually the column name).
+     * @param mixed $value The current value of the field to be edited.
+     * @param string $type The data type of the field (e.g., "int", "float", "string", etc.).
+     * 
+     * @return DOMElement|false A DOM element representing the input or textarea, or `false` if no valid element can be created.
      */
     public static function getEditor($dom, $key, $value, $type)
     {
-        if(stripos($type, 'int') !== false)
+        if(stripos($type, 'int') === 0)
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'number');
@@ -951,7 +954,7 @@ class DatabaseExplorer
             $input->setAttribute('value', $value);  
             return $input;
         }
-        else if(stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false || stripos($type, 'decimal') !== false)
+        else if(stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0)
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'number');
