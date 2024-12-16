@@ -2,6 +2,7 @@
 
 namespace MagicObject\Database;
 
+use MagicObject\MagicObject;
 use MagicObject\Request\PicoRequestBase;
 use MagicObject\Util\PicoStringUtil;
 
@@ -173,7 +174,7 @@ class PicoSortable
         $columnList = array_merge($columns, $joinColumns);
         $columnNames = array();
         foreach ($columnList as $column) {
-            $columnNames[] = $column['name'];
+            $columnNames[] = $column[MagicObject::KEY_NAME];
         }
         $sorts = array();
         foreach ($this->sortable as $sortable) {

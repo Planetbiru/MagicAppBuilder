@@ -72,12 +72,12 @@ class ListDataTitleDto extends ToString
      * Set the field associated with the column title.
      *
      * @param string|null $field The field associated with the column title.
-     * @return self
+     * @return self The current instance, allowing method chaining
      */ 
     public function setField($field)
     {
         $this->field = $field;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -94,12 +94,12 @@ class ListDataTitleDto extends ToString
      * Set the display value of the column title.
      *
      * @param string|null $label The display value of the column title.
-     * @return self
+     * @return self The current instance, allowing method chaining
      */ 
     public function setLabel($label)
     {
         $this->label = $label;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -116,12 +116,12 @@ class ListDataTitleDto extends ToString
      * Set the sortable status of the column.
      *
      * @param bool $sortable Indicates if the column is sortable.
-     * @return self
+     * @return self The current instance, allowing method chaining
      */ 
     public function setSortable($sortable)
     {
         $this->sortable = $sortable;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -138,11 +138,11 @@ class ListDataTitleDto extends ToString
      * Set the current sort direction.
      *
      * @param string|null $currentSort The current sort direction (ASC/DESC).
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function setCurrentSort($currentSort)
     {
         $this->currentSort = $currentSort;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 }

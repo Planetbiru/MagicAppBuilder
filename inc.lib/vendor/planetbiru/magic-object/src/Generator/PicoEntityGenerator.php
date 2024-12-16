@@ -17,6 +17,12 @@ use MagicObject\Util\PicoStringUtil;
  */
 class PicoEntityGenerator
 {
+    const TYPE_CHARACTER_VARYING = "character varying";
+    const TYPE_TINYINT_1 = "tinyint(1)";
+    const TYPE_VARCHAR_255 = "varchar(255)";
+    const TYPE_TIMESTAMP_WITH_TIME_ZONE = "timestamp with time zone";
+    const TYPE_TIMESTAMP_WITHOUT_TIME_ZONE = "timestamp without time zone";
+
     /**
      * Database connection instance.
      *
@@ -80,19 +86,21 @@ class PicoEntityGenerator
     }
 
     /**
-     * Create a property with appropriate documentation based on database metadata.
+     * Generates a PHP property with a docblock based on database column metadata.
      *
-     * This method generates a PHP property with a docblock based on the given column information 
-     * from the database. It includes annotations for the column attributes such as whether it is 
-     * a primary key, auto-increment, nullable, etc.
+     * This method creates a property for a PHP class, including annotations such as `@Id`, `@GeneratedValue`,
+     * `@NotNull`, and `@Column`, derived from the given database column details. It supports column attributes
+     * like primary key, auto-increment, nullable, and default value, and provides type mappings based on the
+     * provided database-to-PHP type mappings.
      *
-     * @param array $typeMap Mapping of database types to PHP types
-     * @param array $columnMap Mapping of database column types to MySQL column types
-     * @param array $row Data row from the database, typically from information_schema.columns
-     * @param string[]|null $nonupdatables List of column names that are non-updatable, or null
-     * @return string PHP code for the property with a docblock, including column attributes and annotations
+     * @param array $typeMap Database-to-PHP type mappings (e.g., 'int' => 'integer').
+     * @param array $columnMap Database column-to-type mappings (e.g., 'int' => 'INTEGER').
+     * @param array $row Column metadata from the database (e.g., from `information_schema.columns`).
+     * @param string[]|null $nonupdatables List of non-updatable columns, or null if none.
+     * @param bool $prettifyLabel Whether to convert column names to human-readable labels (default is true).
+     * @return string PHP code for the property with a docblock, ready to be inserted into a class.
      */
-    protected function createProperty($typeMap, $columnMap, $row, $nonupdatables = null)
+    protected function createProperty($typeMap, $columnMap, $row, $nonupdatables = null, $prettifyLabel = true)
     {
         $columnName = $row['Field'];
         $columnType = $row['Type'];
@@ -102,7 +110,7 @@ class PicoEntityGenerator
         $columnExtra = $row['Extra'];
 
         $propertyName = PicoStringUtil::camelize($columnName);
-        $description = $this->getPropertyName($columnName);
+        $description = $this->getPropertyName($columnName, $prettifyLabel);
         $columnType = $this->getColumnType($columnMap, $columnType);
         $type = $this->getDataType($typeMap, $columnType);
 
@@ -138,7 +146,7 @@ class PicoEntityGenerator
         }
 
         if (!empty($columnDefault)) {
-            $attrs[] = "default_value=\"" . $columnDefault . "\"";
+            $attrs[] = "defaultValue=\"" . $columnDefault . "\"";
         }
         if (!empty($columnNull)) {
             $val = stripos($columnNull, "YES") === 0 ? "true" : "false";
@@ -167,17 +175,23 @@ class PicoEntityGenerator
 
     /**
      * Get a descriptive name for the property based on the column name.
+     * The column name is converted to a formatted property name, where each part
+     * of the column name (split by underscores) is capitalized. Special cases such as 
+     * "Id" and "Ip" are handled to be formatted as "ID" and "IP", respectively.
      *
-     * @param string $name Original column name
-     * @return string Formatted property name
+     * @param string $name Original column name (e.g., 'user_id', 'user_ip')
+     * @param bool $prettifyLabel Whether to replace 'Id' with 'ID' and 'Ip' with 'IP'
+     * @return string Formatted property name (e.g., 'User ID', 'User IP')
      */
-    protected function getPropertyName($name)
+    protected function getPropertyName($name, $prettifyLabel = true)
     {
         $arr = explode("_", $name);
         foreach ($arr as $k => $v) {
-            $arr[$k] = ucfirst($v);
-            $arr[$k] = str_replace("Id", "ID", $arr[$k]);
-            $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
+            $arr[$k] = ucwords($v);
+            if ($prettifyLabel) {
+                $arr[$k] = str_replace("Id", "ID", $arr[$k]);
+                $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
+            }
         }
         return implode(" ", $arr);
     }
@@ -268,7 +282,7 @@ class PicoEntityGenerator
             "float" => "float",              // PostgreSQL: float
             "bigint" => "int",               // PostgreSQL: bigint
             "smallint" => "int",             // PostgreSQL: smallint
-            "tinyint(1)" => "bool",          // MySQL-style, use boolean for tinyint(1)
+            self::TYPE_TINYINT_1 => "bool",          // MySQL-style, use boolean for tinyint(1)
             "tinyint" => "int",              // PostgreSQL/SQLite: tinyint, handled as INT
             "int" => "int",                  // PostgreSQL/SQLite: integer
             "serial" => "int",               // PostgreSQL: auto-increment integer (equivalent to INT)
@@ -280,10 +294,10 @@ class PicoEntityGenerator
             // String types
             "nvarchar" => "string",          // SQLite: variable-length string
             "varchar" => "string",           // PostgreSQL: variable-length string
-            "character varying" => "string", // PostgreSQL: character varying (same as varchar)
+            self::TYPE_CHARACTER_VARYING => "string", // PostgreSQL: character varying (same as varchar)
             "char" => "string",              // PostgreSQL: fixed-length string
             "text" => "string",              // PostgreSQL/SQLite: unlimited length string
-            "varchar(255)" => "string",      // PostgreSQL: same as varchar without length
+            self::TYPE_VARCHAR_255 => "string",      // PostgreSQL: same as varchar without length
             "citext" => "string",            // PostgreSQL: case-insensitive text (equivalent to string)
             
             // MySQL-style text types (these types are similar to `text`)
@@ -301,8 +315,8 @@ class PicoEntityGenerator
             "datetime" => "string",          // PostgreSQL/SQLite: datetime
             "date" => "string",              // PostgreSQL/SQLite: date
             "time" => "string",              // PostgreSQL/SQLite: time
-            "timestamp with time zone" => "string", // PostgreSQL: timestamp with time zone
-            "timestamp without time zone" => "string", // PostgreSQL: timestamp without time zone
+            self::TYPE_TIMESTAMP_WITH_TIME_ZONE => "string", // PostgreSQL: timestamp with time zone
+            self::TYPE_TIMESTAMP_WITHOUT_TIME_ZONE => "string", // PostgreSQL: timestamp without time zone
             "date" => "string",              // PostgreSQL/SQLite: date
             "time" => "string",              // PostgreSQL/SQLite: time
             "interval" => "string",          // PostgreSQL: interval (for durations)
@@ -337,15 +351,12 @@ class PicoEntityGenerator
     }
 
     /**
-     * Returns a mapping of database column types to MySQL equivalents.
+     * Get a mapping of database column types to MySQL equivalents.
      *
-     * This method provides a conversion map from various database column types 
-     * (such as those from PostgreSQL or SQLite) to MySQL-compatible column types.
-     * The mapping is useful for normalizing column types when migrating data 
-     * between different database systems or for general type compatibility.
+     * Provides a conversion map from various database column types to MySQL-compatible 
+     * column types, useful for data migrations or type compatibility.
      *
-     * @return array An associative array where keys are column types from other databases 
-     *               and values are the corresponding MySQL column types.
+     * @return array Associative array with column types from other databases mapped to MySQL types.
      */
     public function getColumnMap()
     {
@@ -355,7 +366,7 @@ class PicoEntityGenerator
             "float" => "float",              // MySQL: FLOAT
             "bigint" => "bigint",            // MySQL: BIGINT
             "smallint" => "smallint",        // MySQL: SMALLINT
-            "tinyint(1)" => "tinyint",    // MySQL-style, use boolean for tinyint(1)
+            self::TYPE_TINYINT_1 => "tinyint",    // MySQL-style, use boolean for tinyint(1)
             "tinyint" => "tinyint",          // MySQL: TINYINT
             "int" => "int",                  // MySQL: INT
             "serial" => "int",               // MySQL: auto-increment integer (equivalent to INT)
@@ -367,10 +378,10 @@ class PicoEntityGenerator
             // String types
             "nvarchar" => "varchar",         // SQLite: VARCHAR
             "varchar" => "varchar",          // MySQL: VARCHAR
-            "character varying" => "varchar", // MySQL: CHARACTER VARYING (same as VARCHAR)
+            self::TYPE_CHARACTER_VARYING => "varchar", // MySQL: CHARACTER VARYING (same as VARCHAR)
             "char" => "char",                // MySQL: CHAR
             "text" => "text",                // MySQL: TEXT
-            "varchar(255)" => "varchar",     // MySQL: VARCHAR with specific length (equivalent to varchar)
+            self::TYPE_VARCHAR_255 => "varchar",     // MySQL: VARCHAR with specific length (equivalent to varchar)
             "citext" => "text",              // MySQL: case-insensitive text (MySQL does not have direct CITEXT type)
             
             // MySQL-style text types
@@ -379,16 +390,16 @@ class PicoEntityGenerator
             "longtext" => "longtext",        // MySQL: LONGTEXT
 
             // Boolean types
-            "bool" => "tinyint(1)",          // MySQL: BOOLEAN (stored as TINYINT(1))
-            "boolean" => "tinyint(1)",       // MySQL: BOOLEAN (same as TINYINT(1))
+            "bool" => self::TYPE_TINYINT_1,          // MySQL: BOOLEAN (stored as TINYINT(1))
+            "boolean" => self::TYPE_TINYINT_1,       // MySQL: BOOLEAN (same as TINYINT(1))
 
             // Date/Time types
             "timestamp" => "timestamp",      // MySQL: TIMESTAMP
             "datetime" => "datetime",        // MySQL: DATETIME
             "date" => "date",                // MySQL: DATE
             "time" => "time",                // MySQL: TIME
-            "timestamp with time zone" => "timestamp", // MySQL does not support time zone, use regular timestamp
-            "timestamp without time zone" => "timestamp", // Same for MySQL (no time zone info)
+            self::TYPE_TIMESTAMP_WITH_TIME_ZONE => "timestamp", // MySQL does not support time zone, use regular timestamp
+            self::TYPE_TIMESTAMP_WITHOUT_TIME_ZONE => "timestamp", // Same for MySQL (no time zone info)
             "year" => "year",                // MySQL: YEAR type
 
             // MySQL-specific types
@@ -410,16 +421,13 @@ class PicoEntityGenerator
     }
 
     /**
-     * Returns a mapping of database column types to the target database type equivalents.
+     * Get a mapping of database column types to target database equivalents.
      *
-     * This method provides a conversion map from various database column types 
-     * (such as those from PostgreSQL or SQLite) to the target database column types.
-     * The mapping is useful for normalizing column types when migrating data 
-     * between different database systems or for general type compatibility.
+     * Converts column types from one database (MySQL, PostgreSQL, SQLite) to another, 
+     * supporting data migrations and compatibility.
      *
      * @param string $targetDb The target database type ('mysql', 'postgresql', or 'sqlite').
-     * @return array An associative array where keys are column types from other databases 
-     *               and values are the corresponding target database column types.
+     * @return array Associative array of column types from other databases mapped to the target database types.
      */
     public function getColumnMapByType($targetDb)
     {
@@ -433,7 +441,7 @@ class PicoEntityGenerator
                 "float" => "float",
                 "bigint" => "bigint",
                 "smallint" => "smallint",
-                "tinyint(1)" => "bool",
+                self::TYPE_TINYINT_1 => "bool",
                 "tinyint" => "tinyint",
                 "int" => "int",
                 "serial" => "int",
@@ -445,10 +453,10 @@ class PicoEntityGenerator
                 // String types
                 "nvarchar" => "varchar",
                 "varchar" => "varchar",
-                "character varying" => "varchar",
+                self::TYPE_CHARACTER_VARYING => "varchar",
                 "char" => "char",
                 "text" => "text",
-                "varchar(255)" => "varchar",
+                self::TYPE_VARCHAR_255 => "varchar",
                 "citext" => "text",
                 
                 // MySQL-style text types
@@ -457,16 +465,16 @@ class PicoEntityGenerator
                 "longtext" => "longtext",
                 
                 // Boolean types
-                "bool" => "tinyint(1)",
-                "boolean" => "tinyint(1)",
+                "bool" => self::TYPE_TINYINT_1,
+                "boolean" => self::TYPE_TINYINT_1,
                 
                 // Date/Time types
                 "timestamp" => "timestamp",
                 "datetime" => "datetime",
                 "date" => "date",
                 "time" => "time",
-                "timestamp with time zone" => "timestamp",
-                "timestamp without time zone" => "timestamp",
+                self::TYPE_TIMESTAMP_WITH_TIME_ZONE => "timestamp",
+                self::TYPE_TIMESTAMP_WITHOUT_TIME_ZONE => "timestamp",
                 "year" => "year",
                 
                 // MySQL-specific types
@@ -493,7 +501,7 @@ class PicoEntityGenerator
                 "float" => "real",
                 "bigint" => "bigint",
                 "smallint" => "smallint",
-                "tinyint(1)" => "boolean",
+                self::TYPE_TINYINT_1 => "boolean",
                 "tinyint" => "smallint",
                 "int" => "integer",
                 "serial" => "serial",
@@ -505,10 +513,10 @@ class PicoEntityGenerator
                 // String types
                 "nvarchar" => "varchar",
                 "varchar" => "varchar",
-                "character varying" => "varchar",
+                self::TYPE_CHARACTER_VARYING => "varchar",
                 "char" => "char",
                 "text" => "text",
-                "varchar(255)" => "varchar",
+                self::TYPE_VARCHAR_255 => "varchar",
                 "citext" => "citext",
                 
                 // PostgreSQL-style text types
@@ -525,8 +533,8 @@ class PicoEntityGenerator
                 "datetime" => "timestamp",
                 "date" => "date",
                 "time" => "time",
-                "timestamp with time zone" => "timestamptz",
-                "timestamp without time zone" => "timestamp",
+                self::TYPE_TIMESTAMP_WITH_TIME_ZONE => "timestamptz",
+                self::TYPE_TIMESTAMP_WITHOUT_TIME_ZONE => "timestamp",
                 "year" => "date",
                 
                 // PostgreSQL-specific types
@@ -553,7 +561,7 @@ class PicoEntityGenerator
                 "float" => "real",
                 "bigint" => "integer",
                 "smallint" => "integer",
-                "tinyint(1)" => "integer",
+                self::TYPE_TINYINT_1 => "integer",
                 "tinyint" => "integer",
                 "int" => "integer",
                 "serial" => "integer",
@@ -565,10 +573,10 @@ class PicoEntityGenerator
                 // String types
                 "nvarchar" => "text",
                 "varchar" => "text",
-                "character varying" => "text",
+                self::TYPE_CHARACTER_VARYING => "text",
                 "char" => "text",
                 "text" => "text",
-                "varchar(255)" => "text",
+                self::TYPE_VARCHAR_255 => "text",
                 "citext" => "text",
                 
                 // SQLite-style text types
@@ -585,8 +593,8 @@ class PicoEntityGenerator
                 "datetime" => "datetime",
                 "date" => "date",
                 "time" => "time",
-                "timestamp with time zone" => "datetime",
-                "timestamp without time zone" => "datetime",
+                self::TYPE_TIMESTAMP_WITH_TIME_ZONE => "datetime",
+                self::TYPE_TIMESTAMP_WITHOUT_TIME_ZONE => "datetime",
                 "year" => "integer",
                 
                 // SQLite-specific types
@@ -609,12 +617,17 @@ class PicoEntityGenerator
     }
 
     /**
-     * Generate the entity class and save it to a file.
+     * Generates an entity class based on database table metadata and saves it to a file.
      *
-     * @param string[]|null $nonupdatables Non-updateable columns
-     * @return int Number of bytes written to the file, or false on failure
+     * This method creates a PHP class that maps to a database table, including properties for each column.
+     * It supports ORM annotations (e.g., `@Entity`, `@Table`, `@JSON`) and handles non-updatable columns. 
+     * Optionally, it can prettify property names for human readability.
+     *
+     * @param string[]|null $nonupdatables List of non-updatable columns, or null if none.
+     * @param bool $prettifyLabel Whether to prettify column names into human-readable labels (default is true).
+     * @return int|false The number of bytes written to the file, or false on failure.
      */
-    public function generate($nonupdatables = null)
+    public function generate($nonupdatables = null, $prettifyLabel = true)
     {
         $typeMap = $this->getTypeMap();
         $columnMap = $this->getColumnMap();
@@ -630,13 +643,11 @@ class PicoEntityGenerator
         }
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $tableName);
-        error_log("ROWS");
-        error_log(print_r($rows, true));
 
         $attrs = array();
         if (is_array($rows)) {
             foreach ($rows as $row) {
-                $prop = $this->createProperty($typeMap, $columnMap, $row, $nonupdatables);
+                $prop = $this->createProperty($typeMap, $columnMap, $row, $nonupdatables, $prettifyLabel);
                 $attrs[] = $prop;
             }
         }
@@ -657,11 +668,11 @@ use MagicObject\MagicObject;
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
- * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @package '.$this->baseNamespace.'
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify='.$prettify.')
  * @Table(name="'.$tableName.'")
  */
 class ' . $className . ' extends MagicObject

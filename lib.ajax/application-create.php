@@ -19,7 +19,7 @@ if (!file_exists($dir))
 $newAppId = trim($inputPost->getId());
 
 $baseApplicationDirectory = $inputPost->getDirectory();
-$baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\/\\\\]/', '', $baseApplicationDirectory);
+$baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseApplicationDirectory);
 $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
 $baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
@@ -97,8 +97,8 @@ $application->setBaseApplicationDirectory(trim($baseApplicationDirectory));
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
-$application->setBaseEntityDirectory("inc.lib/classes");
-$application->setBaseLanguageDirectory("inc.lang");
+$application->setBaseEntityDirectory($baseApplicationDirectory."/inc.lib/classes");
+$application->setBaseLanguageDirectory($baseApplicationDirectory."/inc.lang");
 
 $databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
 $databaseDirectory = dirname($databaseFilePath);
@@ -111,8 +111,8 @@ $paths = $inputPost->getPaths();
 foreach ($paths as $idx => $val) {
     $paths[$idx]['active'] = $paths[$idx]['active'] == 'true';
 }
-$application->setBaseModuleDirectory($paths);
 
+$application->setBaseModuleDirectory($paths);
 $application->setBaseIncludeDirectory("inc.app");
 $application->setBaseAssetDirectory("lib.assets");
 
@@ -160,6 +160,10 @@ $entityInfo = [
     'approval_status' => 'approval_status'
 ];
 
+$entityApvInfo = [
+    'approval_status' => 'approval_status'
+];
+
 $databaseConfig = [
     'driver' => 'sqlite',
     'database_file_path' => $databaseFilePath,
@@ -173,15 +177,29 @@ $databaseConfig = [
 ];
 
 $newApp->setEntityInfo($entityInfo);
+$newApp->setEntityApvInfo($entityApvInfo);
+
 $newApp->setCurrentAction([
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
 ]);
+
+$paginationConfig = new SecretObject([
+    'page_size' => 20,
+    'page_margin' => 30,
+    'prev' => '<i class="fa-solid fa-angle-left"></i>',
+    'next' => '<i class="fa-solid fa-angle-right"></i>',
+    'first' => '<i class="fa-solid fa-angles-left"></i>',
+    'last' => '<i class="fa-solid fa-angles-right"></i>'
+]);
+
 $newApp->setDatabase($databaseConfig);
+$newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
 
-file_put_contents($path2, (new SecretObject($newApp))->dumpYaml());
+$configYaml = (new SecretObject($newApp))->dumpYaml();
+file_put_contents($path2, $configYaml);
 
 PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
@@ -193,3 +211,11 @@ $newApp->loadYamlFile($path2, false, true, true);
 $appConf = $newApp->getApplication();
 $baseDir = $appConf->getBaseApplicationDirectory();
 $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir);
+
+$dir3 = $baseDir."/inc.cfg";
+if(!file_exists($dir3))
+{
+    mkdir($dir3, 0755, true);
+}
+$path3 = $dir3."/application.yml";
+file_put_contents($path3, $configYaml);

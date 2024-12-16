@@ -53,7 +53,7 @@ class XLSXBuffererWriter
      * Write to buffer
      *
      * @param string $string Data to write
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function write($string)
     {
@@ -67,7 +67,7 @@ class XLSXBuffererWriter
     /**
      * Purge the buffer, writing its contents to the file
      *
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     protected function purge()
     {
@@ -85,7 +85,7 @@ class XLSXBuffererWriter
     /**
      * Close the file and flush any remaining buffer
      *
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function close()
     {

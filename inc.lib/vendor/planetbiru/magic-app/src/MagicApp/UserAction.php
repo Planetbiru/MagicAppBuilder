@@ -2,6 +2,13 @@
 
 namespace MagicApp;
 
+/**
+ * Class UserAction
+ *
+ * This class handles various actions a user can perform within the system. 
+ * It provides methods to determine if an action requires approval, handles the approval waiting message, 
+ * and checks if a next action is specified.
+ */
 class UserAction
 {
     // Action constants

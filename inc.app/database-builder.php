@@ -2,14 +2,16 @@
 
 use AppBuilder\Entity\EntityUser;
 use MagicObject\Database\PicoDatabase;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Generator\PicoDatabaseDump;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
-if($builderConfig->getDatabase() != null)
+if($builderConfig->getDatabase() != null || ($builderConfig->getDriver() == PicoDatabaseType::DATABASE_TYPE_SQLITE && $builderConfig->getDatabaseFilePath()))
 {
     $databaseConfigBuilder = $builderConfig->getDatabase();
-    $databaseBuilder = new PicoDatabase($databaseConfigBuilder);
+    $databaseBuilder = new PicoDatabase($databaseConfigBuilder, null, function($sql){
+    });
     try
     {
         $databaseBuilder->connect();

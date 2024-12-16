@@ -140,7 +140,7 @@ class ColumnDataDto extends ToString
     public function setField($field)
     {
         $this->field = $field;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -162,7 +162,7 @@ class ColumnDataDto extends ToString
     public function setValue($value)
     {
         $this->value = $value;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -184,7 +184,7 @@ class ColumnDataDto extends ToString
     public function setType($type)
     {
         $this->type = $type;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -206,7 +206,7 @@ class ColumnDataDto extends ToString
     public function setLabel($label)
     {
         $this->label = $label;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -228,7 +228,7 @@ class ColumnDataDto extends ToString
     public function setReadonly($readonly)
     {
         $this->readonly = $readonly;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -250,7 +250,7 @@ class ColumnDataDto extends ToString
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -272,7 +272,7 @@ class ColumnDataDto extends ToString
     public function setValueDraft($valueDraft)
     {
         $this->valueDraft = $valueDraft;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
     
     /**

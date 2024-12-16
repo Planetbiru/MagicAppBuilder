@@ -1,10 +1,19 @@
 <?php
 
+use AppBuilder\Entity\EntityApplication;
+
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $arr = $appList->valueArray();
 foreach ($arr as $app) {
     if ($app['id'] != null) {
+        $app['application_id'] = $app['id'];
+
+        /*
+        $application = new EntityApplication($app, $databaseBuilder);
+        $application->save();
+        */
+        
         if ($currentApplication != null && $currentApplication->getId() == $app['id']) {
             $selected = 'true';
         } else {

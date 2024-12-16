@@ -10,6 +10,9 @@ use MagicObject\MagicObject;
  * Represents a select form element that can contain multiple options.
  * Provides methods to add options, set formatting, and generate the
  * HTML representation of the select element.
+ *
+ * This class helps in managing and rendering a `<select>` HTML element with various options. It allows you to
+ * dynamically add options, format the text of the options, and generate the HTML representation of the select element.
  */
 class AppFormSelect
 {
@@ -23,12 +26,15 @@ class AppFormSelect
     /**
      * Add an option to the select element.
      *
+     * This method adds a new option to the select element, which consists of display text, a value, a selected status,
+     * optional HTML attributes, and associated data.
+     *
      * @param string $textNode The display text for the option
      * @param string|null $value The value of the option
      * @param boolean $selected Indicates if the option is selected
      * @param string[]|null $attributes Additional HTML attributes for the option
      * @param MagicObject|null $data Associated data for the option
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function add($textNode, $value = null, $selected = false, $attributes = null, $data = null)
     {
@@ -39,8 +45,11 @@ class AppFormSelect
     /**
      * Set the text node format for all options.
      *
+     * This method allows you to set a format for the display text (text node) of each option in the select element. 
+     * You can provide a format string or a callable function that will be applied to the associated data for each option.
+     *
      * @param callable|string $format A callable function or a format string
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function setTextNodeFormat($format)
     {
@@ -59,8 +68,11 @@ class AppFormSelect
     /**
      * Set the text node format using a format string.
      *
+     * This method allows you to set the format for the text of each option by using a format string.
+     * The format string can contain placeholders like `%s` and `%d` to be replaced with values from the option's data.
+     *
      * @param string $format The format string
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function setTextNodeFormatFromString($format)
     {
@@ -97,8 +109,11 @@ class AppFormSelect
     /**
      * Set indentation for the options.
      *
+     * This method sets the level of indentation for each option's HTML representation.
+     * The `indent` parameter determines how many tab characters will be used for indentation.
+     *
      * @param integer $indent The level of indentation (default is 1)
-     * @return self
+     * @return self The current instance, allowing method chaining
      */
     public function setIndent($indent = 1)
     {
@@ -112,7 +127,10 @@ class AppFormSelect
     /**
      * Get the HTML representation of the select element as a string.
      *
-     * @return string The HTML select options
+     * This method generates the complete HTML representation of the `<select>` element, including all of its options.
+     * The options are rendered using their respective `toString()` method.
+     *
+     * @return string The HTML representation of the select element, including options
      */
     public function __toString()
     {

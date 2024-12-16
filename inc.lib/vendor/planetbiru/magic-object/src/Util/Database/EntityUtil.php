@@ -35,7 +35,7 @@ class EntityUtil
         $propertyColumns = array();
         foreach($columns as $prop=>$column)
         {
-            $propertyColumns[$prop] = $column['name'];
+            $propertyColumns[$prop] = $column[MagicObject::KEY_NAME];
         }
         return $propertyColumns;
     }
@@ -57,7 +57,7 @@ class EntityUtil
         $propertyColumns = array();
         foreach($joinColumns as $prop=>$column)
         {
-            $propertyColumns[$prop] = $column['name'];
+            $propertyColumns[$prop] = $column[MagicObject::KEY_NAME];
         }
         return $propertyColumns;
     }

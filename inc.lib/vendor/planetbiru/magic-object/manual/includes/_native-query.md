@@ -27,7 +27,7 @@ The parameters accepted by the native query function are as follows:
 6. `DateTime`
 7. `array` of `string`, `int`, `bool` and `DateTime`
 
-For columns with data type `DATETIME` and `TIMESTAMP`, users can use either `string` or `DateTime` parameters. `DateTime` will be first converted to 'Y-md H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the `in` and `=` criteria.
+For columns with data type `DATETIME` and `TIMESTAMP`, users can use either `string` or `DateTime` parameters. `DateTime` will be first converted to 'Y-m-d H:i:s' format automatically by MagicObject. Don't forget to define DateTimeZone for DateTime object. Also note the time resolution for the `in` and `=` criteria.
 
 ### Return Type
 
@@ -38,14 +38,13 @@ and then runs the query against the database.
 By analyzing the parameters and return type of the calling function, this method enables dynamic query execution tailored to the parameters and return type specified in the @return annotation. Supported return types include:
 
 - **void**: The method will return `null`.
-- **int** or **integer**: It will return the number of affected rows.
-- **object** or **stdClass**: It will return a single result as an object.
-- **stdClass[]**: All results will be returned as an array of stdClass objects.
-- **array**: All results will be returned as an associative array.
-- **string**: The results will be JSON-encoded.
-- **PDOStatement**: The method can return a prepared statement for further operations if necessary.
-- **MagicObject** and its derived classes: If the return type is a class name or an array of class names, instances
-  of the specified class will be created for each row fetched.
+- **int** or **integer**: The method will return the number of affected rows.
+- **object** or **stdClass**: The method will return a single result as an object.
+- **stdClass[]**: The method will return all results as an array of `stdClass` objects, similar to `PDO::fetchAll(PDO::FETCH_OBJ)`.
+- **array**: The method will return all results as an associative array, similar to `PDO::fetchAll(PDO::FETCH_ASSOC)`.
+- **string**: The method will return the result as a JSON-encoded string.
+- **PDOStatement**: The method will return a prepared statement for further operations if necessary.
+- **MagicObject** and its derived classes: If the return type is a class name or an array of class names, instances of the specified class will be created for each row fetched.
 
 MagicObject also supports return types `self` and `self[]` which will represent the respective class.
 
@@ -705,6 +704,118 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC))
 }
 fclose($fp);
 ```
+
+### Dynamic Query Template for Native Query
+
+MagicObject version 2.11 introduces a new feature for native queries called the dynamic query template, which allows users to dynamically pass a query template to the native query method.
+
+**Example 4**
+
+```php
+<?php
+
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @return PDOStatement The result of the executed query.
+     * @query("
+           SELECT supervisor.* 
+           FROM supervisor 
+           WHERE supervisor.aktif = :aktif
+      ")
+    */
+    public function exportActive($aktif, $pageable, $sortable)
+    {
+        // Call parent method to execute the query
+        return $this->executeNativeQuery();
+    }
+}
+```
+
+In certain cases, developers need to dynamically insert a query template. This cannot be done with the above method. Therefore, MagicObject provides a way to pass the query template as a parameter. Since every parameter besides `PicoPageable` and `PicoSortable` is considered as a value for the query, MagicObject uses the `PicoDatabaseQueryTemplate` data type to pass the query template within the parameter. With this, the native query method definition becomes as follows:
+
+```php
+<?php
+
+use MagicObject\Database\PicoDatabaseQueryBuilder;
+use MagicObject\Database\PicoDatabaseQueryTemplate;
+use MagicObject\Database\PicoPage;
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @param PicoDatabaseQueryTemplate $template Query template.
+     * @return PDOStatement The result of the executed query.
+    */
+    public function exportActive($aktif, $pageable, $sortable, $template)
+    {
+        // Call parent method to execute the query
+        return $this->executeNativeQuery();
+    }
+}
+```
+
+Similar to `PicoPageable` and `PicoSortable`, parameters of type `PicoDatabaseQueryTemplate` can be placed anywhere.
+
+To call this method, use the following approach:
+
+
+```php
+<?php
+$explort = new SupervisorExport(null, $database);
+
+$aktif = true;
+$sortable = new PicoSortable();
+$sortable->add(new PicoSort('name', PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(1, 1), $sortable);
+
+$builder = new PicoDatabaseQueryBuilder($database);
+$builder->newQuery()
+    ->select("supervisor.*")
+    ->from("supervisor")
+    ->where("supervisor.aktif = :aktif");
+
+$template = new PicoDatabaseQueryTemplate($builder);
+$result = $explort->exportActive($aktif, $pageable, $sortable, $template);
+```
+
+In the example above, the `PicoDatabaseQueryTemplate` object is initialized using a `PicoDatabaseQueryBuilder` object.
+
+```php
+<?php
+$explort = new SupervisorExport(null, $database);
+
+$aktif = true;
+$sortable = new PicoSortable();
+$sortable->add(new PicoSort('name', PicoSort::ORDER_TYPE_ASC));
+$pageable = new PicoPageable(new PicoPage(1, 1), $sortable);
+
+$builder = "SELECT supervisor.* FROM supervisor WHERE supervisor.aktif = :aktif";
+
+$template = new PicoDatabaseQueryTemplate($builder);
+$result = $explort->exportActive($aktif, $pageable, $sortable, $template);
+```
+
+In the example above, the `PicoDatabaseQueryTemplate` object is initialized using a string.
+
 
 ### Best Practices
 

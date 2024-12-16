@@ -172,16 +172,21 @@ class Getter extends stdClass
     }
 
     /**
-     * Determine if JSON naming strategy is snake case.
+     * Check if the JSON naming strategy is snake case.
      *
-     * @return bool True if snake case is used, false otherwise.
+     * @return bool True if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
-        return isset($this->_classParams[self::JSON]) 
-            && isset($this->_classParams[self::JSON]['property-naming-strategy']) 
-            && strcasecmp($this->_classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0
-            ;
+        return isset($this->_classParams[self::JSON])
+            && (
+                isset($this->_classParams[self::JSON]['property-naming-strategy']) 
+                || isset($this->_classParams[self::JSON]['propertyNamingStrategy'])
+            )
+            && (
+                strcasecmp($this->_classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0 
+                || strcasecmp($this->_classParams[self::JSON]['propertyNamingStrategy'], 'SNAKE_CASE') == 0
+            );
     }
 
     /**

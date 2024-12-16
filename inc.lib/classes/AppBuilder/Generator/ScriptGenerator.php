@@ -421,13 +421,47 @@ class ScriptGenerator //NOSONAR
         "\t".'require_once $appInclude->appForbiddenPage(__DIR__);'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
+        
         $declaration[] = '';
+        
+        $specification = $request->getSpecification();
+        if(isset($specification))
+        {
+            $arr1 = array();
+            $arr1[] = '$dataFilter = PicoSpecification::getInstance();';
+            foreach($specification as $values)
+            {
+                if(is_array($values) || is_object($values))
+                {
+                    $column = trim(AppBuilderBase::getStringOf($values->getColumn()));
+                    $value = trim($values->getValue());
 
+                    $value = AppBuilderBase::fixValue($value);
+
+                    $arr1[] = '$dataFilter->addAnd(PicoPredicate::getInstance()->equals('.$column.', '.$value.'));';
+                }
+            }
+            if(!empty($arr1))
+            {
+                $declaration[] = implode("\r\n", $arr1);
+            }
+            else
+            {
+                $declaration[] = '$dataFilter = null;';
+            }
+        }
+        else
+        {
+            $declaration[] = '$dataFilter = null;';
+        }
+            
+        $declaration[] = '';
+        
         $declarationSection = implode("\r\n", $declaration);
         
         $appBuilder = null;
 
-        $specification = $request->getSpecification();
+        
         $sortable = $request->getSortable();
 
         $ajaxSupport = $request->getFeatures()->getAjaxSupport() == 'true' || $request->getFeatures()->getAjaxSupport() == 1;

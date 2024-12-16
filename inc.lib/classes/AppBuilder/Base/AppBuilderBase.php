@@ -74,6 +74,7 @@ class AppBuilderBase //NOSONAR
     const PHP_TRY = "try";
     const MAP_FOR = '$mapFor';
     const REDIRECT_TO_ITSELF = 'currentModule->getRedirectUrl()';
+    const CALL_FIND_ONE = '->findOne';
     const CALL_FIND_ONE_BY = '->findOneBy';
     const CALL_FIND_ONE_WITH = '->findOneWith';
     const CALL_FIND_ONE_WITH_PRIMARY_KEY = '->findOneWithPrimaryKeyValue';
@@ -300,6 +301,14 @@ class AppBuilderBase //NOSONAR
      */
     protected function createSetter($objectName, $fieldName, $fieldFilter, $primaryKeyName = null, $updatePk = false)
     {
+        if(!isset($objectName) || empty($objectName))
+        {
+            $objectName = "";
+        }
+        else
+        {
+            $objectName = self::VAR . $objectName;
+        }
         if (in_array($fieldName, $this->skipedAutoSetter)) {
             return null;
         }
@@ -313,9 +322,9 @@ class AppBuilderBase //NOSONAR
                 $methodSource = PicoStringUtil::upperCamelize($fieldName);
             }
             $methodTarget = PicoStringUtil::upperCamelize($fieldName);
-            return self::TAB1 . self::VAR . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true));";
+            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true))";
         } else {
-            return self::TAB1 . self::VAR . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "));";
+            return self::TAB1 . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "))";
         }
     }
 
@@ -661,9 +670,10 @@ class AppBuilderBase //NOSONAR
         $html = $this->addWrapper($html, self::WRAPPER_UPDATE);
         
         $getData = array();
+        $getData[] = $this->getSpecs($primaryKeyName, 1);
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
-        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
+        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);';
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
@@ -832,6 +842,31 @@ class AppBuilderBase //NOSONAR
         }
         return implode("\r\n", $map);
     }
+    
+    /**
+     * Generates the specification code based on the provided primary key name, its upper-cased version, and indentation level.
+     * 
+     * This method constructs a formatted string for the specification logic. The generated string 
+     * includes a specification object initialization and an additional method call, both of which 
+     * are indented according to the value of `$ntab`. If `$ntab` is 0, no indentation is applied.
+     * 
+     * @param string $primaryKeyName The name of the primary key to be used in the specification.
+     * @param int $ntab The number of indentation levels (default is 0).
+     * @return string The generated specification code as a formatted string.
+     */
+    public function getSpecs($primaryKeyName, $ntab = 0)
+    {
+        $pnName = PicoStringUtil::camelize($primaryKeyName);
+        $upperPkName = ucfirst($pnName);
+        // Add TAB1 repeated $ntab times for indentation
+        $tabs = str_repeat(self::TAB1, $ntab);
+
+        // Create the $specsVar1 with the correct indentation based on $ntab
+        $specsVar1 = $tabs . '$specification = PicoSpecification::getInstanceOf(' . AppBuilderBase::getStringOf($pnName) . ', ' . self::VAR . "inputGet" . self::CALL_GET . $upperPkName . '(PicoFilterConstant::'.$this->getInputFilter($primaryKeyName).'));';
+        $specsVar1 .= self::NEW_LINE . $tabs . '$specification->addAnd($dataFilter);';
+        
+        return $specsVar1;
+    }
 
     /**
      * Create GUI DETAIL section with approval.
@@ -861,6 +896,7 @@ class AppBuilderBase //NOSONAR
         $htmlDetailCompare = $this->createTableDetailCompare($mainEntity, $objectName, $appFields, $primaryKeyName, $approvalEntity, $objectApprovalName);
 
         $getData = array();
+        $getData[] = $this->getSpecs($primaryKeyName, 1);
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
         
@@ -870,11 +906,11 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_WITH_PRIMARY_KEY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.", ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification, null, $subqueryMap);';
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);';
         }
         
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
@@ -969,6 +1005,8 @@ class AppBuilderBase //NOSONAR
         $htmlDetail = $this->createTableDetail($objectName, $appFields, $primaryKeyName);
 
         $getData = array();
+
+        $getData[] = $this->getSpecs($primaryKeyName, 1);
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
         
@@ -978,11 +1016,11 @@ class AppBuilderBase //NOSONAR
             $referece = $this->defineSubqueryReference($referenceData);
             $subqueryVar = '$subqueryMap = '.$referece.';';
             $getData[] = $this->addIndent($subqueryVar, 2);
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_WITH_PRIMARY_KEY."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.", ".self::VAR."subqueryMap);";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification, null, $subqueryMap);';
         }
         else
         {
-            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE_BY.$upperPkName."(".self::VAR."inputGet".self::CALL_GET.$upperPkName.self::BRACKETS.");";
+            $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);';
         }       
         
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
@@ -1359,10 +1397,10 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $dataSection->appendChild($dom->createTextNode(self::N_TAB2.self::CURLY_BRACKET_OPEN)); 
 
         $paginationVar = '
-    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+    $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
     ->setNavigation(
-    \'<i class="fa-solid fa-angle-left"></i>\', \'<i class="fa-solid fa-angle-right"></i>\',
-    \'<i class="fa-solid fa-angles-left"></i>\', \'<i class="fa-solid fa-angles-right"></i>\'
+        $appConfig->getData()->getPrev(), $appConfig->getData()->getNext(),
+        $appConfig->getData()->getFirst(), $appConfig->getData()->getLast()
     )
     ->setMargin($appConfig->getData()->getPageMargin())
     ;';
@@ -1560,26 +1598,7 @@ else
     private function getAdditionalFilter($specification)
     {
         $additionalFilter = '';
-        if(isset($specification))
-        {
-            $arr1 = array();
-            foreach($specification as $values)
-            {
-                if(is_array($values) || is_object($values))
-                {
-                    $column = trim($values->getColumn());
-                    $value = trim($values->getValue());
-
-                    $value = $this->fixValue($value);
-
-                    $arr1[] = '$specification->addAnd(PicoPredicate::getInstance()->equals(\''.$column.'\', '.$value.'));';
-                }
-            }
-            if(!empty($arr1))
-            {
-                $additionalFilter = "\r\n// Additional filter here\r\n".implode("\r\n", $arr1);
-            }
-        }
+        
 
         if($this->appFeatures->isApprovalRequired())
         {
@@ -1670,6 +1689,7 @@ $sortOrderMap = array(
 // You can define your own specifications
 // Pay attention to security issues
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+$specification->addAnd($dataFilter);
 '.$additionalFilter.'
 
 // You can define your own sortable
@@ -2082,11 +2102,11 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));'.self::PHP_CLOSE_TAG);
+            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));'.self::PHP_CLOSE_TAG);
         }
         else
         {
-            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));'.self::PHP_CLOSE_TAG);
+            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));'.self::PHP_CLOSE_TAG);
         }
         $buttonApprove->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonApproveTiny();'.self::PHP_CLOSE_TAG)); 
         return $buttonApprove;
@@ -2113,7 +2133,7 @@ $subqueryMap = '.$referece.';
         {
             $buttonReject = $dom->createElement('a');
             $buttonReject->setAttribute('class', 'btn btn-tn btn-warning');
-            $buttonReject->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::REJECT));'.self::PHP_CLOSE_TAG);
+            $buttonReject->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::REJECT));'.self::PHP_CLOSE_TAG);
             $buttonReject->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonRejectTiny();'.self::PHP_CLOSE_TAG)); 
         }
         return $buttonReject;
@@ -2183,7 +2203,7 @@ $subqueryMap = '.$referece.';
         $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG)); 
         $edit = $dom->createElement('a');
         $edit->setAttribute('class', 'edit-control');
-        $href = self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
+        $href = self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::UPDATE, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
         $edit->setAttribute('href', $href);
         $spanEdit = $dom->createElement('span');
         $spanEdit->setAttribute('class', 'fa fa-edit');
@@ -2205,7 +2225,7 @@ $subqueryMap = '.$referece.';
         $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG)); 
         $detail = $dom->createElement('a');
         $detail->setAttribute('class', 'detail-control field-master');
-        $href = self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.$this->getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
+        $href = self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.');'.self::PHP_CLOSE_TAG;
         $detail->setAttribute('href', $href);
         $spanDetail = $dom->createElement('span');
         $spanDetail->setAttribute('class', 'fa fa-folder');
@@ -3425,7 +3445,7 @@ $subqueryMap = '.$referece.';
                 $output = array();
                 foreach($additionalOutput as $add)
                 {
-                    $output[] = $this->getStringOf(PicoStringUtil::camelize($add->getColumn()));
+                    $output[] = AppBuilderBase::getStringOf(PicoStringUtil::camelize($add->getColumn()));
                 }
                 $paramAdditionalOutput = ', array('.implode(', ', $output).')';               
             }
@@ -3437,8 +3457,8 @@ $subqueryMap = '.$referece.';
             $specStr = $this->buildSpecification($specification);
             $sortStr = $this->buildSortable($sortable);
 
-            $pk = $this->getStringOf(PicoStringUtil::camelize($entity->getPrimaryKey()));
-            $val = $this->getStringOf(PicoStringUtil::camelize($entity->getValue()));
+            $pk = AppBuilderBase::getStringOf(PicoStringUtil::camelize($entity->getPrimaryKey()));
+            $val = AppBuilderBase::getStringOf(PicoStringUtil::camelize($entity->getValue()));
             $textNodeFormat = $entity->getTextNodeFormat();
             $indent = $entity->getIndent();
             $format = $this->getEntityOptionFormat($textNodeFormat);
@@ -3509,9 +3529,9 @@ $subqueryMap = '.$referece.';
                 if($spc->getColumn() != null && $spc->getValue() !== null)
                 {
                     $field = $spc->getColumn();
-                    $field = $this->getStringOf($field);
+                    $field = AppBuilderBase::getStringOf($field);
                     $value = $spc->getValue();
-                    $value = $this->fixValue($value);
+                    $value = self::fixValue($value);
                     $specs[]  = self::NEW_LINE_N.self::TAB4.self::TAB3."->addAnd(new PicoPredicate($field, $value))";
                 }
             }
@@ -3538,7 +3558,7 @@ $subqueryMap = '.$referece.';
                 if($srt->getSortBy() != null && $srt->getSortType() != null)
                 {
                     $field = $srt->getSortBy();
-                    $field = $this->getStringOf($field);
+                    $field = AppBuilderBase::getStringOf($field);
                     $type = $this->getSortType($srt->getSortType());
                     $specs[]  = self::NEW_LINE_N.self::TAB4.self::TAB3."->add(new PicoSort($field, $type))";
                 }
@@ -3578,7 +3598,7 @@ $subqueryMap = '.$referece.';
      * @param mixed $value The value to format.
      * @return mixed The formatted value.
      */
-    private function fixValue($value)
+    public static function fixValue($value)
     {
         if($value == null)
         {
@@ -4569,18 +4589,17 @@ $subqueryMap = '.$referece.';
         return rtrim($html, self::NEW_LINE);
     }
 
-    /**
+   /**
      * Get a formatted string representation of the provided input.
      *
-     * This method checks if the input string is alphanumeric (excluding underscores)
-     * and returns a formatted string accordingly. If the input is alphanumeric,
-     * it returns a string suitable for field reference; otherwise, it returns
-     * the input string wrapped in quotes.
+     * This method checks if the input string is alphanumeric (excluding underscores).
+     * If the input is alphanumeric, it returns a string suitable for a field reference,
+     * prefixed with `Field::of()->`. Otherwise, it returns the input string wrapped in quotes.
      *
      * @param string $str The input string to format.
      * @return string The formatted string representation.
      */
-    public function getStringOf($str)
+    public static function getStringOf($str)
     {
         if(ctype_alnum(str_replace('_', '', $str)))
         {

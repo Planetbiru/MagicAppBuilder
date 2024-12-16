@@ -101,29 +101,29 @@ class PicoPageControl
     public function __construct($pageData, $parameterName = 'page', $path = null)
     {
         $this->pageData = $pageData;
-        if(isset($parameterName))
+        if($this->isNotEmpty($parameterName))
         {
             $this->parameterName = $parameterName;
         }
-        if(isset($path))
+        if($this->isNotEmpty($path))
         {
             $this->path = $path;
         }
-        
+        $this->prev = '<i class="fa-solid fa-angle-left"></i>';
+        $this->next = '<i class="fa-solid fa-angle-right"></i>';
+        $this->first = '<i class="fa-solid fa-angles-left"></i>';
+        $this->last = '<i class="fa-solid fa-angles-right"></i>';  
     }
 
     /**
-     * Sets the margin for pagination controls.
+     * Checks if a value is set and not empty.
      *
-     * This defines how many pages to show before and after the current page.
-     *
-     * @param int $margin Margin (number of pages before and after the current page).
-     * @return self Returns the current instance for method chaining.
+     * @param mixed $value The value to check.
+     * @return bool Returns `true` if the value is set and not empty, otherwise `false`.
      */
-    public function setMargin($margin)
+    private function isNotEmpty($value)
     {
-        $this->pageData->generatePagination($margin);
-        return $this;
+        return isset($value) && !empty($value);
     }
 
     /**
@@ -141,18 +141,32 @@ class PicoPageControl
      */
     public function setNavigation($prev = null, $next = null, $first = null, $last = null)
     {
-        if (isset($prev)) {
+        if ($this->isNotEmpty($prev)) {
             $this->prev = $prev;
         }
-        if (isset($next)) {
+        if ($this->isNotEmpty($next)) {
             $this->next = $next;
         }
-        if (isset($first)) {
+        if ($this->isNotEmpty($first)) {
             $this->first = $first;
         }
-        if (isset($last)) {
+        if ($this->isNotEmpty($last)) {
             $this->last = $last;
         }
+        return $this;
+    }
+
+    /**
+     * Sets the margin for pagination controls.
+     *
+     * This defines how many pages to show before and after the current page.
+     *
+     * @param int $margin Margin (number of pages before and after the current page).
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setMargin($margin)
+    {
+        $this->pageData->generatePagination($margin);
         return $this;
     }
 

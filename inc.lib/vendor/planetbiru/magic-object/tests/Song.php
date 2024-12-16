@@ -429,7 +429,7 @@ class Song extends MagicObject
 	/**
 	 * Admin Create
 	 * 
-	 * @Column(name="admin_create", type="varchar(50)", length=50, default_value=null, nullable=true, updatable=false)
+	 * @Column(name="admin_create", type="varchar(50)", length=50, defaultValue=null, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
 	 * @var string
 	 */
@@ -438,7 +438,7 @@ class Song extends MagicObject
 	/**
 	 * Admin Edit
 	 * 
-	 * @Column(name="admin_edit", type="varchar(50)", length=50, default_value=null, nullable=true)
+	 * @Column(name="admin_edit", type="varchar(50)", length=50, defaultValue=null, nullable=true)
 	 * @Label(content="Admin Edit")
 	 * @var string
 	 */
@@ -447,7 +447,7 @@ class Song extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
 	 * @var boolean

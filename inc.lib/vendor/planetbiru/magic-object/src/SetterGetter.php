@@ -385,9 +385,14 @@ class SetterGetter extends stdClass
     private function isSnake()
     {
         return isset($this->_classParams[self::JSON])
-            && isset($this->_classParams[self::JSON]['property-naming-strategy'])
-            && strcasecmp($this->_classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0
-            ;
+            && (
+                isset($this->_classParams[self::JSON]['property-naming-strategy']) 
+                || isset($this->_classParams[self::JSON]['propertyNamingStrategy'])
+            )
+            && (
+                strcasecmp($this->_classParams[self::JSON]['property-naming-strategy'], 'SNAKE_CASE') == 0 
+                || strcasecmp($this->_classParams[self::JSON]['propertyNamingStrategy'], 'SNAKE_CASE') == 0
+            );
     }
 
     /**

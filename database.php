@@ -196,7 +196,7 @@ class DatabaseExplorer
         $dom = new DOMDocument('1.0', 'utf-8');
         
         // Create heading
-        $h3 = $dom->createElement('h3', 'Table');
+        $h3 = $dom->createElement('h3', 'Table List');
         $dom->appendChild($h3);
 
         // Create unordered list
@@ -397,14 +397,7 @@ class DatabaseExplorer
                         $tr = $dom->createElement('tr');
                         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
                             // For SQLite
-                            $columns = [
-                                $row['name'], 
-                                $row['type'], 
-                                $row['notnull'] ? 'NO' : 'YES', 
-                                $row['pk'] == 1 ? 'PRI' : '', 
-                                $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-                                strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
-                            ];
+                            $columns = self::createSqliteColumn($row);
                         } else {
                             // For MySQL or PostgreSQL
                             $columns = $row;
@@ -481,31 +474,57 @@ class DatabaseExplorer
 
             // Create the DOM document
             $dom = new DOMDocument('1.0', 'utf-8');
-            
-            // Create table element
-            $tableElem = $dom->createElement('table');
-            $tr = $dom->createElement('tr');
-            
-            // Add table headers
-            for ($i = 0; $i < $stmt->columnCount(); $i++) {
-                $col = $stmt->getColumnMeta($i);
-                $th = $dom->createElement('th', htmlspecialchars($col['name']));
-                $tr->appendChild($th);
-            }
-            $tableElem->appendChild($tr);
-
-            // Add table rows
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            try
+            {
+                // Create table element
+                $tableElem = $dom->createElement('table');
                 $tr = $dom->createElement('tr');
-                foreach ($row as $value) {
-                    $td = $dom->createElement('td', htmlspecialchars($value));
-                    $tr->appendChild($td);
+
+                // Add table headers
+                for ($i = 0; $i < $stmt->columnCount(); $i++) {
+                    $col = $stmt->getColumnMeta($i);
+                    $th = $dom->createElement('th', htmlspecialchars($col['name']));
+                    $tr->appendChild($th);
                 }
                 $tableElem->appendChild($tr);
+                $countResult = 0;
+
+                // Add table rows
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $tr = $dom->createElement('tr');
+                    foreach ($row as $value) {
+                        $td = $dom->createElement('td', htmlspecialchars($value));
+                        $tr->appendChild($td);
+                    }
+                    $tableElem->appendChild($tr);
+                    $countResult++;
+                }
+
+                if($countResult > 0)
+                {
+                    // Create the result title div
+                    $resultTitleDiv = $dom->createElement('div', 'Result');
+                    $resultTitleDiv->setAttribute('class', 'query-title');
+                    $dom->appendChild($resultTitleDiv);
+
+                    $queryResultDiv = $dom->createElement('div');
+                    $queryResultDiv->setAttribute('class', 'query-result');
+                    $queryResultDiv->appendChild($tableElem);
+                    $dom->appendChild($queryResultDiv);
+                }
+                else
+                {
+                    $resultTitleDiv = $dom->createElement('div', 'No results to display');
+                    $resultTitleDiv->setAttribute('class', 'query-title');
+                    $dom->appendChild($resultTitleDiv);
+                }
             }
-
-            $dom->appendChild($tableElem);
-
+            catch(Exception $e)
+            {
+                $resultTitleDiv = $dom->createElement('div', 'No results to display');
+                $resultTitleDiv->setAttribute('class', 'query-title');
+                $dom->appendChild($resultTitleDiv);
+            }
             // Output the HTML
             return $dom->saveHTML();
         } catch (PDOException $e) {
@@ -550,6 +569,8 @@ class DatabaseExplorer
         
         try
         {
+            $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
+            
             $offset = ($page - 1) * $limit;
             $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
             $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -580,6 +601,10 @@ class DatabaseExplorer
 
             // Add table headers
             $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
+            $th = $dom->createElement('th', '');
+            $th->setAttribute('width', '40');
+            $th->setAttribute('class', 'cell-edit');
+            $tr->appendChild($th);
             for ($i = 0; $i < $stmt->columnCount(); $i++) {
                 $col = $stmt->getColumnMeta($i);
                 $th = $dom->createElement('th', htmlspecialchars($col['name']));
@@ -592,6 +617,14 @@ class DatabaseExplorer
             $tbody = $dom->createElement('tbody');
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $tr = $dom->createElement('tr');
+                $id = isset($primaryKeyName) && isset($row[$primaryKeyName]) ? $row[$primaryKeyName] : '';
+                $a = $dom->createElement('a');
+                $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=edit-form&id=$id");
+                $a->appendChild($dom->createTextNode("✏️"));
+                $td = $dom->createElement('td');
+                $td->setAttribute('class', 'cell-edit');
+                $td->appendChild($a);
+                $tr->appendChild($td);
                 foreach ($row as $value) {
                     $td = $dom->createElement('td', htmlspecialchars($value));
                     $tr->appendChild($td);
@@ -664,6 +697,256 @@ class DatabaseExplorer
 
         // Output the HTML with pagination
         return $dom->saveHTML();
+    }
+    
+    /**
+     * Generates an HTML form to edit data for a specific row in the table.
+     *
+     * This function retrieves the data for a given record (identified by the primary key) from the
+     * specified table and generates an HTML form for editing the data. The form is displayed using a
+     * two-column table layout, where the first column contains labels and the second column contains
+     * input fields. The form is built dynamically using DOMDocument.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $applicationId The identifier of the application requesting the data.
+     * @param string $databaseName The name of the database being queried.
+     * @param string $schemaName The name of the schema (if applicable) in the database.
+     * @param string $table The name of the table containing the data.
+     * @param string $primaryKeyValue The value of the primary key for the row being edited.
+     *
+     * @return string The HTML form as a string, or an error message if something goes wrong.
+     *
+     * @throws Exception If there is an error retrieving the data or if no data is found for the given ID.
+     */
+    public static function editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
+    {
+        $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
+        $dom = new DOMDocument('1.0', 'utf-8');
+        
+        try {
+
+            // Fetch the data for the given ID
+            $stmt = $pdo->prepare("SELECT * FROM $table WHERE $primaryKeyName = :id");
+            $stmt->bindParam(':id', $primaryKeyValue, PDO::PARAM_STR);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                throw new Exception("Data not found for ID: $primaryKeyValue");
+            }
+            
+            $referer = $_SERVER['HTTP_REFERER'];
+            if(!isset($referer) || empty($referer))
+            {
+                $referer = '';
+                $backLink = "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1";
+            }
+            else
+            {
+                $backLink = $referer;
+            }
+
+            // Create form container
+            $form = $dom->createElement('form');
+            $form->setAttribute('method', 'POST');
+            $form->setAttribute('action', $referer);
+            $form->setAttribute('class', 'edit-form');
+
+            // Add hidden input for table name
+            $inputId1 = $dom->createElement('input');
+            $inputId1->setAttribute('type', 'hidden');
+            $inputId1->setAttribute('name', '___table_name___');
+            $inputId1->setAttribute('value', htmlspecialchars($table));
+
+            // Add hidden input for primary key name
+            $inputId2 = $dom->createElement('input');
+            $inputId2->setAttribute('type', 'hidden');
+            $inputId2->setAttribute('name', '___primary_key_name___');
+            $inputId2->setAttribute('value', htmlspecialchars($primaryKeyName));
+            
+            // Add hidden input for primary key value
+            $inputId3 = $dom->createElement('input');
+            $inputId3->setAttribute('type', 'hidden');
+            $inputId3->setAttribute('name', '___primary_key_value___');
+            $inputId3->setAttribute('value', htmlspecialchars($primaryKeyValue));
+            
+            $form->appendChild($inputId1);
+            $form->appendChild($inputId2);
+            $form->appendChild($inputId3);
+
+            // Add title
+            $h3 = $dom->createElement('h3', "Edit Data for $table");
+            $form->appendChild($h3);
+
+            // Start the table
+            $tableElem = $dom->createElement('table');
+            $tableElem->setAttribute('class', 'two-side-table');
+            $tableElem->setAttribute('border', '1');
+            
+            $columnNames = [];
+
+            $tr = $dom->createElement('tr');
+
+            // First column - Label
+            $tdLabel = $dom->createElement('td');
+            $label = $dom->createElement('label', htmlspecialchars($primaryKeyValue));
+            $label->setAttribute('for', htmlspecialchars($primaryKeyValue));
+            $tdLabel->appendChild($label);
+            $tr->appendChild($tdLabel);
+
+            // Second column - Textarea field
+            $tdInput = $dom->createElement('td');
+            $textarea = $dom->createElement('div');
+            $textarea->setAttribute('class', 'data-editor');
+            $textarea->nodeValue = htmlspecialchars($primaryKeyValue);  
+            $tdInput->appendChild($textarea);
+            $tr->appendChild($tdInput);
+
+            // Append row to the table
+            $tableElem->appendChild($tr);
+
+            // Loop through the row data to create form fields
+            foreach ($row as $key => $value) {
+                if ($key != $primaryKeyName) {  // Skip the primary key field in the form
+                    $columnNames[] = $key;
+                    $tr = $dom->createElement('tr');
+
+                    // First column - Label
+                    $tdLabel = $dom->createElement('td');
+                    $label = $dom->createElement('label', htmlspecialchars($key));
+                    $label->setAttribute('for', htmlspecialchars($key));
+                    $tdLabel->appendChild($label);
+                    $tr->appendChild($tdLabel);
+
+                    // Second column - Textarea field
+                    $tdInput = $dom->createElement('td');
+                    $textarea = $dom->createElement('textarea');
+                    $textarea->setAttribute('name', htmlspecialchars($key));
+                    $textarea->setAttribute('class', 'data-editor');
+                    $textarea->setAttribute('spellcheck', 'false');
+                    $textarea->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
+                    $tdInput->appendChild($textarea);
+                    $tr->appendChild($tdInput);
+
+                    // Append row to the table
+                    $tableElem->appendChild($tr);
+                }
+            }
+
+            // Append the table to the form
+            $form->appendChild($tableElem);
+
+            
+            // Add hidden input for primary key value
+            $inputId4 = $dom->createElement('input');
+            $inputId4->setAttribute('type', 'hidden');
+            $inputId4->setAttribute('name', '___column_list___');
+            $inputId4->setAttribute('value', htmlspecialchars(implode(",", $columnNames)));
+            $form->appendChild($inputId4);
+            
+            // Add the submit button
+            $inputSubmit = $dom->createElement('input');
+            $inputSubmit->setAttribute('type', 'submit');
+            $inputSubmit->setAttribute('name', 'update');
+            $inputSubmit->setAttribute('value', 'Update');
+            $inputSubmit->setAttribute('class', 'btn btn-success');
+            $form->appendChild($inputSubmit);
+            
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form->appendChild($space);
+            
+            // Add the submit back
+            $inputBack = $dom->createElement('input');
+            $inputBack->setAttribute('type', 'button');
+            $inputBack->setAttribute('name', 'back');
+            $inputBack->setAttribute('value', 'Back');
+            $inputBack->setAttribute('class', 'btn btn-secondary');
+            $inputBack->setAttribute('onclick', "window.location='$backLink'");
+            $form->appendChild($inputBack);
+
+            // Return the form's HTML
+            $dom->appendChild($form);
+            return $dom->saveHTML();
+        } catch (Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+
+    /**
+     * Retrieves the name of the primary key column for a given table.
+     *
+     * This function retrieves the name of the primary key column for a specified table. It queries
+     * the database's schema information to find the column marked as the primary key. The function
+     * supports SQLite, MySQL, and PostgreSQL databases, and will return the name of the primary key
+     * field for the given table.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $schemaName The name of the schema (for MySQL/PostgreSQL). SQLite does not require this.
+     * @param string $table The name of the table for which the primary key is being retrieved.
+     *
+     * @return string|null The name of the primary key column if found, or null if not found or an error occurs.
+     *
+     * @throws Exception If there is an error while querying the database or processing the result.
+     */
+    public static function getPrimaryKeyName($pdo, $schemaName, $table)
+    {
+        $query = self::getQueryShowColumns($pdo, $schemaName, $table);
+        try
+        {
+            $stmt = $pdo->query($query);
+            
+            if ($stmt) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                        // For SQLite
+                        $columns = self::createSqliteColumn($row);
+                    } else {
+                        // For MySQL or PostgreSQL
+                        $columns = $row;
+                    }
+                    if($columns['Key'] == 'PRI')
+                    {
+                        return $columns['Field'];
+                    }
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            // Do nothing
+        }
+        return null;
+    }
+    
+    /**
+     * Creates a structured column array for an SQLite database.
+     *
+     * This function generates an associative array that represents a database column's properties
+     * for SQLite. The array contains details such as the column name, type, nullability, key type,
+     * default value, and extra properties (e.g., auto_increment for INTEGER columns).
+     *
+     * @param array $row An associative array representing the column details fetched from the database.
+     *                   The array should contain keys such as 'name', 'type', 'notnull', 'pk', and 'dflt_value'.
+     *
+     * @return array An associative array with the following keys:
+     *               - 'Field'   => Column name
+     *               - 'Type'    => Column data type
+     *               - 'Null'    => 'YES' or 'NO' indicating whether the column allows NULL values
+     *               - 'Key'     => 'PRI' if the column is the primary key, otherwise an empty string
+     *               - 'Default' => The default value of the column, or 'NULL' if no default is specified
+     *               - 'Extra'   => 'auto_increment' if the column is an INTEGER primary key, otherwise an empty string
+     */
+    public static function createSqliteColumn($row)
+    {
+        return [
+            'Field'=>$row['name'], 
+            'Type'=>$row['type'], 
+            'Null'=>$row['notnull'] ? 'NO' : 'YES', 
+            'Key'=>$row['pk'] == 1 ? 'PRI' : '', 
+            'Default'=>$row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
+            'Extra'=>strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
+        ];
     }
 
     /**
@@ -770,6 +1053,9 @@ class DatabaseExplorer
             foreach ($queries as $i => $q) {
                 $j = $i + 1;
 
+                $queryDivContainer = $dom->createElement('div');
+                $queryDivContainer->setAttribute('class', 'last-query');
+
                 // Create the container div for each query
                 $queryDiv = $dom->createElement('div');
                 $queryDiv->setAttribute('class', 'query-executed');
@@ -778,6 +1064,8 @@ class DatabaseExplorer
                 $queryTitleDiv = $dom->createElement('div', 'Query ' . $j);
                 $queryTitleDiv->setAttribute('class', 'query-title');
                 $queryDiv->appendChild($queryTitleDiv);
+
+                $queryDivContainer->appendChild($queryDiv);
 
                 // Create the raw query div
 
@@ -791,14 +1079,9 @@ class DatabaseExplorer
                 $queryRawDiv->appendChild($queryRawPre);
                 $queryDiv->appendChild($queryRawDiv);
 
-                // Create the result title div
-                $resultTitleDiv = $dom->createElement('div', 'Result');
-                $resultTitleDiv->setAttribute('class', 'query-title');
-                $queryDiv->appendChild($resultTitleDiv);
-
                 // Create the result div
                 $resultDiv = $dom->createElement('div');
-                $resultDiv->setAttribute('class', 'query-result');
+                $resultDiv->setAttribute('class', 'query-result-container');
 
                 // Execute the query and append the result (HTML content)
                 $resultHTML = new DOMDocument();
@@ -806,10 +1089,10 @@ class DatabaseExplorer
                 foreach ($resultHTML->getElementsByTagName('body')->item(0)->childNodes as $child) {
                     $resultDiv->appendChild($dom->importNode($child, true));
                 }
-                $queryDiv->appendChild($resultDiv);
+                $queryDivContainer->appendChild($resultDiv);
 
                 // Append the queryDiv to the DOM
-                $dom->appendChild($queryDiv);
+                $dom->appendChild($queryDivContainer);
             }
 
             // Output the HTML
@@ -997,6 +1280,21 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $queries = array();
 $lastQueries = "";
 
+if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___primary_key_value___']) && isset($_POST['___column_list___']))
+{
+    $tableName = $_POST['___table_name___'];
+    $primaryKeyName = $_POST['___primary_key_name___'];
+    $primaryKeyValue = addslashes($_POST['___primary_key_value___']);
+    $columnList = $_POST['___column_list___'];
+    $columnNames = explode(",", $columnList);
+    $values = [];
+    foreach($columnNames as $key)
+    {
+        $values[] = "$key = '".addslashes($_POST[$key])."'";
+    }
+    $query = "UPDATE $tableName SET \r\n\t".implode(", \r\n\t", $values)." \r\nWHERE $primaryKeyName = '".$primaryKeyValue."';";
+}
+
 // Split and sanitize the query if it exists
 if ($query) {
     $arr = DatabaseExplorer::splitSQL($query);
@@ -1015,7 +1313,6 @@ if ($query) {
 } else {
     $queryArray = null;
 }
-
 // Execute queries and handle results
 if ($query && !empty($queries)) {
     try {
@@ -1023,7 +1320,8 @@ if ($query && !empty($queries)) {
     } catch (Exception $e) {
         $queryResult = self::ERROR . $e->getMessage();
     }
-} else {
+}
+else {
     $queryResult = "";
 }
 
@@ -1031,9 +1329,11 @@ if ($query && !empty($queries)) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="database-type" content="<?php echo $dbType;?>">
     <title>Database Explorer</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.min.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
@@ -1080,7 +1380,16 @@ if ($query && !empty($queries)) {
         // Display table structure and data if a table is selected
         if ($table) {
             echo DatabaseExplorer::showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table);
-            echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
+            if(isset($_GET['id']))
+            {
+                $primaryKeyValue = addslashes($_GET['id']);
+                echo DatabaseExplorer::editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue);
+            }
+            else
+            {
+                echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
+            }
+            
         }
 
         // Display the query executor form and results
@@ -1094,7 +1403,7 @@ if ($query && !empty($queries)) {
 
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Import Database Structure</h2>
+                <h3>Import Database Structure</h3>
                 <span class="close-btn" id="closeBtn">&times;</span>
             </div>
             

@@ -77,7 +77,7 @@ class DetailDataDto extends ToString
     public function setPrimaryKeyName($primaryKeyName)
     {
         $this->primaryKeyName = $primaryKeyName;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -98,7 +98,7 @@ class DetailDataDto extends ToString
         }
         $this->primaryKeyName[] = $primaryKeyName; // Append the primary key name
         $this->primaryKeyDataType[] = new PrimaryKeyValueDto($primaryKeyName, $primaryKeyDataType); // Append the primary key data type
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -123,7 +123,7 @@ class DetailDataDto extends ToString
         }
 
         $this->column->addData(new ColumnDataDto($field, $value, $type, $label, $readonly, $hidden, $valueDraft));
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
@@ -145,7 +145,7 @@ class DetailDataDto extends ToString
     public function setColumn($column)
     {
         $this->column = $column;
-        return $this; // Return current instance for method chaining.
+        return $this; // Returns the current instance for method chaining.
     }
 
     /**
