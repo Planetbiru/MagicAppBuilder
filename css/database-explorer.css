@@ -153,7 +153,8 @@ textarea:focus-visible {
   border-color: #004085;
 }
 
-.btn-primary:focus, .btn-primary.focus {
+.btn-primary:focus,
+.btn-primary.focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
 }
 
@@ -169,7 +170,8 @@ textarea:focus-visible {
   border-color: #545b62;
 }
 
-.btn-secondary:focus, .btn-secondary.focus {
+.btn-secondary:focus,
+.btn-secondary.focus {
   box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
 }
 
@@ -185,7 +187,8 @@ textarea:focus-visible {
   border-color: #1e7e34;
 }
 
-.btn-success:focus, .btn-success.focus {
+.btn-success:focus,
+.btn-success.focus {
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
 }
 
@@ -201,7 +204,8 @@ textarea:focus-visible {
   border-color: #d39e00;
 }
 
-.btn-warning:focus, .btn-warning.focus {
+.btn-warning:focus,
+.btn-warning.focus {
   box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.5);
 }
 
@@ -217,12 +221,14 @@ textarea:focus-visible {
   border-color: #bd2130;
 }
 
-.btn-danger:focus, .btn-danger.focus {
+.btn-danger:focus,
+.btn-danger.focus {
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
 }
 
 /* Tampilan tombol disabled */
-.btn:disabled, .btn.disabled {
+.btn:disabled,
+.btn.disabled {
   opacity: 0.65;
   cursor: not-allowed;
   background-color: #6c757d;
@@ -235,7 +241,8 @@ textarea:focus-visible {
   padding-bottom: 10px;
 }
 
-#database-select, #schema-select {
+#database-select,
+#schema-select {
   padding: 4px 8px;
   background-color: #ECECEC;
   border: 1px solid #ddd;
@@ -255,7 +262,8 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-[data-from-default-app=true] .table-list, [database-type=sqlite] .table-list {
+[data-from-default-app=true] .table-list,
+[database-type=sqlite] .table-list {
   max-height: calc(100vh - 72px);
 }
 
@@ -304,13 +312,19 @@ textarea:focus-visible {
   max-height: calc(100vh - 365px);
 }
 
-.table-structure-inner table td, .table-content-inner table td, .query-result table td {
+.table-structure-inner table td,
+.table-content-inner table td,
+.query-result table td {
   white-space: nowrap;
 }
-.table-structure-inner table tbody tr:nth-child(odd) td, .table-content-inner table tbody tr:nth-child(odd) td, .query-result table tbody tr:nth-child(odd) td {
+.table-structure-inner table tbody tr:nth-child(odd) td,
+.table-content-inner table tbody tr:nth-child(odd) td,
+.query-result table tbody tr:nth-child(odd) td {
   background-color: #F8F8F8;
 }
-.table-structure-inner table tbody tr:nth-child(even) td, .table-content-inner table tbody tr:nth-child(even) td, .query-result table tbody tr:nth-child(even) td {
+.table-structure-inner table tbody tr:nth-child(even) td,
+.table-content-inner table tbody tr:nth-child(even) td,
+.query-result table tbody tr:nth-child(even) td {
   background-color: #FEFEFE;
 }
 
@@ -454,12 +468,15 @@ table.two-side-table {
 }
 
 /* Styling default untuk tabel, untuk layar yang lebih kecil dari 600px */
-table.two-side-table th, table.two-side-table td {
-  width: 100%; /* Setiap kolom memiliki lebar 100% untuk layar kecil */
+table.two-side-table th,
+table.two-side-table td {
+  width: 100%;
+  /* Setiap kolom memiliki lebar 100% untuk layar kecil */
   padding: 8px;
   border: 1px solid #ddd;
   text-align: left;
-  display: block; /* Ubah setiap kolom menjadi block-level untuk responsif */
+  display: block;
+  /* Ubah setiap kolom menjadi block-level untuk responsif */
 }
 
 table.two-side-table th {
@@ -467,28 +484,35 @@ table.two-side-table th {
   font-weight: bold;
 }
 
-table.two-side-table thead tr > th:nth-child(2), table.two-side-table tbody tr td:nth-child(2) {
+table.two-side-table thead tr > th:nth-child(2),
+table.two-side-table tbody tr td:nth-child(2) {
   padding: 0px;
 }
 
 /* Styling untuk layar yang lebih besar dari 600px */
 @media (min-width: 800px) {
-  table.two-side-table th, table.two-side-table td {
-    display: table-cell; /* Kembali ke tampilan tabel biasa */
+  table.two-side-table th,
+  table.two-side-table td {
+    display: table-cell;
+    /* Kembali ke tampilan tabel biasa */
   }
   /* Lebar kolom pertama 30% */
-  table.two-side-table td:first-child, table.two-side-table th:first-child {
-    width: 30%; /* Lebar kolom pertama 30% */
+  table.two-side-table td:first-child,
+  table.two-side-table th:first-child {
+    width: 30%;
+    /* Lebar kolom pertama 30% */
   }
   /* Set kolom lainnya untuk memiliki lebar yang seimbang */
-  table.two-side-table td:not(:first-child), table.two-side-table th:not(:first-child) {
+  table.two-side-table td:not(:first-child),
+  table.two-side-table th:not(:first-child) {
     width: auto;
   }
 }
-textarea.data-editor, div.data-editor {
+textarea.data-editor,
+div.data-editor {
   border-radius: 0;
   height: 44px;
-  padding: 4px 6px;
+  padding: 4px 8px;
   display: block;
   margin: 0;
   border: none;
@@ -496,7 +520,7 @@ textarea.data-editor, div.data-editor {
 
 input.data-editor {
   border-radius: 0;
-  padding: 6px 6px;
+  padding: 8px 8px;
   display: block;
   margin: 0px;
   border: none;
@@ -504,6 +528,18 @@ input.data-editor {
   transition: background-color ease-in-out 0.2s;
   width: 100%;
   box-sizing: border-box;
+}
+
+input[type=number].data-editor::-webkit-outer-spin-button,
+input[type=number].data-editor::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number].data-editor {
+  -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+          appearance: textfield;
 }
 
 input.data-editor:focus-visible {
@@ -516,6 +552,7 @@ form.edit-form {
   padding-bottom: 20px;
 }
 
-th.cell-edit, td.cell-edit {
+th.cell-edit,
+td.cell-edit {
   padding: 1px 8px;
 }/*# sourceMappingURL=database-explorer.css.map */
