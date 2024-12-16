@@ -7,7 +7,7 @@ use MagicObject\MagicObject;
 /**
  * EntityModule is entity of table module. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
- * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)

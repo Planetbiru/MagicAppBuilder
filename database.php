@@ -16,6 +16,11 @@ if(isset($databaseConfig))
     require_once (__DIR__) . "/inc.app/database.php";
 }
 
+class DataException extends Exception
+{
+
+}
+
 /**
  * Class DatabaseExplorer
  * 
@@ -330,6 +335,51 @@ class DatabaseExplorer
     }
 
     /**
+     * Fetches the column information for a specified table.
+     * 
+     * This function retrieves details about the columns in a specified table, including their data type, nullability, keys, default values, and other related information. It adapts to different database drivers (such as SQLite, MySQL, or PostgreSQL) and returns the column information in an associative array.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $schemaName The name of the schema (for PostgreSQL). For MySQL or SQLite, this can be an empty string.
+     * @param string $table The name of the table whose column structure is to be fetched.
+     * 
+     * @return array An array containing the column details for the specified table. Each entry in the array represents a column and its associated details (e.g., name, type, nullability, etc.).
+     */
+    public static function getColumnInfo($pdo, $schemaName, $table)
+    {
+        $columnCount = 0;
+        $columnRows = []; // List to store column data
+        
+        // Fetch the columns
+        $query = self::getQueryShowColumns($pdo, $schemaName, $table);
+        try
+        {
+            if (isset($query)) {
+                $stmt = $pdo->query($query);
+                
+                if ($stmt) {
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $columnCount++;
+                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                            // For SQLite
+                            $columns = self::createSqliteColumn($row);
+                        } else {
+                            // For MySQL or PostgreSQL
+                            $columns = $row;
+                        }
+                        $columnRows[] = $columns; // Store row data in the list
+                    }
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            // Do nothing
+        }
+        return $columnRows;
+    }
+
+    /**
      * Displays the structure of a table, including column details like name, type, nullability, key, default value, and extra information.
      *
      * This function fetches the structure of a table (such as columns, types, nullability, primary keys, default values, etc.)
@@ -344,7 +394,7 @@ class DatabaseExplorer
      * 
      * @return string The generated HTML displaying the table structure or an error message if the table is not found.
      */
-    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
+    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table)
     {
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -381,49 +431,31 @@ class DatabaseExplorer
         $thead->appendChild($tr);
         $tableElem->appendChild($thead);
 
-        $columnCount = 0;
-        
-        // Fetch the columns
-        $query = self::getQueryShowColumns($pdo, $schemaName, $table);
-        try
-        {
-            if (isset($query)) {
-                $stmt = $pdo->query($query);
-                
-                if ($stmt) {
-                    $tbody = $dom->createElement('tbody');
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $columnCount++;
-                        $tr = $dom->createElement('tr');
-                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
-                            // For SQLite
-                            $columns = self::createSqliteColumn($row);
-                        } else {
-                            // For MySQL or PostgreSQL
-                            $columns = $row;
-                        }
-                        foreach ($columns as $value) {
-                            $td = $dom->createElement('td', $value);
-                            $tr->appendChild($td);
-                        }
-                        $tbody->appendChild($tr);
-                    }
-                    $tableElem->appendChild($tbody);
-                }
-            }
-        }
-        catch(Exception $e)
-        {
-            // Do nothing
-        }
+        $columnRows = self::getColumnInfo($pdo, $schemaName, $table);
+
+        $columnCount = count($columnRows);
         
         if($columnCount > 0)
         {
+            // Now render the rows from the list into the table
+            $tbody = $dom->createElement('tbody');
+            foreach ($columnRows as $columns) {
+                $tr = $dom->createElement('tr');
+                foreach ($columns as $value) {
+                    $td = $dom->createElement('td', $value);
+                    $tr->appendChild($td);
+                }
+                $tbody->appendChild($tr);
+            }
+            $tableElem->appendChild($tbody);
+            
+            // Append the table to the div
             $divInner->appendChild($tableElem);
             $dom->appendChild($divOuter);
         }
         else
         {
+            // Handle the case when the table is not found
             $divInner = $dom->createElement('div');
             $divInner->setAttribute('class', 'sql-error');
 
@@ -456,6 +488,7 @@ class DatabaseExplorer
         // Output the HTML
         return $dom->saveHTML();
     }
+
 
     /**
      * Executes a SQL query and displays the result in a table.
@@ -716,7 +749,7 @@ class DatabaseExplorer
      *
      * @return string The HTML form as a string, or an error message if something goes wrong.
      *
-     * @throws Exception If there is an error retrieving the data or if no data is found for the given ID.
+     * @throws DataException If there is an error retrieving the data or if no data is found for the given ID.
      */
     public static function editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
     {
@@ -732,7 +765,7 @@ class DatabaseExplorer
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$row) {
-                throw new Exception("Data not found for ID: $primaryKeyValue");
+                throw new DataException("Data not found for ID: $primaryKeyValue");
             }
             
             $referer = $_SERVER['HTTP_REFERER'];
@@ -745,6 +778,9 @@ class DatabaseExplorer
             {
                 $backLink = $referer;
             }
+
+            $columnRows = self::getColumnInfo($pdo, $schemaName, $table);
+            $columnTypes = self::getColumnType($columnRows);
 
             // Create form container
             $form = $dom->createElement('form');
@@ -820,12 +856,11 @@ class DatabaseExplorer
 
                     // Second column - Textarea field
                     $tdInput = $dom->createElement('td');
-                    $textarea = $dom->createElement('textarea');
-                    $textarea->setAttribute('name', htmlspecialchars($key));
-                    $textarea->setAttribute('class', 'data-editor');
-                    $textarea->setAttribute('spellcheck', 'false');
-                    $textarea->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
-                    $tdInput->appendChild($textarea);
+
+                    $type = isset($columnTypes[$key]) ? $columnTypes[$key] : 'text';
+                    $input = self::getEditor($dom, $key, $value, $type);
+                    
+                    $tdInput->appendChild($input);
                     $tr->appendChild($tdInput);
 
                     // Append row to the table
@@ -871,6 +906,70 @@ class DatabaseExplorer
         } catch (Exception $e) {
             return "Error: " . $e->getMessage();
         }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param DOMDocument $dom
+     * @param string $key
+     * @param mixed $value
+     * @param string $type
+     * @return DOMElement|false
+     */
+    public static function getEditor($dom, $key, $value, $type)
+    {
+        if(stripos($type, 'int') !== false)
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'number');
+            $input->setAttribute('step', '1');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+            return $input;
+        }
+        else if(stripos($type, 'float') !== false || stripos($type, 'double') !== false || stripos($type, 'real') !== false || stripos($type, 'decimal') !== false)
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'number');
+            $input->setAttribute('step', 'any');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+            return $input;
+        }
+        else
+        {
+            $input = $dom->createElement('textarea');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('spellcheck', 'false');
+            $input->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
+            return $input;
+        }
+    }
+
+    /**
+     * Extracts the column types from an array of column details.
+     * 
+     * This function processes an array of column data, which includes details about each column in a table. It returns an associative array where the keys are the column names, and the values are their corresponding data types.
+     *
+     * @param array $columnRows An array of column details, where each entry contains information about a specific column, including the 'Field' (column name) and 'Type' (column data type).
+     * 
+     * @return array An associative array where the keys are column names, and the values are the corresponding column types.
+     */
+    public static function getColumnType($columnRows)
+    {
+        $map = array();
+        if(isset($columnRows) && is_array($columnRows) && !empty($columnRows))
+        {
+            foreach($columnRows as $col)
+            {
+                $map[$col['Field']] = $col['Type'];
+            }
+        }
+        return $map;
     }
 
     /**
@@ -1334,7 +1433,7 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <link rel="stylesheet" href="css/database-explorer.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>
