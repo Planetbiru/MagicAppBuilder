@@ -944,7 +944,7 @@ class DatabaseExplorer
      */
     public static function getEditor($dom, $key, $value, $type)
     {
-        if(stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0)
+        if(self::isInteger($type))
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'number');
@@ -953,7 +953,7 @@ class DatabaseExplorer
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('value', $value);  
         }
-        else if(stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0)
+        else if(self::isFloat($type))
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'number');
@@ -963,7 +963,7 @@ class DatabaseExplorer
             $input->setAttribute('value', $value);  
             return $input;
         }
-        else if(stripos($type, 'datetime') === 0 || stripos($type, 'date') === 0 || stripos($type, 'time') === 0)
+        else if(self::isDateTime($type))
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'text');
@@ -981,6 +981,49 @@ class DatabaseExplorer
         }
         return $input;
     }
+    
+    /**
+     * Determines if the given type represents an integer.
+     *
+     * This method checks if the provided string matches any of the common integer
+     * types used in databases, such as tinyint, smallint, mediumint, bigint, or int.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents an integer, otherwise false.
+     */
+    private static function isInteger($type)
+    {
+        return stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0;
+    }
+
+    /**
+     * Determines if the given type represents a floating-point number.
+     *
+     * This method checks if the provided string matches any of the common floating-point
+     * types used in databases, such as float, double, real, or decimal.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents a floating-point number, otherwise false.
+     */
+    private static function isFloat($type)
+    {
+        return stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0;
+    }
+
+    /**
+     * Determines if the given type represents a date or time.
+     *
+     * This method checks if the provided string matches any of the common date and time
+     * types used in databases, such as datetime, date, or time.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents a date or time, otherwise false.
+     */
+    private static function isDateTime($type)
+    {
+        return stripos($type, 'datetime') === 0 || stripos($type, 'date') === 0 || stripos($type, 'time') === 0;
+    }
+
 
     /**
      * Extracts the column types from an array of column details.
