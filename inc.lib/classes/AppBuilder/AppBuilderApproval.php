@@ -166,6 +166,8 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
+        
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName.parent::BRACKETS.");";
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;
 
@@ -527,7 +529,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when the user approves data modification.";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// You can modify this list by adding or removing fields as needed.".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columToBeCopied = array(".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columnToBeCopied = array(".parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.");";
         $lines[] = "";
@@ -541,7 +543,7 @@ class AppBuilderApproval extends AppBuilderBase
             $trash = "new $entityTrashName()";
         }
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->approve("
-        .parent::VAR."columToBeCopied, new $entityApprovalName(), $trash, ".parent::NEW_LINE 
+        .parent::VAR."columnToBeCopied, new $entityApprovalName(), $trash, ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.$currentTime.",  ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.$currentIp.", ".parent::NEW_LINE
@@ -650,10 +652,19 @@ class AppBuilderApproval extends AppBuilderBase
         .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null, ".parent::VAR."userId = null) {".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1."}";
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
+         
+        if($this->appFeatures->getApprovalByOtherUser())
+        {
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE; 
+        }
+        else
+        {
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE 
+            .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE;
+        }
+        
+        $result .= parent::TAB1.parent::TAB1.parent::TAB1."}";
 
         if($trashRequired)
         {

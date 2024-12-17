@@ -28,6 +28,23 @@ if($applicationId != null)
     }
 }
 
+if(!$appConfig->issetApplication() && isset($appList) && $appList instanceof SecretObject)
+{
+    $arr = $appList->valueArray();
+    foreach($arr as $app)
+    {
+        if($applicationId == $app['id'])
+        {
+            $fixApp = new SecretObject([
+                'name'=>$app['name']
+            ]);
+            $appConfig->setApplication($fixApp);
+        }
+    }
+    
+    
+}
+
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
 $cfgSession = new SecretObject($appConfig->getSessions());
 $app = new SecretObject($appConfig->getApplication());

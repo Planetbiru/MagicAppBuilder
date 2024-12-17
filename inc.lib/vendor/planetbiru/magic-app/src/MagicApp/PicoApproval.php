@@ -121,7 +121,7 @@ class PicoApproval
      *
      * Additionally, if the `approvalCallback` is provided, it can trigger actions before or after the approval process.
      *
-     * @param string[] $columToBeCopied Columns to copy from the approval entity.
+     * @param string[] $columnToBeCopied Columns to copy from the approval entity.
      * @param MagicObject|null $entityApv Approval entity, used for approval actions like updating or copying.
      * @param MagicObject|null $entityTrash Trash entity for storing deleted data.
      * @param string $currentUser The user performing the approval.
@@ -131,7 +131,7 @@ class PicoApproval
      * 
      * @return self The current instance, allowing method chaining The current instance of the class, allowing for method chaining.
      */
-    public function approve($columToBeCopied, $entityApv, $entityTrash, $currentUser, $currentTime, $currentIp, $approvalCallback = null)
+    public function approve($columnToBeCopied, $entityApv, $entityTrash, $currentUser, $currentTime, $currentIp, $approvalCallback = null)
     {
         $this->validateApproval($entityApv, $currentUser);
         $waitingFor = $this->entity->get($this->entityInfo->getWaitingFor());
@@ -147,7 +147,7 @@ class PicoApproval
         } elseif ($waitingFor == WaitingFor::DEACTIVATE) {
             $this->approveDeactivate();
         } elseif ($waitingFor == WaitingFor::UPDATE) {
-            $this->approveUpdate($entityApv, $columToBeCopied);
+            $this->approveUpdate($entityApv, $columnToBeCopied);
         } elseif ($waitingFor == WaitingFor::DELETE) {
             $this->approveDelete($entityTrash, $currentUser, $currentTime, $currentIp, $approvalCallback);
         }
@@ -380,14 +380,14 @@ class PicoApproval
      * @param MagicObject $entityApv Approval entity
      *        The entity that contains the approval information, including the status and fields to be copied.
      *
-     * @param string[] $columToBeCopied Columns to copy from the approval entity
+     * @param string[] $columnToBeCopied Columns to copy from the approval entity
      *        An array of column names that should be copied from the approval entity to the main entity 
      *        during the approval process.
      *
      * @return self The current instance, allowing method chaining
      *        Returns the current instance of the class for method chaining.
      */
-    private function approveUpdate($entityApv, $columToBeCopied)
+    private function approveUpdate($entityApv, $columnToBeCopied)
     {
         $tableInfo = $this->entity->tableInfo();
         $primaryKeys = array_keys($tableInfo->getPrimaryKeys());
@@ -406,7 +406,7 @@ class PicoApproval
                 $updater = $this->entity->where($specs);
 
                 foreach ($values as $field => $value) {
-                    if (in_array($field, $columToBeCopied)) {
+                    if (in_array($field, $columnToBeCopied)) {
                         $updater->set($field, $value);
                         $updated++;
                     }

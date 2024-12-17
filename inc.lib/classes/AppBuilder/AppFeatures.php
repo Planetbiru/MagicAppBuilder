@@ -69,6 +69,13 @@ class AppFeatures
      * @var string
      */
     private $approvalPosition = '';
+    
+    /**
+     * Approval by other user
+     *
+     * @var bool
+     */
+    private $approvalByOtherUser = false;
 
     /**
      * Subquery feature
@@ -119,6 +126,7 @@ class AppFeatures
             $this->subquery = $this->isTrue($features->get('subquery'));
             $this->approvalType = $features->get('approvalType') == 2 ? 2 : 1;
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
+            $this->approvalByOtherUser = $this->isTrue($features->get('approvalByOtherUser'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
         }
     }
@@ -292,6 +300,30 @@ class AppFeatures
     public function setExportUseTemporary($exportUseTemporary)
     {
         $this->exportUseTemporary = $exportUseTemporary;
+
+        return $this;
+    }
+
+    /**
+     * Get approval by other user
+     *
+     * @return  bool
+     */ 
+    public function getApprovalByOtherUser()
+    {
+        return $this->approvalByOtherUser;
+    }
+
+    /**
+     * Set approval by other user
+     *
+     * @param  bool  $approvalByOtherUser  Approval by other user
+     *
+     * @return  self
+     */ 
+    public function setApprovalByOtherUser($approvalByOtherUser)
+    {
+        $this->approvalByOtherUser = $approvalByOtherUser;
 
         return $this;
     }
