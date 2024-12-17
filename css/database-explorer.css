@@ -310,6 +310,8 @@ textarea:focus-visible {
 
 .query-result {
   max-height: calc(100vh - 365px);
+  padding-top: 4px;
+  overflow-x: auto;
 }
 
 .table-structure-inner table td,
@@ -367,11 +369,6 @@ textarea:focus-visible {
   background-color: #ffd3c1;
   font-family: "Courier New", Courier, monospace;
   margin-bottom: 16px;
-}
-
-.query-result {
-  padding-top: 4px;
-  overflow-x: auto;
 }
 
 .alert {
