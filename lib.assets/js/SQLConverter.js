@@ -15,7 +15,7 @@ class SQLConverter {
         this.dbToSqlite = {
             // MySQL and PostgreSQL types to SQLite mapping
             "int": "INTEGER",
-            "tinyint": "INTEGER",  // MySQL treats tinyint as integer
+            "tinyint(1)": "BOOLEAN",  // MySQL treats tinyint(1) as boolean
             "tinyint": "INTEGER",  // MySQL treats tinyint as integer
             "smallint": "INTEGER",
             "mediumint": "INTEGER",
@@ -32,10 +32,10 @@ class SQLConverter {
             "mediumtext": "TEXT",
             "longtext": "TEXT",
             "text": "TEXT",
-            "date": "TEXT",  // SQLite stores dates as TEXT in ISO 8601 format
-            "datetime": "TEXT", // SQLite stores datetime as TEXT in ISO 8601 format
-            "timestamp": "TEXT", // Same as datetime for SQLite
-            "time": "TEXT", // Same as datetime for SQLite
+            "datetime": "DATETIME", // SQLite stores datetime as DATETIME in ISO 8601 format
+            "timestamp": "DATETIME", // Same as datetime for SQLite
+            "date": "DATE",  // SQLite stores dates as DATE in ISO 8601 format
+            "time": "TIME", // Same as datetime for SQLite
             "year": "INTEGER", // SQLite stores year as integer
             "boolean": "INTEGER", // SQLite stores boolean as integer (0 for false, 1 for true)
             "json": "TEXT", // SQLite supports JSON as TEXT
@@ -381,11 +381,15 @@ class SQLConverter {
      * @returns {string} The converted SQLite column type.
      */
     toSqliteType(type, length) {
+        if(type.toLowerCase() == 'tinyint' && length == 1)
+        {
+            return 'BOOLEAN';
+        }
         let sqliteType = 'TEXT';
         for (let i in this.dbToSqlite) {
             if (this.dbToSqlite.hasOwnProperty(i)) {
                 let key = i.toString();
-                if (type.toLowerCase().indexOf(key.toLowerCase()) === 0) {
+                if (type.toLowerCase().startsWith(key.toLowerCase())) {
                     sqliteType = this.dbToSqlite[key];
                     break;
                 }
@@ -427,7 +431,7 @@ class SQLConverter {
         for (let i in this.dbToMySQL) {
             if (this.dbToMySQL.hasOwnProperty(i)) {
                 let key = i.toString();
-                if (type.toLowerCase().indexOf(key.toLowerCase()) === 0) {
+                if (type.toLowerCase().startsWith(key.toLowerCase())) {
                     mysqlType = this.dbToMySQL[key];
                     break;
                 }
@@ -455,7 +459,7 @@ class SQLConverter {
         for (let i in this.dbToPostgreSQL) {
             if (this.dbToPostgreSQL.hasOwnProperty(i)) {
                 let key = i.toString();
-                if (type.toLowerCase().indexOf(key.toLowerCase()) === 0) {
+                if (type.toLowerCase().startsWith(key.toLowerCase())) {
                     pgType = this.dbToPostgreSQL[key];
                     break;
                 }

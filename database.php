@@ -944,7 +944,7 @@ class DatabaseExplorer
      */
     public static function getEditor($dom, $key, $value, $type)
     {
-        if(stripos($type, 'int') === 0)
+        if(stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0)
         {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'number');
@@ -952,7 +952,6 @@ class DatabaseExplorer
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('value', $value);  
-            return $input;
         }
         else if(stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0)
         {
@@ -964,6 +963,14 @@ class DatabaseExplorer
             $input->setAttribute('value', $value);  
             return $input;
         }
+        else if(stripos($type, 'datetime') === 0 || stripos($type, 'date') === 0 || stripos($type, 'time') === 0)
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'text');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+        }
         else
         {
             $input = $dom->createElement('textarea');
@@ -971,8 +978,8 @@ class DatabaseExplorer
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('spellcheck', 'false');
             $input->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
-            return $input;
         }
+        return $input;
     }
 
     /**

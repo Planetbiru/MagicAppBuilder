@@ -47,11 +47,11 @@
 -
     id: lagu
     name: Lagu
-    architecture: ''
-    description: Description
+    architecture: monolith
+    description: ''
     documentRoot: 'D:/xampp/htdocs/lagu'
     author: 'Your Name'
-    selected: false
+    selected: true
 -
     id: lagu2
     name: 'Music Production Manager'
@@ -67,4 +67,4 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
-    selected: true
+    selected: false
