@@ -71,11 +71,11 @@ class AppFeatures
     private $approvalPosition = '';
     
     /**
-     * Approval by other user
+     * Approval by Another User
      *
      * @var bool
      */
-    private $approvalByOtherUser = false;
+    private $approvalByAnotherUser = false;
 
     /**
      * Subquery feature
@@ -126,7 +126,7 @@ class AppFeatures
             $this->subquery = $this->isTrue($features->get('subquery'));
             $this->approvalType = $features->get('approvalType') == 2 ? 2 : 1;
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
-            $this->approvalByOtherUser = $this->isTrue($features->get('approvalByOtherUser'));
+            $this->approvalByAnotherUser = $this->isTrue($features->get('approvalByAnotherUser'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
         }
     }
@@ -304,26 +304,27 @@ class AppFeatures
         return $this;
     }
 
+
     /**
-     * Get approval by other user
+     * Get approval by Another User
      *
      * @return  bool
      */ 
-    public function getApprovalByOtherUser()
+    public function getApprovalByAnotherUser()
     {
-        return $this->approvalByOtherUser;
+        return $this->approvalByAnotherUser;
     }
 
     /**
-     * Set approval by other user
+     * Set approval by Another User
      *
-     * @param  bool  $approvalByOtherUser  Approval by other user
+     * @param  bool  $approvalByAnotherUser  Approval by Another User
      *
      * @return  self
      */ 
-    public function setApprovalByOtherUser($approvalByOtherUser)
+    public function setApprovalByAnotherUser($approvalByAnotherUser)
     {
-        $this->approvalByOtherUser = $approvalByOtherUser;
+        $this->approvalByAnotherUser = $approvalByAnotherUser;
 
         return $this;
     }

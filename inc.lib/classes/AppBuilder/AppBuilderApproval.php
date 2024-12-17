@@ -654,7 +654,7 @@ class AppBuilderApproval extends AppBuilderBase
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
          
-        if($this->appFeatures->getApprovalByOtherUser())
+        if($this->appFeatures->getApprovalByAnotherUser())
         {
             $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE; 
         }

@@ -2782,7 +2782,7 @@ function generateScript(selector) {
   let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
-  let approvalByOtherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
+  let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
   
   
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
@@ -2824,7 +2824,7 @@ function generateScript(selector) {
     trashRequired: withTrash,
     approvalType: approvalType,
     approvalPosition: approvalPosition,
-    approvalByOtherUser: approvalByOtherUser,
+    approvalByAnotherUser: approvalByAnotherUser,
     ajaxSupport: ajaxSupport
   };
 
