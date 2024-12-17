@@ -27,10 +27,9 @@ try {
     $excludeColumns[] = $appConfig->entityInfo->getApprovalNote();
     $excludeColumns[] = $appConfig->entityInfo->getApprovalStatus();
 
-    $queryBuilder = new PicoDatabaseQueryBuilder($database);
-
     if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
         // MySQL Query for column details
+        $queryBuilder = new PicoDatabaseQueryBuilder($database);
         $queryBuilder->newQuery()
             ->select("column_name, column_type, data_type, column_key")
             ->from("INFORMATION_SCHEMA.COLUMNS")
@@ -40,9 +39,13 @@ try {
                 $tableName,
                 $excludeColumns
             );
+        $rs = $database->executeQuery($queryBuilder);
+
+        $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
     } 
     else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
         // PostgreSQL Query for column details
+        $queryBuilder = new PicoDatabaseQueryBuilder($database);
         $queryBuilder->newQuery()
             ->select("c.column_name, c.data_type as data_type, c.data_type as column_type, CASE 
                 WHEN tc.constraint_type = 'PRIMARY KEY' THEN 'PRI'
@@ -66,22 +69,30 @@ try {
             $tableName,
             $excludeColumns
         );
+        $rs = $database->executeQuery($queryBuilder);
+
+        $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
     }
     else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) {
         // SQLite query for column details
-        $queryBuilder->newQuery()
-            ->select("name AS column_name, type AS data_type")
-            ->from("PRAGMA_TABLE_INFO('$tableName')")
-            ->where(
-                "name NOT IN (?)",
-                $excludeColumns
-            );
-            error_log($queryBuilder);
+        $queryBuilder = "PRAGMA table_info('$tableName')";
+        $rs = $database->executeQuery($queryBuilder);
+        $rawRows = $rs->fetchAll(PDO::FETCH_ASSOC);
+        $rows = [];
+        foreach($rawRows as $row)
+        {
+            if(!in_array($row['name'], $excludeColumns))
+            {
+                $rows[] = array(
+                    'column_name' => $row['name'],
+                    'data_type'   => $row['type'],
+                    'column_key'  => $row['pk'] == 1 ? 'PRI' : '',
+                    'column_type' => $row['type'],
+                );
+            }
+        }
     }
     
-    $rs = $database->executeQuery($queryBuilder);
-
-    $rows = $rs->fetchAll();
     $column = "";
     $i = 0;
 
@@ -108,21 +119,14 @@ try {
         $cols[] = $data['column_name'];
         $fields[] = array(
             "column_name" => $data['column_name'],
-            "column_type" => $data['data_type'],
-            "data_type" => $data['data_type']
+            "column_type" => $data['column_type'  ],
+            "data_type"   => $data['data_type'  ]
         );
         
-        // Handle Primary Key Detection for SQLite
-        if ($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) {
-            // Check if the column is a primary key
-            $queryPrimaryKey = $database->query("PRAGMA table_info($tableName)");
-            $primaryKeysData = $queryPrimaryKey->fetchAll();
-            foreach ($primaryKeysData as $pk) {
-                if ($pk['name'] == $data['column_name'] && $pk['pk'] == 1) {
-                    $primaryKeys[] = $data['column_name'];
-                }
-            }
+        if (strtoupper($data['column_key']) == 'PRI') {
+            $primaryKeys[] = $data['column_name'];
         }
+        
     }
 
     $json = array(

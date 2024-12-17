@@ -35,7 +35,7 @@ class DataException extends Exception
  * - Executing a series of SQL queries and displaying their results.
  * - Creating a query execution form with pre-populated SQL queries.
  */
-class DatabaseExplorer
+class DatabaseExplorer // NOSONAR
 {
     const ERROR = "Error: ";
     
@@ -1144,6 +1144,10 @@ class DatabaseExplorer
         else if($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
             $label = 'Execute Query (SQLite)';
+        }
+        else if($dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB)
+        {
+            $label = 'Execute Query (MariaDB)';
         }
         else
         {

@@ -177,9 +177,9 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 'float' => 'REAL',
                 'text' => 'TEXT',
                 'longtext' => 'TEXT',
+                'datetime' => 'DATETIME',
                 'date' => 'DATE',
-                'timestamp' => 'DATETIME',
-                'timestamp' => 'DATETIME',
+                'timestamp' => 'TIMESTAMP',
                 'time' => 'TIME',
                 'blob' => 'BLOB',
             );
@@ -231,12 +231,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $rows[] = array(
-                "Field" => $row['name'],
-                "Type" => $row['type'],
-                "Null" => $row['notnull'] ? 'YES' : 'NO',
-                "Key" => $row['pk'] ? 'PRI' : null,
+                "Field"   => $row['name'],
+                "Type"    => $row['type'],
+                "Null"    => $row['notnull'] ? 'YES' : 'NO',
+                "Key"     => $row['pk'] ? 'PRI' : null,
                 "Default" => $row['dflt_value'] ? $row['dflt_value'] : null,
-                "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
+                "Extra"   => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
         return $rows;
@@ -349,7 +349,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
             'datetime' => 'DATETIME',   // MySQL 'datetime' maps to SQLite 'DATETIME'
             'date' => 'DATE',           // MySQL 'date' maps to SQLite 'DATE'
-            'timestamp' => 'DATETIME',  // MySQL 'timestamp' maps to SQLite 'DATETIME'
+            'timestamp' => 'TIMESTAMP', // MySQL 'timestamp' maps to SQLite 'TIMESTAMP'
             'time' => 'TIME',           // MySQL 'time' maps to SQLite 'TIME'
         );
 
