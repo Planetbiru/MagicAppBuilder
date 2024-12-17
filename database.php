@@ -22,6 +22,136 @@ class DataException extends Exception
 }
 
 /**
+ * Class SQLiteExporter
+ * 
+ * A class to export both the structure (CREATE TABLE) and data (INSERT INTO) of all tables from a SQLite database into an SQL file.
+ */
+class SQLiteExporter
+{
+    private $db; // SQLite3 database connection
+    private $outputBuffer; // Buffer to store the SQL export data
+
+    /**
+     * SQLiteExporter constructor.
+     * 
+     * Opens a connection to the SQLite database and initializes the output buffer.
+     *
+     * @param string $database The path to the SQLite database file.
+     */
+    public function __construct($database)
+    {
+        // Establish connection to SQLite database
+        $this->db = new SQLite3($database);
+        
+        // Initialize the output buffer
+        $this->outputBuffer = '';
+    }
+
+    /**
+     * Exports both table structure (CREATE TABLE) and data (INSERT INTO) from the SQLite database.
+     */
+    public function export()
+    {
+        // Export table structure (CREATE TABLE)
+        $this->exportTableStructure();
+
+        // Export table data (INSERT INTO)
+        $this->exportTableData();
+    }
+
+    /**
+     * Exports the structure of all tables in the SQLite database (CREATE TABLE).
+     */
+    private function exportTableStructure()
+    {
+        // Query to get all table names from the database
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        
+        // Loop through all tables
+        while ($table = $result->fetchArray(SQLITE3_ASSOC)) {
+            $tableName = $table['name'];
+
+            // Get the CREATE TABLE SQL command for the current table
+            $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
+            $createTableSql = $createTable->fetchArray(SQLITE3_ASSOC)['sql'];
+
+            // Append the CREATE TABLE SQL to the output buffer
+            $this->outputBuffer .= "$createTableSql;\n\n";
+        }
+    }
+
+    /**
+     * Exports the data of all tables in the SQLite database (INSERT INTO).
+     */
+    private function exportTableData()
+    {
+        // Query to get all table names from the database
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        
+        // Loop through all tables
+        while ($table = $result->fetchArray(SQLITE3_ASSOC)) {
+            $tableName = $table['name'];
+
+            // Query to fetch all rows of the current table
+            $rows = $this->db->query("SELECT * FROM $tableName;");
+            
+            // Loop through all rows of the current table
+            while ($row = $rows->fetchArray(SQLITE3_ASSOC)) {
+                $columns = array_keys($row); // Get column names
+                $values = array_values($row); // Get column values
+                
+                // Prepare column names and values for the SQL INSERT INTO statement
+                $columnsList = implode(", ", $columns);
+                $valuesList = implode(", ", array_map(function ($value) {
+                    // Escape string values to prevent SQL injection
+                    return "'" . SQLite3::escapeString($value) . "'";
+                }, $values));
+
+                // Create the INSERT INTO statement for the current row
+                $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
+                
+                // Append the INSERT INTO statement to the output buffer
+                $this->outputBuffer .= $insertSql;
+            }
+
+            // Add an empty line after each table's data
+            $this->outputBuffer .= "\n";
+        }
+    }
+
+    /**
+     * Returns the exported SQL data from the buffer.
+     * 
+     * @return string The SQL export data.
+     */
+    public function getExportData()
+    {
+        return $this->outputBuffer;
+    }
+
+    /**
+     * Saves the exported SQL data to a specified file.
+     * 
+     * @param string $filePath The path where the exported SQL file should be saved.
+     */
+    public function saveToFile($filePath)
+    {
+        // Write the content of the output buffer to the specified file
+        file_put_contents($filePath, $this->outputBuffer);
+    }
+
+    /**
+     * Closes the database connection.
+     */
+    public function close()
+    {
+        // Close the SQLite database connection
+        $this->db->close();
+    }
+}
+
+
+/**
  * Class DatabaseExplorer
  * 
  * This class provides various methods to interact with a database and render the data in HTML format.
