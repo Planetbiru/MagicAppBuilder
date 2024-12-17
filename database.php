@@ -1586,7 +1586,7 @@ else {
             </div>
             
             <div class="modal-body">
-                <textarea name="original" id="original" class="original"></textarea>
+                <textarea name="original" id="original" class="original" spellcheck="false"></textarea>
             </div>
 
             <div class="modal-footer">            

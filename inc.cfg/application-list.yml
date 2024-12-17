@@ -51,7 +51,7 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/lagu'
     author: 'Your Name'
-    selected: true
+    selected: false
 -
     id: lagu2
     name: 'Music Production Manager'
@@ -68,3 +68,11 @@
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
     selected: false
+-
+    id: tukang
+    name: Tukang
+    architecture: monolith
+    description: ''
+    documentRoot: 'C:/bitbucket/tukang'
+    author: Kamshory
+    selected: true

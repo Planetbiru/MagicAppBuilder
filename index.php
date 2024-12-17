@@ -395,6 +395,10 @@ $constSelected = ' selected';
                               <td><label><input type="radio" name="approval_position" id="approval_position" value="before-data"> Before Data</label> &nbsp; <label><input type="radio" name="approval_position" id="approval_position" value="after-data" checked> After Data</label> &nbsp;</td>
                             </tr>
                             <tr>
+                              <td>Approval by Other User</td>
+                              <td><label><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1"> Approval by Other User</label> &nbsp;</td>
+                            </tr>
+                            <tr>
                               <td>Trash</td>
                               <td><label><input type="checkbox" name="with_trash" id="with_trash" value="1"> Trash</label> &nbsp;</td>
                             </tr>
