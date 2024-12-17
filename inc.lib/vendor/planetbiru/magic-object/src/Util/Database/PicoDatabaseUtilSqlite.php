@@ -178,7 +178,9 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 'text' => 'TEXT',
                 'longtext' => 'TEXT',
                 'date' => 'DATE',
-                'timestamp' => 'TIMESTAMP',
+                'timestamp' => 'DATETIME',
+                'timestamp' => 'DATETIME',
+                'time' => 'TIME',
                 'blob' => 'BLOB',
             );
 
@@ -333,7 +335,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Define a mapping of common MySQL types to SQLite types
         $map = array(
             'tinyint(1)' => 'BOOLEAN',  // MySQL 'tinyint(1)' maps to SQLite 'BOOLEAN'
+            'smallint' => 'INT',        // MySQL 'smallint' maps to SQLite 'INT'
+            'mediumint' => 'INT',       // MySQL 'mediumint' maps to SQLite 'INT'
             'integer' => 'INTEGER',     // MySQL 'integer' maps to SQLite 'INTEGER'
+            'int' => 'INT',             // MySQL 'int' maps to SQLite 'INT'
             'float' => 'REAL',          // MySQL 'float' maps to SQLite 'REAL'
             'double' => 'REAL',         // MySQL 'double' maps to SQLite 'REAL'
             'decimal' => 'NUMERIC',     // MySQL 'decimal' maps to SQLite 'NUMERIC'
@@ -342,9 +347,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             'mediumtext' => 'TEXT',     // MySQL 'mediumtext' maps to SQLite 'TEXT'
             'longtext' => 'TEXT',       // MySQL 'longtext' maps to SQLite 'TEXT'
             'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
-            'date' => 'TEXT',           // MySQL 'date' maps to SQLite 'TEXT'
-            'datetime' => 'TEXT',       // MySQL 'datetime' maps to SQLite 'TEXT'
-            'timestamp' => 'TEXT'       // MySQL 'timestamp' maps to SQLite 'TEXT'
+            'datetime' => 'DATETIME',   // MySQL 'datetime' maps to SQLite 'DATETIME'
+            'date' => 'DATE',           // MySQL 'date' maps to SQLite 'DATE'
+            'timestamp' => 'DATETIME',  // MySQL 'timestamp' maps to SQLite 'DATETIME'
+            'time' => 'TIME',           // MySQL 'time' maps to SQLite 'TIME'
         );
 
         // Handle 'enum' types and convert them to 'NVARCHAR' with length based on max enum value length + 2
