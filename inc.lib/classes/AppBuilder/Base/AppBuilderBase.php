@@ -3834,7 +3834,7 @@ $subqueryMap = '.$referece.';
         $btn4->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
         $btn42 = clone $btn4;
 
-        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
+        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.PicoStringUtil::camelize($primaryKeyName).', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
         $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, null, self::REDIRECT_TO_ITSELF);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));

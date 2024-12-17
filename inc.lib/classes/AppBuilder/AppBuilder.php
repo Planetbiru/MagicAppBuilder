@@ -218,6 +218,7 @@ class AppBuilder extends AppBuilderBase
         
         $objectNameBk = $objectName;
         $lines = array();
+        $camelPkName = PicoStringUtil::camelize($pkName);
         $upperPkName = PicoStringUtil::upperCamelize($pkName);
         
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == UserAction::DELETE)";
@@ -232,8 +233,13 @@ class AppBuilder extends AppBuilderBase
         {
             $entityTrashName = $trashEntity->getEntityName();
             $objectTrashName = lcfirst($entityTrashName);
+
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."specification = PicoSpecification::getInstance()";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf($camelPkName).", \$rowId))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.";";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk.parent::CALL_FIND_ONE_BY.$upperPkName."(".parent::VAR."rowId);";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectNameBk."->isset".$upperPkName."())";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;       
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectTrashName, $entityTrashName, $objectNameBk);
@@ -243,12 +249,14 @@ class AppBuilder extends AppBuilderBase
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->where(PicoSpecification::getInstance()";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."specification = PicoSpecification::getInstance()";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf($camelPkName).", \$rowId))";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->delete();";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.";";
+
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->where(".parent::VAR."specification)";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->delete();";
         }   
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."catch(Exception \$e)";    

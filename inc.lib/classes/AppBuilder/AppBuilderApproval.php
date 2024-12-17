@@ -215,17 +215,17 @@ class AppBuilderApproval extends AppBuilderBase
      * Create UPDATE section with approval and trash.
      *
      * @param string $entityName The name of the entity to be deleted.
-     * @param string $pkName The primary key name of the entity.
+     * @param string $primaryKeyName The primary key name of the entity.
      * @param mixed $userAction The user action type (e.g., delete).
      * @param string $waitingForKey The key for the waiting state.
      * @param mixed $waitingForValue The value for the waiting state.
      * @return string The generated code for the delete approval section.
      */
-    public function createDeleteApprovalSectionBase($entityName, $pkName, $userAction, $waitingForKey, $waitingForFalue)
+    public function createDeleteApprovalSectionBase($entityName, $primaryKeyName, $userAction, $waitingForKey, $waitingForFalue)
     {
         $objectName = lcfirst($entityName);
         $lines = array();
-        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($pkName);
+        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $upperWaitingFor = PicoStringUtil::upperCamelize($waitingForKey);
          
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == $userAction)";
@@ -259,10 +259,10 @@ class AppBuilderApproval extends AppBuilderBase
     public function createDeleteApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
         $userAction = 'UserAction::DELETE';
         $waitingForFalue = WaitingFor::DELETE;
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
+        return $this->createWaitingForSectionBase($entityName, $primaryKeyName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
     
     /**
@@ -274,18 +274,18 @@ class AppBuilderApproval extends AppBuilderBase
      * for additional processing upon completion or exceptions.
      *
      * @param string $entityName Name of the entity to be processed.
-     * @param string $pkName Primary key name of the entity.
+     * @param string $primaryKeyName Primary key name of the entity.
      * @param string $userAction User action type (e.g., DELETE, UPDATE).
      * @param mixed $waitingForValue Value indicating the waiting state (e.g., WaitingFor::ACTIVATE).
      * @param callable|null $callbackFinish Optional callback function to execute upon completion.
      * @param callable|null $callbackException Optional callback function to execute on exception.
      * @return string The generated code for the waiting for section.
      */
-    public function createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForValue, $callbackFinish = null, $callbackException = null)
+    public function createWaitingForSectionBase($entityName, $primaryKeyName, $userAction, $waitingForValue, $callbackFinish = null, $callbackException = null)
     {
         $objectName = lcfirst($entityName);
         $lines = array();
-        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($pkName);
+        $camelPrimaryKeyName = PicoStringUtil::camelize($primaryKeyName);
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->getentityInfo()->getWaitingFor());
         $waitingFor = str_replace('UserAction', 'WaitingFor', $userAction);
 
@@ -304,7 +304,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()".parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR."rowId))";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf($camelPrimaryKeyName).", ".parent::VAR."rowId))";
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."PicoSpecification::getInstance()";
@@ -338,7 +338,7 @@ class AppBuilderApproval extends AppBuilderBase
         if(isset($callbackException) && is_callable($callbackException))
         {
             // $objectName, $userAction, $primaryKeyName, $exceptionObject
-            $lines[] = call_user_func($callbackException, $objectName, $userAction, $pkName, '$e');
+            $lines[] = call_user_func($callbackException, $objectName, $userAction, $primaryKeyName, '$e');
         }
         else
         {
@@ -351,7 +351,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         if(isset($callbackFinish) && is_callable($callbackFinish))
         {
-            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $pkName);
+            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $primaryKeyName);
         }
         else
         {
@@ -378,10 +378,10 @@ class AppBuilderApproval extends AppBuilderBase
     public function createActivationApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
         $waitingForFalue = WaitingFor::ACTIVATE;
         $userAction = 'UserAction::ACTIVATE';
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
+        return $this->createWaitingForSectionBase($entityName, $primaryKeyName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
     
     /**
@@ -399,10 +399,10 @@ class AppBuilderApproval extends AppBuilderBase
     public function createDeactivationApprovalSection($mainEntity, $callbackFinish, $callbackException)
     {
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
         $waitingForFalue = WaitingFor::DEACTIVATE;
         $userAction = 'UserAction::DEACTIVATE';
-        return $this->createWaitingForSectionBase($entityName, $pkName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
+        return $this->createWaitingForSectionBase($entityName, $primaryKeyName, $userAction, $waitingForFalue, $callbackFinish, $callbackException);
     }
 
     /**
@@ -423,12 +423,12 @@ class AppBuilderApproval extends AppBuilderBase
         $currentIp = $this->getCurrentAction()->getIpFunction();
 
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
         
         $entityApprovalName = $approvalEntity->getEntityName();
         $entityTrashName = $trashEntity->getEntityName();
         
-        $camelPkName = PicoStringUtil::camelize($pkName);
+        $camelPkName = PicoStringUtil::camelize($primaryKeyName);
         $toBeCopied = array();
         foreach(array_keys($editFields) as $val)
         {
@@ -443,17 +443,21 @@ class AppBuilderApproval extends AppBuilderBase
         $userAction = 'UserAction::APPROVE';
         $objectName = lcfirst($entityName);
         $lines = array();
-        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($pkName);
-        $variableName = PicoStringUtil::camelize($pkName);
+        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
 
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == $userAction)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1."{";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
     
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
+        $lines[] = "";
+
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
+        $lines[] = "";
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
@@ -463,7 +467,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -472,7 +476,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -480,7 +484,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -488,7 +492,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -496,7 +500,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -504,7 +508,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -512,7 +516,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -520,7 +524,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -577,23 +581,27 @@ class AppBuilderApproval extends AppBuilderBase
 
         $entityName = $mainEntity->getEntityName();
         $entityApprovalName = $approvalEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
         $entityInfoName = "entityInfo";
         $entityApvInfoName = "entityApvInfo";
         $userAction = 'UserAction::REJECT';
         $objectName = lcfirst($entityName);
         $lines = array();
-        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($pkName);
-        $variableName = PicoStringUtil::camelize($pkName);
+        $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
 
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == $userAction)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1."{";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$variableName." = ".parent::VAR."inputPost->get".$upperPrimaryKeyName."();";
-    
+        
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
+        $lines[] = "";
+
         $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE_BY.$upperPrimaryKeyName."(".parent::VAR.$variableName.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
+        $lines[] = "";
+
         $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
         $lines[] = parent::TAB1.parent::TAB1."{";
 
@@ -603,14 +611,14 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -649,18 +657,18 @@ class AppBuilderApproval extends AppBuilderBase
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityInfoName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityApvInfoName.", ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null, ".parent::VAR."userId = null) {".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
          
         if($this->appFeatures->getApprovalByAnotherUser())
         {
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE; 
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE; 
         }
         else
         {
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."userId);".parent::NEW_LINE 
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE 
             .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE;
         }
         

@@ -67,7 +67,7 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
-    selected: false
+    selected: true
 -
     id: tukang
     name: Tukang
@@ -75,4 +75,4 @@
     description: ''
     documentRoot: 'C:/bitbucket/tukang'
     author: Kamshory
-    selected: true
+    selected: false

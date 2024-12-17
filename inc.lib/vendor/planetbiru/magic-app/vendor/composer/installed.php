@@ -3,7 +3,7 @@
         'name' => 'planetbiru/magic-app',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '205974301b52adb2682baadb3dea27a40dcf6c7c',
+        'reference' => '1f0a4123144911b9254f7cd6fee6efa361655224',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'planetbiru/magic-app' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '205974301b52adb2682baadb3dea27a40dcf6c7c',
+            'reference' => '1f0a4123144911b9254f7cd6fee6efa361655224',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -22,7 +22,7 @@
         'planetbiru/magic-object' => array(
             'pretty_version' => '2.11.2',
             'version' => '2.11.2.0',
-            'reference' => '00a06886a60e6ae7abce3bb3e25a110dac18e43a',
+            'reference' => '7b83c0bc5f34f88eb0294934ef82287e3b11b1f2',
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-object',
             'aliases' => array(),

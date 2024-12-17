@@ -230,10 +230,11 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Fetch and display the column details
         $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            error_log(json_encode($row, JSON_PRETTY_PRINT));
             $rows[] = array(
                 "Field"   => $row['name'],
                 "Type"    => $row['type'],
-                "Null"    => $row['notnull'] ? 'YES' : 'NO',
+                "Null"    => $row['notnull'] == 1 ? 'NO' : 'YES',
                 "Key"     => $row['pk'] ? 'PRI' : null,
                 "Default" => $row['dflt_value'] ? $row['dflt_value'] : null,
                 "Extra"   => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
@@ -477,7 +478,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $result = $defaultValue;
         if(self::isTypeBoolean($type))
         {
-            $result = $defaultValue != 0 ? 'true' : 'false';
+            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'true' : 'false';
         }
         else if(self::isNativeValue($defaultValue))
         {

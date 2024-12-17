@@ -17,6 +17,7 @@ use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use MagicObject\SecretObject;
+use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 use stdClass;
 
@@ -749,7 +750,7 @@ class ScriptGenerator //NOSONAR
                 '$apiResponse->sendSuccess('.
                 $userAction.
                 ', $'.$objectName.
-                ', Field::of()->'.$primaryKeyName.
+                ', Field::of()->'.PicoStringUtil::camelize($primaryKeyName).
                 ', $inputPost->getCheckedRowId()'.
                 ");";
             };
@@ -758,7 +759,7 @@ class ScriptGenerator //NOSONAR
                 '$apiResponse->sendException('.
                 $userAction.
                 ', $'.$objectName.
-                ', Field::of()->'.$primaryKeyName.
+                ', Field::of()->'.PicoStringUtil::camelize($primaryKeyName).
                 ', $inputPost->getCheckedRowId()'.
                 ', '.$exceptionObject.
                 ");";
