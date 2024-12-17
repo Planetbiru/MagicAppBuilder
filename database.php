@@ -16,6 +16,11 @@ if(isset($databaseConfig))
     require_once (__DIR__) . "/inc.app/database.php";
 }
 
+class DataException extends Exception
+{
+
+}
+
 /**
  * Class DatabaseExplorer
  * 
@@ -30,7 +35,7 @@ if(isset($databaseConfig))
  * - Executing a series of SQL queries and displaying their results.
  * - Creating a query execution form with pre-populated SQL queries.
  */
-class DatabaseExplorer
+class DatabaseExplorer // NOSONAR
 {
     const ERROR = "Error: ";
     
@@ -330,6 +335,51 @@ class DatabaseExplorer
     }
 
     /**
+     * Fetches the column information for a specified table.
+     * 
+     * This function retrieves details about the columns in a specified table, including their data type, nullability, keys, default values, and other related information. It adapts to different database drivers (such as SQLite, MySQL, or PostgreSQL) and returns the column information in an associative array.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $schemaName The name of the schema (for PostgreSQL). For MySQL or SQLite, this can be an empty string.
+     * @param string $table The name of the table whose column structure is to be fetched.
+     * 
+     * @return array An array containing the column details for the specified table. Each entry in the array represents a column and its associated details (e.g., name, type, nullability, etc.).
+     */
+    public static function getColumnInfo($pdo, $schemaName, $table)
+    {
+        $columnCount = 0;
+        $columnRows = []; // List to store column data
+        
+        // Fetch the columns
+        $query = self::getQueryShowColumns($pdo, $schemaName, $table);
+        try
+        {
+            if (isset($query)) {
+                $stmt = $pdo->query($query);
+                
+                if ($stmt) {
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $columnCount++;
+                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+                            // For SQLite
+                            $columns = self::createSqliteColumn($row);
+                        } else {
+                            // For MySQL or PostgreSQL
+                            $columns = $row;
+                        }
+                        $columnRows[] = $columns; // Store row data in the list
+                    }
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            // Do nothing
+        }
+        return $columnRows;
+    }
+
+    /**
      * Displays the structure of a table, including column details like name, type, nullability, key, default value, and extra information.
      *
      * This function fetches the structure of a table (such as columns, types, nullability, primary keys, default values, etc.)
@@ -344,7 +394,7 @@ class DatabaseExplorer
      * 
      * @return string The generated HTML displaying the table structure or an error message if the table is not found.
      */
-    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
+    public static function showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table)
     {
         // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -381,49 +431,31 @@ class DatabaseExplorer
         $thead->appendChild($tr);
         $tableElem->appendChild($thead);
 
-        $columnCount = 0;
-        
-        // Fetch the columns
-        $query = self::getQueryShowColumns($pdo, $schemaName, $table);
-        try
-        {
-            if (isset($query)) {
-                $stmt = $pdo->query($query);
-                
-                if ($stmt) {
-                    $tbody = $dom->createElement('tbody');
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $columnCount++;
-                        $tr = $dom->createElement('tr');
-                        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
-                            // For SQLite
-                            $columns = self::createSqliteColumn($row);
-                        } else {
-                            // For MySQL or PostgreSQL
-                            $columns = $row;
-                        }
-                        foreach ($columns as $value) {
-                            $td = $dom->createElement('td', $value);
-                            $tr->appendChild($td);
-                        }
-                        $tbody->appendChild($tr);
-                    }
-                    $tableElem->appendChild($tbody);
-                }
-            }
-        }
-        catch(Exception $e)
-        {
-            // Do nothing
-        }
+        $columnRows = self::getColumnInfo($pdo, $schemaName, $table);
+
+        $columnCount = count($columnRows);
         
         if($columnCount > 0)
         {
+            // Now render the rows from the list into the table
+            $tbody = $dom->createElement('tbody');
+            foreach ($columnRows as $columns) {
+                $tr = $dom->createElement('tr');
+                foreach ($columns as $value) {
+                    $td = $dom->createElement('td', $value);
+                    $tr->appendChild($td);
+                }
+                $tbody->appendChild($tr);
+            }
+            $tableElem->appendChild($tbody);
+            
+            // Append the table to the div
             $divInner->appendChild($tableElem);
             $dom->appendChild($divOuter);
         }
         else
         {
+            // Handle the case when the table is not found
             $divInner = $dom->createElement('div');
             $divInner->setAttribute('class', 'sql-error');
 
@@ -456,6 +488,7 @@ class DatabaseExplorer
         // Output the HTML
         return $dom->saveHTML();
     }
+
 
     /**
      * Executes a SQL query and displays the result in a table.
@@ -637,46 +670,7 @@ class DatabaseExplorer
             // Append the outer div to the DOM
             $dom->appendChild($divOuter);
 
-            // Pagination navigation with a maximum of 7 pages
-            $paginationDiv = $dom->createElement('div');
-            $paginationDiv->setAttribute('class', 'pagination');
-            $startPage = max(1, $page - 3);
-            $endPage = min($totalPages, $page + 3);
-
-            if ($startPage > 1) {
-                $firstPage = $dom->createElement('a', 'First');
-                $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
-                $paginationDiv->appendChild($firstPage);
-
-                if ($startPage > 2) {
-                    $ellipsis = $dom->createElement('span', '...');
-                    $paginationDiv->appendChild($ellipsis);
-                    $space = $dom->createTextNode(" ");
-                    $paginationDiv->appendChild($space);
-                }
-            }
-
-            for ($i = $startPage; $i <= $endPage; $i++) {
-                $pageLink = $dom->createElement('a', htmlspecialchars($i));
-                $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
-                if ($i == $page) {
-                    $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
-                }
-                $paginationDiv->appendChild($pageLink);
-            }
-
-            if ($endPage < $totalPages) {
-                if ($endPage < $totalPages - 1) {
-                    $ellipsis = $dom->createElement('span', '...');
-                    $paginationDiv->appendChild($ellipsis);
-                    $space = $dom->createTextNode(" ");
-                    $paginationDiv->appendChild($space);
-                }
-
-                $lastPage = $dom->createElement('a', 'Last');
-                $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
-                $paginationDiv->appendChild($lastPage);
-            }
+            $paginationDiv = self::createPagination($dom, $applicationId, $databaseName, $schemaName, $table, $page, $totalPages);
 
             // Append the pagination div to the DOM
             $divOuter->appendChild($paginationDiv);
@@ -700,6 +694,67 @@ class DatabaseExplorer
     }
     
     /**
+     * Generates pagination controls for navigating between pages.
+     * 
+     * This function creates a pagination navigation bar with links to specific pages. It ensures that the displayed page range is centered around the current page, with a maximum of 7 visible page numbers. It also includes links for "First" and "Last" pages with ellipses for skipped pages when necessary.
+     * 
+     * @param DOMDocument $dom The DOMDocument object used to create HTML elements.
+     * @param string $applicationId The application identifier.
+     * @param string $databaseName The name of the database.
+     * @param string $schemaName The name of the schema (for PostgreSQL).
+     * @param string $table The name of the table being paginated.
+     * @param int $page The current page number.
+     * @param int $totalPages The total number of pages available.
+     * 
+     * @return DOMElement The DOM element representing the pagination controls.
+     */
+    public static function createPagination($dom, $applicationId, $databaseName, $schemaName, $table, $page, $totalPages)
+    {
+        // Pagination navigation with a maximum of 7 pages
+        $paginationDiv = $dom->createElement('div');
+        $paginationDiv->setAttribute('class', 'pagination');
+        $startPage = max(1, $page - 3);
+        $endPage = min($totalPages, $page + 3);
+
+        if ($startPage > 1) {
+            $firstPage = $dom->createElement('a', 'First');
+            $firstPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1");
+            $paginationDiv->appendChild($firstPage);
+
+            if ($startPage > 2) {
+                $ellipsis = $dom->createElement('span', '...');
+                $paginationDiv->appendChild($ellipsis);
+                $space = $dom->createTextNode(" ");
+                $paginationDiv->appendChild($space);
+            }
+        }
+
+        for ($i = $startPage; $i <= $endPage; $i++) {
+            $pageLink = $dom->createElement('a', htmlspecialchars($i));
+            $pageLink->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$i");
+            if ($i == $page) {
+                $pageLink->setAttribute('style', 'font-weight: bold;'); //NOSONAR
+            }
+            $paginationDiv->appendChild($pageLink);
+        }
+
+        if ($endPage < $totalPages) {
+            if ($endPage < $totalPages - 1) {
+                $ellipsis = $dom->createElement('span', '...');
+                $paginationDiv->appendChild($ellipsis);
+                $space = $dom->createTextNode(" ");
+                $paginationDiv->appendChild($space);
+            }
+
+            $lastPage = $dom->createElement('a', 'Last');
+            $lastPage->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=$totalPages");
+            $paginationDiv->appendChild($lastPage);
+        }
+
+        return $paginationDiv;
+    }
+
+    /**
      * Generates an HTML form to edit data for a specific row in the table.
      *
      * This function retrieves the data for a given record (identified by the primary key) from the
@@ -716,7 +771,7 @@ class DatabaseExplorer
      *
      * @return string The HTML form as a string, or an error message if something goes wrong.
      *
-     * @throws Exception If there is an error retrieving the data or if no data is found for the given ID.
+     * @throws DataException If there is an error retrieving the data or if no data is found for the given ID.
      */
     public static function editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
     {
@@ -732,10 +787,10 @@ class DatabaseExplorer
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$row) {
-                throw new Exception("Data not found for ID: $primaryKeyValue");
+                throw new DataException("No data found for ID: $primaryKeyValue");
             }
             
-            $referer = $_SERVER['HTTP_REFERER'];
+            $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
             if(!isset($referer) || empty($referer))
             {
                 $referer = '';
@@ -745,6 +800,9 @@ class DatabaseExplorer
             {
                 $backLink = $referer;
             }
+
+            $columnRows = self::getColumnInfo($pdo, $schemaName, $table);
+            $columnTypes = self::getColumnType($columnRows);
 
             // Create form container
             $form = $dom->createElement('form');
@@ -789,8 +847,8 @@ class DatabaseExplorer
 
             // First column - Label
             $tdLabel = $dom->createElement('td');
-            $label = $dom->createElement('label', htmlspecialchars($primaryKeyValue));
-            $label->setAttribute('for', htmlspecialchars($primaryKeyValue));
+            $label = $dom->createElement('label', htmlspecialchars($primaryKeyName));
+            $label->setAttribute('for', htmlspecialchars($primaryKeyName));
             $tdLabel->appendChild($label);
             $tr->appendChild($tdLabel);
 
@@ -820,12 +878,11 @@ class DatabaseExplorer
 
                     // Second column - Textarea field
                     $tdInput = $dom->createElement('td');
-                    $textarea = $dom->createElement('textarea');
-                    $textarea->setAttribute('name', htmlspecialchars($key));
-                    $textarea->setAttribute('class', 'data-editor');
-                    $textarea->setAttribute('spellcheck', 'false');
-                    $textarea->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
-                    $tdInput->appendChild($textarea);
+
+                    $type = isset($columnTypes[$key]) ? $columnTypes[$key] : 'text';
+                    $input = self::getEditor($dom, $key, $value, $type);
+                    
+                    $tdInput->appendChild($input);
                     $tr->appendChild($tdInput);
 
                     // Append row to the table
@@ -856,7 +913,7 @@ class DatabaseExplorer
             $space = $dom->createTextNode(' ');
             $form->appendChild($space);
             
-            // Add the submit back
+            // Add the back button
             $inputBack = $dom->createElement('input');
             $inputBack->setAttribute('type', 'button');
             $inputBack->setAttribute('name', 'back');
@@ -871,6 +928,123 @@ class DatabaseExplorer
         } catch (Exception $e) {
             return "Error: " . $e->getMessage();
         }
+    }
+
+    /**
+     * Generates an HTML editor element (input or textarea) based on the provided type.
+     * 
+     * This function creates an appropriate form element for editing data based on the column's data type. It returns an `<input>` element for numeric types (`int`, `float`, `double`, etc.) and a `<textarea>` element for other types such as strings. The function adjusts the input's attributes according to the data type, such as `step` for numeric inputs and `spellcheck` for text areas.
+     * 
+     * @param DOMDocument $dom The DOMDocument object used to create HTML elements.
+     * @param string $key The name or identifier for the input field (usually the column name).
+     * @param mixed $value The current value of the field to be edited.
+     * @param string $type The data type of the field (e.g., "int", "float", "string", etc.).
+     * 
+     * @return DOMElement|false A DOM element representing the input or textarea, or `false` if no valid element can be created.
+     */
+    public static function getEditor($dom, $key, $value, $type)
+    {
+        if(self::isInteger($type))
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'number');
+            $input->setAttribute('step', '1');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+        }
+        else if(self::isFloat($type))
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'number');
+            $input->setAttribute('step', 'any');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+            return $input;
+        }
+        else if(self::isDateTime($type))
+        {
+            $input = $dom->createElement('input');
+            $input->setAttribute('type', 'text');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('value', $value);  
+        }
+        else
+        {
+            $input = $dom->createElement('textarea');
+            $input->setAttribute('name', htmlspecialchars($key));
+            $input->setAttribute('class', 'data-editor');
+            $input->setAttribute('spellcheck', 'false');
+            $input->nodeValue = htmlspecialchars($value);  // Set the value inside the textarea
+        }
+        return $input;
+    }
+    
+    /**
+     * Determines if the given type represents an integer.
+     *
+     * This method checks if the provided string matches any of the common integer
+     * types used in databases, such as tinyint, smallint, mediumint, bigint, or int.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents an integer, otherwise false.
+     */
+    private static function isInteger($type)
+    {
+        return stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0;
+    }
+
+    /**
+     * Determines if the given type represents a floating-point number.
+     *
+     * This method checks if the provided string matches any of the common floating-point
+     * types used in databases, such as float, double, real, or decimal.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents a floating-point number, otherwise false.
+     */
+    private static function isFloat($type)
+    {
+        return stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0;
+    }
+
+    /**
+     * Determines if the given type represents a date or time.
+     *
+     * This method checks if the provided string matches any of the common date and time
+     * types used in databases, such as datetime, date, or time.
+     *
+     * @param string $type The type to check.
+     * @return bool True if the type represents a date or time, otherwise false.
+     */
+    private static function isDateTime($type)
+    {
+        return stripos($type, 'datetime') === 0 || stripos($type, 'date') === 0 || stripos($type, 'time') === 0;
+    }
+
+
+    /**
+     * Extracts the column types from an array of column details.
+     * 
+     * This function processes an array of column data, which includes details about each column in a table. It returns an associative array where the keys are the column names, and the values are their corresponding data types.
+     *
+     * @param array $columnRows An array of column details, where each entry contains information about a specific column, including the 'Field' (column name) and 'Type' (column data type).
+     * 
+     * @return array An associative array where the keys are column names, and the values are the corresponding column types.
+     */
+    public static function getColumnType($columnRows)
+    {
+        $map = array();
+        if(isset($columnRows) && is_array($columnRows) && !empty($columnRows))
+        {
+            foreach($columnRows as $col)
+            {
+                $map[$col['Field']] = $col['Type'];
+            }
+        }
+        return $map;
     }
 
     /**
@@ -940,12 +1114,12 @@ class DatabaseExplorer
     public static function createSqliteColumn($row)
     {
         return [
-            'Field'=>$row['name'], 
-            'Type'=>$row['type'], 
-            'Null'=>$row['notnull'] ? 'NO' : 'YES', 
-            'Key'=>$row['pk'] == 1 ? 'PRI' : '', 
-            'Default'=>$row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
-            'Extra'=>strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
+            'Field'   => $row['name'], 
+            'Type'    => $row['type'], 
+            'Null'    => $row['notnull'] ? 'NO' : 'YES', 
+            'Key'     => $row['pk'] == 1 ? 'PRI' : '', 
+            'Default' => $row['dflt_value'] ? $row['dflt_value'] : 'NULL', 
+            'Extra'   => strtoupper($row['type']) == 'INTEGER' && $row['pk'] == 1 ? 'auto_increment' : ''
         ];
     }
 
@@ -970,6 +1144,10 @@ class DatabaseExplorer
         else if($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
             $label = 'Execute Query (SQLite)';
+        }
+        else if($dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB)
+        {
+            $label = 'Execute Query (MariaDB)';
         }
         else
         {
@@ -1334,7 +1512,7 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <link rel="stylesheet" href="css/database-explorer.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>

@@ -3436,7 +3436,7 @@ function generateSelectFilter(field, args)  //NOSONAR
   for (i in matchByType) {
     j = matchByType[i];
     for (k in j) {
-      if (columnType.indexOf(j[k]) != -1) {
+      if (columnType.toLowerCase().indexOf(j[k].toLowerCase()) != -1) {
         filterType = i;
         found = true;
         break;
@@ -3541,7 +3541,7 @@ function generateSelectType(field, args) {
   for (i in matchByType) {
     j = matchByType[i];
     for (k in j) {
-      if (dataType.indexOf(j[k]) != -1) {
+      if (dataType.toLowerCase().indexOf(j[k].toLowerCase()) != -1) {
         filterType = i;
         found = true;
         break;

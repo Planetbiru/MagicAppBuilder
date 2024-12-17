@@ -112,6 +112,7 @@ try
             $allQueries[] = "-- Queries must be executed one by one manually,";
             $allQueries[] = "-- as there may be duplicate columns from different entities in the same table.";
             $allQueries[] = "-- Consider merging queries by table to avoid duplication.";
+            $allQueries[] = "";
             $inputEntity = $inputPost->getEntity();
             foreach($inputEntity as $entityName)
             {

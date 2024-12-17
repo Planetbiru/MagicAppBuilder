@@ -83,7 +83,7 @@ class AppEntityGenerator extends PicoEntityGenerator
      */
     public function isEntityExists($realEntityName = null, $realTableName = null)
     {
-        $picoTableName = $this->tableName;
+        $tableName = $this->tableName;
         if($realEntityName != null)
         {
             $className = $realEntityName;
@@ -94,7 +94,7 @@ class AppEntityGenerator extends PicoEntityGenerator
         }
         else
         {
-            $className = ucfirst(PicoStringUtil::camelize($picoTableName));
+            $className = ucfirst(PicoStringUtil::camelize($tableName));
         }
         $fileName = $this->baseNamespace."/".$className;
         $path = $this->baseDir."/".$fileName.".php";
@@ -140,10 +140,10 @@ class AppEntityGenerator extends PicoEntityGenerator
      * Get the class name based on provided parameters.
      *
      * @param string|null $realEntityName Optional real entity name to use.
-     * @param string $picoTableName The name of the table to base the class name on.
+     * @param string $tableName The name of the table to base the class name on.
      * @return string Returns the determined class name.
      */
-    private function getClassName($realEntityName, $picoTableName)
+    private function getClassName($realEntityName, $tableName)
     {
         if($realEntityName != null)
         {
@@ -155,7 +155,7 @@ class AppEntityGenerator extends PicoEntityGenerator
         }
         else
         {
-            $className = ucfirst(PicoStringUtil::camelize($picoTableName));
+            $className = ucfirst(PicoStringUtil::camelize($tableName));
         }
         return $className;
     }
@@ -171,13 +171,13 @@ class AppEntityGenerator extends PicoEntityGenerator
     {
         if($realTableName != null)
         {
-            $picoTableName = $realTableName;
+            $tableName = $realTableName;
         }
         else
         {
-            $picoTableName = $this->tableName;
+            $tableName = $this->tableName;
         }
-        return $picoTableName;
+        return $tableName;
     }
 
     /**
@@ -275,9 +275,9 @@ class AppEntityGenerator extends PicoEntityGenerator
     {
         $typeMap = $this->getTypeMap();
         $columnMap = $this->getColumnMap();
-        $picoTableName = $this->tableName;
+        $tableName = $this->tableName;
         
-        $className = $this->getClassName($realEntityName, $picoTableName);
+        $className = $this->getClassName($realEntityName, $tableName);
         
         $fileName = $this->baseNamespace."/".$className;
         $path = $this->baseDir."/".$fileName.".php";
@@ -287,14 +287,14 @@ class AppEntityGenerator extends PicoEntityGenerator
         
         $this->prepareDir($dir);
 
-        $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
+        $rows = PicoColumnGenerator::getColumnList($this->database, $tableName);
         
         if($this->atLeastOneNotNull($predecessorField, $successorField))
         {
             $rows = $this->updateField($rows, $predecessorField, $successorField, $removePk);
         }
 
-        $picoTableName = $this->getTableName($realTableName);
+        $tableName = $this->getTableName($realTableName);
         $reservedColumns = $this->getReservedColumns();     
 
         $attrs = array();
@@ -340,19 +340,19 @@ namespace '.$this->baseNamespace.';
 use MagicObject\MagicObject;'.implode("\r\n", $uses).'
 
 /**
- * The '.$className.' class represents an entity in the "'.$picoTableName.'" table.
+ * The '.$className.' class represents an entity in the "'.$tableName.'" table.
  *
- * This entity maps to the "'.$picoTableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "'.$tableName.'" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
- * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @package '.$this->baseNamespace.'
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
- * @Table(name="'.$picoTableName.'")
+ * @Table(name="'.$tableName.'")
  */
 class '.$className.' extends MagicObject
 {

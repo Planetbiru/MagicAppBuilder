@@ -5,88 +5,63 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityModule is entity of table module. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityWorkspace is entity of table wokspace. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="module")
+ * @Table(name="application")
  */
-class EntityModule extends MagicObject
+class EntityWorkspace extends MagicObject
 {
 	/**
-	 * Module ID
+	 * Workspace ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Module ID")
+	 * @Column(name="workspace_id", type="varchar(255)", length=255, nullable=false, extra="auto_increment")
+	 * @Label(content="Workspace ID")
 	 * @var string
 	 */
-	protected $moduleId;
+	protected $workspaceId;
 
-    /**
-	 * User ID
+	/**
+	 * Name
 	 * 
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User ID")
+	 * @Column(name="name", type="varchar(255)", length=255, nullable=true)
+	 * @Label(content="Name")
 	 * @var string
 	 */
-	protected $userId;
+	protected $name;
 
-    /**
-     * User
-     *
-     * @JoinColumn(name="user_id" referenceColumnName="user_id")
-     * @var EntityUser
-     */
-    protected $user;
+	/**
+	 * Description
+	 * 
+	 * @Column(name="description", type="text", nullable=true)
+	 * @Label(content="Description")
+	 * @var string
+	 */
+	protected $description;
     
     /**
-	 * Application ID
+	 * Directory
 	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application ID")
+	 * @Column(name="directory", type="text", nullable=true)
+	 * @Label(content="Directory")
 	 * @var string
 	 */
-	protected $applicationId;
-
+	protected $directory;
+    
     /**
-     * Application
-     *
-     * @JoinColumn(name="application_id" referenceColumnName="application_id")
-     * @var EntityApplication
-     */
-    protected $application;
-
-    /**
-	 * File Name
+	 * Author
 	 * 
-	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="File Name")
+	 * @Column(name="author", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Author")
 	 * @var string
 	 */
-	protected $fileName;
-
-    /**
-	 * Directory Name
-	 * 
-	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Directory Name")
-	 * @var string
-	 */
-	protected $directoryName;
-
-    /**
-	 * Reference Value
-	 * 
-	 * @Column(name="reference_value", type="longtext", nullable=true)
-	 * @Label(content="Reference Value")
-	 * @var string
-	 */
-	protected $referenceValue;
+	protected $author;
     
     /**
 	 * Time Create
@@ -105,7 +80,7 @@ class EntityModule extends MagicObject
 	 * @var string
 	 */
 	protected $timeEdit;
-
+    
     /**
 	 * Admin Create
 	 * 
@@ -141,5 +116,15 @@ class EntityModule extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
+
+	/**
+	 * Active
+	 * 
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @Label(content="Active")
+	 * @var boolean
+	 */
+	protected $active;
 
 }

@@ -177,8 +177,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
                 'float' => 'REAL',
                 'text' => 'TEXT',
                 'longtext' => 'TEXT',
+                'datetime' => 'DATETIME',
                 'date' => 'DATE',
                 'timestamp' => 'TIMESTAMP',
+                'time' => 'TIME',
                 'blob' => 'BLOB',
             );
 
@@ -229,12 +231,12 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $rows[] = array(
-                "Field" => $row['name'],
-                "Type" => $row['type'],
-                "Null" => $row['notnull'] ? 'YES' : 'NO',
-                "Key" => $row['pk'] ? 'PRI' : null,
+                "Field"   => $row['name'],
+                "Type"    => $row['type'],
+                "Null"    => $row['notnull'] ? 'YES' : 'NO',
+                "Key"     => $row['pk'] ? 'PRI' : null,
                 "Default" => $row['dflt_value'] ? $row['dflt_value'] : null,
-                "Extra" => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
+                "Extra"   => ($row['pk'] == 1 && strtoupper($row['type']) === 'INTEGER') ? 'auto_increment' : null
             );
         }
         return $rows;
@@ -333,7 +335,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Define a mapping of common MySQL types to SQLite types
         $map = array(
             'tinyint(1)' => 'BOOLEAN',  // MySQL 'tinyint(1)' maps to SQLite 'BOOLEAN'
+            'smallint' => 'INT',        // MySQL 'smallint' maps to SQLite 'INT'
+            'mediumint' => 'INT',       // MySQL 'mediumint' maps to SQLite 'INT'
             'integer' => 'INTEGER',     // MySQL 'integer' maps to SQLite 'INTEGER'
+            'int' => 'INT',             // MySQL 'int' maps to SQLite 'INT'
             'float' => 'REAL',          // MySQL 'float' maps to SQLite 'REAL'
             'double' => 'REAL',         // MySQL 'double' maps to SQLite 'REAL'
             'decimal' => 'NUMERIC',     // MySQL 'decimal' maps to SQLite 'NUMERIC'
@@ -342,9 +347,10 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             'mediumtext' => 'TEXT',     // MySQL 'mediumtext' maps to SQLite 'TEXT'
             'longtext' => 'TEXT',       // MySQL 'longtext' maps to SQLite 'TEXT'
             'text' => 'TEXT',           // MySQL 'text' maps to SQLite 'TEXT'
-            'date' => 'TEXT',           // MySQL 'date' maps to SQLite 'TEXT'
-            'datetime' => 'TEXT',       // MySQL 'datetime' maps to SQLite 'TEXT'
-            'timestamp' => 'TEXT'       // MySQL 'timestamp' maps to SQLite 'TEXT'
+            'datetime' => 'DATETIME',   // MySQL 'datetime' maps to SQLite 'DATETIME'
+            'date' => 'DATE',           // MySQL 'date' maps to SQLite 'DATE'
+            'timestamp' => 'TIMESTAMP', // MySQL 'timestamp' maps to SQLite 'TIMESTAMP'
+            'time' => 'TIME',           // MySQL 'time' maps to SQLite 'TIME'
         );
 
         // Handle 'enum' types and convert them to 'NVARCHAR' with length based on max enum value length + 2

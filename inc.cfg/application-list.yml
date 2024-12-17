@@ -46,12 +46,12 @@
     selected: false
 -
     id: lagu
-    name: Lagu
-    architecture: ''
-    description: Description
+    name: Apa
+    architecture: monolith
+    description: ''
     documentRoot: 'D:/xampp/htdocs/lagu'
     author: 'Your Name'
-    selected: false
+    selected: true
 -
     id: lagu2
     name: 'Music Production Manager'
@@ -62,9 +62,9 @@
     selected: false
 -
     id: sipro-gitlab
-    name: SIPRO
+    name: 'SIPRO GITLAB'
     architecture: monolith
     description: ''
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
-    selected: true
+    selected: false
