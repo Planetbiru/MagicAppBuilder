@@ -2025,6 +2025,8 @@ $lastQueries = "";
 
 if(isset($_POST['___export_database___']) || isset($_POST['___export_table___']))
 {
+    $maxRecord = 200;
+    $maxQuerySize = 524288;
     
     $tables = [];
     if(isset($_POST['___export_table___']) && trim($_POST['___export_table___']) != "")
@@ -2038,7 +2040,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
         $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
     }
     $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
-    $exporter->export($tables, $schemaName, 100, 524288);
+    $exporter->export($tables, $schemaName, $maxRecord, $maxQuerySize);
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
     echo $exporter->getExportData();
