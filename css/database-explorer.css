@@ -139,6 +139,7 @@ textarea:focus-visible {
   border: 1px solid transparent;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  margin-bottom: 4px;
 }
 
 /* btn-primary */

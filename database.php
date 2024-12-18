@@ -22,102 +22,425 @@ class DataException extends Exception
 }
 
 /**
- * Class SQLiteExporter
+ * Class DatabaseExporter
  * 
- * A class to export both the structure (CREATE TABLE) and data (INSERT INTO) of all tables from a SQLite database into an SQL file.
+ * A class to export both the structure (CREATE TABLE) and data (INSERT INTO) of all tables 
+ * from different database types: SQLite, MySQL, and PostgreSQL using PDO.
  */
-class SQLiteExporter
+class DatabaseExporter
 {
-    private $db; // SQLite3 database connection
-    private $outputBuffer; // Buffer to store the SQL export data
+    const DATABASE_TYPE_SQLITE = 'sqlite';
+    const DATABASE_TYPE_MYSQL = 'mysql';
+    const DATABASE_TYPE_MARIADB = 'mariadb';
+    const DATABASE_TYPE_PGSQL = 'pgsql';
+
 
     /**
-     * SQLiteExporter constructor.
+     * Database connection (SQLite, MySQL, or PostgreSQL)
      * 
-     * Opens a connection to the SQLite database and initializes the output buffer.
+     * @var PDO
+     */
+    private $db; 
+
+    /**
+     * Buffer to store the SQL export data
+     * 
+     * @var string
+     */
+    private $outputBuffer; 
+
+    /**
+     * Database type (sqlite, mysql, or postgresql)
+     * 
+     * @var string
+     */
+    private $dbType; 
+
+    /**
+     * DatabaseExporter constructor.
+     * 
+     * Initializes the database connection based on the specified database type.
      *
-     * @param string $database The path to the SQLite database file.
+     * @param string $dbType The type of the database (PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_MYSQL, PicoDatabaseType::DATABASE_TYPE_PGSQL).
+     * @param PDO $pdo The PDO instance for the database connection.
      */
-    public function __construct($database)
+    public function __construct($dbType, $pdo)
     {
-        // Establish connection to SQLite database
-        $this->db = new SQLite3($database);
-        
-        // Initialize the output buffer
+        $this->dbType = strtolower($dbType);
         $this->outputBuffer = '';
+
+        $this->db = $pdo;
     }
 
     /**
-     * Exports both table structure (CREATE TABLE) and data (INSERT INTO) from the SQLite database.
+     * Exports both table structure (CREATE TABLE) and data (INSERT INTO).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      */
-    public function export()
+    public function export($tables = null)
     {
-        // Export table structure (CREATE TABLE)
-        $this->exportTableStructure();
-
-        // Export table data (INSERT INTO)
-        $this->exportTableData();
+        $this->outputBuffer .= "-- Database structure\r\n\r\n";
+        $this->exportTableStructure($tables);
+        $this->outputBuffer .= "-- Database content\r\n";
+        $this->exportTableData($tables);
     }
 
     /**
-     * Exports the structure of all tables in the SQLite database (CREATE TABLE).
+     * Exports the structure of all tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
      */
-    private function exportTableStructure()
+    private function exportTableStructure($tables, $schema = 'public')
     {
-        // Query to get all table names from the database
-        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        switch ($this->dbType) {
+            case PicoDatabaseType::DATABASE_TYPE_SQLITE:
+                $this->exportSQLiteTableStructure($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_MYSQL:
+            case PicoDatabaseType::DATABASE_TYPE_MARIADB:
+                $this->exportMySQLTableStructure($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_PGSQL:
+                $this->exportPostgreSQLTableStructure($tables, $schema);
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    /**
+     * Determines if a table should be exported based on the provided list.
+     *
+     * @param string $table The table to check.
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @return bool True if the table should be exported, false otherwise.
+     */
+    private function toBeExported($table, $tables)
+    {
+        // Trim whitespace from the table name and the provided table list
+        $table = trim($table);
         
-        // Loop through all tables
-        while ($table = $result->fetchArray(SQLITE3_ASSOC)) {
+        if (!isset($tables) || !is_array($tables) || empty($tables)) {
+            return true;
+        }
+        
+        // Compare trimmed table names (case insensitive)
+        return in_array(strtolower($table), array_map(function($t) { return strtolower(trim($t)); }, $tables));
+    }
+
+    /**
+     * Exports the structure of SQLite tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     */
+    private function exportSQLiteTableStructure($tables)
+    {
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['name'];
-
-            // Get the CREATE TABLE SQL command for the current table
-            $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
-            $createTableSql = $createTable->fetchArray(SQLITE3_ASSOC)['sql'];
-
-            // Append the CREATE TABLE SQL to the output buffer
-            $this->outputBuffer .= "$createTableSql;\n\n";
+            if($this->toBeExported($tableName, $tables))
+            {
+                $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
+                $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['sql'];
+                $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
+                $this->outputBuffer .= "$createTableSql;\n\n";
+            }
         }
     }
 
     /**
-     * Exports the data of all tables in the SQLite database (INSERT INTO).
+     * Exports the structure of MySQL tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      */
-    private function exportTableData()
+    private function exportMySQLTableStructure($tables)
     {
-        // Query to get all table names from the database
-        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        $result = $this->db->query('SHOW TABLES');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = array_values($table)[0];
+            if($this->toBeExported($tableName, $tables))
+            {
+                $createTable = $this->db->query("SHOW CREATE TABLE $tableName");
+                $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['Create Table'];
+                $this->outputBuffer .= "$createTableSql;\n\n";
+            }
+        }
+    }
+
+    /**
+     * Exports the structure of PostgreSQL tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     */
+    private function exportPostgreSQLTableStructure($tables, $schema = 'public')
+    {
+        // Query to get all table names in PostgreSQL for the specified schema
+        $result = $this->db->query("
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = '$schema';
+        ");
         
-        // Loop through all tables
-        while ($table = $result->fetchArray(SQLITE3_ASSOC)) {
-            $tableName = $table['name'];
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['table_name'];
+            if ($this->toBeExported($tableName, $tables)) {
+                $primaryKeyColumns = [];
+                $foreignKeys = [];
 
-            // Query to fetch all rows of the current table
-            $rows = $this->db->query("SELECT * FROM $tableName;");
-            
-            // Loop through all rows of the current table
-            while ($row = $rows->fetchArray(SQLITE3_ASSOC)) {
-                $columns = array_keys($row); // Get column names
-                $values = array_values($row); // Get column values
-                
-                // Prepare column names and values for the SQL INSERT INTO statement
-                $columnsList = implode(", ", $columns);
-                $valuesList = implode(", ", array_map(function ($value) {
-                    // Escape string values to prevent SQL injection
-                    return "'" . SQLite3::escapeString($value) . "'";
-                }, $values));
+                $columns = $this->getPostgreSQLColumn($tableName, $schema);
 
-                // Create the INSERT INTO statement for the current row
-                $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
-                
-                // Append the INSERT INTO statement to the output buffer
-                $this->outputBuffer .= $insertSql;
+                // Query to get primary key columns
+                $primaryKeyQuery = $this->db->query("
+                    SELECT 
+                        tc.constraint_name, 
+                        tc.table_name, 
+                        kcu.column_name
+                    FROM 
+                        information_schema.table_constraints AS tc 
+                    INNER JOIN 
+                        information_schema.key_column_usage AS kcu 
+                    ON 
+                        tc.constraint_name = kcu.constraint_name
+                    WHERE 
+                        tc.constraint_type = 'PRIMARY KEY'
+                        AND tc.table_name = '$tableName'
+                        AND tc.table_schema = '$schema';
+                ");
+
+                while ($primaryKey = $primaryKeyQuery->fetch(PDO::FETCH_ASSOC)) {
+                    $primaryKeyColumns[] = $primaryKey['column_name'];
+                }
+
+                // Add PRIMARY KEY constraint if applicable
+                if (!empty($primaryKeyColumns)) {
+                    $columns[] = 'PRIMARY KEY (' . implode(', ', $primaryKeyColumns) . ')';
+                }
+
+                // Query to get foreign keys
+                $foreignKeyQuery = $this->db->query("
+                    SELECT 
+                        tc.constraint_name, 
+                        tc.table_name, 
+                        kcu.column_name, 
+                        ccu.table_name AS referenced_table,
+                        ccu.column_name AS referenced_column
+                    FROM 
+                        information_schema.table_constraints AS tc 
+                    INNER JOIN 
+                        information_schema.key_column_usage AS kcu 
+                    ON 
+                        tc.constraint_name = kcu.constraint_name
+                    INNER JOIN 
+                        information_schema.constraint_column_usage AS ccu 
+                    ON 
+                        tc.constraint_name = ccu.constraint_name
+                    WHERE 
+                        tc.constraint_type = 'FOREIGN KEY'
+                        AND tc.table_name = '$tableName'
+                        AND tc.table_schema = '$schema';
+                ");
+
+                while ($foreignKey = $foreignKeyQuery->fetch(PDO::FETCH_ASSOC)) {
+                    $foreignKeys[] = 'FOREIGN KEY (' . $foreignKey['column_name'] . ') REFERENCES ' . $foreignKey['referenced_table'] . ' (' . $foreignKey['referenced_column'] . ')';
+                }
+
+                // Add FOREIGN KEY constraint if applicable
+                if (!empty($foreignKeys)) {
+                    $columns = array_merge($columns, $foreignKeys);
+                }
+
+                // Construct CREATE TABLE statement
+                $createTableSql = "CREATE TABLE $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
+                $this->outputBuffer .= "$createTableSql\n\n";
+            }
+        }
+    }
+
+
+    /**
+     * Retrieves the column details for a given PostgreSQL table.
+     * 
+     * This method queries the `information_schema.columns` to get the column names, 
+     * data types, nullable constraints, and default values for a table in PostgreSQL.
+     *
+     * @param string $tableName The name of the table whose columns are to be retrieved.
+     * @param string $schema The schema where the table resides (default is 'public').
+     * 
+     * @return array An array of column definitions, including name, data type, 
+     *               nullable constraints, and default values.
+     */
+    private function getPostgreSQLColumn($tableName, $schema = 'public')
+    {
+        // Query to get column details (name, data type, nullable, default)
+        $createTableQuery = $this->db->query("
+            SELECT column_name, data_type, is_nullable, column_default 
+            FROM information_schema.columns 
+            WHERE table_name = '$tableName' 
+            AND table_schema = '$schema';
+        ");
+
+        $columns = [];
+
+        // Collect column definitions
+        while ($column = $createTableQuery->fetch(PDO::FETCH_ASSOC)) {
+            $columnDefinition = $column['column_name'] . ' ' . $column['data_type'];
+
+            // Add NOT NULL constraint if applicable
+            if (strtoupper($column['is_nullable']) == 'NO') {
+                $columnDefinition .= ' NOT NULL';
             }
 
-            // Add an empty line after each table's data
-            $this->outputBuffer .= "\n";
+            // Add default value if applicable
+            if ($column['column_default'] !== null) {
+                $columnDefinition .= ' DEFAULT ' . $column['column_default'];
+            }
+
+            $columns[] = $columnDefinition;
+        }
+
+        return $columns;
+    }
+
+
+    /**
+     * Exports the data (INSERT INTO) of all tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     */
+    private function exportTableData($tables, $schema = 'public')
+    {
+        switch ($this->dbType) {
+            case PicoDatabaseType::DATABASE_TYPE_SQLITE:
+                $this->exportSQLiteTableData($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_MYSQL:
+            case PicoDatabaseType::DATABASE_TYPE_MARIADB:
+                        $this->exportMySQLTableData($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_PGSQL:
+                $this->exportPostgreSQLTableData($tables, $schema);
+                break;
+            default:
+                break;
         }
     }
+
+
+    /**
+     * Exports the data (INSERT INTO) of SQLite tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     */
+    private function exportSQLiteTableData($tables)
+    {
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['name'];
+            if($this->toBeExported($tableName, $tables))
+            {
+                $rows = $this->db->query("SELECT * FROM $tableName;");
+                $nrec = 0;
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $columnsList = implode(", ", $columns);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
+                    $this->outputBuffer .= $insertSql;
+                    $nrec++;
+                }
+                if($nrec > 0)
+                {
+                    $this->outputBuffer .= "\n";
+                }
+            }
+        }
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of MySQL tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     */
+    private function exportMySQLTableData($tables)
+    {
+        $result = $this->db->query('SHOW TABLES');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName =array_values($table)[0];
+            if($this->toBeExported($tableName, $tables))
+            {
+                $rows = $this->db->query("SELECT * FROM $tableName");
+                $nrec = 0;
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $columnsList = implode(", ", $columns);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
+                    $this->outputBuffer .= $insertSql;
+                    $nrec++;
+                }
+                if($nrec > 0)
+                {
+                    $this->outputBuffer .= "\n";
+                }
+            }
+        }
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of PostgreSQL tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     */
+    private function exportPostgreSQLTableData($tables, $schema = 'public')
+    {
+        // Query to get all table names in the specified schema
+        $result = $this->db->query("
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = '$schema';
+        ");
+
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['table_name'];
+            if ($this->toBeExported($tableName, $tables)) {
+                // Query to get all rows from the specified table
+                $rows = $this->db->query("SELECT * FROM $schema.$tableName");
+                $nrec = 0;
+                
+                // Iterate through the rows and generate INSERT INTO statements
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $columnsList = implode(", ", $columns);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    
+                    // Generate the INSERT INTO statement for the row
+                    $insertSql = "INSERT INTO $schema.$tableName ($columnsList) VALUES ($valuesList);\n";
+                    $this->outputBuffer .= $insertSql;
+                    $nrec++;
+                }
+                
+                // Add an empty line after each table's data export if it has data
+                if ($nrec > 0) {
+                    $this->outputBuffer .= "\n";
+                }
+            }
+        }
+    }
+
 
     /**
      * Returns the exported SQL data from the buffer.
@@ -136,20 +459,9 @@ class SQLiteExporter
      */
     public function saveToFile($filePath)
     {
-        // Write the content of the output buffer to the specified file
         file_put_contents($filePath, $this->outputBuffer);
     }
-
-    /**
-     * Closes the database connection.
-     */
-    public function close()
-    {
-        // Close the SQLite database connection
-        $this->db->close();
-    }
 }
-
 
 /**
  * Class DatabaseExplorer
@@ -1091,7 +1403,6 @@ class DatabaseExplorer // NOSONAR
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('value', $value);  
-            return $input;
         }
         else if(self::isDateTime($type))
         {
@@ -1305,10 +1616,12 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($br);
 
         // Create submit button
-        $submit = $dom->createElement('input');
+        $submit = $dom->createElement('button');
         $submit->setAttribute('type', 'submit');
         $submit->setAttribute('value', 'Execute');
         $submit->setAttribute('class', 'btn btn-success execute');
+        $buttonText = $dom->createTextNode('Execute');
+        $submit->appendChild($buttonText);
         $form->appendChild($submit);
 
         // Add space between buttons
@@ -1316,10 +1629,11 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($space);
 
         // Create reset button
-        $reset = $dom->createElement('input');
+        $reset = $dom->createElement('button');
         $reset->setAttribute('type', 'reset');
         $reset->setAttribute('value', 'Reset');
         $reset->setAttribute('class', 'btn btn-warning reset');
+        $reset->appendChild($dom->createTextNode('Reset'));
         $form->appendChild($reset);
         
         // Add space between buttons
@@ -1327,11 +1641,48 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($space);
         
         // Create importStructure button
-        $importStructure = $dom->createElement('input');
+        $importStructure = $dom->createElement('button');
         $importStructure->setAttribute('type', 'button');
         $importStructure->setAttribute('value', 'Import Structure');
         $importStructure->setAttribute('class', 'btn btn-primary import-structure');
+        $importStructure->appendChild($dom->createTextNode('Import Structure'));
         $form->appendChild($importStructure);
+
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
+        // Create exportTable button
+
+        $inputGet = new InputGet();
+
+        $tableName = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+        $exportTable = $dom->createElement('button');
+        $exportTable->setAttribute('type', 'submit');
+        $exportTable->setAttribute('name', '___export_table___');
+        $exportTable->setAttribute('value', $tableName);
+        $exportTable->setAttribute('class', 'btn btn-primary');
+        $exportTable->appendChild($dom->createTextNode('Export Table'));
+        $form->appendChild($exportTable);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
+        // Create exportDatabase button
+        $exportDatabase = $dom->createElement('button');
+        $exportDatabase->setAttribute('type', 'submit');
+        $exportDatabase->setAttribute('name', '___export_database___');
+        $exportDatabase->setAttribute('value', $databaseName);
+        $exportDatabase->setAttribute('class', 'btn btn-primary');
+        $exportDatabase->appendChild($dom->createTextNode('Export Database'));
+        $form->appendChild($exportDatabase);
+        
+
+        //<button class="btn btn-primary" type="submit" name="___export_database___" value="yes">Export Database</button>
+
 
         // Append form to DOM
         $dom->appendChild($form);
@@ -1587,6 +1938,28 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Initialize variables for query processing
 $queries = array();
 $lastQueries = "";
+
+if(isset($_POST['___export_database___']) || isset($_POST['___export_table___']))
+{
+    
+    $tables = [];
+    if(isset($_POST['___export_table___']) && trim($_POST['___export_table___']) != "")
+    {
+        $tableName = $_POST['___export_table___'];
+        $tables[] = $tableName;
+        $filename = $tableName."-".date("Y-m-d-H-i-s").".sql";
+    }
+    else
+    {
+        $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
+    }
+    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter->export($tables);
+    header("Content-type: text/plain");
+    header("Content-disposition: attachment; filename=\"$filename\"");
+    echo $exporter->getExportData();
+    exit();
+}
 
 if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___primary_key_value___']) && isset($_POST['___column_list___']))
 {
