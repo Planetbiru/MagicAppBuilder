@@ -1897,6 +1897,7 @@ if ($limit < 1) {
 $dbType = "mysql";
 // Load the database configuration
 $databaseConfig = new SecretObject();
+
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
 
 if (file_exists($appConfigPath)) {
@@ -1912,7 +1913,7 @@ if (file_exists($appConfigPath)) {
     if (empty($schemaName)) {
         $schemaName = $databaseConfig->getDatabaseSchema();
     }
-
+    $databaseConfig->setCharset('UTF8');
     $database = new PicoDatabase($databaseConfig);
 
     try {
