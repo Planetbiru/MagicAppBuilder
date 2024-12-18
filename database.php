@@ -21,6 +21,12 @@ class DataException extends Exception
 
 }
 
+class ConstantText
+{
+    const SHOW_TABLES = "SHOW TABLES";
+    const BTN_SUCCESS = 'btn btn-success';
+}
+
 /**
  * Class DatabaseExporter
  * 
@@ -79,7 +85,7 @@ class DatabaseExporter
      * @param int $batchSize The number of rows per INSERT query (default is 100).
      * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
      */
-    public function export($tables = null, $schema, $batchSize = 100, $maxQuerySize = 524288)
+    public function export($tables = null, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
         $this->exportTableStructure($tables);
@@ -160,7 +166,7 @@ class DatabaseExporter
      */
     private function exportMySQLTableStructure($tables)
     {
-        $result = $this->db->query('SHOW TABLES');
+        $result = $this->db->query(ConstantText::SHOW_TABLES);
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = array_values($table)[0];
             if($this->toBeExported($tableName, $tables))
@@ -348,6 +354,18 @@ class DatabaseExporter
         return $nrec % $batchSize == 0 || $querySize > $maxQuerySize;
     }
 
+    private function addNewLine($nrec)
+    {
+        if ($nrec > 0) {
+            $this->outputBuffer .= "\r\n";
+        }
+    }
+
+    private function constructInsertQuery($tableName, $columns, $batchValues)
+    {
+        return "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+    }
+
     /**
      * Exports the data (INSERT INTO) of SQLite tables.
      * 
@@ -376,7 +394,7 @@ class DatabaseExporter
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
-                    $insertSql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
                     $querySize = strlen($insertSql);
 
                     // If we hit either the batch size or max query size, execute and reset
@@ -389,14 +407,11 @@ class DatabaseExporter
 
                 // Insert any remaining rows after the loop
                 if (!empty($batchValues)) {
-                    $columnsList = implode(", ", $columns);
-                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
                     $this->outputBuffer .= $insertSql;
                 }
 
-                if ($nrec > 0) {
-                    $this->outputBuffer .= "\r\n";
-                }
+                $this->addNewLine($nrec);
             }
         }
     }
@@ -410,7 +425,7 @@ class DatabaseExporter
      */
     private function exportMySQLTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
     {
-        $result = $this->db->query('SHOW TABLES');
+        $result = $this->db->query(ConstantText::SHOW_TABLES);
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = array_values($table)[0];
             if ($this->toBeExported($tableName, $tables)) {
@@ -429,7 +444,7 @@ class DatabaseExporter
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
-                    $insertSql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
                     $querySize = strlen($insertSql);
 
                     // If we hit either the batch size or max query size, execute and reset
@@ -442,14 +457,11 @@ class DatabaseExporter
 
                 // Insert any remaining rows after the loop
                 if (!empty($batchValues)) {
-                    $columnsList = implode(", ", $columns);
-                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
                     $this->outputBuffer .= $insertSql;
                 }
 
-                if ($nrec > 0) {
-                    $this->outputBuffer .= "\r\n";
-                }
+                $this->addNewLine($nrec);
             }
         }
     }
@@ -491,7 +503,7 @@ class DatabaseExporter
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
-                    $insertSql = "INSERT INTO $schema.$tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery("$schema.$tableName", $columns, $batchValues);
                     $querySize = strlen($insertSql);
 
                     // If we hit either the batch size or max query size, execute and reset
@@ -504,14 +516,11 @@ class DatabaseExporter
 
                 // Insert any remaining rows after the loop
                 if (!empty($batchValues)) {
-                    $columnsList = implode(", ", $columns);
-                    $insertSql = "INSERT INTO $schema.$tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $insertSql = $this->constructInsertQuery("$schema.$tableName", $columns, $batchValues);
                     $this->outputBuffer .= $insertSql;
                 }
 
-                if ($nrec > 0) {
-                    $this->outputBuffer .= "\r\n";
-                }
+                $this->addNewLine($nrec);
             }
         }
     }
@@ -726,7 +735,7 @@ class DatabaseExplorer // NOSONAR
 
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? ConstantText::SHOW_TABLES : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -1422,7 +1431,7 @@ class DatabaseExplorer // NOSONAR
             $inputSubmit->setAttribute('type', 'submit');
             $inputSubmit->setAttribute('name', 'update');
             $inputSubmit->setAttribute('value', 'Update');
-            $inputSubmit->setAttribute('class', 'btn btn-success');
+            $inputSubmit->setAttribute('class', ConstantText::BTN_SUCCESS);
             $form->appendChild($inputSubmit);
             
             // Add space between buttons
@@ -1737,7 +1746,7 @@ class DatabaseExplorer // NOSONAR
         $exportTable->setAttribute('type', 'submit');
         $exportTable->setAttribute('name', '___export_table___');
         $exportTable->setAttribute('value', $tableName);
-        $exportTable->setAttribute('class', 'btn btn-success');
+        $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);
         $exportTable->appendChild($dom->createTextNode('Export Table'));
         $form->appendChild($exportTable);
         
@@ -1750,7 +1759,7 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->setAttribute('type', 'submit');
         $exportDatabase->setAttribute('name', '___export_database___');
         $exportDatabase->setAttribute('value', $databaseName);
-        $exportDatabase->setAttribute('class', 'btn btn-success');
+        $exportDatabase->setAttribute('class', ConstantText::BTN_SUCCESS);
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
         $form->appendChild($exportDatabase);
         
