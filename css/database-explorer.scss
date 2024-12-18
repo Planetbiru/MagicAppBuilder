@@ -145,6 +145,7 @@ textarea {
     cursor: pointer;
     transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
     margin-bottom: 4px;
+    min-width: 80px;
 }
 
 /* btn-primary */

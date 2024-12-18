@@ -76,14 +76,17 @@ class DatabaseExporter
      * Exports both table structure (CREATE TABLE) and data (INSERT INTO).
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query (default is 100).
+     * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
      */
-    public function export($tables = null)
+    public function export($tables = null, $schema, $batchSize = 100, $maxQuerySize = 524288)
     {
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
         $this->exportTableStructure($tables);
         $this->outputBuffer .= "-- Database content\r\n";
-        $this->exportTableData($tables);
+        $this->exportTableData($tables, $schema, $batchSize, $maxQuerySize);
     }
+
 
     /**
      * Exports the structure of all tables (CREATE TABLE).
@@ -304,60 +307,95 @@ class DatabaseExporter
         return $columns;
     }
 
-
     /**
      * Exports the data (INSERT INTO) of all tables.
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      * @param string $schema The schema where the tables reside (default is 'public').
+     * @param int $batchSize The number of rows per INSERT query (default is 100).
+     * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
      */
-    private function exportTableData($tables, $schema = 'public')
+    private function exportTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
         switch ($this->dbType) {
             case PicoDatabaseType::DATABASE_TYPE_SQLITE:
-                $this->exportSQLiteTableData($tables);
+                $this->exportSQLiteTableData($tables, $batchSize, $maxQuerySize);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_MYSQL:
             case PicoDatabaseType::DATABASE_TYPE_MARIADB:
-                        $this->exportMySQLTableData($tables);
+                $this->exportMySQLTableData($tables, $batchSize, $maxQuerySize);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_PGSQL:
-                $this->exportPostgreSQLTableData($tables, $schema);
+                $this->exportPostgreSQLTableData($tables, $schema, $batchSize, $maxQuerySize);
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * Determines if the batch limit or query size limit has been reached.
+     * 
+     * @param int $nrec The number of records processed so far in the current batch.
+     * @param int $batchSize The maximum number of records allowed per query.
+     * @param int $querySize The current size of the query in bytes.
+     * @param int $maxQuerySize The maximum allowed query size in bytes.
+     *
+     * @return bool Returns `true` if the batch limit or query size limit has been reached, `false` otherwise.
+     */
+    private function reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)
+    {
+        return $nrec % $batchSize == 0 || $querySize > $maxQuerySize;
+    }
 
     /**
      * Exports the data (INSERT INTO) of SQLite tables.
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportSQLiteTableData($tables)
+    private function exportSQLiteTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
     {
         $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['name'];
-            if($this->toBeExported($tableName, $tables))
-            {
+            if ($this->toBeExported($tableName, $tables)) {
                 $rows = $this->db->query("SELECT * FROM $tableName;");
                 $nrec = 0;
+                $batchValues = [];
+                $querySize = 0;
+
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
                     $columns = array_keys($row);
                     $values = array_values($row);
-                    $columnsList = implode(", ", $columns);
                     $valuesList = implode(", ", array_map(function ($value) {
                         return $this->db->quote($value);
                     }, $values));
-                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
-                    $this->outputBuffer .= $insertSql;
+                    $batchValues[] = "($valuesList)";
                     $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
                 }
-                if($nrec > 0)
-                {
-                    $this->outputBuffer .= "\n";
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $columnsList = implode(", ", $columns);
+                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $this->outputBuffer .= $insertSql;
+                }
+
+                if ($nrec > 0) {
+                    $this->outputBuffer .= "\r\n";
                 }
             }
         }
@@ -367,30 +405,50 @@ class DatabaseExporter
      * Exports the data (INSERT INTO) of MySQL tables.
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportMySQLTableData($tables)
+    private function exportMySQLTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
     {
         $result = $this->db->query('SHOW TABLES');
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
-            $tableName =array_values($table)[0];
-            if($this->toBeExported($tableName, $tables))
-            {
+            $tableName = array_values($table)[0];
+            if ($this->toBeExported($tableName, $tables)) {
                 $rows = $this->db->query("SELECT * FROM $tableName");
                 $nrec = 0;
+                $batchValues = [];
+                $querySize = 0;
+
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
                     $columns = array_keys($row);
                     $values = array_values($row);
-                    $columnsList = implode(", ", $columns);
                     $valuesList = implode(", ", array_map(function ($value) {
                         return $this->db->quote($value);
                     }, $values));
-                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES ($valuesList);\n";
-                    $this->outputBuffer .= $insertSql;
+                    $batchValues[] = "($valuesList)";
                     $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
                 }
-                if($nrec > 0)
-                {
-                    $this->outputBuffer .= "\n";
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $columnsList = implode(", ", $columns);
+                    $insertSql = "INSERT INTO $tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $this->outputBuffer .= $insertSql;
+                }
+
+                if ($nrec > 0) {
+                    $this->outputBuffer .= "\r\n";
                 }
             }
         }
@@ -401,8 +459,10 @@ class DatabaseExporter
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      * @param string $schema The schema where the tables reside (default is 'public').
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportPostgreSQLTableData($tables, $schema = 'public')
+    private function exportPostgreSQLTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
         // Query to get all table names in the specified schema
         $result = $this->db->query("
@@ -417,30 +477,44 @@ class DatabaseExporter
                 // Query to get all rows from the specified table
                 $rows = $this->db->query("SELECT * FROM $schema.$tableName");
                 $nrec = 0;
-                
+                $batchValues = [];
+                $querySize = 0;
+
                 // Iterate through the rows and generate INSERT INTO statements
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
                     $columns = array_keys($row);
                     $values = array_values($row);
-                    $columnsList = implode(", ", $columns);
                     $valuesList = implode(", ", array_map(function ($value) {
                         return $this->db->quote($value);
                     }, $values));
-                    
-                    // Generate the INSERT INTO statement for the row
-                    $insertSql = "INSERT INTO $schema.$tableName ($columnsList) VALUES ($valuesList);\n";
-                    $this->outputBuffer .= $insertSql;
+                    $batchValues[] = "($valuesList)";
                     $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = "INSERT INTO $schema.$tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
                 }
-                
-                // Add an empty line after each table's data export if it has data
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $columnsList = implode(", ", $columns);
+                    $insertSql = "INSERT INTO $schema.$tableName ($columnsList) VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+                    $this->outputBuffer .= $insertSql;
+                }
+
                 if ($nrec > 0) {
-                    $this->outputBuffer .= "\n";
+                    $this->outputBuffer .= "\r\n";
                 }
             }
         }
     }
-
 
     /**
      * Returns the exported SQL data from the buffer.
@@ -1663,7 +1737,7 @@ class DatabaseExplorer // NOSONAR
         $exportTable->setAttribute('type', 'submit');
         $exportTable->setAttribute('name', '___export_table___');
         $exportTable->setAttribute('value', $tableName);
-        $exportTable->setAttribute('class', 'btn btn-primary');
+        $exportTable->setAttribute('class', 'btn btn-success');
         $exportTable->appendChild($dom->createTextNode('Export Table'));
         $form->appendChild($exportTable);
         
@@ -1676,7 +1750,7 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->setAttribute('type', 'submit');
         $exportDatabase->setAttribute('name', '___export_database___');
         $exportDatabase->setAttribute('value', $databaseName);
-        $exportDatabase->setAttribute('class', 'btn btn-primary');
+        $exportDatabase->setAttribute('class', 'btn btn-success');
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
         $form->appendChild($exportDatabase);
         
@@ -1955,7 +2029,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
         $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
     }
     $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
-    $exporter->export($tables);
+    $exporter->export($tables, $schemaName, 100, 524288);
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
     echo $exporter->getExportData();
