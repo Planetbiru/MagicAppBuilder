@@ -572,6 +572,14 @@ form.edit-form {
 }
 
 th.cell-edit,
-td.cell-edit {
-    padding: 1px 8px;
+td.cell-edit,
+th.cell-delete,
+td.cell-delete {
+    padding: 1px 4px;
+    width: 28px;
+    text-align: center;
+    a{
+        display: block;
+        font-size: 11px;
+    }
 }

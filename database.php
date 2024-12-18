@@ -1160,9 +1160,13 @@ class DatabaseExplorer // NOSONAR
             // Add table headers
             $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
             $th = $dom->createElement('th', '');
-            $th->setAttribute('width', '40');
+            $th->setAttribute('width', '28');
             $th->setAttribute('class', 'cell-edit');
             $tr->appendChild($th);
+            $th2 = $dom->createElement('th', '');
+            $th2->setAttribute('width', '28');
+            $th2->setAttribute('class', 'cell-edit');
+            $tr->appendChild($th2);
             for ($i = 0; $i < $stmt->columnCount(); $i++) {
                 $col = $stmt->getColumnMeta($i);
                 $th = $dom->createElement('th', htmlspecialchars($col['name']));
@@ -1183,6 +1187,20 @@ class DatabaseExplorer // NOSONAR
                 $td->setAttribute('class', 'cell-edit');
                 $td->appendChild($a);
                 $tr->appendChild($td);
+
+                $deleteLink = $dom->createElement('a');
+                $deleteLink->setAttribute('href', "javascript:;");
+                $deleteLink->setAttribute('data-database', $databaseName);
+                $deleteLink->setAttribute('data-schema', $schemaName);
+                $deleteLink->setAttribute('data-table', $table);
+                $deleteLink->setAttribute('data-primary-key', $primaryKeyName);
+                $deleteLink->setAttribute('data-value', $id);
+                $deleteLink->appendChild($dom->createTextNode("❌"));
+                $deleteTd = $dom->createElement('td');
+                $deleteTd->setAttribute('class', 'cell-delete');
+                $deleteTd->appendChild($deleteLink);
+                $tr->appendChild($deleteTd);
+
                 foreach ($row as $value) {
                     $td = $dom->createElement('td', htmlspecialchars($value));
                     $tr->appendChild($td);
