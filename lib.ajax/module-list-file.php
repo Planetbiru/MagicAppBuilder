@@ -27,7 +27,7 @@ try
             $module = basename($file, '.php');
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $path = str_replace("\\", "//", trim($target.'/'.$module, "//"));
-            $li[] = '<li class="file-li"><a href="#" data-file-name="'.$path.'" data-toggle="tooltip" data-placement="top" title="'.$filetime.'">'.$module.'.php</a></li>';
+            $li[] = '<li class="file-li"><a href="#" data-file-name="'.$path.'" data-toggle="tooltip" data-placement="top" data-title="'.$filetime.'">'.$module.'.php</a></li>';
         }
         echo '<ul class="module-ul">'.$separatorNLT.implode($separatorNLT, $li)."\r\n".'</ul>'."\r\n";
     }
