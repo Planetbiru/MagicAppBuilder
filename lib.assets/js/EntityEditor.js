@@ -560,4 +560,82 @@ class EntityEditor {
         });
         document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
+
+    /**
+     * Exports the given data object as a JSON file.
+     * 
+     * This function converts the provided JavaScript object into a JSON string, creates a Blob object from
+     * the string, and then triggers a download of the Blob as a `.json` file using a temporary anchor element.
+     * The filename will include a datetime suffix to avoid overwriting files, and the last underscore
+     * will be removed from the datetime part of the filename.
+     * 
+     * @param {Object} data - The JavaScript object to be exported as JSON.
+     */
+    exportJSON(data) {
+        // Get the base filename from the data object
+        const fileName = data.databaseName;
+
+        // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
+        const now = new Date();
+        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // Format datetime to YYYY_MM_DD_HH_MM_SS
+
+        // Remove the last underscore if present
+        if (dateTimeSuffix.endsWith('_')) {
+            dateTimeSuffix = dateTimeSuffix.slice(0, -1);  // Remove the last underscore
+        }
+
+        // Create the filename with the datetime suffix
+        const finalFileName = `${fileName}_${dateTimeSuffix}.json`;
+
+        // Convert the object to a JSON string
+        const jsonData = JSON.stringify(data); // Indented JSON for readability
+
+        // Create a Blob object from the JSON string
+        const blob = new Blob([jsonData], { type: "application/json" });
+
+        // Create a URL for the Blob
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = finalFileName; // Set the filename to include the datetime suffix
+        document.body.appendChild(a);
+        a.click(); // Trigger the download by clicking the anchor
+        document.body.removeChild(a); // Clean up by removing the anchor
+        URL.revokeObjectURL(url); // Release the object URL
+    }
+
+    /**
+     * Imports JSON data from a file and processes it.
+     * 
+     * This function accepts a file object, reads its contents as text using a FileReader, then parses the JSON
+     * content and updates the editor's entities with the parsed data. It also triggers a re-render of the entities.
+     * After the import, a callback function is invoked with the imported entities, if provided.
+     * 
+     * @param {File} file - The file object containing the JSON data to be imported.
+     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated. 
+     *                                The callback will receive the updated entities as its argument.
+     */
+    importJSON(file, callback) {
+        let _this = this;
+        const reader = new FileReader(); // Create a FileReader instance
+
+        reader.onload = function (e) {
+            const contents = e.target.result; // Get the content of the file
+            try {
+                let raw = JSON.parse(contents);  // Parse the JSON content
+                _this.entities = editor.createEntitiesFromJSON(raw.entities); // Insert the received data into editor.entities
+                _this.renderEntities(); // Update the view with the fetched entities
+                if (typeof callback === 'function') {
+                    callback(_this.entities); // Execute callback with the updated entities
+                }
+            } catch (err) {
+                console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+            }
+        };
+
+        reader.readAsText(file); // Read the file as text
+    }
+
 }
