@@ -1757,7 +1757,7 @@ class DatabaseExplorer // NOSONAR
         $entityEditor = $dom->createElement('button');
         $entityEditor->setAttribute('type', 'button');
         $entityEditor->setAttribute('value', 'Entity Editor');
-        $entityEditor->setAttribute('class', 'btn btn-primary entity-editor');
+        $entityEditor->setAttribute('class', 'btn btn-primary open-entity-editor');
         $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
         $form->appendChild($entityEditor);
 
@@ -2133,8 +2133,11 @@ else {
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.css">
+    <link rel="stylesheet" href="css/entity-editor.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/EntityEditor.js"></script>
+    <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
@@ -2229,11 +2232,60 @@ else {
             </div>
             
             <div class="modal-body">
-                
+                <div class="entity-editor">
+                    <div class="container">
+                        <div class="left-panel">
+                            <div class="entities-container">
+                                <!-- Entities will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="resize-bar"></div>
+                        <div class="right-panel">
+                            <div class="entity-selector"><label> <input type="checkbox" class="check-all-entity"> Export all</label></div>
+                            <ul class="table-list"></ul>
+                            <textarea class="query-generated" spellcheck="false"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <button class="btn" onclick="editor.showEditor(-1)">Create New Entity</button>
+                        <button class="btn" onclick="editor.importFromSQL()">Import from SQL</button>
+                        <input type="file" class="file-import" style="display:none;" onchange="editor.handleFileImport(event)">    
+                    </div>
+
+                    <!-- Entity Editor Form -->
+                    <div class="editor-form" style="display:none;">
+                        <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
+                        <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
+                        <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                        <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
+                        <div class="table-container">
+                        <table id="columns-table">
+                            <thead>
+                                <tr>
+                                    <th class="column-action"></th>
+                                    <th>Column Name</th>
+                                    <th>Type</th>
+                                    <th>Length</th>
+                                    <th>Value</th>
+                                    <th>Default</th>
+                                    <th class="column-nl">NL</th>
+                                    <th class="column-pk">PK</th>
+                                    <th class="column-ai">AI</th>
+                                </tr>
+                            </thead>
+                            <tbody class="columns-table-body">
+                                <!-- Columns will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer">            
-                <button class="btn btn-primary translate-structure">Import</button>
+                <button class="btn btn-primary import-from-entity">Import</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
             </div>

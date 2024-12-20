@@ -1,0 +1,322 @@
+// Variable for color and size
+$primary-bg-color: #f4f4f4;
+$border-color: #ddd;
+$light-bg-color: #f1f1f1;
+$min-panel-width: 100px;
+$panel-border: 1px solid #ccc;
+$font-family: Arial, sans-serif;
+$font-size: 13px;
+$button-padding: 5px 12px;
+$input-padding: 5px 10px;
+$select-padding: 5px 10px;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.entity-editor {
+    margin: 0;
+    padding: 0;
+    font-family: $font-family;
+    font-size: $font-size;
+
+    height: 100%;
+    width: 100%;
+    position: relative;
+    // Container for entities
+    .entities-container {
+        margin: 0;
+        height: calc(100vh - 460px);
+        min-height: 200px;
+        overflow: auto;
+    }
+
+    // Main container
+    .container {
+        display: flex;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    // Left and right panels
+    .left-panel,
+    .right-panel {
+        overflow: auto;
+        padding: 10px;
+        border: $panel-border;
+    }
+
+    .resize-bar {
+        width: 10px;
+        cursor: ew-resize;
+    }
+
+    // Panel size
+    .left-panel {
+        width: calc(70% - 5px);
+    }
+
+    .right-panel {
+        width: calc(30% - 5px);
+        background-color: $primary-bg-color;
+
+        textarea {
+            height: calc(100vh - 555px);
+            min-height: 100px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+            tab-size: 4;
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+
+    // Button container
+    .button-container {
+        padding: 10px 0px 0;
+    }
+
+    // Button styling
+    button {
+        padding: $button-padding;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+
+    // Input and select styling
+    input[type="text"],
+    select {
+        padding: $input-padding;
+        background-color: #FFFFFF;
+        border: 1px solid #999999;
+        color: #333333;
+    }
+    
+    .entity-name{
+        &:focus-visible{
+            outline: none;
+        }
+    }
+
+    // Form editor
+    .editor-form {
+        margin-top: 5px;
+        padding: 10px 0 0 0;
+        border-top: 1px solid #DDD;
+
+        h3 {
+            margin: 0;
+        }
+
+        .table-container {
+            max-height: 140px;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: $panel-border;
+
+            .column-mover {
+                width: 16px;
+            }
+
+            .column-action {
+                text-align: center;
+                white-space: nowrap;
+                width: 64px;
+
+                button {
+                    font-size: 13px;
+                    margin-bottom: 2px;
+                }
+            }
+
+            thead {
+                background-color: $light-bg-color;
+                border: $panel-border;
+            }
+
+            th {
+                border: $panel-border;
+                position: sticky;
+                top: 0;
+                background-color: $light-bg-color;
+                padding: 8px;
+                text-align: left;
+                z-index: 2;
+
+                &::before {
+                    content: "";
+                    width: 100%;
+                    display: block;
+                    position: absolute;
+                    height: 1px;
+                    background-color: #ccc;
+                    top: -1px;
+                    left: 0;
+                }
+
+                &.column-nl,
+                &.column-pk,
+                &.column-ai {
+                    width: 20px;
+                    text-align: center;
+                }
+            }
+
+            td {
+                border: $panel-border;
+                padding: 0;
+                text-align: left;
+                font-size: 8px;
+
+                &.column-nl,
+                &.column-pk,
+                &.column-ai {
+                    text-align: center;
+                }
+
+                input[type="text"],
+                select {
+                    display: block;
+                    margin: 0;
+                    border: none;
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 1px 8px;
+                }
+
+                input[type="text"]:focus-visible,
+                select:focus-visible {
+                    outline: none;
+                }
+
+                button {
+                    padding: 0;
+                    border: none;
+                    background-color: transparent;
+                }
+            }
+        }
+    }
+
+    // Checkbox styling
+    input[type="checkbox"] {
+        margin: 0 5px;
+    }
+
+    // Entity styling
+    .entity {
+        display: inline-block;
+        min-width: 200px;
+        border: 1px solid #DDDDDD;
+        vertical-align: top;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding: 0;
+        background-color: #FCFCFC;
+
+        .entity-header {
+            background-color: #EEEEEE;
+
+            button {
+                float: right;
+                width: 16px;
+                height: 16px;
+                border: none;
+                background-color: transparent;
+                font-size: 11px;
+                padding: 2px;
+                margin-right: 6px;
+                margin-top: 2px;
+                &:nth-child(1)
+                {
+                    margin-right: 10px;
+                }
+            }
+
+            h4 {
+                margin: 0;
+                padding: 5px 54px 5px 10px;
+                border-bottom: 1px solid #DDDDDD;
+            }
+        }
+
+        .entity-body ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .entity-body ul li {
+            padding: 4px 10px;
+            border-bottom: 1px solid #DDDDDD;
+        }
+
+        .entity-body ul li:last-child {
+            border-bottom: none;
+        }
+
+        .entity-body ul li .data-type {
+            background-color: #E4E4E4;
+            padding: 2px 5px;
+            font-size: 10px;
+            float: right;
+            margin-left: 8px;
+            border-radius: 2px;
+        }
+        .entity-body ul li::after{
+            content: "";
+            display: block;
+            clear: both;
+        }
+
+        .entity-footer {
+            padding: 5px 10px;
+            display: none;
+        }
+
+        .entity-footer button {
+            margin-bottom: 0;
+        }
+    }
+
+    .table-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        margin: 2px 0 10px 0;
+        height: 80px;
+        overflow: auto;
+
+        li {
+            padding: 0;
+            margin: 0;
+
+            label {
+                padding: 0;
+            }
+
+            line-height: 1.5;
+        }
+    }
+}
