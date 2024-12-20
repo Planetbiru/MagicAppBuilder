@@ -108,6 +108,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     );
+
+    // Event listener for the "Export JSON" button
+    document.getElementById("exportBtn").addEventListener("click", function () {
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        const data = {
+            applicationId: applicationId,
+            databaseType: databaseType,
+            databaseName: databaseName,
+            databaseSchema: databaseSchema,
+            entities: editor.entities  // Converting the entities array into a JSON string
+        };
+        editor.exportJSON(data); // Export the sample object to a JSON file
+    });
+
+    // Event listener for the "Import JSON" button
+    document.getElementById("importBtn").addEventListener("click", function () {
+        document.getElementById("importFile").click();
+    });
+
+    document.getElementById("importFile").addEventListener("change", function () {
+        const file = this.files[0]; // Get the selected file
+        if (file) {
+            editor.importJSON(file, function(entities){
+                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+    
+            }); // Import the file if it's selected
+
+            
+        } else {
+            console.log("Please select a JSON file first.");
+        }
+    });
+
+
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
@@ -179,10 +220,15 @@ function fetchData(applicationId, databaseType, databaseName, databaseSchema, en
         if (xhr.readyState === 4) {  // Check if the request is complete
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 const response = xhr.responseText;  // Get the response from the server
-                editor.entities = editor.createEntitiesFromJSON(JSON.parse(response)); // Insert the received data into editor.entities
-                editor.renderEntities(); // Update the view with the fetched entities
+                try {
+                    const parsedData = JSON.parse(response);  // Try to parse the JSON response
+                    editor.entities = editor.createEntitiesFromJSON(parsedData); // Insert the received data into editor.entities
+                    editor.renderEntities(); // Update the view with the fetched entities
+                    if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
+                } catch (err) {
+                }
             } else {
-                console.error('An error occurred while fetching data from the server'); // Log error if status is not 200
+                console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200
             }
         }
     };
@@ -190,6 +236,7 @@ function fetchData(applicationId, databaseType, databaseName, databaseSchema, en
     // Send the GET request to the server
     xhr.send();
 }
+
 
 /**
  * Builds the URL for the GET request by appending query parameters.

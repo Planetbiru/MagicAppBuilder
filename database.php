@@ -2140,7 +2140,7 @@ else {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="database-type" content="<?php echo $dbType;?>">
-    <meta name="database-name" content="<?php echo $databaseName;?>">
+    <meta name="database-name" content="<?php echo $databaseConfig->getDatabaseName();?>">
     <meta name="database-schema" content="<?php echo $schemaName;?>">
     <meta name="application-id" content="<?php echo $applicationId;?>">
     <title>Database Explorer</title>
@@ -2265,6 +2265,9 @@ else {
                     <div class="editor-container">
                         <div class="button-container">
                             <button class="btn" onclick="editor.showEditor(-1)">Add Entity</button>
+                            <button class="btn" id="importBtn">Import Entity</button>
+                            <button class="btn" id="exportBtn">Export Entity</button>
+                            <input type="file" id="importFile" accept=".json" style="display: none;" />
                         </div>
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">
