@@ -2140,6 +2140,9 @@ else {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="database-type" content="<?php echo $dbType;?>">
+    <meta name="database-name" content="<?php echo $databaseName;?>">
+    <meta name="database-schema" content="<?php echo $schemaName;?>">
+    <meta name="application-id" content="<?php echo $applicationId;?>">
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />

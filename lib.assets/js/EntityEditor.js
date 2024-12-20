@@ -146,7 +146,7 @@ class EntityEditor {
     /**
      * Creates an instance of the EntityEditor class.
      */
-    constructor(selector) {
+    constructor(selector, callbackLoadEntity = null, callbackSaveEntity = null) {
         this.selector = selector;
         this.entities = [];
         this.currentEntityIndex = -1;
@@ -167,6 +167,14 @@ class EntityEditor {
 
         ];
         this.addCheckboxListeners();
+        this.callbackLoadEntity = callbackLoadEntity;
+        this.callbackSaveEntity = callbackSaveEntity;
+
+
+        if(typeof this.callbackLoadEntity == 'function')
+        {
+            this.callbackLoadEntity();
+        }
     }
 
     /**
@@ -224,6 +232,10 @@ class EntityEditor {
         }
         document.querySelector(this.selector+" .button-container").style.display = "none";
         document.querySelector(this.selector+" .editor-form").style.display = "block";
+        if(entityIndex == -1)
+        {
+            document.querySelector(this.selector+" .entity-name").select();
+        }
     }
 
     /**
@@ -361,7 +373,51 @@ class EntityEditor {
         this.renderEntities();
         this.cancelEdit();
         this.exportToSQL();
+        if(typeof this.callbackSaveEntity == 'function')
+        {
+            this.callbackSaveEntity(this.entities);
+        }
     }
+
+    /**
+     * Converts a JSON array to an array of Entity objects.
+     * 
+     * @param {Array} jsonData - The JSON array containing entities and their columns.
+     * @returns {Array} - An array of Entity objects.
+     */
+    createEntitiesFromJSON(jsonData) {
+        const entities = [];
+
+        // Iterate over each entity in the JSON data
+        jsonData.forEach(entityData => {
+            // Create a new Entity instance
+            const entity = new Entity(entityData.name);
+            
+            // Iterate over each column in the entity's columns array
+            entityData.columns.forEach(columnData => {
+                // Create a new Column instance
+                const column = new Column(
+                    columnData.name,
+                    columnData.type,
+                    columnData.nullable,
+                    columnData.default,
+                    columnData.primaryKey,
+                    columnData.autoIncrement,
+                    columnData.enumValues !== "null" ? columnData.enumValues : "",
+                    columnData.length
+                );
+                
+                // Add the column to the entity
+                entity.addColumn(column);
+            });
+
+            // Add the entity to the entities array
+            entities.push(entity);
+        });
+
+        return entities;
+    }
+
 
     /**
      * Renders the list of entities and updates the table list in the UI.
@@ -436,6 +492,10 @@ class EntityEditor {
         this.entities.splice(index, 1);
         this.renderEntities();
         this.exportToSQL();
+        if(typeof this.callbackSaveEntity == 'function')
+        {
+            this.callbackSaveEntity(this.entities);
+        }
     }
 
     /**
@@ -481,7 +541,6 @@ class EntityEditor {
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
-    
             if (entity) {
                 sql.push(entity.toSQL());
             }
