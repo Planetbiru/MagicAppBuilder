@@ -1748,6 +1748,18 @@ class DatabaseExplorer // NOSONAR
         $importStructure->setAttribute('class', 'btn btn-primary import-structure');
         $importStructure->appendChild($dom->createTextNode('Import Structure'));
         $form->appendChild($importStructure);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+        
+        // Create entityEditor button
+        $entityEditor = $dom->createElement('button');
+        $entityEditor->setAttribute('type', 'button');
+        $entityEditor->setAttribute('value', 'Entity Editor');
+        $entityEditor->setAttribute('class', 'btn btn-primary entity-editor');
+        $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
+        $form->appendChild($entityEditor);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
@@ -2057,6 +2069,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
     {
         $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
     }
+    $filename = trim($filename, " - ");
     $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
     $exporter->export($tables, $schemaName, $maxRecord, $maxQuerySize);
     header("Content-type: text/plain");
@@ -2122,7 +2135,7 @@ else {
     <link rel="stylesheet" href="css/database-explorer.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/import-structure.min.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
@@ -2183,13 +2196,13 @@ else {
         ?>
     </div>
     
-    <div class="modal" id="translatorModal">
+    <div class="modal" id="queryTranslatorModal">
         <div class="modal-backdrop"></div>
 
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Import Database Structure</h3>
-                <span class="close-btn" id="closeBtn">&times;</span>
+                <span class="close-btn cancel-button">&times;</span>
             </div>
             
             <div class="modal-body">
@@ -2201,7 +2214,28 @@ else {
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
-                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn btn-secondary cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="entityEditorModal">
+        <div class="modal-backdrop"></div>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Editor</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                
+            </div>
+
+            <div class="modal-footer">            
+                <button class="btn btn-primary translate-structure">Import</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-button">Cancel</button>
             </div>
         </div>
     </div>

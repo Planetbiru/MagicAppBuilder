@@ -2,11 +2,12 @@
 
 // Move init() outside of the class
 function init() {
-    // Mendapatkan elemen-elemen modal dan tombol
-    let modal = document.getElementById("translatorModal");
-    let openModalButton = document.querySelector(".import-structure");
-    let closeModalButton = document.getElementById("closeBtn");
-    let cancelButton = document.getElementById("cancelBtn");
+    let modalQueryTranslator = document.getElementById("queryTranslatorModal");
+    let modalEntityEditor = document.getElementById("entityEditorModal");
+    let closeModalButton = document.querySelectorAll(".cancel-button");
+    let openModalQuertTranslatorButton = document.querySelector(".import-structure");
+    let openModalEntityEditorButton = document.querySelector(".entity-editor");
+    
     let translateButton  = document.querySelector(".translate-structure");
     let clearButton  = document.querySelector(".clear");
     let original = document.querySelector('#original');
@@ -14,20 +15,23 @@ function init() {
     let deleteCells = document.querySelectorAll('.cell-delete a');
 
     // Menampilkan modal saat tombol di klik
-    openModalButton.onclick = function() {
-        modal.style.display = "block";
+    openModalQuertTranslatorButton.onclick = function() {
+        modalQueryTranslator.style.display = "block";
         original.focus();
     }
 
-    // Menutup modal saat tombol close di klik
-    closeModalButton.onclick = function() {
-        modal.style.display = "none";
+    openModalEntityEditorButton.onclick = function() {
+        modalEntityEditor.style.display = "block";
+        original.focus();
     }
+    
 
-    // Menutup modal saat tombol 'Close' di footer di klik
-    cancelButton.onclick = function() {
-        modal.style.display = "none";
-    }
+    
+    closeModalButton.forEach(function(cancelButton) {
+        cancelButton.onclick = function(e) {
+            e.target.closest('.modal').style.display = "none";
+        }
+    });
     
     // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
@@ -40,7 +44,7 @@ function init() {
         let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
         let converted = converter.translate(sql, type);
         document.querySelector('[name="query"]').value = converted;
-        modal.style.display = "none";
+        modalQueryTranslator.style.display = "none";
     }
     deleteCells.forEach(function(cell) {
         cell.addEventListener('click', function(event) {
@@ -57,8 +61,8 @@ function init() {
         });
     });
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
+        if (event.target == modalQueryTranslator) {
+            modalQueryTranslator.style.display = "none";
         }
     }
 }
