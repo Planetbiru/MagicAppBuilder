@@ -89,20 +89,25 @@ let resizablePanels;
 document.addEventListener('DOMContentLoaded', () => {
     
     editor = new EntityEditor('.entity-editor', 
-    function(){
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        fetchData(applicationId, databaseType, databaseName, databaseSchema)
-    }, 
-    function (entities){
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-    });
+        {
+            defaultDataType: 'VARCHAR',
+            defaultDataLength: 50,
+            callbackLoadEntity: function(){
+                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                fetchData(applicationId, databaseType, databaseName, databaseSchema)
+            }, 
+            callbackSaveEntity: function (entities){
+                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+            }
+        }
+    );
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
