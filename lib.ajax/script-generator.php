@@ -6,7 +6,7 @@ use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 
 // Start measuring execution time
-$time_start = microtime(true);
+$timeStart = microtime(true);
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 header("Content-type: application/json");
@@ -37,12 +37,11 @@ if (isset($_POST) && !empty($_POST)) {
         require_once dirname(__DIR__) . "/inc.app/database.php";
         $scriptGenerator = new ScriptGenerator();
         $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo);
-        
     }
 }
 
-$time_end = microtime(true);
-$time = $time_end - $time_start;
+$timeEnd = microtime(true);
+$time = $timeEnd - $timeStart;
 
 $response = array(
     "success" => true,

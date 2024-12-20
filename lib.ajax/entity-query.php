@@ -14,6 +14,8 @@ $inputPost = new InputPost();
 
 header("Content-type: text/plain");
 
+$dashedLine = "-- ------------------------------------------------------------";
+
 try
 {
     $applicationName = $appConfig->getApplication()->getName();
@@ -37,7 +39,7 @@ try
         $dbType = "MySQL";
     }
 
-    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = $dashedLine;
     $allQueries[] = "-- Application Name : $applicationName";
     $allQueries[] = "-- Description      : Queries for table creation and modification ";
     $allQueries[] = "-- Generator        : MagicAppBuilder";
@@ -46,7 +48,7 @@ try
     $allQueries[] = "-- Time Generated   : ".date('j F Y H:i:s');
     $allQueries[] = "-- Time Zone        : ".date('P'); 
     $allQueries[] = "-- Line Endings     : CRLF";
-    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = $dashedLine;
     $allQueries[] = "";
 
     $merged = $inputPost->getMerged();
@@ -148,9 +150,9 @@ try
             }
         }
     }
-    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = $dashedLine;
     $allQueries[] = "-- End of Query";
-    $allQueries[] = "-- ------------------------------------------------------------";
+    $allQueries[] = $dashedLine;
     $sqlQuery = implode("\r\n", $allQueries);
 
     $lines = explode("\r\n", $sqlQuery);

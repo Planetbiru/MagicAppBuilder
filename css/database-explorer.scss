@@ -144,6 +144,8 @@ textarea {
     border: 1px solid transparent;
     cursor: pointer;
     transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    margin-bottom: 4px;
+    min-width: 80px;
 }
 
 /* btn-primary */
@@ -473,7 +475,7 @@ textarea {
     max-height: calc(100vh - 176px);
 }
 
-/* CSS untuk kelas two-side-table */
+/* CSS for the two-side-table class */
 table.two-side-table {
     width: 100%;
     border-collapse: collapse;
@@ -481,16 +483,16 @@ table.two-side-table {
     margin-bottom: 8px;
 }
 
-/* Styling default untuk tabel, untuk layar yang lebih kecil dari 600px */
+/* Default styling for the table, for screens smaller than 600px */
 table.two-side-table th,
 table.two-side-table td {
     width: 100%;
-    /* Setiap kolom memiliki lebar 100% untuk layar kecil */
+    /* Each column has a width of 100% for small screens */
     padding: 8px;
     border: 1px solid #ddd;
     text-align: left;
     display: block;
-    /* Ubah setiap kolom menjadi block-level untuk responsif */
+    /* Change each column to block-level for responsiveness */
 }
 
 table.two-side-table th {
@@ -503,23 +505,23 @@ table.two-side-table tbody tr td:nth-child(2) {
     padding: 0px;
 }
 
-/* Styling untuk layar yang lebih besar dari 600px */
+/* Styling for screens larger than 600px */
 @media (min-width: 800px) {
 
     table.two-side-table th,
     table.two-side-table td {
         display: table-cell;
-        /* Kembali ke tampilan tabel biasa */
+        /* Return to normal table view */
     }
 
-    /* Lebar kolom pertama 30% */
+    /* The first column width is 30% */
     table.two-side-table td:first-child,
     table.two-side-table th:first-child {
         width: 30%;
-        /* Lebar kolom pertama 30% */
+        /* The first column width is 30% */
     }
 
-    /* Set kolom lainnya untuk memiliki lebar yang seimbang */
+    /* Set the other columns to have balanced width */
     table.two-side-table td:not(:first-child),
     table.two-side-table th:not(:first-child) {
         width: auto;
@@ -570,6 +572,14 @@ form.edit-form {
 }
 
 th.cell-edit,
-td.cell-edit {
-    padding: 1px 8px;
+td.cell-edit,
+th.cell-delete,
+td.cell-delete {
+    padding: 1px 4px;
+    width: 28px;
+    text-align: center;
+    a{
+        display: block;
+        font-size: 11px;
+    }
 }

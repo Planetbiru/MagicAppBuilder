@@ -3834,7 +3834,7 @@ $subqueryMap = '.$referece.';
         $btn4->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
         $btn42 = clone $btn4;
 
-        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->'.$primaryKeyName.', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
+        $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, null, 'currentModule->getRedirectUrl(UserAction::UPDATE, '.AppBuilderBase::getStringOf($primaryKeyName).', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
         $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, null, self::REDIRECT_TO_ITSELF);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -4630,25 +4630,48 @@ $subqueryMap = '.$referece.';
         $lines = array();
         $lines[] = "if(".self::VAR."inputPost".self::CALL_GET."UserAction() == UserAction::SORT_ORDER)";
         $lines[] = self::CURLY_BRACKET_OPEN;
-        $lines[] = self::TAB1.self::VAR.$objectName.' = new '.$entityName.'(null, $database);';
+        
         $lines[] = self::TAB1.'if($inputPost->getNewOrder() != null && $inputPost->countableNewOrder())';
         $lines[] = self::TAB1.self::CURLY_BRACKET_OPEN;
         $lines[] = self::TAB1.self::TAB1.'foreach($inputPost->getNewOrder() as $dataItem)';
+
+
         $lines[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.'if(is_string($dataItem))';
-
+        $lines[] = self::TAB1.self::TAB1.self::TAB1."try";
         $lines[] = self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$dataItem = new SetterGetter(json_decode($dataItem));';
+        
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'if(is_string($dataItem))';
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$dataItem = new SetterGetter(json_decode($dataItem));';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.'rowId = $dataItem->getPrimaryKey();';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.'sortOrder = intval($dataItem->getSortOrder());';
+
+        
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$specification = PicoSpecification::getInstance()';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'->addAnd(PicoPredicate::getInstance()->equals('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $rowId))';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'->addAnd($dataFilter)';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.';';
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectName.' = new '.$entityName.'(null, $database);';
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectName.'->where($specification)';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'->setSortOrder($sortOrder)';
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'->update();';     
         $lines[] = self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
 
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::VAR.'primaryKeyValue = $dataItem->getPrimaryKey();';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::VAR.'sortOrder = $dataItem->getSortOrder();';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::VAR.$objectName.'->where(PicoSpecification::getInstance()';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'->addAnd(new PicoPredicate(Field::of()->'.$camelPrimaryKey.', $primaryKeyValue))';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.')';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.'->setSortOrder($sortOrder)';
-        $lines[] = self::TAB1.self::TAB1.self::TAB1.'->update();';     
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1."catch(Exception \$e)";
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
+
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1."// Do something here to handle exception";
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'error_log($e->getMessage());';
+				
+        $lines[] = self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $lines[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $lines[] = self::TAB1.self::CURLY_BRACKET_CLOSE;
 

@@ -21,6 +21,531 @@ class DataException extends Exception
 
 }
 
+class ConstantText
+{
+    const SHOW_TABLES = "SHOW TABLES";
+    const BTN_SUCCESS = 'btn btn-success';
+}
+
+/**
+ * Class DatabaseExporter
+ * 
+ * A class to export both the structure (CREATE TABLE) and data (INSERT INTO) of all tables 
+ * from different database types: SQLite, MySQL, and PostgreSQL using PDO.
+ */
+class DatabaseExporter
+{
+    const DATABASE_TYPE_SQLITE = 'sqlite';
+    const DATABASE_TYPE_MYSQL = 'mysql';
+    const DATABASE_TYPE_MARIADB = 'mariadb';
+    const DATABASE_TYPE_PGSQL = 'pgsql';
+
+
+    /**
+     * Database connection (SQLite, MySQL, or PostgreSQL)
+     * 
+     * @var PDO
+     */
+    private $db; 
+
+    /**
+     * Buffer to store the SQL export data
+     * 
+     * @var string
+     */
+    private $outputBuffer; 
+
+    /**
+     * Database type (sqlite, mysql, or postgresql)
+     * 
+     * @var string
+     */
+    private $dbType; 
+
+    /**
+     * DatabaseExporter constructor.
+     * 
+     * Initializes the database connection based on the specified database type.
+     *
+     * @param string $dbType The type of the database (PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_MYSQL, PicoDatabaseType::DATABASE_TYPE_PGSQL).
+     * @param PDO $pdo The PDO instance for the database connection.
+     */
+    public function __construct($dbType, $pdo)
+    {
+        $this->dbType = strtolower($dbType);
+        $this->outputBuffer = '';
+
+        $this->db = $pdo;
+    }
+
+    /**
+     * Exports both table structure (CREATE TABLE) and data (INSERT INTO).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query (default is 100).
+     * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
+     */
+    public function export($tables = null, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    {
+        $this->outputBuffer .= "-- Database structure\r\n\r\n";
+        $this->exportTableStructure($tables);
+        $this->outputBuffer .= "-- Database content\r\n";
+        $this->exportTableData($tables, $schema, $batchSize, $maxQuerySize);
+    }
+
+
+    /**
+     * Exports the structure of all tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     */
+    private function exportTableStructure($tables, $schema = 'public')
+    {
+        switch ($this->dbType) {
+            case PicoDatabaseType::DATABASE_TYPE_SQLITE:
+                $this->exportSQLiteTableStructure($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_MYSQL:
+            case PicoDatabaseType::DATABASE_TYPE_MARIADB:
+                $this->exportMySQLTableStructure($tables);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_PGSQL:
+                $this->exportPostgreSQLTableStructure($tables, $schema);
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    /**
+     * Determines if a table should be exported based on the provided list.
+     *
+     * @param string $table The table to check.
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @return bool True if the table should be exported, false otherwise.
+     */
+    private function toBeExported($table, $tables)
+    {
+        // Trim whitespace from the table name and the provided table list
+        $table = trim($table);
+        
+        if (!isset($tables) || !is_array($tables) || empty($tables)) {
+            return true;
+        }
+        
+        // Compare trimmed table names (case insensitive)
+        return in_array(strtolower($table), array_map(function($t) { return strtolower(trim($t)); }, $tables));
+    }
+
+    /**
+     * Exports the structure of SQLite tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     */
+    private function exportSQLiteTableStructure($tables)
+    {
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['name'];
+            if($this->toBeExported($tableName, $tables))
+            {
+                $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
+                $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['sql'];
+                $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
+                $this->outputBuffer .= "$createTableSql;\n\n";
+            }
+        }
+    }
+
+    /**
+     * Exports the structure of MySQL tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     */
+    private function exportMySQLTableStructure($tables)
+    {
+        $result = $this->db->query(ConstantText::SHOW_TABLES);
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = array_values($table)[0];
+            if($this->toBeExported($tableName, $tables))
+            {
+                $createTable = $this->db->query("SHOW CREATE TABLE $tableName");
+                $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['Create Table'];
+                $this->outputBuffer .= "$createTableSql;\n\n";
+            }
+        }
+    }
+
+    /**
+     * Exports the structure of PostgreSQL tables (CREATE TABLE).
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     */
+    private function exportPostgreSQLTableStructure($tables, $schema = 'public')
+    {
+        // Query to get all table names in PostgreSQL for the specified schema
+        $result = $this->db->query("
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = '$schema';
+        ");
+        
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['table_name'];
+            if ($this->toBeExported($tableName, $tables)) {
+                $primaryKeyColumns = [];
+                $foreignKeys = [];
+
+                $columns = $this->getPostgreSQLColumn($tableName, $schema);
+
+                // Query to get primary key columns
+                $primaryKeyQuery = $this->db->query("
+                    SELECT 
+                        tc.constraint_name, 
+                        tc.table_name, 
+                        kcu.column_name
+                    FROM 
+                        information_schema.table_constraints AS tc 
+                    INNER JOIN 
+                        information_schema.key_column_usage AS kcu 
+                    ON 
+                        tc.constraint_name = kcu.constraint_name
+                    WHERE 
+                        tc.constraint_type = 'PRIMARY KEY'
+                        AND tc.table_name = '$tableName'
+                        AND tc.table_schema = '$schema';
+                ");
+
+                while ($primaryKey = $primaryKeyQuery->fetch(PDO::FETCH_ASSOC)) {
+                    $primaryKeyColumns[] = $primaryKey['column_name'];
+                }
+
+                // Add PRIMARY KEY constraint if applicable
+                if (!empty($primaryKeyColumns)) {
+                    $columns[] = 'PRIMARY KEY (' . implode(', ', $primaryKeyColumns) . ')';
+                }
+
+                // Query to get foreign keys
+                $foreignKeyQuery = $this->db->query("
+                    SELECT 
+                        tc.constraint_name, 
+                        tc.table_name, 
+                        kcu.column_name, 
+                        ccu.table_name AS referenced_table,
+                        ccu.column_name AS referenced_column
+                    FROM 
+                        information_schema.table_constraints AS tc 
+                    INNER JOIN 
+                        information_schema.key_column_usage AS kcu 
+                    ON 
+                        tc.constraint_name = kcu.constraint_name
+                    INNER JOIN 
+                        information_schema.constraint_column_usage AS ccu 
+                    ON 
+                        tc.constraint_name = ccu.constraint_name
+                    WHERE 
+                        tc.constraint_type = 'FOREIGN KEY'
+                        AND tc.table_name = '$tableName'
+                        AND tc.table_schema = '$schema';
+                ");
+
+                while ($foreignKey = $foreignKeyQuery->fetch(PDO::FETCH_ASSOC)) {
+                    $foreignKeys[] = 'FOREIGN KEY (' . $foreignKey['column_name'] . ') REFERENCES ' . $foreignKey['referenced_table'] . ' (' . $foreignKey['referenced_column'] . ')';
+                }
+
+                // Add FOREIGN KEY constraint if applicable
+                if (!empty($foreignKeys)) {
+                    $columns = array_merge($columns, $foreignKeys);
+                }
+
+                // Construct CREATE TABLE statement
+                $createTableSql = "CREATE TABLE $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
+                $this->outputBuffer .= "$createTableSql\n\n";
+            }
+        }
+    }
+
+
+    /**
+     * Retrieves the column details for a given PostgreSQL table.
+     * 
+     * This method queries the `information_schema.columns` to get the column names, 
+     * data types, nullable constraints, and default values for a table in PostgreSQL.
+     *
+     * @param string $tableName The name of the table whose columns are to be retrieved.
+     * @param string $schema The schema where the table resides (default is 'public').
+     * 
+     * @return array An array of column definitions, including name, data type, 
+     *               nullable constraints, and default values.
+     */
+    private function getPostgreSQLColumn($tableName, $schema = 'public')
+    {
+        // Query to get column details (name, data type, nullable, default)
+        $createTableQuery = $this->db->query("
+            SELECT column_name, data_type, is_nullable, column_default 
+            FROM information_schema.columns 
+            WHERE table_name = '$tableName' 
+            AND table_schema = '$schema';
+        ");
+
+        $columns = [];
+
+        // Collect column definitions
+        while ($column = $createTableQuery->fetch(PDO::FETCH_ASSOC)) {
+            $columnDefinition = $column['column_name'] . ' ' . $column['data_type'];
+
+            // Add NOT NULL constraint if applicable
+            if (strtoupper($column['is_nullable']) == 'NO') {
+                $columnDefinition .= ' NOT NULL';
+            }
+
+            // Add default value if applicable
+            if ($column['column_default'] !== null) {
+                $columnDefinition .= ' DEFAULT ' . $column['column_default'];
+            }
+
+            $columns[] = $columnDefinition;
+        }
+
+        return $columns;
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of all tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     * @param int $batchSize The number of rows per INSERT query (default is 100).
+     * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
+     */
+    private function exportTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    {
+        switch ($this->dbType) {
+            case PicoDatabaseType::DATABASE_TYPE_SQLITE:
+                $this->exportSQLiteTableData($tables, $batchSize, $maxQuerySize);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_MYSQL:
+            case PicoDatabaseType::DATABASE_TYPE_MARIADB:
+                $this->exportMySQLTableData($tables, $batchSize, $maxQuerySize);
+                break;
+            case PicoDatabaseType::DATABASE_TYPE_PGSQL:
+                $this->exportPostgreSQLTableData($tables, $schema, $batchSize, $maxQuerySize);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Determines if the batch limit or query size limit has been reached.
+     * 
+     * @param int $nrec The number of records processed so far in the current batch.
+     * @param int $batchSize The maximum number of records allowed per query.
+     * @param int $querySize The current size of the query in bytes.
+     * @param int $maxQuerySize The maximum allowed query size in bytes.
+     *
+     * @return bool Returns `true` if the batch limit or query size limit has been reached, `false` otherwise.
+     */
+    private function reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)
+    {
+        return $nrec % $batchSize == 0 || $querySize > $maxQuerySize;
+    }
+
+    private function addNewLine($nrec)
+    {
+        if ($nrec > 0) {
+            $this->outputBuffer .= "\r\n";
+        }
+    }
+
+    private function constructInsertQuery($tableName, $columns, $batchValues)
+    {
+        return "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of SQLite tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
+     */
+    private function exportSQLiteTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
+    {
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['name'];
+            if ($this->toBeExported($tableName, $tables)) {
+                $rows = $this->db->query("SELECT * FROM $tableName;");
+                $nrec = 0;
+                $batchValues = [];
+                $querySize = 0;
+
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    $batchValues[] = "($valuesList)";
+                    $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
+                }
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
+                    $this->outputBuffer .= $insertSql;
+                }
+
+                $this->addNewLine($nrec);
+            }
+        }
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of MySQL tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
+     */
+    private function exportMySQLTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
+    {
+        $result = $this->db->query(ConstantText::SHOW_TABLES);
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = array_values($table)[0];
+            if ($this->toBeExported($tableName, $tables)) {
+                $rows = $this->db->query("SELECT * FROM $tableName");
+                $nrec = 0;
+                $batchValues = [];
+                $querySize = 0;
+
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    $batchValues[] = "($valuesList)";
+                    $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
+                }
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $insertSql = $this->constructInsertQuery($tableName, $columns, $batchValues);
+                    $this->outputBuffer .= $insertSql;
+                }
+
+                $this->addNewLine($nrec);
+            }
+        }
+    }
+
+    /**
+     * Exports the data (INSERT INTO) of PostgreSQL tables.
+     * 
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema where the tables reside (default is 'public').
+     * @param int $batchSize The number of rows per INSERT query.
+     * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
+     */
+    private function exportPostgreSQLTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    {
+        // Query to get all table names in the specified schema
+        $result = $this->db->query("
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = '$schema';
+        ");
+
+        while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['table_name'];
+            if ($this->toBeExported($tableName, $tables)) {
+                // Query to get all rows from the specified table
+                $rows = $this->db->query("SELECT * FROM $schema.$tableName");
+                $nrec = 0;
+                $batchValues = [];
+                $querySize = 0;
+
+                // Iterate through the rows and generate INSERT INTO statements
+                while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+                    $columns = array_keys($row);
+                    $values = array_values($row);
+                    $valuesList = implode(", ", array_map(function ($value) {
+                        return $this->db->quote($value);
+                    }, $values));
+                    $batchValues[] = "($valuesList)";
+                    $nrec++;
+
+                    // Generate the INSERT statement up to the current batch
+                    $insertSql = $this->constructInsertQuery("$schema.$tableName", $columns, $batchValues);
+                    $querySize = strlen($insertSql);
+
+                    // If we hit either the batch size or max query size, execute and reset
+                    if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
+                        $this->outputBuffer .= $insertSql."\r\n";
+                        $batchValues = [];  // Clear the batch for the next set
+                        $querySize = 0;     // Reset query size
+                    }
+                }
+
+                // Insert any remaining rows after the loop
+                if (!empty($batchValues)) {
+                    $insertSql = $this->constructInsertQuery("$schema.$tableName", $columns, $batchValues);
+                    $this->outputBuffer .= $insertSql;
+                }
+
+                $this->addNewLine($nrec);
+            }
+        }
+    }
+
+    /**
+     * Returns the exported SQL data from the buffer.
+     * 
+     * @return string The SQL export data.
+     */
+    public function getExportData()
+    {
+        return $this->outputBuffer;
+    }
+
+    /**
+     * Saves the exported SQL data to a specified file.
+     * 
+     * @param string $filePath The path where the exported SQL file should be saved.
+     */
+    public function saveToFile($filePath)
+    {
+        file_put_contents($filePath, $this->outputBuffer);
+    }
+}
+
 /**
  * Class DatabaseExplorer
  * 
@@ -210,7 +735,7 @@ class DatabaseExplorer // NOSONAR
 
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? "SHOW TABLES" : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? ConstantText::SHOW_TABLES : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
             $stmt = $pdo->query($sql);
             
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -635,9 +1160,13 @@ class DatabaseExplorer // NOSONAR
             // Add table headers
             $stmt = $pdo->query("SELECT * FROM $table LIMIT $limit OFFSET $offset");
             $th = $dom->createElement('th', '');
-            $th->setAttribute('width', '40');
+            $th->setAttribute('width', '28');
             $th->setAttribute('class', 'cell-edit');
             $tr->appendChild($th);
+            $th2 = $dom->createElement('th', '');
+            $th2->setAttribute('width', '28');
+            $th2->setAttribute('class', 'cell-edit');
+            $tr->appendChild($th2);
             for ($i = 0; $i < $stmt->columnCount(); $i++) {
                 $col = $stmt->getColumnMeta($i);
                 $th = $dom->createElement('th', htmlspecialchars($col['name']));
@@ -658,6 +1187,20 @@ class DatabaseExplorer // NOSONAR
                 $td->setAttribute('class', 'cell-edit');
                 $td->appendChild($a);
                 $tr->appendChild($td);
+
+                $deleteLink = $dom->createElement('a');
+                $deleteLink->setAttribute('href', "javascript:;");
+                $deleteLink->setAttribute('data-database', $databaseName);
+                $deleteLink->setAttribute('data-schema', $schemaName);
+                $deleteLink->setAttribute('data-table', $table);
+                $deleteLink->setAttribute('data-primary-key', $primaryKeyName);
+                $deleteLink->setAttribute('data-value', $id);
+                $deleteLink->appendChild($dom->createTextNode("❌"));
+                $deleteTd = $dom->createElement('td');
+                $deleteTd->setAttribute('class', 'cell-delete');
+                $deleteTd->appendChild($deleteLink);
+                $tr->appendChild($deleteTd);
+
                 foreach ($row as $value) {
                     $td = $dom->createElement('td', htmlspecialchars($value));
                     $tr->appendChild($td);
@@ -906,7 +1449,7 @@ class DatabaseExplorer // NOSONAR
             $inputSubmit->setAttribute('type', 'submit');
             $inputSubmit->setAttribute('name', 'update');
             $inputSubmit->setAttribute('value', 'Update');
-            $inputSubmit->setAttribute('class', 'btn btn-success');
+            $inputSubmit->setAttribute('class', ConstantText::BTN_SUCCESS);
             $form->appendChild($inputSubmit);
             
             // Add space between buttons
@@ -961,7 +1504,6 @@ class DatabaseExplorer // NOSONAR
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('value', $value);  
-            return $input;
         }
         else if(self::isDateTime($type))
         {
@@ -1175,10 +1717,12 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($br);
 
         // Create submit button
-        $submit = $dom->createElement('input');
+        $submit = $dom->createElement('button');
         $submit->setAttribute('type', 'submit');
         $submit->setAttribute('value', 'Execute');
         $submit->setAttribute('class', 'btn btn-success execute');
+        $buttonText = $dom->createTextNode('Execute');
+        $submit->appendChild($buttonText);
         $form->appendChild($submit);
 
         // Add space between buttons
@@ -1186,10 +1730,11 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($space);
 
         // Create reset button
-        $reset = $dom->createElement('input');
+        $reset = $dom->createElement('button');
         $reset->setAttribute('type', 'reset');
         $reset->setAttribute('value', 'Reset');
         $reset->setAttribute('class', 'btn btn-warning reset');
+        $reset->appendChild($dom->createTextNode('Reset'));
         $form->appendChild($reset);
         
         // Add space between buttons
@@ -1197,11 +1742,60 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($space);
         
         // Create importStructure button
-        $importStructure = $dom->createElement('input');
+        $importStructure = $dom->createElement('button');
         $importStructure->setAttribute('type', 'button');
         $importStructure->setAttribute('value', 'Import Structure');
         $importStructure->setAttribute('class', 'btn btn-primary import-structure');
+        $importStructure->appendChild($dom->createTextNode('Import Structure'));
         $form->appendChild($importStructure);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+        
+        // Create entityEditor button
+        $entityEditor = $dom->createElement('button');
+        $entityEditor->setAttribute('type', 'button');
+        $entityEditor->setAttribute('value', 'Entity Editor');
+        $entityEditor->setAttribute('class', 'btn btn-primary open-entity-editor');
+        $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
+        $form->appendChild($entityEditor);
+
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
+        // Create exportTable button
+
+        $inputGet = new InputGet();
+
+        $tableName = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+        $exportTable = $dom->createElement('button');
+        $exportTable->setAttribute('type', 'submit');
+        $exportTable->setAttribute('name', '___export_table___');
+        $exportTable->setAttribute('value', $tableName);
+        $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);
+        $exportTable->appendChild($dom->createTextNode('Export Table'));
+        $form->appendChild($exportTable);
+        
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
+        // Create exportDatabase button
+        $exportDatabase = $dom->createElement('button');
+        $exportDatabase->setAttribute('type', 'submit');
+        $exportDatabase->setAttribute('name', '___export_database___');
+        $exportDatabase->setAttribute('value', $databaseName);
+        $exportDatabase->setAttribute('class', ConstantText::BTN_SUCCESS);
+        $exportDatabase->appendChild($dom->createTextNode('Export Database'));
+        $form->appendChild($exportDatabase);
+        
+
+        //<button class="btn btn-primary" type="submit" name="___export_database___" value="yes">Export Database</button>
+
 
         // Append form to DOM
         $dom->appendChild($form);
@@ -1416,6 +2010,7 @@ if ($limit < 1) {
 $dbType = "mysql";
 // Load the database configuration
 $databaseConfig = new SecretObject();
+
 $appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
 
 if (file_exists($appConfigPath)) {
@@ -1431,7 +2026,7 @@ if (file_exists($appConfigPath)) {
     if (empty($schemaName)) {
         $schemaName = $databaseConfig->getDatabaseSchema();
     }
-
+    $databaseConfig->setCharset('UTF8');
     $database = new PicoDatabase($databaseConfig);
 
     try {
@@ -1457,6 +2052,31 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Initialize variables for query processing
 $queries = array();
 $lastQueries = "";
+
+if(isset($_POST['___export_database___']) || isset($_POST['___export_table___']))
+{
+    $maxRecord = 200;
+    $maxQuerySize = 524288;
+    
+    $tables = [];
+    if(isset($_POST['___export_table___']) && trim($_POST['___export_table___']) != "")
+    {
+        $tableName = $_POST['___export_table___'];
+        $tables[] = $tableName;
+        $filename = $tableName."-".date("Y-m-d-H-i-s").".sql";
+    }
+    else
+    {
+        $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
+    }
+    $filename = trim($filename, " - ");
+    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter->export($tables, $schemaName, $maxRecord, $maxQuerySize);
+    header("Content-type: text/plain");
+    header("Content-disposition: attachment; filename=\"$filename\"");
+    echo $exporter->getExportData();
+    exit();
+}
 
 if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___primary_key_value___']) && isset($_POST['___column_list___']))
 {
@@ -1513,9 +2133,12 @@ else {
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.css">
+    <link rel="stylesheet" href="css/entity-editor.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/import-structure.min.js"></script>
+    <script src="lib.assets/js/EntityEditor.js"></script>
+    <script src="lib.assets/js/ResizablePanel.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
@@ -1576,13 +2199,13 @@ else {
         ?>
     </div>
     
-    <div class="modal" id="translatorModal">
+    <div class="modal" id="queryTranslatorModal">
         <div class="modal-backdrop"></div>
 
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Import Database Structure</h3>
-                <span class="close-btn" id="closeBtn">&times;</span>
+                <span class="close-btn cancel-button">&times;</span>
             </div>
             
             <div class="modal-body">
@@ -1594,7 +2217,77 @@ else {
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
-                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn btn-secondary cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="entityEditorModal">
+        <div class="modal-backdrop"></div>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Editor</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <div class="entity-editor">
+                    <div class="container">
+                        <div class="left-panel">
+                            <div class="entities-container">
+                                <!-- Entities will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="resize-bar"></div>
+                        <div class="right-panel">
+                            <div class="entity-selector"><label> <input type="checkbox" class="check-all-entity"> Export all</label></div>
+                            <ul class="table-list"></ul>
+                            <textarea class="query-generated" spellcheck="false"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <button class="btn" onclick="editor.showEditor(-1)">Create New Entity</button>
+                        <button class="btn" onclick="editor.importFromSQL()">Import from SQL</button>
+                        <input type="file" class="file-import" style="display:none;" onchange="editor.handleFileImport(event)">    
+                    </div>
+
+                    <!-- Entity Editor Form -->
+                    <div class="editor-form" style="display:none;">
+                        <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
+                        <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
+                        <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                        <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
+                        <div class="table-container">
+                        <table id="columns-table">
+                            <thead>
+                                <tr>
+                                    <th class="column-action"></th>
+                                    <th>Column Name</th>
+                                    <th>Type</th>
+                                    <th>Length</th>
+                                    <th>Value</th>
+                                    <th>Default</th>
+                                    <th class="column-nl">NL</th>
+                                    <th class="column-pk">PK</th>
+                                    <th class="column-ai">AI</th>
+                                </tr>
+                            </thead>
+                            <tbody class="columns-table-body">
+                                <!-- Columns will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">            
+                <button class="btn btn-primary import-from-entity">Import</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-button">Cancel</button>
             </div>
         </div>
     </div>
