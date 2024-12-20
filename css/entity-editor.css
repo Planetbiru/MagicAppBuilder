@@ -81,20 +81,27 @@ body {
   border: 1px solid #999999;
   color: #333333;
 }
-.entity-editor .entity-name:focus-visible {
+.entity-editor input[type=text].entity-name,
+.entity-editor select.entity-name {
+  border: 1px solid #dddddd;
+}
+.entity-editor input[type=text].entity-name:focus-visible,
+.entity-editor select.entity-name:focus-visible {
   outline: none;
 }
+.entity-editor .editor-container {
+  height: 225px;
+}
 .entity-editor .editor-form {
-  margin-top: 5px;
   padding: 10px 0 0 0;
-  border-top: 1px solid #DDD;
 }
 .entity-editor .editor-form h3 {
   margin: 0;
 }
 .entity-editor .editor-form .table-container {
-  max-height: 140px;
+  max-height: 180px;
   overflow: auto;
+  padding-top: 5px;
 }
 .entity-editor .editor-form table {
   width: 100%;

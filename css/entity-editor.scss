@@ -107,27 +107,31 @@ body {
         background-color: #FFFFFF;
         border: 1px solid #999999;
         color: #333333;
-    }
-    
-    .entity-name{
-        &:focus-visible{
-            outline: none;
+        &.entity-name{
+            border: 1px solid #dddddd;
+            &:focus-visible{
+                outline: none;
+            }
         }
     }
 
     // Form editor
+    .editor-container
+    {
+        height: 225px;
+    }
     .editor-form {
-        margin-top: 5px;
         padding: 10px 0 0 0;
-        border-top: 1px solid #DDD;
+        
 
         h3 {
             margin: 0;
         }
 
         .table-container {
-            max-height: 140px;
+            max-height: 180px;
             overflow: auto;
+            padding-top: 5px;
         }
 
         table {

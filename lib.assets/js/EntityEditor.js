@@ -222,6 +222,7 @@ class EntityEditor {
             document.querySelector(this.selector+" .entity-name").value = newTableName;
             document.querySelector(this.selector+" .columns-table-body").innerHTML = '';
         }
+        document.querySelector(this.selector+" .button-container").style.display = "none";
         document.querySelector(this.selector+" .editor-form").style.display = "block";
     }
 
@@ -442,6 +443,7 @@ class EntityEditor {
      */
     cancelEdit() {
         document.querySelector(this.selector+" .editor-form").style.display = "none";
+        document.querySelector(this.selector+" .button-container").style.display = "block";
     }
 
     /**
@@ -474,39 +476,16 @@ class EntityEditor {
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
      */
     exportToSQL() {
-        let sql = "";       
+        let sql = [];       
         const selectedEntities = document.querySelectorAll('.selected-entity:checked');  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
     
             if (entity) {
-                sql += entity.toSQL();
+                sql.push(entity.toSQL());
             }
         });
-        document.querySelector(this.selector+" .query-generated").value = sql;
-    }
-    
-
-    /**
-     * Triggered when the user wants to import a SQL file.
-     */
-    importFromSQL() {
-        document.querySelector(this.selector+" .file-import").click();
-    }
-
-    /**
-     * Handles the file import by reading the content of the SQL file.
-     * 
-     * @param {Event} event - The file import event.
-     */
-    handleFileImport(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function () {
-            const content = reader.result;
-            console.log(content);
-        };
-        reader.readAsText(file);
+        document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
 }
