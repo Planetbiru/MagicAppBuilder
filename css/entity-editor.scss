@@ -1,5 +1,5 @@
 // Variable for color and size
-$primary-bg-color: #f4f4f4;
+$primary-bg-color: #fbfbfb;
 $border-color: #ddd;
 $light-bg-color: #f1f1f1;
 $min-panel-width: 100px;
@@ -67,6 +67,7 @@ body {
     // Panel size
     .left-panel {
         width: calc(70% - 5px);
+        background-color: $primary-bg-color;
     }
 
     .right-panel {
@@ -146,10 +147,10 @@ body {
             .column-action {
                 text-align: center;
                 white-space: nowrap;
-                width: 64px;
+                width: 68px;
 
                 button {
-                    font-size: 13px;
+                    font-size: 14px;
                     margin-bottom: 2px;
                 }
             }
@@ -223,7 +224,7 @@ body {
                     border: none;
                     width: 100%;
                     box-sizing: border-box;
-                    padding: 1px 8px;
+                    padding: 2px 8px;
                 }
 
                 input[type="text"]:focus-visible,
@@ -289,7 +290,7 @@ body {
         }
 
         .entity-body ul li {
-            padding: 4px 10px;
+            padding: 4px 10px 5px 10px;
             border-bottom: 1px solid #DDDDDD;
         }
 
@@ -300,8 +301,9 @@ body {
         .entity-body ul li .data-type {
             background-color: #E4E4E4;
             padding: 2px 5px;
-            font-size: 10px;
+            font-size: 9px;
             float: right;
+            margin-top: 1px;
             margin-left: 8px;
             border-radius: 2px;
         }

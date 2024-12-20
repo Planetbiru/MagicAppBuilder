@@ -11,12 +11,12 @@ class Column {
      * 
      * @param {string} name - The name of the column.
      * @param {string} [type="VARCHAR"] - The type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
+     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
      * @param {string} [defaultValue=""] - The default value for the column (optional).
      * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
      * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
      * @param {string} [enumValues=""] - The values for ENUM or SET types, if applicable (comma-separated).
-     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      */
     constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, enumValues = "") //NOSONAR
     {
@@ -28,6 +28,7 @@ class Column {
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
         this.enumValues = enumValues;
+        this.typeWithValue = ['ENUM', 'SET'];
     }
 
     /**
@@ -43,7 +44,7 @@ class Column {
         let columnDef = `${this.name} ${this.type}`;
         
         // If the type is ENUM or SET, handle them similarly
-        if ((this.type === 'ENUM' || this.type === 'SET') && this.enumValues) {
+        if ((this.typeWithValue.includes(this.type)) && this.enumValues) {
             const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
         } else if (this.length) {
@@ -163,10 +164,12 @@ class EntityEditor {
             'DOUBLE', 'DECIMAL', 'FLOAT', 'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
-            'ENUM', 'SET', 'JSON',
+            'ENUM', 'SET', 
             'LONGBLOB', 'MEDIUMBLOB', 'BLOB', 'TINYBLOB',
-            'UUID', 'VARBINARY', 'BINARY',
-            'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY'
+            'UUID', 
+            'VARBINARY', 'BINARY',
+            'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY',
+            'JSON',
         ];
         this.typeWithLength = [
             'VARCHAR', 'CHAR', 
@@ -174,6 +177,7 @@ class EntityEditor {
             'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
 
         ];
+        this.typeWithValue = ['ENUM', 'SET'];
         this.addCheckboxListeners();
         this.callbackLoadEntity = setting.callbackLoadEntity;
         this.callbackSaveEntity = setting.callbackSaveEntity;
@@ -273,7 +277,7 @@ class EntityEditor {
                 </select>
             </td>
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.typeWithLength.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${typeSimple === 'ENUM' || typeSimple === 'SET' ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.typeWithValue.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
             <td class="column-pk"><input type="checkbox" class="column-primaryKey" ${column.primaryKey ? 'checked' : ''}></td>
@@ -534,7 +538,7 @@ class EntityEditor {
         }
 
         // Show enum input for ENUM type
-        if (columnType === "ENUM" || columnType === "SET") {
+        if (this.typeWithValue.includes(columnType)) {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";

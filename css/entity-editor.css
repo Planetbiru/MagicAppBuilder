@@ -47,10 +47,11 @@ body {
 }
 .entity-editor .left-panel {
   width: calc(70% - 5px);
+  background-color: #fbfbfb;
 }
 .entity-editor .right-panel {
   width: calc(30% - 5px);
-  background-color: #f4f4f4;
+  background-color: #fbfbfb;
 }
 .entity-editor .right-panel textarea {
   height: calc(100vh - 555px);
@@ -114,10 +115,10 @@ body {
 .entity-editor .editor-form table .column-action {
   text-align: center;
   white-space: nowrap;
-  width: 64px;
+  width: 68px;
 }
 .entity-editor .editor-form table .column-action button {
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 2px;
 }
 .entity-editor .editor-form table thead {
@@ -175,7 +176,7 @@ body {
   border: none;
   width: 100%;
   box-sizing: border-box;
-  padding: 1px 8px;
+  padding: 2px 8px;
 }
 .entity-editor .editor-form table td input[type=text]:focus-visible,
 .entity-editor .editor-form table td select:focus-visible {
@@ -227,7 +228,7 @@ body {
   padding: 0;
 }
 .entity-editor .entity .entity-body ul li {
-  padding: 4px 10px;
+  padding: 4px 10px 5px 10px;
   border-bottom: 1px solid #DDDDDD;
 }
 .entity-editor .entity .entity-body ul li:last-child {
@@ -236,8 +237,9 @@ body {
 .entity-editor .entity .entity-body ul li .data-type {
   background-color: #E4E4E4;
   padding: 2px 5px;
-  font-size: 10px;
+  font-size: 9px;
   float: right;
+  margin-top: 1px;
   margin-left: 8px;
   border-radius: 2px;
 }
