@@ -47,10 +47,11 @@ body {
 }
 .entity-editor .left-panel {
   width: calc(70% - 5px);
+  background-color: #fbfbfb;
 }
 .entity-editor .right-panel {
   width: calc(30% - 5px);
-  background-color: #f4f4f4;
+  background-color: #fbfbfb;
 }
 .entity-editor .right-panel textarea {
   height: calc(100vh - 555px);
@@ -81,20 +82,27 @@ body {
   border: 1px solid #999999;
   color: #333333;
 }
-.entity-editor .entity-name:focus-visible {
+.entity-editor input[type=text].entity-name,
+.entity-editor select.entity-name {
+  border: 1px solid #dddddd;
+}
+.entity-editor input[type=text].entity-name:focus-visible,
+.entity-editor select.entity-name:focus-visible {
   outline: none;
 }
+.entity-editor .editor-container {
+  height: 225px;
+}
 .entity-editor .editor-form {
-  margin-top: 5px;
   padding: 10px 0 0 0;
-  border-top: 1px solid #DDD;
 }
 .entity-editor .editor-form h3 {
   margin: 0;
 }
 .entity-editor .editor-form .table-container {
-  max-height: 140px;
+  max-height: 180px;
   overflow: auto;
+  padding-top: 5px;
 }
 .entity-editor .editor-form table {
   width: 100%;
@@ -107,10 +115,10 @@ body {
 .entity-editor .editor-form table .column-action {
   text-align: center;
   white-space: nowrap;
-  width: 64px;
+  width: 68px;
 }
 .entity-editor .editor-form table .column-action button {
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 2px;
 }
 .entity-editor .editor-form table thead {
@@ -122,7 +130,7 @@ body {
   position: sticky;
   top: 0;
   background-color: #f1f1f1;
-  padding: 8px;
+  padding: 4px 8px;
   text-align: left;
   z-index: 2;
 }
@@ -140,6 +148,18 @@ body {
   width: 20px;
   text-align: center;
 }
+.entity-editor .editor-form table th:nth-child(3) {
+  width: 12%;
+}
+.entity-editor .editor-form table th:nth-child(4) {
+  width: 10%;
+}
+.entity-editor .editor-form table th:nth-child(5) {
+  width: 15%;
+}
+.entity-editor .editor-form table th:nth-child(6) {
+  width: 12%;
+}
 .entity-editor .editor-form table td {
   border: 1px solid #ccc;
   padding: 0;
@@ -156,7 +176,7 @@ body {
   border: none;
   width: 100%;
   box-sizing: border-box;
-  padding: 1px 8px;
+  padding: 2px 8px;
 }
 .entity-editor .editor-form table td input[type=text]:focus-visible,
 .entity-editor .editor-form table td select:focus-visible {
@@ -172,7 +192,7 @@ body {
 }
 .entity-editor .entity {
   display: inline-block;
-  min-width: 200px;
+  min-width: 180px;
   border: 1px solid #DDDDDD;
   vertical-align: top;
   margin-right: 10px;
@@ -208,7 +228,7 @@ body {
   padding: 0;
 }
 .entity-editor .entity .entity-body ul li {
-  padding: 4px 10px;
+  padding: 4px 10px 5px 10px;
   border-bottom: 1px solid #DDDDDD;
 }
 .entity-editor .entity .entity-body ul li:last-child {
@@ -217,8 +237,9 @@ body {
 .entity-editor .entity .entity-body ul li .data-type {
   background-color: #E4E4E4;
   padding: 2px 5px;
-  font-size: 10px;
+  font-size: 9px;
   float: right;
+  margin-top: 1px;
   margin-left: 8px;
   border-radius: 2px;
 }

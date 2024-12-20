@@ -656,9 +656,14 @@ class DatabaseExplorer // NOSONAR
         // Fetch databases
         $dbNameFromConfig = $databaseConfig ? $databaseConfig->getDatabaseName() : '';
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $stmt = ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) ? $pdo->query('SELECT datname FROM pg_database') : $pdo->query('SHOW DATABASES');
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+        $sql = ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) ? 'SELECT datname FROM pg_database' : 'SHOW DATABASES';
+        
+        $stmt = $pdo->prepare($sql);
+        
+        $stmt->execute();
+        
+        $rows = $stmt->fetchAll(PDO::FETCH_NUM);
+        foreach ($rows as $row) {
             $dbName = $row[0];
             $option = $dom->createElement('option', $dbName);
             $option->setAttribute('value', $dbName);
@@ -682,9 +687,13 @@ class DatabaseExplorer // NOSONAR
             $selectSchema->appendChild($option);
 
             $scNameFromConfig = $databaseConfig ? $databaseConfig->getDatabaseSchema() : '';
-            $stmt = $pdo->query("SELECT nspname FROM pg_catalog.pg_namespace WHERE nspname NOT LIKE 'pg_%' AND nspname != 'information_schema'; ");
+            $sql = "SELECT nspname FROM pg_catalog.pg_namespace WHERE nspname NOT LIKE 'pg_%' AND nspname != 'information_schema'; ";
 
-            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_NUM);
+        
+            foreach ($rows as $row) {
                 $scName = $row[0];
                 $option = $dom->createElement('option', $scName);
                 $option->setAttribute('value', $scName);
@@ -2032,6 +2041,7 @@ if (file_exists($appConfigPath)) {
     try {
         // Connect to the database and set schema for PostgreSQL
         $database->connect();
+        
         $dbType = $database->getDatabaseType();
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $database->query("SET search_path TO $schemaName;");
@@ -2043,6 +2053,7 @@ if (file_exists($appConfigPath)) {
 } else {
     exit();
 }
+
 
 // Get the PDO instance and set error mode
 $pdo = $database->getDatabaseConnection();
@@ -2129,6 +2140,9 @@ else {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="database-type" content="<?php echo $dbType;?>">
+    <meta name="database-name" content="<?php echo $databaseName;?>">
+    <meta name="database-schema" content="<?php echo $schemaName;?>">
+    <meta name="application-id" content="<?php echo $applicationId;?>">
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
@@ -2247,37 +2261,37 @@ else {
                         </div>
                     </div>
 
-                    <div class="button-container">
-                        <button class="btn" onclick="editor.showEditor(-1)">Create New Entity</button>
-                        <button class="btn" onclick="editor.importFromSQL()">Import from SQL</button>
-                        <input type="file" class="file-import" style="display:none;" onchange="editor.handleFileImport(event)">    
-                    </div>
-
-                    <!-- Entity Editor Form -->
-                    <div class="editor-form" style="display:none;">
-                        <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
-                        <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
-                        <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
-                        <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
-                        <div class="table-container">
-                        <table id="columns-table">
-                            <thead>
-                                <tr>
-                                    <th class="column-action"></th>
-                                    <th>Column Name</th>
-                                    <th>Type</th>
-                                    <th>Length</th>
-                                    <th>Value</th>
-                                    <th>Default</th>
-                                    <th class="column-nl">NL</th>
-                                    <th class="column-pk">PK</th>
-                                    <th class="column-ai">AI</th>
-                                </tr>
-                            </thead>
-                            <tbody class="columns-table-body">
-                                <!-- Columns will be dynamically inserted here -->
-                            </tbody>
-                        </table>
+                    
+                    <div class="editor-container">
+                        <div class="button-container">
+                            <button class="btn" onclick="editor.showEditor(-1)">Add Entity</button>
+                        </div>
+                        <!-- Entity Editor Form -->
+                        <div class="editor-form" style="display:none;">
+                            <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
+                            <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
+                            <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                            <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
+                            <div class="table-container">
+                            <table id="columns-table">
+                                <thead>
+                                    <tr>
+                                        <th class="column-action"></th>
+                                        <th>Column Name</th>
+                                        <th>Type</th>
+                                        <th>Length</th>
+                                        <th>Value</th>
+                                        <th>Default</th>
+                                        <th class="column-nl">NL</th>
+                                        <th class="column-pk">PK</th>
+                                        <th class="column-ai">AI</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="columns-table-body">
+                                    <!-- Columns will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     </div>

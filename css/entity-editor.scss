@@ -1,5 +1,5 @@
 // Variable for color and size
-$primary-bg-color: #f4f4f4;
+$primary-bg-color: #fbfbfb;
 $border-color: #ddd;
 $light-bg-color: #f1f1f1;
 $min-panel-width: 100px;
@@ -67,6 +67,7 @@ body {
     // Panel size
     .left-panel {
         width: calc(70% - 5px);
+        background-color: $primary-bg-color;
     }
 
     .right-panel {
@@ -107,27 +108,31 @@ body {
         background-color: #FFFFFF;
         border: 1px solid #999999;
         color: #333333;
-    }
-    
-    .entity-name{
-        &:focus-visible{
-            outline: none;
+        &.entity-name{
+            border: 1px solid #dddddd;
+            &:focus-visible{
+                outline: none;
+            }
         }
     }
 
     // Form editor
+    .editor-container
+    {
+        height: 225px;
+    }
     .editor-form {
-        margin-top: 5px;
         padding: 10px 0 0 0;
-        border-top: 1px solid #DDD;
+        
 
         h3 {
             margin: 0;
         }
 
         .table-container {
-            max-height: 140px;
+            max-height: 180px;
             overflow: auto;
+            padding-top: 5px;
         }
 
         table {
@@ -142,10 +147,10 @@ body {
             .column-action {
                 text-align: center;
                 white-space: nowrap;
-                width: 64px;
+                width: 68px;
 
                 button {
-                    font-size: 13px;
+                    font-size: 14px;
                     margin-bottom: 2px;
                 }
             }
@@ -160,7 +165,7 @@ body {
                 position: sticky;
                 top: 0;
                 background-color: $light-bg-color;
-                padding: 8px;
+                padding: 4px 8px;
                 text-align: left;
                 z-index: 2;
 
@@ -180,6 +185,23 @@ body {
                 &.column-ai {
                     width: 20px;
                     text-align: center;
+                }
+
+                &:nth-child(3)
+                {
+                    width: 12%;
+                }
+                &:nth-child(4)
+                {
+                    width: 10%;
+                }
+                &:nth-child(5)
+                {
+                    width: 15%;
+                }
+                &:nth-child(6)
+                {
+                    width: 12%;
                 }
             }
 
@@ -202,7 +224,7 @@ body {
                     border: none;
                     width: 100%;
                     box-sizing: border-box;
-                    padding: 1px 8px;
+                    padding: 2px 8px;
                 }
 
                 input[type="text"]:focus-visible,
@@ -227,7 +249,7 @@ body {
     // Entity styling
     .entity {
         display: inline-block;
-        min-width: 200px;
+        min-width: 180px;
         border: 1px solid #DDDDDD;
         vertical-align: top;
         margin-right: 10px;
@@ -268,7 +290,7 @@ body {
         }
 
         .entity-body ul li {
-            padding: 4px 10px;
+            padding: 4px 10px 5px 10px;
             border-bottom: 1px solid #DDDDDD;
         }
 
@@ -279,8 +301,9 @@ body {
         .entity-body ul li .data-type {
             background-color: #E4E4E4;
             padding: 2px 5px;
-            font-size: 10px;
+            font-size: 9px;
             float: right;
+            margin-top: 1px;
             margin-left: 8px;
             border-radius: 2px;
         }

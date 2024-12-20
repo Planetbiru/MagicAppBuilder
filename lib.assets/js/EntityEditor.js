@@ -11,23 +11,24 @@ class Column {
      * 
      * @param {string} name - The name of the column.
      * @param {string} [type="VARCHAR"] - The type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
+     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
      * @param {string} [defaultValue=""] - The default value for the column (optional).
      * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
      * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
      * @param {string} [enumValues=""] - The values for ENUM or SET types, if applicable (comma-separated).
-     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      */
-    constructor(name, type = "VARCHAR", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, enumValues = "", length = "") //NOSONAR
+    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, enumValues = "") //NOSONAR
     {
         this.name = name;
         this.type = type;
+        this.length = length;
         this.nullable = nullable;
         this.default = defaultValue;
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
         this.enumValues = enumValues;
-        this.length = length;
+        this.typeWithValue = ['ENUM', 'SET'];
     }
 
     /**
@@ -43,7 +44,7 @@ class Column {
         let columnDef = `${this.name} ${this.type}`;
         
         // If the type is ENUM or SET, handle them similarly
-        if ((this.type === 'ENUM' || this.type === 'SET') && this.enumValues) {
+        if ((this.typeWithValue.includes(this.type)) && this.enumValues) {
             const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
         } else if (this.length) {
@@ -145,8 +146,16 @@ class EntityEditor {
 
     /**
      * Creates an instance of the EntityEditor class.
+     * 
+     * @param {string} selector - The CSS selector that identifies the target element for the entity editor.
+     * @param {Object} [options={}] - Optional configuration settings for the entity editor.
      */
-    constructor(selector) {
+    constructor(selector, options = {}) {
+        let setting = {};
+
+        // Copy properties from options to setting object
+        Object.assign(setting, options);
+
         this.selector = selector;
         this.entities = [];
         this.currentEntityIndex = -1;
@@ -155,10 +164,12 @@ class EntityEditor {
             'DOUBLE', 'DECIMAL', 'FLOAT', 'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
-            'ENUM', 'SET', 'JSON',
+            'ENUM', 'SET', 
             'LONGBLOB', 'MEDIUMBLOB', 'BLOB', 'TINYBLOB',
-            'UUID', 'VARBINARY', 'BINARY',
-            'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY'
+            'UUID', 
+            'VARBINARY', 'BINARY',
+            'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY',
+            'JSON',
         ];
         this.typeWithLength = [
             'VARCHAR', 'CHAR', 
@@ -166,7 +177,17 @@ class EntityEditor {
             'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
 
         ];
+        this.typeWithValue = ['ENUM', 'SET'];
         this.addCheckboxListeners();
+        this.callbackLoadEntity = setting.callbackLoadEntity;
+        this.callbackSaveEntity = setting.callbackSaveEntity;
+        this.defaultDataType = setting.defaultDataType + '';
+        this.defaultDataLength = setting.defaultDataLength + '';
+
+        if(typeof this.callbackLoadEntity == 'function')
+        {
+            this.callbackLoadEntity();
+        }
     }
 
     /**
@@ -175,7 +196,7 @@ class EntityEditor {
     addCheckboxListeners() {
         document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
-            let allEntities = document.querySelectorAll(".selected-entity");
+            let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
             if(allEntities)
             {
                 allEntities.forEach((entity, index) => {
@@ -222,7 +243,12 @@ class EntityEditor {
             document.querySelector(this.selector+" .entity-name").value = newTableName;
             document.querySelector(this.selector+" .columns-table-body").innerHTML = '';
         }
+        document.querySelector(this.selector+" .button-container").style.display = "none";
         document.querySelector(this.selector+" .editor-form").style.display = "block";
+        if(entityIndex == -1)
+        {
+            document.querySelector(this.selector+" .entity-name").select();
+        }
     }
 
     /**
@@ -251,7 +277,7 @@ class EntityEditor {
                 </select>
             </td>
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.typeWithLength.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${typeSimple === 'ENUM' || typeSimple === 'SET' ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.typeWithValue.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
             <td class="column-pk"><input type="checkbox" class="column-primaryKey" ${column.primaryKey ? 'checked' : ''}></td>
@@ -271,10 +297,10 @@ class EntityEditor {
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
      */
     addColumn(focus = false) {
-        const entityName = document.querySelector(this.selector+" .entity-name").value;
-        let count = document.querySelectorAll('.column-name').length;
+        let entityName = document.querySelector(this.selector+" .entity-name").value;
+        let count = document.querySelectorAll(this.selector+" .column-name").length;
         let countStr = count <= 0 ? '' : count + 1;
-        const column = new Column(count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`);
+        let column = new Column(count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
     }
 
@@ -322,25 +348,25 @@ class EntityEditor {
     saveEntity() {
         const entityName = document.querySelector(this.selector+" .entity-name").value;
         const columns = [];
-        const columnNames = document.querySelectorAll(".column-name");
-        const columnTypes = document.querySelectorAll(".column-type");
-        const columnNullables = document.querySelectorAll(".column-nullable");
-        const columnDefaults = document.querySelectorAll(".column-default");
-        const columnPrimaryKeys = document.querySelectorAll(".column-primaryKey");
-        const columnAutoIncrements = document.querySelectorAll(".column-autoIncrement");
-        const columnLengths = document.querySelectorAll(".column-length");
-        const columnEnums = document.querySelectorAll(".column-enum");
+        const columnNames = document.querySelectorAll(this.selector+" .column-name");
+        const columnTypes = document.querySelectorAll(this.selector+" .column-type");
+        const columnNullables = document.querySelectorAll(this.selector+" .column-nullable");
+        const columnDefaults = document.querySelectorAll(this.selector+" .column-default");
+        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primaryKey");
+        const columnAutoIncrements = document.querySelectorAll(this.selector+" .column-autoIncrement");
+        const columnLengths = document.querySelectorAll(this.selector+" .column-length");
+        const columnEnums = document.querySelectorAll(this.selector+" .column-enum");
 
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
                 columnNames[i].value,
                 columnTypes[i].value,
+                columnLengths[i].value || null,
                 columnNullables[i].checked,
                 columnDefaults[i].value || null,
                 columnPrimaryKeys[i].checked,
                 columnAutoIncrements[i].checked,
                 columnEnums[i].value || null,
-                columnLengths[i].value || null
             );
 
             columns.push(column);
@@ -360,7 +386,51 @@ class EntityEditor {
         this.renderEntities();
         this.cancelEdit();
         this.exportToSQL();
+        if(typeof this.callbackSaveEntity == 'function')
+        {
+            this.callbackSaveEntity(this.entities);
+        }
     }
+
+    /**
+     * Converts a JSON array to an array of Entity objects.
+     * 
+     * @param {Array} jsonData - The JSON array containing entities and their columns.
+     * @returns {Array} - An array of Entity objects.
+     */
+    createEntitiesFromJSON(jsonData) {
+        const entities = [];
+
+        // Iterate over each entity in the JSON data
+        jsonData.forEach(entityData => {
+            // Create a new Entity instance
+            const entity = new Entity(entityData.name);
+            
+            // Iterate over each column in the entity's columns array
+            entityData.columns.forEach(columnData => {
+                // Create a new Column instance
+                const column = new Column(
+                    columnData.name,
+                    columnData.type,
+                    columnData.length,
+                    columnData.nullable,
+                    columnData.default,
+                    columnData.primaryKey,
+                    columnData.autoIncrement,
+                    columnData.enumValues !== "null" ? columnData.enumValues : "",
+                );
+                
+                // Add the column to the entity
+                entity.addColumn(column);
+            });
+
+            // Add the entity to the entities array
+            entities.push(entity);
+        });
+
+        return entities;
+    }
+
 
     /**
      * Renders the list of entities and updates the table list in the UI.
@@ -369,7 +439,7 @@ class EntityEditor {
         const container = document.querySelector(this.selector+" .entities-container");
         container.innerHTML = '';
         const selectedEntity = [];
-        const selectedEntities = document.querySelectorAll('.selected-entity:checked');
+        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
         if(selectedEntities)
         {
             selectedEntities.forEach(checkbox => {
@@ -435,6 +505,10 @@ class EntityEditor {
         this.entities.splice(index, 1);
         this.renderEntities();
         this.exportToSQL();
+        if(typeof this.callbackSaveEntity == 'function')
+        {
+            this.callbackSaveEntity(this.entities);
+        }
     }
 
     /**
@@ -442,6 +516,7 @@ class EntityEditor {
      */
     cancelEdit() {
         document.querySelector(this.selector+" .editor-form").style.display = "none";
+        document.querySelector(this.selector+" .button-container").style.display = "block";
     }
 
     /**
@@ -463,7 +538,7 @@ class EntityEditor {
         }
 
         // Show enum input for ENUM type
-        if (columnType === "ENUM" || columnType === "SET") {
+        if (this.typeWithValue.includes(columnType)) {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";
@@ -474,39 +549,15 @@ class EntityEditor {
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
      */
     exportToSQL() {
-        let sql = "";       
-        const selectedEntities = document.querySelectorAll('.selected-entity:checked');  
+        let sql = [];       
+        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
-    
             if (entity) {
-                sql += entity.toSQL();
+                sql.push(entity.toSQL());
             }
         });
-        document.querySelector(this.selector+" .query-generated").value = sql;
-    }
-    
-
-    /**
-     * Triggered when the user wants to import a SQL file.
-     */
-    importFromSQL() {
-        document.querySelector(this.selector+" .file-import").click();
-    }
-
-    /**
-     * Handles the file import by reading the content of the SQL file.
-     * 
-     * @param {Event} event - The file import event.
-     */
-    handleFileImport(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function () {
-            const content = reader.result;
-            console.log(content);
-        };
-        reader.readAsText(file);
+        document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
 }
