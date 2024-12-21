@@ -636,7 +636,7 @@ class EntityEditor {
 
         // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
         const now = new Date();
-        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // Format datetime to YYYY_MM_DD_HH_MM_SS
+        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // NOSONAR
 
         // Remove the last underscore if present
         if (dateTimeSuffix.endsWith('_')) {
@@ -679,7 +679,6 @@ class EntityEditor {
     importJSON(file, callback) {
         let _this = this;
         const reader = new FileReader(); // Create a FileReader instance
-
         reader.onload = function (e) {
             const contents = e.target.result; // Get the content of the file
             try {
@@ -693,7 +692,6 @@ class EntityEditor {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
             }
         };
-
         reader.readAsText(file); // Read the file as text
     }
 
