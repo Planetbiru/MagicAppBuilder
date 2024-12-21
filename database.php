@@ -2150,9 +2150,9 @@ else {
     <link rel="stylesheet" href="css/entity-editor.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/ResizablePanel.js"></script>
-    <script src="lib.assets/js/import-structure.js"></script>
+    <script src="lib.assets/js/EntityEditor.min.js"></script>
+    <script src="lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="lib.assets/js/import-structure.min.js"></script>
     <script>
         window.onload = function() {
             // Select all toggle buttons within collapsible elements
