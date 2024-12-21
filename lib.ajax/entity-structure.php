@@ -12,7 +12,7 @@ $inputGet = new InputGet();
 
 if($inputPost->getDatabaseName() !== null)
 {
-    $applicationId = $inputPost->hetApplicationId();
+    $applicationId = $inputPost->getApplicationId();
     $databaseType = $inputPost->getDatabaseType();
     $databaseName = $inputPost->getDatabaseName();
     $databaseSchema = $inputPost->getDatabaseSchema();
@@ -28,7 +28,7 @@ if($inputPost->getDatabaseName() !== null)
 }
 else
 {
-    $applicationId = $inputGet->hetApplicationId();
+    $applicationId = $inputGet->getApplicationId();
     $databaseType = $inputGet->getDatabaseType();
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
