@@ -44,7 +44,10 @@ try
     $allQueries[] = "-- Description      : Queries for table creation and modification ";
     $allQueries[] = "-- Generator        : MagicAppBuilder";
     $allQueries[] = "-- Database Type    : ".$dbType;
-    $allQueries[] = "-- Database Driver  : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if($database->getDatabaseConnection() != null)
+    {
+        $allQueries[] = "-- Database Driver  : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
     $allQueries[] = "-- Time Generated   : ".date('j F Y H:i:s');
     $allQueries[] = "-- Time Zone        : ".date('P'); 
     $allQueries[] = "-- Line Endings     : CRLF";

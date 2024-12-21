@@ -159,10 +159,15 @@ class EntityEditor {
      * @param {Object} [options={}] - Optional configuration settings for the entity editor.
      */
     constructor(selector, options = {}) {
-        let setting = {};
+        this.setting = {
+            defaultDataType: 'VARCHAR',
+            defaultDataLength: '48',
+            primaryKeyDataType: 'VARCHAR',
+            primaryKeyDataLength: '40'
+        };
 
         // Copy properties from options to setting object
-        Object.assign(setting, options);
+        Object.assign(this.setting, options);
 
         this.selector = selector;
         this.entities = [];
@@ -187,10 +192,13 @@ class EntityEditor {
         ];
         this.withValueTypes = ['ENUM', 'SET'];
         this.addDomListeners();
-        this.callbackLoadEntity = setting.callbackLoadEntity;
-        this.callbackSaveEntity = setting.callbackSaveEntity;
-        this.defaultDataType = setting.defaultDataType + '';
-        this.defaultDataLength = setting.defaultDataLength + '';
+        this.callbackLoadEntity = this.setting.callbackLoadEntity;
+        this.callbackSaveEntity = this.setting.callbackSaveEntity;
+        this.defaultDataType = this.setting.defaultDataType + '';
+        this.defaultDataLength = this.setting.defaultDataLength + '';
+
+        this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
+        this.primaryKeyDataLength = this.setting.primaryKeyDataLength + '';
 
         if(typeof this.callbackLoadEntity == 'function')
         {
@@ -218,6 +226,21 @@ class EntityEditor {
                 this.exportToSQL();
             }
         });
+        let _this = this;
+        document.addEventListener('change', function (event) {
+            if (event.target.classList.contains('column-primary-key')) {
+                const isChecked = event.target.checked;
+                if(isChecked)
+                {
+                    const tr = event.target.closest('tr');
+                    tr.querySelector('.column-type').value = _this.primaryKeyDataType;
+                    _this.updateColumnLengthInput(tr.querySelector('.column-type'));
+                    tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
+                }
+            }
+        });
+        
+        
 
         document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
@@ -307,7 +330,7 @@ class EntityEditor {
             <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
-            <td class="column-pk"><input type="checkbox" class="column-primaryKey" ${column.primaryKey ? 'checked' : ''}></td>
+            <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''}></td>
         `;
 
@@ -379,7 +402,7 @@ class EntityEditor {
         const columnTypes = document.querySelectorAll(this.selector+" .column-type");
         const columnNullables = document.querySelectorAll(this.selector+" .column-nullable");
         const columnDefaults = document.querySelectorAll(this.selector+" .column-default");
-        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primaryKey");
+        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primary-key");
         const columnAutoIncrements = document.querySelectorAll(this.selector+" .column-autoIncrement");
         const columnLengths = document.querySelectorAll(this.selector+" .column-length");
         const columnEnums = document.querySelectorAll(this.selector+" .column-enum");

@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             defaultDataType: 'VARCHAR',
             defaultDataLength: 50,
+            primaryKeyDataType: 'BIGINT',
+            primaryKeyDataLength: 20,
             callbackLoadEntity: function(){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
