@@ -87,6 +87,17 @@ let resizablePanels;
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Select all toggle buttons within collapsible elements
+    const toggles = document.querySelectorAll('.collapsible .button-toggle');
+
+    // Attach event listeners to each toggle button
+    toggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+            // Find the closest collapsible element and toggle the 'open' class
+            e.target.closest('.collapsible').classList.toggle('open');
+        });
+    });
     
     editor = new EntityEditor('.entity-editor', 
         {

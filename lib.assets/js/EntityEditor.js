@@ -184,7 +184,6 @@ class EntityEditor {
             'VARCHAR', 'CHAR', 
             'VARBINARY', 'BINARY',
             'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
-
         ];
         this.withValueTypes = ['ENUM', 'SET'];
         this.addDomListeners();
@@ -481,8 +480,14 @@ class EntityEditor {
         this.entities.forEach((entity, index) => {
             const entityDiv = document.createElement("div");
             entityDiv.classList.add("entity");
-            let columnsInfo = entity.columns.map(col => col.length > 0 ? `<li>${col.name} <span class="data-type">${col.type}(${col.length})</span></li>` : `<li>${col.name} <span class="data-type">${col.type}</span></li>`).join('');
-
+            let columnsInfo = entity.columns.map(col => {
+                if (col.length > 0) {
+                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}(${col.length})</span></li>`;
+                } else {
+                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}</span></li>`;
+                }
+            }).join('');
+            
             entityDiv.innerHTML = `
                 <div class="entity-header">
                     <button onclick="editor.deleteEntity(${index})">❌</button>

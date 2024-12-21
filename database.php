@@ -2146,27 +2146,13 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.css">
-    <link rel="stylesheet" href="css/entity-editor.css">
+    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <link rel="stylesheet" href="css/entity-editor.min.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
     <script src="lib.assets/js/EntityEditor.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>
-    <script>
-        window.onload = function() {
-            // Select all toggle buttons within collapsible elements
-            const toggles = document.querySelectorAll('.collapsible .button-toggle');
-
-            // Attach event listeners to each toggle button
-            toggles.forEach(function(toggle) {
-                toggle.addEventListener('click', function(e) {
-                    // Find the closest collapsible element and toggle the 'open' class
-                    e.target.closest('.collapsible').classList.toggle('open');
-                });
-            });
-        };
-    </script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
