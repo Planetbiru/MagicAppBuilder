@@ -9,6 +9,11 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $separatorNLT = "\r\n\t";
 
+if($appConfig->getApplication() == null)
+{
+    exit();
+}
+
 try
 {
     $inputGet = new InputGet();
