@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                fetchData(applicationId, databaseType, databaseName, databaseSchema)
+                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema)
             }, 
             callbackSaveEntity: function (entities){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -108,46 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     );
-
-    // Event listener for the "Export JSON" button
-    document.getElementById("exportBtn").addEventListener("click", function () {
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        const data = {
-            applicationId: applicationId,
-            databaseType: databaseType,
-            databaseName: databaseName,
-            databaseSchema: databaseSchema,
-            entities: editor.entities  // Converting the entities array into a JSON string
-        };
-        editor.exportJSON(data); // Export the sample object to a JSON file
-    });
-
-    // Event listener for the "Import JSON" button
-    document.getElementById("importBtn").addEventListener("click", function () {
-        document.getElementById("importFile").click();
-    });
-
-    document.getElementById("importFile").addEventListener("change", function () {
-        const file = this.files[0]; // Get the selected file
-        if (file) {
-            editor.importJSON(file, function(entities){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-    
-            }); // Import the file if it's selected
-
-            
-        } else {
-            console.log("Please select a JSON file first.");
-        }
-    });
-
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
@@ -208,7 +168,7 @@ function sendToServer(applicationId, databaseType, databaseName, databaseSchema,
  * @param {Array} entities - The list of entities to be fetched.
  * @param {Function} callback - The callback function that will be called after the data is fetched.
  */
-function fetchData(applicationId, databaseType, databaseName, databaseSchema, entities, callback) {
+function fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema, entities, callback) {
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
     const url = buildUrl(applicationId, databaseType, databaseName, databaseSchema, entities);
     // Construct the URL with query parameters

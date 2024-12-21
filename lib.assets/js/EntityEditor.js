@@ -187,7 +187,7 @@ class EntityEditor {
 
         ];
         this.withValueTypes = ['ENUM', 'SET'];
-        this.addCheckboxListeners();
+        this.addDomListeners();
         this.callbackLoadEntity = setting.callbackLoadEntity;
         this.callbackSaveEntity = setting.callbackSaveEntity;
         this.defaultDataType = setting.defaultDataType + '';
@@ -202,7 +202,7 @@ class EntityEditor {
     /**
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
-    addCheckboxListeners() {
+    addDomListeners() {
         document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
@@ -219,6 +219,25 @@ class EntityEditor {
                 this.exportToSQL();
             }
         });
+
+        document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
+            const file = this.files[0]; // Get the selected file
+            if (file) {
+                editor.importJSON(file, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+        
+                }); // Import the file if it's selected
+    
+                
+            } else {
+                console.log("Please select a JSON file first.");
+            }
+        });
+    
     }
 
     /**
@@ -646,5 +665,41 @@ class EntityEditor {
 
         reader.readAsText(file); // Read the file as text
     }
+
+    /**
+     * Triggers the import action by simulating a click on the import file element.
+     * This function locates the DOM element based on the `selector` property and 
+     * clicks on it to initiate the import process.
+     */
+    importEntities() {
+        document.querySelector(this.selector + " .import-file").click();
+    }
+
+    /**
+     * Gathers metadata from the HTML document and exports the entities data as a JSON file.
+     * The function retrieves application-specific details such as `application-id`, 
+     * `database-name`, `database-schema`, and `database-type` from the meta tags in the document.
+     * Then, it constructs a data object containing these values and the current list of entities from
+     * the editor, and passes it to the `exportJSON` method to export the data as a JSON file.
+     * 
+     * @returns {void} 
+     */
+    exportEntities() {
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        
+        const data = {
+            applicationId: applicationId,
+            databaseType: databaseType,
+            databaseName: databaseName,
+            databaseSchema: databaseSchema,
+            entities: editor.entities  // Converting the entities array into a JSON string
+        };
+        
+        this.exportJSON(data); // Export the sample object to a JSON file
+    }
+
 
 }

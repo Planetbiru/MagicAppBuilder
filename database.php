@@ -2265,9 +2265,9 @@ else {
                     <div class="editor-container">
                         <div class="button-container">
                             <button class="btn" onclick="editor.showEditor(-1)">Add Entity</button>
-                            <button class="btn" id="importBtn">Import Entity</button>
-                            <button class="btn" id="exportBtn">Export Entity</button>
-                            <input type="file" id="importFile" accept=".json" style="display: none;" />
+                            <button class="btn" onclick="editor.importEntities()">Import Entity</button>
+                            <button class="btn" onclick="editor.exportEnities()">Export Entity</button>
+                            <input class="import-file" type="file" accept=".json" style="display: none;" />
                         </div>
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">
