@@ -601,7 +601,7 @@ class EntityEditor {
      */
     exportJSON(data) {
         // Get the base filename from the data object
-        const fileName = data.databaseName;
+        const fileName = `${data.databaseName}-${data.databaseSchema}`;
 
         // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
         const now = new Date();
@@ -695,7 +695,7 @@ class EntityEditor {
             databaseType: databaseType,
             databaseName: databaseName,
             databaseSchema: databaseSchema,
-            entities: editor.entities  // Converting the entities array into a JSON string
+            entities: this.entities  // Converting the entities array into a JSON string
         };
         
         this.exportJSON(data); // Export the sample object to a JSON file
