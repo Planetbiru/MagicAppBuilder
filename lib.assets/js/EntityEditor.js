@@ -40,12 +40,13 @@ class Column {
      * @returns {string} The SQL column definition.
      */
     toSQL() {
-        let typeWithValue = ['ENUM', 'SET'];
+        let withValueTypes = ['ENUM', 'SET'];
+        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'DOUBLE', 'DECIMAL', 'FLOAT'];
 
         let columnDef = `${this.name} ${this.type}`;
         
         // If the type is ENUM or SET, handle them similarly
-        if ((typeWithValue.includes(this.type)) && this.enumValues) {
+        if ((withValueTypes.includes(this.type)) && this.enumValues) {
             const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
         } else if (this.length) {
@@ -72,11 +73,17 @@ class Column {
 
         // Default value logic
         if (this.default && this.default.toLowerCase() !== 'null') {
-            columnDef += ` DEFAULT '${this.default}'`;
+            // Check if the type is numeric and the default value is a number
+            if (numericTypes.includes(this.type) && !isNaN(this.default)) {
+                columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
+            } else {
+                columnDef += ` DEFAULT '${this.default}'`; // Default is a string, so use quotes
+            }
         }
 
         return columnDef;
     }
+
 }
 
 /**
@@ -162,7 +169,8 @@ class EntityEditor {
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
-            'DOUBLE', 'DECIMAL', 'FLOAT', 'BIT',
+            'DOUBLE', 'DECIMAL', 'FLOAT', 
+            'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
             'ENUM', 'SET', 
@@ -178,7 +186,7 @@ class EntityEditor {
             'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
 
         ];
-        this.typeWithValue = ['ENUM', 'SET'];
+        this.withValueTypes = ['ENUM', 'SET'];
         this.addCheckboxListeners();
         this.callbackLoadEntity = setting.callbackLoadEntity;
         this.callbackSaveEntity = setting.callbackSaveEntity;
@@ -278,7 +286,7 @@ class EntityEditor {
                 </select>
             </td>
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.typeWithLength.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.typeWithValue.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
             <td class="column-pk"><input type="checkbox" class="column-primaryKey" ${column.primaryKey ? 'checked' : ''}></td>
@@ -539,7 +547,7 @@ class EntityEditor {
         }
 
         // Show enum input for ENUM type
-        if (this.typeWithValue.includes(columnType)) {
+        if (this.withValueTypes.includes(columnType)) {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";
