@@ -66,9 +66,13 @@ function init() {
             let value = event.target.getAttribute('data-value');
             let queryString = "";
             let tableName = schema == "" ? `${schema}.${table}` : table;
-            queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}' `;
+            queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
+            let originalQuery = query.value;
+            if(originalQuery.startsWith('DELETE FROM '))
+            {
+                queryString = query.value + queryString;
+            }
             query.value = queryString;
-
         });
     });
     window.onclick = function(event) {
