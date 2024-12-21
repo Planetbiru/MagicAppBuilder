@@ -28,7 +28,6 @@ class Column {
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
         this.enumValues = enumValues;
-        this.typeWithValue = ['ENUM', 'SET'];
     }
 
     /**
@@ -41,10 +40,12 @@ class Column {
      * @returns {string} The SQL column definition.
      */
     toSQL() {
+        let typeWithValue = ['ENUM', 'SET'];
+
         let columnDef = `${this.name} ${this.type}`;
         
         // If the type is ENUM or SET, handle them similarly
-        if ((this.typeWithValue.includes(this.type)) && this.enumValues) {
+        if ((typeWithValue.includes(this.type)) && this.enumValues) {
             const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
         } else if (this.length) {
