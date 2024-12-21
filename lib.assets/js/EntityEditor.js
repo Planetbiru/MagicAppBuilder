@@ -350,7 +350,10 @@ class EntityEditor {
         let entityName = document.querySelector(this.selector+" .entity-name").value;
         let count = document.querySelectorAll(this.selector+" .column-name").length;
         let countStr = count <= 0 ? '' : count + 1;
-        let column = new Column(count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`, this.defaultDataType, this.defaultDataLength);
+        
+        let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
+
+        let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
     }
 
