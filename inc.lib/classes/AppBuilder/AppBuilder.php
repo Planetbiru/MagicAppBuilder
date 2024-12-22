@@ -212,20 +212,20 @@ class AppBuilder extends AppBuilderBase
     public function createDeleteSection($mainEntity, $withTrash = false, $trashEntity = null, $callbackFinish = null, $callbackException = null)
     {
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
 
         $objectName = lcfirst($entityName);
         
         $objectNameBk = $objectName;
         $lines = array();
-        $camelPkName = PicoStringUtil::camelize($pkName);
-        $upperPkName = PicoStringUtil::upperCamelize($pkName);
+        $camelPkName = PicoStringUtil::camelize($primaryKeyName);
+        $upperPkName = PicoStringUtil::upperCamelize($primaryKeyName);
         
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == UserAction::DELETE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->countableCheckedRowId())";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
+        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).") as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::PHP_TRY;    
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
@@ -266,7 +266,7 @@ class AppBuilder extends AppBuilderBase
         if(isset($callbackException) && is_callable($callbackException))
         {
             
-            $lines[] = call_user_func($callbackException, $objectName, 'UserAction::DELETE', $pkName, '$e');
+            $lines[] = call_user_func($callbackException, $objectName, 'UserAction::DELETE', $primaryKeyName, '$e');
         }
         else
         {
@@ -279,7 +279,7 @@ class AppBuilder extends AppBuilderBase
 
         if(isset($callbackFinish) && is_callable($callbackFinish))
         {
-            $lines[] = call_user_func($callbackFinish, $objectName, 'UserAction::DELETE', $pkName);
+            $lines[] = call_user_func($callbackFinish, $objectName, 'UserAction::DELETE', $primaryKeyName);
         }
         else
         {
@@ -309,7 +309,7 @@ class AppBuilder extends AppBuilderBase
     public function createActivationSectionBase($mainEntity, $activationKey, $userAction, $activationValue, $callbackFinish = null, $callbackException = null)
     {
         $entityName = $mainEntity->getEntityName();
-        $pkName =  $mainEntity->getPrimaryKey();
+        $primaryKeyName =  $mainEntity->getPrimaryKey();
 
         $objectName = lcfirst($entityName);
         
@@ -324,14 +324,14 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->countableCheckedRowId())";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
 
-        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
+        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).") as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;
             
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName."->where(PicoSpecification::getInstance()";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($pkName)).", ".parent::VAR."rowId))";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($primaryKeyName)).", ".parent::VAR."rowId))";
         
         if($activationValue)
         {
@@ -380,7 +380,7 @@ class AppBuilder extends AppBuilderBase
         
         if($this->isCallable($callbackFinish))
         {
-            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $pkName);
+            $lines[] = call_user_func($callbackFinish, $objectName, $userAction, $primaryKeyName);
         }
         else
         {

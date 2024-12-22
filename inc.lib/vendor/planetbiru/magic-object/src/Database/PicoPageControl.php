@@ -166,18 +166,11 @@ class PicoPageControl
      */
     public function setMargin($margin)
     {
-        $this->pageData->generatePagination($margin);
+        if(isset($margin) && $margin > 0)
+        {
+            $this->pageData->generatePagination($margin);
+        }
         return $this;
-    }
-
-    /**
-     * Converts the pagination control to HTML format.
-     *
-     * @return string HTML representation of the pagination controls.
-     */
-    public function toHTML()
-    {
-        return $this->__toString();
     }
 
     /**
@@ -218,7 +211,10 @@ class PicoPageControl
      */
     public function setFormatPageNumber($formatPageNumber)
     {
-        $this->formatPageNumber = $formatPageNumber;
+        if(isset($formatPageNumber) && !empty($formatPageNumber))
+        {
+            $this->formatPageNumber = $formatPageNumber;
+        }
         return $this;
     }
 
@@ -260,7 +256,10 @@ class PicoPageControl
      */
     public function setFormatStepOne($formatStepOne)
     {
-        $this->formatStepOne = $formatStepOne;
+        if(isset($formatStepOne) && !empty($formatStepOne))
+        {
+            $this->formatStepOne = $formatStepOne;
+        }
         return $this;
     }
 
@@ -303,7 +302,10 @@ class PicoPageControl
      */
     public function setFormatStartEnd($formatStartEnd)
     {
-        $this->formatStartEnd = $formatStartEnd;
+        if(isset($formatStartEnd) && !empty($formatStartEnd))
+        {
+            $this->formatStartEnd = $formatStartEnd;
+        }
         return $this;
     }
 
@@ -372,6 +374,16 @@ class PicoPageControl
                 $paginationConfig->getTemplateStepOne(),
                 $paginationConfig->getTemplateStartEnd()
             );
+    }
+
+    /**
+     * Converts the pagination control to HTML format.
+     *
+     * @return string HTML representation of the pagination controls.
+     */
+    public function toHTML()
+    {
+        return $this->__toString();
     }
 
     /**

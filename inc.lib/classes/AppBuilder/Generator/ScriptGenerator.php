@@ -751,7 +751,7 @@ class ScriptGenerator //NOSONAR
                 $userAction.
                 ', $'.$objectName.
                 ', Field::of()->'.PicoStringUtil::camelize($primaryKeyName).
-                ', $inputPost->getCheckedRowId()'.
+                ', $inputPost->getCheckedRowId(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).")'.
                 ");";
             };
             $callbackUpdateStatusException = function($objectName, $userAction, $primaryKeyName, $exceptionObject) {
@@ -760,7 +760,7 @@ class ScriptGenerator //NOSONAR
                 $userAction.
                 ', $'.$objectName.
                 ', Field::of()->'.PicoStringUtil::camelize($primaryKeyName).
-                ', $inputPost->getCheckedRowId()'.
+                ', $inputPost->getCheckedRowId(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).")'.
                 ', '.$exceptionObject.
                 ");";
             };
