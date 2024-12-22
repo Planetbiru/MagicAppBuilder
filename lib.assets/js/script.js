@@ -1533,9 +1533,7 @@ async function getUserInput(message, title, buttons, initialValue) {
   );
 }
 
-
-let timeoutEditMenu = setTimeout('', 100);;
-
+let timeoutEditMenu = setTimeout('', 100);
 
 /**
 * Initializes the sortable menu by setting up event listeners
@@ -1586,10 +1584,6 @@ function editMenu(el) {
   input.focus();
   input.select();
   input.focus();
-}
-
-function editSubmenu(el) {
-  let menu = $(el).siblings('.app-submenu');
 }
 
 let draggedItem = null;
@@ -2258,7 +2252,6 @@ function saveEntity() {
  */
 function saveEntityAs() {
   if (currentEntity != "") {
-    //$("#button_save_entity_file_as").attr("disabled", "disabled");
     let fileContent = cmEditorFile.getDoc().getValue();
 
     getUserInput('New Etity Name', 'Save Entity As', [

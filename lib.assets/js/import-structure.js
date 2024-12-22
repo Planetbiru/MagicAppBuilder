@@ -6,8 +6,7 @@ function init() {
     let modalEntityEditor = document.getElementById("entityEditorModal");
     let closeModalButton = document.querySelectorAll(".cancel-button");
     let openModalQuertTranslatorButton = document.querySelector(".import-structure");
-    let openModalEntityEditorButton = document.querySelector(".open-entity-editor");
-    
+    let openModalEntityEditorButton = document.querySelector(".open-entity-editor"); 
     let translateButton  = document.querySelector(".translate-structure");
     let importFromEntityButton = document.querySelector('.import-from-entity');
     let clearButton  = document.querySelector(".clear");
@@ -20,14 +19,12 @@ function init() {
     openModalQuertTranslatorButton.onclick = function() {
         modalQueryTranslator.style.display = "block";
         original.focus();
-    }
+    };
 
     openModalEntityEditorButton.onclick = function() {
         modalEntityEditor.style.display = "block";
         resizablePanels.loadPanelWidth();
-    }
-    
-
+    };
     
     closeModalButton.forEach(function(cancelButton) {
         cancelButton.onclick = function(e) {
@@ -38,7 +35,7 @@ function init() {
     // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
         original.value = "";
-    }
+    };
     
     translateButton.onclick = function()
     {
@@ -47,7 +44,7 @@ function init() {
         let converted = converter.translate(sql, type);
         document.querySelector('[name="query"]').value = converted;
         modalQueryTranslator.style.display = "none";
-    }
+    };
     
     importFromEntityButton.onclick = function()
     {
@@ -56,7 +53,8 @@ function init() {
         let converted = converter.translate(sql, type);
         document.querySelector('[name="query"]').value = converted;
         modalEntityEditor.style.display = "none";
-    }
+    };
+
     deleteCells.forEach(function(cell) {
         cell.addEventListener('click', function(event) {
             event.preventDefault();
@@ -75,11 +73,12 @@ function init() {
             query.value = queryString;
         });
     });
+
     window.onclick = function(event) {
         if (event.target == modalQueryTranslator) {
             modalQueryTranslator.style.display = "none";
         }
-    }
+    };
 }
 
 
