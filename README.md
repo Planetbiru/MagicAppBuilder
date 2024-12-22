@@ -157,13 +157,9 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 
 
 -   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
-    
 -   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
-    
 -   If there are multiple columns referring to the primary key of a table, this should be noted when creating the module.
-    
 -   Columns with the same purpose across different tables must have the same name.
-    
 -   Application features should be defined before creating the entity relationship diagram.
     
 
