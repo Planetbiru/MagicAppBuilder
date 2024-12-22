@@ -37,9 +37,10 @@ try {
     $ulData->setAttribute('class', 'entity-ul');
     $div->appendChild($ulData);
 
-    $format1 = '<li class="entity-li"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
-
+    $format1 = '<li class="entity-li"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
+    $format3 = "%s\\%s";
+    
     $liData = [];
 
     foreach ($list as $idx => $file) {
@@ -53,12 +54,12 @@ try {
             if (!isset($liData[$tableName])) {
                 $liData[$tableName] = [];
             }
-            $liData[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
+            $liData[$tableName][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format1, $dir, $entity, $filetime, $entity)];
         } else {
             if (!isset($liData[$idx])) {
                 $liData[$idx] = [];
             }
-            $liData[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
+            $liData[$idx][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format2, $dir, $entity, $filetime, $entity)];
         }
     }
 
@@ -67,9 +68,9 @@ try {
         foreach ($items as $item) {
             $li = $doc->createElement('li');
             $li->setAttribute('class', 'entity-li');
-            $a = $doc->createElement('a', strip_tags($item));
+            $a = $doc->createElement('a', strip_tags($item['html']));
             $a->setAttribute('href', '#');
-            $a->setAttribute('data-entity-name', $item);
+            $a->setAttribute('data-entity-name', $item['name']);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             $a->setAttribute('data-title', $filetime);
@@ -105,12 +106,12 @@ try {
             if (!isset($liApp[$tableName])) {
                 $liApp[$tableName] = [];
             }
-            $liApp[$tableName][] = sprintf($format1, $dir, $entity, $filetime, $entity);
+            $liApp[$tableName][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format1, $dir, $entity, $filetime, $entity)];
         } else {
             if (!isset($liApp[$idx])) {
                 $liApp[$idx] = [];
             }
-            $liApp[$idx][] = sprintf($format2, $dir, $entity, $filetime, $entity);
+            $liApp[$idx][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format2, $dir, $entity, $filetime, $entity)];
         }
     }
 
@@ -119,9 +120,9 @@ try {
         foreach ($items as $item) {
             $li = $doc->createElement('li');
             $li->setAttribute('class', 'entity-li');
-            $a = $doc->createElement('a', strip_tags($item));
+            $a = $doc->createElement('a', strip_tags($item['html']));
             $a->setAttribute('href', '#');
-            $a->setAttribute('data-entity-name', $item);
+            $a->setAttribute('data-entity-name', $item['name']);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             $a->setAttribute('data-title', $filetime);
