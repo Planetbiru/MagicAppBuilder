@@ -9,115 +9,193 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $separatorNLT = "\r\n\t";
 
-if($appConfig->getApplication() == null)
-{
+if ($appConfig->getApplication() == null) {
     exit();
 }
 
-try
-{
+try {
     $inputGet = new InputGet();
-	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
+    $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $chk = $inputGet->getAutoload() == 'true' ? ' checked' : '';
 
-    echo "<div>\r\n";
-    echo '<div style="white-space:nowrap"><input type="checkbox" id="entity-check-controll"'.$chk.'> <label for="entity-check-controll">Select all</label></div>';
-    echo '<div style="white-space:nowrap"><input type="checkbox" id="entity-merge" class="entity-merge" checked> <label for="entity-merge">Merge queries by table</label></div>';
-  
-    echo "<h4>Data</h4>\r\n";
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->formatOutput = true;
+    $rootDiv = $dom->createElement('div');
+    $dom->appendChild($rootDiv);
+
+    $createCheckbox = function($class, $labelText, $checked = false) use ($dom) {
+        $div = $dom->createElement('div');
+        $div->setAttribute('style', 'white-space:nowrap');
+        
+        $input = $dom->createElement('input');
+        $input->setAttribute('type', 'checkbox');
+        $input->setAttribute('class', $class);
+        if ($checked) {
+            $input->setAttribute('checked', 'checked');
+        }
+    
+        // Adding space after checkbox
+        $space = $dom->createTextNode(' '); // Adding a space after the checkbox
+        
+        $label = $dom->createElement('label', $labelText);
+        
+        $div->appendChild($input);
+        $div->appendChild($space); // Add the space
+        $div->appendChild($label);
+        
+        return $div;
+    };
+    
+
+    $rootDiv->appendChild($createCheckbox('entity-check-controll', 'Select all', $chk));
+    $rootDiv->appendChild($createCheckbox('entity-merge', 'Merge queries by table', true));
+
+    $rootDiv->appendChild($dom->createElement('h4', 'Data'));
 
     $baseEntity = $appConfig->getApplication()->getBaseEntityDataNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
-    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
+    $baseDir = rtrim($baseDirectory, "\\/") . "/" . str_replace("\\", "/", trim($baseEntity, "\\/"));
     
-    $list = glob($baseDir."/*.php");
+    $list = glob($baseDir . "/*.php");
     $li = [];
-    $format1 = '<li class="entity-li"><input type="checkbox" class="entity-checkbox entity-checkbox-query" name="entity[%d]" value="%s\\%s"%s> <a href="#" data-entity-name="%s\\%s" data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><input type="checkbox" class="entity-checkbox entity-checkbox-query" name="entity[%d]" value="%s\\%s" disabled data-toggle="tooltip" data-placement="top" data-title="%s"> %s</li>';
+    $format1 = function($idx, $dir, $entity, $chk, $filetime) use ($dom) {
+        $li = $dom->createElement('li');
+        $li->setAttribute('class', 'entity-li');
+        
+        $input = $dom->createElement('input');
+        $input->setAttribute('type', 'checkbox');
+        $input->setAttribute('class', 'entity-checkbox entity-checkbox-query');
+        $input->setAttribute('name', "entity[$idx]");
+        $input->setAttribute('value', "$dir\\$entity");
+        if ($chk) {
+            $input->setAttribute('checked', 'checked');
+        }
+        
+        // Add space after checkbox (using span with &nbsp;)
+        $span = $dom->createElement('span');
+        $span->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
+        
+        $a = $dom->createElement('a', $entity);
+        $a->setAttribute('href', '#');
+        $a->setAttribute('data-entity-name', "$dir\\$entity");
+        $a->setAttribute('data-toggle', 'tooltip');
+        $a->setAttribute('data-placement', 'top');
+        $a->setAttribute('data-title', $filetime);
+        
+        $li->appendChild($input);
+        $li->appendChild($span); // Add space
+        $li->appendChild($a);
+        
+        return $li;
+    };
     
-    foreach($list as $idx=>$file)
-    {
+    $format2 = function($idx, $dir, $entity, $filetime) use ($dom) {
+        $li = $dom->createElement('li');
+        $li->setAttribute('class', 'entity-li file-syntax-error');
+        
+        $input = $dom->createElement('input');
+        $input->setAttribute('type', 'checkbox');
+        $input->setAttribute('class', 'entity-checkbox entity-checkbox-query');
+        $input->setAttribute('name', "entity[$idx]");
+        $input->setAttribute('value', "$dir\\$entity");
+        $input->setAttribute('disabled', 'disabled');
+        $input->setAttribute('data-toggle', 'tooltip');
+        $input->setAttribute('data-placement', 'top');
+        $input->setAttribute('data-title', $filetime);
+        
+        // Add space after checkbox (using span with &nbsp;)
+        $span = $dom->createElement('span');
+        $span->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
+        
+        $li->appendChild($input);
+        $li->appendChild($span); // Add space
+        $li->appendChild($dom->createTextNode($entity));
+        
+        return $li;
+    };
+    
+
+    foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));   
         $return_var = ErrorChecker::errorCheck($cacheDir, $file);
         
-        if($return_var === 0)
-        {
+        if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
-            
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
-            if(!isset($li[$tableName]))
-            {
-                $li[$tableName]  = [];
+            if (!isset($li[$tableName])) {
+                $li[$tableName] = [];
             }
-            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
-        }
-        else
-        {
-            if(!isset($li[$idx]))
-            {
-                $li[$idx]  = [];
+            $li[$tableName][] = $format1($idx, $dir, $entity, $chk, $filetime);
+        } else {
+            if (!isset($li[$idx])) {
+                $li[$idx] = [];
             }
-            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
+            $li[$idx][] = $format2($idx, $dir, $entity, $filetime);
         }
     }
+
     ksort($li);
 
     $lim = [];
-    foreach($li as $elem)
-    {
+    foreach ($li as $elem) {
         $lim = array_merge($lim, $elem);
     }
 
-    echo '<ul class="entity-ul">'.$separatorNLT.implode($separatorNLT, $lim)."\r\n".'</ul>'."\r\n";
+    $ul = $dom->createElement('ul');
+    $ul->setAttribute('class', 'entity-ul');
+    foreach ($lim as $elem) {
+        $ul->appendChild($elem);
+    }
+    $rootDiv->appendChild($ul);
 
-    echo "<h4>App</h4>\r\n";
+    $rootDiv->appendChild($dom->createElement('h4', 'App'));
 
     $baseEntity = $appConfig->getApplication()->getBaseEntityAppNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
-    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
-    $list = glob($baseDir."/*.php");
+    $baseDir = rtrim($baseDirectory, "\\/") . "/" . str_replace("\\", "/", trim($baseEntity, "\\/"));
+    $list = glob($baseDir . "/*.php");
     $li = [];
-    foreach($list as $idx=>$file)
-    {
+
+    foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));   
         $return_var = ErrorChecker::errorCheck($cacheDir, $file);
         
-        if($return_var === 0)
-        {
+        if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
-            if(!isset($li[$tableName]))
-            {
-                $li[$tableName]  = [];
+            if (!isset($li[$tableName])) {
+                $li[$tableName] = [];
             }
-            $li[$tableName][] = sprintf($format1, $idx, $dir, $entity, $chk, $dir, $entity, $filetime, $entity);
-        }
-        else
-        {
-            if(!isset($li[$idx]))
-            {
-                $li[$idx]  = [];
+            $li[$tableName][] = $format1($idx, $dir, $entity, $chk, $filetime);
+        } else {
+            if (!isset($li[$idx])) {
+                $li[$idx] = [];
             }
-            $li[$idx][] = sprintf($format2, $idx, $dir, $entity, $filetime, $entity);
+            $li[$idx][] = $format2($idx, $dir, $entity, $filetime);
         }
     }
+    
     ksort($li);
  
     $lim = [];
-    foreach($li as $elem)
-    {
+    foreach ($li as $elem) {
         $lim = array_merge($lim, $elem);
     }
 
-    echo '<ul class="entity-ul">'.$separatorNLT.implode($separatorNLT, $lim)."\r\n".'</ul>'."\r\n";
-    echo "</div>\r\n";
-}
-catch(Exception $e)
-{
+    $ul = $dom->createElement('ul');
+    $ul->setAttribute('class', 'entity-ul');
+    foreach ($lim as $elem) {
+        $ul->appendChild($elem);
+    }
+    $rootDiv->appendChild($ul);
+
+    // Output result to buffer
+    echo $dom->saveHTML();
+} catch (Exception $e) {
     error_log($e->getMessage());
     // do nothing
 }

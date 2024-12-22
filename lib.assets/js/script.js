@@ -404,7 +404,7 @@ jQuery(function () {
     getEntityQuery(ents, merged);
   });
 
-  $(document).on("change", "#entity-check-controll", function (e) {
+  $(document).on("change", ".entity-check-controll", function (e) {
     let checked = $(this)[0].checked;
     $(".entity-checkbox-query").each(function () {
       $(this)[0].checked = checked;
