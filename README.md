@@ -148,51 +148,79 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 
 #### Project Preparation
 
-Steps to create an application with MagicAppBuilder
+
+**Steps to create an application with MagicAppBuilder**
+
+1.  Create a new application in MagicAppBuilder and set it as the default application.
+    
+2.  If you don't have a database, create a complete Entity Relationship Diagram (ERD) with the following rules:
 
 
-1.   Create a complete entity relationship diagram (ERD) with the following rules:
+-   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
     
-- The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
-- Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
-- If there are multiple columns that refer to a primary key of a table, this should be noted when creating a module.
-- Columns with the same purpose across different tables must have the same name.
-- Application features should be defined before creating the entity relationship diagram.
+-   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
+    
+-   If there are multiple columns referring to the primary key of a table, this should be noted when creating the module.
+    
+-   Columns with the same purpose across different tables must have the same name.
+    
+-   Application features should be defined before creating the entity relationship diagram.
+    
 
-2.   Export the entity relationship diagram into SQL.
+3.  Export the entity relationship diagram to SQL.
     
-3.   Create new application on MagicAppBuilder and set as default application.
+4.  If you do not want to use third-party applications to create the Entity Relationship Diagram, you can use MagicAppBuilder.
     
-4.   Update application settings consisting of:
+5.  Update the application settings which consist of:
+    
 
-- Application
-- Database
-- Session
-- Reserved columns
-    
-5.   Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
-    
-6.   Execute the SQL that has been converted.
-    
-7.   Click the "Reload Table" button to load all tables from the specified database.
-    
-8.   Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
+-   Application
+-   Database
+-   Session
+-   Reserved columns
 
-9.   Select the path where the module will be located.
+6.  Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
     
-10.    Click the "Load Column" button. MagicAppBuilder will display a new tab containing fields or columns from the table.
+7.  If you are using a third-party application to create the Entity Relationship Diagram, import the exported SQL code by clicking the "Import Structure" button.
     
-12.   Check the checkboxes and radio buttons according to how the module will be created.
+8.  Enter the SQL code into the provided input and then click the "Import" button.
     
-13.   If you choose "select" for the data column or filter column, MagicAppBuilder will display the "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
+9.  Run the converted SQL.
     
-14.   Click the "Data Filter" button to define the data filter.
+10.  If you want to use MagicAppBuilder to create the Entity Relationship Diagram, click the "Entity Editor" button.
     
-15.   Click the "Data Order" button to define the order of the data.
+11.  Create entities according to the application you desire.
     
-16.   Click the "Module Filter" button to configure the module features.
+12.  Check "Export All". MagicAppBuilder will generate SQL code according to the entities you have created.
     
-17.   Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create a module script and some entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
+13.  Click the "Import" button.
+    
+14.  Run the converted SQL.
+    
+15.  Close the Database Explorer.
+    
+16.  Switch to the "Define Module" tab.
+    
+17.  Click the "Reload Table" button to load all tables from the specified database.
+    
+18.  Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
+    
+19.  Select the path where the module will be placed.
+    
+20.  Click the "Load Column" button. MagicAppBuilder will display a new tab containing the fields or columns from the table.
+    
+21.  Check the checkboxes and radio buttons according to how the module will be created.
+    
+22.  If you choose "select" for the data column or filter column, MagicAppBuilder will display a "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
+    
+23.  Click the "Data Filter" button to define the data filter.
+    
+24.  Click the "Data Order" button to define the order of the data.
+    
+25.  Click the "Module Filter" button to configure the module features.
+    
+26.  Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create the module script and several entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
+
 
 ### Reserved Column Mapping
 

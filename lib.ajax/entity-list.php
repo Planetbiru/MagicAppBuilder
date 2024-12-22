@@ -40,15 +40,15 @@ try {
     $format1 = '<li class="entity-li"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
     $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
     $format3 = "%s\\%s";
-    
+
     $liData = [];
 
     foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($cacheDir, $file);
-        if ($return_var === 0) {
-            $filetime = date('Y-m-d H:i:s', filemtime($file));
+        if ($return_var === 0) {          
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
             if (!isset($liData[$tableName])) {
@@ -97,10 +97,10 @@ try {
 
     foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($cacheDir, $file);
         if ($return_var === 0) {
-            $filetime = date('Y-m-d H:i:s', filemtime($file));
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
             if (!isset($liApp[$tableName])) {

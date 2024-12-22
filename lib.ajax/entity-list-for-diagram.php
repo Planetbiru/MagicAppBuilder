@@ -38,6 +38,8 @@ try {
     $list = glob($baseDir . "/*.php");
     $liElements = [];
 
+    $nameFormat = 'entity[%d]';
+
     // Process each file
     foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
@@ -57,7 +59,7 @@ try {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
-            $input->setAttribute('name', 'entity[' . $idx . ']');
+            $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entity);
             if ($inputGet->getAutoload() == 'true') {
                 $input->setAttribute('checked', 'checked');
@@ -87,7 +89,7 @@ try {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
-            $input->setAttribute('name', 'entity[' . $idx . ']');
+            $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entity);
             $input->setAttribute('disabled', 'disabled');
             $input->setAttribute('data-toggle', 'tooltip');
@@ -149,7 +151,7 @@ try {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
-            $input->setAttribute('name', 'entity[' . $idx . ']');
+            $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entity);
             if ($inputGet->getAutoload() == 'true') {
                 $input->setAttribute('checked', 'checked');
@@ -179,7 +181,7 @@ try {
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
-            $input->setAttribute('name', 'entity[' . $idx . ']');
+            $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entity);
             $input->setAttribute('disabled', 'disabled');
             $input->setAttribute('data-toggle', 'tooltip');

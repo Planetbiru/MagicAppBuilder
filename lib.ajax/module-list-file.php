@@ -69,4 +69,3 @@ try {
     error_log($e->getMessage());
     // do nothing
 }
-?>
