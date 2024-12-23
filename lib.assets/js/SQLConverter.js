@@ -275,7 +275,8 @@ class SQLConverter {
      */
     isMySQL(targetType)
     {
-        return targetType === 'mysql' || targetType === 'mariadb';
+        return targetType === 'mysql' 
+            || targetType === 'mariadb';
     }
 
     /**
@@ -286,7 +287,8 @@ class SQLConverter {
      */
     isPGQSL(targetType)
     {
-        return targetType === 'pgsql' || targetType === 'postgresql';
+        return targetType === 'pgsql' 
+            || targetType === 'postgresql';
     }
 
     /**
@@ -308,7 +310,10 @@ class SQLConverter {
      */
     isReal(columnType)
     {
-        return columnType.toUpperCase().indexOf('FLOAT') != -1 || columnType.toUpperCase().indexOf('DOUBLE') != -1 || columnType.toUpperCase().indexOf('REAL') != -1 || columnType.toUpperCase().indexOf('DECIMAL') != -1;
+        return columnType.toUpperCase().indexOf('FLOAT') != -1 
+            || columnType.toUpperCase().indexOf('DOUBLE') != -1 
+            || columnType.toUpperCase().indexOf('REAL') != -1 
+            || columnType.toUpperCase().indexOf('DECIMAL') != -1;
     }
 
     /**
@@ -755,7 +760,7 @@ class SQLConverter {
             let tableName = this.extractTableName(match[1]);
             
             // Format the table name based on the target database type
-            if(targetType === 'pgsql') {
+            if(this.isPGQSL(targetType)) {
                 tableName = '"' + tableName + '"';
             } else if(this.isMySQL(targetType)) {
                 tableName = '`' + tableName + '`';
@@ -778,10 +783,10 @@ class SQLConverter {
         // Check if the input contains a dot (indicating a schema)
         if (input.includes('.')) {
             // If there is a dot, take the part after the dot as the table name
-            return input.split('.')[1];
+            input = input.split('.')[1];
         }
         // If there is no dot, it means the input is just the table name
-        return input;
+        return input.replace(/[^a-zA-Z0-9_]/g, ''); // NOSONAR
     }
 
 }

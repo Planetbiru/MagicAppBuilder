@@ -77,7 +77,7 @@ class TableParser {
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
 
-        let fld_list = [];
+        let fieldList = [];
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
@@ -90,7 +90,7 @@ class TableParser {
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
             let dataType = fld_def[2]; // NOSONAR
-            let is_pk = false;
+            let isPk = false;
 
             // Handle ENUM type and convert to VARCHAR
             if (rg_enum.test(dataType)) {
@@ -107,8 +107,8 @@ class TableParser {
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
 
-                is_pk = rg_pk.test(attr2) || this.isPrimaryKey(line);
-                let is_ai = this.isAutoIncrement(line);
+                isPk = rg_pk.test(attr2) || this.isPrimaryKey(line);
+                let isAi = this.isAutoIncrement(line);
 
                 let def = rg_fld_def.exec(attr2);
                 let comment = null;
@@ -124,16 +124,16 @@ class TableParser {
                 let length = this.getLength(attr);
 
                 let columnName = fld_def.groups.fname.trim();
-                if (is_pk) primaryKeyList.push(columnName);
+                if (isPk) primaryKeyList.push(columnName);
                 if (!this.inArray(columnList, columnName)) {
-                    fld_list.push({
+                    fieldList.push({
                         'Field': columnName,
                         'Type': dataType.trim(),
                         'Length': length,
-                        'Key': is_pk,
+                        'Key': isPk,
                         'Nullable': nullable,
                         'Default': def,
-                        'AutoIncrement': is_ai
+                        'AutoIncrement': isAi
                     });
                     columnList.push(columnName);
                 }
@@ -148,9 +148,9 @@ class TableParser {
 
             if (primaryKey != null) {
                 primaryKey = primaryKey.split('(').join('').split(')').join('');
-                for (let i in fld_list) {
-                    if (fld_list[i]['Field'] == primaryKey) {
-                        fld_list[i]['Key'] = true;
+                for (let i in fieldList) {
+                    if (fieldList[i]['Field'] == primaryKey) {
+                        fieldList[i]['Key'] = true;
                     }
                 }
             }
@@ -159,9 +159,9 @@ class TableParser {
                 let x = f.replace(f.match(rg_pk)[0], ''); // NOSONAR
                 x = x.replace('(', '').replace(')', '');
                 let pkeys = x.split(',').map(pkey => pkey.trim());
-                for (let i in fld_list) {
-                    if (this.inArray(pkeys, fld_list[i]['Field'])) {
-                        fld_list[i]['Key'] = true;
+                for (let i in fieldList) {
+                    if (this.inArray(pkeys, fieldList[i]['Field'])) {
+                        fieldList[i]['Key'] = true;
                     }
                 }
             }
@@ -171,7 +171,7 @@ class TableParser {
             primaryKey = primaryKeyList[0];
         }
 
-        return { tableName: tableName, columns: fld_list, primaryKey: primaryKey };
+        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
     }
 
     /**
