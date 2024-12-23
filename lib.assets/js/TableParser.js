@@ -168,7 +168,8 @@ class TableParser {
                     x = x.replace('(', '').replace(')', '');
                     let pkeys = x.split(',');
                     for (let i in pkeys) {
-                        pkeys[i] = pkeys[i].trim();
+                        let j = parseInt(i);
+                        pkeys[j] = pkeys[j].trim();
                     }
                     for (let i in fld_list) {
                         if (this.inArray(pkeys, fld_list[i]['Field'])) {

@@ -2,8 +2,10 @@
  * Represents a column in a database table.
  * 
  * The Column class is used to define the properties of a column in a database table. 
- * This includes the column's name, type, length, whether it can be NULL, its default value, 
- * whether it's a primary key, whether it auto-increments, and valid values for ENUM or SET types.
+ * This includes the column's name, type, length, nullable status, default value, 
+ * primary key status, auto-increment behavior, and valid values for ENUM or SET types.
+ * 
+ * @class
  */
 class Column {
     /**
@@ -16,7 +18,7 @@ class Column {
      * @param {string} [defaultValue=""] - The default value for the column (optional).
      * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
      * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
-     * @param {string} [values=""] - The values for ENUM or SET types, or the range of values for DECIMAL, NUMERIC, FLOAT, and DOUBLE types (optional, comma-separated).
+     * @param {string} [values=""] - The valid values for ENUM or SET types, or the range of values for types like DECIMAL, NUMERIC, FLOAT, and DOUBLE (optional, comma-separated).
      */
     constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "") //NOSONAR
     {
@@ -31,11 +33,15 @@ class Column {
     }
 
     /**
-     * Converts the column definition into a valid SQL statement.
+     * Converts the column definition into a valid SQL column definition string.
      * 
-     * This method generates the SQL column definition as a string based on the column's
-     * properties such as its type, nullable status, primary key, auto-increment, default value,
-     * and for ENUM/SET types, the list of valid values.
+     * This method generates the SQL column definition based on the column's properties such as:
+     * - data type (e.g., VARCHAR, INT, ENUM, etc.)
+     * - nullable status
+     * - primary key status
+     * - auto-increment behavior
+     * - default value
+     * - valid values for ENUM/SET types or range values for DECIMAL, NUMERIC, FLOAT, and DOUBLE.
      * 
      * @returns {string} The SQL column definition.
      */
@@ -52,29 +58,25 @@ class Column {
 
         let columnDef = `${this.name} ${this.type}`;
         
-        
-        if ((withValueTypes.includes(this.type)) && this.values) {
-            // If the type is ENUM or SET, handle them similarly
-            const enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
+        // Handle ENUM and SET types
+        if (this.hasValue(withValueTypes)) {
+            let enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
-        } else if ((withRangeTypes.includes(this.type)) && this.values) {
-            // If the type is DECIMAL, NUMERIC, DOUBLE, or FLOAT, handle them similarly
-            const enumList = this.values.split(',').map(val => `${val.trim()}`).join(', ');
-            columnDef = `${this.name} ${this.type}(${enumList})`;
-        } else if (this.length && withLengthTypes.includes(this.type)) {
-            // For other types, add length if available
+        } 
+        // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
+        else if (this.hasRange(withRangeTypes)) {
+            let rangeList = this.values.split(',').map(val => `${val.trim()}`).join(', ');
+            columnDef = `${this.name} ${this.type}(${rangeList})`;
+        } 
+        // Handle types that support length, like VARCHAR, CHAR, etc.
+        else if (this.hasLength(withLengthTypes)) {
             columnDef += `(${this.length})`;
         }
 
         // Nullable logic
-        if (this.nullable && !this.primaryKey) {
-            columnDef += " NULL";
+        if (!this.primaryKey) {
+            columnDef += this.nullable ? " NULL" : " NOT NULL";
         } else {
-            columnDef += " NOT NULL";
-        }
-
-        // Primary key logic
-        if (this.primaryKey) {
             columnDef += " PRIMARY KEY";
         }
 
@@ -84,8 +86,7 @@ class Column {
         }
 
         // Default value logic
-        if (this.default && this.default.toLowerCase() !== 'null') {
-            // Check if the type is numeric and the default value is a number
+        if (this.hasDefault()) {
             if (numericTypes.includes(this.type) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
             } else {
@@ -94,6 +95,45 @@ class Column {
         }
 
         return columnDef;
+    }
+
+    /**
+     * Checks if the column type is one of the range types like NUMERIC, DECIMAL, DOUBLE, FLOAT, and has a value.
+     * 
+     * @param {Array} withRangeTypes - The list of types that support range values (e.g., NUMERIC, DECIMAL, etc.).
+     * @returns {boolean} True if the column type is one of the range types and has a value.
+     */
+    hasRange(withRangeTypes) {
+        return withRangeTypes.includes(this.type) && this.values;
+    }
+
+    /**
+     * Checks if the column type is one of the value types like ENUM or SET, and has a value.
+     * 
+     * @param {Array} withValueTypes - The list of types that support specific values (e.g., ENUM, SET).
+     * @returns {boolean} True if the column type is one of the value types and has a value.
+     */
+    hasValue(withValueTypes) {
+        return withValueTypes.includes(this.type) && this.values;
+    }
+
+    /**
+     * Checks if the column type supports length (e.g., VARCHAR, CHAR, etc.) and has a defined length.
+     * 
+     * @param {Array} withLengthTypes - The list of types that support length (e.g., VARCHAR, CHAR).
+     * @returns {boolean} True if the column type supports length and a length is defined.
+     */
+    hasLength(withLengthTypes) {
+        return this.length && withLengthTypes.includes(this.type);
+    }
+
+    /**
+     * Checks if the column has a valid default value.
+     * 
+     * @returns {boolean} True if the column has a default value that is not 'null'.
+     */
+    hasDefault() {
+        return this.default && this.default.toLowerCase() !== 'null';
     }
 }
 

@@ -2146,13 +2146,13 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <link rel="stylesheet" href="css/database-explorer.css">
     <link rel="stylesheet" href="css/entity-editor.css">
-    <script src="lib.assets/js/TableParser.min.js"></script>
-    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="lib.assets/js/import-structure.min.js"></script>
+    <script src="lib.assets/js/ResizablePanel.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
