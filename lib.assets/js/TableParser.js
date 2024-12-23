@@ -47,13 +47,25 @@ class TableParser {
 
     /**
      * Checks if a field is auto-incremented.
-     * @param {string} field The field definition.
+     * 
+     * @param {string} line The field definition.
      * @returns {boolean} True if the field is auto-incremented, otherwise false.
      */
-    isAutoIncrement(field) {
-        const f = field.toUpperCase().replace(/\s+/g, ' ').trim();
-        return f.includes('AUTO_INCREMENT');
+    isAutoIncrement(line) {
+        const f = line.toUpperCase().replace(/\s+/g, ' ').trim();
+        let ai = false;
+        // Check for MySQL/MariaDB's AUTO_INCREMENT
+        ai = f.includes('AUTO_INCREMENT');
+        
+        // Check for PostgreSQL's SERIAL, BIGSERIAL, or nextval() function
+        if(!ai)
+        {
+            ai = f.includes('SERIAL') || f.includes('BIGSERIAL') || f.includes('NEXTVAL');
+        }
+
+        return ai; 
     }
+
 
     /**
      * Parses a CREATE TABLE SQL statement and extracts table and column information.
