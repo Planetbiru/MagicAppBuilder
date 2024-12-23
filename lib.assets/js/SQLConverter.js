@@ -558,7 +558,7 @@ class SQLConverter {
 
     convertToBolean(defaultValue)
     {
-        return (defaultValue.indexOf('1') != -1 ? 'TRUE' : 'FALSE');
+        return defaultValue.indexOf('1') != -1 || defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
     }
 
     /**
