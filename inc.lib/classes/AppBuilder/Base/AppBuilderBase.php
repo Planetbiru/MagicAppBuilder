@@ -1399,10 +1399,10 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $paginationVar = '
     $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
     ->setNavigation(
-        $appConfig->getData()->getPrev(), $appConfig->getData()->getNext(),
-        $appConfig->getData()->getFirst(), $appConfig->getData()->getLast()
+        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
+        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
     )
-    ->setMargin($appConfig->getData()->getPageMargin())
+    ->setMargin($dataControlConfig->getPageMargin())
     ;';
         $paginationVar = str_replace("\r\n", "\n", $paginationVar);
         $pagination1 = $dom->createTextNode($this->createPagination("pagination-top", '$pageControl'));
@@ -1696,7 +1696,7 @@ $specification->addAnd($dataFilter);
 // Pay attention to security issues
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, '.$sortableParam.');
 
-$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
+$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new '.$entityMain->getEntityName().'(null, $database);
 ';
         $features = $this->appFeatures;
@@ -4626,7 +4626,6 @@ $subqueryMap = '.$referece.';
      */
     public function createSortOrderSection($objectName, $entityName, $primaryKeyName)
     {
-        $camelPrimaryKey = PicoStringUtil::camelize($primaryKeyName);
         $lines = array();
         $lines[] = "if(".self::VAR."inputPost".self::CALL_GET."UserAction() == UserAction::SORT_ORDER)";
         $lines[] = self::CURLY_BRACKET_OPEN;

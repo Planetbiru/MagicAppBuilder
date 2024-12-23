@@ -6,12 +6,11 @@ function init() {
     let modalEntityEditor = document.getElementById("entityEditorModal");
     let closeModalButton = document.querySelectorAll(".cancel-button");
     let openModalQuertTranslatorButton = document.querySelector(".import-structure");
-    let openModalEntityEditorButton = document.querySelector(".open-entity-editor");
-    
+    let openModalEntityEditorButton = document.querySelector(".open-entity-editor"); 
     let translateButton  = document.querySelector(".translate-structure");
     let importFromEntityButton = document.querySelector('.import-from-entity');
     let clearButton  = document.querySelector(".clear");
-    let original = document.querySelector('#original');
+    let original = document.querySelector('.original');
     let queryGenerated = document.querySelector('.query-generated');
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');
@@ -20,14 +19,12 @@ function init() {
     openModalQuertTranslatorButton.onclick = function() {
         modalQueryTranslator.style.display = "block";
         original.focus();
-    }
+    };
 
     openModalEntityEditorButton.onclick = function() {
         modalEntityEditor.style.display = "block";
         resizablePanels.loadPanelWidth();
-    }
-    
-
+    };
     
     closeModalButton.forEach(function(cancelButton) {
         cancelButton.onclick = function(e) {
@@ -38,7 +35,7 @@ function init() {
     // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
         original.value = "";
-    }
+    };
     
     translateButton.onclick = function()
     {
@@ -47,7 +44,7 @@ function init() {
         let converted = converter.translate(sql, type);
         document.querySelector('[name="query"]').value = converted;
         modalQueryTranslator.style.display = "none";
-    }
+    };
     
     importFromEntityButton.onclick = function()
     {
@@ -56,7 +53,8 @@ function init() {
         let converted = converter.translate(sql, type);
         document.querySelector('[name="query"]').value = converted;
         modalEntityEditor.style.display = "none";
-    }
+    };
+
     deleteCells.forEach(function(cell) {
         cell.addEventListener('click', function(event) {
             event.preventDefault();
@@ -66,16 +64,21 @@ function init() {
             let value = event.target.getAttribute('data-value');
             let queryString = "";
             let tableName = schema == "" ? `${schema}.${table}` : table;
-            queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}' `;
+            queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
+            let originalQuery = query.value;
+            if(originalQuery.startsWith('DELETE FROM '))
+            {
+                queryString = query.value + queryString;
+            }
             query.value = queryString;
-
         });
     });
+
     window.onclick = function(event) {
         if (event.target == modalQueryTranslator) {
             modalQueryTranslator.style.display = "none";
         }
-    }
+    };
 }
 
 
@@ -87,17 +90,30 @@ let resizablePanels;
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Select all toggle buttons within collapsible elements
+    const toggles = document.querySelectorAll('.collapsible .button-toggle');
+
+    // Attach event listeners to each toggle button
+    toggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+            // Find the closest collapsible element and toggle the 'open' class
+            e.target.closest('.collapsible').classList.toggle('open');
+        });
+    });
     
     editor = new EntityEditor('.entity-editor', 
         {
             defaultDataType: 'VARCHAR',
             defaultDataLength: 50,
+            primaryKeyDataType: 'BIGINT',
+            primaryKeyDataLength: 20,
             callbackLoadEntity: function(){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                fetchData(applicationId, databaseType, databaseName, databaseSchema)
+                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema)
             }, 
             callbackSaveEntity: function (entities){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -108,46 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     );
-
-    // Event listener for the "Export JSON" button
-    document.getElementById("exportBtn").addEventListener("click", function () {
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        const data = {
-            applicationId: applicationId,
-            databaseType: databaseType,
-            databaseName: databaseName,
-            databaseSchema: databaseSchema,
-            entities: editor.entities  // Converting the entities array into a JSON string
-        };
-        editor.exportJSON(data); // Export the sample object to a JSON file
-    });
-
-    // Event listener for the "Import JSON" button
-    document.getElementById("importBtn").addEventListener("click", function () {
-        document.getElementById("importFile").click();
-    });
-
-    document.getElementById("importFile").addEventListener("change", function () {
-        const file = this.files[0]; // Get the selected file
-        if (file) {
-            editor.importJSON(file, function(entities){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-    
-            }); // Import the file if it's selected
-
-            
-        } else {
-            console.log("Please select a JSON file first.");
-        }
-    });
-
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
@@ -208,7 +184,7 @@ function sendToServer(applicationId, databaseType, databaseName, databaseSchema,
  * @param {Array} entities - The list of entities to be fetched.
  * @param {Function} callback - The callback function that will be called after the data is fetched.
  */
-function fetchData(applicationId, databaseType, databaseName, databaseSchema, entities, callback) {
+function fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema, entities, callback) {
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
     const url = buildUrl(applicationId, databaseType, databaseName, databaseSchema, entities);
     // Construct the URL with query parameters

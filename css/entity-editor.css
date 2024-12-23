@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   margin: 0;
   padding: 0;
@@ -102,7 +103,7 @@ body {
 .entity-editor .editor-form .table-container {
   max-height: 180px;
   overflow: auto;
-  padding-top: 5px;
+  margin-top: 5px;
 }
 .entity-editor .editor-form table {
   width: 100%;
@@ -221,6 +222,7 @@ body {
   margin: 0;
   padding: 5px 54px 5px 10px;
   border-bottom: 1px solid #DDDDDD;
+  color: #282828;
 }
 .entity-editor .entity .entity-body ul {
   list-style-type: none;
@@ -230,18 +232,26 @@ body {
 .entity-editor .entity .entity-body ul li {
   padding: 4px 10px 5px 10px;
   border-bottom: 1px solid #DDDDDD;
-}
-.entity-editor .entity .entity-body ul li:last-child {
-  border-bottom: none;
+  color: #2d2d2d;
 }
 .entity-editor .entity .entity-body ul li .data-type {
-  background-color: #E4E4E4;
+  background-color: #EAEAEA;
   padding: 2px 5px;
   font-size: 9px;
   float: right;
   margin-top: 1px;
   margin-left: 8px;
   border-radius: 2px;
+}
+.entity-editor .entity .entity-body ul li[data-primary-key=true] {
+  background-color: #E8F6FF;
+  color: #053D62;
+}
+.entity-editor .entity .entity-body ul li[data-primary-key=true] .data-type {
+  background-color: #C4E9FF;
+}
+.entity-editor .entity .entity-body ul li:last-child {
+  border-bottom: none;
 }
 .entity-editor .entity .entity-body ul li::after {
   content: "";
@@ -270,4 +280,20 @@ body {
 }
 .entity-editor .table-list li label {
   padding: 0;
+}
+
+.icon-delete::before {
+  content: "❌";
+}
+
+.icon-edit::before {
+  content: "✏️";
+}
+
+.icon-move-up::before {
+  content: "⬆️";
+}
+
+.icon-move-down::before {
+  content: "⬇️";
 }/*# sourceMappingURL=entity-editor.css.map */

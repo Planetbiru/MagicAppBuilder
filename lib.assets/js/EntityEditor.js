@@ -1,24 +1,26 @@
 /**
- * Class representing a column in a database table.
+ * Represents a column in a database table.
  * 
- * The Column class is used to define a column for a database table, including 
- * its name, type, nullable status, default value, primary key, auto-increment,
- * and specific values for ENUM or SET types.
+ * The Column class is used to define the properties of a column in a database table. 
+ * This includes the column's name, type, length, nullable status, default value, 
+ * primary key status, auto-increment behavior, and valid values for ENUM or SET types.
+ * 
+ * @class
  */
 class Column {
     /**
      * Creates an instance of the Column class.
      * 
      * @param {string} name - The name of the column.
-     * @param {string} [type="VARCHAR"] - The type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
+     * @param {string} [type="VARCHAR"] - The data type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
      * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
      * @param {string} [defaultValue=""] - The default value for the column (optional).
      * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
      * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
-     * @param {string} [enumValues=""] - The values for ENUM or SET types, if applicable (comma-separated).
+     * @param {string} [values=""] - The valid values for ENUM or SET types, or the range of values for types like DECIMAL, NUMERIC, FLOAT, and DOUBLE (optional, comma-separated).
      */
-    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, enumValues = "") //NOSONAR
+    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "") //NOSONAR
     {
         this.name = name;
         this.type = type;
@@ -27,40 +29,54 @@ class Column {
         this.default = defaultValue;
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
-        this.enumValues = enumValues;
-        this.typeWithValue = ['ENUM', 'SET'];
+        this.values = values;
     }
 
     /**
-     * Converts the column definition into a valid SQL statement.
+     * Converts the column definition into a valid SQL column definition string.
      * 
-     * This method generates the SQL column definition as a string based on the column's
-     * properties such as its type, nullable status, primary key, auto-increment, default value,
-     * and for ENUM/SET types, the list of valid values.
+     * This method generates the SQL column definition based on the column's properties such as:
+     * - data type (e.g., VARCHAR, INT, ENUM, etc.)
+     * - nullable status
+     * - primary key status
+     * - auto-increment behavior
+     * - default value
+     * - valid values for ENUM/SET types or range values for DECIMAL, NUMERIC, FLOAT, and DOUBLE.
      * 
      * @returns {string} The SQL column definition.
      */
     toSQL() {
+        let withValueTypes = ['ENUM', 'SET'];
+        let withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
+        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
+        let withLengthTypes = [
+            'VARCHAR', 'CHAR', 
+            'VARBINARY', 'BINARY',
+            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
+            'BIT'
+        ];
+
         let columnDef = `${this.name} ${this.type}`;
         
-        // If the type is ENUM or SET, handle them similarly
-        if ((this.typeWithValue.includes(this.type)) && this.enumValues) {
-            const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
+        // Handle ENUM and SET types
+        if (this.hasValue(withValueTypes)) {
+            let enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
-        } else if (this.length) {
-            // For other types, add length if available
+        } 
+        // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
+        else if (this.hasRange(withRangeTypes)) {
+            let rangeList = this.values.split(',').map(val => `${val.trim()}`).join(', ');
+            columnDef = `${this.name} ${this.type}(${rangeList})`;
+        } 
+        // Handle types that support length, like VARCHAR, CHAR, etc.
+        else if (this.hasLength(withLengthTypes)) {
             columnDef += `(${this.length})`;
         }
 
         // Nullable logic
-        if (this.nullable && !this.primaryKey) {
-            columnDef += " NULL";
+        if (!this.primaryKey) {
+            columnDef += this.nullable ? " NULL" : " NOT NULL";
         } else {
-            columnDef += " NOT NULL";
-        }
-
-        // Primary key logic
-        if (this.primaryKey) {
             columnDef += " PRIMARY KEY";
         }
 
@@ -70,13 +86,57 @@ class Column {
         }
 
         // Default value logic
-        if (this.default && this.default.toLowerCase() !== 'null') {
-            columnDef += ` DEFAULT '${this.default}'`;
+        if (this.hasDefault()) {
+            if (numericTypes.includes(this.type) && !isNaN(this.default)) {
+                columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
+            } else {
+                columnDef += ` DEFAULT '${this.default}'`; // Default is a string, so use quotes
+            }
         }
 
         return columnDef;
     }
+
+    /**
+     * Checks if the column type is one of the range types like NUMERIC, DECIMAL, DOUBLE, FLOAT, and has a value.
+     * 
+     * @param {Array} withRangeTypes - The list of types that support range values (e.g., NUMERIC, DECIMAL, etc.).
+     * @returns {boolean} True if the column type is one of the range types and has a value.
+     */
+    hasRange(withRangeTypes) {
+        return withRangeTypes.includes(this.type) && this.values;
+    }
+
+    /**
+     * Checks if the column type is one of the value types like ENUM or SET, and has a value.
+     * 
+     * @param {Array} withValueTypes - The list of types that support specific values (e.g., ENUM, SET).
+     * @returns {boolean} True if the column type is one of the value types and has a value.
+     */
+    hasValue(withValueTypes) {
+        return withValueTypes.includes(this.type) && this.values;
+    }
+
+    /**
+     * Checks if the column type supports length (e.g., VARCHAR, CHAR, etc.) and has a defined length.
+     * 
+     * @param {Array} withLengthTypes - The list of types that support length (e.g., VARCHAR, CHAR).
+     * @returns {boolean} True if the column type supports length and a length is defined.
+     */
+    hasLength(withLengthTypes) {
+        return this.length && withLengthTypes.includes(this.type);
+    }
+
+    /**
+     * Checks if the column has a valid default value.
+     * 
+     * @returns {boolean} True if the column has a default value that is not 'null'.
+     */
+    hasDefault() {
+        return this.default && this.default.toLowerCase() !== 'null';
+    }
 }
+
 
 /**
  * Class representing an entity (table) in a database.
@@ -151,17 +211,23 @@ class EntityEditor {
      * @param {Object} [options={}] - Optional configuration settings for the entity editor.
      */
     constructor(selector, options = {}) {
-        let setting = {};
+        this.setting = {
+            defaultDataType: 'VARCHAR',
+            defaultDataLength: '48',
+            primaryKeyDataType: 'VARCHAR',
+            primaryKeyDataLength: '40'
+        };
 
         // Copy properties from options to setting object
-        Object.assign(setting, options);
+        Object.assign(this.setting, options);
 
         this.selector = selector;
         this.entities = [];
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
-            'DOUBLE', 'DECIMAL', 'FLOAT', 'BIT',
+            'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT', 
+            'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
             'ENUM', 'SET', 
@@ -171,18 +237,22 @@ class EntityEditor {
             'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY',
             'JSON',
         ];
-        this.typeWithLength = [
+        this.withLengthTypes = [
             'VARCHAR', 'CHAR', 
             'VARBINARY', 'BINARY',
-            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
-
+            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
+            'BIT'
         ];
-        this.typeWithValue = ['ENUM', 'SET'];
-        this.addCheckboxListeners();
-        this.callbackLoadEntity = setting.callbackLoadEntity;
-        this.callbackSaveEntity = setting.callbackSaveEntity;
-        this.defaultDataType = setting.defaultDataType + '';
-        this.defaultDataLength = setting.defaultDataLength + '';
+        this.withValueTypes = ['ENUM', 'SET'];
+        this.withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
+        this.addDomListeners();
+        this.callbackLoadEntity = this.setting.callbackLoadEntity;
+        this.callbackSaveEntity = this.setting.callbackSaveEntity;
+        this.defaultDataType = this.setting.defaultDataType + '';
+        this.defaultDataLength = this.setting.defaultDataLength + '';
+
+        this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
+        this.primaryKeyDataLength = this.setting.primaryKeyDataLength + '';
 
         if(typeof this.callbackLoadEntity == 'function')
         {
@@ -193,7 +263,7 @@ class EntityEditor {
     /**
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
-    addCheckboxListeners() {
+    addDomListeners() {
         document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
@@ -210,6 +280,40 @@ class EntityEditor {
                 this.exportToSQL();
             }
         });
+        let _this = this;
+        document.addEventListener('change', function (event) {
+            if (event.target.classList.contains('column-primary-key')) {
+                const isChecked = event.target.checked;
+                if(isChecked)
+                {
+                    const tr = event.target.closest('tr');
+                    tr.querySelector('.column-type').value = _this.primaryKeyDataType;
+                    _this.updateColumnLengthInput(tr.querySelector('.column-type'));
+                    tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
+                }
+            }
+        });
+        
+        
+
+        document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
+            const file = this.files[0]; // Get the selected file
+            if (file) {
+                editor.importJSON(file, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+        
+                }); // Import the file if it's selected
+    
+                
+            } else {
+                console.log("Please select a JSON file first.");
+            }
+        });
+    
     }
 
     /**
@@ -266,9 +370,9 @@ class EntityEditor {
         let typeSimple = column.type.split('(')[0].trim();
         row.innerHTML = `
             <td class="column-action">
-                <button onclick="editor.removeColumn(this)">❌</button>
-                <button onclick="editor.moveUp(this)">⬆️</button>
-                <button onclick="editor.moveDown(this)">⬇️</button>    
+                <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
+                <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
+                <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
             </td>
             <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
             <td>
@@ -276,11 +380,11 @@ class EntityEditor {
                     ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
                 </select>
             </td>
-            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.typeWithLength.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.typeWithValue.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
-            <td class="column-pk"><input type="checkbox" class="column-primaryKey" ${column.primaryKey ? 'checked' : ''}></td>
+            <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''}></td>
         `;
 
@@ -300,7 +404,10 @@ class EntityEditor {
         let entityName = document.querySelector(this.selector+" .entity-name").value;
         let count = document.querySelectorAll(this.selector+" .column-name").length;
         let countStr = count <= 0 ? '' : count + 1;
-        let column = new Column(count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`, this.defaultDataType, this.defaultDataLength);
+        
+        let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
+
+        let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
     }
 
@@ -352,7 +459,7 @@ class EntityEditor {
         const columnTypes = document.querySelectorAll(this.selector+" .column-type");
         const columnNullables = document.querySelectorAll(this.selector+" .column-nullable");
         const columnDefaults = document.querySelectorAll(this.selector+" .column-default");
-        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primaryKey");
+        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primary-key");
         const columnAutoIncrements = document.querySelectorAll(this.selector+" .column-autoIncrement");
         const columnLengths = document.querySelectorAll(this.selector+" .column-length");
         const columnEnums = document.querySelectorAll(this.selector+" .column-enum");
@@ -417,7 +524,7 @@ class EntityEditor {
                     columnData.default,
                     columnData.primaryKey,
                     columnData.autoIncrement,
-                    columnData.enumValues !== "null" ? columnData.enumValues : "",
+                    columnData.values !== "null" ? columnData.values : "",
                 );
                 
                 // Add the column to the entity
@@ -449,16 +556,22 @@ class EntityEditor {
 
         const tabelList = document.querySelector(this.selector+" .table-list");
         tabelList.innerHTML = '';
-        
+        let withLengthTypes = this.withLengthTypes;
         this.entities.forEach((entity, index) => {
             const entityDiv = document.createElement("div");
             entityDiv.classList.add("entity");
-            let columnsInfo = entity.columns.map(col => col.length > 0 ? `<li>${col.name} <span class="data-type">${col.type}(${col.length})</span></li>` : `<li>${col.name} <span class="data-type">${col.type}</span></li>`).join('');
-
+            let columnsInfo = entity.columns.map(col => {
+                if (withLengthTypes.includes(col.type) && col.length > 0) {
+                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}(${col.length})</span></li>`;
+                } else {
+                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}</span></li>`;
+                }
+            }).join('');
+            
             entityDiv.innerHTML = `
                 <div class="entity-header">
-                    <button onclick="editor.deleteEntity(${index})">❌</button>
-                    <button onclick="editor.editEntity(${index})">✏️</button>
+                    <button onclick="editor.deleteEntity(${index})" class="icon-delete"></button>
+                    <button onclick="editor.editEntity(${index})" class="icon-edit"></button>
                     <h4>${entity.name}</h4>
                 </div>
                 <div class="entity-body">
@@ -531,14 +644,14 @@ class EntityEditor {
         const enumInput = row.querySelector(".column-enum");
 
         // Show length input for specific types
-        if (this.typeWithLength.includes(columnType)) {
+        if (this.withLengthTypes.includes(columnType)) {
             lengthInput.style.display = "inline";
         } else {
             lengthInput.style.display = "none";
         }
 
         // Show enum input for ENUM type
-        if (this.typeWithValue.includes(columnType)) {
+        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType)) {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";
@@ -573,11 +686,11 @@ class EntityEditor {
      */
     exportJSON(data) {
         // Get the base filename from the data object
-        const fileName = data.databaseName;
+        const fileName = `${data.databaseName}-${data.databaseSchema}`;
 
         // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
         const now = new Date();
-        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // Format datetime to YYYY_MM_DD_HH_MM_SS
+        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // NOSONAR
 
         // Remove the last underscore if present
         if (dateTimeSuffix.endsWith('_')) {
@@ -620,7 +733,6 @@ class EntityEditor {
     importJSON(file, callback) {
         let _this = this;
         const reader = new FileReader(); // Create a FileReader instance
-
         reader.onload = function (e) {
             const contents = e.target.result; // Get the content of the file
             try {
@@ -634,8 +746,43 @@ class EntityEditor {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
             }
         };
-
         reader.readAsText(file); // Read the file as text
     }
+
+    /**
+     * Triggers the import action by simulating a click on the import file element.
+     * This function locates the DOM element based on the `selector` property and 
+     * clicks on it to initiate the import process.
+     */
+    importEntities() {
+        document.querySelector(this.selector + " .import-file").click();
+    }
+
+    /**
+     * Gathers metadata from the HTML document and exports the entities data as a JSON file.
+     * The function retrieves application-specific details such as `application-id`, 
+     * `database-name`, `database-schema`, and `database-type` from the meta tags in the document.
+     * Then, it constructs a data object containing these values and the current list of entities from
+     * the editor, and passes it to the `exportJSON` method to export the data as a JSON file.
+     * 
+     * @returns {void} 
+     */
+    exportEntities() {
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        
+        const data = {
+            applicationId: applicationId,
+            databaseType: databaseType,
+            databaseName: databaseName,
+            databaseSchema: databaseSchema,
+            entities: this.entities  // Converting the entities array into a JSON string
+        };
+        
+        this.exportJSON(data); // Export the sample object to a JSON file
+    }
+
 
 }

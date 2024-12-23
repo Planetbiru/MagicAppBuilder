@@ -54,7 +54,11 @@ class SQLConverter {
             "mediumint": "MEDIUMINT",
             "smallint": "SMALLINT",
             "integer": "INT",
-            "real": "FLOAT",
+            "double": "DOUBLE",
+            "float": "FLOAT",
+            "real": "DOUBLE",
+            "decimal": "DECIMAL",
+            "numeric": "NUMERIC",
             "tinytext": "TINYTEXT",
             "mediumtext": "MEDIUMTEXT",
             "longtext": "LONGTEXT",
@@ -72,7 +76,9 @@ class SQLConverter {
             "timestamp with time zone": "TIMESTAMP",
             "timestamp without time zone": "DATETIME",
             "timestamp": "TIMESTAMPTZ",
-            "json": "JSON"
+            "json": "JSON",
+            "enum": "ENUM",
+            "set": "SET"
         };
         
         this.dbToPostgreSQL = {
@@ -137,6 +143,8 @@ class SQLConverter {
         value = this.replaceAll(value, ' character varying', ' varchar');
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
         value = this.replaceAll(value, ' TINYINT(1)', ' boolean');
+        
+        
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -163,11 +171,11 @@ class SQLConverter {
      * @returns {string} The converted table schema as a string.
      */
     convertQuery(table, targetType) {
-        if (targetType === 'sqlite') {
+        if (this.isSQLite(targetType)) {
             return this.toSqliteOut(table, targetType);
-        } else if (targetType === 'mysql' || targetType === 'mariadb') {
+        } else if (this.isMySQL(targetType)) {
             return this.toMySQLOut(table, targetType);
-        } else if (targetType === 'pgsql' || targetType === 'postgresql') {
+        } else if (this.isPGQSL(targetType)) {
             return this.toPostgreSQLOut(table, targetType);
         }
     }
@@ -179,17 +187,17 @@ class SQLConverter {
      * @returns {string} The converted SQLite table schema as a string.
      */
     toSqliteOut(table, targetType) {
-        let sqliteTable = {};
-        sqliteTable.tableName = table.tableName;
-        sqliteTable.primaryKey = table.primaryKey;
-        sqliteTable.columns = [];
-        for (let i in table.columns) {
-            let column = Object.assign({}, table.columns[i]);
-            column.Type = this.toSqliteType(column.Type, column.Length);
-            sqliteTable.columns.push(column);
-        }
+        let sqliteTable = {
+            tableName: table.tableName,
+            primaryKey: table.primaryKey,
+            columns: table.columns.map(column => {
+                let columnCopy = { ...column }; // Using object spread instead of Object.assign
+                columnCopy.Type = this.toSqliteType(columnCopy.Type, columnCopy.Length);
+                return columnCopy;
+            })
+        };
         return this.toSqliteTable(sqliteTable, targetType);
-    }
+    }    
 
     /**
      * Converts a table schema to MySQL format.
@@ -198,18 +206,17 @@ class SQLConverter {
      * @returns {string} The converted MySQL table schema as a string.
      */
     toMySQLOut(table, targetType) {
-        let mysqlTable = {};
-        mysqlTable.tableName = table.tableName;
-        mysqlTable.primaryKey = table.primaryKey;
-        mysqlTable.columns = [];
-        for (let i in table.columns) {
-            let column = Object.assign({}, table.columns[i]);
-            column.Field = column.Field
-            column.Type = this.toMySQLType(column.Type, column.Length);
-            mysqlTable.columns.push(column);
-        }
+        let mysqlTable = {
+            tableName: table.tableName,
+            primaryKey: table.primaryKey,
+            columns: table.columns.map(column => {
+                let columnCopy = { ...column, Field: column.Field }; // Spread and copy Field directly
+                columnCopy.Type = this.toMySQLType(columnCopy.Type, columnCopy.Length);
+                return columnCopy;
+            })
+        };
         return this.toMySQLTable(mysqlTable, targetType);
-    }
+    }    
 
     /**
      * Converts a table schema to PostgreSQL format.
@@ -218,17 +225,17 @@ class SQLConverter {
      * @returns {string} The converted PostgreSQL table schema as a string.
      */
     toPostgreSQLOut(table, targetType) {
-        let pgTable = {};
-        pgTable.tableName = table.tableName;
-        pgTable.primaryKey = table.primaryKey;
-        pgTable.columns = [];
-        for (let i in table.columns) {
-            let column = Object.assign({}, table.columns[i]);
-            column.Type = this.toPostgreSQLType(column.Type, column.Length);
-            pgTable.columns.push(column);
-        }
+        let pgTable = {
+            tableName: table.tableName,
+            primaryKey: table.primaryKey,
+            columns: table.columns.map(column => {
+                let columnCopy = { ...column }; // Create a shallow copy of the column
+                columnCopy.Type = this.toPostgreSQLType(columnCopy.Type, columnCopy.Length);
+                return columnCopy;
+            })
+        };
         return this.toPostgreSQLTable(pgTable, targetType);
-    }
+    }    
     
     /**
      * Converts a table schema to SQLite format.
@@ -261,6 +268,212 @@ class SQLConverter {
     }
 
     /**
+     * Checks if the target type is MySQL or MariaDB.
+     *
+     * @param {string} targetType The database type (e.g., 'mysql', 'mariadb').
+     * @returns {boolean} True if the target type is MySQL or MariaDB, otherwise false.
+     */
+    isMySQL(targetType)
+    {
+        return targetType === 'mysql' 
+            || targetType === 'mariadb';
+    }
+
+    /**
+     * Checks if the target type is PostgreSQL.
+     *
+     * @param {string} targetType The database type (e.g., 'pgsql', 'postgresql').
+     * @returns {boolean} True if the target type is PostgreSQL, otherwise false.
+     */
+    isPGQSL(targetType)
+    {
+        return targetType === 'pgsql' 
+            || targetType === 'postgresql';
+    }
+
+    /**
+     * Checks if the target type is SQLite.
+     *
+     * @param {string} targetType The database type (e.g., 'sqlite').
+     * @returns {boolean} True if the target type is SQLite, otherwise false.
+     */
+    isSQLite(targetType)
+    {
+        return targetType === 'sqlite';
+    }
+
+    /**
+     * Checks if the column type is a real number (FLOAT, DOUBLE, REAL, DECIMAL).
+     *
+     * @param {string} columnType The column data type (e.g., 'FLOAT', 'DECIMAL').
+     * @returns {boolean} True if the column type is a real number type, otherwise false.
+     */
+    isReal(columnType)
+    {
+        return columnType.toUpperCase().indexOf('FLOAT') != -1 
+            || columnType.toUpperCase().indexOf('DOUBLE') != -1 
+            || columnType.toUpperCase().indexOf('REAL') != -1 
+            || columnType.toUpperCase().indexOf('DECIMAL') != -1;
+    }
+
+    /**
+     * Checks if the column type is Boolean (BOOLEAN or TINYINT(1)).
+     *
+     * @param {string} columnType The column data type (e.g., 'BOOLEAN', 'TINYINT(1)').
+     * @returns {boolean} True if the column type is Boolean, otherwise false.
+     */
+    isBoolean(columnType)
+    {
+        return columnType.toUpperCase() == 'BOOLEAN' 
+            || columnType.toUpperCase() == 'BOOL' 
+            || columnType.toUpperCase() == 'TINYINT(1)';
+    }
+
+    /**
+     * Checks if the column type is TINYINT with a length of 1.
+     *
+     * This method checks if the given column type is 'TINYINT' and if its length
+     * is exactly 1, which is commonly used to represent boolean values in certain databases.
+     *
+     * @param {string} type The data type of the column (e.g., 'TINYINT').
+     * @param {number} length The length of the column (e.g., 1).
+     * @returns {boolean} True if the type is 'TINYINT' and length is 1, otherwise false.
+     */
+    isTinyInt1(type, length)
+    {
+        return type.toUpperCase() === 'TINYINT' && length == 1;
+    }
+
+    /**
+     * Checks if the column type is an integer (e.g., TINYINT, SMALLINT, INT, BIGINT).
+     *
+     * @param {string} type The column data type (e.g., 'INT', 'BIGINT').
+     * @returns {boolean} True if the column type is an integer type, otherwise false.
+     */
+    isInteger(type)
+    {
+        return type.toUpperCase() === 'TINYINT'
+            || type.toUpperCase() === 'SMALLINT'
+            || type.toUpperCase() === 'MEDIUMINT'
+            || type.toUpperCase() === 'BIGINT'
+            || type.toUpperCase() === 'INTEGER'
+            || type.toUpperCase() === 'INT';
+    }
+
+    /**
+     * Determines if a column is auto-incremented for MySQL databases.
+     *
+     * @param {boolean} autoIncrement Whether the column is set to auto-increment.
+     * @param {string} targetType The target database type (e.g., 'mysql', 'mariadb').
+     * @returns {boolean} True if the column is auto-incremented in MySQL or MariaDB, otherwise false.
+     */
+    isAutoIncrement(autoIncrement, targetType)
+    {
+        return this.isMySQL(targetType) && autoIncrement;
+    }
+
+    /**
+     * Checks if a value is not empty (not null or an empty string).
+     *
+     * @param {string} value The value to check.
+     * @returns {boolean} True if the value is not empty, otherwise false.
+     */
+    isNotEmpty(value)
+    {
+        return value != null && value != '';
+    }
+
+    /**
+     * Determines if a column has a default value, excluding primary keys.
+     *
+     * @param {boolean} primaryKey Whether the column is a primary key.
+     * @param {string} defaultValue The default value of the column.
+     * @returns {boolean} True if the column has a default value, otherwise false.
+     */
+    hasDefaultValue(primaryKey, defaultValue)
+    {
+        return !primaryKey && defaultValue !== null && defaultValue !== '';
+    }
+
+    /**
+     * Fixes the table name according to the target database type.
+     * 
+     * This method adjusts the table name by removing any database prefix and applying
+     * the appropriate syntax for the target database (e.g., quoting for MySQL or PostgreSQL).
+     *
+     * @param {string} tableName The name of the table to fix.
+     * @param {string} targetType The target database type (e.g., 'mysql', 'pgsql').
+     * @returns {string} The fixed table name.
+     */
+    fixTableName(tableName, targetType)
+    {
+        if (tableName.indexOf('.') !== -1) {
+            tableName = tableName.split('.')[1];
+        }
+        if (this.isMySQL(targetType)) {
+            tableName = '`' + tableName + '`';
+        }
+        else if (this.isPGQSL(targetType)) {
+            tableName = '"' + tableName + '"';
+        }
+        return tableName;
+    }
+
+    /**
+     * Fixes the column name according to the target database type.
+     * 
+     * This method applies proper quoting for column names based on the target database
+     * (e.g., MySQL uses backticks for column names).
+     *
+     * @param {string} columnName The name of the column to fix.
+     * @param {string} targetType The target database type (e.g., 'mysql').
+     * @returns {string} The fixed column name.
+     */
+    fixColumnName(columnName, targetType)
+    {
+        if (this.isMySQL(targetType)) {
+            columnName = '`' + columnName + '`';
+        }
+        return columnName;
+    }
+
+    /**
+     * Generates the default value SQL for a column based on its type.
+     * 
+     * This method returns the appropriate default value syntax for the column's type,
+     * handling different types such as BOOLEAN, INTEGER, and REAL.
+     *
+     * @param {string} defaultValue The default value to apply to the column.
+     * @param {string} columnType The type of the column (e.g., 'BOOLEAN', 'INT').
+     * @returns {string} The default value SQL definition for the column.
+     */
+    getDefaultData(defaultValue, columnType)
+    {
+        let colDef = "";
+        if(defaultValue.toUpperCase() == 'NULL')
+        {
+            colDef += ' DEFAULT NULL';
+        }
+        else if(this.isBoolean(columnType))
+        {
+            colDef += ' DEFAULT ' + this.convertToBolean(defaultValue);
+        }
+        else if(columnType.toUpperCase().indexOf('INT') != -1)
+        {
+            colDef += ' DEFAULT ' + this.convertToInteger(defaultValue);
+        }
+        else if(this.isReal(columnType))
+        {
+            colDef += ' DEFAULT ' + this.convertToReal(defaultValue);
+        }
+        else
+        {
+            colDef += ' DEFAULT ' + defaultValue;
+        }
+        return colDef;
+    }
+
+    /**
      * Converts a table schema to a common table format for SQLite, MySQL, or PostgreSQL.
      * @param {Object} table The table object to convert.
      * @param {string} targetType The target database type.
@@ -268,64 +481,39 @@ class SQLConverter {
      */
     toTable(table, targetType) {
         let tableName = table.tableName;
-        if (tableName.indexOf('.') !== -1) {
-            tableName = tableName.split('.')[1];
-        }
+        
         let lines = [];
-        if (targetType === 'mysql' || targetType === 'mariadb') {
-            tableName = '`' + tableName + '`';
-        }
-        else if (targetType === 'pgsql' || targetType === 'postgresql') {
-            tableName = '"' + tableName + '"';
-        }
+
+        tableName = this.fixTableName(tableName, targetType);
+        
         lines.push('CREATE TABLE IF NOT EXISTS ' + tableName);
         lines.push('(');
         let linesCol = [];
         for (let i in table.columns) {
-            let columnName = table.columns[i].Field;
-            if (targetType === 'mysql' || targetType === 'mariadb') {
-                columnName = '`' + columnName + '`';
-            }
+            let columnName = this.fixColumnName(table.columns[i].Field, targetType);
+            
             let columnType = table.columns[i].Type;
             let primaryKey = table.columns[i].Field === table.primaryKey;
             let colDef = '\t' + columnName + ' ' + columnType;
             if (primaryKey) {
-                colDef += ' PRIMARY KEY';
-                colDef += ' NOT NULL';
+                colDef += ' PRIMARY KEY';             
+                if (this.isAutoIncrement(table.columns[i].AutoIncrement, targetType)) {
+                    colDef += ' AUTO_INCREMENT';
+                }
                 table.columns[i].Nullable = false;
             }
-            else {
-                if (table.columns[i].Nullable) {
-                    colDef += ' NULL';
-                } else {
-                    colDef += ' NOT NULL';
-                }
+            else if (table.columns[i].Nullable) {
+                colDef += ' NULL';
+            } else {
+                colDef += ' NOT NULL';
             }
+            
             let defaultValue = table.columns[i].Default;
-            if (!primaryKey && defaultValue !== '' && defaultValue !== null) {
+            if (this.hasDefaultValue(primaryKey, defaultValue)) {
                 defaultValue = this.replaceAll(defaultValue, '::character varying', '');
                 defaultValue = this.fixDefaultValue(defaultValue, targetType);
-                if (defaultValue != '' && defaultValue != null) {
-                    if(defaultValue.toUpperCase() == 'NULL')
-                    {
-                        colDef += ' DEFAULT NULL';
-                    }
-                    else if(columnType.toUpperCase() == 'BOOLEAN' || columnType.toUpperCase() == 'TINYINT(1)')
-                    {
-                        colDef += ' DEFAULT ' + ((defaultValue.indexOf('1') != -1) ? 'TRUE' : 'FALSE');
-                    }
-                    else if(columnType.toUpperCase().indexOf('INT') != -1)
-                    {
-                        colDef += ' DEFAULT ' + this.convertToInteger(defaultValue);
-                    }
-                    else if(columnType.toUpperCase().indexOf('FLOAT') != -1 || columnType.toUpperCase().indexOf('DOUBLE') != -1 || columnType.toUpperCase().indexOf('REAL') != -1 | columnType.toUpperCase().indexOf('DECIMAL') != -1)
-                    {
-                        colDef += ' DEFAULT ' + this.convertToReal(defaultValue);
-                    }
-                    else
-                    {
-                        colDef += ' DEFAULT ' + defaultValue;
-                    }
+                if (this.isNotEmpty(defaultValue)) {
+                    colDef += this.getDefaultData(defaultValue, columnType);
                 }
             }
             linesCol.push(colDef);
@@ -344,7 +532,7 @@ class SQLConverter {
      */
     convertToInteger(value) {
         // Remove single quotes if they exist
-        let trimmedValue = value.replace(/^'|'$/g, '');
+        let trimmedValue = value.replace(/^'|'$/g, ''); // NOSONAR
         
         // If the string is empty, return 0, else convert to integer
         return trimmedValue === '' ? 0 : parseInt(trimmedValue, 10);
@@ -359,7 +547,7 @@ class SQLConverter {
      */
     convertToReal(value) {
         // Remove single quotes if they exist
-        let trimmedValue = value.replace(/^'|'$/g, '');
+        let trimmedValue = value.replace(/^'|'$/g, ''); // NOSONAR
         
         // If the string is empty, return 0
         if (trimmedValue === '') {
@@ -373,6 +561,11 @@ class SQLConverter {
         return isNaN(result) ? 0 : result;
     }
 
+    convertToBolean(defaultValue)
+    {
+        return defaultValue.indexOf('1') != -1 || defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
+    }
+
     /**
      * Fixes default value for SQLite.
      * @param {string} defaultValue The default value to fix.
@@ -380,7 +573,7 @@ class SQLConverter {
      * @returns {string} The fixed default value.
      */
     fixDefaultValue(defaultValue, targetType) {
-        if (targetType === 'sqlite') {
+        if (this.isSQLite(targetType)) {
             if (defaultValue.toLowerCase().indexOf('now(') !== -1) {
                 defaultValue = '';
             }
@@ -410,7 +603,7 @@ class SQLConverter {
             }
         }
         if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             sqliteType = 'NVARCHAR(' + (maxLength + 2) + ')';
         }
         else if ((sqliteType === 'NVARCHAR' || sqliteType === 'INT') && length > 0) {
@@ -427,18 +620,11 @@ class SQLConverter {
      */
     toMySQLType(type, length) {
         let mysqlType = 'TEXT';
-        if(type.toUpperCase() === 'TINYINT' && length == 1)
+        if(this.isTinyInt1(type, length))
         {
             return 'TINYINT(1)';
         }
-        if((
-            type.toUpperCase() === 'TINYINT'
-            || type.toUpperCase() === 'SMALLINT'
-            || type.toUpperCase() === 'MEDIUMINT'
-            || type.toUpperCase() === 'BIGINT'
-            || type.toUpperCase() === 'INTEGER'
-            || type.toUpperCase() === 'INT'
-            ) && length > 0)
+        if(this.isInteger(type) && length > 0)
         {
             return `${type}(${length})`;
         }
@@ -453,8 +639,17 @@ class SQLConverter {
         }
         mysqlType = this.replaceAll(mysqlType, 'TIMESTAMPTZ', 'TIMESTAMP')
         if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
-            mysqlType = 'enum(\'' + (resultArray.join('\',\'')) + '\')';
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
+            mysqlType = 'ENUM(\'' + (resultArray.join('\',\'')) + '\')';
+        } else if (type.toUpperCase().indexOf('SET') != -1) {
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
+            mysqlType = 'SET(\'' + (resultArray.join('\',\'')) + '\')';
+        } else if (type.toUpperCase().indexOf('DECIMAL') != -1) {
+            const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
+            mysqlType = 'DECIMAL(' + (resultArray.join(', ')) + ')';
+        } else if (type.toUpperCase().indexOf('NUMERIC') != -1) {
+            const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
+            mysqlType = 'NUMERIC(' + (resultArray.join(', ')) + ')';
         }
         if (mysqlType === 'VARCHAR' && length > 0) {
             mysqlType = mysqlType + '(' + length + ')';
@@ -483,7 +678,7 @@ class SQLConverter {
             pgType = 'BOOLEAN';
         }
         else if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }
         else if (pgType === 'CHARACTER VARYING' && length > 0) {
@@ -515,6 +710,32 @@ class SQLConverter {
 
         return { resultArray, maxLength };
     }
+    
+    /**
+     * Parses a numeric type value like DECIMAL(6,3), NUMERIC(10,2), etc.
+     * @param {string} inputString The numeric value in string format, like 'DECIMAL(6, 3)'.
+     * @returns {Object} An object containing the type (e.g., DECIMAL) and the length (total digits) and scale (digits after the decimal point).
+     */
+    parseNumericType(inputString) {
+        // Regex untuk menangkap nilai yang dipisahkan oleh koma, tanpa tanda kutip
+        const regex = /([A-Za-z0-9_]+)/g; // NOSONAR
+        let matches;
+        let resultArray = [];
+
+        // Menangkap semua kecocokan
+        while ((matches = regex.exec(inputString)) !== null) {
+            resultArray.push(matches[1]); // matches[1] adalah nilai yang dipisahkan
+        }
+
+        // Menentukan panjang maksimum dari array hasil
+        let maxLength = resultArray.reduce((max, current) => {
+            return current.length > max ? current.length : max;
+        }, 0);
+
+        return { resultArray, maxLength };
+    }
+
+    
 
     /**
      * Extracts the DROP TABLE IF EXISTS queries from the provided SQL string.
@@ -539,9 +760,9 @@ class SQLConverter {
             let tableName = this.extractTableName(match[1]);
             
             // Format the table name based on the target database type
-            if(targetType === 'pgsql') {
+            if(this.isPGQSL(targetType)) {
                 tableName = '"' + tableName + '"';
-            } else if(targetType === 'mysql' || targetType === 'mariadb') {
+            } else if(this.isMySQL(targetType)) {
                 tableName = '`' + tableName + '`';
             }
             result.push({
@@ -562,10 +783,10 @@ class SQLConverter {
         // Check if the input contains a dot (indicating a schema)
         if (input.includes('.')) {
             // If there is a dot, take the part after the dot as the table name
-            return input.split('.')[1];
+            input = input.split('.')[1];
         }
         // If there is no dot, it means the input is just the table name
-        return input;
+        return input.replace(/[^a-zA-Z0-9_]/g, ''); // NOSONAR
     }
 
 }

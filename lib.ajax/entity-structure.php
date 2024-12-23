@@ -12,13 +12,13 @@ $inputGet = new InputGet();
 
 if($inputPost->getDatabaseName() !== null)
 {
-    $applicationId = $inputPost->hetApplicationId();
+    $applicationId = $inputPost->getApplicationId();
     $databaseType = $inputPost->getDatabaseType();
     $databaseName = $inputPost->getDatabaseName();
     $databaseSchema = $inputPost->getDatabaseSchema();
     $entities = $inputPost->getEntities();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entities/$filename";
+    $path = $workspaceDirectory."/entity/data/$filename";
     if(!file_exists(dirname($path)))
     {
         mkdir(dirname($path), 0755, true);
@@ -28,12 +28,12 @@ if($inputPost->getDatabaseName() !== null)
 }
 else
 {
-    $applicationId = $inputGet->hetApplicationId();
+    $applicationId = $inputGet->getApplicationId();
     $databaseType = $inputGet->getDatabaseType();
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entities/$filename";
+    $path = $workspaceDirectory."/entity/data/$filename";
     if(!file_exists(dirname($path)))
     {
         mkdir(dirname($path), 0755, true);

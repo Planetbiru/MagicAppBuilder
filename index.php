@@ -4,6 +4,7 @@ use MagicObject\SecretObject;
 
 require_once __DIR__ . "/inc.app/auth.php";
 require_once __DIR__ . "/inc.app/navs.php";
+require_once __DIR__ . "/inc.app/sqlite-detector.php";
 
 $constShowActive = ' show active';
 $constSelected = ' selected';
@@ -222,27 +223,27 @@ $constSelected = ' selected';
                     <td rowspan="2" class="data-sort data-sort-header"></td>
                     <td rowspan="2" align="center">Field</td>
                     <td rowspan="2" align="center">Caption</td>
-                    <td rowspan="2" align="center" width="32" title="Insert">I</td>
-                    <td rowspan="2" align="center" width="32" title="Update">U</td>
-                    <td rowspan="2" align="center" width="32" title="Detail">D</td>
-                    <td rowspan="2" align="center" width="32" title="List">L</td>
-                    <td rowspan="2" align="center" width="32" title="Export">E</td>
-                    <td rowspan="2" align="center" width="32" title="Key">K</td>
-                    <td rowspan="2" align="center" width="32" title="Required">R</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert">I</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update">U</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail">D</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List">L</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export">E</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">K</td>
+                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">R</td>
                     <td colspan="5" align="center">Element Type</td>
                     <td colspan="3" align="center" width="60">Search</td>
                     <td rowspan="2" align="center" width="100">Data Type</td>
                     <td rowspan="2" align="center" width="180">Filter Type</td>
                   </tr>
                   <tr>
-                    <td align="center" width="32" title="Input Text">TE</td>
-                    <td align="center" width="32" title="Textarea">TA</td>
-                    <td align="center" width="32" title="Checkbox">CB</td>
-                    <td align="center" width="32" title="Select">SE</td>
-                    <td align="center" width="74" title="Select">Source</td>
-                    <td align="center" width="30">TE</td>
-                    <td align="center" width="30">SE</td>
-                    <td align="center" width="74" title="Select">Source</td>
+                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
+                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea">TA</td>
+                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox">CB</td>
+                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
+                    <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
+                    <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
+                    <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
+                    <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
                   </tr>
                 </thead>
 

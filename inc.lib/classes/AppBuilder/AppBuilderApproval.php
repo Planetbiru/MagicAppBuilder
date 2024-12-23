@@ -297,7 +297,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->countableCheckedRowId())";
         $lines[] = parent::TAB1."{";
-        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId() as ".parent::VAR."rowId)";    
+        $lines[] = parent::TAB1.parent::TAB1."foreach(".parent::VAR."inputPost->getCheckedRowId(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).") as ".parent::VAR."rowId)";    
         $lines[] = parent::TAB1.parent::TAB1."{";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."try";
@@ -467,7 +467,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -476,7 +476,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -484,7 +484,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -492,7 +492,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -500,7 +500,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -508,7 +508,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -516,7 +516,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -524,7 +524,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -611,14 +611,14 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -657,14 +657,14 @@ class AppBuilderApproval extends AppBuilderBase
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityInfoName.", ".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityApvInfoName.", ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
          
         if($this->appFeatures->getApprovalByAnotherUser())
         {
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE; 
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."dataControlConfig->isTwoUserApproval() && ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE; 
         }
         else
         {

@@ -2148,25 +2148,11 @@ else {
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.css">
     <link rel="stylesheet" href="css/entity-editor.css">
-    <script src="lib.assets/js/TableParser.min.js"></script>
-    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
-    <script>
-        window.onload = function() {
-            // Select all toggle buttons within collapsible elements
-            const toggles = document.querySelectorAll('.collapsible .button-toggle');
-
-            // Attach event listeners to each toggle button
-            toggles.forEach(function(toggle) {
-                toggle.addEventListener('click', function(e) {
-                    // Find the closest collapsible element and toggle the 'open' class
-                    e.target.closest('.collapsible').classList.toggle('open');
-                });
-            });
-        };
-    </script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
@@ -2264,10 +2250,10 @@ else {
                     
                     <div class="editor-container">
                         <div class="button-container">
-                            <button class="btn" onclick="editor.showEditor(-1)">Add Entity</button>
-                            <button class="btn" id="importBtn">Import Entity</button>
-                            <button class="btn" id="exportBtn">Export Entity</button>
-                            <input type="file" id="importFile" accept=".json" style="display: none;" />
+                            <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
+                            <button class="btn" onclick="editor.importEntities()">Import Entity</button>
+                            <button class="btn" onclick="editor.exportEntities()">Export Entity</button>
+                            <input class="import-file" type="file" accept=".json" style="display: none;" />
                         </div>
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">

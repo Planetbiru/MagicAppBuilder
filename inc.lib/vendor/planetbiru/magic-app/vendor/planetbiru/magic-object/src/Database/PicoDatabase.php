@@ -397,7 +397,7 @@ class PicoDatabase // NOSONAR
                 throw new InvalidDatabaseConfiguration("Database username may not be empty. Please check your database configuration!");
             }
 
-            $initialQueries = "";
+            $initialQueries = array();
 
             // Get charset from the database credentials
             $charset = addslashes($this->databaseCredentials->getCharset());
@@ -406,16 +406,16 @@ class PicoDatabase // NOSONAR
             if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
 
                 // Set time zone for PostgreSQL
-                $initialQueries = "SET TIMEZONE TO '$timeZoneOffset';";
+                $initialQueries[] = "SET TIMEZONE TO '$timeZoneOffset';";
 
                 // Set the client encoding (charset) for PostgreSQL
                 if ($charset) {
-                    $initialQueries .= "SET CLIENT_ENCODING TO '$charset';";
+                    $initialQueries[] = "SET CLIENT_ENCODING TO '$charset';";
                 }
 
                 // Set schema if provided for PostgreSQL
                 if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
-                    $initialQueries .= "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
+                    $initialQueries[] = "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
                 }
 
                 // PostgreSQL connection setup
@@ -430,18 +430,21 @@ class PicoDatabase // NOSONAR
 
                 // Execute the initial queries (timezone, charset, schema) in PostgreSQL
                 if (!empty($initialQueries)) {
-                    $this->databaseConnection->exec($initialQueries);
+                    foreach($initialQueries as $initialQuery)
+                    {
+                        $this->databaseConnection->exec($initialQuery);
+                    }
                 }
 
             }
             // Handle MySQL-specific connection settings
             else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
                 // Set time zone for MySQL
-                $initialQueries = "SET time_zone='$timeZoneOffset';";
+                $initialQueries[] = "SET time_zone='$timeZoneOffset';";
                 
                 // Add charset to the initial queries for MySQL
                 if ($charset) {
-                    $initialQueries .= "SET NAMES '$charset';";  // Set charset for MySQL
+                    $initialQueries[] = "SET NAMES '$charset';";  // Set charset for MySQL
                 }
 
                 // MySQL connection setup
@@ -450,11 +453,17 @@ class PicoDatabase // NOSONAR
                     $this->databaseCredentials->getUsername(),
                     $this->databaseCredentials->getPassword(),
                     [
-                        PDO::MYSQL_ATTR_INIT_COMMAND => $initialQueries,
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::MYSQL_ATTR_FOUND_ROWS => true
                     ]
                 );
+                
+                if (!empty($initialQueries)) {
+                    foreach($initialQueries as $initialQuery)
+                    {
+                        $this->databaseConnection->exec($initialQuery);
+                    }
+                }
             }
             // If the database type is neither MySQL nor PostgreSQL, throw an exception
             else {
