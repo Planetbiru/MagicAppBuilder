@@ -1,24 +1,24 @@
 /**
- * Class representing a column in a database table.
+ * Represents a column in a database table.
  * 
- * The Column class is used to define a column for a database table, including 
- * its name, type, nullable status, default value, primary key, auto-increment,
- * and specific values for ENUM or SET types.
+ * The Column class is used to define the properties of a column in a database table. 
+ * This includes the column's name, type, length, whether it can be NULL, its default value, 
+ * whether it's a primary key, whether it auto-increments, and valid values for ENUM or SET types.
  */
 class Column {
     /**
      * Creates an instance of the Column class.
      * 
      * @param {string} name - The name of the column.
-     * @param {string} [type="VARCHAR"] - The type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
+     * @param {string} [type="VARCHAR"] - The data type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
      * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
      * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
      * @param {string} [defaultValue=""] - The default value for the column (optional).
      * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
      * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
-     * @param {string} [enumValues=""] - The values for ENUM or SET types, if applicable (comma-separated).
+     * @param {string} [values=""] - The values for ENUM or SET types, or the range of values for DECIMAL, NUMERIC, FLOAT, and DOUBLE types (optional, comma-separated).
      */
-    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, enumValues = "") //NOSONAR
+    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "") //NOSONAR
     {
         this.name = name;
         this.type = type;
@@ -27,7 +27,7 @@ class Column {
         this.default = defaultValue;
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
-        this.enumValues = enumValues;
+        this.values = values;
     }
 
     /**
@@ -41,8 +41,8 @@ class Column {
      */
     toSQL() {
         let withValueTypes = ['ENUM', 'SET'];
-        let withRangeTypes = ['DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE'];
-        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'DOUBLE', 'DECIMAL', 'FLOAT'];
+        let withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
+        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
         let withLengthTypes = [
             'VARCHAR', 'CHAR', 
             'VARBINARY', 'BINARY',
@@ -52,12 +52,14 @@ class Column {
 
         let columnDef = `${this.name} ${this.type}`;
         
-        // If the type is ENUM or SET, handle them similarly
-        if ((withValueTypes.includes(this.type)) && this.enumValues) {
-            const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
+        
+        if ((withValueTypes.includes(this.type)) && this.values) {
+            // If the type is ENUM or SET, handle them similarly
+            const enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
-        } if ((withRangeTypes.includes(this.type)) && this.enumValues) {
-            const enumList = this.enumValues.split(',').map(val => `${val.trim()}`).join(', ');
+        } else if ((withRangeTypes.includes(this.type)) && this.values) {
+            // If the type is DECIMAL, NUMERIC, DOUBLE, or FLOAT, handle them similarly
+            const enumList = this.values.split(',').map(val => `${val.trim()}`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
         } else if (this.length && withLengthTypes.includes(this.type)) {
             // For other types, add length if available
@@ -93,8 +95,8 @@ class Column {
 
         return columnDef;
     }
-
 }
+
 
 /**
  * Class representing an entity (table) in a database.
@@ -184,7 +186,7 @@ class EntityEditor {
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
-            'DOUBLE', 'DECIMAL', 'FLOAT', 
+            'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT', 
             'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
@@ -202,7 +204,7 @@ class EntityEditor {
             'BIT'
         ];
         this.withValueTypes = ['ENUM', 'SET'];
-        this.withRangeTypes = ['DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE'];
+        this.withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
         this.addDomListeners();
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
@@ -339,7 +341,7 @@ class EntityEditor {
                 </select>
             </td>
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
@@ -482,7 +484,7 @@ class EntityEditor {
                     columnData.default,
                     columnData.primaryKey,
                     columnData.autoIncrement,
-                    columnData.enumValues !== "null" ? columnData.enumValues : "",
+                    columnData.values !== "null" ? columnData.values : "",
                 );
                 
                 // Add the column to the entity
