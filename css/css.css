@@ -646,7 +646,7 @@ h3.entity-table-name {
 .sortable-menu .sortable-icon {
   cursor: pointer;
   margin-right: 2px;
-  font-size: 14px;
+  font-size: 10px;
   display: inline-block;
   width: 10px;
   text-align: center;
@@ -656,19 +656,16 @@ h3.entity-table-name {
   cursor: move;
 }
 .sortable-menu .sortable-icon.icon-move-up::before {
-  content: "↑";
+  content: "⬆️";
 }
 .sortable-menu .sortable-icon.icon-move-down::before {
-  content: "↓";
-}
-.sortable-menu .sortable-icon.icon-edit {
-  transform: rotate(90deg);
+  content: "⬇️";
 }
 .sortable-menu .sortable-icon.icon-edit {
   margin-right: 8px;
 }
 .sortable-menu .sortable-icon.icon-edit::before {
-  content: "✎";
+  content: "✏️";
 }
 .sortable-menu .sortable-menu-item > input.form-control,
 .sortable-menu .sortable-submenu-item > input.form-control {

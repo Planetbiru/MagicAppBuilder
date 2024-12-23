@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   margin: 0;
   padding: 0;
@@ -279,4 +280,20 @@ body {
 }
 .entity-editor .table-list li label {
   padding: 0;
+}
+
+.icon-delete::before {
+  content: "❌";
+}
+
+.icon-edit::before {
+  content: "✏️";
+}
+
+.icon-move-up::before {
+  content: "⬆️";
+}
+
+.icon-move-down::before {
+  content: "⬇️";
 }/*# sourceMappingURL=entity-editor.css.map */

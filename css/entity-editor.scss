@@ -357,3 +357,16 @@ body {
         }
     }
 }
+
+.icon-delete::before{
+    content: "❌";
+}
+.icon-edit::before{
+    content: "✏️";
+}
+.icon-move-up::before{
+    content: "⬆️";
+}
+.icon-move-down::before{
+    content: "⬇️";
+}

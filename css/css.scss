@@ -764,7 +764,7 @@ h3.entity-table-name {
     .sortable-icon {
         cursor: pointer;
         margin-right: 2px;
-        font-size: 14px;
+        font-size: 10px;
         display: inline-block;
         width: 10px;
         text-align: center;
@@ -775,22 +775,19 @@ h3.entity-table-name {
         }
 
         &.icon-move-up::before {
-            content: '↑';
+            content: '⬆️';
         }
 
         &.icon-move-down::before {
-            content: '↓';
+            content: '⬇️';
         }
 
-        &.icon-edit {
-            transform: rotate(90deg);
-        }
 		&.icon-edit
 		{
 			margin-right: 8px;
 		}
         &.icon-edit::before {
-            content: '✎';
+            content: '✏️';
         }
     }
 

@@ -10,7 +10,7 @@ function init() {
     let translateButton  = document.querySelector(".translate-structure");
     let importFromEntityButton = document.querySelector('.import-from-entity');
     let clearButton  = document.querySelector(".clear");
-    let original = document.querySelector('#original');
+    let original = document.querySelector('.original');
     let queryGenerated = document.querySelector('.query-generated');
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');

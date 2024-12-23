@@ -330,9 +330,9 @@ class EntityEditor {
         let typeSimple = column.type.split('(')[0].trim();
         row.innerHTML = `
             <td class="column-action">
-                <button onclick="editor.removeColumn(this)">❌</button>
-                <button onclick="editor.moveUp(this)">⬆️</button>
-                <button onclick="editor.moveDown(this)">⬇️</button>    
+                <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
+                <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
+                <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
             </td>
             <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
             <td>
@@ -530,8 +530,8 @@ class EntityEditor {
             
             entityDiv.innerHTML = `
                 <div class="entity-header">
-                    <button onclick="editor.deleteEntity(${index})">❌</button>
-                    <button onclick="editor.editEntity(${index})">✏️</button>
+                    <button onclick="editor.deleteEntity(${index})" class="icon-delete"></button>
+                    <button onclick="editor.editEntity(${index})" class="icon-edit"></button>
                     <h4>${entity.name}</h4>
                 </div>
                 <div class="entity-body">
