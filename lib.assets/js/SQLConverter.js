@@ -598,7 +598,7 @@ class SQLConverter {
             }
         }
         if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             sqliteType = 'NVARCHAR(' + (maxLength + 2) + ')';
         }
         else if ((sqliteType === 'NVARCHAR' || sqliteType === 'INT') && length > 0) {
@@ -634,16 +634,16 @@ class SQLConverter {
         }
         mysqlType = this.replaceAll(mysqlType, 'TIMESTAMPTZ', 'TIMESTAMP')
         if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             mysqlType = 'ENUM(\'' + (resultArray.join('\',\'')) + '\')';
         } else if (type.toUpperCase().indexOf('SET') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             mysqlType = 'SET(\'' + (resultArray.join('\',\'')) + '\')';
         } else if (type.toUpperCase().indexOf('DECIMAL') != -1) {
-            const { resultArray, maxLength } = this.parseNumericType(length);
+            const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
             mysqlType = 'DECIMAL(' + (resultArray.join(', ')) + ')';
         } else if (type.toUpperCase().indexOf('NUMERIC') != -1) {
-            const { resultArray, maxLength } = this.parseNumericType(length);
+            const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
             mysqlType = 'NUMERIC(' + (resultArray.join(', ')) + ')';
         }
         if (mysqlType === 'VARCHAR' && length > 0) {
@@ -673,7 +673,7 @@ class SQLConverter {
             pgType = 'BOOLEAN';
         }
         else if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length);
+            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }
         else if (pgType === 'CHARACTER VARYING' && length > 0) {
