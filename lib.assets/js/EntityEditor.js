@@ -41,7 +41,14 @@ class Column {
      */
     toSQL() {
         let withValueTypes = ['ENUM', 'SET'];
+        let withRangeTypes = ['DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE'];
         let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'DOUBLE', 'DECIMAL', 'FLOAT'];
+        let withLengthTypes = [
+            'VARCHAR', 'CHAR', 
+            'VARBINARY', 'BINARY',
+            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
+            'BIT'
+        ];
 
         let columnDef = `${this.name} ${this.type}`;
         
@@ -49,7 +56,10 @@ class Column {
         if ((withValueTypes.includes(this.type)) && this.enumValues) {
             const enumList = this.enumValues.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
-        } else if (this.length) {
+        } if ((withRangeTypes.includes(this.type)) && this.enumValues) {
+            const enumList = this.enumValues.split(',').map(val => `${val.trim()}`).join(', ');
+            columnDef = `${this.name} ${this.type}(${enumList})`;
+        } else if (this.length && withLengthTypes.includes(this.type)) {
             // For other types, add length if available
             columnDef += `(${this.length})`;
         }
@@ -185,12 +195,14 @@ class EntityEditor {
             'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY',
             'JSON',
         ];
-        this.typeWithLength = [
+        this.withLengthTypes = [
             'VARCHAR', 'CHAR', 
             'VARBINARY', 'BINARY',
-            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'
+            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
+            'BIT'
         ];
         this.withValueTypes = ['ENUM', 'SET'];
+        this.withRangeTypes = ['DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE'];
         this.addDomListeners();
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
@@ -326,8 +338,8 @@ class EntityEditor {
                     ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
                 </select>
             </td>
-            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.typeWithLength.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.enumValues}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
@@ -502,12 +514,12 @@ class EntityEditor {
 
         const tabelList = document.querySelector(this.selector+" .table-list");
         tabelList.innerHTML = '';
-        
+        let withLengthTypes = this.withLengthTypes;
         this.entities.forEach((entity, index) => {
             const entityDiv = document.createElement("div");
             entityDiv.classList.add("entity");
             let columnsInfo = entity.columns.map(col => {
-                if (col.length > 0) {
+                if (withLengthTypes.includes(col.type) && col.length > 0) {
                     return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}(${col.length})</span></li>`;
                 } else {
                     return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}</span></li>`;
@@ -590,14 +602,14 @@ class EntityEditor {
         const enumInput = row.querySelector(".column-enum");
 
         // Show length input for specific types
-        if (this.typeWithLength.includes(columnType)) {
+        if (this.withLengthTypes.includes(columnType)) {
             lengthInput.style.display = "inline";
         } else {
             lengthInput.style.display = "none";
         }
 
         // Show enum input for ENUM type
-        if (this.withValueTypes.includes(columnType)) {
+        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType)) {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";
