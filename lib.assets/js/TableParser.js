@@ -24,6 +24,18 @@ class TableParser {
             }
             return false;
         };
+        
+        this.isPrimaryKey = function(field)
+        {
+            let f = field.toUpperCase().replace(/\s+/g, ' ').trim();
+            return f.indexOf('PRIMARY KEY') != -1;
+        }
+        
+        this.isAutoIncrement = function(field)
+        {
+            let f = field.toUpperCase().replace(/\s+/g, ' ').trim();
+            return f.indexOf('AUTO_INCREMENT') != -1;
+        }
 
         /**
          * Parses a CREATE TABLE SQL statement and extracts table and column information.
@@ -36,7 +48,7 @@ class TableParser {
 
             // The regex for each component:
             let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-            let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+smalltext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\))/gim;
+            let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+numeric\s*\(.*\))/gim;
 
             let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
             let rg_enum = /enum\s*\(([^)]+)\)/i; // Regex untuk menangkap isi enum
@@ -54,9 +66,13 @@ class TableParser {
             let columnList = [];
             let pk = null;
             let pkLine = "";
+            let primaryKeyList = [];
 
             while ((result = rg_fld.exec(sql)) != null) {
+                
                 let f = result[0];
+                let line = f;
+                
 
                 // Reset
                 rg_fld2.lastIndex = 0;
@@ -88,6 +104,12 @@ class TableParser {
 
                     // Look for PRIMARY KEY
                     is_pk = rg_pk.test(attr2);
+                    
+                    if(!is_pk)
+                    {
+                        is_pk = this.isPrimaryKey(line);
+                    }
+                    let is_ai = this.isAutoIncrement(line);
 
                     // Look for DEFAULT
                     let def = rg_fld_def.exec(attr2);
@@ -106,6 +128,11 @@ class TableParser {
 
                     // Append to the arr only if not already present in the columnList
                     let columnName = fld_def.groups.fname.trim();
+                    
+                    if(is_pk)
+                    {
+                        primaryKeyList.push(columnName)
+                    }
                     if (!this.inArray(columnList, columnName)) {
                         fld_list.push({
                             'Field': columnName,
@@ -113,7 +140,8 @@ class TableParser {
                             'Length': length,
                             'Key': is_pk,
                             'Nullable': nullable,
-                            'Default': def
+                            'Default': def,
+                            'AutoIncrement': is_ai
                         });
                         columnList.push(columnName); // Mark this column as processed
                     }
@@ -148,6 +176,10 @@ class TableParser {
                         }
                     }
                 }
+            }
+            if(primaryKey == null)
+            {
+                primaryKey = primaryKeyList[0];
             }
             return { tableName: tableName, columns: fld_list, primaryKey: primaryKey };
         };
@@ -187,7 +219,7 @@ class TableParser {
          * Initializes the type list for valid SQL column types.
          */
         this.init = function () {
-            let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,smallint,mediumint,bigint,tinytext,smalltext,mediumtext,longtext,longtext,text,nvarchar,varchar,enum,char,real,float,integer,int,datetime,date,double,boolean,bool';
+            let typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,enum,set,numeric,decimal,char,real,float,integer,int,datetime,date,double,boolean,bool';
             this.typeList = typeList.split(',');
         };
 

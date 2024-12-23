@@ -54,7 +54,11 @@ class SQLConverter {
             "mediumint": "MEDIUMINT",
             "smallint": "SMALLINT",
             "integer": "INT",
-            "real": "FLOAT",
+            "double": "DOUBLE",
+            "float": "FLOAT",
+            "real": "DOUBLE",
+            "decimal": "DECIMAL",
+            "numeric": "NUMERIC",
             "tinytext": "TINYTEXT",
             "mediumtext": "MEDIUMTEXT",
             "longtext": "LONGTEXT",
@@ -72,7 +76,9 @@ class SQLConverter {
             "timestamp with time zone": "TIMESTAMP",
             "timestamp without time zone": "DATETIME",
             "timestamp": "TIMESTAMPTZ",
-            "json": "JSON"
+            "json": "JSON",
+            "enum": "ENUM",
+            "set": "SET"
         };
         
         this.dbToPostgreSQL = {
@@ -137,6 +143,8 @@ class SQLConverter {
         value = this.replaceAll(value, ' character varying', ' varchar');
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
         value = this.replaceAll(value, ' TINYINT(1)', ' boolean');
+        
+        
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -291,7 +299,10 @@ class SQLConverter {
             let colDef = '\t' + columnName + ' ' + columnType;
             if (primaryKey) {
                 colDef += ' PRIMARY KEY';
-                colDef += ' NOT NULL';
+                
+                if ((targetType === 'mysql' || targetType === 'mariadb') && table.columns[i].AutoIncrement) {
+                    colDef += ' AUTO_INCREMENT';
+                }
                 table.columns[i].Nullable = false;
             }
             else {
@@ -454,7 +465,16 @@ class SQLConverter {
         mysqlType = this.replaceAll(mysqlType, 'TIMESTAMPTZ', 'TIMESTAMP')
         if (type.toUpperCase().indexOf('ENUM') != -1) {
             const { resultArray, maxLength } = this.parseEnumValue(length);
-            mysqlType = 'enum(\'' + (resultArray.join('\',\'')) + '\')';
+            mysqlType = 'ENUM(\'' + (resultArray.join('\',\'')) + '\')';
+        } else if (type.toUpperCase().indexOf('SET') != -1) {
+            const { resultArray, maxLength } = this.parseEnumValue(length);
+            mysqlType = 'SET(\'' + (resultArray.join('\',\'')) + '\')';
+        } else if (type.toUpperCase().indexOf('DECIMAL') != -1) {
+            const { resultArray, maxLength } = this.parseNumericType(length);
+            mysqlType = 'DECIMAL(' + (resultArray.join(', ')) + ')';
+        } else if (type.toUpperCase().indexOf('NUMERIC') != -1) {
+            const { resultArray, maxLength } = this.parseNumericType(length);
+            mysqlType = 'NUMERIC(' + (resultArray.join(', ')) + ')';
         }
         if (mysqlType === 'VARCHAR' && length > 0) {
             mysqlType = mysqlType + '(' + length + ')';
@@ -515,6 +535,32 @@ class SQLConverter {
 
         return { resultArray, maxLength };
     }
+    
+    /**
+     * Parses a numeric type value like DECIMAL(6,3), NUMERIC(10,2), etc.
+     * @param {string} inputString The numeric value in string format, like 'DECIMAL(6, 3)'.
+     * @returns {Object} An object containing the type (e.g., DECIMAL) and the length (total digits) and scale (digits after the decimal point).
+     */
+    parseNumericType(inputString) {
+        // Regex untuk menangkap nilai yang dipisahkan oleh koma, tanpa tanda kutip
+        const regex = /([A-Za-z0-9_]+)/g;
+        let matches;
+        let resultArray = [];
+
+        // Menangkap semua kecocokan
+        while ((matches = regex.exec(inputString)) !== null) {
+            resultArray.push(matches[1]); // matches[1] adalah nilai yang dipisahkan
+        }
+
+        // Menentukan panjang maksimum dari array hasil
+        let maxLength = resultArray.reduce((max, current) => {
+            return current.length > max ? current.length : max;
+        }, 0);
+
+        return { resultArray, maxLength };
+    }
+
+    
 
     /**
      * Extracts the DROP TABLE IF EXISTS queries from the provided SQL string.
