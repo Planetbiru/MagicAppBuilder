@@ -736,7 +736,13 @@ class DatabaseExplorer // NOSONAR
         
         // Create heading
         $h3 = $dom->createElement('h3', 'Table List');
-        $dom->appendChild($h3);
+
+        $a = $dom->createElement('a');
+        $a->appendChild($h3);
+        $a->setAttribute('class', 'all-table');
+        $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=");
+
+        $dom->appendChild($a);
 
         // Create unordered list
         $ul = $dom->createElement('ul');
@@ -2155,7 +2161,7 @@ else {
     <script src="lib.assets/js/import-structure.js"></script>
 </head>
 
-<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>">
+<body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
     <div class="sidebar">
         <?php
         try {
@@ -2241,7 +2247,7 @@ else {
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label> <input type="checkbox" class="check-all-entity"> Export all</label></div>
+                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Export all</label></div>
                             <ul class="table-list"></ul>
                             <textarea class="query-generated" spellcheck="false"></textarea>
                         </div>

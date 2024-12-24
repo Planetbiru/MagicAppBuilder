@@ -565,4 +565,16 @@ th.cell-delete a,
 td.cell-delete a {
   display: block;
   font-size: 11px;
+}
+
+[data-no-table=true] textarea {
+  height: calc(100vh - 100px);
+}
+
+a.all-table {
+  color: #fafafa;
+}
+
+.entity-name {
+  width: 200px;
 }/*# sourceMappingURL=database-explorer.css.map */

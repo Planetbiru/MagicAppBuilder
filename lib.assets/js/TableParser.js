@@ -21,7 +21,7 @@ class TableParser {
      * Initializes the type list for valid SQL column types.
      */
     init() {
-        const typeList = 'timestamptz,timestamp,serial4,bigserial,int2,int4,int8,tinyint,bigint,text,nvarchar,varchar,enum,set,numeric,decimal,char,real,float,integer,int,datetime,date,double,boolean,bool';
+        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL';
         this.typeList = typeList.split(',');
     }
 
@@ -149,7 +149,7 @@ class TableParser {
                     });
                     columnList.push(columnName);
                 }
-            } else if (result[1].toLowerCase().includes('primary') && result[1].toLowerCase().includes('key')) {
+            } else if (this.isPrimaryKey(line)) {
                 let text = result[1];
                 let re = /\((.*)\)/;
                 let matched = text.match(re); // NOSONAR
@@ -206,7 +206,7 @@ class TableParser {
      * @returns {boolean} True if the data type is valid, otherwise false.
      */
     isValidType(dataType) {
-        return this.typeList.includes(dataType.toLowerCase());
+        return this.typeList.includes(dataType.toUpperCase());
     }
 
     /**
