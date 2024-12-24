@@ -1,302 +1,3 @@
-const data = {
-    "applicationId": "",
-    "databaseType": "mysql",
-    "databaseName": "sipro",
-    "databaseSchema": "public",
-    "entities": [
-      {
-        "name": "song",
-        "columns": [
-          {
-            "name": "song_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": true,
-            "autoIncrement": true,
-            "values": "null"
-          },
-          {
-            "name": "name",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "title",
-            "type": "VARCHAR",
-            "length": "250",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "producer_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "artist_id",
-            "type": "VARCHAR",
-            "length": "20",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "active",
-            "type": "TINYINT",
-            "length": "1",
-            "nullable": false,
-            "default": "1",
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "enumval",
-            "type": "ENUM",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "A, B"
-          },
-          {
-            "name": "song_col8",
-            "type": "NUMERIC",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "9, 2"
-          },
-          {
-            "name": "song_col9",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col10",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col11",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col12",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col13",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col14",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col15",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col16",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "song_col17",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          }
-        ]
-      },
-      {
-        "name": "producer",
-        "columns": [
-          {
-            "name": "producer_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": true,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "name",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "active",
-            "type": "TINYINT",
-            "length": "1",
-            "nullable": false,
-            "default": "1",
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          }
-        ]
-      },
-      {
-        "name": "artist",
-        "columns": [
-          {
-            "name": "artist_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": true,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "name",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          },
-          {
-            "name": "agency_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "active",
-            "type": "TINYINT",
-            "length": "1",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": "null"
-          }
-        ]
-      },
-      {
-        "name": "agency",
-        "columns": [
-          {
-            "name": "agency_id",
-            "type": "VARCHAR",
-            "length": "40",
-            "nullable": false,
-            "default": null,
-            "primaryKey": true,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "name",
-            "type": "VARCHAR",
-            "length": "50",
-            "nullable": false,
-            "default": null,
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          },
-          {
-            "name": "active",
-            "type": "TINYINT",
-            "length": "1",
-            "nullable": false,
-            "default": "1",
-            "primaryKey": false,
-            "autoIncrement": false,
-            "values": null
-          }
-        ]
-      }
-    ]
-  }
-  ;
 
 /**
  * Class representing an Entity-Relationship Diagram (ERD) generator.
@@ -306,7 +7,7 @@ const data = {
  * The data structure includes entities (tables), columns, and foreign key relationships.
  * The class positions tables on an SVG canvas, draws them, and connects them with lines to show relationships.
  */
-class ERDRenderer {
+class EntityRenderer {
 
     /**
      * Creates an instance of the ERDGenerator, initializing properties for rendering an Entity-Relationship Diagram (ERD).
@@ -366,7 +67,7 @@ class ERDRenderer {
             this.mod++;
 
             // Wrap to the next row if we've reached the width limit of the SVG
-            if (xPos > this.svg.clientWidth - this.spacing) {
+            if (xPos > (width - this.spacing)) {
                 xPos = 0;
                 yPos += ((this.maxCol * 20) + 60); // Move down to the next row
                 this.maxCol = 0;
@@ -398,7 +99,7 @@ class ERDRenderer {
                 if (col.name.endsWith("_id") && !col.primaryKey) {
                     const refEntityName = col.name.replace("_id", "");
                     // Check if the referenced entity exists in the tables list
-                    if (this.tables[refEntityName]) {
+                    if (entity.name != refEntityName && this.tables[refEntityName]) {
                         this.createRelationship(entity, col, index);
                     }
                 }
@@ -427,7 +128,7 @@ class ERDRenderer {
         // Table Rectangle
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("width", this.tableWidth);
-        rect.setAttribute("height", (entity.columns.length * 20) + 32);
+        rect.setAttribute("height", (entity.columns.length * 20) + 28);
         rect.setAttribute("fill", "transparent");
         rect.setAttribute("stroke", "#8496B1");
         rect.setAttribute("stroke-width", "0.5");
@@ -474,15 +175,9 @@ class ERDRenderer {
         editIcon.style.cursor = "pointer";
         deleteIcon.style.cursor = "pointer";
 
-        // Attach event listener to Edit icon
-        editIcon.addEventListener('click', () => {
-            this.editEntity(index); // Call editEntity method
-        });
-
-        // Attach event listener to Delete icon
-        deleteIcon.addEventListener('click', () => {
-            this.deleteEntity(index); // Call deleteEntity method
-        });
+        // Use the onclick attribute instead of event listeners
+        editIcon.setAttribute('onclick', `editor.editEntity(${index})`);
+        deleteIcon.setAttribute('onclick', `editor.deleteEntity(${index})`);
 
         let yOffset = 40;
         let yOffsetCol = 26;
@@ -551,8 +246,8 @@ class ERDRenderer {
         let fromTable = this.tables[entity.name].table;
         let toTable = this.tables[refEntityName].table;
 
-        let y1 = (index * 20) + this.tables[entity.name].yPos + 44;
-        let y2 = (refIndex * 20) + this.tables[refEntityName].yPos + 44;
+        let y1 = (index * 20) + this.tables[entity.name].yPos + 35;
+        let y2 = (refIndex * 20) + this.tables[refEntityName].yPos + 35;
 
         const fromX = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
 
@@ -723,15 +418,3 @@ class ERDRenderer {
     }
 
 }
-
-
-// Initialize ERD generator
-let erdGenerator = new ERDRenderer(document.getElementById("erd-svg"));
-erdGenerator.createERD(data, 800);
-window.addEventListener('resize', function () {
-    // Get the updated width of the SVG container
-    let updatedWidth = document.getElementById("erd-svg").parentNode.offsetWidth;
-
-    // Re-call createERD with the updated width
-    erdGenerator.createERD(data, updatedWidth);
-});

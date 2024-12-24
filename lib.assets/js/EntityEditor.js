@@ -542,7 +542,7 @@ class EntityEditor {
     /**
      * Renders the list of entities and updates the table list in the UI.
      */
-    renderEntities() {
+    renderEntitiesOld() {
         const container = document.querySelector(this.selector+" .entities-container");
         container.innerHTML = '';
         const selectedEntity = [];
@@ -597,6 +597,46 @@ class EntityEditor {
             }
         });
         
+    }
+    
+    renderEntities()
+    {
+        const container = document.querySelector(this.selector+" .entities-container");
+        const selectedEntity = [];
+        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
+        if(selectedEntities)
+        {
+            selectedEntities.forEach(checkbox => {
+                selectedEntity.push(checkbox.getAttribute('data-name'));
+            });
+        }
+
+        const tabelList = document.querySelector(this.selector+" .table-list");
+        tabelList.innerHTML = '';
+        this.entities.forEach((entity, index) => {
+            
+            let entityCb = document.createElement('li');
+            entityCb.innerHTML = `
+            <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
+            `;
+            
+            tabelList.appendChild(entityCb);
+        });
+
+        selectedEntity.forEach(value => {
+            let cb = document.querySelector(`input[data-name="${value}"]`);
+            if(cb)
+            {
+                cb.checked = true;
+            }
+        });
+        let svg = container.querySelector(".erd-svg");
+        let updatedWidth = svg.parentNode.parentNode.offsetWidth;
+        if(updatedWidth == 0)
+        {
+            updatedWidth = resizablePanels.getLeftPanelWidth();
+        }
+        renderer.createERD(editor.getData(), updatedWidth - 40);
     }
 
     /**
@@ -784,5 +824,9 @@ class EntityEditor {
         this.exportJSON(data); // Export the sample object to a JSON file
     }
 
+    getData()
+    {
+        return {entities: this.entities};
+    }
 
 }

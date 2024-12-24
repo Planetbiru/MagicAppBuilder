@@ -2157,6 +2157,7 @@ else {
     <script src="lib.assets/js/TableParser.js"></script>
     <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
+    <script src="lib.assets/js/EntityRenderer.js"></script>
     <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
 </head>
@@ -2243,6 +2244,7 @@ else {
                         <div class="left-panel">
                             <div class="entities-container">
                                 <!-- Entities will be rendered here -->
+                                <svg class="erd-svg" width="600" height="800"></svg>
                             </div>
                         </div>
                         <div class="resize-bar"></div>

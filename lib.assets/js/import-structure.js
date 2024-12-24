@@ -86,6 +86,7 @@ function init() {
 // Instantiate the class
 const converter = new SQLConverter();
 let editor;
+let renderer;
 let resizablePanels;
 
 // Initialize event listeners
@@ -93,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
     const toggles = document.querySelectorAll('.collapsible .button-toggle');
+    let svg = document.querySelector(".erd-svg");
+    renderer = new EntityRenderer(svg);
 
     // Attach event listeners to each toggle button
     toggles.forEach(function(toggle) {
@@ -113,7 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema)
+                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema);
+                
             }, 
             callbackSaveEntity: function (entities){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -124,7 +128,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     );
-
+    
+    window.addEventListener('resize', function () {
+        // Get the updated width of the SVG container
+        let updatedWidth = svg.parentNode.offsetWidth;
+    
+        // Re-call createERD with the updated width
+        renderer.createERD(editor.getData(), updatedWidth - 40);
+    });
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 

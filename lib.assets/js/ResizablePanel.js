@@ -54,6 +54,8 @@ class ResizablePanels {
                 // Save the new width of the left panel in localStorage
                 localStorage.setItem(this.localStorageKey, leftPanelWidth);
             }
+            
+            editor.renderEntities();
         }
     }
 
@@ -61,6 +63,7 @@ class ResizablePanels {
         this.isResizing = false;
         document.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
         document.removeEventListener('mouseup', () => this.stopResizing());
+        editor.renderEntities();
     }
 
     doResize(savedLeftPanelWidth)
@@ -83,16 +86,20 @@ class ResizablePanels {
             this.rightPanel.style.width = rightPanelWidth + 'px';
         }
     }
+    
+    getLeftPanelWidth()
+    {
+        return parseInt(localStorage.getItem(this.localStorageKey));
+    }
 
     loadPanelWidth() {
-        let savedLeftPanelWidth = localStorage.getItem(this.localStorageKey);
-        this.doResize(savedLeftPanelWidth);
+        this.doResize(this.getLeftPanelWidth());
         
     }
 
     onWindowResize() {
         // Recalculate the panel widths based on the new window size
-        let savedLeftPanelWidth = localStorage.getItem(this.localStorageKey);
-        this.doResize(savedLeftPanelWidth);
+        this.doResize(this.getLeftPanelWidth());
+        
     }
 }
