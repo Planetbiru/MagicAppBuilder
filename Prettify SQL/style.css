@@ -8,17 +8,9 @@ h1 {
     color: #333;
 }
 
-#erd-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    flex-wrap: wrap; /* Allow wrapping of tables to the next line if necessary */
-}
-
 #erd-svg {
-    width: 100%;
     height: auto;
-    max-width: 1200px; /* Adjust for maximum width */
+    vertical-align: text-top;
 }
 
 table {
