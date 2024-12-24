@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+#erd-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Allow wrapping of tables to the next line if necessary */
+}
+
+#erd-svg {
+    width: 100%;
+    height: auto;
+    max-width: 1200px; /* Adjust for maximum width */
+}
+
+table {
+    display: inline-block;
+    margin-right: 30px;
+}
