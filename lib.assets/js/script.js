@@ -1478,8 +1478,6 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
     alertMessage.append(inputElement);
     alertTitle.html(title);
 
-    
-
     // Dynamically create buttons
     buttons.forEach(button => {
       const buttonElement = $('<button>')

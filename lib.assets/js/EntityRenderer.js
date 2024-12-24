@@ -44,6 +44,8 @@ class EntityRenderer {
      * @param {number} width - The width of the SVG canvas, used to set the `width` attribute for the SVG element.
      */
     createERD(data, width) {
+        this.lastMaxCol = 0;
+        this.maxCol = 0;
         this.svg.innerHTML = '';
         this.data = data; // The input data structure containing the entities, columns, and relationships
         this.svg.setAttribute('width', width); // Set the width of the SVG canvas
@@ -54,7 +56,11 @@ class EntityRenderer {
         // Loop through each entity (table) and create it
         this.data.entities.forEach((entity, index) => {
             const tableGroup = this.createTable(entity, index, xPos, yPos);
-            this.tables[entity.name] = { table: tableGroup, xPos: xPos, yPos: yPos };
+            this.tables[entity.name] = { 
+                table: tableGroup, 
+                xPos: xPos, 
+                yPos: yPos 
+            };
 
             // Update the maximum column count for wrapping the tables in rows
             if (this.maxCol < entity.columns.length) {
@@ -124,7 +130,7 @@ class EntityRenderer {
     createTable(entity, index, x, y) {
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
         group.setAttribute("transform", `translate(${x}, ${y})`);
-
+    
         // Table Rectangle
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("width", this.tableWidth);
@@ -133,7 +139,7 @@ class EntityRenderer {
         rect.setAttribute("stroke", "#8496B1");
         rect.setAttribute("stroke-width", "0.5");
         group.appendChild(rect);
-
+    
         // Header background rectangle
         const headerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         headerRect.setAttribute("x", 1);
@@ -142,7 +148,7 @@ class EntityRenderer {
         headerRect.setAttribute("height", 24);
         headerRect.setAttribute("fill", "#E0EDFF");
         group.appendChild(headerRect);
-
+    
         // Table Name (header text)
         const tableName = document.createElementNS("http://www.w3.org/2000/svg", "text");
         tableName.setAttribute("x", 10);
@@ -153,35 +159,56 @@ class EntityRenderer {
         tableName.setAttribute("fill", "#1d3c86");
         tableName.textContent = entity.name;
         group.appendChild(tableName);
+    
+        
+    
+        const editIconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        editIconText.setAttribute("x", this.tableWidth - 42); // Center text inside the rectangle
+        editIconText.setAttribute("y", 17); // Vertically center text
+        editIconText.setAttribute("font-size", "10");
+        editIconText.setAttribute("fill", "#ffffff"); // Text color (white)
+        editIconText.textContent = "✏️"; // Edit text
+        group.appendChild(editIconText);
 
-        // Add Edit Icon (on the right of the table name)
-        const editIcon = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        editIcon.setAttribute("x", this.tableWidth - 42); // Adjust x to position on the right
-        editIcon.setAttribute("y", 17);
-        editIcon.setAttribute("font-size", "11");
-        editIcon.setAttribute("fill", "#ffffff"); // Icon color
-        editIcon.textContent = "✏️"; // Using a pencil emoji as the "edit" icon
-        group.appendChild(editIcon);
+        // Add Edit Icon (on the right of the table name) - Using a rectangle and text
+        const editIconRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        editIconRect.setAttribute("x", this.tableWidth - 42); // Adjust x to position on the right
+        editIconRect.setAttribute("y", 7); // Center vertically
+        editIconRect.setAttribute("width", 14); // Icon width
+        editIconRect.setAttribute("height", 14); // Icon height
+        editIconRect.setAttribute("fill", "transparent"); // Icon color (green)
+        group.appendChild(editIconRect);
+    
+        
+    
+        const deleteIconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        deleteIconText.setAttribute("x", this.tableWidth - 22); // Center text inside the rectangle
+        deleteIconText.setAttribute("y", 17); // Vertically center text
+        deleteIconText.setAttribute("font-size", "10");
+        deleteIconText.setAttribute("fill", "#ffffff"); // Text color (white)
+        deleteIconText.textContent = "❌"; // Delete text
+        group.appendChild(deleteIconText);
 
-        // Add Delete Icon (beside the edit icon)
-        const deleteIcon = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        deleteIcon.setAttribute("x", this.tableWidth - 22); // Adjust x to position beside the edit icon
-        deleteIcon.setAttribute("y", 17);
-        deleteIcon.setAttribute("font-size", "11");
-        deleteIcon.setAttribute("fill", "#ffffff"); // Icon color
-        deleteIcon.textContent = "❌"; // Using a cross emoji as the "delete" icon
-        group.appendChild(deleteIcon);
-
-        editIcon.style.cursor = "pointer";
-        deleteIcon.style.cursor = "pointer";
-
+        // Add Delete Icon (beside the edit icon) - Using a rectangle and text
+        const deleteIconRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        deleteIconRect.setAttribute("x", this.tableWidth - 22); // Adjust x to position beside the edit icon
+        deleteIconRect.setAttribute("y", 7); // Center vertically
+        deleteIconRect.setAttribute("width", 14); // Icon width
+        deleteIconRect.setAttribute("height", 14); // Icon height
+        deleteIconRect.setAttribute("fill", "transparent"); // Icon color (red)
+        group.appendChild(deleteIconRect);
+    
+        // Set cursor to pointer for both icons
+        editIconRect.style.cursor = "pointer";
+        deleteIconRect.style.cursor = "pointer";
+    
         // Use the onclick attribute instead of event listeners
-        editIcon.setAttribute('onclick', `editor.editEntity(${index})`);
-        deleteIcon.setAttribute('onclick', `editor.deleteEntity(${index})`);
-
+        editIconRect.setAttribute('onclick', `editor.editEntity(${index})`);
+        deleteIconRect.setAttribute('onclick', `editor.deleteEntity(${index})`);
+    
         let yOffset = 40;
         let yOffsetCol = 26;
-
+    
         // Table Columns with their types
         entity.columns.forEach((col, index) => {
             // Column Name
@@ -192,14 +219,14 @@ class EntityRenderer {
             columnText.setAttribute("fill", "#3a4255"); // Set type text color
             columnText.textContent = col.name;
             group.appendChild(columnText);
-
+    
             // Column Type (right-aligned)
             const typeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             typeText.setAttribute("x", this.tableWidth - 10); // Position the type at the far right (10px margin from right edge)
             typeText.setAttribute("y", yOffset + index * 20);
             typeText.setAttribute("font-size", "10");
             typeText.setAttribute("fill", "#3a4255"); // Set type text color
-
+    
             let colType;
             if (this.withLengthTypes.includes(col.type) && col.length > 0) {
                 colType = `${col.type}(${col.length})`;
@@ -210,11 +237,11 @@ class EntityRenderer {
             else {
                 colType = `${col.type}`;
             }
-
+    
             typeText.textContent = colType; // Display the column type
             typeText.setAttribute("text-anchor", "end"); // Align the text to the right
             group.appendChild(typeText);
-
+    
             const borderLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
             borderLine.setAttribute("x1", 0); // Start from the left side of the table
             borderLine.setAttribute("y1", yOffsetCol + index * 20); // Vertical position of the column text
@@ -223,12 +250,12 @@ class EntityRenderer {
             borderLine.setAttribute("stroke", "#8496B1"); // Set the border color
             borderLine.setAttribute("stroke-width", "0.3");
             group.appendChild(borderLine);
-
         });
-
+    
         this.svg.appendChild(group); // Append the table group to the SVG
         return group;
     }
+    
 
     /**
      * Method to create a relationship line between two tables.
@@ -312,7 +339,6 @@ class EntityRenderer {
             </defs>
             ${svgData}
         </svg>`;
-        const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgWithFont);
 
         // Create a Blob from the SVG string
         const blob = new Blob([svgWithFont], { type: "image/svg+xml" });

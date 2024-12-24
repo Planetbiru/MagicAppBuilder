@@ -824,9 +824,16 @@ class EntityEditor {
         this.exportJSON(data); // Export the sample object to a JSON file
     }
 
-    getData()
-    {
+    /**
+     * Retrieves the data containing the entities.
+     *
+     * This method returns an object with a property `entities`, which contains
+     * the current entities stored in the class.
+     *
+     * @returns {Object} An object containing the `entities` property.
+     * @property {Array} entities - The array of entities in the current instance.
+     */
+    getData() {
         return {entities: this.entities};
     }
-
 }
