@@ -128,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.erd-svg .move-down-btn')) {
+        if (e.target.closest('.erd-svg .move-down-icon')) {
             editor.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
         }
-        if (e.target.closest('.erd-svg .move-up-btn')) {
+        if (e.target.closest('.erd-svg .move-up-icon')) {
             editor.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
         }
         if (e.target.closest('.erd-svg .edit-icon')) {
