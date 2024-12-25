@@ -28,7 +28,6 @@ $constSelected = ' selected';
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.js"></script>
   <script type="text/javascript" src="lib.assets/js/script.js"></script>
-  <script type="text/javascript" src="lib.assets/js/FileSaver.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
 

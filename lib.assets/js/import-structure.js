@@ -15,7 +15,6 @@ function init() {
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');
 
-    // Menampilkan modal saat tombol di klik
     openModalQuertTranslatorButton.onclick = function() {
         modalQueryTranslator.style.display = "block";
         original.focus();
@@ -32,7 +31,6 @@ function init() {
         }
     });
     
-    // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
         original.value = "";
     };
@@ -130,21 +128,16 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     document.addEventListener('click', function(e) {
-        // Mengecek apakah elemen yang diklik memiliki kelas 'cls2' di dalam elemen dengan kelas 'cls1'
         if (e.target.closest('.erd-svg .move-down-btn')) {
-            // lakukan sesuatu di sini          
             editor.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
         }
         if (e.target.closest('.erd-svg .move-up-btn')) {
-            // lakukan sesuatu di sini
             editor.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
         }
         if (e.target.closest('.erd-svg .edit-icon')) {
-            // lakukan sesuatu di sini
             editor.editEntity(parseInt(e.target.getAttribute('data-index')))
         }
         if (e.target.closest('.erd-svg .delete-icon')) {
-            // lakukan sesuatu di sini
             editor.deleteEntity(parseInt(e.target.getAttribute('data-index')))
         }
     });

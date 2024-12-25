@@ -2333,8 +2333,17 @@ function saveQuery() {
   let blob = new Blob([cmEditorSQL.getDoc().getValue()], {
     type: "application/x-sql;charset=utf-8",
   });
-  let appId = $("#current_application").val();
-  saveAs(blob, appId + "-" + new Date().getTime() + ".sql");
+  let finalFileName = (new Date()).getTime() + ".sql"
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+  // Create a temporary anchor element
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = finalFileName; // Set the filename to include the datetime suffix
+  document.body.appendChild(a);
+  a.click(); // Trigger the download by clicking the anchor
+  document.body.removeChild(a); // Clean up by removing the anchor
+  URL.revokeObjectURL(url); // Release the object URL
 }
 
 /**

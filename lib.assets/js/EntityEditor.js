@@ -300,8 +300,6 @@ class EntityEditor {
                 }
             }
         });
-        
-        
 
         document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
@@ -320,7 +318,6 @@ class EntityEditor {
                 console.log("Please select a JSON file first.");
             }
         });
-    
     }
 
     /**
@@ -701,7 +698,6 @@ class EntityEditor {
             {
                 this.callbackSaveEntity(this.entities);
             }
-            
         }
     }
 
@@ -753,7 +749,6 @@ class EntityEditor {
 
         // Re-render the sorted list of entities
         this.renderEntities();
-
         this.exportToSQL();
         if(typeof this.callbackSaveEntity == 'function')
         {
