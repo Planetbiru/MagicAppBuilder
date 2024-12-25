@@ -54,7 +54,16 @@ function init() {
     {
         let sql = queryGenerated.value;
         let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        let converted = converter.translate(sql, type);
+
+        let converted = '';
+        if(type.toLowerCase() != 'mysql' && type.toLowerCase() != 'mariadb')
+        {
+            converted = converter.translate(sql, type);
+        }
+        else
+        {
+            converted = sql;
+        }
         document.querySelector('[name="query"]').value = converted;
         modalEntityEditor.style.display = "none";
     };
@@ -83,9 +92,13 @@ function init() {
             modalQueryTranslator.style.display = "none";
         }
     };
-    document.querySelector('.structure-sql').addEventListener('change', function(){
+    document.querySelector('.structure-sql').addEventListener('change', function(e){
         openStructure(this.files[0]);
-    })
+    });
+
+    document.querySelector('.draw-relationship').addEventListener('change', function(e){
+        editor.renderEntities();
+    });
     
 }
 

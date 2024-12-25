@@ -100,7 +100,7 @@ class Column {
             // Nullable
             columnDef += this.nullable ? " NULL" : " NOT NULL";
         } else {
-            columnDef += " PRIMARY KEY";
+            columnDef += " NOT NULL PRIMARY KEY";
         }
         // Auto increment logic
         if (this.autoIncrement) {
@@ -203,8 +203,7 @@ class Entity {
      * @returns {string} The SQL statement for creating the entity (table).
      */
     toSQL() {
-        let sql = `-- Entity: ${this.name}\r\n`;
-        sql += `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
+        let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
         this.columns.forEach(col => {
             sql += `\t${col.toSQL()},\r\n`;
         });
@@ -706,6 +705,8 @@ class EntityEditor {
 
         // Get the list element where the entities will be rendered
         const tabelList = document.querySelector(this.selector+" .table-list");
+        let drawRelationship = document.querySelector(this.selector+" .draw-relationship").checked;
+
 
         // Clear any existing content in the table list
         tabelList.innerHTML = '';
@@ -744,7 +745,7 @@ class EntityEditor {
         }
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
-        renderer.createERD(editor.getData(), updatedWidth - 40);
+        renderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
 
     /**

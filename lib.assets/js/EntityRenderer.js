@@ -47,19 +47,25 @@ class EntityRenderer {
 
         this.tableFontSize = 12;
         this.relationStrokeWidth = 0.7;
+        this.drawRelationship = true;
     }
 
     /**
-     * Method to generate the ERD (Entity-Relationship Diagram).
-     * This method will create all the tables and set their positions on the SVG canvas.
-     * It also calculates the height of the SVG element based on the number of tables.
-     * 
+     * Method to generate the Entity-Relationship Diagram (ERD).
+     * This method creates tables on the SVG canvas, sets their positions, 
+     * and calculates the SVG canvas's height based on the number of tables. 
+     * It also supports drawing relationships between tables if specified.
+     *
      * @param {Object} data - The data structure containing entities (tables), columns, and relationships. It should include:
      *   - {Array} entities - An array of entity objects where each entity represents a table with its columns and relationships.
      *   - {Array} relationships - An array of relationship objects between the entities, describing how they are related.
+     *
      * @param {number} width - The width of the SVG canvas, used to set the `width` attribute for the SVG element.
+     * 
+     * @param {boolean} drawRelationship - A flag to indicate whether to draw relationships between tables. 
+     *   If `true`, the method will create relationship lines between the tables after placing them.
      */
-    createERD(data, width) {
+    createERD(data, width, drawRelationship) {
         this.lastMaxCol = 0;
         this.maxCol = 0;
         this.svg.innerHTML = '';
@@ -71,6 +77,8 @@ class EntityRenderer {
         let yPos = yOffset; // Initial vertical position for the first table
         let maxMod = 0;
         let mod = 0; // Modulo to help with table wrapping
+
+        this.drawRelationship = 
 
         // Loop through each entity (table) and create it
         this.data.entities.forEach((entity, index) => {
@@ -121,7 +129,10 @@ class EntityRenderer {
         this.svg.setAttribute('width', finalWidth);
 
         // Create the relationships (lines) between tables
-        this.createRelationships();
+        if(drawRelationship)
+        {
+            this.createRelationships();
+        }
     }
 
     /**
