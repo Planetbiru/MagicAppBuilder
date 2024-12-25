@@ -245,6 +245,13 @@ class EntityEditor {
         ];
         this.withValueTypes = ['ENUM', 'SET'];
         this.withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
+        this.defaultLength = {
+            'BIGINT'    : 20,
+            'INT'       : 11,
+            'MEDIUMINT' : 8,
+            'SMALLINT'  : 5,
+            'TINYINT'   : 4
+        };
         this.addDomListeners();
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
@@ -293,8 +300,6 @@ class EntityEditor {
                 }
             }
         });
-        
-        
 
         document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
@@ -313,7 +318,6 @@ class EntityEditor {
                 console.log("Please select a JSON file first.");
             }
         });
-    
     }
 
     /**
@@ -409,6 +413,9 @@ class EntityEditor {
 
         let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
+        const element = document.querySelector(this.selector+' .table-container');
+        element.scrollTop = element.scrollHeight;
+
     }
 
     /**
@@ -542,7 +549,7 @@ class EntityEditor {
     /**
      * Renders the list of entities and updates the table list in the UI.
      */
-    renderEntities() {
+    renderEntitiesOld() {
         const container = document.querySelector(this.selector+" .entities-container");
         container.innerHTML = '';
         const selectedEntity = [];
@@ -598,6 +605,157 @@ class EntityEditor {
         });
         
     }
+    
+    /**
+     * Renders the entities to the DOM.
+     * This method updates the UI by rendering a list of entities as checkboxes,
+     * allowing users to select or deselect entities. It also ensures that previously
+     * selected entities are checked when the list is re-rendered.
+     * 
+     * The method also updates the width of the ERD (Entity-Relationship Diagram) based on 
+     * the available space in the container and re-renders the ERD with the updated width.
+     */
+    renderEntities() {
+        // Get the container element for the entities
+        const container = document.querySelector(this.selector+" .entities-container");
+
+        // Create an array to hold the names of selected entities
+        const selectedEntity = [];
+
+        // Get all selected entity checkboxes (those that are checked)
+        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
+
+        // If there are selected checkboxes, add their data-name to the selectedEntity array
+        if (selectedEntities) {
+            selectedEntities.forEach(checkbox => {
+                selectedEntity.push(checkbox.getAttribute('data-name'));
+            });
+        }
+
+        // Get the list element where the entities will be rendered
+        const tabelList = document.querySelector(this.selector+" .table-list");
+
+        // Clear any existing content in the table list
+        tabelList.innerHTML = '';
+
+        // Iterate over the entities and create a checkbox for each entity
+        this.entities.forEach((entity, index) => {
+            // Create a new list item for each entity
+            let entityCb = document.createElement('li');
+            entityCb.innerHTML = `
+            <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
+            `;
+            
+            // Append the created list item to the table list
+            tabelList.appendChild(entityCb);
+        });
+
+        // Ensure that previously selected entities are checked
+        selectedEntity.forEach(value => {
+            // Find the checkbox corresponding to the selected entity name
+            let cb = document.querySelector(`input[data-name="${value}"]`);
+            if (cb) {
+                // Check the checkbox if found
+                cb.checked = true;
+            }
+        });
+
+        // Get the SVG element for the ERD (Entity-Relationship Diagram)
+        let svg = container.querySelector(".erd-svg");
+
+        // Calculate the updated width of the SVG container
+        let updatedWidth = svg.parentNode.parentNode.offsetWidth;
+
+        // If the width is 0 (meaning it's not set), fallback to the left panel width
+        if (updatedWidth == 0) {
+            updatedWidth = resizablePanels.getLeftPanelWidth();
+        }
+
+        // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
+        renderer.createERD(editor.getData(), updatedWidth - 40);
+    }
+
+    /**
+     * Moves an entity up in the list of entities.
+     * This method swaps the selected entity with the one before it in the array.
+     * 
+     * @param {number} index - The index of the entity to move up.
+     */
+    moveEntityUp(index) {
+        editor.cancelEdit();
+        // Ensure the index is valid and it's not the last element
+        if (index < this.entities.length - 1) {
+            // Swap the entity at 'index' with the one after it (at 'index + 1')
+            const temp = this.entities[index];
+            this.entities[index] = this.entities[index + 1];
+            this.entities[index + 1] = temp;
+
+            // Re-render the entities after the change
+            this.renderEntities();
+            this.exportToSQL();
+            
+            if(typeof this.callbackSaveEntity == 'function')
+            {
+                this.callbackSaveEntity(this.entities);
+            }
+        }
+    }
+
+    /**
+     * Moves an entity down in the list of entities.
+     * This method swaps the selected entity with the one after it in the array.
+     * 
+     * @param {number} index - The index of the entity to move down.
+     */
+    moveEntityDown(index) {
+        editor.cancelEdit();
+        // Ensure the index is valid and it's not the first element
+        if (index > 0) {
+            // Swap the entity at 'index' with the one before it (at 'index - 1')
+            const temp = this.entities[index];
+            this.entities[index] = this.entities[index - 1];
+            this.entities[index - 1] = temp;
+
+            // Re-render the entities after the change
+            this.renderEntities();
+            this.exportToSQL();
+            
+            if(typeof this.callbackSaveEntity == 'function')
+            {
+                this.callbackSaveEntity(this.entities);
+            }
+            
+        }
+        
+    }
+
+
+    /**
+     * Sorts the entities alphabetically based on the 'name' property.
+     * This method sorts the entities in ascending order (A-Z) and then calls 
+     * `renderEntities()` to re-render the sorted list of entities in the UI.
+     */
+    sortEntities() {
+        // Sort the entities array alphabetically by the 'name' property
+        this.entities.sort((a, b) => {
+            if (a.name > b.name) {
+                return 1;  // a comes after b in alphabetical order
+            }
+            if (a.name < b.name) {
+                return -1;  // a comes before b in alphabetical order
+            }
+            return 0;  // a and b are equal, no change
+        });
+
+        // Re-render the sorted list of entities
+        this.renderEntities();
+        this.exportToSQL();
+        if(typeof this.callbackSaveEntity == 'function')
+        {
+            this.callbackSaveEntity(this.entities);
+        }
+    }
+
 
     /**
      * Edits the specified entity based on its index in the entities array.
@@ -655,6 +813,11 @@ class EntityEditor {
             enumInput.style.display = "inline";
         } else {
             enumInput.style.display = "none";
+        }
+        if(typeof this.defaultLength[columnType] != 'undefined')
+        {
+            let defaultLength = this.defaultLength[columnType];
+            lengthInput.value = defaultLength;
         }
     }
 
@@ -784,5 +947,16 @@ class EntityEditor {
         this.exportJSON(data); // Export the sample object to a JSON file
     }
 
-
+    /**
+     * Retrieves the data containing the entities.
+     *
+     * This method returns an object with a property `entities`, which contains
+     * the current entities stored in the class.
+     *
+     * @returns {Object} An object containing the `entities` property.
+     * @property {Array} entities - The array of entities in the current instance.
+     */
+    getData() {
+        return {entities: this.entities};
+    }
 }

@@ -583,3 +583,15 @@ td.cell-delete {
         font-size: 11px;
     }
 }
+
+[data-no-table="true"] textarea{
+    height: calc(100vh - 100px);
+}
+
+a.all-table{
+    color: #fafafa;
+}
+
+.entity-name{
+    width: 200px;
+}

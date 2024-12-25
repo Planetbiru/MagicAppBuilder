@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+#erd-svg {
+    height: auto;
+    vertical-align: text-top;
+    font-family: Arial;
+    font-size: 8px;
+}
+
+table {
+    display: inline-block;
+    margin-right: 30px;
+}

@@ -15,7 +15,6 @@ function init() {
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');
 
-    // Menampilkan modal saat tombol di klik
     openModalQuertTranslatorButton.onclick = function() {
         modalQueryTranslator.style.display = "block";
         original.focus();
@@ -32,7 +31,6 @@ function init() {
         }
     });
     
-    // Menutup modal saat tombol 'Close' di footer di klik
     clearButton.onclick = function() {
         original.value = "";
     };
@@ -86,6 +84,7 @@ function init() {
 // Instantiate the class
 const converter = new SQLConverter();
 let editor;
+let renderer;
 let resizablePanels;
 
 // Initialize event listeners
@@ -93,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
     const toggles = document.querySelectorAll('.collapsible .button-toggle');
+    let svg = document.querySelector(".erd-svg");
+    renderer = new EntityRenderer(svg);
 
     // Attach event listeners to each toggle button
     toggles.forEach(function(toggle) {
@@ -113,7 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema)
+                fetchDataFromServer(applicationId, databaseType, databaseName, databaseSchema);
+                
             }, 
             callbackSaveEntity: function (entities){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -125,6 +127,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.erd-svg .move-down-btn')) {
+            editor.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
+        }
+        if (e.target.closest('.erd-svg .move-up-btn')) {
+            editor.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
+        }
+        if (e.target.closest('.erd-svg .edit-icon')) {
+            editor.editEntity(parseInt(e.target.getAttribute('data-index')))
+        }
+        if (e.target.closest('.erd-svg .delete-icon')) {
+            editor.deleteEntity(parseInt(e.target.getAttribute('data-index')))
+        }
+    });
+    
+    window.addEventListener('resize', function () {
+        // Get the updated width of the SVG container
+        editor.renderEntities();
+    });
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
