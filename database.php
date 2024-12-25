@@ -2160,6 +2160,8 @@ else {
     <script src="lib.assets/js/EntityRenderer.js"></script>
     <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
+
+
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -2219,12 +2221,15 @@ else {
                 <textarea name="original" id="original" class="original" spellcheck="false"></textarea>
             </div>
 
-            <div class="modal-footer">            
-                <button class="btn btn-primary translate-structure">Import</button>
+            <div class="modal-footer">
+                <button class="btn btn-primary open-structure">Open File</button>
+                &nbsp;            
+                <button class="btn btn-success translate-structure">Import</button>
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
+                <input class="structure-sql" type="file" accept=".sql" style="display: none;" />
             </div>
         </div>
     </div>
@@ -2249,7 +2254,7 @@ else {
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Export all</label></div>
+                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all</label></div>
                             <ul class="table-list"></ul>
                             <textarea class="query-generated" spellcheck="false"></textarea>
                         </div>
@@ -2261,10 +2266,13 @@ else {
                             <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
                             <button class="btn" onclick="editor.uploadEntities()">Upload Entity</button>
                             <button class="btn" onclick="editor.downloadEntities()">Download Entity</button>
+                            <button class="btn" onclick="editor.importSQL()">Upload SQL</button>
+                            <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
                             <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
                             <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
-                            <input class="import-file" type="file" accept=".json" style="display: none;" />
+                            <input class="import-file-json" type="file" accept=".json" style="display: none;" />
+                            <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
                         </div>
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">
@@ -2305,5 +2313,6 @@ else {
             </div>
         </div>
     </div>
+
 </body>
 </html>

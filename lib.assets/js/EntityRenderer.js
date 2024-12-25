@@ -31,8 +31,6 @@ class EntityRenderer {
         ];
         this.withValueTypes = ['ENUM', 'SET'];
         this.withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
-        this.btnSpace = 16;
-        this.btnMargin = 2;
         this.entityStrokeWidth = "0.5";
         this.stroke = "#8496B1";
         this.columnTextColor = "#3a4255";
@@ -40,6 +38,9 @@ class EntityRenderer {
         this.columnTypeFontSize = 10;
         this.columnFontSize = 11
         this.headerBackgroundColor = "#d8e8ff";
+
+        this.buttonSpace = 16;
+        this.buttonMargin = 6;
         this.buttonWidth = 14;
         this.buttonHeight = 14;
         this.buttonFontSize = 10;
@@ -153,7 +154,7 @@ class EntityRenderer {
      */
     createOffset(index)
     {
-        return (index * this.btnSpace) + this.btnMargin;
+        return (index * this.buttonSpace) + this.buttonMargin;
     }
 
     /**
@@ -292,7 +293,7 @@ class EntityRenderer {
                 pkRect.setAttribute("x", 1);
                 pkRect.setAttribute("y", yOffsetCol + (index * this.columnHeight) + 1);
                 pkRect.setAttribute("width", this.tableWidth - 2);
-                pkRect.setAttribute("height", this.columnHeight);
+                pkRect.setAttribute("height", this.columnHeight - 2);
                 pkRect.setAttribute("fill", "#f4f8ff");
                 group.appendChild(pkRect);
             }

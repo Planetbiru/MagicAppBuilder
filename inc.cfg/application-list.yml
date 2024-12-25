@@ -46,7 +46,7 @@
     selected: false
 -
     id: lagu
-    name: Apa
+    name: Lagu
     architecture: monolith
     description: ''
     documentRoot: 'D:/xampp/htdocs/lagu'

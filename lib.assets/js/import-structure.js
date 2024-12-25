@@ -7,6 +7,7 @@ function init() {
     let closeModalButton = document.querySelectorAll(".cancel-button");
     let openModalQuertTranslatorButton = document.querySelector(".import-structure");
     let openModalEntityEditorButton = document.querySelector(".open-entity-editor"); 
+    let openFileButton  = document.querySelector(".open-structure");
     let translateButton  = document.querySelector(".translate-structure");
     let importFromEntityButton = document.querySelector('.import-from-entity');
     let clearButton  = document.querySelector(".clear");
@@ -43,6 +44,11 @@ function init() {
         document.querySelector('[name="query"]').value = converted;
         modalQueryTranslator.style.display = "none";
     };
+
+    openFileButton.onclick = function()
+    {
+        document.querySelector('.structure-sql').click();
+    }
     
     importFromEntityButton.onclick = function()
     {
@@ -77,9 +83,25 @@ function init() {
             modalQueryTranslator.style.display = "none";
         }
     };
+    document.querySelector('.structure-sql').addEventListener('change', function(){
+        openStructure(this.files[0]);
+    })
+    
 }
 
-
+function openStructure(file)
+{
+    const reader = new FileReader(); // Create a FileReader instance
+    reader.onload = function (e) {
+        try {
+            document.querySelector('.original').value = e.target.result;
+            
+        } catch (err) {
+            console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+        }
+    };
+    reader.readAsText(file); // Read the file as text
+}
 
 // Instantiate the class
 const converter = new SQLConverter();

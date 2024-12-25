@@ -602,7 +602,7 @@ class SQLConverter {
                 }
             }
         }
-        if (type.toUpperCase().indexOf('ENUM') != -1) {
+        if (type.toUpperCase().indexOf('ENUM') != -1 || type.toUpperCase().indexOf('SET') != -1) {
             const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             sqliteType = 'NVARCHAR(' + (maxLength + 2) + ')';
         }
@@ -677,7 +677,7 @@ class SQLConverter {
         if (type.toUpperCase().indexOf('TINYINT') != -1 && length == 1) {
             pgType = 'BOOLEAN';
         }
-        else if (type.toUpperCase().indexOf('ENUM') != -1) {
+        else if (type.toUpperCase().indexOf('ENUM') != -1 || type.toUpperCase().indexOf('SET') != -1) {
             const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }

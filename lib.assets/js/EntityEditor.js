@@ -321,10 +321,28 @@ class EntityEditor {
             }
         });
 
-        document.querySelector(this.selector+" .import-file").addEventListener("change", function () {
+        document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importJSON(file, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+        
+                }); // Import the file if it's selected
+    
+                
+            } else {
+                console.log("Please select a JSON file first.");
+            }
+        });
+
+        document.querySelector(this.selector+" .import-file-sql").addEventListener("change", function () {
+            const file = this.files[0]; // Get the selected file
+            if (file) {
+                editor.importSQLFile(file, function(entities){
                     let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
                     let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                     let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
@@ -552,6 +570,40 @@ class EntityEditor {
                     columnData.primaryKey,
                     columnData.autoIncrement,
                     columnData.values !== "null" ? columnData.values : "",
+                );
+                
+                // Add the column to the entity
+                entity.addColumn(column);
+            });
+
+            // Add the entity to the entities array
+            entities.push(entity);
+        });
+
+        return entities;
+    }
+
+    
+    createEntitiesFromSQL(tables) {
+        const entities = [];
+
+        // Iterate over each entity in the JSON data
+        tables.forEach(table => {
+            // Create a new Entity instance
+            const entity = new Entity(table.tableName);
+            
+            // Iterate over each column in the entity's columns array
+            table.columns.forEach(columnData => {
+                // Create a new Column instance
+                const column = new Column(
+                    columnData.Field,
+                    columnData.Type,
+                    columnData.Length,
+                    columnData.Nullable,
+                    columnData.Default,
+                    columnData.Key,
+                    columnData.AutoIncrement,
+                    (columnData.EnumValues != null && typeof columnData.EnumValues == 'object') ? columnData.EnumValues.join(', ') : null,
                 );
                 
                 // Add the column to the entity
@@ -903,6 +955,61 @@ class EntityEditor {
     }
 
     /**
+     * Downloads a SQL file containing database information.
+     * 
+     * This function collects metadata about the database from the document, constructs a data object, 
+     * and generates a `.sql` file for download. The filename will include a datetime suffix to avoid 
+     * overwriting files.
+     * 
+     * @returns {void}
+     */
+    downloadSQL() {
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        
+        const data = {
+            applicationId: applicationId,
+            databaseType: databaseType,
+            databaseName: databaseName,
+            databaseSchema: databaseSchema,
+        };
+
+        // Get the base filename from the data object
+        const fileName = `${data.databaseName}-${data.databaseSchema}`;
+
+        // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
+        const now = new Date();
+        let dateTimeSuffix = now.toISOString().replace(/[-T:\.Z]/g, '_');  // NOSONAR
+
+        // Remove the last underscore if present
+        if (dateTimeSuffix.endsWith('_')) {
+            dateTimeSuffix = dateTimeSuffix.slice(0, -1);  // Remove the last underscore
+        }
+
+        // Create the filename with the datetime suffix
+        const finalFileName = `${fileName}_${dateTimeSuffix}.sql`;
+
+        // Convert the object to a JSON string
+
+        // Create a Blob object from the JSON string
+        const blob = new Blob([document.querySelector(this.selector+' .query-generated').value], { type: "text/plain" });
+
+        // Create a URL for the Blob
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = finalFileName; // Set the filename to include the datetime suffix
+        document.body.appendChild(a);
+        a.click(); // Trigger the download by clicking the anchor
+        document.body.removeChild(a); // Clean up by removing the anchor
+        URL.revokeObjectURL(url); // Release the object URL
+    }
+
+    /**
      * Imports JSON data from a file and processes it.
      * 
      * This function accepts a file object, reads its contents as text using a FileReader, then parses the JSON
@@ -933,12 +1040,55 @@ class EntityEditor {
     }
 
     /**
+     * Imports an SQL file and processes its content.
+     * 
+     * This function accepts an SQL file, reads its contents as text using a FileReader, then parses it 
+     * using a `TableParser` and updates the editor's entities with the parsed data. After the import, 
+     * a callback function is invoked with the updated entities, if provided.
+     * 
+     * @param {File} file - The SQL file object to be imported.
+     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated. 
+     *                                The callback will receive the updated entities as its argument.
+     * @returns {void}
+     */
+    importSQLFile(file, callback) {
+        let _this = this;
+        const reader = new FileReader(); // Create a FileReader instance
+        reader.onload = function (e) {
+            const contents = e.target.result; // Get the content of the file
+            try {
+                let parser = new TableParser(contents);
+                _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities
+            
+                _this.renderEntities(); // Update the view with the fetched entities
+                
+                if (typeof callback === 'function') {
+                    callback(_this.entities); // Execute callback with the updated entities
+                }
+                
+            } catch (err) {
+                console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+            }
+        };
+        reader.readAsText(file); // Read the file as text
+    }
+
+    /**
      * Triggers the import action by simulating a click on the import file element.
      * This function locates the DOM element based on the `selector` property and 
      * clicks on it to initiate the import process.
      */
     uploadEntities() {
-        document.querySelector(this.selector + " .import-file").click();
+        document.querySelector(this.selector + " .import-file-json").click();
+    }
+
+    /**
+     * Triggers the import action by simulating a click on the import file element.
+     * This function locates the DOM element based on the `selector` property and 
+     * clicks on it to initiate the import process.
+     */
+    importSQL() {
+        document.querySelector(this.selector + " .import-file-sql").click();
     }
 
     /**
