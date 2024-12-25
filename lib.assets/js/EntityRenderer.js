@@ -22,7 +22,6 @@ class EntityRenderer {
         this.maxTop = 0; // To track the maximum top position of the last row
         this.maxCol = 0; // The maximum number of columns in any table (used to wrap rows)
         this.lastMaxCol = 0; // The previous maximum column count for row wrapping
-        this.mod = 0; // Modulo to help with table wrapping
         this.withLengthTypes = [
             'VARCHAR', 'CHAR',
             'VARBINARY', 'BINARY',
@@ -54,6 +53,8 @@ class EntityRenderer {
 
         let xPos = 0; // Initial horizontal position for the first table
         let yPos = 0; // Initial vertical position for the first table
+        let maxMod = 0;
+        let mod = 0; // Modulo to help with table wrapping
 
         // Loop through each entity (table) and create it
         this.data.entities.forEach((entity, index) => {
@@ -72,25 +73,33 @@ class EntityRenderer {
 
             // Update the x position for the next table
             xPos += this.spacing;
-            this.mod++;
+            mod++;
+            if(mod > maxMod)
+            {
+                maxMod = mod;
+            }
 
             // Wrap to the next row if we've reached the width limit of the SVG
-            if (xPos > (width - this.spacing)) {
+            if (xPos > (width - this.tableWidth - 2)) {
                 xPos = 0;
-                yPos += ((this.maxCol * 20) + 60); // Move down to the next row
+                yPos += ((this.maxCol * 20) + 40); // Move down to the next row
                 this.maxCol = 0;
-                this.mod = 0;
+                mod = 0;
             }
             this.maxTop = yPos;
         });
 
         // Adjust the height of the SVG to accommodate all tables
         let height = yPos - 20;
-        if (this.mod > 0) {
+        if (mod > 0) {
             height += (this.maxCol * 20) + 60;
         }
 
-        this.svg.setAttribute('height', height); // Set the SVG height to fit all tables
+        this.svg.setAttribute('height', height + 10); // Set the SVG height to fit all tables
+
+        let finalWidth = (maxMod * this.spacing) - (this.spacing - this.tableWidth) + 2;
+        console.log(maxMod, finalWidth, this.spacing, this.tableWidth)
+        this.svg.setAttribute('width', finalWidth);
 
         // Create the relationships (lines) between tables
         this.createRelationships();
@@ -142,7 +151,7 @@ class EntityRenderer {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("width", this.tableWidth);
         rect.setAttribute("height", (entity.columns.length * 20) + 28);
-        rect.setAttribute("fill", "transparent");
+        rect.setAttribute("fill", "#ffffff");
         rect.setAttribute("stroke", "#8496B1");
         rect.setAttribute("stroke-width", "0.5");
         group.appendChild(rect);
@@ -153,7 +162,7 @@ class EntityRenderer {
         headerRect.setAttribute("y", 1);
         headerRect.setAttribute("width", this.tableWidth - 2);
         headerRect.setAttribute("height", 24);
-        headerRect.setAttribute("fill", "#E0EDFF");
+        headerRect.setAttribute("fill", "#d8e8ff");
         group.appendChild(headerRect);
 
         // Table Name (header text)
@@ -185,15 +194,12 @@ class EntityRenderer {
         moveUpBtn.setAttribute("data-index", index);
         group.appendChild(moveUpBtn);
 
-
-
         const moveDownText = document.createElementNS("http://www.w3.org/2000/svg", "text");
         moveDownText.setAttribute("x", this.tableWidth - this.createOffset(3));
         moveDownText.setAttribute("y", 17);
         moveDownText.setAttribute("font-size", "10");
         moveDownText.textContent = "⬇️"; // Down arrow symbol
         group.appendChild(moveDownText);
-
 
         // Move Down Button (rectangle + text)
         const moveDownBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -252,6 +258,19 @@ class EntityRenderer {
 
         // Table Columns with their types
         entity.columns.forEach((col, index) => {
+
+
+            if(col.primaryKey)
+            {
+                const pkRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                pkRect.setAttribute("x", 1);
+                pkRect.setAttribute("y", 27 + (index * 20));
+                pkRect.setAttribute("width", this.tableWidth - 2);
+                pkRect.setAttribute("height", 20);
+                pkRect.setAttribute("fill", "#f4f8ff");
+                group.appendChild(pkRect);
+            }
+
             const columnText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             columnText.setAttribute("x", 10);
             columnText.setAttribute("y", yOffset + (index * 20));
@@ -288,12 +307,9 @@ class EntityRenderer {
             borderLine.setAttribute("stroke-width", "0.3");
             group.appendChild(borderLine);
         });
-
         this.svg.appendChild(group); // Append the table group to the SVG
         return group;
     }
-
-    
 
     /**
      * Method to create a relationship line between two tables.
@@ -308,7 +324,7 @@ class EntityRenderer {
         const referenceEntity = this.getEntityByName(refEntityName);
         if(referenceEntity != null)
         {
-            const refIndex = this.getColumnIndex(referenceEntity, col.name);
+            let refIndex = this.getColumnIndex(referenceEntity, col.name);
 
             let fromTable = this.tables[entity.name].table;
             let toTable = this.tables[refEntityName].table;
@@ -316,15 +332,15 @@ class EntityRenderer {
             let y1 = (index * 20) + this.tables[entity.name].yPos + 35;
             let y2 = (refIndex * 20) + this.tables[refEntityName].yPos + 35;
 
-            const fromX = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
-
-            const toX = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
+            let x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")) + this.tableWidth;
+            let x2 = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
 
             // Draw a line between the two tables to represent the relationship
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", fromX + this.tableWidth);
+            let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+
+            line.setAttribute("x1", x1 - 4);
             line.setAttribute("y1", y1);
-            line.setAttribute("x2", toX);
+            line.setAttribute("x2", x2 + 4);
             line.setAttribute("y2", y2);
             line.setAttribute("stroke", "#2E4C95");
             line.setAttribute("stroke-width", "0.7");
@@ -353,6 +369,16 @@ class EntityRenderer {
         return entity.columns.findIndex(col => col.name === columnName);
     }
 
+    downloadSVG()
+    {
+        this.exportToSVG(this.svg);
+    }
+
+    downloadPNG()
+    {
+        this.exportToPNG(this.svg);
+    }
+
     /**
      * Exports an SVG element as an SVG file.
      * 
@@ -364,7 +390,10 @@ class EntityRenderer {
      */
     exportToSVG(svgElement, fileName = "exported-image.svg") {
         // Serialize the SVG element to a string
+        const width = svgElement.clientWidth;
+        const height = svgElement.clientHeight + 2;
         const svgData = new XMLSerializer().serializeToString(svgElement);
+
 
         // Embed the font-face in the SVG string (example: using Arial font)
         const svgWithFont = `
@@ -460,28 +489,6 @@ class EntityRenderer {
 
         // Load the image from the SVG data URL
         img.src = svgUrl;
-    }
-
-
-
-    /**
-     * Example method to edit an entity.
-     * 
-     * @param {Object} entity - The entity to be edited.
-     */
-    editEntity(entity) {
-        console.log("Editing entity:", entity);
-        // Implement your logic for editing the entity here
-    }
-
-    /**
-     * Example method to delete an entity.
-     * 
-     * @param {Object} entity - The entity to be deleted.
-     */
-    deleteEntity(entity) {
-        console.log("Deleting entity:", entity);
-        // Implement your logic for deleting the entity here
     }
 
 }

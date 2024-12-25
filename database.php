@@ -2259,8 +2259,10 @@ else {
                     <div class="editor-container">
                         <div class="button-container">
                             <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
-                            <button class="btn" onclick="editor.importEntities()">Import Entity</button>
-                            <button class="btn" onclick="editor.exportEntities()">Export Entity</button>
+                            <button class="btn" onclick="editor.uploadEntities()">Upload Entity</button>
+                            <button class="btn" onclick="editor.downloadEntities()">Download Entity</button>
+                            <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
+                            <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
                             <input class="import-file" type="file" accept=".json" style="display: none;" />
                         </div>

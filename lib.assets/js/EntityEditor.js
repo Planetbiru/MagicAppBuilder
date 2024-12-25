@@ -45,7 +45,8 @@ class Column {
      * 
      * @returns {string} The SQL column definition.
      */
-    toSQL() {
+    toSQL() // NOSONAR
+    {
         let withValueTypes = ['ENUM', 'SET'];
         let withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
         let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
@@ -56,35 +57,55 @@ class Column {
             'BIT'
         ];
 
-        let columnDef = `${this.name} ${this.type}`;
+        let columnDef = "";
         
-        // Handle ENUM and SET types
-        if (this.hasValue(withValueTypes)) {
+        if (this.hasValue(withValueTypes)) 
+        {
+            // Handle ENUM and SET types
             let enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
             columnDef = `${this.name} ${this.type}(${enumList})`;
+        }     
+        else if (this.hasRange(withRangeTypes)) 
+        {
+            // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
+            let rangeList = this.values.split(',').map(val => val.trim());
+
+            // Filter only integer values, remove non-integer values
+            rangeList = rangeList.filter(val => Number.isInteger(parseFloat(val)));
+
+            // Join the valid integer values back into a range string
+            let rangeString = rangeList.join(', ');
+
+            // Set the column definition
+            if (rangeList.length < 2) {
+                // If no valid integer values are present, don't set a range
+                columnDef = `${this.name} ${this.type}`;
+            } else {
+                // If there are valid integer values, include the range in the column definition
+                columnDef = `${this.name} ${this.type}(${rangeString})`;
+            }
         } 
-        // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
-        else if (this.hasRange(withRangeTypes)) {
-            let rangeList = this.values.split(',').map(val => `${val.trim()}`).join(', ');
-            columnDef = `${this.name} ${this.type}(${rangeList})`;
-        } 
-        // Handle types that support length, like VARCHAR, CHAR, etc.
-        else if (this.hasLength(withLengthTypes)) {
-            columnDef += `(${this.length})`;
+        else if (this.hasLength(withLengthTypes)) 
+        {
+            // Handle types that support length, like VARCHAR, CHAR, etc.
+            columnDef = `${this.name} ${this.type}(${this.length})`;
+        }
+        else
+        {
+            columnDef = `${this.name} ${this.type}`;
         }
 
-        // Nullable logic
+        
         if (!this.primaryKey) {
+            // Nullable
             columnDef += this.nullable ? " NULL" : " NOT NULL";
         } else {
             columnDef += " PRIMARY KEY";
         }
-
         // Auto increment logic
         if (this.autoIncrement) {
             columnDef += " AUTO_INCREMENT";
         }
-
         // Default value logic
         if (this.hasDefault()) {
             if (numericTypes.includes(this.type) && !isNaN(this.default)) {
@@ -93,7 +114,6 @@ class Column {
                 columnDef += ` DEFAULT '${this.default}'`; // Default is a string, so use quotes
             }
         }
-
         return columnDef;
     }
 
@@ -917,7 +937,7 @@ class EntityEditor {
      * This function locates the DOM element based on the `selector` property and 
      * clicks on it to initiate the import process.
      */
-    importEntities() {
+    uploadEntities() {
         document.querySelector(this.selector + " .import-file").click();
     }
 
@@ -930,7 +950,7 @@ class EntityEditor {
      * 
      * @returns {void} 
      */
-    exportEntities() {
+    downloadEntities() {
         let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
         let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
         let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
