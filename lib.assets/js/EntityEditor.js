@@ -1055,13 +1055,13 @@ class EntityEditor {
         let _this = this;
         const reader = new FileReader(); // Create a FileReader instance
         reader.onload = function (e) {
-            const contents = e.target.result; // Get the content of the file
+            let contents = e.target.result; // Get the content of the file
             try {
+                let translator = new SQLConverter();
+                contents = translator.translate(contents, 'mysql').split('`').join('');
                 let parser = new TableParser(contents);
-                _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities
-            
+                _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities            
                 _this.renderEntities(); // Update the view with the fetched entities
-                
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
                 }
