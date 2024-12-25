@@ -63,7 +63,6 @@ class ResizablePanels {
         this.isResizing = false;
         document.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
         document.removeEventListener('mouseup', () => this.stopResizing());
-        editor.renderEntities();
     }
 
     doResize(savedLeftPanelWidth)
@@ -100,6 +99,5 @@ class ResizablePanels {
     onWindowResize() {
         // Recalculate the panel widths based on the new window size
         this.doResize(this.getLeftPanelWidth());
-        
     }
 }
