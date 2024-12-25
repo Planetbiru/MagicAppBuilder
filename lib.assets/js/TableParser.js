@@ -81,6 +81,7 @@ class TableParser {
         let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+numeric\s*\(.*\))/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i;
+        let rg_set = /set\s*\(([^)]+)\)/i;
         let rg_not_null = /not\s+null/i;
         let rg_pk = /primary\s+key/i;
         let rg_fld_def = /default\s+(.+)/i;
@@ -101,20 +102,23 @@ class TableParser {
             // Reset regex for field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
+            let dataTypeRaw = fld_def[0]; // NOSONAR
             let dataType = fld_def[2]; // NOSONAR
+            let dataTypeOriginal = dataType;
             let isPk = false;
+            let enumValues = null;
+            let enumArray = null;
 
-            // Handle ENUM type and convert to VARCHAR
-            if (rg_enum.test(dataType)) {
-                let enumValues = rg_enum.exec(dataType)[1];
-                let enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
-                let maxLength = Math.max(...enumArray.map(val => val.length));
-                let length = maxLength + 2;
-                let targetType = "VARCHAR";
-                dataType = `${targetType}(${length})`;
+            if (rg_enum.test(dataTypeRaw)) {
+                enumValues = rg_enum.exec(dataTypeRaw)[1];
+                enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
+            }
+            if (rg_set.test(dataTypeRaw)) {
+                enumValues = rg_set.exec(dataTypeRaw)[1];
+                enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
             }
 
-            if (this.isValidType(dataType.toString())) {
+            if (this.isValidType(dataType.toString()) || this.isValidType(dataTypeOriginal.toString())) {
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
@@ -145,7 +149,8 @@ class TableParser {
                         'Key': isPk,
                         'Nullable': nullable,
                         'Default': def,
-                        'AutoIncrement': isAi
+                        'AutoIncrement': isAi,
+                        'EnumValues': enumArray
                     });
                     columnList.push(columnName);
                 }
