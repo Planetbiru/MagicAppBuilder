@@ -144,7 +144,6 @@ class SQLConverter {
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
         value = this.replaceAll(value, ' TINYINT(1)', ' boolean');
         
-        
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -486,8 +485,7 @@ class SQLConverter {
 
         tableName = this.fixTableName(tableName, targetType);
         
-        lines.push('CREATE TABLE IF NOT EXISTS ' + tableName);
-        lines.push('(');
+        lines.push(`CREATE TABLE IF NOT EXISTS ${tableName} (`);
         let linesCol = [];
         for (let i in table.columns) {
             let columnName = this.fixColumnName(table.columns[i].Field, targetType);
