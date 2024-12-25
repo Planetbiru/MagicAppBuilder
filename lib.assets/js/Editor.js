@@ -7,11 +7,11 @@ let transEd1 = null;
 let transEd2 = null;
 let transEd3 = null;
 let transEd4 = null;
-
 let currentTab = "";
 let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
+
 function format() {
   let totalLinesModule = cmEditorModule.lineCount();
   cmEditorModule.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesModule });
@@ -43,7 +43,7 @@ function isHidden(el) {
     el.visibility == 'hidden';
 }
 
-$(document).ready(function () {
+jQuery(function () {
 
   $('#modal-query-executor').on('shown.bs.modal', function () {
     cmEditorSQLExecute.refresh();
@@ -51,7 +51,7 @@ $(document).ready(function () {
     $('.button-execute-query')[0].disabled = false;
   });
   $('#maintab').on("shown.bs.tab", function (e) {
-    var currId = $(e.target).attr("id");
+    let currId = $(e.target).attr("id");
     currentTab = currId;
     if (currId == 'entity-file-tab') {
       cmEditorFile.focus();
@@ -280,8 +280,8 @@ $(document).ready(function () {
 });
 
 function hilightLine1() {
-  var cursor = transEd1.getCursor();
-  var lineNumber = cursor.line;
+  let cursor = transEd1.getCursor();
+  let lineNumber = cursor.line;
 
   transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
   transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
@@ -293,8 +293,8 @@ function hilightLine1() {
 }
 
 function hilightLine2() {
-  var cursor = transEd2.getCursor();
-  var lineNumber = cursor.line;
+  let cursor = transEd2.getCursor();
+  let lineNumber = cursor.line;
 
   transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
   transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
@@ -306,8 +306,8 @@ function hilightLine2() {
 }
 
 function hilightLine3() {
-  var cursor = transEd3.getCursor();
-  var lineNumber = cursor.line;
+  let cursor = transEd3.getCursor();
+  let lineNumber = cursor.line;
 
   transEd3.removeLineClass(lastLine1, 'background', 'highlight-line');
   transEd4.removeLineClass(lastLine1, 'background', 'highlight-line');
@@ -319,8 +319,8 @@ function hilightLine3() {
 }
 
 function hilightLine4() {
-  var cursor = transEd4.getCursor();
-  var lineNumber = cursor.line;
+  let cursor = transEd4.getCursor();
+  let lineNumber = cursor.line;
 
   transEd3.removeLineClass(lastLine1, 'background', 'highlight-line');
   transEd4.removeLineClass(lastLine1, 'background', 'highlight-line');

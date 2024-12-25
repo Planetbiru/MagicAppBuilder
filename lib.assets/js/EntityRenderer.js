@@ -421,7 +421,6 @@ class EntityRenderer {
         const height = svgElement.clientHeight + 2;
         const svgData = new XMLSerializer().serializeToString(svgElement);
 
-
         // Embed the font-face in the SVG string (example: using Arial font)
         const svgWithFont = `
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}">
@@ -460,9 +459,9 @@ class EntityRenderer {
      * the canvas content as a PNG file.
      * 
      * @param {SVGElement} svgElement - The SVG element to export as a PNG file.
-     * @param {string} [fileName="exported_image.png"] - The name of the exported file (default is "exported_image.png").
+     * @param {string} [fileName="exported-image.png"] - The name of the exported file (default is "exported-image.png").
      */
-    exportToPNG(svgElement, fileName = "exported_image.png") {
+    exportToPNG(svgElement, fileName = "exported-image.png") {
         // Get the dimensions of the SVG element
         const width = svgElement.clientWidth;
         const height = svgElement.clientHeight;
