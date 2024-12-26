@@ -76,3 +76,11 @@
     documentRoot: 'C:/bitbucket/tukang'
     author: Kamshory
     selected: false
+-
+    id: 0676c48e81b0c8635047
+    name: ApplicationName
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/0676c48e81b0c8635047'
+    author: 'Your Name'
+    selected: false

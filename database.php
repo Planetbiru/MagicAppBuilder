@@ -2271,6 +2271,7 @@ else {
                             <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
                             <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
+                            <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
                         </div>
