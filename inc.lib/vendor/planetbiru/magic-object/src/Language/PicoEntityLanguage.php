@@ -68,6 +68,8 @@ class PicoEntityLanguage
      */
     private $_entityLanguage = ""; // NOSONAR
 
+    private $_defaultLabel = array(); // NOSONAR
+
     /**
      * Constructor
      *
@@ -118,6 +120,8 @@ class PicoEntityLanguage
                 }
             }
         }
+        
+        $this->_defaultLabel = $defaultLanguage;
 
         $this->addLanguage($this->_entityLanguage, $defaultLanguage, true);
         return $this;
@@ -364,5 +368,14 @@ class PicoEntityLanguage
         } else {
             return "{}";
         }
+    }
+
+    /**
+     * Get the value of defaultLabel
+     * @return array Get default label of the entity
+     */ 
+    public function getDefaultLabel()
+    {
+        return $this->_defaultLabel;
     }
 }

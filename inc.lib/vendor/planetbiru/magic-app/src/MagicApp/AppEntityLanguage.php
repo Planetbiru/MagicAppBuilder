@@ -64,11 +64,12 @@ class AppEntityLanguage extends PicoEntityLanguage
     public function __construct($entity, $appConfig, $currentLanguage)
     {
         parent::__construct($entity);
-
+        $labels = $this->getDefaultLabel();
         $langs = $this->loadEntityLanguage($entity, $appConfig, $currentLanguage);
         $values = $langs->valueArray();
+        $labels = array_merge($labels, $values);
         if (!empty($values)) {
-            $this->addLanguage($currentLanguage, $values, true);
+            $this->addLanguage($currentLanguage, $labels, true);
         }
     }
 

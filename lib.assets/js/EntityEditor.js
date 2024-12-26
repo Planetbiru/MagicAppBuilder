@@ -108,13 +108,149 @@ class Column {
         }
         // Default value logic
         if (this.hasDefault()) {
-            if (numericTypes.includes(this.type) && !isNaN(this.default)) {
+            if(this.isTypeBoolean(this.type, this.length)) {
+                columnDef += ` DEFAULT ${this.toBoolean(this.default)}`; // No quotes for boolean values
+            } else if (numericTypes.includes(this.type) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
             } else {
                 columnDef += ` DEFAULT '${this.default}'`; // Default is a string, so use quotes
             }
         }
         return columnDef;
+    }
+
+    /**
+     * Converts a given value to a boolean-like string representation.
+     * 
+     * This function evaluates the input value and converts it to either 'TRUE' or 'FALSE'.
+     * It interprets values such as:
+     * - Any string containing 'false' (case-insensitive) will return 'FALSE'.
+     * - Any non-zero integer or string 'true' (case-insensitive) will return 'TRUE'.
+     * - Any other value will return 'FALSE'.
+     *
+     * @param {string} value - The value to be converted to a boolean-like string.
+     * @returns {string} 'TRUE' or 'FALSE' based on the value.
+     */
+    toBoolean(value) {
+        if (value.toLowerCase().indexOf('false') !== -1) {
+            return 'FALSE';
+        }
+        return (parseInt(value) !== 0 || value.toLowerCase() === 'true') ? 'TRUE' : 'FALSE';
+    }
+
+    /**
+     * Fixes the default value based on the column's type and length.
+     * 
+     * This method adjusts the default value depending on the column's data type:
+     * - For BOOLEAN types, converts values to 'true' or 'false'.
+     * - For text types, escapes single quotes.
+     * - For numeric types (INTEGER and FLOAT), parses the value accordingly.
+     * 
+     * @param {string} defaultValue - The default value to fix.
+     * @param {string} type - The type of the column.
+     * @param {string} length - The length of the column.
+     * @returns {string|number} The fixed default value.
+     */
+    fixDefaultValue(defaultValue, type, length) {
+        let result = defaultValue;
+    
+        if (this.isTypeBoolean(type, length)) {
+            result = (defaultValue !== 0 && defaultValue.toString().toLowerCase() === 'true') ? 'true' : 'false';
+        } else if (this.isNativeValue(defaultValue)) {
+            result = defaultValue;
+        } else if (this.isTypeText(type)) {
+            result = `'${defaultValue.replace(/'/g, "\\'")}'`; // addslashes equivalent in JS
+        } else if (this.isTypeInteger(type)) {
+            result = parseInt(defaultValue.replace(/[^\d]/g, ''), 10);
+        } else if (this.isTypeFloat(type)) {
+            result = parseFloat(defaultValue.replace(/[^\d.]/g, ''));
+        }
+    
+        return result;
+    }
+    
+    /**
+     * Checks if the given type is a boolean type in MySQL.
+     * 
+     * @param {string} type - The type to check.
+     * @param {string} length - The length of the column (used for TINYINT with length 1).
+     * @returns {boolean} True if the type is BOOLEAN, BIT, or TINYINT(1), false otherwise.
+     */
+    isTypeBoolean(type, length) {
+        return type.toLowerCase() === 'boolean' || type.toLowerCase() === 'bool' || type.toLowerCase() === 'bit' || (type.toLowerCase() === 'tinyint' && length == 1);
+    }
+    
+    /**
+     * Checks if the given value is a native value (true, false, or null).
+     *
+     * This function checks if the provided `defaultValue` is a string representing
+     * one of the native values: "true", "false", or "null".
+     *
+     * @param {string} defaultValue The value to check.
+     * @return {boolean} True if the value is "true", "false", or "null", false otherwise.
+     */
+    isNativeValue(defaultValue) {
+        return defaultValue.toLowerCase() === 'true' || defaultValue.toLowerCase() === 'false' || defaultValue.toLowerCase() === 'null';
+    }
+
+    /**
+     * Checks if the given type is a text/string type in MySQL.
+     * This includes all text-related types like CHAR, VARCHAR, TEXT, etc.
+     *
+     * @param {string} type The type to check.
+     * @return {boolean} True if the type is a text type, false otherwise.
+     */
+    isTypeText(type) {
+        const textTypes = ['char', 'varchar', 'text', 'tinytext', 'mediumtext', 'longtext', 'enum', 'set'];
+        return textTypes.includes(type.toLowerCase());
+    }
+
+    /**
+     * Checks if the given type is a numeric/integer type in MySQL.
+     * This includes all integer-like types such as TINYINT, SMALLINT, INT, BIGINT, etc.
+     *
+     * @param {string} type The type to check.
+     * @return {boolean} True if the type is a numeric type, false otherwise.
+     */
+    isTypeInteger(type) {
+        const integerTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'integer'];
+        return integerTypes.includes(type.toLowerCase());
+    }
+
+    /**
+     * Checks if the given type is a floating-point type in MySQL.
+     * This includes types like FLOAT, DOUBLE, and DECIMAL.
+     *
+     * @param {string} type The type to check.
+     * @return {boolean} True if the type is a floating-point type, false otherwise.
+     */
+    isTypeFloat(type) {
+        const floatTypes = ['float', 'double', 'decimal', 'numeric'];
+        return floatTypes.includes(type.toLowerCase());
+    }
+
+    /**
+     * Checks if the given type is a date/time type in MySQL.
+     * This includes types like DATE, DATETIME, TIMESTAMP, TIME, and YEAR.
+     *
+     * @param {string} type The type to check.
+     * @return {boolean} True if the type is a date/time type, false otherwise.
+     */
+    isTypeDate(type) {
+        const dateTypes = ['date', 'datetime', 'timestamp', 'time', 'year'];
+        return dateTypes.includes(type.toLowerCase());
+    }
+
+    /**
+     * Checks if the given type is a binary/blob type in MySQL.
+     * This includes types like BLOB, TINYBLOB, MEDIUMBLOB, LONGBLOB.
+     *
+     * @param {string} type The type to check.
+     * @return {boolean} True if the type is a binary/blob type, false otherwise.
+     */
+    isTypeBinary(type) {
+        const binaryTypes = ['blob', 'tinyblob', 'mediumblob', 'longblob'];
+        return binaryTypes.includes(type.toLowerCase());
     }
 
     /**
