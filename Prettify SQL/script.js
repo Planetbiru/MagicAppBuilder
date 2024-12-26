@@ -617,7 +617,6 @@ class ERDRenderer {
             </defs>
             ${svgData}
         </svg>`;
-        const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgWithFont);
 
         // Create a Blob from the SVG string
         const blob = new Blob([svgWithFont], { type: "image/svg+xml" });
