@@ -74,7 +74,6 @@ class DatabaseExporter
     {
         $this->dbType = strtolower($dbType);
         $this->outputBuffer = '';
-
         $this->db = $pdo;
     }
 
@@ -93,7 +92,7 @@ class DatabaseExporter
     public function exportData($tables = null, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
-        $this->exportTableStructure($tables);
+        $this->exportTableStructure($tables, $schema);
         $this->outputBuffer .= "-- Database content\r\n";
         $this->exportTableData($tables, $schema, $batchSize, $maxQuerySize);
     }
@@ -110,7 +109,7 @@ class DatabaseExporter
     public function exportStructure($tables = null, $schema = 'public')
     {
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
-        $this->exportTableStructure($tables);
+        $this->exportTableStructure($tables, $schema);
     }
 
     /**
