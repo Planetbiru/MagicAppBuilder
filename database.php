@@ -2221,7 +2221,7 @@ else {
     <link rel="stylesheet" href="css/entity-editor.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/EntityEditor.min.js"></script>
+    <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>
@@ -2404,5 +2404,24 @@ else {
         </div>
     </div>
 
+    <div class="modal modal-sm" id="asyncConfirm">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Editor</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                Confirmation
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary confirm-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary confirm-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    
 </body>
 </html>

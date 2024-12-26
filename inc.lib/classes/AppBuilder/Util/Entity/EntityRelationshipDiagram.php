@@ -1048,8 +1048,6 @@ class EntityRelationshipDiagram //NOSONAR
         return $this;
     }
 
-    
-
     /**
      * Get maximum columns
      *

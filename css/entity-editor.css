@@ -296,4 +296,8 @@ body {
 
 .icon-move-down::before {
   content: "⬇️";
+}
+
+label {
+  white-space: nowrap;
 }/*# sourceMappingURL=entity-editor.css.map */
