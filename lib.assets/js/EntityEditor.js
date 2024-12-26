@@ -152,7 +152,6 @@ class Column {
      * @returns {string|number} The fixed default value.
      */
     fixDefaultValue(defaultValue, type, length) {
-        console.log(defaultValue, type, length)
         let result = defaultValue;
     
         if (this.isTypeBoolean(type, length)) {
