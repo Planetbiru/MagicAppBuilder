@@ -94,7 +94,6 @@ class Column {
         {
             columnDef = `${this.name} ${this.type}`;
         }
-
         
         if (!this.primaryKey) {
             // Nullable
@@ -159,7 +158,7 @@ class Column {
         } else if (this.isNativeValue(defaultValue)) {
             result = defaultValue;
         } else if (this.isTypeText(type)) {
-            result = `'${defaultValue.replace(/'/g, "\\'")}'`; // addslashes equivalent in JS
+            result = `'${defaultValue.replace(/'/g, "\\'")}'`;
         } else if (this.isTypeInteger(type)) {
             result = parseInt(defaultValue.replace(/[^\d]/g, ''), 10);
         } else if (this.isTypeFloat(type)) {
@@ -293,7 +292,6 @@ class Column {
     }
 }
 
-
 /**
  * Class representing an entity (table) in a database.
  * 
@@ -412,7 +410,6 @@ class EntityEditor {
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
         this.defaultDataType = this.setting.defaultDataType + '';
         this.defaultDataLength = this.setting.defaultDataLength + '';
-
         this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
         this.primaryKeyDataLength = this.setting.primaryKeyDataLength + '';
 
@@ -543,7 +540,6 @@ class EntityEditor {
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.replace(/\D/g,'');
         let columnDefault = column.default == null ? '' : column.default;
-
         let typeSimple = column.type.split('(')[0].trim();
         row.innerHTML = `
             <td class="column-action">
@@ -581,9 +577,7 @@ class EntityEditor {
         let entityName = document.querySelector(this.selector+" .entity-name").value;
         let count = document.querySelectorAll(this.selector+" .column-name").length;
         let countStr = count <= 0 ? '' : count + 1;
-        
         let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
-
         let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
         const element = document.querySelector(this.selector+' .table-container');
@@ -655,7 +649,6 @@ class EntityEditor {
                 columnAutoIncrements[i].checked,
                 columnEnums[i].value || null,
             );
-
             columns.push(column);
         }
 
@@ -933,11 +926,8 @@ class EntityEditor {
             {
                 this.callbackSaveEntity(this.entities);
             }
-            
         }
-        
     }
-
 
     /**
      * Sorts the entities alphabetically based on the 'name' property.

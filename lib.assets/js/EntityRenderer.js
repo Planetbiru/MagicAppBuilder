@@ -38,16 +38,13 @@ class EntityRenderer {
         this.columnTypeFontSize = 10;
         this.columnFontSize = 11
         this.headerBackgroundColor = "#d8e8ff";
-
         this.buttonSpace = 16;
         this.buttonMargin = 6;
         this.buttonWidth = 14;
         this.buttonHeight = 14;
         this.buttonFontSize = 10;
-
         this.tableFontSize = 12;
         this.relationStrokeWidth = 0.7;
-        this.drawRelationship = true;
     }
 
     /**
@@ -77,8 +74,6 @@ class EntityRenderer {
         let yPos = yOffset; // Initial vertical position for the first table
         let maxMod = 0;
         let mod = 0; // Modulo to help with table wrapping
-
-        this.drawRelationship = 
 
         // Loop through each entity (table) and create it
         this.data.entities.forEach((entity, index) => {
@@ -183,6 +178,9 @@ class EntityRenderer {
      * @returns {SVGElement} The SVG `<g>` (group) element that represents the table, containing all the SVG elements (rectangles, text, lines, etc.).
      */
     createTable(entity, index, x, y) {
+        let yOffset = 40;
+        let yOffsetCol = 26;
+
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
         group.setAttribute("transform", `translate(${x}, ${y})`);
 
@@ -291,12 +289,8 @@ class EntityRenderer {
         editIconRect.style.cursor = "pointer";
         deleteIconRect.style.cursor = "pointer";
 
-        let yOffset = 40;
-        let yOffsetCol = 26;
-
         // Table Columns with their types
         entity.columns.forEach((col, index) => {
-
 
             if(col.primaryKey)
             {
@@ -369,7 +363,6 @@ class EntityRenderer {
 
             const y1 = (index * this.columnHeight) + this.tables[entity.name].yPos + 35;
             const y2 = (refIndex * this.columnHeight) + this.tables[refEntityName].yPos + 35;
-
             const x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")) + this.tableWidth;
             const x2 = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
 
@@ -399,21 +392,35 @@ class EntityRenderer {
     /**
      * Helper method to get the index of a column by its name in an entity.
      * 
-     * @param {Object} entity - The entity containing the column.
-     * @param {string} columnName - The name of the column to find.
-     * @returns {number} The index of the column in the entity's columns array.
+     * This function searches through the columns of the provided entity and returns
+     * the index of the column with the specified name.
+     * If the column is not found, it returns -1.
+     * 
+     * @param {Object} entity - The entity containing the columns array.
+     * @param {string} columnName - The name of the column to find in the entity.
+     * @returns {number} The index of the column in the entity's columns array, or -1 if not found.
      */
     getColumnIndex(entity, columnName) {
         return entity.columns.findIndex(col => col.name === columnName);
     }
 
-    downloadSVG()
-    {
+    /**
+     * Exports the current SVG content to a file and triggers a download.
+     * 
+     * This method calls the `exportToSVG` function, passing the current SVG data 
+     * for export. It handles the process of downloading the SVG file.
+     */
+    downloadSVG() {
         this.exportToSVG(this.svg);
     }
 
-    downloadPNG()
-    {
+    /**
+     * Exports the current SVG content to a PNG file and triggers a download.
+     * 
+     * This method calls the `exportToPNG` function, passing the current SVG data 
+     * for export. It handles the process of downloading the PNG file.
+     */
+    downloadPNG() {
         this.exportToPNG(this.svg);
     }
 
