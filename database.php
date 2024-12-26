@@ -79,13 +79,18 @@ class DatabaseExporter
     }
 
     /**
-     * Exports both table structure (CREATE TABLE) and data (INSERT INTO).
+     * Exports both the table structure (CREATE TABLE) and data (INSERT INTO).
      * 
+     * This method exports the structure of the tables (CREATE TABLE statements)
+     * and their data (INSERT INTO statements) for the specified tables. If no
+     * tables are specified, all tables in the database will be exported.
+     *
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema name to export from. Defaults to 'public'.
      * @param int $batchSize The number of rows per INSERT query (default is 100).
      * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
      */
-    public function export($tables = null, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    public function exportData($tables = null, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
         $this->exportTableStructure($tables);
@@ -93,6 +98,20 @@ class DatabaseExporter
         $this->exportTableData($tables, $schema, $batchSize, $maxQuerySize);
     }
 
+    /**
+     * Exports only the structure (CREATE TABLE) of the specified tables.
+     * 
+     * This method generates the CREATE TABLE statements for the specified tables.
+     * If no tables are specified, all tables in the database will be exported.
+     *
+     * @param array|null $tables Table names to be exported. If null, all tables will be exported.
+     * @param string $schema The schema name to export from. Defaults to 'public'.
+     */
+    public function exportStructure($tables = null, $schema = 'public')
+    {
+        $this->outputBuffer .= "-- Database structure\r\n\r\n";
+        $this->exportTableStructure($tables);
+    }
 
     /**
      * Exports the structure of all tables (CREATE TABLE).
@@ -1781,7 +1800,6 @@ class DatabaseExplorer // NOSONAR
         $form->appendChild($space);
 
         // Create exportTable button
-
         $inputGet = new InputGet();
 
         $tableName = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
@@ -1808,9 +1826,31 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
         $form->appendChild($exportDatabase);
         
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
 
-        //<button class="btn btn-primary" type="submit" name="___export_database___" value="yes">Export Database</button>
+        // Create exportTableStructure button (Export Structure Tabel)
+        $exportTableStructure = $dom->createElement('button');
+        $exportTableStructure->setAttribute('type', 'submit');
+        $exportTableStructure->setAttribute('name', '___export_table_structure___');
+        $exportTableStructure->setAttribute('value', $tableName);
+        $exportTableStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
+        $exportTableStructure->appendChild($dom->createTextNode('Export Table Structure'));
+        $form->appendChild($exportTableStructure);
 
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
+        // Create exportDatabaseStructure button (Export Struktur Database)
+        $exportDatabaseStructure = $dom->createElement('button');
+        $exportDatabaseStructure->setAttribute('type', 'submit');
+        $exportDatabaseStructure->setAttribute('name', '___export_database_structure___');
+        $exportDatabaseStructure->setAttribute('value', $databaseName);
+        $exportDatabaseStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
+        $exportDatabaseStructure->appendChild($dom->createTextNode('Export Database Structure'));
+        $form->appendChild($exportDatabaseStructure);
 
         // Append form to DOM
         $dom->appendChild($form);
@@ -1818,6 +1858,7 @@ class DatabaseExplorer // NOSONAR
         // Output the HTML
         return $dom->saveHTML();
     }
+
 
     /**
      * Executes a series of SQL queries and displays the results.
@@ -2088,7 +2129,32 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
     }
     $filename = trim($filename, " - ");
     $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
-    $exporter->export($tables, $schemaName, $maxRecord, $maxQuerySize);
+    $exporter->exportData($tables, $schemaName, $maxRecord, $maxQuerySize);
+    header("Content-type: text/plain");
+    header("Content-disposition: attachment; filename=\"$filename\"");
+    echo $exporter->getExportData();
+    exit();
+}
+
+if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_table_structure___']))
+{
+    $maxRecord = 200;
+    $maxQuerySize = 524288;
+    
+    $tables = [];
+    if(isset($_POST['___export_table_structure___']) && trim($_POST['___export_table_structure___']) != "")
+    {
+        $tableName = $_POST['___export_table_structure___'];
+        $tables[] = $tableName;
+        $filename = $tableName."-".date("Y-m-d-H-i-s").".sql";
+    }
+    else
+    {
+        $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
+    }
+    $filename = trim($filename, " - ");
+    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter->exportStructure($tables, $schemaName);
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
     echo $exporter->getExportData();
@@ -2154,14 +2220,12 @@ else {
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/database-explorer.css">
     <link rel="stylesheet" href="css/entity-editor.css">
-    <script src="lib.assets/js/TableParser.js"></script>
-    <script src="lib.assets/js/SQLConverter.js"></script>
-    <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/EntityRenderer.js"></script>
-    <script src="lib.assets/js/ResizablePanel.js"></script>
-    <script src="lib.assets/js/import-structure.js"></script>
-
-
+    <script src="lib.assets/js/TableParser.min.js"></script>
+    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/EntityEditor.min.js"></script>
+    <script src="lib.assets/js/EntityRenderer.min.js"></script>
+    <script src="lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="lib.assets/js/import-structure.min.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -2199,7 +2263,6 @@ else {
             {
                 echo DatabaseExplorer::showTableData($pdo, $applicationId, $databaseName, $schemaName, $table, $page, $limit);
             }
-            
         }
 
         // Display the query executor form and results
