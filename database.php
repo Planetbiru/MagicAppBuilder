@@ -2217,11 +2217,11 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.min.css">
-    <link rel="stylesheet" href="css/entity-editor.min.css">
+    <link rel="stylesheet" href="css/entity-editor.css">
+    <link rel="stylesheet" href="css/database-explorer.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/EntityEditor.min.js"></script>
+    <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>
@@ -2332,6 +2332,7 @@ else {
                             <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
                             <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
+                            <button class="btn" onclick="editor.preference()">Preferences</button>
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
@@ -2402,15 +2403,33 @@ else {
         </div>
     </div>
 
-    <div class="modal modal-sm" id="asyncConfirm">
+    <div class="modal modal-sm" id="settingModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Entity Editor</h3>
+                <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
             </div>       
             <div class="modal-body">
                 Confirmation
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary confirm-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary confirm-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" id="asyncConfirm">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                Message
             </div>
             <div class="modal-footer">            
                 <button class="btn btn-primary confirm-ok">OK</button>

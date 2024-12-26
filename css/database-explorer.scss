@@ -436,7 +436,7 @@ textarea {
 
 .modal-sm .modal-content {
     display: block;
-    width: 400px;
+    width: 480px;
     max-width: calc(100vh - 40px);
     margin: 80px auto 0 auto;
 }
@@ -474,6 +474,23 @@ textarea {
 .modal-body {
     padding: 16px 16px 10px 16px;
     position: relative;
+
+    table.two-side-table {
+        border: none;
+        td {
+            border: none;
+            padding: 8px 0;
+
+            input[type="text"], select{
+                padding: 4px 8px;
+                border: 1px solid #DDDDDD;
+                background-color: #FFFFFF;
+                color: #313131;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    }
 }
 
 .modal-footer {
@@ -482,6 +499,8 @@ textarea {
     justify-content: flex-end;
     padding: 10px 16px 16px 16px;
 }
+
+
 
 .original {
     height: calc(100vh - 176px);
@@ -527,11 +546,9 @@ table.two-side-table tbody tr td:nth-child(2) {
         /* Return to normal table view */
     }
 
-    /* The first column width is 30% */
     table.two-side-table td:first-child,
     table.two-side-table th:first-child {
-        width: 30%;
-        /* The first column width is 30% */
+        width: 35%;
     }
 
     /* Set the other columns to have balanced width */
