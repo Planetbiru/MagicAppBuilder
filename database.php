@@ -2217,11 +2217,11 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/database-explorer.css">
-    <link rel="stylesheet" href="css/entity-editor.css">
+    <link rel="stylesheet" href="css/database-explorer.min.css">
+    <link rel="stylesheet" href="css/entity-editor.min.css">
     <script src="lib.assets/js/TableParser.min.js"></script>
     <script src="lib.assets/js/SQLConverter.min.js"></script>
-    <script src="lib.assets/js/EntityEditor.js"></script>
+    <script src="lib.assets/js/EntityEditor.min.js"></script>
     <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
     <script src="lib.assets/js/import-structure.min.js"></script>
@@ -2321,7 +2321,6 @@ else {
                             <textarea class="query-generated" spellcheck="false"></textarea>
                         </div>
                     </div>
-
                     
                     <div class="editor-container">
                         <div class="button-container">
@@ -2395,7 +2394,6 @@ else {
                     </div>
                 </div>
             </div>
-
             <div class="modal-footer">            
                 <button class="btn btn-primary import-from-entity">Import</button>
                 &nbsp;
@@ -2421,7 +2419,5 @@ else {
             </div>
         </div>
     </div>
-
-    
 </body>
 </html>

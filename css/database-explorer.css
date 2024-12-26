@@ -128,7 +128,6 @@ textarea:focus-visible {
   border-color: rgba(0, 123, 255, 0.862745098);
 }
 
-/* Styling dasar untuk semua tombol */
 .btn {
   display: inline-block;
   padding: 5px 10px;
@@ -141,9 +140,9 @@ textarea:focus-visible {
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
   margin-bottom: 4px;
   min-width: 60px;
+  color: #313131;
 }
 
-/* btn-primary */
 .btn-primary {
   background-color: #007bff;
   border-color: #007bff;

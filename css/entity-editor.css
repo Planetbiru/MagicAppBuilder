@@ -71,11 +71,6 @@ body {
 .entity-editor .button-container {
   padding: 10px 0px 0;
 }
-.entity-editor button {
-  padding: 5px 12px;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
 .entity-editor input[type=text],
 .entity-editor select {
   padding: 5px 10px;
