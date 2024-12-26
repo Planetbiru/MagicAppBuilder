@@ -34,14 +34,13 @@ else
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
     $path = $workspaceDirectory."/entity/data/$filename";
-    if(!file_exists(dirname($path)))
-    {
-        mkdir(dirname($path), 0755, true);
-    }
     if(!file_exists($path))
     {
-        file_put_contents($path, "[]");
+        $json = "[]";
     }
-    $json = file_get_contents($path);
+    else
+    {
+        $json = file_get_contents($path);
+    }
     ResponseUtil::sendJSON($json);
 }

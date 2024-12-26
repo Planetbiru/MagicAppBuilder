@@ -2277,31 +2277,58 @@ else {
                         </div>
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">
-                            <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
-                            <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
-                            <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
-                            <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
-                            <div class="table-container">
-                            <table id="columns-table">
-                                <thead>
-                                    <tr>
-                                        <th class="column-action"></th>
-                                        <th>Column Name</th>
-                                        <th>Type</th>
-                                        <th>Length</th>
-                                        <th>Value</th>
-                                        <th>Default</th>
-                                        <th class="column-nl">NL</th>
-                                        <th class="column-pk">PK</th>
-                                        <th class="column-ai">AI</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="columns-table-body">
-                                    <!-- Columns will be dynamically inserted here -->
-                                </tbody>
-                            </table>
+                            <div class="entity-container">
+                                <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
+                                <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
+                                <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
+                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                                <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
+                                <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
+                                <div class="table-container">
+                                    <table id="table-entity-editor">
+                                        <thead>
+                                            <tr>
+                                                <th class="column-action"></th>
+                                                <th>Column Name</th>
+                                                <th>Type</th>
+                                                <th>Length</th>
+                                                <th>Value</th>
+                                                <th>Default</th>
+                                                <th class="column-nl">NL</th>
+                                                <th class="column-pk">PK</th>
+                                                <th class="column-ai">AI</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="entity-columns-table-body">
+                                            <!-- Columns will be dynamically inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="template-container">
+                                <button class="btn" onclick="editor.addColumnTemplate(true)">Add Column</button>
+                                <button class="btn" onclick="editor.saveTemplate()">Save Template</button>
+                                <button class="btn" onclick="editor.cancelEditTemplate()">Cancel</button>
+                                <div class="table-container">
+                                    <table id="table-template-editor">
+                                        <thead>
+                                            <tr>
+                                                <th class="column-action"></th>
+                                                <th>Column Name</th>
+                                                <th>Type</th>
+                                                <th>Length</th>
+                                                <th>Value</th>
+                                                <th>Default</th>
+                                                <th class="column-nl">NL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="template-columns-table-body">
+                                            <!-- Columns will be dynamically inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
                     </div>
                 </div>

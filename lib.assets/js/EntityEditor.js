@@ -406,8 +406,13 @@ class EntityEditor {
             'TINYINT'   : 4
         };
         this.addDomListeners();
+
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
+ 
+        this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
+        this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
+ 
         this.defaultDataType = this.setting.defaultDataType + '';
         this.defaultDataLength = this.setting.defaultDataLength + '';
         this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
@@ -417,6 +422,12 @@ class EntityEditor {
         {
             this.callbackLoadEntity();
         }
+        if(typeof this.callbackLoadTemplate == 'function')
+        {
+            this.callbackLoadTemplate();
+        }
+            
+        this.template = {columns: []};
     }
 
     /**
@@ -461,7 +472,7 @@ class EntityEditor {
                     let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                     let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                     let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                    sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
     
@@ -479,7 +490,7 @@ class EntityEditor {
                     let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                     let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                     let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                    sendToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
     
@@ -501,7 +512,7 @@ class EntityEditor {
             this.currentEntityIndex = entityIndex;
             const entity = this.entities[entityIndex];
             document.querySelector(this.selector+" .entity-name").value = entity.name;
-            document.querySelector(this.selector+" .columns-table-body").innerHTML = '';
+            document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
             entity.columns.forEach(col => this.addColumnToTable(col));
         } else {
             this.currentEntityIndex = -1;
@@ -519,9 +530,11 @@ class EntityEditor {
                 }
             }
             document.querySelector(this.selector+" .entity-name").value = newTableName;
-            document.querySelector(this.selector+" .columns-table-body").innerHTML = '';
+            document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
         }
         document.querySelector(this.selector+" .button-container").style.display = "none";
+        document.querySelector(this.selector+" .entity-container").style.display = "block";
+        document.querySelector(this.selector+" .template-container").style.display = "none";
         document.querySelector(this.selector+" .editor-form").style.display = "block";
         if(entityIndex == -1)
         {
@@ -536,7 +549,7 @@ class EntityEditor {
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
      */
     addColumnToTable(column, focus = false) {
-        const tableBody = document.querySelector(this.selector+" .columns-table-body");
+        const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.replace(/\D/g,'');
         let columnDefault = column.default == null ? '' : column.default;
@@ -580,47 +593,9 @@ class EntityEditor {
         let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
         let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         this.addColumnToTable(column, focus);
-        const element = document.querySelector(this.selector+' .table-container');
+        const element = document.querySelector(this.selector+' .entity-container .table-container');
         element.scrollTop = element.scrollHeight;
 
-    }
-
-    /**
-     * Removes the selected column from the entity.
-     * 
-     * @param {HTMLElement} button - The button that was clicked to remove the column.
-     */
-    removeColumn(button) {
-        const row = button.closest("tr");
-        row.remove();
-    }
-
-    /**
-     * Moves a column up in the columns table.
-     * 
-     * @param {HTMLElement} button - The button that was clicked to move the column up.
-     */
-    moveUp(button) {
-        const row = button.closest("tr");
-        const tableBody = document.querySelector(this.selector+" .columns-table-body");
-        const previousRow = row.previousElementSibling;
-        if (previousRow) {
-            tableBody.insertBefore(row, previousRow);
-        }
-    }
-
-    /**
-     * Moves a column down in the columns table.
-     * 
-     * @param {HTMLElement} button - The button that was clicked to move the column down.
-     */
-    moveDown(button) {
-        const row = button.closest("tr");
-        const tableBody = document.querySelector(this.selector+" .columns-table-body");
-        const nextRow = row.nextElementSibling;
-        if (nextRow) {
-            tableBody.insertBefore(nextRow, row);
-        }
     }
 
     /**
@@ -629,14 +604,14 @@ class EntityEditor {
     saveEntity() {
         const entityName = document.querySelector(this.selector+" .entity-name").value;
         const columns = [];
-        const columnNames = document.querySelectorAll(this.selector+" .column-name");
-        const columnTypes = document.querySelectorAll(this.selector+" .column-type");
-        const columnNullables = document.querySelectorAll(this.selector+" .column-nullable");
-        const columnDefaults = document.querySelectorAll(this.selector+" .column-default");
-        const columnPrimaryKeys = document.querySelectorAll(this.selector+" .column-primary-key");
-        const columnAutoIncrements = document.querySelectorAll(this.selector+" .column-autoIncrement");
-        const columnLengths = document.querySelectorAll(this.selector+" .column-length");
-        const columnEnums = document.querySelectorAll(this.selector+" .column-enum");
+        const columnNames = document.querySelectorAll(this.selector+" #table-entity-editor .column-name");
+        const columnTypes = document.querySelectorAll(this.selector+" #table-entity-editor .column-type");
+        const columnNullables = document.querySelectorAll(this.selector+" #table-entity-editor .column-nullable");
+        const columnDefaults = document.querySelectorAll(this.selector+" #table-entity-editor .column-default");
+        const columnPrimaryKeys = document.querySelectorAll(this.selector+" #table-entity-editor .column-primary-key");
+        const columnAutoIncrements = document.querySelectorAll(this.selector+" #table-entity-editor .column-autoIncrement");
+        const columnLengths = document.querySelectorAll(this.selector+" #table-entity-editor .column-length");
+        const columnEnums = document.querySelectorAll(this.selector+" #table-entity-editor .column-enum");
 
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
@@ -669,6 +644,167 @@ class EntityEditor {
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
+        }
+    }
+
+    /**
+     * Displays the template editor, hides the entity editor, and shows the appropriate containers.
+     */
+    showEditorTemplate() {
+        this.currentEntityIndex = -2;
+        document.querySelector(this.selector + " .template-columns-table-body").innerHTML = '';
+        this.template.columns.forEach(col => this.addColumnToTemplate(col));
+        document.querySelector(this.selector + " .button-container").style.display = "none";
+        document.querySelector(this.selector + " .entity-container").style.display = "none";
+        document.querySelector(this.selector + " .template-container").style.display = "block";
+        document.querySelector(this.selector + " .editor-form").style.display = "block";
+    }
+
+    /**
+     * Adds a new column template to the editor with default values.
+     * 
+     * @param {boolean} focus - Whether to focus on the newly added column input field.
+     */
+    addColumnTemplate(focus) {
+        let column = {
+            "name": "",
+            "type": "VARCHAR",
+            "length": "50",
+            "nullable": true,
+            "default": null,
+            "values": ""
+        }
+        this.addColumnToTemplate(column, focus);
+        const element = document.querySelector(this.selector + ' .template-container .table-container');
+        element.scrollTop = element.scrollHeight;
+    }
+
+    /**
+     * Adds a new column to the template editor.
+     * 
+     * @param {Object} column - The column data to add (name, type, length, nullable, default, values).
+     * @param {boolean} focus - Whether to focus on the column input field after adding it.
+     */
+    addColumnToTemplate(column, focus) {
+        const tableBody = document.querySelector(this.selector + " .template-columns-table-body");
+        const row = document.createElement("tr");
+        let columnLength = column.length == null ? '' : column.length.replace(/\D/g, '');
+        let columnDefault = column.default == null ? '' : column.default;
+        let typeSimple = column.type.split('(')[0].trim();
+        row.innerHTML = `
+            <td class="column-action">
+                <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
+                <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
+                <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
+            </td>
+            <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
+            <td>
+                <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
+                    ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
+                </select>
+            </td>
+            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
+            <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
+        `;
+        tableBody.appendChild(row);
+        if (focus) {
+            row.querySelector('.column-name').select();
+        }
+    }
+
+    /**
+     * Saves the column template by collecting the values from the form and updating the template.
+     */
+    saveTemplate() {
+        const columns = [];
+        const columnNames = document.querySelectorAll(this.selector + " #table-template-editor .column-name");
+        const columnTypes = document.querySelectorAll(this.selector + " #table-template-editor .column-type");
+        const columnNullables = document.querySelectorAll(this.selector + " #table-template-editor .column-nullable");
+        const columnDefaults = document.querySelectorAll(this.selector + " #table-template-editor .column-default");
+        const columnLengths = document.querySelectorAll(this.selector + " #table-template-editor .column-length");
+        const columnEnums = document.querySelectorAll(this.selector + " #table-template-editor .column-enum");
+
+        for (let i = 0; i < columnNames.length; i++) {
+            let column = new Column(
+                columnNames[i].value,
+                columnTypes[i].value,
+                columnLengths[i].value || null,
+                columnNullables[i].checked,
+                columnDefaults[i].value || null,
+                columnEnums[i].value || null,
+            );
+            columns.push(column);
+        }
+        this.template.columns = columns;
+        document.querySelector(this.selector + " .entity-container").style.display = "block";
+        document.querySelector(this.selector + " .template-container").style.display = "none";
+        if(typeof this.callbackSaveTemplate == 'function')
+        {
+            this.callbackSaveTemplate(this.template)
+        }
+    }
+
+    /**
+     * Cancels the template editing process and reverts to the entity editor view.
+     */
+    cancelEditTemplate() {
+        document.querySelector(this.selector + " .entity-container").style.display = "block";
+        document.querySelector(this.selector + " .template-container").style.display = "none";
+    }
+
+    /**
+     * Adds columns from the template to the table, ensuring that only columns not already present are added.
+     */
+    addColumnFromTemplate() {
+        const existingColumnNames = [];
+        const columnNames = document.querySelectorAll(this.selector + " #table-entity-editor .column-name");
+        for (const columnName of columnNames) {
+            existingColumnNames.push(columnName.value);
+        }
+        this.template.columns.forEach(column => {
+            if (!existingColumnNames.includes(column.name)) {
+                this.addColumnToTable(column, focus);
+            }
+        });
+    }
+
+    /**
+     * Removes the selected column from the entity.
+     * 
+     * @param {HTMLElement} button - The button that was clicked to remove the column.
+     */
+    removeColumn(button) {
+        const row = button.closest("tr");
+        row.remove();
+    }
+
+    /**
+     * Moves a column up in the columns table.
+     * 
+     * @param {HTMLElement} button - The button that was clicked to move the column up.
+     */
+    moveUp(button) {
+        const row = button.closest("tr");
+        const tableBody = row.closest('tbody');
+        const previousRow = row.previousElementSibling;
+        if (previousRow) {
+            tableBody.insertBefore(row, previousRow);
+        }
+    }
+
+    /**
+     * Moves a column down in the columns table.
+     * 
+     * @param {HTMLElement} button - The button that was clicked to move the column down.
+     */
+    moveDown(button) {
+        const row = button.closest("tr");
+        const tableBody = row.closest('tbody');
+        const nextRow = row.nextElementSibling;
+        if (nextRow) {
+            tableBody.insertBefore(nextRow, row);
         }
     }
 
@@ -711,7 +847,41 @@ class EntityEditor {
         return entities;
     }
 
-    
+    /**
+     * Converts a JSON array to an array of Entity objects.
+     * 
+     * @param {Array} jsonData - The JSON array containing entities and their columns.
+     * @returns {Array} - An array of Entity objects.
+     */
+    createTemplateFromJSON(jsonData) {
+        const columns = [];
+        // Iterate over each column in the entity's columns array
+        jsonData.columns.forEach(columnData => {
+            // Create a new Column instance
+            const column = new Column(
+                columnData.name,
+                columnData.type,
+                columnData.length,
+                columnData.nullable,
+                columnData.default,
+                columnData.values !== "null" ? columnData.values : "",
+            );
+            columns.push(column);
+        });
+        return {columns: columns};
+    }
+
+    /**
+     * Creates an array of Entity instances from the given SQL table data.
+     * 
+     * This method takes in an array of tables, each containing information about table columns, and converts that 
+     * data into Entity and Column objects. It then returns an array of the created entities.
+     *
+     * @param {Array} tables - An array of tables (each table being an object) with column data to convert into entities.
+     * Each table should contain a `tableName` and a `columns` array where each column object contains metadata about the column (e.g., Field, Type, Length, Nullable, etc.).
+     * 
+     * @returns {Array} entities - An array of Entity objects, each containing Column objects based on the provided table data.
+     */
     createEntitiesFromSQL(tables) {
         const entities = [];
 
@@ -743,67 +913,6 @@ class EntityEditor {
         });
 
         return entities;
-    }
-
-
-    /**
-     * Renders the list of entities and updates the table list in the UI.
-     */
-    renderEntitiesOld() {
-        const container = document.querySelector(this.selector+" .entities-container");
-        container.innerHTML = '';
-        const selectedEntity = [];
-        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
-        if(selectedEntities)
-        {
-            selectedEntities.forEach(checkbox => {
-                selectedEntity.push(checkbox.getAttribute('data-name'));
-            });
-        }
-
-        const tabelList = document.querySelector(this.selector+" .table-list");
-        tabelList.innerHTML = '';
-        let withLengthTypes = this.withLengthTypes;
-        this.entities.forEach((entity, index) => {
-            const entityDiv = document.createElement("div");
-            entityDiv.classList.add("entity");
-            let columnsInfo = entity.columns.map(col => {
-                if (withLengthTypes.includes(col.type) && col.length > 0) {
-                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}(${col.length})</span></li>`;
-                } else {
-                    return `<li data-primary-key="${col.primaryKey ? 'true' : 'false'}">${col.name} <span class="data-type">${col.type}</span></li>`;
-                }
-            }).join('');
-            
-            entityDiv.innerHTML = `
-                <div class="entity-header">
-                    <button onclick="editor.deleteEntity(${index})" class="icon-delete"></button>
-                    <button onclick="editor.editEntity(${index})" class="icon-edit"></button>
-                    <h4>${entity.name}</h4>
-                </div>
-                <div class="entity-body">
-                    <ul>${columnsInfo}</ul>
-                </div>
-            `;
-
-            container.appendChild(entityDiv);
-            
-            let entityCb = document.createElement('li');
-            entityCb.innerHTML = `
-            <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
-            `;
-            
-            tabelList.appendChild(entityCb);
-        });
-
-        selectedEntity.forEach(value => {
-            let cb = document.querySelector(`input[data-name="${value}"]`);
-            if(cb)
-            {
-                cb.checked = true;
-            }
-        });
-        
     }
     
     /**
