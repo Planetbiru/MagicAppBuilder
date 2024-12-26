@@ -136,7 +136,7 @@ textarea {
 /* Styling dasar untuk semua tombol */
 .btn {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 5px 10px;
     font-weight: 400;
     text-align: center;
     text-decoration: none;
@@ -145,7 +145,7 @@ textarea {
     cursor: pointer;
     transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
     margin-bottom: 4px;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 /* btn-primary */
@@ -407,6 +407,8 @@ textarea {
     overflow: hidden;
 }
 
+
+
 .modal-backdrop {
     position: absolute;
     top: 0;
@@ -426,6 +428,18 @@ textarea {
     width: calc(100vw - 32px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1;
+}
+
+.modal-content p{
+    line-height: 1.45;
+    margin-bottom: 4px;
+}
+
+.modal-sm .modal-content {
+    display: block;
+    width: 400px;
+    max-width: calc(100vh - 40px);
+    margin: 80px auto 0 auto;
 }
 
 .close-btn {

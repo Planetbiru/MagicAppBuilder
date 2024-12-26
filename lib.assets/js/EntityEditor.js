@@ -1081,13 +1081,19 @@ class EntityEditor {
      * @param {number} index - The index of the entity to delete.
      */
     deleteEntity(index) {
-        this.entities.splice(index, 1);
-        this.renderEntities();
-        this.exportToSQL();
-        if(typeof this.callbackSaveEntity == 'function')
-        {
-            this.callbackSaveEntity(this.entities);
-        }
+        let _this = this;
+        let entityName = _this.entities[index].name;
+        _this.showConfirmationDialog(`<p>Are you sure you want to delete the entity &quot;${entityName}&quot;?</p>`, 'Delete Confirmation', 'Yes', 'No', function(isConfirmed) {
+            if (isConfirmed) {
+                _this.entities.splice(index, 1);
+                _this.renderEntities();
+                _this.exportToSQL();
+                if(typeof _this.callbackSaveEntity == 'function')
+                {
+                    _this.callbackSaveEntity(_this.entities);
+                }
+            } 
+        });
     }
 
     /**
@@ -1365,4 +1371,52 @@ class EntityEditor {
     getData() {
         return {entities: this.entities};
     }
+
+    /**
+     * Displays a confirmation dialog with OK and Cancel buttons.
+     * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
+     * 
+     * @param {string} message - The message to display in the dialog.
+     * @param {string} title - The title of the dialog.
+     * @param {string} captionOk - The label for the OK button.
+     * @param {string} captionCancel - The label for the Cancel button.
+     * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
+     * 
+     * @returns {void}
+     */
+    showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
+        // Get modal and buttons
+        const modal = document.querySelector('#asyncConfirm');
+        const okBtn = modal.querySelector('.confirm-ok');
+        const cancelBtn = modal.querySelector('.confirm-cancel');
+
+        modal.querySelector('.modal-header h3').innerHTML = title;
+        modal.querySelector('.modal-body').innerHTML = message;
+        okBtn.innerHTML = captionOk;
+        cancelBtn.innerHTML = captionCancel;
+
+        // Show the modal
+        modal.style.display = 'block';
+
+        // Remove existing event listeners to prevent duplicates
+        okBtn.removeEventListener('click', handleOkClick);
+        cancelBtn.removeEventListener('click', handleCancelClick);
+
+        // Define the event listener for OK button
+        function handleOkClick() {
+            modal.style.display = 'none';
+            callback(true);  // Execute callback with 'true' if OK is clicked
+        }
+
+        // Define the event listener for Cancel button
+        function handleCancelClick() {
+            modal.style.display = 'none';
+            callback(false);  // Execute callback with 'false' if Cancel is clicked
+        }
+
+        // Add event listeners for OK and Cancel buttons
+        okBtn.addEventListener('click', handleOkClick);
+        cancelBtn.addEventListener('click', handleCancelClick);
+    }
+
 }
