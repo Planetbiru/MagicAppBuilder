@@ -715,7 +715,7 @@ class EntityRelationshipDiagram //NOSONAR
         $bodyBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeight());
         $bodyBG->setStyle('fill', self::ENTITY_BACKGROUND_COLOR);
         
-        $headerBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight());
+        $headerBG = new SVGRect(0, 0, $diagram->getWidth(), $diagram->getHeaderHeight() - 1);
         $headerBG->setStyle('fill', self::HEADER_BACKGROUND_COLOR);
         
         $entity->addChild($bodyBG); 
