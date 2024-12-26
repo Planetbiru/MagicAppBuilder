@@ -118,7 +118,7 @@ class EntityRenderer {
             height = height - this.betweenY;
         }
 
-        this.svg.setAttribute('height', height); // Set the SVG height to fit all tables
+        this.svg.setAttribute('height', height - 2); // Set the SVG height to fit all tables
 
         let finalWidth = (maxMod * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
         this.svg.setAttribute('width', finalWidth);
@@ -187,7 +187,7 @@ class EntityRenderer {
         // Table Rectangle
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("width", this.tableWidth);
-        rect.setAttribute("height", (entity.columns.length * this.columnHeight) + 28);
+        rect.setAttribute("height", (entity.columns.length * this.columnHeight) + 26);
         rect.setAttribute("fill", "#ffffff");
         rect.setAttribute("stroke", this.stroke);
         rect.setAttribute("stroke-width", this.entityStrokeWidth);
@@ -216,7 +216,7 @@ class EntityRenderer {
         moveUpText.setAttribute("x", this.tableWidth - this.createOffset(4));
         moveUpText.setAttribute("y", 17);
         moveUpText.setAttribute("font-size", this.buttonFontSize);
-        moveUpText.textContent = "⬆️"; // Up arrow symbol
+        moveUpText.textContent = "⬅️"; // Up arrow symbol
         group.appendChild(moveUpText);
 
         // Move Up Button (rectangle + text)
@@ -234,7 +234,7 @@ class EntityRenderer {
         moveDownText.setAttribute("x", this.tableWidth - this.createOffset(3));
         moveDownText.setAttribute("y", 17);
         moveDownText.setAttribute("font-size", this.buttonFontSize);
-        moveDownText.textContent = "⬇️"; // Down arrow symbol
+        moveDownText.textContent = "➡️"; // Down arrow symbol
         group.appendChild(moveDownText);
 
         // Move Down Button (rectangle + text)
