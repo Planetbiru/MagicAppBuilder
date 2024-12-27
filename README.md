@@ -295,7 +295,7 @@ Here is an explanation of the reserved columns above.
 | Number of directory                     | Unlimited  | Unlimited  |
 | Number of entity                        | Unlimited  | Unlimited  |
 | Number of module                        | Unlimited  | Unlimited  |
-| Number of theme                         | 2          | 3          |
+| Number of theme                         | 1          | 3          |
 | Number of user                          | 1          | 100        |
 | User management                         | No         | Yes        |
 | Collaboration                           | No         | Yes        |
