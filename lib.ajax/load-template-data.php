@@ -35,6 +35,7 @@ else
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
     $path = $workspaceDirectory."/entity/template/$filename";
+    error_log($path);
     if(!file_exists($path))
     {
         $columns = [];
@@ -70,11 +71,30 @@ else
             
             
         }
-
-        if(isset($appConfig->entityInfo))
+        $entityInfo = null;
+        if(isset($appConfig) && $appConfig->getEntityInfo() != null)
+        {
+            $entityInfo = $appConfig->entityInfo;
+        }
+        else
+        {
+            $entityInfo = new SecretObject([
+                'name' => 'name',
+                'sortOrder' => 'sort_order',
+                'adminCreate' => 'admin_create',
+                'adminEdit' => 'admin_edit',
+                'timeCreate' => 'time_create',
+                'timeEdit' => 'time_edit',
+                'ipCreate' => 'ip_create',
+                'ipEdit' => 'ip_edit',
+                'active' => 'active'
+            ]);
+            
+        }
+        if(isset($entityInfo))
         {
             $columns[] = [
-                "name" => $appConfig->entityInfo->name,
+                "name" => $entityInfo->name,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
@@ -83,7 +103,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->sortOrder,
+                "name" => $entityInfo->sortOrder,
                 "type" => "INT",
                 "length" => "11",
                 "nullable" => true,
@@ -92,7 +112,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->adminCreate,
+                "name" => $entityInfo->adminCreate,
                 "type" => "VARCHAR",
                 "length" => "40",
                 "nullable" => true,
@@ -101,7 +121,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->adminEdit,
+                "name" => $entityInfo->adminEdit,
                 "type" => "VARCHAR",
                 "length" => "40",
                 "nullable" => true,
@@ -110,7 +130,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->timeCreate,
+                "name" => $entityInfo->timeCreate,
                 "type" => "TIMESTAMP",
                 "length" => "",
                 "nullable" => true,
@@ -119,7 +139,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->timeEdit,
+                "name" => $entityInfo->timeEdit,
                 "type" => "TIMESTAMP",
                 "length" => "",
                 "nullable" => true,
@@ -128,7 +148,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->ipCreate,
+                "name" => $entityInfo->ipCreate,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
@@ -137,7 +157,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->ipEdit,
+                "name" => $entityInfo->ipEdit,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
@@ -146,7 +166,7 @@ else
             ];
 
             $columns[] = [
-                "name" => $appConfig->entityInfo->active,
+                "name" => $entityInfo->active,
                 "type" => "TINYINT",
                 "length" => "1",
                 "nullable" => false,

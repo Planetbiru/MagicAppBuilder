@@ -770,6 +770,8 @@ class EntityEditor {
                 this.addColumnToTable(column, focus);
             }
         });
+        const element = document.querySelector(this.selector+' .entity-container .table-container');
+        element.scrollTop = element.scrollHeight;
     }
 
     /**
