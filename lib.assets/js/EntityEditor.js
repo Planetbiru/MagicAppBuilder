@@ -409,9 +409,9 @@ class EntityEditor {
 
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
- 
         this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
         this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
+        this.callbackSaveConfig = this.setting.callbackSaveConfig;
  
         this.defaultDataType = this.setting.defaultDataType + '';
         this.defaultDataLength = this.setting.defaultDataLength + '';
@@ -426,6 +426,8 @@ class EntityEditor {
         {
             this.callbackLoadTemplate();
         }
+
+        
             
         this.template = {columns: []};
     }
@@ -1423,13 +1425,10 @@ class EntityEditor {
     {
         let html = '';
         html += `<select name="${name}">\r\n`;
-
         this.mysqlDataTypes.forEach((type, index) => {
             html += `<option value="${type}">${type}</option>\r\n`;
         });
-
         html += `</select>`;
-
         return html;
     }
 
@@ -1459,17 +1458,26 @@ class EntityEditor {
             </table>
             `, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
             if (isConfirmed) {
-                _this.defaultDataType = document.querySelector('[name="primary_key_type"]').value;
-                _this.defaultDataLength = document.querySelector('[name="primary_key_length"]').value;
-                _this.primaryKeyDataType = document.querySelector('[name="column_type"]').value;
-                _this.primaryKeyDataLength = document.querySelector('[name="column_length"]').value;    
+                _this.primaryKeyDataType = document.querySelector('[name="primary_key_type"]').value;
+                _this.primaryKeyDataLength = document.querySelector('[name="primary_key_length"]').value;
+                _this.defaultDataType = document.querySelector('[name="column_type"]').value;
+                _this.defaultDataLength = document.querySelector('[name="column_length"]').value;    
+                if(typeof _this.callbackSaveConfig == 'function')
+                {
+                    _this.callbackSaveConfig({
+                        primaryKeyDataType: _this.primaryKeyDataType,
+                        primaryKeyDataLength: _this.primaryKeyDataLength,
+                        defaultDataType: _this.defaultDataType,
+                        defaultDataLength: _this.defaultDataLength,
+                    });
+                }
             } 
         });
 
-        document.querySelector('[name="primary_key_type"]').value = _this.defaultDataType;
-        document.querySelector('[name="primary_key_length"]').value = _this.defaultDataLength;
-        document.querySelector('[name="column_type"]').value = _this.primaryKeyDataType;
-        document.querySelector('[name="column_length"]').value = _this.primaryKeyDataLength;
+        document.querySelector('[name="primary_key_type"]').value = _this.primaryKeyDataType;
+        document.querySelector('[name="primary_key_length"]').value = _this.primaryKeyDataLength;
+        document.querySelector('[name="column_type"]').value = _this.defaultDataType;
+        document.querySelector('[name="column_length"]').value = _this.defaultDataLength;
 
     }
 
@@ -1488,24 +1496,24 @@ class EntityEditor {
         modal.style.display = 'block';
 
         // Remove existing event listeners to prevent duplicates
-        okBtn.removeEventListener('click', handleOkClick);
-        cancelBtn.removeEventListener('click', handleCancelClick);
+        okBtn.removeEventListener('click', handleOkConfig);
+        cancelBtn.removeEventListener('click', handleCancelConfig);
 
         // Define the event listener for OK button
-        function handleOkClick() {
+        function handleOkConfig() {
             modal.style.display = 'none';
             callback(true);  // Execute callback with 'true' if OK is clicked
         }
 
         // Define the event listener for Cancel button
-        function handleCancelClick() {
+        function handleCancelConfig() {
             modal.style.display = 'none';
             callback(false);  // Execute callback with 'false' if Cancel is clicked
         }
 
         // Add event listeners for OK and Cancel buttons
-        okBtn.addEventListener('click', handleOkClick);
-        cancelBtn.addEventListener('click', handleCancelClick);
+        okBtn.addEventListener('click', handleOkConfig);
+        cancelBtn.addEventListener('click', handleCancelConfig);
     }
 
 }

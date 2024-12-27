@@ -2224,7 +2224,7 @@ else {
     <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="lib.assets/js/import-structure.min.js"></script>
+    <script src="lib.assets/js/import-structure.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
