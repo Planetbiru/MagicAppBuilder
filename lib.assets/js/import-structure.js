@@ -144,12 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
             defaultDataLength: 50,
             primaryKeyDataType: 'BIGINT',
             primaryKeyDataLength: 20,
+            
             callbackLoadEntity: function(){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);         
+                fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
+                fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);         
             }, 
             callbackSaveEntity: function (entities){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -170,8 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-                console.log(template)
                 sendTemplateToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
+            },
+            callbackSaveConfig: function (template){
+                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                sendConfigToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
             }
         }
     );
@@ -368,9 +376,98 @@ function fetchTemplateFromServer(applicationId, databaseType, databaseName, data
 
 
 /**
+ * Sends data to the server using the POST method with URL-encoded format.
+ * 
+ * @param {string} applicationId - The application ID to be sent.
+ * @param {string} databaseType - The type of database being used.
+ * @param {string} databaseName - The name of the database being used.
+ * @param {string} databaseSchema - The schema of the database being used.
+ * @param {Array} config - The list of entities to be sent to the server.
+ */
+function sendConfigToServer(applicationId, databaseType, databaseName, databaseSchema, config) {
+    const data = {
+        applicationId: applicationId,
+        databaseType: databaseType,
+        databaseName: databaseName,
+        databaseSchema: databaseSchema,
+        config: JSON.stringify(config) 
+    };
+
+    const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
+    const url = buildUrl('config', applicationId, databaseType, databaseName, databaseSchema, '');
+
+    xhr.open('POST', url, true); // Open a POST connection to the server
+
+    // Set the header to send data in URL-encoded format
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    // Handle the server response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {  // Check if the request is complete
+            if (xhr.status === 200) {  // Check if the response is successful (status 200)
+                // Response received successfully
+            } else {
+                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+            }
+        }
+    };
+
+
+    // Prepare data in URL-encoded format
+    const urlEncodedData = new URLSearchParams(data).toString();
+
+    // Send the data in URL-encoded format
+    xhr.send(urlEncodedData);
+}
+
+/**
+ * Fetches data from the server using the GET method with the provided parameters.
+ * 
+ * @param {string} applicationId - The application ID being used.
+ * @param {string} databaseType - The type of database being used.
+ * @param {string} databaseName - The name of the database being used.
+ * @param {string} databaseSchema - The schema of the database being used.
+ * @param {Array} config - The list of entities to be fetched.
+ * @param {Function} callback - The callback function that will be called after the data is fetched.
+ */
+function fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema, config, callback) {
+    
+    const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
+    const url = buildUrl('config', applicationId, databaseType, databaseName, databaseSchema, '');
+    // Construct the URL with query parameters
+
+    xhr.open('GET', url, true); // Open a GET connection to the server
+    // Handle the server response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {  // Check if the request is complete
+            if (xhr.status === 200) {  // Check if the response is successful (status 200)
+                const response = xhr.responseText;  // Get the response from the server
+                try {
+                    const parsedData = JSON.parse(response);  // Try to parse the JSON response
+                    
+                    editor.defaultDataType = parsedData.defaultDataType + '';
+                    editor.defaultDataLength = parsedData.defaultDataLength + '';
+                    editor.primaryKeyDataType = parsedData.primaryKeyDataType + '';
+                    editor.primaryKeyDataLength = parsedData.primaryKeyDataLength + ''; 
+                } catch (err) {
+                    console.error(err)
+                }
+            } else {
+                console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200
+            }
+        }
+    };
+
+    // Send the GET request to the server
+    xhr.send();
+}
+
+
+
+/**
  * Builds the URL for the GET request by appending query parameters.
  * 
- * @param {string} type - 'entity' or 'template'
+ * @param {string} type - 'entity', 'config' or 'template'
  * @param {string} applicationId - The application ID being used.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -384,6 +481,10 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
     {
         return `lib.ajax/load-template-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     }
+    else if(type == 'config')
+    {
+        return `lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+    } 
     else
     {
         return `lib.ajax/load-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
