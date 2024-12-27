@@ -1423,17 +1423,47 @@ class EntityEditor {
         cancelBtn.addEventListener('click', handleCancelClick);
     }
 
-    createDataTypeOption(name)
+    /**
+     * Creates a dropdown (select) option with MySQL data types and binds it to the given name.
+     * 
+     * @param {string} name - The name for the select input field.
+     * @param {string} selectorLength - The selector for the length input field.
+     * 
+     * @returns {string} - The HTML string for the dropdown (select) element.
+     */
+    createDataTypeOption(name, selectorLength)
     {
         let html = '';
-        html += `<select name="${name}">\r\n`;
+        html += `<select name="${name}" onchange="editor.setDefaultLength(this, '${selectorLength}')">\r\n`;
         this.mysqlDataTypes.forEach((type, index) => {
             html += `<option value="${type}">${type}</option>\r\n`;
         });
         html += `</select>`;
         return html;
     }
+    
+    /**
+     * Sets the default length for the selected data type in the given element.
+     * 
+     * @param {HTMLElement} element - The select input element for the data type.
+     * @param {string} selectorLength - The selector for the length input field.
+     * 
+     * @returns {void}
+     */
+    setDefaultLength(element, selectorLength)
+    {
+        let type = element.value;
+        if(typeof this.defaultLength[type] != 'undefined')
+        {
+            document.querySelector(selectorLength).value = this.defaultLength[type];
+        }
+    }
 
+    /**
+     * Displays the preference settings dialog and handles saving the user's preferences.
+     * 
+     * @returns {void}
+     */
     preference()
     {
         let _this = this;
@@ -1442,19 +1472,19 @@ class EntityEditor {
                 <tbody>
                     <tr>
                         <td>Primary Key Type</td>
-                        <td>${_this.createDataTypeOption('primary_key_type')}</td>
+                        <td>${_this.createDataTypeOption('primary_key_type', '#primary_key_length')}</td>
                     </tr>
                     <tr>
                         <td>Primary Key Length</td>
-                        <td><input type="text" name="primary_key_length" value=""></td>
+                        <td><input type="text" name="primary_key_length" id="primary_key_length" value=""></td>
                     </tr>
                     <tr>
                         <td>Column Type</td>
-                        <td>${_this.createDataTypeOption('column_type')}</td>
+                        <td>${_this.createDataTypeOption('column_type', '#column_length')}</td>
                     </tr>
                     <tr>
                         <td>Column Length</td>
-                        <td><input type="text" name="column_length" value=""></td>
+                        <td><input type="text" name="column_length" id="column_length" value=""></td>
                     </tr>
                 </tbody>
             </table>
@@ -1483,6 +1513,17 @@ class EntityEditor {
 
     }
 
+    /**
+     * Displays a settings dialog for configuring various preferences.
+     * 
+     * @param {string} message - The content (HTML) to be displayed inside the modal.
+     * @param {string} title - The title of the dialog.
+     * @param {string} captionOk - The label for the OK button.
+     * @param {string} captionCancel - The label for the Cancel button.
+     * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
+     * 
+     * @returns {void}
+     */
     showSettingDialog(message, title, captionOk, captionCancel, callback) {
         // Get modal and buttons
         const modal = document.querySelector('#settingModal');
