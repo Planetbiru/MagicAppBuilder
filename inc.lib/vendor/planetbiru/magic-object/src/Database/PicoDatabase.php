@@ -1057,6 +1057,33 @@ class PicoDatabase // NOSONAR
     }
 
     /**
+     * Retrieves the time zone used by the database.
+     *
+     * This function calls the `getTimeZone()` method from the `databaseCredentials`
+     * object to fetch the time zone configured for the database connection.
+     *
+     * @return string The time zone of the database (e.g., "UTC", "America/New_York").
+     */
+    public function getDatabaseTimeZone()
+    {
+        return $this->databaseCredentials->getTimeZone();
+    }
+
+    /**
+     * Retrieves the time zone offset of the database connection.
+     *
+     * This function retrieves the time zone offset by calling the static method
+     * `getTimeZoneOffset()` with the `databaseConnection` as an argument.
+     * The offset is returned in seconds from UTC.
+     *
+     * @return string The time zone offset, typically in hours and minutes (e.g., "+02:00").
+     */
+    public function getDatabaseTimeZoneOffset()
+    {
+        return self::getTimeZoneOffset($this->databaseConnection);
+    }
+
+    /**
      * Convert the object to a JSON string representation for debugging.
      *
      * This method is intended for debugging purposes only and provides 
