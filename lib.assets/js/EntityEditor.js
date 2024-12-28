@@ -589,8 +589,8 @@ class EntityEditor {
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
      */
     addColumn(focus = false) {
-        let entityName = document.querySelector(this.selector+" .entity-name").value;
-        let count = document.querySelectorAll(this.selector+" .column-name").length;
+        let entityName = document.querySelector(this.selector+" .entity-container .entity-name").value;
+        let count = document.querySelectorAll(this.selector+" .entity-container .column-name").length;
         let countStr = count <= 0 ? '' : count + 1;
         let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
         let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
