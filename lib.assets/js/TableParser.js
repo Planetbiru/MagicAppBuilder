@@ -21,7 +21,7 @@ class TableParser {
      * Initializes the type list for valid SQL column types.
      */
     init() {
-        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL';
+        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL,TIME,UUID,MONEY,BLOB,BIT,JSON';
         this.typeList = typeList.split(',');
     }
 
@@ -73,31 +73,30 @@ class TableParser {
      * @returns {Object} An object containing table name and columns, along with primary key information.
      */
     parseTable(sql) // NOSONAR
-    {
-
+    { 
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+numeric\s*\(.*\))/gim; // NOSONAR
+        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+serial8|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+numeric\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i;
         let rg_set = /set\s*\(([^)]+)\)/i;
         let rg_not_null = /not\s+null/i;
         let rg_pk = /primary\s+key/i;
-        let rg_fld_def = /default\s+(.+)/i;
+        let rg_fld_def = /default\s+([^'"]+|'[^']*'|\"[^\"]*\")\s*(comment\s+'[^']*')?/i; // Updated regex
+        let rg_fld_comment = /COMMENT\s*'([^']*)'/i; // Updated regex
         let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi; // NOSONAR
-
+    
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
-
+    
         let fieldList = [];
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
-
-
+    
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
             let line = f;
-
+    
             // Reset regex for field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
@@ -107,7 +106,7 @@ class TableParser {
             let isPk = false;
             let enumValues = null;
             let enumArray = null;
-
+    
             if (rg_enum.test(dataTypeRaw)) {
                 enumValues = rg_enum.exec(dataTypeRaw)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
@@ -116,41 +115,46 @@ class TableParser {
                 enumValues = rg_set.exec(dataTypeRaw)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
             }
-
+    
             if (this.isValidType(dataType.toString()) || this.isValidType(dataTypeOriginal.toString())) {
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
-
+    
                 isPk = rg_pk.test(attr2) || this.isPrimaryKey(line);
                 let isAi = this.isAutoIncrement(line);
-
+    
                 let def = rg_fld_def.exec(attr2);
-                let comment = null;
-                if (def && def.length > 0) {
-                    def = def[1].trim();
-                    if (def.toLowerCase().includes('comment')) {
-                        comment = def.substring(def.indexOf('comment')); // NOSONAR
-                    }
-                } else {
-                    def = null;
-                }
+                let defaultValue = def && def[1] ? def[1].trim() : null;
 
+                defaultValue = this.fixDefaultValue(defaultValue);
+
+    
+                // Ensure COMMENT is handled separately
+                let cmn = rg_fld_comment.exec(attr2);
+    
+                let comment = cmn && cmn[1] ? cmn[1].trim() : null;
+
+
+                
+                dataType = dataType.trim();
 
                 let length = this.getLength(attr);
 
+    
                 let columnName = fld_def.groups.fname.trim();
                 if (isPk) primaryKeyList.push(columnName);
                 if (!this.inArray(columnList, columnName)) {
                     fieldList.push({
                         'Field': columnName,
-                        'Type': dataType.trim(),
+                        'Type': dataType,
                         'Length': length,
                         'Key': isPk,
                         'Nullable': nullable,
-                        'Default': def,
+                        'Default': defaultValue, // Only include the default value (no COMMENT)
                         'AutoIncrement': isAi,
-                        'EnumValues': enumArray
+                        'EnumValues': enumArray,
+                        'Comment': comment // Store the comment separately
                     });
                     columnList.push(columnName);
                 }
@@ -162,7 +166,7 @@ class TableParser {
                     primaryKey = matched ? matched[1] : null;
                 }
             }
-
+    
             if (primaryKey != null) {
                 primaryKey = primaryKey.split('(').join('').split(')').join('');
                 for (let i in fieldList) {
@@ -171,7 +175,7 @@ class TableParser {
                     }
                 }
             }
-
+    
             if (rg_pk2.test(f) && rg_pk.test(f)) {
                 let x = f.replace(f.match(rg_pk)[0], ''); // NOSONAR
                 x = x.replace('(', '').replace(')', '');
@@ -183,13 +187,94 @@ class TableParser {
                 }
             }
         }
-
+    
         if (primaryKey == null) {
             primaryKey = primaryKeyList[0];
         }
-
+    
         return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
     }
+
+    /**
+     * Fixes and normalizes default values in SQL statements to ensure they are in the correct format.
+     * This function handles various cases, including NULL values, string literals, numbers, SQL functions, 
+     * date literals, boolean values, and special SQL functions like CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
+     * and CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP.
+     *
+     * @param {string} defaultValue - The input default value as a string to be fixed.
+     * @returns {string|null} - A normalized default value string or null if no valid default value is provided.
+     */
+    fixDefaultValue(defaultValue)
+    {
+        if (defaultValue) {
+            // Case 1: Handle 'DEFAULT NULL'
+            if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
+                defaultValue = 'NULL'; // Correctly treat it as a string "NULL" without quotes
+            }
+            // Case 2: Handle numbers (integers or floats) and ensure no quotes
+            else if (this.isNumber(defaultValue)) {
+                defaultValue = "'"+defaultValue.toString()+"'"; // Numeric values are valid as-is (no quotes needed)
+            }
+            // Case 3: Handle SQL functions like CURRENT_TIMESTAMP
+            else if (/^(CURRENT_TIMESTAMP|NOW\(\))$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
+            }
+            // Case 4: Handle date/time literals (e.g., '2021-01-01')
+            else if (defaultValue.startsWith("'") && defaultValue.endsWith("'") && /\d{4}-\d{2}-\d{2}/.test(defaultValue.slice(1, -1))) {
+                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; // Normalize date literals (date only)
+            }
+            // Case 5: Handle datetime literals (e.g., '2021-01-01 00:00:00')
+            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(defaultValue)) {
+                defaultValue = "'"+defaultValue+"'" // Normalize datetime literals
+            }
+            // Case 6: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
+            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/.test(defaultValue)) {
+                defaultValue = "'"+defaultValue+"'" // Normalize datetime with microseconds
+            }
+            // Case 7: Handle other possible types (e.g., boolean TRUE/FALSE)
+            else if (/^(TRUE|FALSE)$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize booleans
+            }
+            // Case 8: Handle CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            else if (/^CURRENT_TIMESTAMP\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
+            }
+            // Case 9: Handle CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP
+            else if (/^CURRENT_TIMESTAMP\s+ON\s+INSERT\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
+            }
+            // Case 10: Handle string literals (e.g., 'some text')
+            else if (isInQuotes(defaultValue)) {
+                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
+            }
+        } else {
+            defaultValue = null; // If no default value, set it to null
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Checks if the given string is enclosed in single quotes.
+     * 
+     * @param {string} defaultValue - The string to check.
+     * @returns {boolean} - Returns true if the string starts and ends with single quotes, otherwise false.
+     */
+    isInQuotes(defaultValue)
+    {
+        return defaultValue.startsWith("'") && defaultValue.endsWith("'");
+    }
+
+    /**
+     * Checks if the given value is a valid number.
+     * 
+     * @param {string|any} defaultValue - The value to check.
+     * @returns {boolean} - Returns true if the value is a number (not NaN) and not an empty string, otherwise false.
+     */
+    isNumber(defaultValue)
+    {
+        return !isNaN(defaultValue) && defaultValue !== '';
+    }
+
 
     /**
      * Extracts the length of a column type if specified (e.g., VARCHAR(255)).
@@ -224,7 +309,6 @@ class TableParser {
         const parsedResult = this.parseSQL(sql);
         for(let i in parsedResult)
         {
-            console.log(parsedResult[i].query)
             let info = this.parseTable(parsedResult[i].query);
             inf.push(info);
         }

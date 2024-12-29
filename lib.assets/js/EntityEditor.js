@@ -112,10 +112,99 @@ class Column {
             } else if (numericTypes.includes(this.type) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
             } else {
-                columnDef += ` DEFAULT '${this.default}'`; // Default is a string, so use quotes
+                columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default)}`; // Default is a string, so use quotes
             }
         }
         return columnDef;
+    }
+
+    /**
+     * Fixes and normalizes default values in SQL column definitions to ensure they are in the correct format.
+     * This function handles various cases, including:
+     * - NULL values
+     * - Numeric literals (integers and floats)
+     * - SQL functions such as CURRENT_TIMESTAMP and NOW()
+     * - Date literals (e.g., '2021-01-01')
+     * - DateTime literals (e.g., '2021-01-01 00:00:00')
+     * - DateTime with microseconds literals (e.g., '2021-01-01 00:00:00.000000')
+     * - Boolean literals (TRUE/FALSE)
+     * - SQL expressions like CURRENT_TIMESTAMP ON UPDATE and CURRENT_TIMESTAMP ON INSERT
+     * - String literals (e.g., 'some text')
+     *
+     * The function ensures that the value is normalized and consistent with SQL standards.
+     *
+     * @param {string} defaultValue - The input default value as a string to be fixed and normalized.
+     * @returns {string|null} - A normalized default value string or null if no valid default value is provided.
+     */
+    fixDefaultColumnValue(defaultValue)
+    {
+        if (defaultValue) {
+            // Case 1: Handle 'DEFAULT NULL'
+            if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
+                defaultValue = 'NULL'; // Correctly treat it as a string "NULL" without quotes
+            }
+            // Case 2: Handle numbers (integers or floats) and ensure no quotes
+            else if (this.isNumber(defaultValue)) {
+                defaultValue = "'"+defaultValue.toString()+"'"; // Numeric values are valid as-is (no quotes needed)
+            }
+            // Case 3: Handle SQL functions like CURRENT_TIMESTAMP
+            else if (/^(CURRENT_TIMESTAMP|NOW\(\))$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
+            }
+            // Case 4: Handle date/time literals (e.g., '2021-01-01')
+            else if (defaultValue.startsWith("'") && defaultValue.endsWith("'") && /\d{4}-\d{2}-\d{2}/.test(defaultValue.slice(1, -1))) {
+                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; // Normalize date literals (date only)
+            }
+            // Case 5: Handle datetime literals (e.g., '2021-01-01 00:00:00')
+            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(defaultValue)) {
+                defaultValue = "'"+defaultValue+"'" // Normalize datetime literals
+            }
+            // Case 6: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
+            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/.test(defaultValue)) {
+                defaultValue = "'"+defaultValue+"'" // Normalize datetime with microseconds
+            }
+            // Case 7: Handle other possible types (e.g., boolean TRUE/FALSE)
+            else if (/^(TRUE|FALSE)$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize booleans
+            }
+            // Case 8: Handle CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            else if (/^CURRENT_TIMESTAMP\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
+            }
+            // Case 9: Handle CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP
+            else if (/^CURRENT_TIMESTAMP\s+ON\s+INSERT\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
+                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
+            }
+            // Case 10: Handle string literals (e.g., 'some text')
+            else if (isInQuotes(defaultValue)) {
+                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
+            }
+        } else {
+            defaultValue = null; // If no default value, set it to null
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Checks if the given string is enclosed in single quotes.
+     * 
+     * @param {string} defaultValue - The string to check.
+     * @returns {boolean} - Returns true if the string starts and ends with single quotes, otherwise false.
+     */
+    isInQuotes(defaultValue)
+    {
+        return defaultValue.startsWith("'") && defaultValue.endsWith("'");
+    }
+
+    /**
+     * Checks if the given value is a valid number.
+     * 
+     * @param {string|any} defaultValue - The value to check.
+     * @returns {boolean} - Returns true if the value is a number (not NaN) and not an empty string, otherwise false.
+     */
+    isNumber(defaultValue)
+    {
+        return !isNaN(defaultValue) && defaultValue !== '';
     }
 
     /**

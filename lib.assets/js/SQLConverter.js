@@ -78,7 +78,8 @@ class SQLConverter {
             "timestamp": "TIMESTAMPTZ",
             "json": "JSON",
             "enum": "ENUM",
-            "set": "SET"
+            "set": "SET",
+            "char": "CHAR"
         };
         
         this.dbToPostgreSQL = {
@@ -118,6 +119,10 @@ class SQLConverter {
      * @returns {string} The modified string with replacements.
      */
     replaceAll(str, search, replacement) {
+        if(typeof str == 'undefined')
+        {
+            return null;
+        }
         const regex = new RegExp(search, 'gi'); // 'i' for case-insensitive, 'g' for global
         return str.replace(regex, replacement);
     }
@@ -514,11 +519,29 @@ class SQLConverter {
                     colDef += this.getDefaultData(defaultValue, columnType);
                 }
             }
+            
+            if(table.columns[i].Comment != null)
+            {
+                colDef += ` COMMENT '${this.addslashes(table.columns[i].Comment)}'`;
+            }
+
             linesCol.push(colDef);
         }
         lines.push(linesCol.join(',\r\n'));
         lines.push(');');
         return lines.join('\r\n');
+    }
+
+    /**
+     * Escapes single quotes in a string by replacing them with two single quotes.
+     * This is commonly used for SQL-style escaping to prevent errors or SQL injection.
+     *
+     * @param {string} str - The input string containing single quotes to escape.
+     * @returns {string} - A new string with all single quotes replaced by two single quotes (SQL-style).
+     */
+    addslashes(str) {
+        // Replace single quotes with two single quotes (SQL-style escaping)
+        return str.replace(/'/g, "''");
     }
 
     /**
@@ -649,9 +672,10 @@ class SQLConverter {
             const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
             mysqlType = 'NUMERIC(' + (resultArray.join(', ')) + ')';
         }
-        if (mysqlType === 'VARCHAR' && length > 0) {
+        if ((mysqlType === 'VARCHAR' || mysqlType === 'CHAR') && length > 0) {
             mysqlType = mysqlType + '(' + length + ')';
         }
+
         return mysqlType;
     }
 
