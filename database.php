@@ -2047,6 +2047,7 @@ $limit = $builderConfig->getDataLimit(); // Rows per page
 // Determine application ID and check if it is from the default application
 if (empty($applicationId)) {
     $appId = $curApp->getId();
+    $applicationId = $appId;
     $fromDefaultApp = true;
 } else {
     $appId = $applicationId;
@@ -2219,8 +2220,8 @@ else {
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/entity-editor.css">
     <link rel="stylesheet" href="css/database-explorer.css">
-    <script src="lib.assets/js/TableParser.min.js"></script>
-    <script src="lib.assets/js/SQLConverter.min.js"></script>
+    <script src="lib.assets/js/TableParser.js"></script>
+    <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>

@@ -27,7 +27,7 @@ body {
 }
 .entity-editor .entities-container {
   margin: 0;
-  height: calc(100vh - 460px);
+  height: calc(100vh - 410px);
   min-height: 200px;
   overflow: auto;
 }

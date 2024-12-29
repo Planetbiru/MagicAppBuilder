@@ -19,7 +19,7 @@ class EntityRenderer {
         this.tables = {}; // Store the SVG elements for the tables
         this.betweenX  = 20;
         this.betweenY = 20;
-        this.tableWidth = 220; // Table width
+        this.tableWidth = 260; // Table width
         this.maxTop = 0; // To track the maximum top position of the last row
         this.maxCol = 0; // The maximum number of columns in any table (used to wrap rows)
         this.lastMaxCol = 0; // The previous maximum column count for row wrapping

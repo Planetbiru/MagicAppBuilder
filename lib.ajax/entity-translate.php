@@ -25,6 +25,7 @@ if($inputPost->getUserAction() == 'get')
 
         if($inputPost->getEntityName())
         {
+            
             $entityName = $inputPost->getEntityName();
             $className = "\\".$baseEntity."\\".$entityName;
             $entityName = trim($entityName);
@@ -36,8 +37,10 @@ if($inputPost->getUserAction() == 'get')
             {
                 $langs->loadIniFile($pathTrans);
             }
+            
             if(file_exists($path))
             {
+                
                 $return_var = ErrorChecker::errorCheck($cacheDir, $path);
                 
                 if($return_var == 0)

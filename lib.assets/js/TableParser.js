@@ -21,7 +21,7 @@ class TableParser {
      * Initializes the type list for valid SQL column types.
      */
     init() {
-        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL';
+        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL';
         this.typeList = typeList.split(',');
     }
 
@@ -74,11 +74,9 @@ class TableParser {
      */
     parseTable(sql) // NOSONAR
     {
-        let arr = sql.split(";");
-        sql = arr[0];
 
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+numeric\s*\(.*\))/gim; // NOSONAR
+        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+bigserial.*|\w+\s+serial.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+numeric\s*\(.*\))/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i;
         let rg_set = /set\s*\(([^)]+)\)/i;
@@ -94,6 +92,7 @@ class TableParser {
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
+
 
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
@@ -136,6 +135,7 @@ class TableParser {
                 } else {
                     def = null;
                 }
+
 
                 let length = this.getLength(attr);
 
@@ -219,15 +219,115 @@ class TableParser {
      * @param {string} sql The SQL string containing multiple CREATE TABLE statements.
      */
     parseAll(sql) {
+
         let inf = [];
-        let result;
-        let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gi; // NOSONAR
-        while ((result = rg_tb.exec(sql)) != null) {
-            let sub = sql.substring(result.index);
-            let info = this.parseTable(sub);
+        const parsedResult = this.parseSQL(sql);
+        for(let i in parsedResult)
+        {
+            console.log(parsedResult[i].query)
+            let info = this.parseTable(parsedResult[i].query);
             inf.push(info);
         }
         this.tableInfo = inf;
+    }
+
+    /**
+     * Parses a SQL script by splitting it into individual queries, handling comments, 
+     * whitespace, and custom delimiters. It returns an array of query objects with 
+     * each SQL query and its associated delimiter.
+     *
+     * @param {string} sql - The SQL script as a string.
+     * @returns {Array} - An array of objects, where each object contains a `query` (the SQL statement) 
+     *                    and `delimiter` (the delimiter used for the query).
+     */
+    parseSQL(sql) {
+        sql = sql.replace(/\n/g, "\r\n");
+        sql = sql.replace(/\r\r\n/g, "\r\n");
+    
+        let arr = sql.split("\r\n");
+        let arr2 = [];
+    
+        arr.forEach((val) => {
+            val = val.trim();
+            if (!val.startsWith("-- ") && val !== "--" && val !== "") {
+                arr2.push(val);
+            }
+        });
+    
+        arr = arr2;
+        let append = 0;
+        let skip = 0;
+        let start = 1;
+        let nquery = -1;
+        let delimiter = ";";
+        let queryArray = [];
+        let delimiterArray = [];
+    
+        arr.forEach((text) => {
+            if (text === "") {
+                if (append === 1) {
+                    queryArray[nquery] += "\r\n";
+                }
+            }
+    
+            if (append === 0) {
+                if (text.trim().startsWith("--")) {
+                    skip = 1;
+                    nquery++;
+                    start = 1;
+                    append = 0;
+                } else {
+                    skip = 0;
+                }
+            }
+    
+            if (skip === 0) {
+                if (start === 1) {
+                    nquery++;
+                    queryArray[nquery] = "";
+                    delimiterArray[nquery] = delimiter;
+                    start = 0;
+                }
+    
+                queryArray[nquery] += text + "\r\n";
+                delimiterArray[nquery] = delimiter;
+                text = text.trim();
+                start = text.length - delimiter.length - 1;
+    
+                if (text.substring(start).includes(delimiter) || text === delimiter) {
+                    nquery++;
+                    start = 1;
+                    append = 0;
+                } else {
+                    start = 0;
+                    append = 1;
+                }
+    
+                delimiterArray[nquery] = delimiter;
+    
+                if (text.toLowerCase().startsWith("delimiter ")) {
+                    text = text.trim().replace(/\s+/g, " ");
+                    let arr2 = text.split(" ");
+                    delimiter = arr2[1];
+                    nquery++;
+                    delimiterArray[nquery] = delimiter;
+                    start = 1;
+                    append = 0;
+                }
+            }
+        });
+    
+        let result = [];
+        queryArray.forEach((sql, line) => {
+            let delimiter = delimiterArray[line];
+            if (!sql.toLowerCase().startsWith("delimiter ")) {
+                sql = sql.trim();
+                sql = sql.substring(0, sql.length - delimiter.length);
+                result.push({ query: sql, delimiter: delimiter });
+            }
+        });
+    
+        return result;
     }
 
     /**
