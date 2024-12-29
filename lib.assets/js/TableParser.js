@@ -81,8 +81,8 @@ class TableParser {
         let rg_set = /set\s*\(([^)]+)\)/i;
         let rg_not_null = /not\s+null/i;
         let rg_pk = /primary\s+key/i;
-        let rg_fld_def = /default\s+([^'"]+|'[^']*'|\"[^\"]*\")\s*(comment\s+'[^']*')?/i; // Updated regex
-        let rg_fld_comment = /COMMENT\s*'([^']*)'/i; // Updated regex
+        let rg_fld_def = /default\s+([^'"]+|'[^']*'|\"[^\"]*\")\s*(comment\s+'[^']*')?/i; // NOSONAR
+        let rg_fld_comment = /COMMENT\s*'([^']*)'/i; // NOSONAR
         let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi; // NOSONAR
     
         let result = rg_tb.exec(sql);
@@ -244,7 +244,7 @@ class TableParser {
                 defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
             }
             // Case 10: Handle string literals (e.g., 'some text')
-            else if (isInQuotes(defaultValue)) {
+            else if (this.isInQuotes(defaultValue)) {
                 defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
             }
         } else {

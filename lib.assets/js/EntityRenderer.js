@@ -352,30 +352,58 @@ class EntityRenderer {
      * @param {number} index - The index of the foreign key column in the entity's columns.
      */
     createRelationship(entity, col, index) {
-        const refEntityName = col.name.replace("_id", "");
-        const referenceEntity = this.getEntityByName(refEntityName);
+        let refEntityName = col.name.replace("_id", "");
+        let referenceEntity = this.getEntityByName(refEntityName);
         if(referenceEntity != null)
         {
-            const refIndex = this.getColumnIndex(referenceEntity, col.name);
+            let refIndex = this.getColumnIndex(referenceEntity, col.name);
 
-            const fromTable = this.tables[entity.name].table;
-            const toTable = this.tables[refEntityName].table;
+            let fromTable = this.tables[entity.name].table;
+            let toTable = this.tables[refEntityName].table;
 
-            const y1 = (index * this.columnHeight) + this.tables[entity.name].yPos + 35;
-            const y2 = (refIndex * this.columnHeight) + this.tables[refEntityName].yPos + 35;
-            const x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")) + this.tableWidth;
-            const x2 = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
+            let y1 = (index * this.columnHeight) + this.tables[entity.name].yPos + 36;
+            let x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")) + this.tableWidth;
 
-            // Draw a line between the two tables to represent the relationship
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            let x4 = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
+            let y4 = (refIndex * this.columnHeight) + this.tables[refEntityName].yPos + 36;
 
-            line.setAttribute("x1", x1);
-            line.setAttribute("y1", y1);
-            line.setAttribute("x2", x2);
-            line.setAttribute("y2", y2);
-            line.setAttribute("stroke", "#2E4C95");
-            line.setAttribute("stroke-width", this.relationStrokeWidth);
-            this.svg.appendChild(line);
+            let circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            let circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+            x1 = x1 - 4;
+            x4 = x4 + 4;
+
+
+            let x2 = x1 + 8;
+            let x3 = x4 - 8;
+
+            let y2 = y1;
+            let y3 = y4;
+
+            circle1.setAttribute("cx", x1);
+            circle1.setAttribute("cy", y1);
+            circle1.setAttribute("r", 3);
+            circle1.setAttribute("fill", "#2A56BD");
+
+            circle2.setAttribute("cx", x4);
+            circle2.setAttribute("cy", y4);
+            circle2.setAttribute("r", 3);
+            circle2.setAttribute("fill", "#CC0088");
+
+            this.svg.appendChild(circle1);
+            this.svg.appendChild(circle2);
+
+            // Draw a path between the two tables to represent the relationship
+            let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+            let pathData = `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4}`;
+            path.setAttribute("d", pathData);
+            path.setAttribute("stroke", "#2E4C95");
+            path.setAttribute("stroke-width", this.relationStrokeWidth);
+            path.setAttribute("fill", "transparent"); // Ensures the path is not filled with color
+
+            this.svg.appendChild(path);
+
         }
     }
 

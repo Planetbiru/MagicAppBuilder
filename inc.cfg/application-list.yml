@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: false
+    selected: true
     architecture: monolith
 -
     id: sipro
@@ -67,7 +67,7 @@
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
-    selected: true
+    selected: false
 -
     id: tukang
     name: Tukang

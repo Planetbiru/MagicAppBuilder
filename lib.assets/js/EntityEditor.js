@@ -176,7 +176,7 @@ class Column {
                 defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
             }
             // Case 10: Handle string literals (e.g., 'some text')
-            else if (isInQuotes(defaultValue)) {
+            else if (this.isInQuotes(defaultValue)) {
                 defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
             }
         } else {
