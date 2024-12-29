@@ -3,7 +3,6 @@
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
-use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
 require_once dirname(__DIR__) . "/inc.app/sessions.php";

@@ -2372,7 +2372,7 @@ else {
                                 <button class="btn" onclick="editor.saveTemplate()">Save Template</button>
                                 <button class="btn" onclick="editor.cancelEditTemplate()">Cancel</button>
                                 <div class="table-container">
-                                    <table id="table-template-editor">
+                                    <table id="table-template-editor" class="table-template-editor">
                                         <thead>
                                             <tr>
                                                 <th class="column-action"></th>

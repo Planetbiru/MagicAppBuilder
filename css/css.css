@@ -456,6 +456,12 @@ h3.entity-table-name {
 .application-card > div {
   margin-bottom: 1rem;
 }
+.application-card .card-body {
+  padding-bottom: 0.8rem;
+}
+.application-card .card-body .btn {
+  margin-bottom: 0.45rem;
+}
 
 .application-container .card .card-text {
   overflow: hidden;

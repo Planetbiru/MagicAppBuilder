@@ -559,8 +559,18 @@ h3.entity-table-name {
 	margin-bottom: 20px;
 }
 
-.application-card > div {
-	margin-bottom: 1rem;
+.application-card
+{
+	& > div {
+		margin-bottom: 1rem;
+	}
+	.card-body
+	{
+		padding-bottom: 0.8rem;
+		.btn{
+			margin-bottom: 0.45rem;
+		}
+	}
 }
 
 .application-container .card .card-text{

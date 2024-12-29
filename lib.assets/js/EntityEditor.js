@@ -154,7 +154,7 @@ class Column {
         let result = defaultValue;
     
         if (this.isTypeBoolean(type, length)) {
-            result = (defaultValue !== 0 && defaultValue.toString().toLowerCase() === 'true') ? 'true' : 'false';
+            result = (defaultValue != 0 && defaultValue.toString().toLowerCase() === 'true') ? 'true' : 'false';
         } else if (this.isNativeValue(defaultValue)) {
             result = defaultValue;
         } else if (this.isTypeText(type)) {
@@ -721,12 +721,12 @@ class EntityEditor {
      */
     saveTemplate() {
         const columns = [];
-        const columnNames = document.querySelectorAll(this.selector + " #table-template-editor .column-name");
-        const columnTypes = document.querySelectorAll(this.selector + " #table-template-editor .column-type");
-        const columnNullables = document.querySelectorAll(this.selector + " #table-template-editor .column-nullable");
-        const columnDefaults = document.querySelectorAll(this.selector + " #table-template-editor .column-default");
-        const columnLengths = document.querySelectorAll(this.selector + " #table-template-editor .column-length");
-        const columnEnums = document.querySelectorAll(this.selector + " #table-template-editor .column-enum");
+        const columnNames = document.querySelectorAll(this.selector + " .table-template-editor .column-name");
+        const columnTypes = document.querySelectorAll(this.selector + " .table-template-editor .column-type");
+        const columnNullables = document.querySelectorAll(this.selector + " .table-template-editor .column-nullable");
+        const columnDefaults = document.querySelectorAll(this.selector + " .table-template-editor .column-default");
+        const columnLengths = document.querySelectorAll(this.selector + " .table-template-editor .column-length");
+        const columnEnums = document.querySelectorAll(this.selector + " .table-template-editor .column-enum");
 
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
