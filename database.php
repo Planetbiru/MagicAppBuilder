@@ -2223,7 +2223,7 @@ else {
     <script src="lib.assets/js/TableParser.js"></script>
     <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/EntityRenderer.js"></script>
+    <script src="lib.assets/js/EntityRenderer.min.js"></script>
     <script src="lib.assets/js/ResizablePanel.min.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
 </head>
