@@ -1710,7 +1710,11 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isInteger($type)
     {
-        return stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0;
+        return stripos($type, 'tinyint') === 0 
+        || stripos($type, 'smallint') === 0 
+        || stripos($type, 'mediumint') === 0 
+        || stripos($type, 'bigint') === 0 
+        || stripos($type, 'int') === 0;
     }
 
     /**
@@ -1724,7 +1728,10 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isFloat($type)
     {
-        return stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0;
+        return stripos($type, 'float') === 0 
+        || stripos($type, 'double') === 0 
+        || stripos($type, 'real') === 0 
+        || stripos($type, 'decimal') === 0;
     }
 
     /**
@@ -2169,7 +2176,10 @@ class DatabaseExplorer // NOSONAR
 
         // Add the last query if any
         if (!empty($currentQuery)) {
-            $queries[] = array('query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 'delimiter' => $delimiter);
+            $queries[] = array(
+                'query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 
+                'delimiter' => $delimiter
+            );
         }
 
         return $queries;
