@@ -1095,6 +1095,10 @@ class EntityEditor {
             // Append the created list item to the table list
             tabelList.appendChild(entityCb);
         });
+        
+        let count = this.entities.length;
+        let countStr = count > 0 ? `(${count})` : ``;
+        document.querySelector(this.selector + " .entity-count").textContent = countStr;
 
         // Ensure that previously selected entities are checked
         selectedEntity.forEach(value => {

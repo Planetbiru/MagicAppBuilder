@@ -2317,7 +2317,7 @@ else {
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all</label></div>
+                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all <span class="entity-count"></span></label></div>
                             <ul class="table-list"></ul>
                             <textarea class="query-generated" spellcheck="false"></textarea>
                         </div>
