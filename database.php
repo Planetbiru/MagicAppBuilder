@@ -2002,14 +2002,28 @@ class DatabaseExplorer // NOSONAR
             $space = $dom->createTextNode(' ');
             $form->appendChild($space);
 
-            // Create insertData button
-            $insertData = $dom->createElement('button');
-            $insertData->setAttribute('type', 'button');
-            $insertData->setAttribute('class', ConstantText::BTN_PRIMARY);
-            $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=insert-form'");
+            if($inputGet->getAction() == 'insert-form')
+            {
+                // Create viewData button
+                $insertData = $dom->createElement('button');
+                $insertData->setAttribute('type', 'button');
+                $insertData->setAttribute('class', ConstantText::BTN_PRIMARY);
+                $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table'");
 
-            $insertData->appendChild($dom->createTextNode('Insert Data'));
-            $form->appendChild($insertData);
+                $insertData->appendChild($dom->createTextNode('View Data'));
+                $form->appendChild($insertData);
+            }
+            else
+            {
+                // Create insertData button
+                $insertData = $dom->createElement('button');
+                $insertData->setAttribute('type', 'button');
+                $insertData->setAttribute('class', ConstantText::BTN_PRIMARY);
+                $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=insert-form'");
+
+                $insertData->appendChild($dom->createTextNode('Insert Data'));
+                $form->appendChild($insertData);
+            }
         }
 
         // Append form to DOM
