@@ -75,7 +75,7 @@ class ResizablePanels {
                 localStorage.setItem(this.localStorageKey, leftPanelWidth);
             }
 
-            editor.renderEntities(); // Assuming this function is from a larger context
+            
         }
     }
 
@@ -86,6 +86,7 @@ class ResizablePanels {
         this.isResizing = false;
         document.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
         document.removeEventListener('mouseup', () => this.stopResizing());
+        editor.renderEntities(); // Assuming this function is from a larger context
     }
 
     /**
