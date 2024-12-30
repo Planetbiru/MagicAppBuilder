@@ -12,10 +12,11 @@ class EntityRenderer {
     /**
      * Creates an instance of the ERDGenerator, initializing properties for rendering an Entity-Relationship Diagram (ERD).
      * 
-     * @param {SVGElement} svgElement - The SVG element to which the generated ERD (tables and relationships) will be appended.
+     * @param {string} selector - The SVG element selector to which the generated ERD (tables and relationships) will be appended.
      */
-    constructor(svgElement) {
-        this.svg = svgElement; // The SVG element to render the ERD
+    constructor(selector) {
+        this.selector = selector;
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
         this.tables = {}; // Store the SVG elements for the tables
 
         this.xPadding = 5;
@@ -67,6 +68,7 @@ class EntityRenderer {
      *   If `true`, the method will create relationship lines between the tables after placing them.
      */
     createERD(data, width, drawRelationship) {
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
         this.lastMaxCol = 0;
         this.maxCol = 0;
         this.svg.innerHTML = '';
@@ -133,6 +135,7 @@ class EntityRenderer {
         {
             this.createRelationships();
         }
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
     }
 
     /**

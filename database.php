@@ -2223,8 +2223,8 @@ else {
     <script src="lib.assets/js/TableParser.js"></script>
     <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/EntityRenderer.min.js"></script>
-    <script src="lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="lib.assets/js/EntityRenderer.js"></script>
+    <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
 </head>
 
@@ -2332,8 +2332,7 @@ else {
                             <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
                             <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
                             <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
-                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
-                            <button class="btn" onclick="editor.preference()">Preferences</button>
+                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
@@ -2346,6 +2345,7 @@ else {
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
                                 <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
+                                <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
                                 <div class="table-container">
                                     <table id="table-entity-editor">

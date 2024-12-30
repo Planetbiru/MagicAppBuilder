@@ -525,6 +525,7 @@ class EntityEditor {
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
     addDomListeners() {
+        let _this = this;
         document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
@@ -541,7 +542,7 @@ class EntityEditor {
                 this.exportToSQL();
             }
         });
-        let _this = this;
+        
         document.addEventListener('change', function (event) {
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
@@ -588,6 +589,27 @@ class EntityEditor {
                 
             } else {
                 console.log("Please select a JSON file first.");
+            }
+        });
+        
+        this.initIconEvent();
+    }
+    
+    initIconEvent()
+    {
+        let _this = this;
+        renderer.svg.addEventListener('click', function(e) {
+            if (e.target.closest('.erd-svg .move-down-icon')) {
+                _this.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .move-up-icon')) {
+                _this.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .edit-icon')) {
+                _this.editEntity(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .delete-icon')) {
+                _this.deleteEntity(parseInt(e.target.getAttribute('data-index')))
             }
         });
     }
@@ -1074,9 +1096,18 @@ class EntityEditor {
         if (updatedWidth == 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
+        
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
         renderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
+    }
+    
+    refreshEntities()
+    {
+        let _this = this;
+        setTimeout(function(){
+            _this.renderEntities();
+        }, 1);
     }
 
     /**

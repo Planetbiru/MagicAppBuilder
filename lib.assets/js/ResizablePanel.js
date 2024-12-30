@@ -12,6 +12,7 @@ class ResizablePanels {
      */
     constructor(selector, leftPanelSelector, rightPanelSelector, resizeBarSelector, minWidth = 100) {
         this.selector = selector;
+        this.element = document.querySelector(this.selector);
         this.leftPanel = document.querySelector(selector + " " + leftPanelSelector);
         this.rightPanel = document.querySelector(selector + " " + rightPanelSelector);
         this.resizeBar = document.querySelector(selector + " " + resizeBarSelector);
@@ -34,16 +35,7 @@ class ResizablePanels {
         this.loadPanelWidth();
     }
 
-    /**
-     * Start the resizing process when the mouse is pressed down on the resize bar.
-     * @param {MouseEvent} e - The mouse down event.
-     */
-    startResizing(e) {
-        this.isResizing = true;
-        this.lastDownX = e.clientX;
-        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        document.addEventListener('mouseup', () => this.stopResizing());
-    }
+    
 
     /**
      * Handle the mouse movement during resizing.
@@ -78,15 +70,46 @@ class ResizablePanels {
             
         }
     }
+    
+    disableSelection(element)
+    {
+        element.style.webkitUserSelect = 'none'; // Safari
+        element.style.mozUserSelect = 'none';    // Firefox
+        element.style.msUserSelect = 'none';     // IE/Edge
+        element.style.userSelect = 'none';       // Standard
+    }
+    
+    enableSelection(element)
+    {
+        element.style.webkitUserSelect = 'auto'; // Safari
+        element.style.mozUserSelect = 'auto';    // Firefox
+        element.style.msUserSelect = 'auto';     // IE/Edge
+        element.style.userSelect = 'auto';       // Standard
+    }
+    
+    /**
+     * Start the resizing process when the mouse is pressed down on the resize bar.
+     * @param {MouseEvent} e - The mouse down event.
+     */
+    startResizing(e) {
+        this.isResizing = true;
+        this.lastDownX = e.clientX;
+        this.disableSelection(this.leftPanel);
+        this.disableSelection(this.rightPanel);
+        this.element.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.element.addEventListener('mouseup', () => this.stopResizing());
+    }
 
     /**
      * Stop the resizing process when the mouse is released.
      */
     stopResizing() {
         this.isResizing = false;
-        document.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
-        document.removeEventListener('mouseup', () => this.stopResizing());
-        editor.renderEntities(); // Assuming this function is from a larger context
+        this.element.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.element.removeEventListener('mouseup', () => this.stopResizing());
+        editor.refreshEntities();
+        this.enableSelection(this.leftPanel);
+        this.enableSelection(this.rightPanel);
     }
 
     /**
