@@ -378,8 +378,8 @@ class EntityRenderer {
             x1 = x1 - 4;
             x4 = x4 + 4;
 
-            let x2 = x1 + 8;
-            let x3 = x4 - 8;
+            let x2 = x1 + 6;
+            let x3 = x4 - 6;
             let y2 = y1;
             let y3 = y4;
 
