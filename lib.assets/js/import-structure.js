@@ -127,8 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
     const toggles = document.querySelectorAll('.collapsible .button-toggle');
-    let svg = document.querySelector(".erd-svg");
-    renderer = new EntityRenderer(svg);
+    renderer = new EntityRenderer(".erd-svg");
 
     // Attach event listeners to each toggle button
     toggles.forEach(function(toggle) {
@@ -184,20 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.erd-svg .move-down-icon')) {
-            editor.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
-        }
-        if (e.target.closest('.erd-svg .move-up-icon')) {
-            editor.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
-        }
-        if (e.target.closest('.erd-svg .edit-icon')) {
-            editor.editEntity(parseInt(e.target.getAttribute('data-index')))
-        }
-        if (e.target.closest('.erd-svg .delete-icon')) {
-            editor.deleteEntity(parseInt(e.target.getAttribute('data-index')))
-        }
-    });
+    
     
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container

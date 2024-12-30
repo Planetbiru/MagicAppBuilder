@@ -12,13 +12,18 @@ class EntityRenderer {
     /**
      * Creates an instance of the ERDGenerator, initializing properties for rendering an Entity-Relationship Diagram (ERD).
      * 
-     * @param {SVGElement} svgElement - The SVG element to which the generated ERD (tables and relationships) will be appended.
+     * @param {string} selector - The SVG element selector to which the generated ERD (tables and relationships) will be appended.
      */
-    constructor(svgElement) {
-        this.svg = svgElement; // The SVG element to render the ERD
+    constructor(selector) {
+        this.selector = selector;
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
         this.tables = {}; // Store the SVG elements for the tables
-        this.betweenX  = 20;
-        this.betweenY = 20;
+
+        this.xPadding = 5;
+        this.yPadding = 5;
+
+        this.betweenX  = 24;
+        this.betweenY = 24;
         this.tableWidth = 260; // Table width
         this.maxTop = 0; // To track the maximum top position of the last row
         this.maxCol = 0; // The maximum number of columns in any table (used to wrap rows)
@@ -63,13 +68,14 @@ class EntityRenderer {
      *   If `true`, the method will create relationship lines between the tables after placing them.
      */
     createERD(data, width, drawRelationship) {
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
         this.lastMaxCol = 0;
         this.maxCol = 0;
         this.svg.innerHTML = '';
         this.data = data; // The input data structure containing the entities, columns, and relationships
         this.svg.setAttribute('width', width); // Set the width of the SVG canvas
-        let xOffset = 1;
-        let yOffset = 1;
+        let xOffset = this.xPadding;
+        let yOffset = this.yPadding;
         let xPos = xOffset; // Initial horizontal position for the first table
         let yPos = yOffset; // Initial vertical position for the first table
         let maxMod = 0;
@@ -118,9 +124,10 @@ class EntityRenderer {
             height = height - this.betweenY;
         }
 
-        this.svg.setAttribute('height', height - 2); // Set the SVG height to fit all tables
+        let finalWidth = (2 * this.xPadding) + (maxMod * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
+        let finalHeight = (2 * this.yPadding) + height - 2;
 
-        let finalWidth = (maxMod * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
+        this.svg.setAttribute('height', finalHeight);
         this.svg.setAttribute('width', finalWidth);
 
         // Create the relationships (lines) between tables
@@ -128,6 +135,7 @@ class EntityRenderer {
         {
             this.createRelationships();
         }
+        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
     }
 
     /**
@@ -373,10 +381,8 @@ class EntityRenderer {
             x1 = x1 - 4;
             x4 = x4 + 4;
 
-
-            let x2 = x1 + 8;
-            let x3 = x4 - 8;
-
+            let x2 = x1 + 6;
+            let x3 = x4 - 6;
             let y2 = y1;
             let y3 = y4;
 
@@ -398,7 +404,7 @@ class EntityRenderer {
 
             let pathData = `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4}`;
             path.setAttribute("d", pathData);
-            path.setAttribute("stroke", "#2E4C95");
+            path.setAttribute("stroke", "#2A56BD");
             path.setAttribute("stroke-width", this.relationStrokeWidth);
             path.setAttribute("fill", "transparent"); // Ensures the path is not filled with color
 

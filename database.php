@@ -25,6 +25,7 @@ class ConstantText
 {
     const SHOW_TABLES = "SHOW TABLES";
     const BTN_SUCCESS = 'btn btn-success';
+    const BTN_PRIMARY = 'btn btn-primary';
 }
 
 /**
@@ -1214,7 +1215,7 @@ class DatabaseExplorer // NOSONAR
                 $tr = $dom->createElement('tr');
                 $id = isset($primaryKeyName) && isset($row[$primaryKeyName]) ? $row[$primaryKeyName] : '';
                 $a = $dom->createElement('a');
-                $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=edit-form&id=$id");
+                $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=update-form&id=$id");
                 $a->appendChild($dom->createTextNode("✏️"));
                 $td = $dom->createElement('td');
                 $td->setAttribute('class', 'cell-edit');
@@ -1349,7 +1350,7 @@ class DatabaseExplorer // NOSONAR
      *
      * @throws DataException If there is an error retrieving the data or if no data is found for the given ID.
      */
-    public static function editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
+    public static function updateData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
     {
         $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -1384,7 +1385,7 @@ class DatabaseExplorer // NOSONAR
             $form = $dom->createElement('form');
             $form->setAttribute('method', 'POST');
             $form->setAttribute('action', $referer);
-            $form->setAttribute('class', 'edit-form');
+            $form->setAttribute('class', 'update-form');
 
             // Add hidden input for table name
             $inputId1 = $dom->createElement('input');
@@ -1502,7 +1503,148 @@ class DatabaseExplorer // NOSONAR
             $dom->appendChild($form);
             return $dom->saveHTML();
         } catch (Exception $e) {
-            return "Error: " . $e->getMessage();
+            return self::ERROR . $e->getMessage();
+        }
+    }
+
+    /**
+     * Generates an HTML form to create new data for a specific row in the table.
+     *
+     * This function generates an HTML form for inserting new data into a database table. The form is dynamically created
+     * using a two-column layout, where the first column contains labels for each field and the second column contains 
+     * input fields (typically text inputs or textareas). The form is built using the DOMDocument class.
+     * 
+     * The form includes hidden inputs for the table name, primary key name, and a list of columns. It also provides 
+     * buttons to submit the form or go back to the previous page.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $applicationId The identifier of the application requesting the data.
+     * @param string $databaseName The name of the database being queried.
+     * @param string $schemaName The name of the schema (if applicable) in the database.
+     * @param string $table The name of the table for which the form is being created.
+     *
+     * @return string The HTML form as a string, or an error message if something goes wrong.
+     *
+     * @throws DataException If there is an error retrieving the data or if no data is found for the given table.
+     */
+    public static function insertData($pdo, $applicationId, $databaseName, $schemaName, $table)
+    {
+        $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
+        $dom = new DOMDocument('1.0', 'utf-8');
+        
+        try {
+            $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+            if(!isset($referer) || empty($referer))
+            {
+                $referer = '';
+                $backLink = "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&page=1";
+            }
+            else
+            {
+                $backLink = $referer;
+            }
+
+            $columnRows = self::getColumnInfo($pdo, $schemaName, $table);
+
+            // Create form container
+            $form = $dom->createElement('form');
+            $form->setAttribute('method', 'POST');
+            $form->setAttribute('action', $referer);
+            $form->setAttribute('class', 'update-form');
+
+            // Add hidden input for table name
+            $inputId1 = $dom->createElement('input');
+            $inputId1->setAttribute('type', 'hidden');
+            $inputId1->setAttribute('name', '___table_name___');
+            $inputId1->setAttribute('value', htmlspecialchars($table));
+
+            // Add hidden input for primary key name
+            $inputId2 = $dom->createElement('input');
+            $inputId2->setAttribute('type', 'hidden');
+            $inputId2->setAttribute('name', '___primary_key_name___');
+            $inputId2->setAttribute('value', htmlspecialchars($primaryKeyName));
+            
+            $form->appendChild($inputId1);
+            $form->appendChild($inputId2);
+
+            // Add title
+            $h3 = $dom->createElement('h3', "New Data for $table");
+            $form->appendChild($h3);
+
+            // Start the table
+            $tableElem = $dom->createElement('table');
+            $tableElem->setAttribute('class', 'two-side-table');
+            $tableElem->setAttribute('border', '1');
+            
+            $columnNames = [];
+
+            // Loop through the row data to create form fields
+            foreach ($columnRows as $value) {
+                $key = $value['Field'];
+                $columnNames[] = $key;
+                $tr = $dom->createElement('tr');
+
+                // First column - Label
+                $tdLabel = $dom->createElement('td');
+                $label = $dom->createElement('label', htmlspecialchars($key));
+                $label->setAttribute('for', htmlspecialchars($key));
+                $tdLabel->appendChild($label);
+                $tr->appendChild($tdLabel);
+
+                // Second column - Textarea field
+                $tdInput = $dom->createElement('td');
+
+                $type = isset($value['Type']) ? $value['Type'] : 'text';
+                $input = self::getEditor($dom, $key, '', $type);
+                if($primaryKeyName == $key)
+                {
+                    $input->setAttribute('required', 'required');
+                }
+                
+                $tdInput->appendChild($input);
+                $tr->appendChild($tdInput);
+
+                // Append row to the table
+                $tableElem->appendChild($tr);
+                
+            }
+
+            // Append the table to the form
+            $form->appendChild($tableElem);
+
+            // Add hidden input for primary key value
+            $inputId4 = $dom->createElement('input');
+            $inputId4->setAttribute('type', 'hidden');
+            $inputId4->setAttribute('name', '___column_list___');
+            $inputId4->setAttribute('value', htmlspecialchars(implode(",", $columnNames)));
+            $form->appendChild($inputId4);
+            
+            // Add the submit button
+            $inputSubmit = $dom->createElement('input');
+            $inputSubmit->setAttribute('type', 'submit');
+            $inputSubmit->setAttribute('name', 'insert');
+            $inputSubmit->setAttribute('value', 'Insert');
+            $inputSubmit->setAttribute('class', ConstantText::BTN_SUCCESS);
+            $form->appendChild($inputSubmit);
+            
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form->appendChild($space);
+            
+            // Add the back button
+            $inputBack = $dom->createElement('input');
+            $inputBack->setAttribute('type', 'button');
+            $inputBack->setAttribute('name', 'back');
+            $inputBack->setAttribute('value', 'Back');
+            $inputBack->setAttribute('class', 'btn btn-secondary');
+            $inputBack->setAttribute('onclick', "window.location='$backLink'");
+            $form->appendChild($inputBack);
+
+            // Return the form's HTML
+            $dom->appendChild($form);
+            return $dom->saveHTML();
+        } catch (Exception $e) {
+            return self::ERROR . $e->getMessage();
         }
     }
 
@@ -1568,7 +1710,11 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isInteger($type)
     {
-        return stripos($type, 'tinyint') === 0 || stripos($type, 'smallint') === 0 || stripos($type, 'mediumint') === 0 || stripos($type, 'bigint') === 0 || stripos($type, 'int') === 0;
+        return stripos($type, 'tinyint') === 0 
+        || stripos($type, 'smallint') === 0 
+        || stripos($type, 'mediumint') === 0 
+        || stripos($type, 'bigint') === 0 
+        || stripos($type, 'int') === 0;
     }
 
     /**
@@ -1582,7 +1728,10 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isFloat($type)
     {
-        return stripos($type, 'float') === 0 || stripos($type, 'double') === 0 || stripos($type, 'real') === 0 || stripos($type, 'decimal') === 0;
+        return stripos($type, 'float') === 0 
+        || stripos($type, 'double') === 0 
+        || stripos($type, 'real') === 0 
+        || stripos($type, 'decimal') === 0;
     }
 
     /**
@@ -1803,15 +1952,10 @@ class DatabaseExplorer // NOSONAR
 
         $tableName = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
         $databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $schemaName = $inputGet->getSchemaName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $table = $inputGet->getTable(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
-        $exportTable = $dom->createElement('button');
-        $exportTable->setAttribute('type', 'submit');
-        $exportTable->setAttribute('name', '___export_table___');
-        $exportTable->setAttribute('value', $tableName);
-        $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);
-        $exportTable->appendChild($dom->createTextNode('Export Table'));
-        $form->appendChild($exportTable);
-        
         // Add space between buttons
         $space = $dom->createTextNode(' ');
         $form->appendChild($space);
@@ -1824,19 +1968,6 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->setAttribute('class', ConstantText::BTN_SUCCESS);
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
         $form->appendChild($exportDatabase);
-        
-        // Add space between buttons
-        $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
-
-        // Create exportTableStructure button (Export Structure Tabel)
-        $exportTableStructure = $dom->createElement('button');
-        $exportTableStructure->setAttribute('type', 'submit');
-        $exportTableStructure->setAttribute('name', '___export_table_structure___');
-        $exportTableStructure->setAttribute('value', $tableName);
-        $exportTableStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
-        $exportTableStructure->appendChild($dom->createTextNode('Export Table Structure'));
-        $form->appendChild($exportTableStructure);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
@@ -1851,13 +1982,67 @@ class DatabaseExplorer // NOSONAR
         $exportDatabaseStructure->appendChild($dom->createTextNode('Export Database Structure'));
         $form->appendChild($exportDatabaseStructure);
 
+        if(!empty($table))
+        {
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form->appendChild($space);
+
+            // Create exportTableStructure button (Export Structure Tabel)
+            $exportTableStructure = $dom->createElement('button');
+            $exportTableStructure->setAttribute('type', 'submit');
+            $exportTableStructure->setAttribute('name', '___export_table_structure___');
+            $exportTableStructure->setAttribute('value', $tableName);
+            $exportTableStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
+            $exportTableStructure->appendChild($dom->createTextNode('Export Table Structure'));
+            $form->appendChild($exportTableStructure);
+
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form->appendChild($space);
+
+            $exportTable = $dom->createElement('button');
+            $exportTable->setAttribute('type', 'submit');
+            $exportTable->setAttribute('name', '___export_table___');
+            $exportTable->setAttribute('value', $tableName);
+            $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);
+            $exportTable->appendChild($dom->createTextNode('Export Table'));
+            $form->appendChild($exportTable);
+
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form->appendChild($space);
+
+            if($inputGet->getAction() == 'insert-form')
+            {
+                // Create viewData button
+                $insertData = $dom->createElement('button');
+                $insertData->setAttribute('type', 'button');
+                $insertData->setAttribute('class', ConstantText::BTN_PRIMARY);
+                $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table'");
+
+                $insertData->appendChild($dom->createTextNode('View Data'));
+                $form->appendChild($insertData);
+            }
+            else
+            {
+                // Create insertData button
+                $insertData = $dom->createElement('button');
+                $insertData->setAttribute('type', 'button');
+                $insertData->setAttribute('class', ConstantText::BTN_PRIMARY);
+                $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=insert-form'");
+
+                $insertData->appendChild($dom->createTextNode('Insert Data'));
+                $form->appendChild($insertData);
+            }
+        }
+
         // Append form to DOM
         $dom->appendChild($form);
 
         // Output the HTML
         return $dom->saveHTML();
     }
-
 
     /**
      * Executes a series of SQL queries and displays the results.
@@ -1991,7 +2176,10 @@ class DatabaseExplorer // NOSONAR
 
         // Add the last query if any
         if (!empty($currentQuery)) {
-            $queries[] = array('query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 'delimiter' => $delimiter);
+            $queries[] = array(
+                'query' => rtrim($currentQuery, PicoDatabaseUtil::INLINE_TRIM), 
+                'delimiter' => $delimiter
+            );
         }
 
         return $queries;
@@ -2161,19 +2349,34 @@ if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_t
     exit();
 }
 
-if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___primary_key_value___']) && isset($_POST['___column_list___']))
+if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) && isset($_POST['___column_list___']))
 {
     $tableName = $_POST['___table_name___'];
     $primaryKeyName = $_POST['___primary_key_name___'];
-    $primaryKeyValue = addslashes($_POST['___primary_key_value___']);
     $columnList = $_POST['___column_list___'];
     $columnNames = explode(",", $columnList);
-    $values = [];
-    foreach($columnNames as $key)
+
+    if(isset($_POST['___primary_key_value___']))
     {
-        $values[] = "$key = '".addslashes($_POST[$key])."'";
+        $primaryKeyValue = addslashes($_POST['___primary_key_value___']);
+        $values = [];
+        foreach($columnNames as $key)
+        {
+            $values[] = "$key = '".addslashes($_POST[$key])."'";
+        }
+        $query = "UPDATE $tableName SET \r\n\t".implode(", \r\n\t", $values)." \r\nWHERE $primaryKeyName = '".$primaryKeyValue."';";
     }
-    $query = "UPDATE $tableName SET \r\n\t".implode(", \r\n\t", $values)." \r\nWHERE $primaryKeyName = '".$primaryKeyValue."';";
+    else
+    {
+        $values = [];
+        foreach($columnNames as $key)
+        {
+            $values[$key] = "'".addslashes($_POST[$key])."'";
+        }
+        $field = implode(", ", array_keys($values));
+        $value = implode(", ", array_values($values));
+        $query = "INSERT INTO $tableName ($field) VALUES ($value)";
+    }
 }
 
 // Split and sanitize the query if it exists
@@ -2223,8 +2426,8 @@ else {
     <script src="lib.assets/js/TableParser.js"></script>
     <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/EntityRenderer.min.js"></script>
-    <script src="lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="lib.assets/js/EntityRenderer.js"></script>
+    <script src="lib.assets/js/ResizablePanel.js"></script>
     <script src="lib.assets/js/import-structure.js"></script>
 </head>
 
@@ -2254,10 +2457,14 @@ else {
         // Display table structure and data if a table is selected
         if ($table) {
             echo DatabaseExplorer::showTableStructure($pdo, $applicationId, $databaseName, $schemaName, $table);
-            if(isset($_GET['id']))
+            if(isset($_GET['action']) && $_GET['action'] == 'update-form' && isset($_GET['id']))
             {
                 $primaryKeyValue = addslashes($_GET['id']);
-                echo DatabaseExplorer::editData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue);
+                echo DatabaseExplorer::updateData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue);
+            }
+            else if(isset($_GET['action']) && $_GET['action'] == 'insert-form')
+            {
+                echo DatabaseExplorer::insertData($pdo, $applicationId, $databaseName, $schemaName, $table);
             }
             else
             {
@@ -2317,7 +2524,7 @@ else {
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all</label></div>
+                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all <span class="entity-count"></span></label></div>
                             <ul class="table-list"></ul>
                             <textarea class="query-generated" spellcheck="false"></textarea>
                         </div>
@@ -2332,8 +2539,7 @@ else {
                             <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
                             <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
                             <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
-                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>
-                            <button class="btn" onclick="editor.preference()">Preferences</button>
+                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
@@ -2346,6 +2552,7 @@ else {
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
                                 <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
+                                <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
                                 <div class="table-container">
                                     <table id="table-entity-editor">

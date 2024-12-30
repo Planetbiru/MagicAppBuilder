@@ -515,9 +515,6 @@ class EntityEditor {
         {
             this.callbackLoadTemplate();
         }
-
-        
-            
         this.template = {columns: []};
     }
 
@@ -525,6 +522,7 @@ class EntityEditor {
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
     addDomListeners() {
+        let _this = this;
         document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
@@ -541,7 +539,7 @@ class EntityEditor {
                 this.exportToSQL();
             }
         });
-        let _this = this;
+        
         document.addEventListener('change', function (event) {
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
@@ -584,10 +582,54 @@ class EntityEditor {
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
-    
-                
             } else {
                 console.log("Please select a JSON file first.");
+            }
+        });
+        
+        document.querySelector(this.selector).addEventListener('keypress', function(event){
+            if(event.key == 'Enter') 
+            {
+                if((event.target.closest('.entity-container .entity-name') || event.target.closest('.entity-container .column-name')))
+                {
+                    _this.addColumn(true);
+                }
+                else if(event.target.closest('.template-container .column-name'))
+                {
+                    _this.addColumnTemplate(true);
+                }
+            }
+        });
+        
+        this.initIconEvent();
+    }
+    
+    /**
+     * Initializes the event listeners for click events on various icons within the SVG.
+     * The event listener checks for specific icon classes within the SVG (e.g., move up, move down, edit, delete)
+     * and triggers the corresponding methods based on the target element that was clicked.
+     * 
+     * Event Listeners:
+     * - `move-down-icon`: Calls `moveEntityUp()` with the index of the clicked entity.
+     * - `move-up-icon`: Calls `moveEntityDown()` with the index of the clicked entity.
+     * - `edit-icon`: Calls `editEntity()` with the index of the clicked entity.
+     * - `delete-icon`: Calls `deleteEntity()` with the index of the clicked entity.
+     */
+    initIconEvent()
+    {
+        let _this = this;
+        renderer.svg.addEventListener('click', function(e) {
+            if (e.target.closest('.erd-svg .move-down-icon')) {
+                _this.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .move-up-icon')) {
+                _this.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .edit-icon')) {
+                _this.editEntity(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .delete-icon')) {
+                _this.deleteEntity(parseInt(e.target.getAttribute('data-index')))
             }
         });
     }
@@ -1053,6 +1095,10 @@ class EntityEditor {
             // Append the created list item to the table list
             tabelList.appendChild(entityCb);
         });
+        
+        let count = this.entities.length;
+        let countStr = count > 0 ? `(${count})` : ``;
+        document.querySelector(this.selector + " .entity-count").textContent = countStr;
 
         // Ensure that previously selected entities are checked
         selectedEntity.forEach(value => {
@@ -1074,9 +1120,18 @@ class EntityEditor {
         if (updatedWidth == 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
+        
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
         renderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
+    }
+    
+    refreshEntities()
+    {
+        let _this = this;
+        setTimeout(function(){
+            _this.renderEntities();
+        }, 1);
     }
 
     /**
