@@ -1596,6 +1596,10 @@ class DatabaseExplorer // NOSONAR
 
                 $type = isset($value['Type']) ? $value['Type'] : 'text';
                 $input = self::getEditor($dom, $key, '', $type);
+                if($primaryKeyName == $key)
+                {
+                    $input->setAttribute('required', 'required');
+                }
                 
                 $tdInput->appendChild($input);
                 $tr->appendChild($tdInput);
