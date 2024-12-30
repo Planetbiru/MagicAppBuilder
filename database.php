@@ -2646,5 +2646,21 @@ else {
             </div>
         </div>
     </div>
+
+    <div class="modal modal-sm" id="asyncAlert">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                Message
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary alert-ok">OK</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
