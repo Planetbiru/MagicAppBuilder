@@ -1503,7 +1503,7 @@ class DatabaseExplorer // NOSONAR
             $dom->appendChild($form);
             return $dom->saveHTML();
         } catch (Exception $e) {
-            return "Error: " . $e->getMessage();
+            return self::ERROR . $e->getMessage();
         }
     }
 
@@ -1640,7 +1640,7 @@ class DatabaseExplorer // NOSONAR
             $dom->appendChild($form);
             return $dom->saveHTML();
         } catch (Exception $e) {
-            return "Error: " . $e->getMessage();
+            return self::ERROR . $e->getMessage();
         }
     }
 
@@ -2347,7 +2347,7 @@ if(isset($_POST['___table_name___']) && isset($_POST['___primary_key_name___']) 
         }
         $field = implode(", ", array_keys($values));
         $value = implode(", ", array_values($values));
-        $query = "INSERT INTO $tableName ($field) VALUES($value)";
+        $query = "INSERT INTO $tableName ($field) VALUES ($value)";
     }
 }
 
