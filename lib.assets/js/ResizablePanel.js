@@ -71,6 +71,12 @@ class ResizablePanels {
         }
     }
     
+    /**
+     * Disables text selection on the specified element by setting the appropriate 
+     * CSS properties to prevent text selection in different browsers.
+     * 
+     * @param {HTMLElement} element - The DOM element on which text selection should be disabled.
+     */
     disableSelection(element)
     {
         element.style.webkitUserSelect = 'none'; // Safari
@@ -79,6 +85,12 @@ class ResizablePanels {
         element.style.userSelect = 'none';       // Standard
     }
     
+    /**
+     * Enables text selection on the specified element by resetting the CSS properties 
+     * that control text selection to their default behavior.
+     * 
+     * @param {HTMLElement} element - The DOM element on which text selection should be enabled.
+     */
     enableSelection(element)
     {
         element.style.webkitUserSelect = 'auto'; // Safari

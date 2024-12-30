@@ -515,9 +515,6 @@ class EntityEditor {
         {
             this.callbackLoadTemplate();
         }
-
-        
-            
         this.template = {columns: []};
     }
 
@@ -585,16 +582,39 @@ class EntityEditor {
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
-    
-                
             } else {
                 console.log("Please select a JSON file first.");
+            }
+        });
+        
+        document.querySelector(this.selector).addEventListener('keypress', function(event){
+            if(event.key == 'Enter') 
+            {
+                if((event.target.closest('.entity-container .entity-name') || event.target.closest('.entity-container .column-name')))
+                {
+                    _this.addColumn(true);
+                }
+                else if(event.target.closest('.template-container .column-name'))
+                {
+                    _this.addColumnTemplate(true);
+                }
             }
         });
         
         this.initIconEvent();
     }
     
+    /**
+     * Initializes the event listeners for click events on various icons within the SVG.
+     * The event listener checks for specific icon classes within the SVG (e.g., move up, move down, edit, delete)
+     * and triggers the corresponding methods based on the target element that was clicked.
+     * 
+     * Event Listeners:
+     * - `move-down-icon`: Calls `moveEntityUp()` with the index of the clicked entity.
+     * - `move-up-icon`: Calls `moveEntityDown()` with the index of the clicked entity.
+     * - `edit-icon`: Calls `editEntity()` with the index of the clicked entity.
+     * - `delete-icon`: Calls `deleteEntity()` with the index of the clicked entity.
+     */
     initIconEvent()
     {
         let _this = this;
