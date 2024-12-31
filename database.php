@@ -172,6 +172,7 @@ class DatabaseExporter
             {
                 $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['sql'];
+                $createTableSql = $this->formatSQL($createTableSql);
                 $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
                 $this->outputBuffer .= "$createTableSql;\n\n";
             }
@@ -287,6 +288,19 @@ class DatabaseExporter
         }
     }
 
+    /**
+     * Formats a SQL query string by:
+     * - Removing unnecessary spaces and normalizing spacing around commas and parentheses.
+     * - Ensuring the opening parenthesis of the `CREATE TABLE` or `CREATE TABLE IF NOT EXISTS` statement is placed correctly on the same line.
+     *
+     * This function is useful for cleaning up and standardizing SQL statements, especially when working with dynamically generated queries.
+     *
+     * @param string $sql The unformatted SQL query string to be formatted.
+     * @return string The formatted SQL query string with proper spacing and formatting.
+     */
+    private function formatSQL($sql) {
+        return trim(preg_replace('/CREATE TABLE( IF NOT EXISTS)?\s+([a-zA-Z0-9_]+)\s*\n\s*\(/', 'CREATE TABLE$1 $2 (', $sql));
+    }
 
     /**
      * Retrieves the column details for a given PostgreSQL table.

@@ -33,7 +33,7 @@ class SQLConverter {
             "longtext": "TEXT",
             "text": "TEXT",
             "datetime": "DATETIME", // SQLite stores datetime as DATETIME in ISO 8601 format
-            "timestamp": "DATETIME", // Same as datetime for SQLite
+            "timestamp": "TIMESTAMP", // Same as datetime for SQLite
             "date": "DATE",  // SQLite stores dates as DATE in ISO 8601 format
             "time": "TIME", // Same as datetime for SQLite
             "year": "INTEGER", // SQLite stores year as integer

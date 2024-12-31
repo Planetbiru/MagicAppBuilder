@@ -1707,6 +1707,7 @@ class EntityEditor {
         }
     }
 
+
     /**
      * Displays the preference settings dialog and handles saving the user's preferences.
      * 

@@ -304,10 +304,25 @@ class TableParser {
         const parsedResult = this.parseSQL(sql);
         for(let i in parsedResult)
         {
-            let info = this.parseTable(parsedResult[i].query);
+            let info = this.parseTable(this.formatSQL(parsedResult[i].query));
             inf.push(info);
         }
         this.tableInfo = inf;
+    }
+    
+    /**
+     * This function formats a SQL query string by:
+     * - Removing unnecessary spaces.
+     * - Normalizing spacing around commas and parentheses.
+     * - Ensuring that the opening parenthesis of the `CREATE TABLE` or `CREATE TABLE IF NOT EXISTS` statement is on the same line.
+     * 
+     * This is useful for cleaning and standardizing SQL statements, particularly for dynamically generated queries.
+     *
+     * @param {string} sql The unformatted SQL query string to be formatted.
+     * @return {string} The formatted SQL query string.
+     */
+    formatSQL(sql) {
+        return sql.replace(/CREATE TABLE( IF NOT EXISTS)?\s+([a-zA-Z0-9_]+)\s*\n\s*\(/, 'CREATE TABLE$1 $2 (');
     }
 
     /**
