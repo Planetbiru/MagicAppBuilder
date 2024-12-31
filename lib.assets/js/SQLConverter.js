@@ -27,7 +27,7 @@ class SQLConverter {
             "nvarchar": "NVARCHAR",
             "varchar": "NVARCHAR",
             "character varying": "NVARCHAR",
-            "char": "TEXT",
+            "char": "NVARCHAR",
             "tinytext": "TEXT",
             "mediumtext": "TEXT",
             "longtext": "TEXT",
@@ -45,7 +45,7 @@ class SQLConverter {
             "serial": "INTEGER",
             "bigserial": "INTEGER",
             "double precision": "REAL",
-            "timestamptz": "TEXT", // Same as timestamp but with timezone in SQLite
+            "timestamptz": "TIMESTAMP", // Same as timestamp but with timezone in SQLite
         };
 
         this.dbToMySQL = {
@@ -179,7 +179,7 @@ class SQLConverter {
             return this.toSqliteOut(table, targetType);
         } else if (this.isMySQL(targetType)) {
             return this.toMySQLOut(table, targetType);
-        } else if (this.isPGQSL(targetType)) {
+        } else if (this.isPGSQL(targetType)) {
             return this.toPostgreSQLOut(table, targetType);
         }
     }
@@ -289,7 +289,7 @@ class SQLConverter {
      * @param {string} targetType The database type (e.g., 'pgsql', 'postgresql').
      * @returns {boolean} True if the target type is PostgreSQL, otherwise false.
      */
-    isPGQSL(targetType)
+    isPGSQL(targetType)
     {
         return targetType === 'pgsql' 
             || targetType === 'postgresql';
@@ -417,7 +417,7 @@ class SQLConverter {
         if (this.isMySQL(targetType)) {
             tableName = '`' + tableName + '`';
         }
-        else if (this.isPGQSL(targetType)) {
+        else if (this.isPGSQL(targetType)) {
             tableName = '"' + tableName + '"';
         }
         return tableName;
@@ -782,7 +782,7 @@ class SQLConverter {
             let tableName = this.extractTableName(match[1]);
             
             // Format the table name based on the target database type
-            if(this.isPGQSL(targetType)) {
+            if(this.isPGSQL(targetType)) {
                 tableName = '"' + tableName + '"';
             } else if(this.isMySQL(targetType)) {
                 tableName = '`' + tableName + '`';
