@@ -216,8 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
     // Get modal and buttons
     const modal = document.querySelector('#asyncConfirm');
-    const okBtn = modal.querySelector('.confirm-ok');
-    const cancelBtn = modal.querySelector('.confirm-cancel');
+    let okBtn = modal.querySelector('.confirm-ok');
+    let cancelBtn = modal.querySelector('.confirm-cancel');
+    okBtn = removeAllEventListeners(okBtn);
+    cancelBtn = removeAllEventListeners(cancelBtn);
 
     modal.querySelector('.modal-header h3').innerHTML = title;
     modal.querySelector('.modal-body').innerHTML = message;
@@ -226,10 +228,6 @@ function showConfirmationDialog(message, title, captionOk, captionCancel, callba
 
     // Show the modal
     modal.style.display = 'block';
-
-    // Remove existing event listeners to prevent duplicates
-    okBtn.removeEventListener('click', handleOkClick);
-    cancelBtn.removeEventListener('click', handleCancelClick);
 
     // Define the event listener for OK button
     function handleOkClick() {
@@ -246,6 +244,21 @@ function showConfirmationDialog(message, title, captionOk, captionCancel, callba
     // Add event listeners for OK and Cancel buttons
     okBtn.addEventListener('click', handleOkClick);
     cancelBtn.addEventListener('click', handleCancelClick);
+}
+
+/**
+ * Removes all event listeners from the given element by replacing it with a cloned copy.
+ * The new element will be an exact copy of the original element, including its children and attributes,
+ * but without any event listeners attached.
+ *
+ * @param {HTMLElement} element - The DOM element from which event listeners will be removed.
+ * 
+ * @returns {HTMLElement} - The cloned element that is a replacement for the original element, without event listeners attached.
+ */
+function removeAllEventListeners(element) {
+    const newElement = element.cloneNode(true);  // clone the element with all children and attributes
+    element.parentNode.replaceChild(newElement, element);  // replace the old element with the new one
+    return newElement;  // return the cloned element
 }
 
 /**
