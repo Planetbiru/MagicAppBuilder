@@ -79,7 +79,6 @@ class ResizablePanels {
      */
     disableSelection(element)
     {
-        element.style.webkitUserSelect = 'none'; // Safari
         element.style.mozUserSelect = 'none';    // Firefox
         element.style.msUserSelect = 'none';     // IE/Edge
         element.style.userSelect = 'none';       // Standard
@@ -93,7 +92,6 @@ class ResizablePanels {
      */
     enableSelection(element)
     {
-        element.style.webkitUserSelect = 'auto'; // Safari
         element.style.mozUserSelect = 'auto';    // Firefox
         element.style.msUserSelect = 'auto';     // IE/Edge
         element.style.userSelect = 'auto';       // Standard
