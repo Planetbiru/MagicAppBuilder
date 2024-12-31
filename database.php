@@ -289,18 +289,49 @@ class DatabaseExporter
     }
 
     /**
-     * Formats a SQL query string by:
-     * - Removing unnecessary spaces and normalizing spacing around commas and parentheses.
-     * - Ensuring the opening parenthesis of the `CREATE TABLE` or `CREATE TABLE IF NOT EXISTS` statement is placed correctly on the same line.
+     * Formats an SQL string to ensure consistent indentation and spacing.
+     * Specifically, it:
+     * - Removes excess spaces.
+     * - Ensures "CREATE TABLE" is properly formatted.
+     * - Preserves and correctly formats "IF NOT EXISTS" if present.
+     * - Positions parentheses correctly.
+     * - Adds a new line after the opening parenthesis.
+     * - Ensures proper indentation for columns.
+     * - Ensures that the closing parenthesis is moved to the next line.
      *
-     * This function is useful for cleaning up and standardizing SQL statements, especially when working with dynamically generated queries.
-     *
-     * @param string $sql The unformatted SQL query string to be formatted.
-     * @return string The formatted SQL query string with proper spacing and formatting.
+     * @param string $sql The raw SQL string to format.
+     * @return string The formatted SQL string.
      */
     private function formatSQL($sql) {
-        return trim(preg_replace('/CREATE TABLE( IF NOT EXISTS)?\s+([a-zA-Z0-9_]+)\s*\n\s*\(/', 'CREATE TABLE$1 $2 (', $sql));
+        // Remove excess whitespace throughout the entire string
+        $sql = preg_replace('/\s+/i', ' ', $sql);
+
+        // Ensure "CREATE TABLE" is consistently formatted (with a single space after it)
+        $sql = preg_replace('/\bCREATE\s+TABLE\s+/i', 'CREATE TABLE ', $sql);
+
+        // Handle "IF NOT EXISTS" and preserve its format if present
+        $sql = preg_replace('/\bIF\s+NOT\s+EXISTS\s+/i', 'IF NOT EXISTS ', $sql);
+
+        // Ensure the opening parenthesis is correctly positioned (no spaces before it)
+        $sql = preg_replace('/\s*\(/', ' (', $sql);  // Remove spaces before the opening parenthesis
+
+        // Ensure the closing parenthesis and semicolon are correctly positioned
+        // Move the closing parenthesis to the next line
+        $sql = preg_replace('/\s*\)\s*;/', "\r\n);", $sql);  // Remove spaces after the closing parenthesis
+
+        // Add a new line and indentation after the opening parenthesis (only for the first '(' after the table name)
+        $sql = preg_replace('/\(\s*/', "(\n\t", $sql, 1);  // Add a new line after the first '('
+
+        // Ensure columns are separated with new lines and indented properly
+        // Add a newline and indentation after each comma separating columns
+        $sql = preg_replace('/,\s*/', ",\n\t", $sql);  // Ensure indentation after commas separating columns
+
+        // Add a new line before "CREATE TABLE" to improve the format
+        $sql = str_replace("CREATE TABLE", "\nCREATE TABLE", $sql);  // Add a new line before "CREATE TABLE"
+
+        return $sql;
     }
+
 
     /**
      * Retrieves the column details for a given PostgreSQL table.

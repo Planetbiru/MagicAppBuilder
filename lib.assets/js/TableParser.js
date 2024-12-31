@@ -311,19 +311,45 @@ class TableParser {
     }
     
     /**
-     * This function formats a SQL query string by:
-     * - Removing unnecessary spaces.
-     * - Normalizing spacing around commas and parentheses.
-     * - Ensuring that the opening parenthesis of the `CREATE TABLE` or `CREATE TABLE IF NOT EXISTS` statement is on the same line.
-     * 
-     * This is useful for cleaning and standardizing SQL statements, particularly for dynamically generated queries.
+     * Formats an SQL string to ensure consistent indentation and spacing.
+     * Specifically, it ensures that:
+     * - Extra spaces are removed.
+     * - `CREATE TABLE` is properly formatted.
+     * - `IF NOT EXISTS` (if present) is preserved and properly formatted.
+     * - Parentheses are correctly placed.
+     * - Columns are separated by line breaks with appropriate indentation.
      *
-     * @param {string} sql The unformatted SQL query string to be formatted.
-     * @return {string} The formatted SQL query string.
+     * @param {string} sql - The raw SQL string to format.
+     * @returns {string} - The formatted SQL string.
      */
     formatSQL(sql) {
-        return sql.replace(/CREATE TABLE( IF NOT EXISTS)?\s+([a-zA-Z0-9_]+)\s*\n\s*\(/, 'CREATE TABLE$1 $2 (');
+        // Remove excess whitespace throughout the entire string
+        sql = sql.replace(/\s+/g, ' ');
+
+        // Ensure "CREATE TABLE" is consistently formatted
+        sql = sql.replace(/\bCREATE\s+TABLE\s+/i, 'CREATE TABLE ');
+
+        // Handle and preserve "IF NOT EXISTS" if it exists, ensuring consistent formatting
+        sql = sql.replace(/\bIF\s+NOT\s+EXISTS\s+/i, 'IF NOT EXISTS ');
+
+        // Ensure parentheses are positioned correctly by removing any extra spaces before the opening parenthesis
+        sql = sql.replace(/\s*\(/, ' (');  // Remove spaces before opening parenthesis
+
+        // Ensure there are no extra spaces after the closing parenthesis and move the closing parenthesis to a new line
+        sql = sql.replace(/\s*\)\s*;/, "\r\n);");  // Remove spaces after closing parenthesis and ensure it moves to the next line
+
+        // Add a new line after the first opening parenthesis to separate the columns
+        sql = sql.replace(/\(\s*/, "(\n\t", sql);  // Add a new line after the first '(' to format columns
+
+        // Ensure that columns are separated by line breaks and indented properly
+        sql = sql.replace(/,\s*/g, ",\n\t");  // Add new lines and indentation after commas separating columns
+
+        // Add a new line before "CREATE TABLE" to ensure proper formatting
+        sql = sql.replace("CREATE TABLE", "\nCREATE TABLE", sql);  // Add a new line before CREATE TABLE to start fresh
+
+        return sql;
     }
+
 
     /**
      * Parses a SQL script by splitting it into individual queries, handling comments, 
