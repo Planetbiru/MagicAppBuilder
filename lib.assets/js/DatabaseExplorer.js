@@ -183,7 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
-    
+    document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
+        event.preventDefault();
+        showConfirmationDialog('Are you sure you want to execute the query?', 'Execute Query Confirmation', 'Yes', 'No', function(isConfirmed) {
+            if (isConfirmed) {
+                event.target.closest('form').submit();  // Submit the form containing the button
+            } 
+        });
+    });
     
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container
@@ -193,6 +200,66 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
 
 });
+
+/**
+ * Displays a confirmation dialog with OK and Cancel buttons.
+ * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
+ * 
+ * @param {string} message - The message to display in the dialog.
+ * @param {string} title - The title of the dialog.
+ * @param {string} captionOk - The label for the OK button.
+ * @param {string} captionCancel - The label for the Cancel button.
+ * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
+ * 
+ * @returns {void} - This function does not return a value.
+ */
+function showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
+    // Get modal and buttons
+    const modal = document.querySelector('#asyncConfirm');
+    let okBtn = modal.querySelector('.confirm-ok');
+    let cancelBtn = modal.querySelector('.confirm-cancel');
+    okBtn = removeAllEventListeners(okBtn);
+    cancelBtn = removeAllEventListeners(cancelBtn);
+
+    modal.querySelector('.modal-header h3').innerHTML = title;
+    modal.querySelector('.modal-body').innerHTML = message;
+    okBtn.innerHTML = captionOk;
+    cancelBtn.innerHTML = captionCancel;
+
+    // Show the modal
+    modal.style.display = 'block';
+
+    // Define the event listener for OK button
+    function handleOkClick() {
+        modal.style.display = 'none';
+        callback(true);  // Execute callback with 'true' if OK is clicked
+    }
+
+    // Define the event listener for Cancel button
+    function handleCancelClick() {
+        modal.style.display = 'none';
+        callback(false);  // Execute callback with 'false' if Cancel is clicked
+    }
+
+    // Add event listeners for OK and Cancel buttons
+    okBtn.addEventListener('click', handleOkClick);
+    cancelBtn.addEventListener('click', handleCancelClick);
+}
+
+/**
+ * Removes all event listeners from the given element by replacing it with a cloned copy.
+ * The new element will be an exact copy of the original element, including its children and attributes,
+ * but without any event listeners attached.
+ *
+ * @param {HTMLElement} element - The DOM element from which event listeners will be removed.
+ * 
+ * @returns {HTMLElement} - The cloned element that is a replacement for the original element, without event listeners attached.
+ */
+function removeAllEventListeners(element) {
+    const newElement = element.cloneNode(true);  // clone the element with all children and attributes
+    element.parentNode.replaceChild(newElement, element);  // replace the old element with the new one
+    return newElement;  // return the cloned element
+}
 
 /**
  * Sends data to the server using the POST method with URL-encoded format.

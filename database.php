@@ -2428,7 +2428,7 @@ else {
     <script src="lib.assets/js/EntityEditor.js"></script>
     <script src="lib.assets/js/EntityRenderer.js"></script>
     <script src="lib.assets/js/ResizablePanel.js"></script>
-    <script src="lib.assets/js/import-structure.js"></script>
+    <script src="lib.assets/js/DatabaseExplorer.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -2643,6 +2643,22 @@ else {
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" id="asyncAlert">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                Message
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary alert-ok">OK</button>
             </div>
         </div>
     </div>

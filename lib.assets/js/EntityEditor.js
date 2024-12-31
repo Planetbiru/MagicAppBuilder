@@ -459,6 +459,8 @@ class EntityEditor {
             primaryKeyDataType: 'VARCHAR',
             primaryKeyDataLength: '40'
         };
+        this.keyWords = 'absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,view,when,whenever,where,with,without,work,write,year,zone'.split(',');
+
 
         // Copy properties from options to setting object
         Object.assign(this.setting, options);
@@ -592,17 +594,66 @@ class EntityEditor {
             {
                 if((event.target.closest('.entity-container .entity-name') || event.target.closest('.entity-container .column-name')))
                 {
-                    _this.addColumn(true);
+                    _this.addColumnIfValid(event.target);
                 }
                 else if(event.target.closest('.template-container .column-name'))
                 {
-                    _this.addColumnTemplate(true);
+                    _this.addColumnTemplateIfValid(event.target);
                 }
             }
         });
         
         this.initIconEvent();
     }
+
+    /**
+     * Checks if the value of the input element is a reserved keyword.
+     * If the value is reserved, shows an alert and prevents further input.
+     * If the value is not reserved, proceeds to add a column.
+     *
+     * @param {HTMLElement} element - The input element whose value is to be checked.
+     */
+    addColumnIfValid(element) {
+        // Convert the input value to lowercase for case-insensitive comparison
+        const value = element.value.toLowerCase(); 
+
+        // Check if the value is included in the reserved keywords list (case-insensitive)
+        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {  
+            // Show an alert if the word is reserved
+            this.showAlertDialog(`The word "${element.value}" is reserved and cannot be used. Please choose another one.`, `Reserved Word`, `Close`, function(){
+                // Select the input text for the user to correct it
+                element.select();
+            });
+        } else {
+            // Proceed to add a column if the value is not a reserved keyword
+            this.addColumn(true);
+        }
+    }
+
+    /**
+     * Checks if the value of the input element is a reserved keyword.
+     * If the value is reserved, shows an alert and prevents further input.
+     * If the value is not reserved, proceeds to add a column.
+     *
+     * @param {HTMLElement} element - The input element whose value is to be checked.
+     */
+    addColumnTemplateIfValid(element) {
+        // Convert the input value to lowercase for case-insensitive comparison
+        const value = element.value.toLowerCase(); 
+
+        // Check if the value is included in the reserved keywords list (case-insensitive)
+        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {  
+            // Show an alert if the word is reserved
+            this.showAlertDialog(`The word "${element.value}" is reserved and cannot be used. Please choose another one.`, `Reserved Word`, `Close`, function(){
+                // Select the input text for the user to correct it
+                element.select();
+            });
+        } else {
+            // Proceed to add a column if the value is not a reserved keyword
+            this.addColumnTemplate(true);
+        }
+    }
+
     
     /**
      * Initializes the event listeners for click events on various icons within the SVG.
@@ -1351,7 +1402,7 @@ class EntityEditor {
      * and generates a `.sql` file for download. The filename will include a datetime suffix to avoid 
      * overwriting files.
      * 
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     downloadSQL() {
         let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -1439,7 +1490,7 @@ class EntityEditor {
      * @param {File} file - The SQL file object to be imported.
      * @param {Function} [callback] - Optional callback function to be executed after the entities are updated. 
      *                                The callback will receive the updated entities as its argument.
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     importSQLFile(file, callback) {
         let _this = this;
@@ -1488,7 +1539,7 @@ class EntityEditor {
      * Then, it constructs a data object containing these values and the current list of entities from
      * the editor, and passes it to the `exportJSON` method to export the data as a JSON file.
      * 
-     * @returns {void} 
+     * @returns {void} - This function does not return a value. 
      */
     downloadEntities() {
         let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -1521,6 +1572,45 @@ class EntityEditor {
     }
 
     /**
+     * Displays an alert dialog with an OK button.
+     * The dialog will show a message and a title, and execute a callback when the OK button is clicked.
+     *
+     * @param {string} message - The message to display in the body of the dialog.
+     * @param {string} title - The title to display in the header of the dialog.
+     * @param {string} captionOk - The label to display on the OK button.
+     * @param {Function} callback - The callback function to be called when the OK button is clicked.
+     * 
+     * @returns {void} - This function does not return a value.
+     */
+    showAlertDialog(message, title, captionOk, callback)
+    {
+        // Get modal and buttons
+        const modal = document.querySelector('#asyncAlert');
+        let okBtn = modal.querySelector('.alert-ok');
+        okBtn = this.removeAllEventListeners(okBtn);
+
+        modal.querySelector('.modal-header h3').innerHTML = title;
+        modal.querySelector('.modal-body').innerHTML = message;
+        okBtn.innerHTML = captionOk;
+
+        // Show the modal
+        modal.style.display = 'block';
+
+        // Define the event listener for OK button
+        function handleOkClick() {
+            modal.style.display = 'none';
+            if(typeof callback == 'function')
+            {
+                callback();
+            }
+        }
+
+        // Add event listeners for OK and Cancel buttons
+        okBtn.addEventListener('click', handleOkClick);
+        okBtn.focus();
+    }
+
+    /**
      * Displays a confirmation dialog with OK and Cancel buttons.
      * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
      * 
@@ -1530,13 +1620,16 @@ class EntityEditor {
      * @param {string} captionCancel - The label for the Cancel button.
      * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
      * 
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
         // Get modal and buttons
         const modal = document.querySelector('#asyncConfirm');
-        const okBtn = modal.querySelector('.confirm-ok');
-        const cancelBtn = modal.querySelector('.confirm-cancel');
+        
+        let okBtn = modal.querySelector('.confirm-ok');
+        let cancelBtn = modal.querySelector('.confirm-cancel');
+        okBtn = this.removeAllEventListeners(okBtn);
+        cancelBtn = this.removeAllEventListeners(cancelBtn);
 
         modal.querySelector('.modal-header h3').innerHTML = title;
         modal.querySelector('.modal-body').innerHTML = message;
@@ -1545,10 +1638,6 @@ class EntityEditor {
 
         // Show the modal
         modal.style.display = 'block';
-
-        // Remove existing event listeners to prevent duplicates
-        okBtn.removeEventListener('click', handleOkClick);
-        cancelBtn.removeEventListener('click', handleCancelClick);
 
         // Define the event listener for OK button
         function handleOkClick() {
@@ -1565,6 +1654,21 @@ class EntityEditor {
         // Add event listeners for OK and Cancel buttons
         okBtn.addEventListener('click', handleOkClick);
         cancelBtn.addEventListener('click', handleCancelClick);
+    }
+
+    /**
+     * Removes all event listeners from the given element by replacing it with a cloned copy.
+     * The new element will be an exact copy of the original element, including its children and attributes,
+     * but without any event listeners attached.
+     *
+     * @param {HTMLElement} element - The DOM element from which event listeners will be removed.
+     * 
+     * @returns {HTMLElement} - The cloned element that is a replacement for the original element, without event listeners attached.
+     */
+    removeAllEventListeners(element) {
+        const newElement = element.cloneNode(true);  // clone the element with all children and attributes
+        element.parentNode.replaceChild(newElement, element);  // replace the old element with the new one
+        return newElement;  // return the cloned element
     }
 
     /**
@@ -1592,7 +1696,7 @@ class EntityEditor {
      * @param {HTMLElement} element - The select input element for the data type.
      * @param {string} selectorLength - The selector for the length input field.
      * 
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     setDefaultLength(element, selectorLength)
     {
@@ -1606,7 +1710,7 @@ class EntityEditor {
     /**
      * Displays the preference settings dialog and handles saving the user's preferences.
      * 
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     preference()
     {
@@ -1666,7 +1770,7 @@ class EntityEditor {
      * @param {string} captionCancel - The label for the Cancel button.
      * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
      * 
-     * @returns {void}
+     * @returns {void} - This function does not return a value.
      */
     showSettingDialog(message, title, captionOk, captionCancel, callback) {
         // Get modal and buttons

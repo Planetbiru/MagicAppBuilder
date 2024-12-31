@@ -125,18 +125,13 @@ class TableParser {
                 let isAi = this.isAutoIncrement(line);
     
                 let def = rg_fld_def.exec(attr2);
-                let defaultValue = def && def[1] ? def[1].trim() : null;
+                let defaultValue = def && def[1] ? def[1].trim() : null; // NOSONAR
 
                 defaultValue = this.fixDefaultValue(defaultValue);
-
     
-                // Ensure COMMENT is handled separately
                 let cmn = rg_fld_comment.exec(attr2);
-    
-                let comment = cmn && cmn[1] ? cmn[1].trim() : null;
+                let comment = cmn && cmn[1] ? cmn[1].trim() : null; // NOSONAR
 
-
-                
                 dataType = dataType.trim();
 
                 let length = this.getLength(attr);
