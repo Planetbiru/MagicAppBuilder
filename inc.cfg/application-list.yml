@@ -91,4 +91,12 @@
     description: ''
     documentRoot: 'C:/bitbucket/067736eafefefbeb7030'
     author: 'Your Name'
+    selected: false
+-
+    id: 06773c4cd91d41b29c01
+    name: ApplicationName
+    architecture: ''
+    description: Description
+    documentRoot: 'D:/xampp/htdocs/06773c4cd91d41b29c01'
+    author: 'Your Name'
     selected: true

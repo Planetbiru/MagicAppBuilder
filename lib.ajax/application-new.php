@@ -34,6 +34,9 @@ catch(Exception $e)
 {
     $magicAppList = [];
 }
+
+$magicAppList = array_slice($magicAppList, 0, 20);
+
 $data = [
     'application_name' => 'ApplicationName',
     'application_id' => $appId,

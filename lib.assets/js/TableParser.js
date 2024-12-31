@@ -135,7 +135,6 @@ class TableParser {
                 dataType = dataType.trim();
 
                 let length = this.getLength(attr);
-
     
                 let columnName = fld_def.groups.fname.trim();
                 if (isPk) primaryKeyList.push(columnName);
@@ -270,19 +269,21 @@ class TableParser {
         return !isNaN(defaultValue) && defaultValue !== '';
     }
 
-
     /**
      * Extracts the length of a column type if specified (e.g., VARCHAR(255)).
      * @param {string} text The attribute text containing the length (e.g., VARCHAR(255)).
      * @returns {string} The length of the column type or an empty string if no length is found.
      */
     getLength(text) {
+        // Check if the text contains parentheses and ensure there is a number inside
         if (text.includes('(') && text.includes(')')) {
-            let re = /\((.*)\)/;
+            // Adjusting regex to capture the first number inside parentheses
+            let re = /\((\d+)\)/;
             let match = text.match(re); // NOSONAR
+            // If a match is found, return the number inside the parentheses; otherwise, return an empty string
             return match ? match[1] : '';
         }
-        return '';
+        return ''; // Return an empty string if no parentheses are found
     }
 
     /**
@@ -299,13 +300,20 @@ class TableParser {
      * @param {string} sql The SQL string containing multiple CREATE TABLE statements.
      */
     parseAll(sql) {
-
         let inf = [];
         const parsedResult = this.parseSQL(sql);
         for(let i in parsedResult)
         {
-            let info = this.parseTable(this.formatSQL(parsedResult[i].query));
-            inf.push(info);
+            let sub = this.formatSQL(parsedResult[i].query);
+            try
+            {
+                let info = this.parseTable(sub);
+                inf.push(info);
+            }
+            catch(e)
+            {
+                // If query is not CREATE TABLE or invalid
+            }
         }
         this.tableInfo = inf;
     }
