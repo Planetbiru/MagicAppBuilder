@@ -152,9 +152,15 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 **Steps to create an application with MagicAppBuilder**
 
 1.  Create a new application in MagicAppBuilder and set it as the default application.
-    
-2.  If you don't have a database, create a complete Entity Relationship Diagram (ERD) with the following rules:
 
+2.  Update the application settings which consist of:
+
+-   Application
+-   Database
+-   Session
+-   Reserved columns
+    
+3.  If you don't have a database, create a complete Entity Relationship Diagram (ERD) with the following rules:
 
 -   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
 -   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
@@ -163,17 +169,9 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 -   Application features should be defined before creating the entity relationship diagram.
     
 
-3.  Export the entity relationship diagram to SQL.
+4.  Export the entity relationship diagram to SQL.
     
-4.  If you do not want to use third-party applications to create the Entity Relationship Diagram, you can use MagicAppBuilder.
-    
-5.  Update the application settings which consist of:
-    
-
--   Application
--   Database
--   Session
--   Reserved columns
+5.  If you do not want to use third-party applications to create the Entity Relationship Diagram, you can use MagicAppBuilder.
 
 6.  Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
     
