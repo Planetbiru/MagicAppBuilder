@@ -208,11 +208,11 @@ class TableParser {
      * @param {number} length - The length of the column, used to determine how to handle small data types (e.g., TINYINT).
      * @returns {string|null} - A normalized default value string or null if no valid default value is provided.
      */
-    fixDefaultValue(defaultValue, dataType, length) // NOSONAR
+    fixDefaultValue(defaultValue, dataType, length)
     {
         if (defaultValue) {
             // Case 1: Handle BOOLEAN values (TRUE/FALSE)
-            if(dataType.toUpperCase().indexOf('BOOL') != -1 || (dataType.toUpperCase().indexOf('TINYINT') != -1 && length == 1)) {
+            if(this.isBoolean(dataType, length)) {
                 defaultValue = defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
             }
             // Case 2: Handle 'DEFAULT NULL'
@@ -228,16 +228,8 @@ class TableParser {
                 defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
             }
             // Case 5: Handle date literals (e.g., '2021-01-01')
-            else if (defaultValue.startsWith("'") && defaultValue.endsWith("'") && /\d{4}-\d{2}-\d{2}/.test(defaultValue.slice(1, -1))) {
-                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; // Normalize date literals (date only)
-            }
-            // Case 6: Handle datetime literals (e.g., '2021-01-01 00:00:00')
-            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(defaultValue)) {
-                defaultValue = "'"+defaultValue+"'" // Normalize datetime literals
-            }
-            // Case 7: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
-            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/.test(defaultValue)) {
-                defaultValue = "'"+defaultValue+"'" // Normalize datetime with microseconds
+            else if (this.isDateTime(defaultValue)) {
+                defaultValue = this.createDate(defaultValue); // Normalize datetime with microseconds
             }
             // Case 8: Handle boolean values (TRUE/FALSE) in any part of the string
             else if (/^TRUE/i.test(defaultValue)) {
@@ -254,16 +246,84 @@ class TableParser {
             else if (/^CURRENT_TIMESTAMP\s+ON\s+INSERT\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
                 defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
             }
-            // Case 11: Handle string literals (e.g., 'some text')
-            else if (this.isInQuotes(defaultValue)) {
-                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
-            }
         } else {
             defaultValue = null; // If no default value, set it to null
         }
         return defaultValue;
     }
 
+    /**
+     * Creates a properly quoted date string from the given input.
+     * This function removes any surrounding quotes (both single and double) from the input 
+     * and ensures the final value is enclosed within single quotes. If the input is null, 
+     * it returns null. Additionally, it handles trimming and possible variations in 
+     * quoting style.
+     *
+     * @param {string|null} defaultValue - The input value to be formatted as a date string.
+     * @returns {string|null} - The formatted date string enclosed in single quotes, or null if the input is null.
+     */
+    createDate(defaultValue)
+    {
+        if(defaultValue == null)
+        {
+            return null;
+        }
+        defaultValue = defaultValue.trim();
+        if (this.isInQuotes(defaultValue)) {
+            defaultValue = defaultValue.slice(1, -1); 
+        }
+        else if(defaultValue.startsWith("'"))
+        {
+            defaultValue = defaultValue.substring(1);
+        }
+        else if(defaultValue.endsWith("'"))
+        {
+            defaultValue = defaultValue.substring(0, defaultValue.length-3);
+        }
+
+        return `'${defaultValue}'`;
+    }
+
+    /**
+     * Checks if the input value is a valid date, datetime, or time format.
+     * This function can detect the following formats:
+     * - Date format (YYYY-MM-DD)
+     * - Datetime format (YYYY-MM-DD HH:MM:SS)
+     * - Datetime with microseconds (YYYY-MM-DD HH:MM:SS.SSSSSS)
+     * - Time format (HH:MM:SS)
+     *
+     * @param {string} defaultValue - The input value to check.
+     * @returns {boolean} - Returns true if the value matches one of the valid date/time formats.
+     */
+    isDateTime(defaultValue) {
+        // Check for datetime with microseconds (e.g., '2021-01-01 12:30:45.123456')
+        const dateTimeWithMicroseconds = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/;
+        
+        // Check for datetime (e.g., '2021-01-01 12:30:45')
+        const dateTime = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/;
+        
+        // Check for date (e.g., '2021-01-01')
+        const date = /\d{4}-\d{2}-\d{2}/;
+        
+        // Check for time (e.g., '01:23:45')
+        const time = /\d{2}:\d{2}:\d{2}/;
+
+        // Check if the value matches any of the patterns
+        return dateTimeWithMicroseconds.test(defaultValue) || dateTime.test(defaultValue) || date.test(defaultValue) || time.test(defaultValue);
+    }
+
+    /**
+     * Checks if the given data type is a boolean type or a small integer type (such as TINYINT(1)).
+     * This function returns true if the data type is a boolean (e.g., BOOL) or a TINYINT with a length of 1 
+     * (which is commonly used to represent boolean values in databases).
+     *
+     * @param {string} dataType - The data type of the column, typically from a database schema.
+     * @param {number} length - The length of the column, used to help determine if it's a boolean representation.
+     * @returns {boolean} - Returns true if the data type is boolean or a TINYINT(1), otherwise false.
+     */
+    isBoolean(dataType, length) {
+        return dataType.toUpperCase().indexOf('BOOL') != -1 || (dataType.toUpperCase().indexOf('TINYINT') != -1 && length == 1);
+    }
 
     /**
      * Checks if the given string is enclosed in single quotes.
@@ -286,7 +346,6 @@ class TableParser {
     {
         return !isNaN(defaultValue) && defaultValue !== '';
     }
-
 
     /**
      * Extracts the length of a column type if specified (e.g., VARCHAR(255)).
@@ -374,7 +433,6 @@ class TableParser {
 
         return sql;
     }
-
 
     /**
      * Parses a SQL script by splitting it into individual queries, handling comments, 
