@@ -216,7 +216,7 @@ class TableParser {
      * - 'NULL' is treated as a string without quotes.
      * - Numeric values (integers and floats) are preserved without quotes.
      * - SQL functions like `CURRENT_TIMESTAMP` or `NOW()` are normalized to uppercase.
-     * - Date literals (e.g., '2021-01-01') and datetime literals (e.g., '2021-01-01 00:00:00') are preserved with single quotes.
+     * - Date literals (e.g., '2025-01-01') and datetime literals (e.g., '2025-01-01 00:00:00') are preserved with single quotes.
      * - Boolean values 'TRUE' and 'FALSE' are normalized to uppercase.
      * - Special SQL expressions like `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` are normalized to uppercase.
      * - String literals are trimmed of surrounding quotes and re-quoted properly.
@@ -245,7 +245,7 @@ class TableParser {
             else if (/^(CURRENT_TIMESTAMP|NOW\(\))$/i.test(defaultValue)) {
                 defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
             }
-            // Case 5: Handle date literals (e.g., '2021-01-01')
+            // Case 5: Handle date literals (e.g., '2025-01-01')
             else if (this.isDateTime(defaultValue)) {
                 defaultValue = this.createDate(defaultValue); // Normalize datetime with microseconds
             }
@@ -329,13 +329,13 @@ class TableParser {
      * @returns {boolean} - Returns true if the value matches one of the valid date/time formats.
      */
     isDateTime(defaultValue) {
-        // Check for datetime with microseconds (e.g., '2021-01-01 12:30:45.123456')
+        // Check for datetime with microseconds (e.g., '2025-01-01 12:30:45.123456')
         const dateTimeWithMicroseconds = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/;
         
-        // Check for datetime (e.g., '2021-01-01 12:30:45')
+        // Check for datetime (e.g., '2025-01-01 12:30:45')
         const dateTime = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/;
         
-        // Check for date (e.g., '2021-01-01')
+        // Check for date (e.g., '2025-01-01')
         const date = /\d{4}-\d{2}-\d{2}/;
         
         // Check for time (e.g., '01:23:45')

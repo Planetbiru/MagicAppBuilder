@@ -19,8 +19,8 @@ $constSelected = ' selected';
   <link rel="shortcut icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.css">
-  <link rel="stylesheet" type="text/css" href="css/css.css">
-  <link rel="stylesheet" type="text/css" href="css/fontawesome/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="lib.assets/css/css.css">
+  <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>

@@ -2517,8 +2517,8 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/entity-editor.css">
-    <link rel="stylesheet" href="css/database-explorer.css">
+    <link rel="stylesheet" href="lib.assets/css/entity-editor.css">
+    <link rel="stylesheet" href="lib.assets/css/database-explorer.css">
     <script src="lib.assets/js/TableParser.js"></script>
     <script src="lib.assets/js/SQLConverter.js"></script>
     <script src="lib.assets/js/EntityEditor.js"></script>

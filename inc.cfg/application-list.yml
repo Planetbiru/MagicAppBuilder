@@ -67,7 +67,7 @@
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
     documentRoot: 'D:/xampp/htdocs/sipro-gitlab'
     author: Kamshory
-    selected: false
+    selected: true
 -
     id: tukang
     name: Tukang
@@ -99,4 +99,4 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/06773c4cd91d41b29c01'
     author: 'Your Name'
-    selected: true
+    selected: false

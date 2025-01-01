@@ -726,17 +726,14 @@ class SQLConverter {
      * @returns {Object} An object containing the result array and maximum length of ENUM values.
      */
     parseEnumValue(inputString) {
-        // Regex untuk menangkap teks di dalam single quotes (misalnya, 'A', 'BB', 'CCC')
         const regex = /'([^']+)'/g;
         let matches;
         let resultArray = [];
 
-        // Menangkap semua kecocokan
         while ((matches = regex.exec(inputString)) !== null) {
             resultArray.push(matches[1]); // matches[1] adalah isi di dalam single quotes
         }
 
-        // Menentukan panjang maksimum dari array hasil
         let maxLength = resultArray.reduce((max, current) => {
             return current.length > max ? current.length : max;
         }, 0);
@@ -750,17 +747,14 @@ class SQLConverter {
      * @returns {Object} An object containing the type (e.g., DECIMAL) and the length (total digits) and scale (digits after the decimal point).
      */
     parseNumericType(inputString) {
-        // Regex untuk menangkap nilai yang dipisahkan oleh koma, tanpa tanda kutip
         const regex = /([A-Za-z0-9_]+)/g; // NOSONAR
         let matches;
         let resultArray = [];
 
-        // Menangkap semua kecocokan
         while ((matches = regex.exec(inputString)) !== null) {
             resultArray.push(matches[1]); // matches[1] adalah nilai yang dipisahkan
         }
 
-        // Menentukan panjang maksimum dari array hasil
         let maxLength = resultArray.reduce((max, current) => {
             return current.length > max ? current.length : max;
         }, 0);
