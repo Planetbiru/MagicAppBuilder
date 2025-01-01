@@ -291,46 +291,55 @@ class DatabaseExporter
     /**
      * Formats an SQL string to ensure consistent indentation and spacing.
      * Specifically, it:
-     * - Removes excess spaces.
-     * - Ensures "CREATE TABLE" is properly formatted.
-     * - Preserves and correctly formats "IF NOT EXISTS" if present.
-     * - Positions parentheses correctly.
-     * - Adds a new line after the opening parenthesis.
-     * - Ensures proper indentation for columns.
-     * - Ensures that the closing parenthesis is moved to the next line.
+     * - Removes excess spaces between words and around symbols.
+     * - Ensures "CREATE TABLE" is properly formatted with single spaces.
+     * - Preserves and correctly formats the "IF NOT EXISTS" clause, if present.
+     * - Positions parentheses correctly (removes spaces before opening parenthesis).
+     * - Adds a new line after the opening parenthesis for better readability.
+     * - Ensures proper indentation for each column in the table definition.
+     * - Adds indentation after commas between column definitions for better readability.
+     * - Moves the closing parenthesis to a new line, making the structure cleaner.
+     * - Adds a semicolon at the end of the SQL query if it is missing.
      *
      * @param string $sql The raw SQL string to format.
-     * @return string The formatted SQL string.
+     * @return string The formatted SQL string with consistent spacing and indentation.
      */
     private function formatSQL($sql) {
-        // Remove excess whitespace throughout the entire string
+        // Remove excess whitespace throughout the entire string and replace with a single space
         $sql = preg_replace('/\s+/i', ' ', $sql);
 
-        // Ensure "CREATE TABLE" is consistently formatted (with a single space after it)
+        // Trim leading and trailing spaces or newlines from the string
+        $sql = trim($sql, " \r\n\t ");
+
+        // Ensure the query ends with a semicolon
+        if (substr($sql, strlen($sql) - 1, 1) != ";") {
+            $sql .= ";";  // Append semicolon if missing
+        }
+
+        // Ensure "CREATE TABLE" is consistently formatted with a single space after it
         $sql = preg_replace('/\bCREATE\s+TABLE\s+/i', 'CREATE TABLE ', $sql);
 
-        // Handle "IF NOT EXISTS" and preserve its format if present
+        // Handle "IF NOT EXISTS" correctly, preserving the spacing and formatting if it is present
         $sql = preg_replace('/\bIF\s+NOT\s+EXISTS\s+/i', 'IF NOT EXISTS ', $sql);
 
-        // Ensure the opening parenthesis is correctly positioned (no spaces before it)
-        $sql = preg_replace('/\s*\(/', ' (', $sql);  // Remove spaces before the opening parenthesis
+        // Remove spaces before the opening parenthesis to ensure proper positioning
+        $sql = preg_replace('/\s*\(/', ' (', $sql);
 
-        // Ensure the closing parenthesis and semicolon are correctly positioned
-        // Move the closing parenthesis to the next line
-        $sql = preg_replace('/\s*\)\s*;/', "\r\n);", $sql);  // Remove spaces after the closing parenthesis
+        // Move the closing parenthesis to the next line, remove spaces after it, and ensure proper formatting
+        $sql = preg_replace('/\s*\)\s*;/', "\n)", $sql);  // Close parenthesis and semicolon on a new line
 
-        // Add a new line and indentation after the opening parenthesis (only for the first '(' after the table name)
-        $sql = preg_replace('/\(\s*/', "(\n\t", $sql, 1);  // Add a new line after the first '('
+        // Add a new line and indentation after the opening parenthesis, only for the first occurrence (table definition)
+        $sql = preg_replace('/\(\s*/', "(\n\t", $sql, 1);  // Insert newline and tab indentation after '('
 
-        // Ensure columns are separated with new lines and indented properly
-        // Add a newline and indentation after each comma separating columns
-        $sql = preg_replace('/,\s*/', ",\n\t", $sql);  // Ensure indentation after commas separating columns
+        // Ensure columns are separated by commas followed by new lines, and each column is indented properly
+        $sql = preg_replace('/,\s*/', ",\n\t", $sql);  // Add newline and indentation after commas separating columns
 
-        // Add a new line before "CREATE TABLE" to improve the format
-        $sql = str_replace("CREATE TABLE", "\nCREATE TABLE", $sql);  // Add a new line before "CREATE TABLE"
+        // Add a new line before "CREATE TABLE" to improve readability in the final formatted string
+        $sql = str_replace("CREATE TABLE", "\nCREATE TABLE", $sql);  // Insert a newline before the "CREATE TABLE" statement
 
         return $sql;
     }
+
 
 
     /**
@@ -2361,10 +2370,11 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
         $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
     }
     $filename = trim($filename, " - ");
-    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
-    $exporter->exportData($tables, $schemaName, $maxRecord, $maxQuerySize);
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
+    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter->exportData($tables, $schemaName, $maxRecord, $maxQuerySize);
+    
     echo $exporter->getExportData();
     exit();
 }
@@ -2386,10 +2396,11 @@ if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_t
         $filename = $databaseConfig->getDatabaseName()."-".date("Y-m-d-H-i-s").".sql";
     }
     $filename = trim($filename, " - ");
-    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
-    $exporter->exportStructure($tables, $schemaName);
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
+    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter->exportStructure($tables, $schemaName);
+    
     echo $exporter->getExportData();
     exit();
 }
