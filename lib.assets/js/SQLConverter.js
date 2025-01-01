@@ -497,7 +497,7 @@ class SQLConverter {
             let columnName = this.fixColumnName(table.columns[i].Field, targetType);
             
             let columnType = table.columns[i].Type;
-            let primaryKey = table.columns[i].Field === table.primaryKey;
+            let primaryKey = table.columns[i].Key || table.columns[i].Field === table.primaryKey;
             let colDef = '\t' + columnName + ' ' + columnType;
             if (primaryKey) {
                 colDef += ' PRIMARY KEY';             

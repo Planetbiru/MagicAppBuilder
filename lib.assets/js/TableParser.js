@@ -135,7 +135,10 @@ class TableParser {
 
                 dataType = dataType.trim();
                 
-                if (isPk) primaryKeyList.push(columnName);
+                if (isPk) 
+                {
+                    primaryKeyList.push(columnName);
+                }
                 if (!this.inArray(columnList, columnName)) {
                     fieldList.push({
                         'Field': columnName,
@@ -180,11 +183,27 @@ class TableParser {
             }
         }
     
-        if (primaryKey == null) {
+        if (primaryKey == null && primaryKeyList.length > 0) {
             primaryKey = primaryKeyList[0];
+        }
+
+        if(primaryKey != null)
+        {
+            fieldList = this.updatePrimaryKey(fieldList, primaryKey);
         }
     
         return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
+    }
+
+    updatePrimaryKey(fieldList, primaryKey)
+    {
+        fieldList.forEach(function(field, index){
+            if(primaryKey.trim() == field.Field.trim())
+            {
+                fieldList[index].Key = true;
+            }
+        });
+        return fieldList;
     }
 
     /**
