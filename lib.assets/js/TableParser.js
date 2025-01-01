@@ -295,7 +295,7 @@ class TableParser {
      */
     getLength(text) {
         if (text.includes('(') && text.includes(')')) {
-            let re = /\((\d)\)/;
+            let re = /\((\d+)\)/;
             let match = text.match(re); // NOSONAR
             return match ? match[1] : '';
         }

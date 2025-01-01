@@ -48,7 +48,6 @@ body {
 .main-table tbody td.data-sort {
   background-color: #797979;
   cursor: move;
-  cursor: move;
 }
 .main-table tbody tr:hover td {
   background-color: #E8E8EE;
