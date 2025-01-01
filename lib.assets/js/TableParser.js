@@ -106,7 +106,8 @@ class TableParser {
             let isPk = false;
             let enumValues = null;
             let enumArray = null;
-    
+            let columnName = fld_def.groups.fname.trim();
+
             if (rg_enum.test(dataTypeRaw)) {
                 enumValues = rg_enum.exec(dataTypeRaw)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
@@ -126,17 +127,15 @@ class TableParser {
     
                 let def = rg_fld_def.exec(attr2);
                 let defaultValue = def && def[1] ? def[1].trim() : null; // NOSONAR
+                let length = this.getLength(attr);
 
-                defaultValue = this.fixDefaultValue(defaultValue);
+                defaultValue = this.fixDefaultValue(defaultValue, dataType, length);
     
                 let cmn = rg_fld_comment.exec(attr2);
                 let comment = cmn && cmn[1] ? cmn[1].trim() : null; // NOSONAR
 
                 dataType = dataType.trim();
-
-                let length = this.getLength(attr);
-    
-                let columnName = fld_def.groups.fname.trim();
+                
                 if (isPk) primaryKeyList.push(columnName);
                 if (!this.inArray(columnList, columnName)) {
                     fieldList.push({
@@ -191,53 +190,71 @@ class TableParser {
 
     /**
      * Fixes and normalizes default values in SQL statements to ensure they are in the correct format.
-     * This function handles various cases, including NULL values, string literals, numbers, SQL functions, 
-     * date literals, boolean values, and special SQL functions like CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
+     * This function handles various cases, including NULL values, string literals, numbers, SQL functions,
+     * date literals, boolean values, and special SQL expressions such as CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
      * and CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP.
      *
+     * The function applies the following normalizations:
+     * - 'NULL' is treated as a string without quotes.
+     * - Numeric values (integers and floats) are preserved without quotes.
+     * - SQL functions like `CURRENT_TIMESTAMP` or `NOW()` are normalized to uppercase.
+     * - Date literals (e.g., '2021-01-01') and datetime literals (e.g., '2021-01-01 00:00:00') are preserved with single quotes.
+     * - Boolean values 'TRUE' and 'FALSE' are normalized to uppercase.
+     * - Special SQL expressions like `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` are normalized to uppercase.
+     * - String literals are trimmed of surrounding quotes and re-quoted properly.
+     *
      * @param {string} defaultValue - The input default value as a string to be fixed.
+     * @param {string} dataType - The data type of the column to help with special case handling.
+     * @param {number} length - The length of the column, used to determine how to handle small data types (e.g., TINYINT).
      * @returns {string|null} - A normalized default value string or null if no valid default value is provided.
      */
-    fixDefaultValue(defaultValue)
+    fixDefaultValue(defaultValue, dataType, length) // NOSONAR
     {
         if (defaultValue) {
-            // Case 1: Handle 'DEFAULT NULL'
-            if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
+            // Case 1: Handle BOOLEAN values (TRUE/FALSE)
+            if(dataType.toUpperCase().indexOf('BOOL') != -1 || (dataType.toUpperCase().indexOf('TINYINT') != -1 && length == 1)) {
+                defaultValue = defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
+            }
+            // Case 2: Handle 'DEFAULT NULL'
+            else if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
                 defaultValue = 'NULL'; // Correctly treat it as a string "NULL" without quotes
             }
-            // Case 2: Handle numbers (integers or floats) and ensure no quotes
+            // Case 3: Handle numbers (integers or floats)
             else if (this.isNumber(defaultValue)) {
                 defaultValue = "'"+defaultValue.toString()+"'"; // Numeric values are valid as-is (no quotes needed)
             }
-            // Case 3: Handle SQL functions like CURRENT_TIMESTAMP
+            // Case 4: Handle SQL functions like CURRENT_TIMESTAMP or NOW()
             else if (/^(CURRENT_TIMESTAMP|NOW\(\))$/i.test(defaultValue)) {
                 defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
             }
-            // Case 4: Handle date/time literals (e.g., '2021-01-01')
+            // Case 5: Handle date literals (e.g., '2021-01-01')
             else if (defaultValue.startsWith("'") && defaultValue.endsWith("'") && /\d{4}-\d{2}-\d{2}/.test(defaultValue.slice(1, -1))) {
                 defaultValue = "'"+defaultValue.slice(1, -1)+"'"; // Normalize date literals (date only)
             }
-            // Case 5: Handle datetime literals (e.g., '2021-01-01 00:00:00')
+            // Case 6: Handle datetime literals (e.g., '2021-01-01 00:00:00')
             else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(defaultValue)) {
                 defaultValue = "'"+defaultValue+"'" // Normalize datetime literals
             }
-            // Case 6: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
+            // Case 7: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
             else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/.test(defaultValue)) {
                 defaultValue = "'"+defaultValue+"'" // Normalize datetime with microseconds
             }
-            // Case 7: Handle other possible types (e.g., boolean TRUE/FALSE)
-            else if (/^(TRUE|FALSE)$/i.test(defaultValue)) {
-                defaultValue = defaultValue.toUpperCase(); // Normalize booleans
+            // Case 8: Handle boolean values (TRUE/FALSE) in any part of the string
+            else if (/^TRUE/i.test(defaultValue)) {
+                defaultValue = 'TRUE'; // Normalize to 'TRUE' if it starts with 'TRUE'
+            } 
+            else if (/^FALSE/i.test(defaultValue)) {
+                defaultValue = 'FALSE'; // Normalize to 'FALSE' if it starts with 'FALSE'
             }
-            // Case 8: Handle CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            // Case 9: Handle CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             else if (/^CURRENT_TIMESTAMP\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
                 defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
             }
-            // Case 9: Handle CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP
+            // Case 10: Handle CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP
             else if (/^CURRENT_TIMESTAMP\s+ON\s+INSERT\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
                 defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
             }
-            // Case 10: Handle string literals (e.g., 'some text')
+            // Case 11: Handle string literals (e.g., 'some text')
             else if (this.isInQuotes(defaultValue)) {
                 defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
             }
@@ -246,6 +263,7 @@ class TableParser {
         }
         return defaultValue;
     }
+
 
     /**
      * Checks if the given string is enclosed in single quotes.
@@ -269,21 +287,19 @@ class TableParser {
         return !isNaN(defaultValue) && defaultValue !== '';
     }
 
+
     /**
      * Extracts the length of a column type if specified (e.g., VARCHAR(255)).
      * @param {string} text The attribute text containing the length (e.g., VARCHAR(255)).
      * @returns {string} The length of the column type or an empty string if no length is found.
      */
     getLength(text) {
-        // Check if the text contains parentheses and ensure there is a number inside
         if (text.includes('(') && text.includes(')')) {
-            // Adjusting regex to capture the first number inside parentheses
-            let re = /\((\d+)\)/;
+            let re = /\((\d)\)/;
             let match = text.match(re); // NOSONAR
-            // If a match is found, return the number inside the parentheses; otherwise, return an empty string
             return match ? match[1] : '';
         }
-        return ''; // Return an empty string if no parentheses are found
+        return '';
     }
 
     /**
@@ -300,6 +316,7 @@ class TableParser {
      * @param {string} sql The SQL string containing multiple CREATE TABLE statements.
      */
     parseAll(sql) {
+
         let inf = [];
         const parsedResult = this.parseSQL(sql);
         for(let i in parsedResult)

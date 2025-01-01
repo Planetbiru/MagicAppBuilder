@@ -515,7 +515,7 @@ class SQLConverter {
             let defaultValue = table.columns[i].Default;
             if (this.hasDefaultValue(primaryKey, defaultValue)) {
                 defaultValue = this.replaceAll(defaultValue, '::character varying', '');
-                defaultValue = this.fixDefaultValue(defaultValue, table.columns[i].Type, targetType);
+                defaultValue = this.fixDefaultValue(defaultValue, targetType);
                 if (this.isNotEmpty(defaultValue)) {
                     colDef += this.getDefaultData(defaultValue, columnType);
                 }
@@ -600,12 +600,10 @@ class SQLConverter {
     /**
      * Fixes default value for SQLite.
      * @param {string} defaultValue The default value to fix.
-     * @param {string} columnType The coulumn type.
      * @param {string} targetType The target database type.
      * @returns {string} The fixed default value.
      */
-    fixDefaultValue(defaultValue, columnType, targetType) {
-        console.log(columnType)
+    fixDefaultValue(defaultValue, targetType) {
         if (this.isSQLite(targetType)) {
             if (defaultValue.toLowerCase().indexOf('now(') !== -1) {
                 defaultValue = '';
