@@ -90,6 +90,7 @@ class SQLConverter {
             "tinyint(1)": "BOOLEAN",
             "tinyint": "INTEGER",
             "integer": "INTEGER",
+            "int": "INTEGER",
             "real": "REAL",
             "longtext": "TEXT",
             "mediumtext": "TEXT",
@@ -99,7 +100,7 @@ class SQLConverter {
             "character varying": "CHARACTER VARYING",
             "nvarchar": "CHARACTER VARYING",
             "varchar": "CHARACTER VARYING",
-            "char": "char",
+            "char": "CHARACTER",
             "boolean": "BOOLEAN",
             "datetime": "TIMESTAMP WITHOUT TIME ZONE",
             "date": "DATE",
@@ -462,7 +463,7 @@ class SQLConverter {
         {
             colDef += ' DEFAULT ' + this.convertToBolean(defaultValue);
         }
-        else if(this.isInteger(columnType))
+        else if(columnType.toUpperCase().indexOf('INT') != -1)
         {
             colDef += ' DEFAULT ' + this.convertToInteger(defaultValue);
         }
@@ -582,6 +583,15 @@ class SQLConverter {
         return isNaN(result) ? 0 : result;
     }
 
+    /**
+     * Converts a given string to a boolean-like string ('TRUE' or 'FALSE').
+     * 
+     * This function checks if the input string contains the character '1' or the string 'TRUE' (case-insensitive).
+     * If either condition is met, it returns the string 'TRUE', otherwise, it returns the string 'FALSE'.
+     *
+     * @param {string} defaultValue - The input string to be checked and converted to 'TRUE' or 'FALSE'.
+     * @returns {string} - Returns 'TRUE' if the string contains '1' or 'TRUE', otherwise returns 'FALSE'.
+     */
     convertToBolean(defaultValue)
     {
         return defaultValue.indexOf('1') != -1 || defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
@@ -705,9 +715,10 @@ class SQLConverter {
             const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
             pgType = 'CHARACTER VARYING(' + (maxLength + 2) + ')';
         }
-        else if (pgType === 'CHARACTER VARYING' && length > 0) {
+        else if ((pgType === 'CHARACTER VARYING' || pgType === 'CHARACTER' || pgType === 'CHAR') && length > 0) {
             pgType = pgType + '(' + length + ')';
         }
+        
         return pgType;
     }
 
@@ -758,8 +769,6 @@ class SQLConverter {
 
         return { resultArray, maxLength };
     }
-
-    
 
     /**
      * Extracts the DROP TABLE IF EXISTS queries from the provided SQL string.
