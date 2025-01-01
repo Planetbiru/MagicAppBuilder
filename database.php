@@ -36,11 +36,33 @@ class ConstantText
  */
 class DatabaseExporter
 {
+    /**
+     * Constant representing the SQLite database type.
+     *
+     * This constant is used to identify the SQLite database type in the application.
+     */
     const DATABASE_TYPE_SQLITE = 'sqlite';
-    const DATABASE_TYPE_MYSQL = 'mysql';
-    const DATABASE_TYPE_MARIADB = 'mariadb';
-    const DATABASE_TYPE_PGSQL = 'pgsql';
 
+    /**
+     * Constant representing the MySQL database type.
+     *
+     * This constant is used to identify the MySQL database type in the application.
+     */
+    const DATABASE_TYPE_MYSQL = 'mysql';
+
+    /**
+     * Constant representing the MariaDB database type.
+     *
+     * This constant is used to identify the MariaDB database type in the application.
+     */
+    const DATABASE_TYPE_MARIADB = 'mariadb';
+
+    /**
+     * Constant representing the PostgreSQL database type.
+     *
+     * This constant is used to identify the PostgreSQL database type in the application.
+     */
+    const DATABASE_TYPE_PGSQL = 'pgsql';
 
     /**
      * Database connection (SQLite, MySQL, or PostgreSQL)
@@ -136,7 +158,6 @@ class DatabaseExporter
                 break;
         }
     }
-
 
     /**
      * Determines if a table should be exported based on the provided list.
@@ -340,8 +361,6 @@ class DatabaseExporter
         return $sql;
     }
 
-
-
     /**
      * Retrieves the column details for a given PostgreSQL table.
      * 
@@ -427,6 +446,14 @@ class DatabaseExporter
         return $nrec % $batchSize == 0 || $querySize > $maxQuerySize;
     }
 
+    /**
+     * Adds a new line to the output buffer if the number of records is greater than zero.
+     *
+     * This method appends a carriage return and line feed (CRLF) to the `outputBuffer` property 
+     * of the class if the passed `$nrec` parameter is greater than zero.
+     *
+     * @param int $nrec The number of records. If greater than 0, a new line will be added to the output buffer.
+     */
     private function addNewLine($nrec)
     {
         if ($nrec > 0) {
@@ -434,6 +461,19 @@ class DatabaseExporter
         }
     }
 
+    /**
+     * Constructs an SQL INSERT query with provided table name, column names, and batch values.
+     *
+     * This method creates an SQL INSERT statement for the provided table, columns, and values.
+     * The values are inserted in batches, with each set of values separated by commas and new lines.
+     *
+     * @param string $tableName The name of the table to insert data into.
+     * @param array $columns An array of column names to be included in the INSERT query.
+     * @param array $batchValues An array of value sets (each set of values corresponding to the columns).
+     *                           Each set is a string containing values to be inserted.
+     *
+     * @return string The constructed SQL INSERT query.
+     */
     private function constructInsertQuery($tableName, $columns, $batchValues)
     {
         return "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES \r\n" . implode(", \r\n", $batchValues) . "\r\n;\r\n";
