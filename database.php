@@ -876,7 +876,7 @@ class DatabaseExplorer // NOSONAR
 
                 // Highlight the selected table
                 if ($table == $tableName) {
-                    $a->setAttribute('style', 'font-weight: bold;'); //NOSONAR
+                    $a->setAttribute('class', 'active'); //NOSONAR
                 }
 
                 $li->appendChild($a);
