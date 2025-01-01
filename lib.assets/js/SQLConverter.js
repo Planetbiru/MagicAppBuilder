@@ -216,7 +216,7 @@ class SQLConverter {
             primaryKey: table.primaryKey,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column, Field: column.Field }; // Spread and copy Field directly
-                columnCopy.Type = this.toMySQLType(columnCopy.Type, columnCopy.Length);
+                columnCopy.Type = this.toMySQLType(columnCopy.Type, columnCopy.Length, columnCopy.EnumValues);
                 return columnCopy;
             })
         };
@@ -647,9 +647,10 @@ class SQLConverter {
      * Converts a column type to the MySQL type format.
      * @param {string} type The original column type.
      * @param {number} length The column length (optional).
+     * @param {Array} enumValues The enum values.
      * @returns {string} The converted MySQL column type.
      */
-    toMySQLType(type, length) {
+    toMySQLType(type, length, enumValues) {
         let mysqlType = 'TEXT';
         if(this.isTinyInt1(type, length))
         {
@@ -670,17 +671,15 @@ class SQLConverter {
         }
         mysqlType = this.replaceAll(mysqlType, 'TIMESTAMPTZ', 'TIMESTAMP')
         if (type.toUpperCase().indexOf('ENUM') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
-            mysqlType = 'ENUM(\'' + (resultArray.join('\',\'')) + '\')';
+            mysqlType = 'ENUM(\'' + (enumValues.join('\',\'')) + '\')';
         } else if (type.toUpperCase().indexOf('SET') != -1) {
-            const { resultArray, maxLength } = this.parseEnumValue(length); // NOSONAR
-            mysqlType = 'SET(\'' + (resultArray.join('\',\'')) + '\')';
+            mysqlType = 'SET(\'' + (enumValues.join('\',\'')) + '\')';
         } else if (type.toUpperCase().indexOf('DECIMAL') != -1) {
             const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
-            mysqlType = 'DECIMAL(' + (resultArray.join(', ')) + ')';
+            mysqlType = 'DECIMAL(' + (resultArray.join(',')) + ')';
         } else if (type.toUpperCase().indexOf('NUMERIC') != -1) {
             const { resultArray, maxLength } = this.parseNumericType(length); // NOSONAR
-            mysqlType = 'NUMERIC(' + (resultArray.join(', ')) + ')';
+            mysqlType = 'NUMERIC(' + (resultArray.join(',')) + ')';
         }
         if ((mysqlType === 'VARCHAR' || mysqlType === 'CHAR') && length > 0) {
             mysqlType = mysqlType + '(' + length + ')';
@@ -726,14 +725,17 @@ class SQLConverter {
      * @returns {Object} An object containing the result array and maximum length of ENUM values.
      */
     parseEnumValue(inputString) {
+        // Regex untuk menangkap teks di dalam single quotes (misalnya, 'A', 'BB', 'CCC')
         const regex = /'([^']+)'/g;
         let matches;
         let resultArray = [];
 
+        // Menangkap semua kecocokan
         while ((matches = regex.exec(inputString)) !== null) {
             resultArray.push(matches[1]); // matches[1] adalah isi di dalam single quotes
         }
 
+        // Menentukan panjang maksimum dari array hasil
         let maxLength = resultArray.reduce((max, current) => {
             return current.length > max ? current.length : max;
         }, 0);
@@ -747,14 +749,17 @@ class SQLConverter {
      * @returns {Object} An object containing the type (e.g., DECIMAL) and the length (total digits) and scale (digits after the decimal point).
      */
     parseNumericType(inputString) {
+        // Regex untuk menangkap nilai yang dipisahkan oleh koma, tanpa tanda kutip
         const regex = /([A-Za-z0-9_]+)/g; // NOSONAR
         let matches;
         let resultArray = [];
 
+        // Menangkap semua kecocokan
         while ((matches = regex.exec(inputString)) !== null) {
             resultArray.push(matches[1]); // matches[1] adalah nilai yang dipisahkan
         }
 
+        // Menentukan panjang maksimum dari array hasil
         let maxLength = resultArray.reduce((max, current) => {
             return current.length > max ? current.length : max;
         }, 0);

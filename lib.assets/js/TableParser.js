@@ -74,10 +74,12 @@ class TableParser {
     parseTable(sql) // NOSONAR
     { 
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+serial8|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(.*\)|\w+\s+set\s*\(.*\)|\w+\s+numeric\s*\(.*\)|\w+\s+decimal\s*\(.*\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
+        let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+serial8|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(([^)]+)\)|\w+\s+set\s*\(([^)]+)\)|\w+\s+numeric\s*\(([^)]+)\)|\w+\s+decimal\s*\(([^)]+)\)|\w+\s+float\s*\(([^)]+)\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i;
         let rg_set = /set\s*\(([^)]+)\)/i;
+        let rg_numeric = /numeric\s*\(([^)]+)\)/i;
+        let rg_decimal = /decimal\s*\(([^)]+)\)/i;
         let rg_not_null = /not\s+null/i;
         let rg_pk = /primary\s+key/i;
         let rg_fld_def = /default\s+([^'"]+|'[^']*'|\"[^\"]*\")\s*(comment\s+'[^']*')?/i; // NOSONAR
@@ -95,11 +97,13 @@ class TableParser {
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
             let line = f;
+
+            line = line.replace(/[\r\n]+/g, ' ');
     
             // Reset regex for field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
-            let dataTypeRaw = fld_def[0]; // NOSONAR
+            
             let dataType = fld_def[2]; // NOSONAR
             let dataTypeOriginal = dataType;
             let isPk = false;
@@ -107,16 +111,28 @@ class TableParser {
             let enumArray = null;
             let columnName = fld_def.groups.fname.trim();
 
-            if (rg_enum.test(dataTypeRaw)) {
-                enumValues = rg_enum.exec(dataTypeRaw)[1];
+            if (rg_enum.test(line)) {
+                enumValues = rg_enum.exec(line)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
             }
-            if (rg_set.test(dataTypeRaw)) {
-                enumValues = rg_set.exec(dataTypeRaw)[1];
+            
+            if (enumArray == null && rg_set.test(line)) {
+                enumValues = rg_set.exec(line)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
             }
-    
+
+            if (enumArray == null && rg_numeric.test(line)) {
+                enumValues = rg_numeric.exec(line)[1];
+                enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
+            }
+
+            if (enumArray == null && rg_decimal.test(line)) {
+                enumValues = rg_decimal.exec(line)[1];
+                enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
+            }
+
             if (this.isValidType(dataType.toString()) || this.isValidType(dataTypeOriginal.toString())) {
+                
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
@@ -127,6 +143,11 @@ class TableParser {
                 let def = rg_fld_def.exec(attr2);
                 let defaultValue = def && def[1] ? def[1].trim() : null; // NOSONAR
                 let length = this.getLength(attr);
+
+                if(length == '' && enumArray != null)
+                {
+                    length = '\'' + (enumArray.join('\',\'')) + '\'';
+                }
 
                 defaultValue = this.fixDefaultValue(defaultValue, dataType, length);
     
@@ -140,7 +161,7 @@ class TableParser {
                     primaryKeyList.push(columnName);
                 }
                 if (!this.inArray(columnList, columnName)) {
-                    fieldList.push({
+                    let column = {
                         'Field': columnName,
                         'Type': dataType,
                         'Length': length,
@@ -150,7 +171,9 @@ class TableParser {
                         'AutoIncrement': isAi,
                         'EnumValues': enumArray,
                         'Comment': comment // Store the comment separately
-                    });
+                    };
+
+                    fieldList.push(column);
                     columnList.push(columnName);
                 }
             } else if (this.isPrimaryKey(line)) {
