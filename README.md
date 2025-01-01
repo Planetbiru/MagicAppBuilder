@@ -167,7 +167,6 @@ The image format of ERD is SVG. This format can be converted to PNG if needed. P
 -   If there are multiple columns referring to the primary key of a table, this should be noted when creating the module.
 -   Columns with the same purpose across different tables must have the same name.
 -   Application features should be defined before creating the entity relationship diagram.
-    
 
 4.  Export the entity relationship diagram to SQL.
     
