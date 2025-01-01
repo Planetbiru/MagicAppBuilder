@@ -109,6 +109,8 @@ class Column {
         if (this.hasDefault()) {
             if(this.isTypeBoolean(this.type, this.length)) {
                 columnDef += ` DEFAULT ${this.toBoolean(this.default)}`; // No quotes for boolean values
+            } else if(this.isTypeNumeric(this.type, numericTypes)) {
+                columnDef += ` DEFAULT ${this.toNumeric(this.default)}`; // No quotes for boolean values
             } else if (numericTypes.includes(this.type) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
             } else {
@@ -116,6 +118,42 @@ class Column {
             }
         }
         return columnDef;
+    }
+
+    /**
+     * Converts a string with quotes into a numeric string without quotes.
+     * 
+     * This function removes leading and trailing quotes from the input string.
+     * If the resulting string is empty, it returns the string '0'.
+     *
+     * @param {string} value - The input string that may contain quotes.
+     * @returns {string} - The numeric string without quotes, or '0' if the string is empty after removing quotes.
+     */
+    toNumeric(value)
+    {
+        let result = value;
+        result = result.replace(/^"(.*)"$/, '$1');
+        result = result.replace(/^'(.*)'$/, '$1');
+        if(result == '')
+        {
+            return '0';
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the given type is included in the list of numeric types.
+     *
+     * This function takes a `type` and checks if it is included in the provided
+     * `numericTypes` array. The comparison is case-insensitive.
+     *
+     * @param {string} type - The type to check (e.g., 'BIGINT', 'FLOAT', etc.).
+     * @param {string[]} numericTypes - The list of valid numeric types (e.g., ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT']).
+     * @returns {boolean} - Returns `true` if `type` is included in `numericTypes`, otherwise returns `false`.
+     */
+    isTypeNumeric(type, numericTypes)
+    {
+        return numericTypes.includes(type.toUpperCase());
     }
 
     /**
@@ -1081,7 +1119,7 @@ class EntityEditor {
                 // Create a new Column instance
                 const column = new Column(
                     columnData.Field,
-                    columnData.Type,
+                    columnData.Type.toUpperCase(),
                     columnData.Length,
                     columnData.Nullable,
                     columnData.Default,
