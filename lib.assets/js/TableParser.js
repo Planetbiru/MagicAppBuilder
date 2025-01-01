@@ -66,7 +66,6 @@ class TableParser {
         return ai; 
     }
 
-
     /**
      * Parses a CREATE TABLE SQL statement and extracts table and column information.
      * @param {string} sql The SQL string representing a CREATE TABLE statement.
@@ -213,7 +212,7 @@ class TableParser {
         if (defaultValue) {
             // Case 1: Handle BOOLEAN values (TRUE/FALSE)
             if(this.isBoolean(dataType, length)) {
-                defaultValue = defaultValue.toUpperCase().indexOf('TRUE') != -1 ? 'TRUE' : 'FALSE';
+                defaultValue = this.toBoolean(defaultValue);
             }
             // Case 2: Handle 'DEFAULT NULL'
             else if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
@@ -250,6 +249,21 @@ class TableParser {
             defaultValue = null; // If no default value, set it to null
         }
         return defaultValue;
+    }
+
+    /**
+     * Converts a given value to a boolean string ('TRUE' or 'FALSE') based on its content.
+     * This function checks if the value contains the string 'TRUE' (case-insensitive) or 
+     * if it contains the character '1'. If either condition is met, it returns 'TRUE'; 
+     * otherwise, it returns 'FALSE'. This is useful for normalizing boolean-like values 
+     * (e.g., strings such as '1', 'TRUE', 'true', etc.) into a standardized 'TRUE'/'FALSE' format.
+     *
+     * @param {string} defaultValue - The input value to be converted to a boolean string.
+     * @returns {string} - Returns 'TRUE' if the input contains 'TRUE' or '1', otherwise returns 'FALSE'.
+     */
+    toBoolean(defaultValue)
+    {
+        return defaultValue.toUpperCase().indexOf('TRUE') != -1 || defaultValue.indexOf('1') != -1 ? 'TRUE' : 'FALSE';
     }
 
     /**
