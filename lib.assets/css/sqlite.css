@@ -12,6 +12,11 @@ body {
     height: 100vh;
 }
 
+a{
+    color: #007bff;
+    text-decoration: none;
+}
+
 .container {
     display: block;
     align-items: center;
@@ -58,7 +63,7 @@ p {
 
 .button {
     display: inline-block;
-    background-color: #007bff;
+    background-color: #066cd9;
     color: #fff;
     padding: 10px 20px;
     text-decoration: none;
