@@ -12,7 +12,7 @@ class TableParser {
         this.tableInfo = [];
         this.init();
 
-        if (sql) {
+        if (sql != null) {
             this.parseAll(sql);
         }
     }
@@ -218,6 +218,17 @@ class TableParser {
         return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
     }
 
+    /**
+     * Updates the primary key flag for a specified field in a list of fields.
+     * 
+     * This function iterates over a list of field objects, compares the 'Field' property
+     * of each object to the given primaryKey, and sets the 'Key' property to true 
+     * for the matching field. If no match is found, the field remains unchanged.
+     * 
+     * @param {Array} fieldList - An array of field objects, each containing a 'Field' and 'Key' property.
+     * @param {string} primaryKey - The field name to be set as the primary key.
+     * @returns {Array} The updated fieldList with the 'Key' property set to true for the matched field.
+     */
     updatePrimaryKey(fieldList, primaryKey)
     {
         fieldList.forEach(function(field, index){

@@ -12,6 +12,16 @@
             <h1>SQLite is Not Available</h1>
             <p>It seems that SQLite is not available on your system. Please make sure that SQLite is properly installed and enabled.</p>
             <p>If you need help setting up SQLite, please refer to the installation documentation or contact your administrator.</p>
+            <?php
+            // Mendapatkan semua ekstensi yang aktif di PHP
+            $extensions = get_loaded_extensions();
+            if(!in_array('pdo_sqlite', $extensions))
+            {
+                ?>
+                <p><strong>pdo_sqlite extension is not loaded</strong></p>
+                <?php
+            }
+            ?>
         </div>
     </div>
 </body>
