@@ -5,12 +5,15 @@
   font-family: monospace;
   height: 300px;
   color: black;
+  padding-left: 0; 
+  line-height: 1.6;
 }
 
 /* PADDING */
 
 .CodeMirror-lines {
   padding: 4px 0; /* Vertical padding around content */
+  line-height: 1.6;
 }
 .CodeMirror pre {
   padding: 0 4px; /* Horizontal padding of content */
@@ -23,11 +26,14 @@
 /* GUTTER */
 
 .CodeMirror-gutters {
+  width: 40px; 
   border-right: 1px solid #ddd;
   background-color: #f7f7f7;
   white-space: nowrap;
 }
-.CodeMirror-linenumbers {}
+.CodeMirror-linenumbers {
+  padding-right: 5px; 
+}
 .CodeMirror-linenumber {
   padding: 0 3px 0 5px;
   min-width: 20px;
@@ -162,6 +168,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
 .CodeMirror-sizer {
   position: relative;
   border-right: 30px solid transparent;
+  padding-left: 0px; 
 }
 
 /* The fake, visible scrollbars. Used to force redraw during scrolling
@@ -332,3 +339,5 @@ div.CodeMirror-dragcursors {
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
+
+

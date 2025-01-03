@@ -18,15 +18,15 @@ $constSelected = ' selected';
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="shortcut icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/css.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>
-  <script type="text/javascript" src="lib.assets/cm/lib/codemirror.js"></script>
-  <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.js"></script>
-  <script type="text/javascript" src="lib.assets/cm/mode/meta.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
@@ -1124,5 +1124,8 @@ $constSelected = ' selected';
       </div>
   </div>
 
+  <style>
+    
+  </style>
 </body>
 </html>
