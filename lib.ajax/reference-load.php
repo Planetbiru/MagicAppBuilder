@@ -10,7 +10,13 @@ require_once dirname(__DIR__) . "/inc.app/app.php";
 $inputGet = new InputGet();
 if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
     header("Content-type: application/json");
-    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/reference/" . $inputGet->getFieldName() . "-" . $inputGet->getKey() . ".json";
+    $path = sprintf(
+        "%s/applications/%d/reference/%s-%s.json",
+        $workspaceDirectory,
+        $curApp->getId(),
+        $inputGet->getFieldName(),
+        $inputGet->getKey()
+    );
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }
