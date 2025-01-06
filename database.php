@@ -1898,7 +1898,7 @@ class DatabaseExplorer // NOSONAR
                         // For MySQL or PostgreSQL
                         $columns = $row;
                     }
-                    if($columns['Key'] == 'PRI')
+                    if($columns['Key'] == 'PRI' || $columns['Key'] == 'DEFAULTPRI')
                     {
                         return $columns['Field'];
                     }
