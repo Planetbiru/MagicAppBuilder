@@ -599,13 +599,23 @@ jQuery(function () {
       },
     });
   });
+  
+  $(document).on('click', '.add_subfix', function (e) {
+    let entityName = $('.rd-entity-name').val();
+    if(!entityName.endsWith('Min'))
+    {
+      entityName += 'Min';
+      $('.rd-entity-name').val(entityName);
+    }
+  });
+  
 
   $(document).on('click', '.generate_entity', function (e) {
     let entityName = $('.rd-entity-name').val();
     let tableName = $('.rd-table-name').val();
 
     asyncAlert(
-      'Are you sure you want to generate entity and replace existing file?',  // Message to display in the modal
+      'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
       'Entity Generation Confirmation',  // Modal title
       [
         {
@@ -4319,7 +4329,10 @@ function getReferenceResource() {
                       </tr>
                       <tr class="entity-generator">
                           <td></td>
-                          <td><button type="button" class="btn btn-primary generate_entity">Generate Entity</button></td>
+                          <td>
+                            <button type="button" class="btn btn-primary add_subfix">Add Entity Subfix</button>
+                            <button type="button" class="btn btn-success generate_entity">Generate Entity</button>
+                          </td>
                       </tr>
                   </tbody>
               </table>

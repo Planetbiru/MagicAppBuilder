@@ -10,10 +10,8 @@ require_once __DIR__ . "/inc.app/sessions.php";
 $inputPost = new InputPost();
 
 $entityUser = new EntityApplicationUser(null, $databaseBuilder);
-echo $inputPost;
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
-    echo "AAAAAAAA";
     $userLoggedIn = false;
     try
     {
