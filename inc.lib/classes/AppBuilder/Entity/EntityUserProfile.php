@@ -28,13 +28,22 @@ class EntityUserProfile extends MagicObject
 	protected $userProfileId;
 
     /**
-	 * User ID
+	 * Application User ID
 	 * 
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User ID")
+	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Application User ID")
 	 * @var string
 	 */
-	protected $userId;
+	protected $applicationUserId;
+	
+	/**
+	 * Application User
+	 * 
+	 * @JoinColumn(name="application_user_id", referenceColumnName="application_user_id")
+	 * @Label(content="Application User")
+	 * @var string
+	 */
+	protected $applicationUser;
     
     /**
 	 * Profile Name

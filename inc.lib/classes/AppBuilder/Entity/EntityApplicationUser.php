@@ -5,27 +5,27 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUser is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityApplicationUser is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user")
+ * @Table(name="application_user")
  */
-class EntityUser extends MagicObject
+class EntityApplicationUser extends MagicObject
 {
 	/**
-	 * User ID
+	 * Application User ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User ID")
+	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Application User ID")
 	 * @var string
 	 */
-	protected $userId;
+	protected $applicationUserId;
 
 	/**
 	 * Name

@@ -1,16 +1,25 @@
 <?php
 
-use AppBuilder\Entity\EntityUser;
+use AppBuilder\AppInstaller;
+use AppBuilder\Entity\EntityApplicationUser;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
-use MagicObject\Generator\PicoDatabaseDump;
+use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
-if($builderConfig->getDatabase() != null || ($builderConfig->getDriver() == PicoDatabaseType::DATABASE_TYPE_SQLITE && $builderConfig->getDatabaseFilePath()))
+$databaseConfigBuilder = $builderConfig->getDatabase();
+
+if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == PicoDatabaseType::DATABASE_TYPE_SQLITE && $databaseConfigBuilder->getDatabaseFilePath()))
 {
-    $databaseConfigBuilder = $builderConfig->getDatabase();
+    $installed = true;
+    if(!file_exists($databaseConfigBuilder->getDatabaseFilePath()))
+    {
+        $installed = false;
+    }
+
     $databaseBuilder = new PicoDatabase($databaseConfigBuilder, null, function($sql){
+        error_log($sql);
     });
     try
     {
@@ -18,67 +27,58 @@ if($builderConfig->getDatabase() != null || ($builderConfig->getDriver() == Pico
     }
     catch(Exception $e)
     {
-        if($e->getCode() == 1049)
+    }
+    
+    if(!$installed)
+    {
+        try
         {
+            $appInstaller = new AppInstaller();
+
+            $sql = $appInstaller->generateInstallerQuery($databaseBuilder, $cacheDir);
+            $queries = PicoDatabaseUtil::splitSql($sql);
             try
             {
-                $databaseName = $databaseConfigBuilder->getDatabaseName();
-                
-                $databaseBuilder->connect(false);
-                $databaseBuilder->execute("CREATE DATABASE IF NOT EXISTS $databaseName");
-                $databaseBuilder->connect();
-                
-                $files = glob(dirname(__DIR__)."/inc.lib/classes/AppBuilder/Entity/*.php");
-                
-                foreach($files as $file)
+                foreach($queries as $query)
                 {
-                    $path = $file;
-                    
-                    $entityName = basename($path, ".php");
-                    include_once $path;
-                            
-                    $className = "AppBuilder\\Entity\\".$entityName;
-                    $entity = new $className(null, $databaseBuilder);
-                    $dumper = new PicoDatabaseDump();
-        
-                    $quertArr = $dumper->createAlterTableAdd($entity);
-                    foreach($quertArr as $sql)
-                    {
-                        if(!empty($sql))
-                        {
-                            $databaseBuilder->execute($sql);
-                        }
-                    }
+                    $query = $query['query'];
+                    $databaseBuilder->execute($query);
                 }
-                
-                $now = date('Y-m-d H:i:s');
-                
-                $user = new EntityUser(null, $databaseBuilder);
-                $user->setUsername("administrator");
-                $user->setName("Administrator");
-                $password = 'administrator';
-                $hash = hash('sha512', $password);
-                $hash = hash('sha512', $hash);
-                $user->setPassword($hash);    
-                $user->setLastResetPassword($now);
-                $user->setTimeCreate($now);
-                $user->setTimeEdit($now);
-                $user->setIpCreate($_SERVER['REMOTE_ADDR']);
-                $user->setIpEdit($_SERVER['REMOTE_ADDR']);
-                $user->setActive(true);
-                $user->insert();
-                            
-                $userUpdate = new EntityUser(null, $databaseBuilder);
-                $userUpdate
-                    ->setUserId($user->getUserId())
-                    ->setAdminCreate($user->getUserId())
-                    ->setAdminEdit($user->getUserId())
-                    ->update();
             }
-            catch(Exception $e2)
+            catch(Exception $e)
             {
-                exit();
+                error_log($e->getMessage());
             }
+
+            $now = date('Y-m-d H:i:s');
+                    
+            $user = new EntityApplicationUser(null, $databaseBuilder);
+            $user->setUsername("administrator");
+            $user->setName("Administrator");
+            $password = 'administrator';
+            $hash = hash('sha1', $password);
+            $hash = hash('sha1', $hash);
+            $user->setPassword($hash);    
+            $user->setLastResetPassword($now);
+            $user->setTimeCreate($now);
+            $user->setTimeEdit($now);
+            $user->setIpCreate($_SERVER['REMOTE_ADDR']);
+            $user->setIpEdit($_SERVER['REMOTE_ADDR']);
+            $user->setActive(true);
+            $user->insert();
+                        
+            $userUpdate = new EntityApplicationUser(null, $databaseBuilder);
+            $userUpdate
+                ->setApplicationUserId($user->getApplicationUserId())
+                ->setAdminCreate($user->getApplicationUserId())
+                ->setAdminEdit($user->getApplicationUserId())
+                ->update();
         }
+        catch(Exception $e)
+        {
+            echo $e->getMessage();
+        }
+
+
     }
 }

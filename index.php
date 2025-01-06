@@ -45,7 +45,9 @@ $constSelected = ' selected';
         <?php
         }
         ?>
-
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" type="button" role="tab" aria-controls="config" onclick="window.location='logout.php'">Logout</button>
+        </li>
       </ul>
       <div class="tab-content" id="myTabContent">
 

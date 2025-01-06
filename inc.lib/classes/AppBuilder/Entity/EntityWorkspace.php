@@ -11,7 +11,7 @@ use MagicObject\MagicObject;
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application")
+ * @Table(name="workspace")
  */
 class EntityWorkspace extends MagicObject
 {
