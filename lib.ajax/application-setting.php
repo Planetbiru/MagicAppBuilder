@@ -128,11 +128,12 @@ else
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $moduleLocation = $appConfig->getApplication() != null ? $appConfig->getApplication()->getBaseModuleDirectory() : [new SecretObject([
+                                        $moduleLocation = $appConfig->getApplication() != null && $appConfig->getApplication()->getBaseModuleDirectory() != null && is_array($appConfig->getApplication()->getBaseModuleDirectory()) ? $appConfig->getApplication()->getBaseModuleDirectory() : [new SecretObject([
                                             "name"=>"root",
                                             "path"=>"/",
                                             "active"=>false
                                         ])];
+                                       
                                         foreach($moduleLocation as $index=>$location)
                                         {
                                         ?>
@@ -144,6 +145,7 @@ else
                                         </tr>
                                         <?php
                                         }
+                                        
                                         ?>
                                     </tbody>
                                     <tfoot>
