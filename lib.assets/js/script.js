@@ -170,6 +170,7 @@ jQuery(function () {
     let dataToPost = {
       name: form.find('[name="application_name"]').val(),
       architecture: form.find('[name="application_architecture"]').val(),
+      base_application_directory: form.find('[name="application_base_directory"]').val(),
       description: form.find('[name="description"]').val(),
       database: {},
       sessions: {},

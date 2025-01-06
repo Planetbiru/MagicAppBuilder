@@ -6,28 +6,28 @@ require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/database-builder.php";
 require_once __DIR__ . "/sessions.php";
 
-
-$entityUser = new EntityApplicationUser(null, $databaseBuilder);
-//$sessions->userId = "administrator";
-//$sessions->userPassword = sha1("administrator");
-
-$userLoggedIn = false;
-
-if(isset($sessions->userId) && isset($sessions->userPassword))
+if(isset($databaseBuilder))
 {
-    try
-    {
-        $entityUser->findOneByUsernameAndPassword($sessions->userId, sha1($sessions->userPassword));
-        $userLoggedIn = true;
-    }
-    catch(Exception $e)
-    {
-        $userLoggedIn = false;
-    }
-}
+    $entityUser = new EntityApplicationUser(null, $databaseBuilder);
 
-if(!$userLoggedIn)
-{
-    require_once __DIR__ . "/login-form.php";
-    exit();
+    $userLoggedIn = false;
+
+    if(isset($sessions->userId) && isset($sessions->userPassword))
+    {
+        try
+        {
+            $entityUser->findOneByUsernameAndPassword($sessions->userId, sha1($sessions->userPassword));
+            $userLoggedIn = true;
+        }
+        catch(Exception $e)
+        {
+            $userLoggedIn = false;
+        }
+    }
+
+    if(!$userLoggedIn)
+    {
+        require_once __DIR__ . "/login-form.php";
+        exit();
+    }
 }

@@ -28,7 +28,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     }
     if(!$userLoggedIn)
     {
-        require_once __DIR__ . "/login-form.php";
+        require_once __DIR__ . "/inc.app/login-form.php";
         exit();
     }
     else

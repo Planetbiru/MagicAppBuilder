@@ -41,8 +41,6 @@ if(!$appConfig->issetApplication() && isset($appList) && $appList instanceof Sec
             $appConfig->setApplication($fixApp);
         }
     }
-    
-    
 }
 
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
@@ -111,6 +109,10 @@ else
                             <tr>
                                 <td>Description</td>
                                 <td><textarea class="form-control" name="description" spellcheck="false"><?php echo $app->getDescription(); ?></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>Application Directory</td>
+                                <td><input class="form-control" type="text" name="application_base_directory" value="<?php echo $app->getBaseApplicationDirectory(); ?>"></td>
                             </tr>
                             <tr>
                                 <td>Path</td>

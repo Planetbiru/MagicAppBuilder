@@ -32,6 +32,21 @@ try
 		$appConfig->getApplication()->setName($applicationName);
 		$appConfig->getApplication()->setDescription($description);
 		$appConfig->getApplication()->setArchitecture($architecture);
+
+
+        if($inputPost->getBaseApplicationDirectory() != null)
+        {
+            $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory();
+            $baseApplicationDirectory = rtrim($baseApplicationDirectory);
+            $baseEntityDirectory = $baseApplicationDirectory . '/inc.lib/classes';
+            $baseLanguageDirectory = $baseApplicationDirectory . '/inc.lang';
+
+            $appConfig->getApplication()->setBaseApplicationDirectory($baseApplicationDirectory);
+            $appConfig->getApplication()->setBaseEntityDirectory($baseEntityDirectory);
+            $appConfig->getApplication()->setBaseLanguageDirectory($baseLanguageDirectory);
+
+        }
+
 	}
 
     $moduleLocations = $inputPost->getModuleLocation();
