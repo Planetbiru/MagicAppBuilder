@@ -8,9 +8,8 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
-require_once (__DIR__) . "/inc.app/app.php";
 require_once __DIR__ . "/inc.app/sqlite-detector.php";
-require_once (__DIR__) . "/inc.app/sessions.php";
+require_once __DIR__ . "/inc.app/auth.php";
 
 if(isset($databaseConfig))
 {

@@ -2,9 +2,9 @@
 
 use MagicObject\SecretObject;
 
+require_once __DIR__ . "/inc.app/sqlite-detector.php";
 require_once __DIR__ . "/inc.app/auth.php";
 require_once __DIR__ . "/inc.app/navs.php";
-require_once __DIR__ . "/inc.app/sqlite-detector.php";
 
 $constShowActive = ' show active';
 $constSelected = ' selected';

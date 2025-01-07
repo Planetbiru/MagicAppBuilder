@@ -39,6 +39,11 @@ try
     $workspace->setActive(true);
     
     $workspace->insert();
+
+    if(isset($entityUser) && $entityUser->getApplicationUserId() != null)
+    {
+        $entityUser->setWorkspaceId($workspace->getWorkspaceId())->update();
+    }
 }
 catch(Exception $e)
 {
