@@ -8,6 +8,7 @@ use PDOException;
 use PDOStatement;
 use MagicObject\Exceptions\InvalidDatabaseConfiguration;
 use MagicObject\Exceptions\NullPointerException;
+use MagicObject\Exceptions\UnsupportedDatabaseException;
 use MagicObject\SecretObject;
 use ReflectionFunction;
 use stdClass;
@@ -397,73 +398,16 @@ class PicoDatabase // NOSONAR
                 throw new InvalidDatabaseConfiguration("Database username may not be empty. Please check your database configuration!");
             }
 
-            $initialQueries = array();
-
             // Get charset from the database credentials
             $charset = addslashes($this->databaseCredentials->getCharset());
 
             // Handle PostgreSQL-specific connection settings
             if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-
-                // Set time zone for PostgreSQL
-                $initialQueries[] = "SET TIMEZONE TO '$timeZoneOffset';";
-
-                // Set the client encoding (charset) for PostgreSQL
-                if ($charset) {
-                    $initialQueries[] = "SET CLIENT_ENCODING TO '$charset';";
-                }
-
-                // Set schema if provided for PostgreSQL
-                if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
-                    $initialQueries[] = "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
-                }
-
-                // PostgreSQL connection setup
-                $this->databaseConnection = new PDO(
-                    $connectionString,
-                    $this->databaseCredentials->getUsername(),
-                    $this->databaseCredentials->getPassword(),
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-                    ]
-                );
-
-                // Execute the initial queries (timezone, charset, schema) in PostgreSQL
-                if (!empty($initialQueries)) {
-                    foreach($initialQueries as $initialQuery)
-                    {
-                        $this->databaseConnection->exec($initialQuery);
-                    }
-                }
-
+                $this->connectPostgreSql($connectionString, $timeZoneOffset, $charset);
             }
             // Handle MySQL-specific connection settings
             else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
-                // Set time zone for MySQL
-                $initialQueries[] = "SET time_zone='$timeZoneOffset';";
-                
-                // Add charset to the initial queries for MySQL
-                if ($charset) {
-                    $initialQueries[] = "SET NAMES '$charset';";  // Set charset for MySQL
-                }
-
-                // MySQL connection setup
-                $this->databaseConnection = new PDO(
-                    $connectionString,
-                    $this->databaseCredentials->getUsername(),
-                    $this->databaseCredentials->getPassword(),
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::MYSQL_ATTR_FOUND_ROWS => true
-                    ]
-                );
-                
-                if (!empty($initialQueries)) {
-                    foreach($initialQueries as $initialQuery)
-                    {
-                        $this->databaseConnection->exec($initialQuery);
-                    }
-                }
+                $this->connectMySql($connectionString, $timeZoneOffset, $charset);
             }
             // If the database type is neither MySQL nor PostgreSQL, throw an exception
             else {
@@ -480,22 +424,112 @@ class PicoDatabase // NOSONAR
         }
         return $connected;
     }
+
+    /**
+     * Establish a connection to a MySQL or MariaDB database.
+     *
+     * This method sets up a connection to a MySQL or MariaDB database, configuring the time zone
+     * and character set (charset) as needed. It runs initial queries to set the correct time zone 
+     * and charset, and then establishes a PDO connection to the database.
+     *
+     * @param string $connectionString The connection string used to connect to the database.
+     * @param string $timeZoneOffset The time zone offset to be used in the database session.
+     * @param string $charset The character set (charset) to be used for the database connection.
+     *
+     * @return void
+     *
+     * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
+     */
+    private function connectMySql($connectionString, $timeZoneOffset, $charset)
+    {
+        $initialQueries = array();
+        // Set time zone for MySQL
+        $initialQueries[] = "SET time_zone='$timeZoneOffset';";
+                        
+        // Add charset to the initial queries for MySQL
+        if ($charset) {
+            $initialQueries[] = "SET NAMES '$charset';";  // Set charset for MySQL
+        }
+
+        // MySQL connection setup
+        $this->databaseConnection = new PDO(
+            $connectionString,
+            $this->databaseCredentials->getUsername(),
+            $this->databaseCredentials->getPassword(),
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_FOUND_ROWS => true
+            ]
+        );
+
+        if (!empty($initialQueries)) {
+            foreach($initialQueries as $initialQuery)
+            {
+                $this->databaseConnection->exec($initialQuery);
+            }
+        }
+    }
+
+    /**
+     * Establish a connection to a PostgreSQL database.
+     *
+     * This method sets up a connection to a PostgreSQL database, configuring the time zone,
+     * character set (charset), and schema (search path) as needed. It runs initial queries 
+     * to set the correct time zone, charset, and schema for the session, and then establishes 
+     * a PDO connection to the database.
+     *
+     * @param string $connectionString The connection string used to connect to the PostgreSQL database.
+     * @param string $timeZoneOffset The time zone offset to be used in the database session.
+     * @param string $charset The character set (charset) to be used for the PostgreSQL connection.
+     *
+     * @return void
+     *
+     * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
+     */
+    private function connectPostgreSql($connectionString, $timeZoneOffset, $charset)
+    {
+        $initialQueries = array();
+        // Set time zone for PostgreSQL
+        $initialQueries[] = "SET TIMEZONE TO '$timeZoneOffset';";
+
+        // Set the client encoding (charset) for PostgreSQL
+        if (isset($charset) && !empty($charset)) {
+            $initialQueries[] = "SET CLIENT_ENCODING TO '$charset';";
+        }
+
+        // Set schema if provided for PostgreSQL
+        if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
+            $initialQueries[] = "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
+        }
+
+        // PostgreSQL connection setup
+        $this->databaseConnection = new PDO(
+            $connectionString,
+            $this->databaseCredentials->getUsername(),
+            $this->databaseCredentials->getPassword(),
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]
+        );
+
+        // Execute the initial queries (timezone, charset, schema) in PostgreSQL
+        if (!empty($initialQueries)) {
+            foreach($initialQueries as $initialQuery)
+            {
+                $this->databaseConnection->exec($initialQuery);
+            }
+        }
+    }
     
     /**
-     * Determine the database type based on the provided database type string.
+     * Determine the database type from a string.
      *
-     * This method evaluates the given string to identify common database type names
-     * (e.g., SQLite, PostgreSQL, MariaDB, MySQL) and returns the corresponding 
-     * constant from the `PicoDatabaseType` class that represents the type of database.
-     * The function performs case-insensitive string matching using `stripos` to check for
-     * keywords like "sqlite", "postgre", "pgsql", "maria", and defaults to MySQL if no match is found.
+     * This method evaluates the provided string to identify common database types (e.g., SQLite, PostgreSQL, MariaDB, MySQL) 
+     * and returns the corresponding constant from the `PicoDatabaseType` class.
      *
-     * @param string $databaseType The database type string to evaluate, such as 'SQLite', 'PostgreSQL', 'MariaDB', or 'MySQL'.
-     * @return string The corresponding database type constant from `PicoDatabaseType`:
-     *                - `PicoDatabaseType::DATABASE_TYPE_SQLITE`
-     *                - `PicoDatabaseType::DATABASE_TYPE_PGSQL`
-     *                - `PicoDatabaseType::DATABASE_TYPE_MARIADB`
-     *                - `PicoDatabaseType::DATABASE_TYPE_MYSQL`
+     * @param string $databaseType The database type string (e.g., 'SQLite', 'PostgreSQL', 'MariaDB', 'MySQL').
+     * @return string The corresponding `PicoDatabaseType` constant.
+     * @throws UnsupportedDatabaseException If the database type is unsupported.
      */
     private static function getDbType($databaseType) // NOSONAR
     {
@@ -511,9 +545,13 @@ class PicoDatabase // NOSONAR
         {
             return PicoDatabaseType::DATABASE_TYPE_MARIADB;
         }
-        else
+        else if(stripos($databaseType, 'mysql') !== false)
         {
             return PicoDatabaseType::DATABASE_TYPE_MYSQL;
+        }
+        else
+        {
+            throw new UnsupportedDatabaseException("Unsupported database type: $databaseType");
         }
     }
 
@@ -644,6 +682,20 @@ class PicoDatabase // NOSONAR
     }
 
     /**
+     * Start a new database transaction.
+     *
+     * This method begins a new transaction, allowing subsequent database operations
+     * to be grouped together. The changes made during the transaction are not permanent
+     * until the transaction is committed.
+     *
+     * @return bool Returns `true` if the transaction was successfully started, `false` otherwise.
+     */
+    public function startTransaction()
+    {
+        return $this->databaseConnection->query((new PicoDatabaseQueryBuilder($this))->startTransaction());
+    }
+
+    /**
      * Commit the current transaction.
      *
      * This method commits the transaction, making all changes made during the transaction permanent.
@@ -652,7 +704,7 @@ class PicoDatabase // NOSONAR
      */
     public function commit()
     {
-        return $this->databaseConnection->commit();
+        return $this->databaseConnection->query((new PicoDatabaseQueryBuilder($this))->commit());
     }
 
     /**
@@ -664,7 +716,7 @@ class PicoDatabase // NOSONAR
      */
     public function rollback()
     {
-        return $this->databaseConnection->rollback();
+        return $this->databaseConnection->query((new PicoDatabaseQueryBuilder($this))->rollback());
     }
 
     /**

@@ -2294,16 +2294,37 @@ Session variables keep information about one single user, and are available to a
 
 ```yaml
 session:
-  name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
-  save_handler: files
-  save_path: /tmp/sessions
+  name: ${SESSION_NAME}
+  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  save_handler: ${SESSION_SAVE_HANDLER}
+  save_path: ${SESSION_SAVE_PATH}
+  cookie_lifetime: ${SESSION_COOKIE_LIFETIME}
+  cookie_path: ${SESSION_COOKIE_PATH}
+  cookie_secure: ${SESSION_COOKIE_SECURE}
+  cookie_httponly: ${SESSION_COOKIE_HTTPONLY}
+  cookie_domain: ${SESSION_COOKIE_DOMAIN}
 ```
 
-- `name`: Name of the session.
-- `max_life_time`: Maximum lifetime of the session in seconds (e.g., 86400 seconds = 24 hours).
-- `save_handler`: Specifies the session storage mechanism (in this case, files).
-- `save_path`: Directory where session files are stored.
+### Explanation:
+  
+-   **name**: Specifies the name of the session. The value `${SESSION_NAME}` refers to an environment variable or a parameter that should be defined elsewhere in the application or server environment. It determines the session's name identifier.
+    
+-   **max_life_time**: Defines the maximum lifetime of the session in seconds. The value `${SESSION_MAX_LIFE_TIME}` is expected to come from an environment variable or configuration setting, controlling how long the session will last before it expires.
+    
+-   **save_handler**: Specifies the handler used to save session data. In this case, `${SESSION_SAVE_HANDLER}` likely refers to the session handler, such as `redis`, `files`, or `database`, depending on the server configuration.
+    
+-   **save_path**: Defines the path where session data will be stored. The value `${SESSION_SAVE_PATH}` is an environment variable or configuration parameter, which could specify a directory or Redis connection string (if `redis` is used as the save handler).
+    
+-   **cookie_lifetime**: Specifies the lifetime of the session cookie in seconds, which controls how long the cookie will persist in the user's browser. `${SESSION_COOKIE_LIFETIME}` is the environment variable or configuration value that sets this duration.
+    
+-   **cookie_path**: The path on the server where the session cookie is valid. `${SESSION_COOKIE_PATH}` determines the directory or URL prefix for which the session cookie is set.
+    
+-   **cookie_secure**: A boolean flag that determines whether the session cookie should be transmitted over HTTPS only. If `${SESSION_COOKIE_SECURE}` is set to `true`, the cookie will only be sent over secure connections.
+    
+-   **cookie_httponly**: A boolean flag that indicates whether the session cookie is accessible only through the HTTP protocol (i.e., not accessible via JavaScript). If `${SESSION_COOKIE_HTTPONLY}` is `true`, it increases security by preventing client-side access to the cookie.
+    
+-   **cookie_domain**: Specifies the domain to which the session cookie is valid. `${SESSION_COOKIE_DOMAIN}` can define the domain for which the session cookie should be sent, allowing cross-subdomain access to the session.
+
 
 **PHP Script**
 
@@ -2354,10 +2375,15 @@ For example:
 
 ```yaml
 session:
-  name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
-  save_handler: redis
+  name: ${SESSION_NAME}
+  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  save_handler: ${SESSION_SAVE_HANDLER}
   save_path: ${SESSION_SAVE_PATH}
+  cookie_lifetime: ${SESSION_COOKIE_LIFETIME}
+  cookie_path: ${SESSION_COOKIE_PATH}
+  cookie_secure: ${SESSION_COOKIE_SECURE}
+  cookie_httponly: ${SESSION_COOKIE_HTTPONLY}
+  cookie_domain: ${SESSION_COOKIE_DOMAIN}
 ```
 
 `${SESSION_SAVE_PATH}` contains entire of `save_path` that encrypted with you secure key.

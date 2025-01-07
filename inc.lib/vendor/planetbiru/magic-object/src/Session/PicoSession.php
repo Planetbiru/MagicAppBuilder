@@ -195,26 +195,29 @@ class PicoSession
     }
 
     /**
-     * Sets cookie parameters for the session.
+     * Sets the session cookie parameters, including lifetime, path, domain, security attributes, and SameSite settings.
      *
-     * This method sets parameters for the session cookie, including lifetime,
-     * security attributes, and SameSite settings.
+     * This method configures the session cookie parameters such as maximum lifetime, path, domain, and security settings
+     * like whether the cookie should be accessible only over HTTPS or only via HTTP. It also sets the SameSite attribute
+     * for compatibility with different browsers and PHP versions.
      *
-     * @param int $maxlifetime Maximum lifetime of the session cookie.
+     * @param int $maxlifetime Maximum lifetime of the session cookie in seconds.
+     * @param string $path The path where the cookie will be available on the server.
+     * @param string $domain The domain to which the cookie is available.
      * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
-     * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
-     * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
+     * @param bool $httponly Indicates if the cookie should be accessible only through the HTTP protocol.
+     * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None). Default is 'Strict'.
      * @return self Returns the current instance for method chaining.
      */
-    public function setSessionCookieParams($maxlifetime, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
+    public function setSessionCookieParams($maxlifetime, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT)
     {
         if (PHP_VERSION_ID < 70300) {
-            session_set_cookie_params($maxlifetime, '/; samesite=' . $samesite, $_SERVER['HTTP_HOST'], $secure, $httponly);
+            session_set_cookie_params($maxlifetime, $path.'; samesite=' . $samesite, $domain, $secure, $httponly);
         } else {
             session_set_cookie_params(array(
                 'lifetime' => $maxlifetime,
-                'path' => '/',
-                'domain' => $_SERVER['HTTP_HOST'],
+                'path' => $path,
+                'domain' => $domain,
                 'secure' => $secure,
                 'httponly' => $httponly,
                 'samesite' => $samesite
@@ -224,18 +227,19 @@ class PicoSession
     }
 
     /**
-     * Sets a cookie with SameSite attribute support for different PHP versions.
+     * Sets a cookie with the SameSite attribute, supporting both older and newer PHP versions.
      *
-     * This method sets a cookie with the specified SameSite attribute, supporting both older and newer PHP versions.
+     * This method sets a cookie with a specified SameSite attribute, ensuring compatibility with both PHP versions
+     * prior to and after PHP 7.3. It supports cookies with the 'Lax', 'Strict', or 'None' SameSite attributes.
      *
      * @param string $name The name of the cookie.
      * @param string $value The value of the cookie.
-     * @param int $expire The expiration time of the cookie.
-     * @param string $path The path on the server in which the cookie will be available.
-     * @param string $domain The domain that the cookie is available to.
+     * @param int $expire The expiration time of the cookie as a Unix timestamp.
+     * @param string $path The path on the server where the cookie is available.
+     * @param string $domain The domain to which the cookie is available.
      * @param bool $secure Indicates if the cookie should only be transmitted over a secure HTTPS connection.
      * @param bool $httponly Indicates if the cookie is accessible only through the HTTP protocol.
-     * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None).
+     * @param string $samesite The SameSite attribute of the cookie (Lax, Strict, None). Default is 'Strict'.
      * @return self Returns the current instance for method chaining.
      */
     public function setSessionCookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = self::SAME_SITE_STRICT) // NOSONAR
@@ -355,4 +359,18 @@ class PicoSession
         @session_id($id);
         return $this;
     }
+
+    /**
+     * Converts the session data to a string representation.
+     *
+     * This method returns the session data as a JSON-encoded string, which can be useful for debugging
+     * or logging the contents of the session. It encodes the global `$_SESSION` array into a JSON string.
+     *
+     * @return string The JSON-encoded string representation of the session data.
+     */
+    public function __toString()
+    {
+        return json_encode($_SESSION);
+    }
+
 }

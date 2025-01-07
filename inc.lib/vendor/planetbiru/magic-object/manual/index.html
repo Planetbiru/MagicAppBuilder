@@ -1989,15 +1989,44 @@ PicoFilterConstant::FILTER_SANITIZE_ASCII               = 601;</code></pre>
 <h3>Session with File</h3>
 <p><strong>Yaml File</strong></p>
 <pre><code class="language-yaml">session:
-  name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
-  save_handler: files
-  save_path: /tmp/sessions</code></pre>
+  name: ${SESSION_NAME}
+  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  save_handler: ${SESSION_SAVE_HANDLER}
+  save_path: ${SESSION_SAVE_PATH}
+  cookie_lifetime: ${SESSION_COOKIE_LIFETIME}
+  cookie_path: ${SESSION_COOKIE_PATH}
+  cookie_secure: ${SESSION_COOKIE_SECURE}
+  cookie_httponly: ${SESSION_COOKIE_HTTPONLY}
+  cookie_domain: ${SESSION_COOKIE_DOMAIN}</code></pre>
+<h3>Explanation:</h3>
 <ul>
-<li><code>name</code>: Name of the session.</li>
-<li><code>max_life_time</code>: Maximum lifetime of the session in seconds (e.g., 86400 seconds = 24 hours).</li>
-<li><code>save_handler</code>: Specifies the session storage mechanism (in this case, files).</li>
-<li><code>save_path</code>: Directory where session files are stored.</li>
+<li>
+<p><strong>name</strong>: Specifies the name of the session. The value <code>${SESSION_NAME}</code> refers to an environment variable or a parameter that should be defined elsewhere in the application or server environment. It determines the session's name identifier.</p>
+</li>
+<li>
+<p><strong>max_life_time</strong>: Defines the maximum lifetime of the session in seconds. The value <code>${SESSION_MAX_LIFE_TIME}</code> is expected to come from an environment variable or configuration setting, controlling how long the session will last before it expires.</p>
+</li>
+<li>
+<p><strong>save_handler</strong>: Specifies the handler used to save session data. In this case, <code>${SESSION_SAVE_HANDLER}</code> likely refers to the session handler, such as <code>redis</code>, <code>files</code>, or <code>database</code>, depending on the server configuration.</p>
+</li>
+<li>
+<p><strong>save_path</strong>: Defines the path where session data will be stored. The value <code>${SESSION_SAVE_PATH}</code> is an environment variable or configuration parameter, which could specify a directory or Redis connection string (if <code>redis</code> is used as the save handler).</p>
+</li>
+<li>
+<p><strong>cookie_lifetime</strong>: Specifies the lifetime of the session cookie in seconds, which controls how long the cookie will persist in the user's browser. <code>${SESSION_COOKIE_LIFETIME}</code> is the environment variable or configuration value that sets this duration.</p>
+</li>
+<li>
+<p><strong>cookie_path</strong>: The path on the server where the session cookie is valid. <code>${SESSION_COOKIE_PATH}</code> determines the directory or URL prefix for which the session cookie is set.</p>
+</li>
+<li>
+<p><strong>cookie_secure</strong>: A boolean flag that determines whether the session cookie should be transmitted over HTTPS only. If <code>${SESSION_COOKIE_SECURE}</code> is set to <code>true</code>, the cookie will only be sent over secure connections.</p>
+</li>
+<li>
+<p><strong>cookie_httponly</strong>: A boolean flag that indicates whether the session cookie is accessible only through the HTTP protocol (i.e., not accessible via JavaScript). If <code>${SESSION_COOKIE_HTTPONLY}</code> is <code>true</code>, it increases security by preventing client-side access to the cookie.</p>
+</li>
+<li>
+<p><strong>cookie_domain</strong>: Specifies the domain to which the session cookie is valid. <code>${SESSION_COOKIE_DOMAIN}</code> can define the domain for which the session cookie should be sent, allowing cross-subdomain access to the session.</p>
+</li>
 </ul>
 <p><strong>PHP Script</strong></p>
 <pre><code class="language-php">&lt;?php
@@ -2031,10 +2060,15 @@ $sessions-&gt;startSession();</code></pre>
 <p>You can not encrypt the <code>${REDIS_AUTH}</code> value. If you want to secure the config, encrypt entire <code>save_path</code> instead.</p>
 <p>For example:</p>
 <pre><code class="language-yaml">session:
-  name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
-  save_handler: redis
-  save_path: ${SESSION_SAVE_PATH}</code></pre>
+  name: ${SESSION_NAME}
+  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  save_handler: ${SESSION_SAVE_HANDLER}
+  save_path: ${SESSION_SAVE_PATH}
+  cookie_lifetime: ${SESSION_COOKIE_LIFETIME}
+  cookie_path: ${SESSION_COOKIE_PATH}
+  cookie_secure: ${SESSION_COOKIE_SECURE}
+  cookie_httponly: ${SESSION_COOKIE_HTTPONLY}
+  cookie_domain: ${SESSION_COOKIE_DOMAIN}</code></pre>
 <p><code>${SESSION_SAVE_PATH}</code> contains entire of <code>save_path</code> that encrypted with you secure key.</p>
 <p><strong>PHP Script</strong></p>
 <pre><code class="language-php">&lt;?php

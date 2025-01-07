@@ -459,6 +459,10 @@ class AppUserPermission
      */
     public function setAllowedSortOrderFalse()
     {
+        if(!$this->initialized)
+        {
+            $this->loadPermission();
+        }
         $this->allowedSortOrder = false;
 
         return $this;
