@@ -261,7 +261,7 @@ $constSelected = ' selected';
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
                   Module Features
                 </button>
-                <input class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Script"> &nbsp;
+                <input class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Module"> &nbsp;
 
                 <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
                   <div class="modal-dialog modal-md modal-dialog-centered">

@@ -204,7 +204,27 @@ jQuery(function () {
 
   $(document).on("click", "#generate_script", function (e) {
     e.preventDefault();
-    generateScript($(".main-table tbody"));
+    
+    asyncAlert(
+      'Do you want to generate the module and entities and replace the existing files?',  // Message to display in the modal
+      'Confirmation',  // Modal title
+      [
+        {
+          'caption': 'Yes',  // Caption for the button
+          'fn': () => {
+            generateScript($(".main-table tbody"));
+          },  // Callback for OK button
+          'class': 'btn-primary'  // Bootstrap class for styling
+        },
+        {
+          'caption': 'No',  // Caption for the button
+          'fn': () => { },  // Callback for Cancel button
+          'class': 'btn-secondary'  // Bootstrap class for styling
+        }
+      ]
+    );
+    
+    
   });
 
   $(document).on("click", "#switch_application", function (e) {
