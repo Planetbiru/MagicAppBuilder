@@ -55,11 +55,20 @@ class EntityApplicationUser extends MagicObject
 	protected $password;
 	
 	/**
+	 * User Level ID
+	 * 
+	 * @Column(name="user_level_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="User Level ID")
+	 * @var string
+	 */
+	protected $userLevelId;
+	
+	/**
 	 * User Level
 	 * 
-	 * @Column(name="userLevel", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Level")
-	 * @var string
+	 * @JoinColumn(name="user_level_id", referenceColumName="user_level_id")
+	 * @Label(content="User Level ID")
+	 * @var EntityUserLevel
 	 */
 	protected $userLevel;
     
@@ -98,6 +107,42 @@ class EntityApplicationUser extends MagicObject
 	 * @var string
 	 */
 	protected $phone;
+	
+	/**
+	 * Applcation ID
+	 * 
+	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Applcation ID")
+	 * @var string
+	 */
+	protected $applicationId;
+	
+	/**
+	 * Application
+	 * 
+	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
+	 * @Label(content="Application")
+	 * @var EntityApplication
+	 */
+	protected $application;
+	
+	/**
+	 * Workspace ID
+	 * 
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Workspace ID")
+	 * @var string
+	 */
+	protected $workspaceId;
+	
+	/**
+	 * Workspace
+	 * 
+	 * @JoinColumn(name="workspace_id", referenceColumnName="workspace_id")
+	 * @Label(content="Workspace")
+	 * @var EntityWorkspace
+	 */
+	protected $workspace;
     
     /**
 	 * Validation Code

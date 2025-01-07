@@ -6,7 +6,7 @@ use AppBuilder\AppNavs;
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
 $appNavs = (new AppNavs())
-    ->add(new AppNav('builder', 'Builder'))
+    ->add(new AppNav('define-workspace', 'Workspace'))
     ->add(new AppNav('define-application', 'Apps'))
     ->add(new AppNav('define-module', 'Select Table', true))
     ->add(new AppNav('define-column', 'Generate Module'))

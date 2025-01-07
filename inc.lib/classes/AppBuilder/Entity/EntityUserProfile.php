@@ -22,7 +22,7 @@ class EntityUserProfile extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
 	 * @Column(name="user_profile_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User ID")
+	 * @Label(content="User Profile ID")
 	 * @var string
 	 */
 	protected $userProfileId;

@@ -223,8 +223,6 @@ jQuery(function () {
         }
       ]
     );
-    
-    
   });
 
   $(document).on("click", "#switch_application", function (e) {
@@ -1235,7 +1233,7 @@ jQuery(function () {
     window.location = 'vscode://file/' + path;
   });
 
-  $(document).on('click', '.refresh-application-list', function (e) {
+  $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
     reloadApplicationList();
   });
@@ -1243,14 +1241,17 @@ jQuery(function () {
   $(document).on('click', '.button-save-workspace', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
-    let workspace = modal.find('[name="workspace"]').val();
-    let php_path = modal.find('[name="php_path"]').val();
+    let workspaceName = modal.find('[name="workspace_name"]').val();
+    let workspaceDescription = modal.find('[name="workspace_description"]').val();
+    let workspaceDirectory = modal.find('[name="workspace_directory"]').val();
+    let phpPath = modal.find('[name="php_path"]').val();
     $.ajax({
       type: 'POST',
-      url: 'lib.ajax/workspace-update.php',
-      data: { workspace: workspace, php_path:php_path },
+      url: 'lib.ajax/workspace-create.php',
+      data: { workspaceName: workspaceName, workspaceDirectory:workspaceDirectory, workspaceDescription:workspaceDescription, phpPath:phpPath },
       success: function (data) {
         modal.modal('hide');
+        reloadApplicationList();
       }
     });
   });
@@ -1759,6 +1760,14 @@ function reloadApplicationList() {
     url: 'lib.ajax/application-list.php',
     success: function (data) {
       $('.application-card').empty().append(data);
+    }
+  });
+  
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/workspace-list.php',
+    success: function (data) {
+      $('.workspace-card').empty().append(data);
     }
   });
 

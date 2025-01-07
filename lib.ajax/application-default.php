@@ -6,8 +6,7 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 try
 {
@@ -52,6 +51,11 @@ try
         }
         file_put_contents($appListPath, PicoYamlUtil::dump($arr, null, 4, 0));
     }
+    if(isset($entityUser) && $entityUser->getApplicationUserId() != null)
+    {
+        $entityUser->setApplicationId($appId)->update();
+    }
+
 }
 catch(Exception $e)
 {

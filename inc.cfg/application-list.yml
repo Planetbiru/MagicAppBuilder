@@ -12,7 +12,7 @@
     documentRoot: 'C:\PortableApps\usbwebserver\root\sipro-baru'
     author: Kamshory
     description: 'Sipro Baru'
-    selected: true
+    selected: false
     architecture: monolith
 -
     id: 0673c952cb576d077460
@@ -99,4 +99,4 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/06773c4cd91d41b29c01'
     author: 'Your Name'
-    selected: false
+    selected: true

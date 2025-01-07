@@ -9,9 +9,7 @@ require_once __DIR__ . "/sessions.php";
 if(isset($databaseBuilder))
 {
     $entityUser = new EntityApplicationUser(null, $databaseBuilder);
-
     $userLoggedIn = false;
-
     if(isset($sessions->userId) && isset($sessions->userPassword))
     {
         try

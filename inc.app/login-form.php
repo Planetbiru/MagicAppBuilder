@@ -6,12 +6,35 @@
     <title>Login Page</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
+    <style>
+        .container.login-form-container
+        {
+            height: 100vh;
+        }
+        @media screen and (min-height:342px) {
+            .container.login-form-container
+            {
+                align-items: center !important;
+            }
+        }
+        @media screen and (max-height:341px)
+        {
+            .card.login-form-card
+            {
+                border-color: transparent;
+            }
+        }
+        .card.login-form-card{
+            width: 100%; 
+            max-width: 400px;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Login Form Section -->
-    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="card" style="width: 100%; max-width: 400px;">
+    <div class="container login-form-container d-flex justify-content-center">
+        <div class="card login-form-card">
             <div class="card-body">
                 <h5 class="card-title text-center mb-4">Login</h5>
                 <!-- Login Form -->

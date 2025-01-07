@@ -429,9 +429,18 @@ li.file-syntax-error a {
   padding: 2px 0px 10px 0px;
 }
 
-.application-container {
+.application-container, .workspace-container {
   padding-left: 0;
   padding-right: 0;
+}
+.application-container .card .card-text, .workspace-container .card .card-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 40px;
 }
 
 .application-item[data-selected=true] {
@@ -452,24 +461,14 @@ h3.entity-table-name {
   margin-bottom: 20px;
 }
 
-.application-card > div {
+.workspace-card > div, .application-card > div {
   margin-bottom: 1rem;
 }
-.application-card .card-body {
+.workspace-card .card-body, .application-card .card-body {
   padding-bottom: 0.8rem;
 }
-.application-card .card-body .btn {
+.workspace-card .card-body .btn, .application-card .card-body .btn {
   margin-bottom: 0.45rem;
-}
-
-.application-container .card .card-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  min-height: 40px;
 }
 
 .card-header {

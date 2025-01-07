@@ -7,7 +7,7 @@ use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Response\PicoResponse;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $path = $workspaceDirectory."/application-list.yml";

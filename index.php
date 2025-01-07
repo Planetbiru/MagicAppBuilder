@@ -57,7 +57,13 @@ $constSelected = ' selected';
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
           <div class="main-menu">
-            <button type="button" class="btn btn-primary change-workspace" data-toggle="modal" data-target="#modal-workspace">Workspace</button>
+            <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace">Create New</button>
+            <button type="button" class="btn btn-primary refresh-workspace-list">Refresh</button>
+          </div>
+          
+          <div class="container-fluid workspace-container">
+          <div class="row workspace-card">
+          </div>
           </div>
         </div>
 
@@ -983,13 +989,21 @@ $constSelected = ' selected';
           <form action="">
             <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
               <tbody>
+              <tr>
+                  <td>Name</td>
+                  <td><input class="form-control" type="text" name="workspace_name" value="" autocomplete="off"></td>
+                </tr>
                 <tr>
-                  <td>Workspace</td>
-                  <td><input class="form-control" type="text" name="workspace" value="<?php echo $builderConfig->getWorkspaceDirectory();?>" autocomplete="off"></td>
+                  <td>Description</td>
+                  <td><textarea class="form-control" name="workspace_description"></textarea></td>
+                </tr>
+                <tr>
+                  <td>Directory</td>
+                  <td><input class="form-control" type="text" name="workspace_directory" value="" autocomplete="off"></td>
                 </tr>
                 <tr>
                   <td>PHP Path</td>
-                  <td><input class="form-control" type="text" name="php_path" value="<?php echo $builderConfig->getPhpPath();?>" autocomplete="off"></td>
+                  <td><input class="form-control" type="text" name="php_path" value="" autocomplete="off"></td>
                 </tr>
               </tbody>
             </table>

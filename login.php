@@ -10,6 +10,7 @@ require_once __DIR__ . "/inc.app/sessions.php";
 $inputPost = new InputPost();
 
 $entityUser = new EntityApplicationUser(null, $databaseBuilder);
+
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
     $userLoggedIn = false;
@@ -18,9 +19,8 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         $hashPassword = sha1($inputPost->getPassword());
         $entityUser->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
         $userLoggedIn = true;
-        
-            $sessions->userId = $inputPost->getUsername();
-            $sessions->userPassword = $hashPassword;
+        $sessions->userId = $inputPost->getUsername();
+        $sessions->userPassword = $hashPassword;
     }
     catch(Exception $e)
     {

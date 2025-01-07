@@ -2,6 +2,7 @@
 
 use AppBuilder\AppInstaller;
 use AppBuilder\Entity\EntityApplicationUser;
+use AppBuilder\Entity\EntityUserLevel;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtil;
@@ -55,6 +56,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
                 $hash = hash('sha1', $hash);
                 $user->setPassword($hash);    
                 $user->setLastResetPassword($now);
+                $user->setUserLevelId("superuser");
                 $user->setTimeCreate($now);
                 $user->setTimeEdit($now);
                 $user->setIpCreate($_SERVER['REMOTE_ADDR']);
@@ -68,6 +70,18 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
                     ->setAdminCreate($user->getApplicationUserId())
                     ->setAdminEdit($user->getApplicationUserId())
                     ->update();
+                    
+                
+                $userLevel = new EntityUserLevel(null, $databaseBuilder);
+                $userLevel->setUserLevelId("superuser");
+                $userLevel->setName("Super User");
+                $userLevel->setSortOrder(1);
+                $userLevel->setTimeCreate($now);
+                $userLevel->setTimeEdit($now);
+                $userLevel->setIpCreate($_SERVER['REMOTE_ADDR']);
+                $userLevel->setIpEdit($_SERVER['REMOTE_ADDR']);
+                $userLevel->setActive(true);
+                $userLevel->insert();
             }
             catch(Exception $e)
             {

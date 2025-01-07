@@ -536,10 +536,23 @@ li.file-syntax-error {
 	padding: 2px 0px 10px 0px;
 }
 
-.application-container {
+.application-container, .workspace-container {
 	padding-left: 0;
 	padding-right: 0;
+	
+	.card .card-text{
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		min-height: 40px;
+	}
 }
+
+
+
 
 .application-item[data-selected="true"] {
 	border-color: rgba(0, 0, 0, 0.15);
@@ -558,7 +571,7 @@ h3.entity-table-name {
 	margin-bottom: 20px;
 }
 
-.application-card
+.workspace-card, .application-card
 {
 	& > div {
 		margin-bottom: 1rem;
@@ -572,15 +585,7 @@ h3.entity-table-name {
 	}
 }
 
-.application-container .card .card-text{
-	overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-	line-clamp: 2;
-    -webkit-box-orient: vertical;
-	min-height: 40px;
-}
+
 
 .card-header{
 	padding: .2rem 1.25rem;
