@@ -9,7 +9,6 @@
                 "field": "pekerjaanId",
                 "label": "Pekerjaan",
                 "data_type": "object",
-                "filter": null,
                 "current_value": {
                     "label": "Pekerjaan 1",
                     "value": "001"
@@ -20,7 +19,6 @@
                 "field": "acuanPengawasanId",
                 "label": "Acuan Pengawasan",
                 "data_type": "string",
-                "filter": null,
                 "current_value": {
                     "label": "Acuan 1",
                     "value": "01"
@@ -40,27 +38,20 @@
             {
                 "field": "aktif",
                 "label": "Aktif",
-                "input_type": "checkbox",
                 "data_type": "boolean",
                 "current_value": {
                     "label": "Ya",
                     "value": true
                 },
                 "hidden": false
-            },
-            {
-                "field": "waitingFor",
-                "label": "Waiting For",
-                "data_type": "integer",
-                "current_value": {
-                    "label": "2",
-                    "value": 2
-                },
-                "hidden": true
             }
         ],
         "allowed_actions": [
             "update", "delete"
-        ]
+        ],
+        "waiting_for": {
+            "label": "none",
+            "value": 0
+        }
     }
 }

@@ -37,11 +37,11 @@
                 "data_type": "datetime",
                 "current_value": {
                     "label": "2 Januari 2024 03:04:05",
-                    "value": "2024-01-02T03:04:05Z"
+                    "value": "2024-01-02 03:04:05"
                 },
                 "proposed_value": {
                     "label": "2 Januari 2024 03:04:05",
-                    "value": "2024-01-02T03:04:05Z"
+                    "value": "2024-01-02 03:04:05"
                 }
             },
             {
@@ -59,8 +59,19 @@
                 }
             }
         ],
+        "waiting_for": {
+            "label": "update",
+            "value": 1
+        },
         "allowed_actions": [
-            "approve", "reject"
+            {
+                "label": "Approve",
+                "value": "approve"
+            },
+            {
+                "label": "Reject",
+                "value": "reject"
+            }
         ]
     }
 }

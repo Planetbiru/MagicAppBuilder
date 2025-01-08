@@ -32,13 +32,17 @@
                     "label": "Acuan 1",
                     "value": "01",
                     "selected": false
+                }, {
+                    "label": "Acuan 2",
+                    "value": "02",
+                    "selected": false
                 }]
             },
             {
                 "field": "tanggal",
                 "label": "Tanggal",
-                "input_type": "text",
-                "data_type": "string",
+                "input_type": "datetime-local",
+                "data_type": "datetime",
                 "filter": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"
             }
         ],

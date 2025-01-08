@@ -18,9 +18,12 @@
                 }, {
                     "label": "Pekerjaan 2",
                     "value": "02",
-                    "selected": true
+                    "selected": false
                 }],
-                "current_value": "01"
+                "current_value": {
+                    "label": "Pekerjaan 1",
+                    "value": "01"
+                }
             },
             {
                 "field": "acuanPengawasanId",
@@ -38,22 +41,31 @@
                     "value": "02",
                     "selected": false
                 }],
-                "current_value": "01"
+                "current_value": {
+                    "label": "Acuan 1",
+                    "value": "01"
+                }
             },
             {
                 "field": "tanggal",
                 "label": "Tanggal",
-                "input_type": "text",
-                "data_type": "string",
+                "input_type": "datetime-local",
+                "data_type": "datetime",
                 "filter": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
-                "current_value": "2024-01-02 03:04:05"
+                "current_value": {
+                    "label": "2 Januari 2024 03:04:05",
+                    "value": "2024-01-02 03:04:05"
+                }
             },
             {
                 "field": "aktif",
                 "label": "Aktif",
                 "input_type": "checkbox",
-                "data_type": "integer",
-                "current_value": 1
+                "data_type": "boolean",
+                "current_value": {
+                    "label": "Ya",
+                    "value": true
+                }
             }
         ],
         "allowed_actions": [
