@@ -11,7 +11,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Song ID",
-                "type": "string",
+                "data_type": "string",
                 "value": "111111"
             },
             {
@@ -19,7 +19,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Title",
-                "type": "string",
+                "data_type": "string",
                 "value": "Song 1"
             },
             {
@@ -41,7 +41,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Active",
-                "type": "boolean",
+                "data_type": "boolean",
                 "value": true
             }
         ],
@@ -51,7 +51,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Song ID",
-                "type": "string",
+                "data_type": "string",
                 "value": "111111"
             },
             {
@@ -59,7 +59,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Title",
-                "type": "string",
+                "data_type": "string",
                 "value": "Song 1"
             },
             {
@@ -81,7 +81,7 @@
                 "hidden": false,
                 "readonly": false,
                 "label": "Active",
-                "type": "boolean",
+                "data_type": "boolean",
                 "value": true
             }
         ]

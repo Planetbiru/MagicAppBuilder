@@ -13,36 +13,54 @@
                 "current_value": {
                     "label": "Pekerjaan 1",
                     "value": "001"
-                }
+                },
+                "hidden": false
             },
             {
                 "field": "acuanPengawasanId",
                 "label": "Acuan Pengawasan",
                 "data_type": "string",
                 "filter": null,
-                "options": [{
+                "current_value": {
                     "label": "Acuan 1",
-                    "value": "01",
-                    "selected": false
-                }],
-                "current_value": "01"
+                    "value": "01"
+                },
+                "hidden": false
             },
             {
                 "field": "tanggal",
                 "label": "Tanggal",
-                "data_type": "string",
-                "current_value": "2024-01-02 03:04:05"
+                "data_type": "datetime",
+                "current_value": {
+                    "label": "2 Januari 2024 03:04:05",
+                    "value": "2024-01-02 03:04:05"
+                },
+                "hidden": false
             },
             {
                 "field": "aktif",
                 "label": "Aktif",
                 "input_type": "checkbox",
+                "data_type": "boolean",
+                "current_value": {
+                    "label": "Ya",
+                    "value": true
+                },
+                "hidden": false
+            },
+            {
+                "field": "waitingFor",
+                "label": "Waiting For",
                 "data_type": "integer",
-                "current_value": 1
+                "current_value": {
+                    "label": "2",
+                    "value": 2
+                },
+                "hidden": true
             }
         ],
         "allowed_actions": [
-            "update"
+            "update", "delete"
         ]
     }
 }

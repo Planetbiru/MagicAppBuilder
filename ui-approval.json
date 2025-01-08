@@ -34,17 +34,29 @@
             {
                 "field": "tanggal",
                 "label": "Tanggal",
-                "data_type": "string",
-                "current_value": "2024-01-02 03:04:05",
-                "proposed_value": "2024-01-02 03:04:05"
+                "data_type": "datetime",
+                "current_value": {
+                    "label": "2 Januari 2024 03:04:05",
+                    "value": "2024-01-02T03:04:05Z"
+                },
+                "proposed_value": {
+                    "label": "2 Januari 2024 03:04:05",
+                    "value": "2024-01-02T03:04:05Z"
+                }
             },
             {
                 "field": "aktif",
                 "label": "Aktif",
                 "input_type": "checkbox",
-                "data_type": "integer",
-                "current_value": 1,
-                "proposed_value": 1
+                "data_type": "boolean",
+                "current_value": {
+                    "label": "Ya",
+                    "value": true
+                },
+                "proposed_value": {
+                    "label": "Tidak",
+                    "value": false
+                }
             }
         ],
         "allowed_actions": [

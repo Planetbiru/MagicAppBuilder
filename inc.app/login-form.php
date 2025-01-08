@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <!-- Include Bootstrap CSS -->
+    <title>Login to MagicAppBuilder</title>
     <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
     <style>
         .container.login-form-container
@@ -59,8 +58,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Include Bootstrap JS -->
-    <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

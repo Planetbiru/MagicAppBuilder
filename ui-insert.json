@@ -10,9 +10,14 @@
                 "input_type": "select",
                 "data_type": "string",
                 "filter": null,
-                "options": [{
+                "option_source": "map",
+                "map": [{
                     "label": "Pekerjaan 1",
                     "value": "01",
+                    "selected": false
+                }, {
+                    "label": "Pekerjaan 2",
+                    "value": "02",
                     "selected": false
                 }]
             },
@@ -22,7 +27,8 @@
                 "input_type": "select",
                 "data_type": "string",
                 "filter": null,
-                "options": [{
+                "option_source": "map",
+                "map": [{
                     "label": "Acuan 1",
                     "value": "01",
                     "selected": false

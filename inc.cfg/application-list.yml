@@ -4,7 +4,7 @@
     documentRoot: 'D:\xampp\htdocs\sipro-baru'
     author: Kamshory
     description: 'Sistem Informasi Proyek PT Perusahaan Listrik Negara (Persero)'
-    selected: false
+    selected: true
     architecture: monolith
 -
     id: sipro
@@ -99,4 +99,4 @@
     description: ''
     documentRoot: 'D:/xampp/htdocs/06773c4cd91d41b29c01'
     author: 'Your Name'
-    selected: true
+    selected: false

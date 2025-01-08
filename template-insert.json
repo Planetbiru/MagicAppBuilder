@@ -7,20 +7,21 @@
             {
                 "field": "song_id",
                 "label": "Song ID",
-                "type": "string",
-                "source": "text"
+                "data_type": "string",
+                "input_type": "text"
             },
             {
                 "field": "title",
                 "label": "Title",
-                "type": "string",
-                "source": "text"
+                "data_type": "string",
+                "input_type": "text"
             },
             {
                 "field": "album_id",
                 "label": "Album",
-                "type": "string",
-                "source": "select",
+                "data_type": "string",
+                "input_type": "select",
+                "option_source": "map",
                 "map": [
                     {
                         "label": "Album 1",
@@ -35,8 +36,8 @@
             {
                 "field": "active",
                 "label": "Active",
-                "type": "boolean",
-                "source": "checkbox"
+                "data_type": "boolean",
+                "input_type": "checkbox"
             }
         ]
     }
