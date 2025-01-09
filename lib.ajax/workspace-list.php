@@ -25,8 +25,8 @@ try
     data-path="<?php echo str_replace("\\", "/", $workspace->getDirectory()); ?>"
     >
         <div class="card-body">
-            <h5 class="card-title"><?php echo $workspace->getWorkspaceId(); ?></h5>
-            <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getName(); ?></h6>
+            <h5 class="card-title"><?php echo $workspace->getName(); ?></h5>
+            <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getDirectory(); ?></h6>
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-setting">Setting</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-open">VS Code</a>

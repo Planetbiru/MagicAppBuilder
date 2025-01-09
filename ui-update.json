@@ -9,7 +9,7 @@
                 "label": "Pekerjaan",
                 "input_type": "select",
                 "data_type": "string",
-                "filter": null,
+                "pattern": null,
                 "option_source": "map",
                 "map": [{
                     "label": "Pekerjaan 1",
@@ -30,7 +30,7 @@
                 "label": "Acuan Pengawasan",
                 "input_type": "select",
                 "data_type": "string",
-                "filter": null,
+                "pattern": null,
                 "option_source": "map",
                 "map": [{
                     "label": "Acuan 1",
@@ -51,7 +51,7 @@
                 "label": "Tanggal",
                 "input_type": "datetime-local",
                 "data_type": "datetime",
-                "filter": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
                 "current_value": {
                     "label": "2 Januari 2024 03:04:05",
                     "value": "2024-01-02 03:04:05"

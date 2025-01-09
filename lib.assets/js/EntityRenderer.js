@@ -360,56 +360,90 @@ class EntityRenderer {
      * @param {number} index - The index of the foreign key column in the entity's columns.
      */
     createRelationship(entity, col, index) {
+        // Determine the name of the referenced table by removing '_id' from the foreign key column name
         let refEntityName = col.name.replace("_id", "");
+        
+        // Get the referenced entity using the reference entity's name
         let referenceEntity = this.getEntityByName(refEntityName);
-        if(referenceEntity != null)
-        {
+        
+        // If the reference entity exists
+        if (referenceEntity != null) {
+            // Get the index of the column in the referenced entity (primary key)
             let refIndex = this.getColumnIndex(referenceEntity, col.name);
 
+            // Get the 'from' and 'to' tables based on the entities
             let fromTable = this.tables[entity.name].table;
             let toTable = this.tables[refEntityName].table;
 
-            let y1 = (index * this.columnHeight) + this.tables[entity.name].yPos + 36;
-            let x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")) + this.tableWidth;
+            // Calculate the y-coordinates for the foreign key and primary key
+            let y1 = (index * this.columnHeight) + this.tables[entity.name].yPos + 36; // Foreign key y-position
+            let x1 = parseInt(fromTable.getAttribute("transform").split(",")[0].replace("translate(", "")); // Foreign key x-position
 
+            // Calculate the x and y positions for the primary key column in the referenced table
             let x4 = parseInt(toTable.getAttribute("transform").split(",")[0].replace("translate(", ""));
-            let y4 = (refIndex * this.columnHeight) + this.tables[refEntityName].yPos + 36;
+            let y4 = (refIndex * this.columnHeight) + this.tables[refEntityName].yPos + 36; // Primary key y-position
 
-            let circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            let circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-
-            x1 = x1 - 4;
-            x4 = x4 + 4;
-
-            let x2 = x1 + 6;
-            let x3 = x4 - 6;
+            // Set the y-coordinates for the line to be drawn (horizontal alignment)
             let y2 = y1;
             let y3 = y4;
 
+            // Define the x-coordinates for the relationship line based on the positions of the tables
+            let x2;
+            let x3;
+            
+            // Adjust positions
+
+            if (x1 == x4) {
+                x1 = x1 + 4;  // Slightly adjust the position of the first table
+                x4 = x4 + 4;  // Adjust the position of the second table
+                x2 = x1 - 8;  // Set intermediate x-coordinate for the path
+                x3 = x4 - 8;  // Set intermediate x-coordinate for the path
+            }
+            else if (x1 <= x4) {
+                x1 += this.tableWidth; // Move the first table further to the right
+                x1 = x1 - 4;  // Slightly adjust the position of the first table
+                x4 = x4 + 4;  // Adjust the position of the second table
+                x2 = x1 + 8;  // Set intermediate x-coordinate for the path
+                x3 = x4 - 8;  // Set intermediate x-coordinate for the path
+            }
+            else {
+                x4 += this.tableWidth; // Move the second table further to the right
+                x1 = x1 + 4;  // Slightly adjust the position of the first table
+                x4 = x4 - 4;  // Adjust the position of the second table
+                x2 = x1 - 8;  // Set intermediate x-coordinate for the path
+                x3 = x4 + 8;  // Set intermediate x-coordinate for the path
+            }
+
+            // Create circles at the start and end of the path (representing the foreign key and primary key)
+            let circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            let circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+            // Set attributes for the first circle (foreign key)
             circle1.setAttribute("cx", x1);
             circle1.setAttribute("cy", y1);
-            circle1.setAttribute("r", 3);
-            circle1.setAttribute("fill", "#2A56BD");
+            circle1.setAttribute("r", 3); // Radius of the circle
+            circle1.setAttribute("fill", "#2A56BD"); // Color of the circle
 
+            // Set attributes for the second circle (primary key)
             circle2.setAttribute("cx", x4);
             circle2.setAttribute("cy", y4);
-            circle2.setAttribute("r", 3);
-            circle2.setAttribute("fill", "#CC0088");
+            circle2.setAttribute("r", 3); // Radius of the circle
+            circle2.setAttribute("fill", "#CC0088"); // Color of the circle
 
-            this.svg.appendChild(circle1);
-            this.svg.appendChild(circle2);
-
-            // Draw a path between the two tables to represent the relationship
+            // Create an SVG path element to represent the relationship line
             let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
+            // Define the path data for the relationship (connects the two tables with a curved line)
             let pathData = `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4}`;
             path.setAttribute("d", pathData);
-            path.setAttribute("stroke", "#2A56BD");
-            path.setAttribute("stroke-width", this.relationStrokeWidth);
+            path.setAttribute("stroke", "#2A56BD"); // Color of the line
+            path.setAttribute("stroke-width", this.relationStrokeWidth); // Thickness of the line
             path.setAttribute("fill", "transparent"); // Ensures the path is not filled with color
 
+            // Append the path and circles to the SVG element (to be drawn on the screen)
             this.svg.appendChild(path);
-
+            this.svg.appendChild(circle1);
+            this.svg.appendChild(circle2);
         }
     }
 
