@@ -28,21 +28,21 @@ class EntityReference extends MagicObject
 	protected $referenceId;
 
     /**
-	 * User ID
+	 * Admin ID
 	 * 
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User ID")
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $userId;
+	protected $adminId;
 
     /**
      * User
      *
-     * @JoinColumn(name="user_id" referenceColumnName="user_id")
+     * @JoinColumn(name="admin_id" referenceColumnName="admin_id")
      * @var EntityUser
      */
-    protected $user;
+    protected $admin;
     
     /**
 	 * Application ID

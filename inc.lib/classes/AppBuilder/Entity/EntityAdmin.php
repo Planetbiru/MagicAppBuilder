@@ -5,24 +5,24 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityApplicationUser is entity of table user. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityAdmin is entity of table admin. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application_user")
+ * @Table(name="admin")
  */
-class EntityApplicationUser extends MagicObject
+class EntityAdmin extends MagicObject
 {
 	/**
-	 * Application User ID
+	 * Admin ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Application User ID")
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
 	protected $applicationUserId;
@@ -55,22 +55,22 @@ class EntityApplicationUser extends MagicObject
 	protected $password;
 	
 	/**
-	 * User Level ID
+	 * Admin Level ID
 	 * 
-	 * @Column(name="user_level_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Level ID")
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Level ID")
 	 * @var string
 	 */
-	protected $userLevelId;
+	protected $adminLevelId;
 	
 	/**
-	 * User Level
+	 * Admin Level
 	 * 
-	 * @JoinColumn(name="user_level_id", referenceColumName="user_level_id")
-	 * @Label(content="User Level ID")
-	 * @var EntityUserLevel
+	 * @JoinColumn(name="admin_level_id", referenceColumName="admin_level_id")
+	 * @Label(content="Admin Level ID")
+	 * @var EntityAdminLevel
 	 */
-	protected $userLevel;
+	protected $adminLevel;
     
     /**
 	 * Gender

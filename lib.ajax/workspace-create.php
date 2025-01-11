@@ -22,12 +22,12 @@ try
     $workspace->setDirectory($directory);
     $workspace->setPhpPath($phpPath);
     
-    $author = isset($entityUser) && $entityUser->getName() ? $entityUser->getName() : null;
+    $author = isset($entityAdmin) && $entityAdmin->getName() ? $entityAdmin->getName() : null;
     $workspace->setAuthor($author);
     
     $now = date('Y-m-d H:i:s');
     
-    $adminId = isset($entityUser) && $entityUser->getApplicationUserId() ? $entityUser->getApplicationUserId() : null;
+    $adminId = isset($entityAdmin) && $entityAdmin->getApplicationUserId() ? $entityAdmin->getApplicationUserId() : null;
     
     $workspace->setAdminCreate($adminId);
     $workspace->setAdminEdit($adminId); 
@@ -40,9 +40,9 @@ try
     
     $workspace->insert();
 
-    if(isset($entityUser) && $entityUser->getApplicationUserId() != null)
+    if(isset($entityAdmin) && $entityAdmin->getApplicationUserId() != null)
     {
-        $entityUser->setWorkspaceId($workspace->getWorkspaceId())->update();
+        $entityAdmin->setWorkspaceId($workspace->getWorkspaceId())->update();
     }
 }
 catch(Exception $e)

@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplicationUser;
+use AppBuilder\Entity\EntityAdmin;
 use MagicObject\Request\InputPost;
 
 require_once __DIR__ . "/inc.app/app.php";
@@ -9,7 +9,7 @@ require_once __DIR__ . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 
-$entityUser = new EntityApplicationUser(null, $databaseBuilder);
+$entityAdmin = new EntityAdmin(null, $databaseBuilder);
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
@@ -17,9 +17,9 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     try
     {
         $hashPassword = sha1($inputPost->getPassword());
-        $entityUser->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
+        $entityAdmin->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
         $userLoggedIn = true;
-        $sessions->userId = $inputPost->getUsername();
+        $sessions->adminId = $inputPost->getUsername();
         $sessions->userPassword = $hashPassword;
     }
     catch(Exception $e)

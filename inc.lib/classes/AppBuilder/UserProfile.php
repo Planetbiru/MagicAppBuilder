@@ -2,7 +2,7 @@
 
 namespace AppBuilder;
 
-use AppBuilder\Entity\EntityUser;
+use AppBuilder\Entity\EntityAdmin;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\SecretObject;
@@ -42,7 +42,7 @@ class UserProfile
      *
      * @var string
      */
-    private $userId;
+    private $adminId;
     
     /**
      * Undocumented variable
@@ -74,16 +74,16 @@ class UserProfile
     
     public function auth($username, $password)
     {
-        $entityUser = new EntityUser(null, $this->database);
+        $entityAdmin = new EntityAdmin(null, $this->database);
         try
         {
-            $entityUser->findOneByUsername($username);
-            if($entityUser->getPassword() == sha1($password))
+            $entityAdmin->findOneByUsername($username);
+            if($entityAdmin->getPassword() == sha1($password))
             {
-                $this->userId = $entityUser->getUserId();
-                $this->username = $entityUser->getUsername();
-                $this->name = $entityUser->getName();
-                $this->userLevel = $entityUser->getUserLevel();
+                $this->adminId = $entityAdmin->getUserId();
+                $this->username = $entityAdmin->getUsername();
+                $this->name = $entityAdmin->getName();
+                $this->userLevel = $entityAdmin->getUserLevel();
             }
         }
         catch(Exception $e)
@@ -123,19 +123,19 @@ class UserProfile
      */ 
     public function getUserId()
     {
-        return $this->userId;
+        return $this->adminId;
     }
 
     /**
      * Set undocumented variable
      *
-     * @param  string  $userId  Undocumented variable
+     * @param  string  $adminId  Undocumented variable
      *
      * @return  self
      */ 
-    public function setUserId($userId)
+    public function setUserId($adminId)
     {
-        $this->userId = $userId;
+        $this->adminId = $adminId;
 
         return $this;
     }

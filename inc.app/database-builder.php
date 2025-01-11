@@ -1,7 +1,8 @@
 <?php
 
 use AppBuilder\AppInstaller;
-use AppBuilder\Entity\EntityApplicationUser;
+use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\Entity\EntityAdminLevel;
 use AppBuilder\Entity\EntityUserLevel;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
@@ -48,32 +49,32 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
 
                 $now = date('Y-m-d H:i:s');
                         
-                $user = new EntityApplicationUser(null, $databaseBuilder);
-                $user->setUsername("administrator");
-                $user->setName("Administrator");
+                $admin = new EntityAdmin(null, $databaseBuilder);
+                $admin->setUsername("administrator");
+                $admin->setName("Administrator");
                 $password = 'administrator';
                 $hash = hash('sha1', $password);
                 $hash = hash('sha1', $hash);
-                $user->setPassword($hash);    
-                $user->setLastResetPassword($now);
-                $user->setUserLevelId("superuser");
-                $user->setTimeCreate($now);
-                $user->setTimeEdit($now);
-                $user->setIpCreate($_SERVER['REMOTE_ADDR']);
-                $user->setIpEdit($_SERVER['REMOTE_ADDR']);
-                $user->setActive(true);
-                $user->insert();
+                $admin->setPassword($hash);    
+                $admin->setLastResetPassword($now);
+                $admin->setAdminLevelId("superuser");
+                $admin->setTimeCreate($now);
+                $admin->setTimeEdit($now);
+                $admin->setIpCreate($_SERVER['REMOTE_ADDR']);
+                $admin->setIpEdit($_SERVER['REMOTE_ADDR']);
+                $admin->setActive(true);
+                $admin->insert();
                             
-                $userUpdate = new EntityApplicationUser(null, $databaseBuilder);
+                $userUpdate = new EntityAdmin(null, $databaseBuilder);
                 $userUpdate
-                    ->setApplicationUserId($user->getApplicationUserId())
-                    ->setAdminCreate($user->getApplicationUserId())
-                    ->setAdminEdit($user->getApplicationUserId())
+                    ->setApplicationUserId($admin->getApplicationUserId())
+                    ->setAdminCreate($admin->getApplicationUserId())
+                    ->setAdminEdit($admin->getApplicationUserId())
                     ->update();
                     
                 
-                $userLevel = new EntityUserLevel(null, $databaseBuilder);
-                $userLevel->setUserLevelId("superuser");
+                $userLevel = new EntityAdminLevel(null, $databaseBuilder);
+                $userLevel->setAdminLevelId("superuser");
                 $userLevel->setName("Super User");
                 $userLevel->setSortOrder(1);
                 $userLevel->setTimeCreate($now);

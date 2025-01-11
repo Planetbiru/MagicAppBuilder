@@ -5,45 +5,45 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUserProfile is entity of table user_profile. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityAdminProfile is entity of table admin_profile. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user_profile")
+ * @Table(name="admin_profile")
  */
-class EntityUserProfile extends MagicObject
+class EntityAdminProfile extends MagicObject
 {
 	/**
-	 * User Profile ID
+	 * Admin Profile ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_profile_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User Profile ID")
+	 * @Column(name="admin_profile_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Admin Profile ID")
 	 * @var string
 	 */
-	protected $userProfileId;
+	protected $adminProfileId;
 
     /**
 	 * Application User ID
 	 * 
-	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Application User ID")
 	 * @var string
 	 */
-	protected $applicationUserId;
+	protected $adminId;
 	
 	/**
-	 * Application User
+	 * Admin
 	 * 
-	 * @JoinColumn(name="application_user_id", referenceColumnName="application_user_id")
-	 * @Label(content="Application User")
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
 	 * @var string
 	 */
-	protected $applicationUser;
+	protected $admin;
     
     /**
 	 * Profile Name
@@ -62,14 +62,6 @@ class EntityUserProfile extends MagicObject
 	 * @var string
 	 */
 	protected $profileValue;
-
-    /**
-     * User
-     *
-     * @JoinColumn(name="user_id" referenceColumnName="user_id")
-     * @var EntityUser
-     */
-    protected $user;
 
 	/**
 	 * User Agent

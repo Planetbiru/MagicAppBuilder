@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplicationUser;
+use AppBuilder\Entity\EntityAdmin;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/database-builder.php";
@@ -8,13 +8,13 @@ require_once __DIR__ . "/sessions.php";
 
 if(isset($databaseBuilder))
 {
-    $entityUser = new EntityApplicationUser(null, $databaseBuilder);
+    $entityAdmin = new EntityAdmin(null, $databaseBuilder);
     $userLoggedIn = false;
-    if(isset($sessions->userId) && isset($sessions->userPassword))
+    if(isset($sessions->adminId) && isset($sessions->userPassword))
     {
         try
         {
-            $entityUser->findOneByUsernameAndPassword($sessions->userId, sha1($sessions->userPassword));
+            $entityAdmin->findOneByUsernameAndPassword($sessions->adminId, sha1($sessions->userPassword));
             $userLoggedIn = true;
         }
         catch(Exception $e)

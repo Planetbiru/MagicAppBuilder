@@ -37,13 +37,31 @@ class EntityApplicationGroupMember extends MagicObject
 	protected $applicationGroupId;
 
 	/**
-	 * Application User ID
+	 * Application Group
 	 * 
-	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application User ID")
+	 * @JoinColumn(name="application_group_id", referenceColumnName="application_group_id")
+	 * @Label(content="Application Group ID")
 	 * @var string
 	 */
-	protected $applicationUSserId;
+	protected $applicationGroup;
+
+	/**
+	 * Admin ID
+	 * 
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin ID")
+	 * @var string
+	 */
+	protected $adminId;
+
+	/**
+	 * Admin
+	 * 
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
+	 * @var string
+	 */
+	protected $admin;
 
     /**
 	 * Time Create

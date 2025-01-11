@@ -5,45 +5,45 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUserSession is entity of table user_session. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityAdminSession is entity of table admin_session. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user_session")
+ * @Table(name="admin_session")
  */
-class EntityUserSession extends MagicObject
+class EntityAdminSession extends MagicObject
 {
 	/**
-	 * User ID
+	 * Admin ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_session_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User ID")
+	 * @Column(name="admin_session_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $userSessionId;
+	protected $adminSessionId;
 
     /**
-	 * Application User ID
+	 * Admin ID
 	 * 
-	 * @Column(name="application_user_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application User ID")
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $applicationUserId;
+	protected $adminId;
 	
 	/**
-	 * Application User
+	 * Admin
 	 * 
-	 * @JoinColumn(name="application_user_id", referenceColumnName="application_user_id")
-	 * @Label(content="Application User")
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
 	 * @var string
 	 */
-	protected $applicationUser;
+	protected $applicationAdmin;
     
     /**
 	 * Application ID
@@ -63,10 +63,10 @@ class EntityUserSession extends MagicObject
     protected $application;
 
 	/**
-	 * User Agent
+	 * Admin Agent
 	 * 
 	 * @Column(name="user_agent", type="text", nullable=true)
-	 * @Label(content="User Agent")
+	 * @Label(content="Admin Agent")
 	 * @var string
 	 */
 	protected $userAgent;

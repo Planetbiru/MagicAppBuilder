@@ -51,9 +51,9 @@ try
         }
         file_put_contents($appListPath, PicoYamlUtil::dump($arr, null, 4, 0));
     }
-    if(isset($entityUser) && $entityUser->getApplicationUserId() != null)
+    if(isset($entityAdmin) && $entityAdmin->getApplicationUserId() != null)
     {
-        $entityUser->setApplicationId($appId)->update();
+        $entityAdmin->setApplicationId($appId)->update();
     }
 
 }

@@ -5,27 +5,27 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityUserLevel is entity of table user_level. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityAdminLevel is entity of table admin_level. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user_level")
+ * @Table(name="admin_level")
  */
-class EntityUserLevel extends MagicObject
+class EntityAdminLevel extends MagicObject
 {
 	/**
-	 * User Level ID
+	 * Admin Level ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="user_level_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="User Level ID")
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Admin Level ID")
 	 * @var string
 	 */
-	protected $userLevelId;
+	protected $adminLevelId;
 
     /**
 	 * Name
