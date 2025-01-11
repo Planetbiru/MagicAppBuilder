@@ -1,9 +1,9 @@
 {
     "name": "planetbiru/magic-app",
-    "description": "Magic app",
+    "description": "MagicApp",
     "license": "GPL-3.0-only",
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "MagicApp\\": "src/"
         }
     },

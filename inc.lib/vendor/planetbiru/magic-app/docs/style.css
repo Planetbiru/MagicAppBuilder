@@ -109,18 +109,13 @@ pre {
 
 code {
     font-family: monospace;
-    padding: 1px 2px;
     overflow: auto;
     line-height: 1.5;
     font-size: 14px;
-    background-color: #EEE;
-    border-radius: 2px;
 }
 
 pre code {
     background-color: transparent;
-    border-radius: 0;
-    padding: 0;
 }
 
 .class-declaration {
@@ -180,6 +175,9 @@ pre code {
     white-space: pre-wrap;
 }
 
+.hljs-meta{
+    color: #D50B1E;
+}
 
 .language-javascript {
     color: #f1e05a;
@@ -202,7 +200,7 @@ pre code {
 }
 
 .language-php .hljs-string {
-    color: #f20101;
+    color: #db0000;
 }
 
 .language-html {
