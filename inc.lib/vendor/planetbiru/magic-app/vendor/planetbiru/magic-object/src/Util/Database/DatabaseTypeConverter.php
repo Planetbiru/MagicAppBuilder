@@ -16,8 +16,9 @@ namespace MagicObject\Util\Database;
  * Use the conversion methods (`mysqlToPostgresql`, `postgresqlToSQLite`, etc.) to convert schema dumps 
  * from one format to another.
  *
- * Example:
+ * **Example:**
  * ```php
+ * <?php
  * $converter = new DatabaseTypeConverter();
  * $postgresqlSchema = $converter->mysqlToPostgresql($mysqlSchema);
  * ```

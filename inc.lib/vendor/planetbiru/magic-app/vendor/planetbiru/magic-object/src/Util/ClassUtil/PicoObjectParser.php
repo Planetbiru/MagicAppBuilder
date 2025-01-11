@@ -33,7 +33,7 @@ class PicoObjectParser
         $magicObject = new MagicObject();
         $values = $data->value();
         foreach ($values as $key => $value) {
-            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+            $key2 = PicoStringUtil::camelize($key);
             if(is_scalar($value))
             {
                 $magicObject->set($key2, $value, true);
@@ -59,7 +59,7 @@ class PicoObjectParser
     {
         $magicObject = new MagicObject();
         foreach ($data as $key => $value) {
-            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+            $key2 = PicoStringUtil::camelize($key);
             if(is_scalar($value))
             {
                 $magicObject->set($key2, $value, true);

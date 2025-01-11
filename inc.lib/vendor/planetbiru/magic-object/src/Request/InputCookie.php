@@ -20,7 +20,7 @@ class InputCookie extends PicoRequestBase {
      *
      * @var bool
      */
-    private $_recursive = false; // NOSONAR
+    protected $_recursive = false; // NOSONAR
 
     /**
      * Constructor for the InputCookie class.

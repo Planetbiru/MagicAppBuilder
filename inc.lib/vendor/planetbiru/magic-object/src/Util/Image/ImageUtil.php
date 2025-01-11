@@ -2,7 +2,6 @@
 
 namespace MagicObject\Util\Image;
 
-use ByJG\ImageUtil\ImageColorAlpha;
 use GdImage;
 use MagicObject\Exceptions\FileNotFoundException;
 use MagicObject\Exceptions\InvalidParameterException;
@@ -13,8 +12,9 @@ use MagicObject\Util\File\FileUtil;
  *
  * A wrapper for the GD library in PHP. GD must be installed in your system for this to work.
  *
- * Example:
+ * **Example:**
  * ```php
+ * <?php
  * $img = new Image('wheel.png');
  * $img->flip(1)->resize(120, 0)->save('wheel.jpg');
  * ```

@@ -7,6 +7,23 @@ namespace MagicObject\Database;
  * A query builder for constructing SQL statements programmatically. This class 
  * facilitates the creation of various SQL commands including SELECT, INSERT, 
  * UPDATE, and DELETE, while managing database-specific nuances.
+ * 
+ * **Example:**
+ * ```php
+ * <?php
+ * $id = 100;
+ * $db = new PicoDatabase($credentials);
+ * $db->connect();
+ * $query = new PicoDatabaseQueryBuilder($db);
+ * $query
+ *     ->select("*")
+ *     ->from("client")
+ *     ->where("client_id = ?", $id)
+ * ;
+ * $data = $db->fetch($query);
+ * echo $data['client_id']."\r\n"; // Client ID
+ * echo $data['name']."\r\n"; // Client name 
+ * ```
  *
  * @author Kamshory
  * @package MagicObject\Database
@@ -674,7 +691,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			$result = "'" . $this->escapeSQL($value) . "'";
 		} elseif (is_bool($value)) {
 			// Boolean value
-			$result = $value ? 'TRUE' : 'FALSE';
+			$result = $this->createBoolean($value);
 		} elseif (is_numeric($value)) {
 			// Numeric value
 			$result = (string)$value;
@@ -686,6 +703,24 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			$result = "'" . $this->escapeSQL((string)$value) . "'";
 		}
 		return $result;
+	}
+	
+	/**
+	 * Convert a value to its boolean representation for SQL.
+	 *
+	 * For SQLite, returns '1' for true and '0' for false.
+	 * For other databases, returns 'TRUE' for true and 'FALSE' for false.
+	 *
+	 * @param mixed $value The value to be converted.
+	 * @return string The boolean representation as a string.
+	 */
+	private function createBoolean($value)
+	{
+		if($this->isSqlite())
+		{
+			return $value ? '1' : '0';
+		}
+		return $value ? 'TRUE' : 'FALSE';
 	}
 
 	/**

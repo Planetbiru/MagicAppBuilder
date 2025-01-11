@@ -39,7 +39,7 @@ class PicoLanguage
     {
         if ($data != null && (is_array($data) || is_object($data))) {
             foreach ($data as $key => $value) {
-                $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                $key2 = PicoStringUtil::camelize($key);
                 $this->set($key2, $value);
             }
         }
@@ -74,7 +74,12 @@ class PicoLanguage
 
     /**
      * Magic method to set property values.
-     * Example: $instance->foo = 'bar';
+     * 
+     * **Example:** 
+     * ```php
+     * <?php
+     * $instance->foo = 'bar';
+     * ```
      *
      * @param string $name Name of the property to set.
      * @param mixed $value Value to assign to the property.
@@ -87,7 +92,12 @@ class PicoLanguage
 
     /**
      * Magic method to get property values.
-     * Example: echo $instance->foo;
+     * 
+     * **Example:** 
+     * ```php
+     * <?php
+     * echo $instance->foo;
+     * ```
      *
      * @param string $name Name of the property to get.
      * @return mixed The value stored in the property.

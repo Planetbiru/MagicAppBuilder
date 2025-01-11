@@ -88,7 +88,7 @@ class PicoRequestBase extends stdClass // NOSONAR
                 {
                     $key = strtolower($key);
                 }
-                $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                $key2 = PicoStringUtil::camelize($key);
                 $this->{$key2} = $value;
             }
         }

@@ -2,8 +2,6 @@
 
 namespace MagicObject\Util\Image;
 
-namespace ByJG\ImageUtil;
-
 use GdImage;
 use MagicObject\Util\Image\ImageColor;
 
@@ -12,8 +10,9 @@ use MagicObject\Util\Image\ImageColor;
  *
  * Represents a color with an alpha channel for transparency in images.
  *
- * Example:
+ * **Example:**
  * ```php
+ * <?php
  * $color = new ImageColorAlpha(255, 0, 0, 50); // Red with 50% opacity
  * ```
  *

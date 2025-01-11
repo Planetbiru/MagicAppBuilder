@@ -13,6 +13,10 @@ use DateTime;
  *
  * It supports multiple date formats, including ISO 8601 and RFC 2822,
  * as well as local and custom formats and Unix timestamps.
+ * 
+ * @author Kamshory
+ * @package MagicObject
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDateTimeUtil
 {

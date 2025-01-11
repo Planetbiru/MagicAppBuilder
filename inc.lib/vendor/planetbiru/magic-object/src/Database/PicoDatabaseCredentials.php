@@ -15,6 +15,7 @@ use MagicObject\SecretObject;
  * 
  * Example usage:
  * ```php
+ * <?php
  * $credentials = new PicoDatabaseCredentials();
  * $credentials->setHost('localhost');
  * $credentials->setUsername('user');

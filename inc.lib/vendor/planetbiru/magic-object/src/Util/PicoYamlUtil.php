@@ -33,7 +33,7 @@ class PicoYamlUtil
      *
      * This method recursively calculates how deep the given array is.
      * 
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $array = [1, [2, [3, 4]]];
@@ -72,7 +72,7 @@ class PicoYamlUtil
      * inline representation, indentation, and flags for 
      * serialization.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $data = ['name' => 'John', 'age' => 30];

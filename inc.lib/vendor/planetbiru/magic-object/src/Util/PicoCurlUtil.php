@@ -9,6 +9,10 @@ use MagicObject\Exceptions\CurlException;
  * Class PicoCurlUtil
  *
  * This class provides an interface for making HTTP requests using cURL.
+ * 
+ * @author Kamshory
+ * @package MagicObject
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoCurlUtil {
 

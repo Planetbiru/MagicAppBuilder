@@ -68,7 +68,7 @@ if($inputPost->getUserAction() == 'get')
             }
             
             $parsedLanguage = new MagicObject($parsed);   
-            $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory() . "/" . $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
+            $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
             $langs = new MagicObject();
             if(file_exists($pathTrans))
             {
@@ -86,11 +86,19 @@ if($inputPost->getUserAction() == 'get')
                     if($translated == null)
                     {
                         $translated = $original;
-                        $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                        $response[] = array(
+                            'original' => $original, 
+                            'translated' => $translated, 
+                            'propertyName' => $key
+                        );
                     }  
                     else if($filter == 'all') 
                     {
-                        $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                        $response[] = array(
+                            'original' => $original, 
+                            'translated' => $translated, 
+                            'propertyName' => $key
+                        );
                     }
                 }
             }
@@ -130,14 +138,14 @@ if($inputPost->getUserAction() == 'set')
     
     $translatedLabel = array_combine($keys, $values);
 
-    foreach($keys as $i=>$key)
+    foreach($keys as $i => $key)
     {
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
     
     $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
-    $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
+    $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
     $dirname = dirname($pathTrans);
     if (!file_exists($dirname)) { 
         mkdir($dirname, 0755, true); 

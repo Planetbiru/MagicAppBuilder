@@ -16,6 +16,7 @@ namespace MagicObject\Util\Database;
  * 
  * Example usage:
  * ```php
+ * <?php
  * $parser = new PicoSqlParser($sql);
  * $result = $parser->getResult();
  * ```

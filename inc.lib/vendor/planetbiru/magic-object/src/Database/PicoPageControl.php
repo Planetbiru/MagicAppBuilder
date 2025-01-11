@@ -195,7 +195,7 @@ class PicoPageControl
      * - `%s`: URL for the link (`href` attribute).
      * - `%s`: Text content of the link (usually the page number).
      *
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
@@ -240,7 +240,7 @@ class PicoPageControl
      * - `%s`: URL for the link (`href` attribute).
      * - `%s`: Symbol or text for the button (e.g., "Next" or "Prev").
      *
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
@@ -286,7 +286,7 @@ class PicoPageControl
      * - `%s`: URL for the link (`href` attribute).
      * - `%s`: Symbol or text for the button (e.g., "Start" or "End").
      *
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
@@ -317,19 +317,19 @@ class PicoPageControl
      *
      * @param string $pageNumberFormat The format template for rendering page numbers.
      * 
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
      * @param string $stepOneFormat The format template for rendering step buttons.
      * 
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
      * @param string $startEndFormat The format template for rendering start and end buttons.
      * 
-     * Example:
+     * **Example:**
      * ```html
      * <span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```

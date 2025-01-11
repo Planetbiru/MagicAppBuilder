@@ -7,10 +7,21 @@ use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 
 /**
  * Represents the structure of a database table.
+ *
+ * This class is used to manage and generate the structure of a database table based on annotations
+ * defined in a MagicObject class. It provides functionality to create SQL `CREATE TABLE` statements
+ * and retrieve metadata about the table, including its columns, primary keys, and nullable fields.
  * 
- * @author Kamshory
+ * It uses annotations such as `@Table` to specify the table name and `@Column` to define column properties
+ * in a class. The class can automatically generate SQL statements for creating a table and its columns
+ * based on this metadata.
+ *
+ * The class also provides utility methods for retrieving table information, such as column definitions,
+ * and for handling column attributes like `nullable`, `primary`, and `notnull`.
+ *
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
+ * @author Kamshory
  */
 class PicoDatabaseStructure
 {

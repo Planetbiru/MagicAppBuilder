@@ -49,7 +49,7 @@ class Dms
      * This method takes degree, minute, and second components 
      * and converts them to a decimal degree value.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $dms = new Dms();
@@ -81,7 +81,7 @@ class Dms
      * its DMS representation, storing the results in the instance 
      * variables.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $dms = new Dms();

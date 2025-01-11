@@ -279,30 +279,29 @@ class SecretObject extends stdClass // NOSONAR
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "isset", 5) === 0) {
-            $var = lcfirst(substr($method, 5));
+            $var = PicoStringUtil::camelize(substr($method, 5));
             return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0) {
-            $var = lcfirst(substr($method, 2));
+            $var = PicoStringUtil::camelize(substr($method, 2));
             return isset($this->{$var}) ? $this->{$var} == 1 : false;
         } else if (strncasecmp($method, "get", 3) === 0) {
-            $var = lcfirst(substr($method, 3));
+            $var = PicoStringUtil::camelize(substr($method, 3));
             return $this->_get($var);
         }
         else if (strncasecmp($method, "set", 3) === 0 && isset($params) && is_array($params) && !empty($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 3));
+            $var = PicoStringUtil::camelize(substr($method, 3));
             $this->_set($var, $params[0]);
             $this->modifyNullProperties($var, $params[0]);
             return $this;
         }
-        else if (strncasecmp($method, "unset", 5) === 0)
-        {
-            $var = lcfirst(substr($method, 5));
+        else if (strncasecmp($method, "unset", 5) === 0) {
+            $var = PicoStringUtil::camelize(substr($method, 5));
             unset($this->{$var});
             return $this;
         }
         else if (strncasecmp($method, "push", 4) === 0 && isset($params) && is_array($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 4));
+            $var = PicoStringUtil::camelize(substr($method, 4));
             if(!isset($this->{$var}))
             {
                 $this->{$var} = array();
@@ -314,7 +313,7 @@ class SecretObject extends stdClass // NOSONAR
             return $this;
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
-            $var = lcfirst(substr($method, 3));
+            $var = PicoStringUtil::camelize(substr($method, 3));
             if(isset($this->{$var}) && is_array($this->{$var}))
             {
                 return array_pop($this->{$var});
@@ -621,13 +620,13 @@ class SecretObject extends stdClass // NOSONAR
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->_set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->_set($key2, $value);
                 }
             }

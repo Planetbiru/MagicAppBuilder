@@ -31,7 +31,7 @@ class AttrUtil
      * on option elements in a dropdown when the current value 
      * matches the value of the option.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * echo AttrUtil::selected($currentValue, $optionValue);
@@ -54,7 +54,7 @@ class AttrUtil
      * on checkbox or radio button elements when the current value 
      * matches the value of the input.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * echo AttrUtil::checked($currentValue, $inputValue);

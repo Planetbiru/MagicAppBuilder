@@ -31,7 +31,7 @@ if($inputPost->getUserAction() == 'get')
             $entityName = trim($entityName);
             $path = $baseDir."/".$entityName.".php";
 
-            $pathTrans = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
+            $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
             $langs = new MagicObject();
             if(file_exists($pathTrans))
             {
@@ -39,8 +39,7 @@ if($inputPost->getUserAction() == 'get')
             }
             
             if(file_exists($path))
-            {
-                
+            {          
                 $return_var = ErrorChecker::errorCheck($cacheDir, $path);
                 
                 if($return_var == 0)
@@ -58,11 +57,19 @@ if($inputPost->getUserAction() == 'get')
                         if($translated == null)
                         {
                             $translated = $original;
-                            $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                            $response[] = array(
+                                'original' => $original, 
+                                'translated' => $translated, 
+                                'propertyName' => $key
+                            );
                         }  
                         else if($filter == 'all') 
                         {
-                            $response[] = array('original'=>$original, 'translated'=>$translated, 'propertyName'=>$key);
+                            $response[] = array(
+                                'original' => $original, 
+                                'translated' => $translated, 
+                                'propertyName' => $key
+                            );
                         }
                     }
                     ResponseUtil::sendJSON($response);
@@ -112,14 +119,14 @@ if($inputPost->getUserAction() == 'set')
 
         if($inputPost->getEntityName())
         {
-            $path = $appConfig->getApplication()->getBaseApplicationDirectory()."/".$appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
+            $path = $appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
             $dir = dirname($path); 
             if(!file_exists($dir))
             {
                 mkdir($dir, 0755, true);
             }
             $original = PicoIniUtil::parseIniFile($path);
-            foreach($translatedLabel as $key=>$value)
+            foreach($translatedLabel as $key => $value)
             {
                 $original[$key] = $value;
             }

@@ -27,6 +27,14 @@ class PicoSortable
 
     /**
      * Constructor to initialize sortable criteria based on provided arguments.
+     * 
+     * **Example:**
+     * ```php
+     * <?php
+     * $sortable = new PicoSortable(); // Without initialization
+     * // or
+     * $sortable = new PicoSortable("rank", "ASC", "name", "ASC"); // With initialization
+     * ```
      */
     public function __construct()
     {
@@ -249,7 +257,7 @@ class PicoSortable
         $sortable = new self;
         if (self::isArray($map)) {
             foreach ($map as $key => $value) {
-                if (PicoStringUtil::camelize($request->getOrderby()) == PicoStringUtil::camelize(str_replace("-", "_", $key))) {
+                if (PicoStringUtil::camelize($request->getOrderby()) == PicoStringUtil::camelize($key)) {
                     $sortable->add(new PicoSort($value, PicoSort::fixSortType($request->getOrdertype())));
                 }
             }

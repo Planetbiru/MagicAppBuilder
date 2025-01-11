@@ -29,7 +29,7 @@ class PicoArrayUtil
      *
      * This method can process both associative arrays and objects.
      * 
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $data = ['first_name' => 'John', 'last_name' => 'Doe'];
@@ -57,7 +57,7 @@ class PicoArrayUtil
      *
      * This method can process both associative arrays and objects.
      * 
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $data = ['firstName' => 'John', 'lastName' => 'Doe'];
@@ -96,7 +96,7 @@ class PicoArrayUtil
             unset($array[$key]);
 
             // Transform key to camelCase
-            $transformedKey = PicoStringUtil::camelize(str_replace("-", "_", $key));
+            $transformedKey = PicoStringUtil::camelize($key);
 
             // Work recursively
             if (is_array($value)) {

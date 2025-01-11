@@ -9,6 +9,20 @@ use PDOException;
  * Class PicoSqlite
  *
  * A simple wrapper for SQLite database operations using PDO.
+ * 
+ * This class provides an easy-to-use interface for interacting with an SQLite database.
+ * It supports basic CRUD (Create, Read, Update, Delete) operations such as creating tables,
+ * inserting records, selecting records with optional conditions, updating records, and deleting records.
+ * 
+ * The class uses PDO (PHP Data Objects) for database connectivity and supports executing SQL queries
+ * through various methods. The connection to the SQLite database is made through the provided file path,
+ * and additional callbacks can be provided for query execution and debugging.
+ * 
+ * This class extends the `PicoDatabase` class, which provides additional database interaction capabilities.
+ *
+ * @author Kamshory
+ * @package MagicObject\Database
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSqlite extends PicoDatabase
 {

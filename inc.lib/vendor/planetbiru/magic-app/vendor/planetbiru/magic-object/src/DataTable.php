@@ -111,7 +111,6 @@ class DataTable extends SetterGetter
      */
     private $_labels = array(); // NOSONAR
 
-
     /**
      * Constructor
      *
@@ -147,13 +146,13 @@ class DataTable extends SetterGetter
                     $this->_tableInfo = null;
                 }
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value);
                     $this->_labels[$key2] = $data->label($key2);
                 }
             } elseif (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value);
                 }
             }
@@ -348,7 +347,7 @@ class DataTable extends SetterGetter
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
      * @param array $props Array of ReflectionProperty objects representing class properties.
      * @param string $className Name of the class for reflection.
-     * @return void
+     * @return self
      */
     private function appendByProp($doc, $tbody, $props, $className)
     {
@@ -377,6 +376,7 @@ class DataTable extends SetterGetter
                 $td2->textContent = isset($value) ? $value : "";
             }
         }
+        return $this;
     }
 
      /**
@@ -388,7 +388,7 @@ class DataTable extends SetterGetter
      * @param DOMDocument $doc The DOM document used to create elements.
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
      * @param stdClass $values Data to append as rows.
-     * @return void
+     * @return self
      */
     private function appendByValues($doc, $tbody, $values)
     {
@@ -406,6 +406,7 @@ class DataTable extends SetterGetter
                 $td2->textContent = isset($value) ? $value : "";
             }
         }
+        return $this;
     }
 
     /**

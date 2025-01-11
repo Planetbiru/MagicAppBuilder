@@ -10,6 +10,17 @@ namespace MagicObject;
  * that are called statically or accessed dynamically but are not explicitly defined within the class.
  * It can be useful for implementing dynamic behavior or creating a fluent interface.
  * 
+ * **Example**
+ * ```php
+ * <?php
+ * echo Txt::planetbiru(); // Will print "planetbiru"
+ * echo Txt::of()->planetbiru; // Will print "planetbiru"
+ * echo Txt::getInstance()->planetbiru; // Will print "planetbiru"
+ * ```
+ * 
+ * @author Kamshory
+ * @package MagicObject
+ * @link https://github.com/Planetbiru/MagicObject
  * @final
  */
 class Txt

@@ -88,13 +88,13 @@ class SetterGetter extends stdClass
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value);
                 }
             }
@@ -330,33 +330,34 @@ class SetterGetter extends stdClass
     {
         if (strncasecmp($method, "isset", 5) === 0)
         {
-            $var = lcfirst(substr($method, 5));
+            $var = PicoStringUtil::camelize(substr($method, 5));
             return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0)
         {
-            $var = lcfirst(substr($method, 2));
+            $var = PicoStringUtil::camelize(substr($method, 2));
             return isset($this->{$var}) ? $this->{$var} == 1 : false;
         }
         else if (strncasecmp($method, "get", 3) === 0)
         {
-            $var = lcfirst(substr($method, 3));
+            $var = PicoStringUtil::camelize(substr($method, 3));
             return isset($this->{$var}) ? $this->{$var} : null;
         }
         else if (strncasecmp($method, "set", 3) === 0)
         {
-            $var = lcfirst(substr($method, 3));
-            $this->{$var} = $params[0];
+            $var = PicoStringUtil::camelize(substr($method, 3));
+            $this->set($var, $params[0]);
             return $this;
         }
         else if (strncasecmp($method, "unset", 5) === 0)
         {
-            $var = lcfirst(substr($method, 5));
+            $var = PicoStringUtil::camelize(substr($method, 5));
             unset($this->{$var});
             return $this;
         }
-        else if (strncasecmp($method, "push", 4) === 0) {
-            $var = lcfirst(substr($method, 4));
+        else if (strncasecmp($method, "push", 4) === 0) 
+        {
+            $var = PicoStringUtil::camelize(substr($method, 4));
             if(!isset($this->{$var}))
             {
                 $this->{$var} = array();
@@ -367,8 +368,9 @@ class SetterGetter extends stdClass
             }
             return $this;
         }
-        else if (strncasecmp($method, "pop", 3) === 0) {
-            $var = lcfirst(substr($method, 3));
+        else if (strncasecmp($method, "pop", 3) === 0) 
+        {
+            $var = PicoStringUtil::camelize(substr($method, 3));
             if(isset($this->{$var}) && is_array($this->{$var}))
             {
                 return array_pop($this->{$var});

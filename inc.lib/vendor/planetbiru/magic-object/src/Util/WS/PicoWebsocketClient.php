@@ -2,60 +2,53 @@
 
 namespace MagicObject\Util\WS;
 
-/*----------------------------------------------------------------------------*\
-  Websocket client
-  By Paragi 2013, Simon Riget MIT license.
-  This is a demonstration of a websocket clinet.
-  If you find flaws in it, please let me know at simon.riget (at) gmail
-  Websockets use hybi10 frame encoding:
-        0                   1                   2                   3
-        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-       +-+-+-+-+-------+-+-------------+-------------------------------+
-       |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-       |I|S|S|S|  (4)  |A|     (7)     |             (16/63)           |
-       |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-       | |1|2|3|       |K|             |                               |
-       +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-       |     Extended payload length continued, if payload len == 127  |
-       + - - - - - - - - - - - - - - - +-------------------------------+
-       |                               |Masking-key, if MASK set to 1  |
-       +-------------------------------+-------------------------------+
-       | Masking-key (continued)       |          Payload Data         |
-       +-------------------------------- - - - - - - - - - - - - - - - +
-       :                     Payload Data continued ...                :
-       + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-       |                     Payload Data continued ...                |
-       +---------------------------------------------------------------+
-  See: https://tools.ietf.org/rfc/rfc6455.txt
-  or:  http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10#section-4.2
-\*----------------------------------------------------------------------------*/
-
-/*============================================================================*\
-  Open websocket connection
-  resource websocketOpen(string $host [,int $port [,$additional_headers [,string &error_string ,[, int $timeout]]]]
-  host
-    A host URL. It can be a domain name like www.example.com or an IP address,
-    with port number. Local host example: 127.0.0.1:8080
-  port
-  headers (optional)
-    additional HTTP headers to attach to the request.
-    For example to parse a session cookie: "Cookie: SID=" . session_id()
-  error_string (optional)
-    A referenced variable to store error messages, i any
-  timeout (optional)
-    The maximum time in seconds, a read operation will wait for an answer from
-    the server. Default value is 10 seconds.
-  ssl (optional)
-  persistant (optional)
-  path (optional)
-  Context (optional)
-  Open a websocket connection by initiating a HTTP GET, with an upgrade request
-  to websocket.
-  If the server accepts, it sends a 101 response header, containing
-  "Sec-WebSocket-Accept"
-\*============================================================================*/
-
-
+/**
+ * WebSocket client.
+ *
+ * By Paragi 2013, Simon Riget MIT license.
+ * This is a demonstration of a WebSocket client.
+ * If you find flaws in it, please let me know at simon.riget (at) gmail.
+ *
+ * WebSockets use hybi10 frame encoding:
+ * 
+ *        0                   1                   2                   3
+ *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *       +-+-+-+-+-------+-+-------------+-------------------------------+
+ *       |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+ *       |I|S|S|S|  (4)  |A|     (7)     |             (16/63)           |
+ *       |N|V|V|V|       |S|             |   (if payload len == 126/127) |
+ *       | |1|2|3|       |K|             |                               |
+ *       +-+-+-+-+-------+-+-------------+-------------------------------+
+ *       |     Extended payload length continued, if payload len == 127  |
+ *       +---------------------------------------------------------------+
+ *       |                               |Masking-key, if MASK set to 1  |
+ *       +-------------------------------+-------------------------------+
+ *       | Masking-key (continued)       |          Payload Data         |
+ *       +-------------------------------- - - - - - - - - - - - - - - - +
+ *       :                     Payload Data continued ...                :
+ *       + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+ *       |                     Payload Data continued ...                |
+ *       +---------------------------------------------------------------+
+ * 
+ * See: https://tools.ietf.org/rfc/rfc6455.txt
+ * or:  http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10#section-4.2
+ *
+ * Open WebSocket connection:
+ * 
+ * resource websocketOpen(string $host [,int $port [,array $headers [,string &$error_string [,int $timeout]]]])
+ * 
+ * @param string $host The host URL. It can be a domain name like www.example.com or an IP address, with port number. Local host example: 127.0.0.1:8080.
+ * @param int $port (Optional) The port number.
+ * @param array $headers (Optional) Additional HTTP headers to attach to the request. For example, to parse a session cookie: "Cookie: SID=" . session_id().
+ * @param string &$error_string (Optional) A referenced variable to store error messages, if any.
+ * @param int $timeout (Optional) The maximum time in seconds that a read operation will wait for an answer from the server. Default value is 10 seconds.
+ * @param bool $ssl (Optional) Whether to use SSL for the connection. Default is false.
+ * @param bool $persistant (Optional) Whether to use a persistent connection. Default is false.
+ * @param string $path (Optional) The path to connect to on the server. Default is '/'.
+ * @param resource|null $context (Optional) A stream context resource to be used for the connection.
+ *
+ * @return resource|false Returns the WebSocket resource on success, or false on failure.
+ */
 class PicoWebsocketClient
 {
 

@@ -41,7 +41,7 @@ class PicoGenericObject extends stdClass
      * Accepts either an associative array or an object, 
      * converting its keys to camelCase format before loading.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $obj = new PicoGenericObject();
@@ -57,7 +57,7 @@ class PicoGenericObject extends stdClass
         if($data != null && (is_array($data) || is_object($data)))
         {
             foreach ($data as $key => $value) {
-                $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                $key2 = PicoStringUtil::camelize($key);
                 $this->set($key2, $value);
             }
         }
@@ -69,7 +69,7 @@ class PicoGenericObject extends stdClass
      *
      * Converts the property name to camelCase and assigns the value.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $obj = new PicoGenericObject();
@@ -93,7 +93,7 @@ class PicoGenericObject extends stdClass
      *
      * Retrieves the value of a property, returning null if not set.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $value = $obj->get('firstName'); // Retrieves the value of 'firstName'
@@ -113,7 +113,7 @@ class PicoGenericObject extends stdClass
      *
      * This method allows setting properties without directly calling `set()`.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $obj->firstName = 'John'; // Calls __set() internally
@@ -133,7 +133,7 @@ class PicoGenericObject extends stdClass
      *
      * This method allows getting properties without directly calling `get()`.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $value = $obj->firstName; // Calls __get() internally
@@ -153,7 +153,7 @@ class PicoGenericObject extends stdClass
     /**
      * Check if a property is set.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * if ($obj->issetFirstName()) {
@@ -172,7 +172,7 @@ class PicoGenericObject extends stdClass
     /**
      * Unset a property value.
      *
-     * Example:
+     * **Example:**
      * ```php
      * <?php
      * $obj->unsetFirstName(); // Removes the property 'firstName'
@@ -195,19 +195,19 @@ class PicoGenericObject extends stdClass
      * Supported methods:
      * 
      * - `isset<PropertyName>`: Checks if the property is set.
-     *   - Example: `$obj->issetFoo()` returns true if property `foo` is set.
+     *   - **Example:** `$obj->issetFoo()` returns true if property `foo` is set.
      * 
      * - `is<PropertyName>`: Checks if the property is set and equals 1 (truthy).
-     *   - Example: `$obj->isFoo()` returns true if property `foo` is set and is equal to 1.
+     *   - **Example:** `$obj->isFoo()` returns true if property `foo` is set and is equal to 1.
      * 
      * - `get<PropertyName>`: Retrieves the value of the property.
-     *   - Example: `$value = $obj->getFoo()` gets the value of property `foo`.
+     *   - **Example:** `$value = $obj->getFoo()` gets the value of property `foo`.
      * 
      * - `set<PropertyName>`: Sets the value of the property.
-     *   - Example: `$obj->setFoo($value)` sets the property `foo` to `$value`.
+     *   - **Example:** `$obj->setFoo($value)` sets the property `foo` to `$value`.
      * 
      * - `unset<PropertyName>`: Unsets the property.
-     *   - Example: `$obj->unsetFoo()` removes the property `foo`.
+     *   - **Example:** `$obj->unsetFoo()` removes the property `foo`.
      *
      * @param string $method Method name.
      * @param array $params Parameters for the method.

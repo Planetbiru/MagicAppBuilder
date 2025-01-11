@@ -9,8 +9,9 @@ use Exception;
  *
  * Custom exception class for handling image-related errors in the MagicObject library.
  *
- * Example:
+ * **Example:**
  * ```php
+ * <?php
  * throw new ImageUtilException("Error processing image", 500);
  * ```
  *

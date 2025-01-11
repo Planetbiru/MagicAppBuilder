@@ -246,7 +246,7 @@ class MagicObject extends stdClass // NOSONAR
                 $values = $data->value();
                 foreach ($values as $key => $value) 
                 {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value, true);
                 }
             }
@@ -254,7 +254,7 @@ class MagicObject extends stdClass // NOSONAR
             {
                 foreach ($data as $key => $value) 
                 {
-                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
+                    $key2 = PicoStringUtil::camelize($key);
                     $this->set($key2, $value, true);
                 }
             }
@@ -1044,7 +1044,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function startTransaction()
     {
-        $this->transactionalCommand("start");
+        $this->_database->startTransaction();
         return $this;
     }
 
@@ -1062,7 +1062,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function commit()
     {
-        $this->transactionalCommand("commit");
+        $this->_database->commit();
         return $this;
     }
 
@@ -1079,50 +1079,8 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function rollback()
     {
-        $this->transactionalCommand("rollback");
+        $this->_database->rollback();
         return $this;
-    }
-
-    /**
-     * Executes a transactional SQL command (start, commit, or rollback).
-     *
-     * This method executes a SQL command to manage the state of a database transaction.
-     * It checks the type of command (`start_transaction`, `commit`, or `rollback`) and
-     * delegates the corresponding SQL generation to the `PicoDatabaseQueryBuilder` class.
-     * The SQL statement is then executed on the active database connection.
-     *
-     * @param string $command The transactional command to execute. Possible values are:
-     *                        - "start" to begin a new transaction.
-     *                        - "commit" to commit the current transaction.
-     *                        - "rollback" to rollback the current transaction.
-     * 
-     * @return void
-     * 
-     * @throws NoDatabaseConnectionException If there is no active database connection.
-     * @throws PDOException If there is an error while executing the transactional command.
-     */
-    private function transactionalCommand($command)
-    {
-        if ($this->_databaseConnected()) {
-            try {
-                $queryBuilder = new PicoDatabaseQueryBuilder($this->_database);
-                $sql = null;
-                if ($command == "start") {
-                    $sql = $queryBuilder->startTransaction();
-                } elseif ($command == "commit") {
-                    $sql = $queryBuilder->commit();
-                } elseif ($command == "rollback") {
-                    $sql = $queryBuilder->rollback();
-                }
-                if (isset($sql)) {
-                    $this->_database->execute($sql);
-                }
-            } catch (Exception $e) {
-                throw new PDOException($e);
-            }
-        } else {
-            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
-        }
     }
 
     /**
@@ -1218,7 +1176,8 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function append($propertyName, $propertyValue)
     {
-        return $this->push($propertyName, $propertyValue);
+        $var = PicoStringUtil::camelize($propertyName);
+        return $this->push($var, $propertyValue);
     }
     
     /**
@@ -1341,7 +1300,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function __get($propertyName)
     {
-        $propertyName = lcfirst($propertyName);
+        $propertyName = PicoStringUtil::camelize($propertyName);
         if($this->__isset($propertyName))
         {
             return $this->get($propertyName);
@@ -1359,7 +1318,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function __isset($propertyName)
     {
-        $propertyName = lcfirst($propertyName);
+        $propertyName = PicoStringUtil::camelize($propertyName);
         return isset($this->{$propertyName});
     }
 
@@ -1374,7 +1333,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function __unset($propertyName)
     {
-        $propertyName = lcfirst($propertyName);
+        $propertyName = PicoStringUtil::camelize($propertyName);
         unset($this->{$propertyName});
     }
 
@@ -1426,7 +1385,8 @@ class MagicObject extends stdClass // NOSONAR
      */
     private function removeValue($propertyName, $skipModifyNullProperties = false)
     {
-        return $this->set($propertyName, null, $skipModifyNullProperties);
+        $var = PicoStringUtil::camelize($propertyName);
+        return $this->set($var, null, $skipModifyNullProperties);
     }
 
     /**
@@ -2521,98 +2481,97 @@ class MagicObject extends stdClass // NOSONAR
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "hasValue", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
+            $var = PicoStringUtil::camelize(substr($method, 8));
             return isset($this->{$var});
         }
         else if (strncasecmp($method, "isset", 5) === 0) {
-            $var = lcfirst(substr($method, 5));
+            $var = PicoStringUtil::camelize(substr($method, 5));
             return isset($this->{$var});
         }
         else if (strncasecmp($method, "is", 2) === 0) {
-            $var = lcfirst(substr($method, 2));
+            $var = PicoStringUtil::camelize(substr($method, 2));
             return isset($this->{$var}) ? $this->{$var} == 1 : false;
         }
         else if (strncasecmp($method, "equals", 6) === 0) {
-            $var = lcfirst(substr($method, 6));
+            $var = PicoStringUtil::camelize(substr($method, 6));
             return isset($this->{$var}) && $this->{$var} == $params[0];
         }
         else if (strncasecmp($method, "get", 3) === 0) {
-            $var = lcfirst(substr($method, 3));
-            return isset($this->{$var}) ? $this->{$var} : null;
+            return $this->get(substr($method, 3));
         }
         else if (strncasecmp($method, "set", 3) === 0 && $this->_isArray($params) && !empty($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 3));
-            $this->{$var} = $params[0];
+            $var = substr($method, 3);
+            $this->set($var, $params[0]);
             $this->modifyNullProperties($var, $params[0]);
             return $this;
         }
         else if (strncasecmp($method, "unset", 5) === 0 && !$this->_readonly) {
-            $var = lcfirst(substr($method, 5));
+            $var = substr($method, 5);
             $this->removeValue($var);
             return $this;
         }
         else if (strncasecmp($method, "push", 4) === 0 && $this->_isArray($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 4));
+            $var = substr($method, 4);
             return $this->push($var, $this->_isArray($params) && isset($params[0]) ? $params[0] : null);
         }
         else if (strncasecmp($method, "append", 6) === 0 && $this->_isArray($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 6));
+            $var = substr($method, 6);
             return $this->append($var, $this->_isArray($params) && isset($params[0]) ? $params[0] : null);
         }
         else if (strncasecmp($method, "unshift", 7) === 0 && $this->_isArray($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 7));
+            $var = substr($method, 7);
             return $this->unshift($var, $this->_isArray($params) && isset($params[0]) ? $params[0] : null);
         }
         else if (strncasecmp($method, "prepend", 7) === 0 && $this->_isArray($params) && !$this->_readonly) {
-            $var = lcfirst(substr($method, 7));
+            $var = substr($method, 7);
             return $this->prepend($var, $this->_isArray($params) && isset($params[0]) ? $params[0] : null);
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
-            $var = lcfirst(substr($method, 3));
+            $var = substr($method, 3);
             return $this->pop($var);
         }
         else if (strncasecmp($method, "shift", 5) === 0) {
-            $var = lcfirst(substr($method, 5));
+            $var = substr($method, 5);
             return $this->shift($var);
         }
         else if (strncasecmp($method, "findOneBy", 9) === 0) {
-            $var = lcfirst(substr($method, 9));
+            $var = PicoStringUtil::camelize(substr($method, 9));
             $sortable = PicoDatabaseUtil::sortableFromParams($params);
             // filter param
             $parameters = PicoDatabaseUtil::valuesFromParams($params);
             return $this->findOneBy($var, $parameters, $sortable);
         }
         else if (strncasecmp($method, "findOneIfExistsBy", 17) === 0) {
-            $var = lcfirst(substr($method, 17));
+            $var = PicoStringUtil::camelize(substr($method, 17));
             $sortable = PicoDatabaseUtil::sortableFromParams($params);
             // filter param
             $parameters = PicoDatabaseUtil::valuesFromParams($params);
             return $this->findOneIfExistsBy($var, $parameters, $sortable);
         }
         else if (strncasecmp($method, "deleteOneBy", 11) === 0) {
-            $var = lcfirst(substr($method, 11));
+            $var = PicoStringUtil::camelize(substr($method, 11));
             // filter param
             $parameters = PicoDatabaseUtil::valuesFromParams($params);
             return $this->deleteOneBy($var, $parameters);
         }
         else if (strncasecmp($method, "findFirstBy", 11) === 0) {
-            $var = lcfirst(substr($method, 11));
+            $var = PicoStringUtil::camelize(substr($method, 11));
             return $this->findOneBy($var, $params, PicoDatabasePersistence::ORDER_ASC);
         }
         else if (strncasecmp($method, "findFirstIfExistsBy", 19) === 0) {
-            $var = lcfirst(substr($method, 19));
+            $var = PicoStringUtil::camelize(substr($method, 19));
             return $this->findOneIfExistsBy($var, $params, PicoDatabasePersistence::ORDER_ASC);
         }
         else if (strncasecmp($method, "findLastBy", 10) === 0) {
-            $var = lcfirst(substr($method, 10));
+            $var = PicoStringUtil::camelize(substr($method, 10));
             return $this->findOneBy($var, $params, PicoDatabasePersistence::ORDER_DESC);
         }
         else if (strncasecmp($method, "findLastIfExistsBy", 18) === 0) {
-            $var = lcfirst(substr($method, 18));
+            $var = PicoStringUtil::camelize(substr($method, 18));
             return $this->findOneIfExistsBy($var, $params, PicoDatabasePersistence::ORDER_DESC);
         }
         else if (strncasecmp($method, "findBy", 6) === 0) {
-            $var = lcfirst(substr($method, 6));
+            $var = PicoStringUtil::camelize(substr($method, 6));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // get sortable
@@ -2622,7 +2581,7 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pageable, $sortable);
         }
         else if (strncasecmp($method, "findAscBy", 9) === 0) {
-            $var = lcfirst(substr($method, 9));
+            $var = PicoStringUtil::camelize(substr($method, 9));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // filter param
@@ -2630,7 +2589,7 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pageable, PicoDatabasePersistence::ORDER_ASC);
         }
         else if (strncasecmp($method, "findDescBy", 10) === 0) {
-            $var = lcfirst(substr($method, 10));
+            $var = PicoStringUtil::camelize(substr($method, 10));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // filter param
@@ -2638,7 +2597,7 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pageable, PicoDatabasePersistence::ORDER_DESC);
         }
         else if (strncasecmp($method, "listBy", 6) === 0) {
-            $var = lcfirst(substr($method, 6));
+            $var = PicoStringUtil::camelize(substr($method, 6));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // get sortable
@@ -2648,7 +2607,7 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pageable, $sortable, true);
         }
         else if (strncasecmp($method, "listAscBy", 9) === 0) {
-            $var = lcfirst(substr($method, 9));
+            $var = PicoStringUtil::camelize(substr($method, 9));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // filter param
@@ -2656,7 +2615,7 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pageable, PicoDatabasePersistence::ORDER_ASC, true);
         }
         else if (strncasecmp($method, "listDescBy", 10) === 0) {
-            $var = lcfirst(substr($method, 10));
+            $var = PicoStringUtil::camelize(substr($method, 10));
             // get pageable
             $pageable = PicoDatabaseUtil::pageableFromParams($params);
             // filter param
@@ -2678,32 +2637,32 @@ class MagicObject extends stdClass // NOSONAR
             return $this->findAll($specification, $pageable, PicoDatabasePersistence::ORDER_DESC, true);
         }
         else if (strncasecmp($method, "countBy", 7) === 0) {
-            $var = lcfirst(substr($method, 7));
+            $var = PicoStringUtil::camelize(substr($method, 7));
             $parameters = PicoDatabaseUtil::valuesFromParams($params);
             return $this->countBy($var, $parameters);
         }
         else if (strncasecmp($method, "existsBy", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
+            $var = PicoStringUtil::camelize(substr($method, 8));
             return $this->existsBy($var, $params);
         }
         else if (strncasecmp($method, "deleteBy", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
+            $var = PicoStringUtil::camelize(substr($method, 8));
             return $this->deleteBy($var, $params);
         }
         else if (strncasecmp($method, "booleanToTextBy", 15) === 0) {
-            $prop = lcfirst(substr($method, 15));
+            $prop = PicoStringUtil::camelize(substr($method, 15));
             return $this->booleanToTextBy($prop, $params);
         }
         else if (strncasecmp($method, "booleanToSelectedBy", 19) === 0) {
-            $prop = lcfirst(substr($method, 19));
+            $prop = PicoStringUtil::camelize(substr($method, 19));
             return $this->booleanToTextBy($prop, array(self::ATTR_SELECTED, ''));
         }
         else if (strncasecmp($method, "booleanToCheckedBy", 18) === 0) {
-            $prop = lcfirst(substr($method, 18));
+            $prop = PicoStringUtil::camelize(substr($method, 18));
             return $this->booleanToTextBy($prop, array(self::ATTR_CHECKED, ''));
         }
         else if (strncasecmp($method, "createSelected", 14) === 0) {
-            $var = lcfirst(substr($method, 14));
+            $var = PicoStringUtil::camelize(substr($method, 14));
             if(isset($params) && isset($params[0])) {
                 return isset($this->{$var}) && $this->{$var} == $params[0] ? self::ATTR_SELECTED : '';
             }
@@ -2712,7 +2671,7 @@ class MagicObject extends stdClass // NOSONAR
             }
         }
         else if (strncasecmp($method, "createChecked", 13) === 0) {
-            $var = lcfirst(substr($method, 13));
+            $var = PicoStringUtil::camelize(substr($method, 13));
             if(isset($params) && isset($params[0])) {
                 return isset($this->{$var}) && $this->{$var} == $params[0] ? self::ATTR_CHECKED : '';
             } else {
@@ -2720,21 +2679,21 @@ class MagicObject extends stdClass // NOSONAR
             }
         }
         else if (strncasecmp($method, "startsWith", 10) === 0) {
-            $var = lcfirst(substr($method, 10));
+            $var = PicoStringUtil::camelize(substr($method, 10));
             $value = $params[0];
             $caseSensitive = isset($params[1]) && $params[1];
             $haystack = $this->{$var};
             return PicoStringUtil::startsWith($haystack, $value, $caseSensitive);
         }
         else if (strncasecmp($method, "endsWith", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
+            $var = PicoStringUtil::camelize(substr($method, 8));
             $value = $params[0];
             $caseSensitive = isset($params[1]) && $params[1];
             $haystack = $this->{$var};
             return PicoStringUtil::endsWith($haystack, $value, $caseSensitive);
         }
         else if (strncasecmp($method, "label", 5) === 0) {
-            $var = lcfirst(substr($method, 5));
+            $var = PicoStringUtil::camelize(substr($method, 5));
             if(empty($var))
             {
                 $var = PicoStringUtil::camelize($params[0]);
@@ -2756,23 +2715,23 @@ class MagicObject extends stdClass // NOSONAR
             return "";
         }
         else if(strncasecmp($method, "option", 6) === 0) {
-            $var = lcfirst(substr($method, 6));
+            $var = PicoStringUtil::camelize(substr($method, 6));
             return isset($this->{$var}) && ($this->{$var} == 1 || $this->{$var} === true) ? $params[0] : $params[1];
         }
         else if(strncasecmp($method, "notNull", 7) === 0) {
-            $var = lcfirst(substr($method, 7));
+            $var = PicoStringUtil::camelize(substr($method, 7));
             return isset($this->{$var});
         }
         else if(strncasecmp($method, "notEmpty", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
+            $var = PicoStringUtil::camelize(substr($method, 8));
             return isset($this->{$var}) && !empty($this->{$var});
         }
         else if(strncasecmp($method, "notZero", 7) === 0) {
-            $var = lcfirst(substr($method, 7));
+            $var = PicoStringUtil::camelize(substr($method, 7));
             return isset($this->{$var}) && $this->{$var} != 0;
         }
         else if (strncasecmp($method, "notEquals", 9) === 0) {
-            $var = lcfirst(substr($method, 9));
+            $var = PicoStringUtil::camelize(substr($method, 9));
             return isset($this->{$var}) && $this->{$var} != $params[0];
         }
     }
