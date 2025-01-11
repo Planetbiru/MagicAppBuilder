@@ -706,6 +706,10 @@ jQuery(function () {
     let img = $('<img />');
     img.attr('src', 'lib.ajax/entity-relationship-diagram.php?' + params.join('&'));
     $('.erd-image').empty().append(img);
+    let urlMap = 'lib.ajax/entity-relationship-diagram-map.php?' + params.join('&');
+    $('[name="erd-map"]').load(urlMap, function (e) {
+      img.attr('usemap', '#erd-map');
+    });
   });
 
   $(document).on('click', '.btn-move-up', function (e) {
