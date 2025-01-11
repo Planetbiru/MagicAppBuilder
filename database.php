@@ -2054,6 +2054,19 @@ class DatabaseExplorer // NOSONAR
         $space = $dom->createTextNode(' ');
         $form->appendChild($space);
 
+        // Create exportDatabaseStructure button (Export Struktur Database)
+        $exportDatabaseStructure = $dom->createElement('button');
+        $exportDatabaseStructure->setAttribute('type', 'submit');
+        $exportDatabaseStructure->setAttribute('name', '___export_database_structure___');
+        $exportDatabaseStructure->setAttribute('value', $databaseName);
+        $exportDatabaseStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
+        $exportDatabaseStructure->appendChild($dom->createTextNode('Export Database Structure'));
+        $form->appendChild($exportDatabaseStructure);
+
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
         // Create exportDatabase button
         $exportDatabase = $dom->createElement('button');
         $exportDatabase->setAttribute('type', 'submit');
@@ -2063,18 +2076,7 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
         $form->appendChild($exportDatabase);
 
-        // Add space between buttons
-        $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
-
-        // Create exportDatabaseStructure button (Export Struktur Database)
-        $exportDatabaseStructure = $dom->createElement('button');
-        $exportDatabaseStructure->setAttribute('type', 'submit');
-        $exportDatabaseStructure->setAttribute('name', '___export_database_structure___');
-        $exportDatabaseStructure->setAttribute('value', $databaseName);
-        $exportDatabaseStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
-        $exportDatabaseStructure->appendChild($dom->createTextNode('Export Database Structure'));
-        $form->appendChild($exportDatabaseStructure);
+       
 
         if(!empty($table))
         {

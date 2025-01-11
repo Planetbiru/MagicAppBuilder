@@ -191,6 +191,28 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         });
     });
+
+    document.querySelector('[type="submit"][name="___export_database___"]').addEventListener('click', function(event) {
+        event.preventDefault();
+        showConfirmationDialog('Are you sure you want to export the data from the database?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
+            if (isConfirmed) {
+                event.target.closest('form').submit();  // Submit the form containing the button
+            } 
+        });
+    });
+
+    let btnTableExport = document.querySelector('[type="submit"][name="___export_table___"]');
+    if(btnTableExport != null)
+    {
+        btnTableExport.addEventListener('click', function(event) {
+            event.preventDefault();
+            showConfirmationDialog('Are you sure you want to export the data from the table?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
+                if (isConfirmed) {
+                    event.target.closest('form').submit();  // Submit the form containing the button
+                } 
+            });
+        });
+    }
     
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container

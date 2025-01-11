@@ -61,6 +61,10 @@ try
                 $no = 0;
                 foreach($columns as $column)
                 {
+                    if($columnName == $column['name'])
+                    {
+                        $colPos1 = $no;
+                    }
                     $no++;
                     ?>
                         <tr class="entity-column<?php echo $columnName == $column['name'] ? ' entity-column-selected' : '';?>">
@@ -73,6 +77,7 @@ try
                         </tr>
                     <?php
                 }
+                $ncol1 = $no;
                 ?>
                     </tbody>
                 </table>
@@ -116,6 +121,10 @@ try
                 $no = 0;
                 foreach($columns as $column)
                 {
+                    if($columnName == $column['name'])
+                    {
+                        $colPos2 = $no;
+                    }
                     $no++;
                     ?>
                         <tr class="entity-column<?php echo $columnName == $column['name'] ? ' entity-column-selected' : '';?>">
@@ -128,6 +137,7 @@ try
                         </tr>
                     <?php
                 }
+                $ncol2 = $no;
                 ?>
                     </tbody>
                 </table>
@@ -135,6 +145,26 @@ try
                 <?php
             }
         }
+        $rowHeight = 30.9;
+
+        $corection = 90;
+        $offset = 4;
+
+        $height = $corection + ($rowHeight * (($ncol1 - $colPos1) + $colPos2 ));
+        $marginTop = $offset - $corection + ($rowHeight * ($colPos1 - ($ncol1 + $ncol2)));
+
+        ?>
+        <div class="line-relation" style="
+            position: absolute;
+            width: 5px;
+            margin-left: -5px;
+            border: solid #666666;
+            border-width: 1px 0 1px 1px;
+            height: <?php echo $height;?>px;
+            margin-top: <?php echo $marginTop;?>px;
+            "></div>
+        <?php
+
     }
 }
 catch(Exception $e)
