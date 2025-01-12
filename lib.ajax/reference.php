@@ -35,9 +35,9 @@ try
     $entityInfo = new EntityInfo($appConfig->getEntityInfo());
     $entityApvInfo = new EntityApvInfo($appConfig->getEntityApvInfo());
 
-    if($curApp != null && $curApp->getId() != null)
+    if($curApp != null && $activeApplication->getApplicationId() != null)
     {
-        $referenceConfigPath = $workspaceDirectory."/applications/".$curApp->getId()."/reference.yml";
+        $referenceConfigPath = $activeWorkspace->getDirectory()."/".$activeApplication->getApplicationId()."/reference.yml";
         if(file_exists($referenceConfigPath))
         {
             $referenceConfig->loadYamlFile($referenceConfigPath, false, true, true);

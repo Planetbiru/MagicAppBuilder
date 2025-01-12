@@ -11,7 +11,7 @@ $inputPost = new InputPost();
 
 $currentApplication = trim($inputPost->getCurrentApplication());
 
-$path = $workspaceDirectory."/application-list.yml";
+$path = $activeWorkspace->getDirectory()."/application-list.yml";
 $dir = dirname($path);
 if(!file_exists($dir))
 {
@@ -20,8 +20,8 @@ if(!file_exists($dir))
 
 $builderConfig = new AppSecretObject(null);
 
-$builderConfigPath = $workspaceDirectory."/core.yml";
-$appListPath = $workspaceDirectory."/application-list.yml";
+$builderConfigPath = $activeWorkspace->getDirectory()."/core.yml";
+$appListPath = $activeWorkspace->getDirectory()."/application-list.yml";
 if(file_exists($builderConfigPath))
 {
     $builderConfig->loadYamlFile($builderConfigPath, false, true, true);

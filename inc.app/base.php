@@ -15,11 +15,11 @@ if(file_exists($builderConfigPath))
 $appConfig = new AppSecretObject(null);
 
 $curApp = $builderConfig->getCurrentApplication();
-$appBaseConfigPath = $workspaceDirectory."/applications";
-$configTemplatePath = $workspaceDirectory."/application-template.yml";
-if($curApp != null && $curApp->getId() != null)
+$appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
+$configTemplatePath = $activeWorkspace->getDirectory()."/application-template.yml";
+if($curApp != null && $activeApplication->getApplicationId() != null)
 {
-    $appConfigPath = $workspaceDirectory."/applications/".$curApp->getId()."/default.yml";
+    $appConfigPath = $activeWorkspace->getDirectory()."/".$activeApplication->getApplicationId()."/default.yml";
     if(file_exists($appConfigPath))
     {
         $appConfig->loadYamlFile($appConfigPath, false, true, true);

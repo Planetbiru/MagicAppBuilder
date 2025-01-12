@@ -19,7 +19,7 @@ if($inputPost->getDatabaseType() != null || $inputPost->getDatabaseName() !== nu
     $databaseSchema = $inputPost->getDatabaseSchema();
     $template = $inputPost->getTemplate();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entity/template/$filename";
+    $path = $activeWorkspace->getDirectory()."/entity/template/$filename";
     if(!file_exists(dirname($path)))
     {
         mkdir(dirname($path), 0755, true);
@@ -34,21 +34,21 @@ else
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entity/template/$filename";
+    $path = $activeWorkspace->getDirectory()."/entity/template/$filename";
     error_log($path);
     if(!file_exists($path))
     {
         $columns = [];
 
         $curApp = $builderConfig->getCurrentApplication();
-        $appBaseConfigPath = $workspaceDirectory."/applications";
+        $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
         $appConfig = new SecretObject();
         $appConfig->setDatabase(new SecretObject());
         $appConfig->setSessions(new SecretObject());
 
         if($applicationId != null)
         {
-            $appConfigPath = $workspaceDirectory."/applications/".$applicationId."/default.yml";
+            $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
             if(file_exists($appConfigPath))
             {
                 $appConfig->loadYamlFile($appConfigPath, false, true, true);

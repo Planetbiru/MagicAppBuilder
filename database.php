@@ -11,11 +11,6 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
 require_once __DIR__ . "/inc.app/sqlite-detector.php";
 require_once __DIR__ . "/inc.app/auth.php";
 
-if(isset($databaseConfig))
-{
-    require_once (__DIR__) . "/inc.app/database.php";
-}
-
 class DataException extends Exception
 {
 
@@ -2330,7 +2325,7 @@ $limit = $builderConfig->getDataLimit(); // Rows per page
 
 // Determine application ID and check if it is from the default application
 if (empty($applicationId)) {
-    $appId = $curApp->getId();
+    $appId = $activeApplication->getApplicationId();
     $applicationId = $appId;
     $fromDefaultApp = true;
 } else {
@@ -2351,7 +2346,7 @@ $dbType = "mysql";
 // Load the database configuration
 $databaseConfig = new SecretObject();
 
-$appConfigPath = $workspaceDirectory . "/applications/$appId/default.yml";
+$appConfigPath = $activeWorkspace->getDirectory() . "/applications/$appId/default.yml";
 
 if (file_exists($appConfigPath)) {
     $appConfig->loadYamlFile($appConfigPath, false, true, true);

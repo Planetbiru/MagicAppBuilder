@@ -18,7 +18,7 @@ if($inputPost->getConfig() != null)
     $databaseSchema = $inputPost->getDatabaseSchema();
     $config = $inputPost->getConfig();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entity/config/$filename";
+    $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
     if(!file_exists(dirname($path)))
     {
         mkdir(dirname($path), 0755, true);
@@ -34,7 +34,7 @@ else
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $workspaceDirectory."/entity/config/$filename";
+    $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
     error_log($path);
     if(!file_exists($path))
     {

@@ -18,12 +18,12 @@ if (isset($_POST) && !empty($_POST)) {
     $request = new InputPost(true);
 
     // Build the JSON file path
-    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/module/" . basename($request->getModuleFile(), ".php") . ".json";
+    $path = $activeWorkspace->getDirectory()."/applications/" . $activeApplication->getApplicationId() . "/module/" . basename($request->getModuleFile(), ".php") . ".json";
     $target = trim($request->getTarget(), "/\\");
     if (!empty($target)) {
         $target = "/" . $target;
     }
-    $path = $workspaceDirectory."/applications/" . $curApp->getId() . "/module$target/" . basename($request->getModuleFile(), ".php") . ".json";
+    $path = $activeWorkspace->getDirectory()."/applications/" . $activeApplication->getApplicationId() . "/module$target/" . basename($request->getModuleFile(), ".php") . ".json";
     
     // Ensure the directory exists
     if (!file_exists(dirname($path))) {

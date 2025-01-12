@@ -14,7 +14,7 @@ $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZ
 
 if($applicationId != null)
 {
-    $appConfigPath = $workspaceDirectory."/applications/".$applicationId."/default.yml";
+    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
     
     if(file_exists($appConfigPath))
     {

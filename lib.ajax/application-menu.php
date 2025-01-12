@@ -16,7 +16,7 @@ if(!isset($applicationId) || empty($applicationId))
 
 if($applicationId != null)
 {
-    $appConfigPath = $workspaceDirectory."/applications/".$applicationId."/default.yml";
+    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
     
     if(file_exists($appConfigPath))
     {

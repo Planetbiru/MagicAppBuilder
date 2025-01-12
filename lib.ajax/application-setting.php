@@ -14,14 +14,14 @@ $inputGet = new InputGet();
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
 $curApp = $builderConfig->getCurrentApplication();
-$appBaseConfigPath = $workspaceDirectory."/applications";
+$appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
 $appConfig = new SecretObject();
 $appConfig->setDatabase(new SecretObject());
 $appConfig->setSessions(new SecretObject());
 
 if($applicationId != null)
 {
-    $appConfigPath = $workspaceDirectory."/applications/".$applicationId."/default.yml";
+    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
     if(file_exists($appConfigPath))
     {
         $appConfig->loadYamlFile($appConfigPath, false, true, true);

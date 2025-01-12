@@ -12,24 +12,20 @@ try
     $yml = FileDirUtil::normalizePath($activeApplication->getProjectDirectory()."/default.yml");
     if(file_exists($yml))
     {
-    
-    $appConfig->loadYamlFile($yml, false, true, true);
-            $app = $appConfig->getApplication();
+        $appConfig->loadYamlFile($yml, false, true, true);
+        $app = $appConfig->getApplication();
+        $databaseConfig = new SecretObject($appConfig->getDatabase());
+    }
+    if(!isset($app))
+    {
+        $app = new SecretObject();
+    }
+    if(!isset($databaseConfig))
+    {
+        $databaseConfig = new SecretObject();
+    }
 
-            $databaseConfig = new SecretObject($appConfig->getDatabase());
-        }
-        if(!isset($app))
-        {
-            $app = new SecretObject();
-        }
-        if(!isset($databaseConfig))
-        {
-            $databaseConfig = new SecretObject();
-        }
-
-        
-        $database = new PicoDatabase($databaseConfig);
-
+    $database = new PicoDatabase($databaseConfig);
     $databaseName = $databaseConfig->getDatabaseName();
     $schemaName = $databaseConfig->getDatabaseSchema();
     

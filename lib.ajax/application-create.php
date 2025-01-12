@@ -10,7 +10,7 @@ use MagicObject\Response\PicoResponse;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
-$path = $workspaceDirectory."/application-list.yml";
+$path = $activeWorkspace->getDirectory()."/application-list.yml";
 $dir = dirname($path);
 if (!file_exists($dir)) 
 {
@@ -24,7 +24,7 @@ $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
 $baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
 
-$dir2 = $workspaceDirectory."/applications/$newAppId";
+$dir2 = $activeWorkspace->getDirectory()."/applications/$newAppId";
 
 if (!file_exists($dir2)) 
 {
