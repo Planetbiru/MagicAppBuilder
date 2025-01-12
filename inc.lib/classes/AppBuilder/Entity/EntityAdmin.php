@@ -25,7 +25,7 @@ class EntityAdmin extends MagicObject
 	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $applicationUserId;
+	protected $adminId;
 
 	/**
 	 * Name

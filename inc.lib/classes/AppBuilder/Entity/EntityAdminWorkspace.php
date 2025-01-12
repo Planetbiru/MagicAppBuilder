@@ -5,15 +5,15 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityAdminSession is entity of table admin_session. You can join this entity to other entity using annotation JoinColumn. 
+ * EntityAdminWorkspace is entity of table admin_workspace. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="admin_session")
+ * @Table(name="admin_workspace")
  */
-class EntityAdminSession extends MagicObject
+class EntityAdminWorkspace extends MagicObject
 {
 	/**
 	 * Admin ID
@@ -46,30 +46,21 @@ class EntityAdminSession extends MagicObject
 	protected $admin;
     
     /**
-	 * Application ID
+	 * Workspace ID
 	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application ID")
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Workspace ID")
 	 * @var string
 	 */
-	protected $applicationId;
+	protected $workspaceId;
 
     /**
-     * Application
+     * Workspace
      *
-     * @JoinColumn(name="application_id" referenceColumnName="application_id")
-     * @var EntityApplication
+     * @JoinColumn(name="workspace_id" referenceColumnName="workspace_id")
+     * @var EntityWorkspace
      */
-    protected $application;
-
-	/**
-	 * User Agent
-	 * 
-	 * @Column(name="user_agent", type="text", nullable=true)
-	 * @Label(content="User Agent")
-	 * @var string
-	 */
-	protected $userAgent;
+    protected $workspace;
     
     /**
 	 * Time Create

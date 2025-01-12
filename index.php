@@ -720,9 +720,13 @@ $constSelected = ' selected';
                   </td>
                 </tr>
                 <tr>
+                  <td>Workspace</td>
+                  <td><input class="form-control" type="text" name="application_workspace" readonly></td>
+                </tr>
+                <tr>
                   <td>Application Directory</td>
                   <td><input class="form-control" type="text" name="application_directory"></td>
-                </tr>
+                </tr>                
                 <tr>
                   <td>Base Namespace</td>
                   <td><input class="form-control" type="text" name="application_namespace"></td>
@@ -730,8 +734,7 @@ $constSelected = ' selected';
                 <tr>
                   <td>Author</td>
                   <td><input class="form-control" type="text" name="application_author"></td>
-                </tr>
-                
+                </tr>           
                 <tr>
                   <td>Path</td>
                   <td class="paths">

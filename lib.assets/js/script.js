@@ -782,6 +782,7 @@ jQuery(function () {
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
     $('[name="application_directory"]').val('');
+    $('[name="application_workspace"]').val('');
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
@@ -793,7 +794,12 @@ jQuery(function () {
         $('[name="application_id"]').val(data.application_id);
         $('[name="application_architecture"]').val(data.application_architecture);
         $('[name="application_directory"]').val(data.application_directory);
+        
+        
         $('[name="application_namespace"]').val(data.application_namespace);
+
+
+        $('[name="application_workspace"]').val(data.application_workspace);
         $('[name="application_author"]').val(data.application_author);
         $('[name="application_description"]').val(data.application_description);
         for (let i in data.magic_app_versions) {

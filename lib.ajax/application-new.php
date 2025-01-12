@@ -8,6 +8,16 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $appId = PicoDatabaseUtil::uuid();
+$workspaceId = null;
+$workspaceName = null;
+$author = null;
+
+if(isset($entityAdmin))
+{
+    $author = $entityAdmin->getname();
+    $workspaceId = $entityAdmin->getWorkspaceId();
+    $workspaceName = $entityAdmin->issetWorkspace() ? $entityAdmin->getWorkspace()->getName() : "";
+}
 
 $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
@@ -41,8 +51,9 @@ $data = [
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
+    'application_workspace' => $workspaceName,
     'application_namespace' => 'ApplicationName',
-    'application_author' => 'Your Name',
+    'application_author' => $author,
     'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
     'magic_app_versions' => $magicAppList

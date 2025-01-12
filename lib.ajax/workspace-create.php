@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Entity\EntityWorkspace;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -27,11 +28,10 @@ try
     
     $now = date('Y-m-d H:i:s');
     
-    $adminId = isset($entityAdmin) && $entityAdmin->getApplicationUserId() ? $entityAdmin->getApplicationUserId() : null;
+    $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
     
     $workspace->setAdminCreate($adminId);
-    $workspace->setAdminEdit($adminId); 
-    
+    $workspace->setAdminEdit($adminId);   
     $workspace->setTimeCreate($now);
     $workspace->setTimeEdit($now);
     $workspace->setIpCreate($_SERVER['REMOTE_ADDR']);
@@ -40,9 +40,24 @@ try
     
     $workspace->insert();
 
-    if(isset($entityAdmin) && $entityAdmin->getApplicationUserId() != null)
+    $workspaceId = $workspace->getWorkspaceId();
+
+    if(isset($entityAdmin) && $entityAdmin->getAdminId() != null)
     {
-        $entityAdmin->setWorkspaceId($workspace->getWorkspaceId())->update();
+        $entityAdmin->setWorkspaceId($workspaceId)->update();
+        
+        $workspaceAdmin = new EntityAdminWorkspace(null, $databaseBuilder);
+
+        $workspaceAdmin->setAdminId($adminId);
+        $workspaceAdmin->setWorkspaceId($workspaceId);
+        $workspaceAdmin->setAdminCreate($adminId);
+        $workspaceAdmin->setAdminEdit($adminId);   
+        $workspaceAdmin->setTimeCreate($now);
+        $workspaceAdmin->setTimeEdit($now);
+        $workspaceAdmin->setIpCreate($_SERVER['REMOTE_ADDR']);
+        $workspaceAdmin->setIpEdit($_SERVER['REMOTE_ADDR']);
+        $workspaceAdmin->setActive(true);
+        $workspaceAdmin->insert();
     }
 }
 catch(Exception $e)
