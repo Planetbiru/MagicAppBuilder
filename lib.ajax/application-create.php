@@ -2,6 +2,7 @@
 
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Generator\ScriptGenerator;
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
@@ -11,14 +12,17 @@ use MagicObject\Response\PicoResponse;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
-$dir = $activeWorkspace->getDirectory();
-if (!file_exists($dir)) 
+
+$dir2 = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$newAppId");
+if (!file_exists($dir2)) 
 {
-    mkdir($dir, 0755, true);
+    mkdir($dir2, 0755, true);
 }
+
 $newAppId = trim($inputPost->getId());
 
 $author = $entityAdmin->getName();
+$adminId = $entityAdmin->getAdminId();
 
 $baseApplicationDirectory = $inputPost->getDirectory();
 $baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseApplicationDirectory);
@@ -26,12 +30,7 @@ $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
 $baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
 
-$dir2 = $activeWorkspace->getDirectory()."/applications/$newAppId";
 
-if (!file_exists($dir2)) 
-{
-    mkdir($dir2, 0755, true);
-}
 $path2 = $dir2 . "/default.yml";
 
 $existing = new SecretObject();

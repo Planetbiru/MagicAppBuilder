@@ -37,6 +37,7 @@ try
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getDirectory(); ?></h6>
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-setting">Setting</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-scan">Scan</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-open">VS Code</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-workspace-default">Default</a>
         </div>
