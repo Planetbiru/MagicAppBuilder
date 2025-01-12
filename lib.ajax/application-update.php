@@ -2,6 +2,7 @@
 use AppBuilder\AppBuilder;
 use AppBuilder\AppSecretObject;
 use AppBuilder\Entity\EntityApplication;
+use AppBuilder\Util\FileDirUtil;
 use MagicApp\Field;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -9,7 +10,6 @@ use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
-use MagicObject\Util\PicoYamlUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -18,6 +18,11 @@ try
 {
 	$inputPost = new InputPost();
 	$appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+
+    $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
+
+    $applicationToUpdate->find($appId);
+
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
 	$architecture = $inputPost->getArchitecture();
@@ -29,7 +34,24 @@ try
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
 	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
-    $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory(), $configTemplatePath); 
+
+    $yml = FileDirUtil::normalizePath($applicationToUpdate->getProjectDirectory()."/default.yml");
+    $appConfig = new SecretObject(null);
+
+    if(file_exists($yml))
+    {
+        $appConfig->loadYamlFile($yml, false, true, true);
+    }
+    else
+    {
+        $appConfig->loadYamlFile($configTemplatePath);
+    }
+    $app = $appConfig->getApplication();
+
+    if(!isset($app))
+    {
+        $app = new SecretObject();
+    }
 
 	if($appConfig->getApplication() != null)
 	{
@@ -98,7 +120,9 @@ try
 	$appConfig->setSessions($existingSessions);
 	$appConfig->setEntityInfo($inputPost->getEntityInfo());
 
-	AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+    $yamlData = $appConfig->dumpYaml();
+
+    file_put_contents($applicationToUpdate->getProjectDirectory()."/default.yml", $yamlData);
 
 	$workspaceDirectory = $activeWorkspace->getDirectory();
     if(PicoStringUtil::startsWith($workspaceDirectory, "./"))
@@ -107,11 +131,7 @@ try
     }
 
 
-
-
-
-    $entityApplication = new EntityApplication(null, $databaseBuilder);
-    $entityApplication->where(PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->applicationId, $appId)))
+    $applicationToUpdate
     ->setName($applicationName)
     ->setDescription($description)
     ->setArchitecture($architecture)

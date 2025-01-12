@@ -17,7 +17,9 @@ try
         
         foreach($pageData->getResult() as $row)
         {
-            $workspace = $row->issetWorkspace() ? $row->getWorkspace() : new EntityWorkspace();
+            if($row->issetWorkspace())
+            {
+            $workspace = $row->getWorkspace();
 
             $selected = $currentWorkspaceId == $workspace->getWorkspaceId() ? "true" : "false";
 
@@ -41,6 +43,7 @@ try
     </div>
 </div>
 <?php
+            }
     }
 }
 }

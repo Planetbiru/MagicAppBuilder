@@ -2,6 +2,7 @@
 
 use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Entity\EntityWorkspace;
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
@@ -14,7 +15,7 @@ try
 {
     
     $name = $inputPost->getWorkspaceName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-    $directory = $inputPost->getWorkspaceDirectory(PicoFilterConstant::FILTER_DEFAULT);
+    $directory = FileDirUtil::normalizePath($inputPost->getWorkspaceDirectory(PicoFilterConstant::FILTER_DEFAULT));
     $description = $inputPost->getWorkspaceDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
     $phpPath = $inputPost->getPhpPath(PicoFilterConstant::FILTER_DEFAULT);
     

@@ -10,7 +10,7 @@ $applicationFinder = new EntityApplication(null, $databaseBuilder);
 
 try
 {
-    $pageData = $applicationFinder->findAll();
+    $pageData = $applicationFinder->findByWorkspaceId($activeWorkspace->getWorkspaceId());
     foreach ($pageData->getResult() as $application) {
 
         $currentApplicationId = isset($entityAdmin) && $entityAdmin->issetApplicationId() ? $entityAdmin->getApplicationId() : null;

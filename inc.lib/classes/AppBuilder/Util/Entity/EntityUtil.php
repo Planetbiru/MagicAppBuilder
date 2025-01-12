@@ -4,7 +4,6 @@ namespace AppBuilder\Util\Entity;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
-use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\ClassUtil\PicoEmptyParameter;
 
 class EntityUtil
