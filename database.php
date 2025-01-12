@@ -59,6 +59,9 @@ if (file_exists($appConfigPath)) {
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $database->query("SET search_path TO $schemaName;");
         }
+        if ($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE) {
+            $databaseName = "";
+        }
     } catch (Exception $e) {
         echo $e->getMessage();
         exit();
