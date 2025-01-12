@@ -1,6 +1,10 @@
 <?php
 use AppBuilder\AppBuilder;
 use AppBuilder\AppSecretObject;
+use AppBuilder\Entity\EntityApplication;
+use MagicApp\Field;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
@@ -25,7 +29,7 @@ try
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
 	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
-    $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
+    $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory(), $configTemplatePath); 
 
 	if($appConfig->getApplication() != null)
 	{
@@ -102,34 +106,18 @@ try
         $workspaceDirectory = dirname(__DIR__) . "/" . substr($workspaceDirectory, 2);
     }
 
-    $appListPath = $workspaceDirectory."/application-list.yml";
 
-    $currentApplication = new AppSecretObject();
 
-    $currentApplication->setId($appId);
 
-    $builderConfig->setCurrentApplication($currentApplication);
-    $appBaseConfigPath = $workspaceDirectory."/applications";
 
-    $configYml = PicoYamlUtil::dump($builderConfig->valueArray(), null, 4, 0);
-    file_put_contents($builderConfigPath, $configYml);
-
-    $appList = new AppSecretObject();
-    if(file_exists($appListPath))
-    {
-        $appList->loadYamlFile($appListPath, false, true, true);
-        $arr = $appList->valueArray();
-        foreach($arr as $idx => $app)
-        {
-            if($appId == $app['id'])
-            {
-                $arr[$idx]['name'] = $applicationName;
-				$arr[$idx]['description'] = $description;
-				$arr[$idx]['architecture'] = $architecture;
-            }
-        }
-        file_put_contents($appListPath, PicoYamlUtil::dump($arr, null, 4, 0));
-    }
+    $entityApplication = new EntityApplication(null, $databaseBuilder);
+    $entityApplication->where(PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->applicationId, $appId)))
+    ->setName($applicationName)
+    ->setDescription($description)
+    ->setArchitecture($architecture)
+    ->setBaseApplicationDirectory($baseApplicationDirectory)
+    ->update();
+    
 }
 catch(Exception $e)
 {

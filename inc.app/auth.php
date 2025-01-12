@@ -11,7 +11,8 @@ require_once __DIR__ . "/sessions.php";
 $activeWorkspace = new EntityWorkspace();
 $activeApplication = new EntityApplication();
 
-
+$appBaseConfigPath = "";
+$configTemplatePath = "";
 if(isset($databaseBuilder))
 {
     $entityAdmin = new EntityAdmin(null, $databaseBuilder);
@@ -31,6 +32,9 @@ if(isset($databaseBuilder))
                 $activeApplication = $entityAdmin->getApplication();
             }
             $userLoggedIn = true;
+
+            $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
+            $configTemplatePath = $activeWorkspace->getDirectory()."/application-template.yml";
         }
         catch(Exception $e)
         {
