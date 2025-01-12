@@ -2,6 +2,10 @@
 
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
+use MagicApp\Field;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -10,7 +14,9 @@ $applicationFinder = new EntityApplication(null, $databaseBuilder);
 
 try
 {
-    $pageData = $applicationFinder->findByWorkspaceId($activeWorkspace->getWorkspaceId());
+    $specs = PicoSpecification::getInstance()->addAnd([Field::of()->workspaceId, $activeWorkspace->getWorkspaceId()]);
+    $sorts = new PicoSortable(Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC);
+    $pageData = $applicationFinder->findAll($specs, null, $sorts);
     foreach ($pageData->getResult() as $application) {
 
         $currentApplicationId = isset($entityAdmin) && $entityAdmin->issetApplicationId() ? $entityAdmin->getApplicationId() : null;

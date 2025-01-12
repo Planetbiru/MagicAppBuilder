@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Generator\ScriptGenerator;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
@@ -10,13 +11,14 @@ use MagicObject\Response\PicoResponse;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
-$path = $activeWorkspace->getDirectory()."/application-list.yml";
-$dir = dirname($path);
+$dir = $activeWorkspace->getDirectory();
 if (!file_exists($dir)) 
 {
     mkdir($dir, 0755, true);
 }
 $newAppId = trim($inputPost->getId());
+
+$author = $entityAdmin->getName();
 
 $baseApplicationDirectory = $inputPost->getDirectory();
 $baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseApplicationDirectory);
@@ -32,49 +34,23 @@ if (!file_exists($dir2))
 }
 $path2 = $dir2 . "/default.yml";
 
-$application = [
-    'id' => $newAppId,
-    'name' => trim($inputPost->getName()),
-    'architecture' => trim($inputPost->getType()),
-    'description' => trim($inputPost->getDescription()),
-    'documentRoot' => trim($baseApplicationDirectory),
-    'author' => trim($inputPost->getAuthor()),
-    'selected' => false
-];
-
 $existing = new SecretObject();
-$existing->loadYamlFile($path);
-$existingApplication = $existing->valueArray();
-$replaced = false;
-if (isset($existingApplication) && is_array($existingApplication)) 
-{
-    foreach ($existingApplication as $key => $val) 
-    {
-        if ($val['id'] == $newAppId) 
-        {
-            $existingApplication[$key] = $application;
-            $replaced = true;
-        }
-    }
-    if (!$replaced) 
-    {
-        $existingApplication[] = $application;
-    }
-} 
-else 
-{
-    $existingApplication = array($application);
-}
 
-file_put_contents($path, (new SecretObject($existingApplication))->dumpYaml());
+if(file_exists($path2))
+{
+    $existing->loadYamlFile($path2, false, true, true);
+}
+else
+{
+    $existing->loadYamlFile($configTemplatePath, false, true, true);
+}
 
 $newApp = new SecretObject();
 
 $application = new SecretObject();
 try
 {
-    $newApp->loadYamlFile($path2);
-    $application = $newApp->getApplication() != null ? $newApp->getApplication() : new SecretObject();
+    $application = $existing->getApplication() != null ? $existing->getApplication() : new SecretObject();
 }
 catch(Exception $e)
 {
@@ -85,15 +61,22 @@ if(!file_exists($baseApplicationDirectory))
 {
     mkdir($baseApplicationDirectory, 0755, true);
 }
+$workspaceId = $activeWorkspace->getWorkspaceId();
+$applicationName = trim($inputPost->getName());
+$applicationArchitecture = trim($inputPost->getArchitecture());
+$applicationDirectory = trim($baseApplicationDirectory);
+$applicationDescription = trim($inputPost->getDescription());
+$projectDirectory = $dir2;
 
 $application->setId($newAppId);
-$application->setName(trim($inputPost->getName()));
-$application->setType(trim($inputPost->getType()));
+$application->setName($applicationName);
+$application->setDescription($applicationDescription);
+$application->setArchitecture($applicationArchitecture);
 
 $appBaseNamespace = trim($inputPost->getNamespace());
 $namespace = preg_replace('/[^A-Za-z0-9]/', '', $appBaseNamespace);
 $application->setBaseApplicationNamespace($namespace);
-$application->setBaseApplicationDirectory(trim($baseApplicationDirectory));
+$application->setBaseApplicationDirectory($applicationDirectory);
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
@@ -219,3 +202,25 @@ if(!file_exists($dir3))
 }
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
+
+$now = date("Y-m-d H:i:s");
+
+$entityApplication = new EntityApplication(null, $databaseBuilder);
+$entityApplication->setApplicationId($newAppId);
+$entityApplication->setName($applicationName);
+$entityApplication->setDescription($applicationDescription);
+$entityApplication->setProjectDirectory($projectDirectory);
+$entityApplication->setBaseApplicationDirectory($applicationDirectory);
+$entityApplication->setArchitecture($applicationArchitecture);
+$entityApplication->setAuthor($author);
+
+$entityApplication->setAdminId($adminId);
+$entityApplication->setWorkspaceId($workspaceId);
+$entityApplication->setAdminCreate($adminId);
+$entityApplication->setAdminEdit($adminId);   
+$entityApplication->setTimeCreate($now);
+$entityApplication->setTimeEdit($now);
+$entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
+$entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+$entityApplication->setActive(true);
+$entityApplication->save();
