@@ -1224,6 +1224,19 @@ jQuery(function () {
     }
   });
 
+  $(document).on('click', '.button-workspace-default', function (e) {
+    e.preventDefault();
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/workspace-default.php',
+      data: { workspaceId: workspaceId },
+      success: function (data) {
+        reloadApplicationList();
+      }
+    });
+  });
+  
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');

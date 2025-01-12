@@ -3,8 +3,8 @@
 use MagicObject\Request\InputPost;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
 $inputPost = new InputPost();

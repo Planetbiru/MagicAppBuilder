@@ -76,7 +76,7 @@ function init() {
             let primaryKey = event.target.getAttribute('data-primary-key');
             let value = event.target.getAttribute('data-value');
             let queryString = "";
-            let tableName = schema == "" ? `${schema}.${table}` : table;
+            let tableName = schema != "" ? `${schema}.${table}` : table;
             queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
             let originalQuery = query.value;
             if(originalQuery.startsWith('DELETE FROM '))

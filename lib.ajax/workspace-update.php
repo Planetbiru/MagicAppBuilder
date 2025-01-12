@@ -6,7 +6,7 @@ use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Util\PicoStringUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 

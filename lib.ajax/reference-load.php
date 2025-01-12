@@ -5,15 +5,15 @@ use AppBuilder\Util\ResponseUtil;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
     header("Content-type: application/json");
     $path = sprintf(
         "%s/applications/%d/reference/%s-%s.json",
-        $workspaceDirectory,
-        $curApp->getId(),
+        $activeWorkspace->getDirectory(),
+        $activeApplication->getApplicationId(),
         $inputGet->getFieldName(),
         $inputGet->getKey()
     );

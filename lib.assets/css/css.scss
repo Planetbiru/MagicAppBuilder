@@ -551,9 +551,7 @@ li.file-syntax-error {
 	}
 }
 
-
-
-
+.workspace-item[data-selected="true"] ,
 .application-item[data-selected="true"] {
 	border-color: rgba(0, 0, 0, 0.15);
 	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);

@@ -8,7 +8,8 @@ use AppBuilder\Util\ResponseUtil;
 // Start measuring execution time
 $timeStart = microtime(true);
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 header("Content-type: application/json");
 
 $inputGet = new InputGet();

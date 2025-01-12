@@ -4,8 +4,8 @@ use AppBuilder\Util\Entity\EntityRelationshipDiagram;
 use AppBuilder\Util\Error\ErrorChecker;
 use MagicObject\Request\InputGet;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 
 $inputGet = new InputGet();
 try

@@ -4,18 +4,15 @@ use MagicObject\Database\PicoDatabaseQueryBuilder;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Database\PicoDatabaseType;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/database.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 try {
-    $databaseName = $databaseConfig->getDatabaseName();
-    $schemaName = $databaseConfig->getDatabaseSchema();
-    $databaseType = $database->getDatabaseType();
+
+    
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
-    $tables = [];
 
+    $tables = [];
     if ($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
         // PostgreSQL query to get primary keys
         $sql = "SELECT 

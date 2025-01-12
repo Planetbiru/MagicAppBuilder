@@ -3,7 +3,6 @@
 use AppBuilder\AppInstaller;
 use AppBuilder\Entity\EntityAdmin;
 use AppBuilder\Entity\EntityAdminLevel;
-use AppBuilder\Entity\EntityUserLevel;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtil;
@@ -25,6 +24,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
     try
     {
         $databaseBuilder->connect();
+
         
         if(!$installed)
         {

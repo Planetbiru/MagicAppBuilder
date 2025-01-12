@@ -5,8 +5,8 @@ use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 
 $inputPost = new InputPost();
 $inputGet = new InputGet();

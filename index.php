@@ -1,7 +1,5 @@
 <?php
 
-use MagicObject\SecretObject;
-
 require_once __DIR__ . "/inc.app/sqlite-detector.php";
 require_once __DIR__ . "/inc.app/auth.php";
 require_once __DIR__ . "/inc.app/navs.php";
@@ -53,7 +51,6 @@ $constSelected = ' selected';
 
         <?php
         $nav = $appNavs->item(0);
-        $cfgSession = new SecretObject($builderConfig->getSessions());
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
           <div class="main-menu">
@@ -69,7 +66,6 @@ $constSelected = ' selected';
 
         <?php
         $nav = $appNavs->item(1);
-        $cfgSession = new SecretObject($appConfig->getSessions());
         ?>
         <div id="<?php echo $nav->getKey(); ?>" class="tab-pane fade<?php echo $nav->getActive() ? $constShowActive : ''; ?>" role="tabpanel" aria-labelledby="<?php echo $nav->getKey(); ?>-tab">
 

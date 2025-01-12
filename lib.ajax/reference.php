@@ -1,17 +1,40 @@
 <?php
 
 use AppBuilder\AppSecretObject;
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputGet;
 use AppBuilder\Util\ResponseUtil;
+use MagicApp\EntityApvInfo;
+use MagicApp\EntityInfo;
+use MagicObject\MagicObject;
+use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 
 try
 {
     $inputGet = new InputGet();
     $referenceConfig = new AppSecretObject();
+
+    
+    $yml = FileDirUtil::normalizePath($activeApplication->getProjectDirectory()."/default.yml");
+        
+    if(file_exists($yml))
+    {
+        $config = new MagicObject(null);
+        $config->loadYamlFile($yml, false, true, true);
+        $curApp = $config->getApplication();
+    }
+    else
+    {
+        $curApp = new SecretObject();
+    }
+
+    $entityInfo = new EntityInfo($appConfig->getEntityInfo());
+    $entityApvInfo = new EntityApvInfo($appConfig->getEntityApvInfo());
+
     if($curApp != null && $curApp->getId() != null)
     {
         $referenceConfigPath = $workspaceDirectory."/applications/".$curApp->getId()."/reference.yml";

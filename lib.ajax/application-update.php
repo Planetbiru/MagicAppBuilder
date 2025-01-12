@@ -7,8 +7,8 @@ use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 
 try
 {
@@ -96,7 +96,7 @@ try
 
 	AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
 
-	$workspaceDirectory = $builderConfig->getWorkspaceDirectory();
+	$workspaceDirectory = $activeWorkspace->getDirectory();
     if(PicoStringUtil::startsWith($workspaceDirectory, "./"))
     {
         $workspaceDirectory = dirname(__DIR__) . "/" . substr($workspaceDirectory, 2);

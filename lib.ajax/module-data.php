@@ -3,8 +3,7 @@
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 
@@ -17,7 +16,7 @@ try
     {
         $target = "/".$target;
     }
-    $path = $workspaceDirectory."/applications/".$curApp->getId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
+    $path = $activeWorkspace->getDirectory()."/applications/".$activeApplication->getApplicationId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
     if(isset($moduleFile) && !empty($moduleFile) && file_exists($path))
     {
         ResponseUtil::sendJSON(file_get_contents($path));

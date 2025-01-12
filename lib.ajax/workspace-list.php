@@ -10,6 +10,7 @@ $workspaceFinder = new EntityAdminWorkspace(null, $databaseBuilder);
 try
 {
     $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
+    $currentWorkspaceId = isset($entityAdmin) && $entityAdmin->issetWorkspaceId() ? $entityAdmin->getWorkspaceId() : null;
     $pageData = $workspaceFinder->findDescByAdminIdAndActive($adminId, true);
     if($pageData->getTotalResult() > 0)
     {
@@ -17,6 +18,8 @@ try
         foreach($pageData->getResult() as $row)
         {
             $workspace = $row->issetWorkspace() ? $row->getWorkspace() : new EntityWorkspace();
+
+            $selected = $currentWorkspaceId == $workspace->getWorkspaceId() ? "true" : "false";
 
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">

@@ -1,20 +1,35 @@
 <?php
 
 use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\Entity\EntityApplication;
+use AppBuilder\Entity\EntityWorkspace;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/database-builder.php";
 require_once __DIR__ . "/sessions.php";
 
+$activeWorkspace = new EntityWorkspace();
+$activeApplication = new EntityApplication();
+
+
 if(isset($databaseBuilder))
 {
     $entityAdmin = new EntityAdmin(null, $databaseBuilder);
     $userLoggedIn = false;
+
     if(isset($sessions->adminId) && isset($sessions->userPassword))
     {
         try
         {
             $entityAdmin->findOneByUsernameAndPassword($sessions->adminId, sha1($sessions->userPassword));
+            if($entityAdmin->issetWorkspace())
+            {
+                $activeWorkspace = $entityAdmin->getWorkspace();
+            }
+            if($entityAdmin->issetApplication())
+            {
+                $activeApplication = $entityAdmin->getApplication();
+            }
             $userLoggedIn = true;
         }
         catch(Exception $e)
@@ -29,3 +44,4 @@ if(isset($databaseBuilder))
         exit();
     }
 }
+require_once __DIR__ . "/database.php";

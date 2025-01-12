@@ -73,13 +73,22 @@ class EntityApplication extends MagicObject
 	protected $description;
     
     /**
-	 * Directory
+	 * Project Directory
 	 * 
-	 * @Column(name="directory", type="text", nullable=true)
-	 * @Label(content="Directory")
+	 * @Column(name="project_directory", type="text", nullable=true)
+	 * @Label(content="Project Directory")
 	 * @var string
 	 */
-	protected $directory;
+	protected $projectDirectory;
+
+	/**
+	 * Base Application Directory
+	 * 
+	 * @Column(name="base_application_directory", type="text", nullable=true)
+	 * @Label(content="Base Application Directory")
+	 * @var string
+	 */
+	protected $baseApplicationDirectory;
     
     /**
 	 * Author
