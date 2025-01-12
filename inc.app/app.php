@@ -1,9 +1,6 @@
 <?php
 
 use AppBuilder\AppSecretObject;
-use AppBuilder\EntityApvInfo;
-use AppBuilder\EntityInfo;
-use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 

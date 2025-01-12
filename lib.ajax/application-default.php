@@ -8,7 +8,6 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 try
 {
 	$inputPost = new InputPost();
-	
     if(isset($entityAdmin) && $entityAdmin->issetAdminId())
     {
         $appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);

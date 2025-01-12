@@ -30,6 +30,7 @@ if($inputPost->getUserAction() == 'get')
             $className = "\\".$baseEntity."\\".$entityName;
             $entityName = trim($entityName);
             $path = $baseDir."/".$entityName.".php";
+            
 
             $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
             $langs = new MagicObject();

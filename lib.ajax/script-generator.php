@@ -10,6 +10,9 @@ $timeStart = microtime(true);
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+$entityInfo = $appConfig->getEntityInfo();
+$entityApvInfo = $appConfig->getEntityApvInfo();
+
 header("Content-type: application/json");
 
 $inputGet = new InputGet();

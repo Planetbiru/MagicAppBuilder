@@ -2331,7 +2331,15 @@ $subqueryMap = '.$referece.';
         $tbody->appendChild($dom->createTextNode("\n\n\t\t\t\t\t")); 
 
         $trh->setAttribute('data-number', self::PHP_OPEN_TAG.'echo $pageData->getDataOffset() + $dataIndex;'.self::PHP_CLOSE_TAG); 
+
+        if($this->appFeatures->isActivateDeactivate())
+        {
+            $trh->setAttribute('data-active', self::PHP_OPEN_TAG.'echo $'.$objectName.'->option'.ucfirst($this->entityInfo->getActive())."('true', 'false');".self::PHP_CLOSE_TAG);
+        }
+
         $tbody->setAttribute('data-offset', self::PHP_OPEN_TAG.'echo $pageData->getDataOffset();'.self::PHP_CLOSE_TAG); 
+
+        
         $tbody->appendChild($trh);
         $tbody->appendChild($dom->createTextNode(self::N_TAB5)); 
         
