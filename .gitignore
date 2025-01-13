@@ -1,8 +1,8 @@
-/inc.cfg/applications/*
-/inc.cfg/core.yml
-/inc.cfg/entity/*
-/inc.cfg/entities/*
-/tmp/*
+inc.cfg/applications/*
+inc.cfg/core.yml
+inc.cfg/entity/*
+inc.cfg/entities/*
+tmp/*
 
 .cache/*
-/inc.cfg/*
+inc.cfg/*
