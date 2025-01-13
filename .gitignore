@@ -6,4 +6,4 @@
 
 .cache/*
 inc.cfg/application-list.yml
-inc.cfg/database.sqlite
+/inc.cfg/database.sqlite
