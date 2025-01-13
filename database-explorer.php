@@ -1980,6 +1980,7 @@ class DatabaseExplorer // NOSONAR
         // Create form
         $form = $dom->createElement('form');
         $form->setAttribute('method', 'post');
+        $form->setAttribute('action', '');
 
         // Create textarea
         $textarea = $dom->createElement('textarea', htmlspecialchars($lastQueries));
