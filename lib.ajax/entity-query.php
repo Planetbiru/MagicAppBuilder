@@ -12,7 +12,7 @@ $inputPost = new InputPost();
 
 header("Content-type: text/plain");
 
-$dashedLine = "-- ------------------------------------------------------------";
+$dashedLine = "-- --------------------------------------------------------------";
 
 try
 {
@@ -113,7 +113,8 @@ try
         {
             $allQueries[] = "-- Important Notes:";
             $allQueries[] = "-- Queries must be executed one by one manually,";
-            $allQueries[] = "-- as there may be duplicate columns from different entities in the same table.";
+            $allQueries[] = "-- as there may be duplicate columns from different entities";
+            $allQueries[] = "-- in the same table.";
             $allQueries[] = "-- Consider merging queries by table to avoid duplication.";
             $allQueries[] = "";
             $inputEntity = $inputPost->getEntity();
