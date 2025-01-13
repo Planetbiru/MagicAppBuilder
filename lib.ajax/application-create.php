@@ -12,6 +12,7 @@ use MagicObject\Response\PicoResponse;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
+$newAppId = trim($inputPost->getId());
 
 $dir2 = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$newAppId");
 if (!file_exists($dir2)) 
@@ -19,7 +20,6 @@ if (!file_exists($dir2))
     mkdir($dir2, 0755, true);
 }
 
-$newAppId = trim($inputPost->getId());
 
 $author = $entityAdmin->getName();
 $adminId = $entityAdmin->getAdminId();

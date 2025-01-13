@@ -5,10 +5,16 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityAdmin is entity of table admin. You can join this entity to other entity using annotation JoinColumn. 
- * Don't forget to add "use" statement if the entity is outside the namespace.
+ * The EntityAdmin class represents an entity in the "admin" table.
+ *
+ * This entity maps to the "admin" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
+ * @package AppBuilder\Entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
@@ -35,8 +41,8 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $name;
-    
-    /**
+
+	/**
 	 * Username
 	 * 
 	 * @Column(name="username", type="varchar(100)", length=100, nullable=true)
@@ -44,8 +50,8 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $username;
-    
-    /**
+
+	/**
 	 * Password
 	 * 
 	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
@@ -53,7 +59,7 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $password;
-	
+
 	/**
 	 * Admin Level ID
 	 * 
@@ -62,17 +68,17 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $adminLevelId;
-	
+
 	/**
 	 * Admin Level
 	 * 
-	 * @JoinColumn(name="admin_level_id", referenceColumName="admin_level_id")
-	 * @Label(content="Admin Level ID")
+	 * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+	 * @Label(content="Admin Level")
 	 * @var EntityAdminLevel
 	 */
 	protected $adminLevel;
-    
-    /**
+
+	/**
 	 * Gender
 	 * 
 	 * @Column(name="gender", type="varchar(1)", length=1, nullable=true)
@@ -80,8 +86,8 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $gender;
-    
-    /**
+
+	/**
 	 * Birth Day
 	 * 
 	 * @Column(name="birth_day", type="text", nullable=true)
@@ -89,8 +95,8 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $birthDay;
-    
-    /**
+
+	/**
 	 * Email
 	 * 
 	 * @Column(name="email", type="varchar(100)", length=100, nullable=true)
@@ -98,8 +104,8 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $email;
-    
-    /**
+
+	/**
 	 * Phone
 	 * 
 	 * @Column(name="phone", type="varchar(100)", length=100, nullable=true)
@@ -107,16 +113,16 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $phone;
-	
+
 	/**
-	 * Applcation ID
+	 * Application ID
 	 * 
 	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Applcation ID")
+	 * @Label(content="Application ID")
 	 * @var string
 	 */
 	protected $applicationId;
-	
+
 	/**
 	 * Application
 	 * 
@@ -125,7 +131,7 @@ class EntityAdmin extends MagicObject
 	 * @var EntityApplication
 	 */
 	protected $application;
-	
+
 	/**
 	 * Workspace ID
 	 * 
@@ -134,7 +140,7 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $workspaceId;
-	
+
 	/**
 	 * Workspace
 	 * 
@@ -143,53 +149,53 @@ class EntityAdmin extends MagicObject
 	 * @var EntityWorkspace
 	 */
 	protected $workspace;
-    
-    /**
-	 * Validation Code
+
+	/**
+	 * Vatidation Code
 	 * 
 	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Validation Code")
+	 * @Label(content="Vatidation Code")
 	 * @var string
 	 */
 	protected $vatidationCode;
-    
-    /**
+
+	/**
 	 * Last Reset Password
 	 * 
-	 * @Column(name="last_reset_password", type="timestamp", nullable=true)
+	 * @Column(name="last_reset_password", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Last Reset Password")
 	 * @var string
 	 */
 	protected $lastResetPassword;
-    
-    /**
+
+	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", nullable=true)
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
 	protected $timeCreate;
-    
-    /**
-	 * Admin Edit
+
+	/**
+	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
 	protected $timeEdit;
-    
-    /**
+
+	/**
 	 * Admin Create
 	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
 	 * @var string
 	 */
 	protected $adminCreate;
-    
-    /**
+
+	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
@@ -197,17 +203,17 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
-    
-    /**
+
+	/**
 	 * IP Create
 	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
 	 * @var string
 	 */
 	protected $ipCreate;
-    
-    /**
+
+	/**
 	 * IP Edit
 	 * 
 	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
@@ -219,10 +225,10 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
-	 * @DefaultColumn(value="1")
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 

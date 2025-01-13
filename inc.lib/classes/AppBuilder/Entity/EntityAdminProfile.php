@@ -5,10 +5,16 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityAdminProfile is entity of table admin_profile. You can join this entity to other entity using annotation JoinColumn. 
- * Don't forget to add "use" statement if the entity is outside the namespace.
+ * The EntityAdminProfile class represents an entity in the "admin_profile" table.
+ *
+ * This entity maps to the "admin_profile" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
+ * @package AppBuilder\Entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_profile")
@@ -27,25 +33,25 @@ class EntityAdminProfile extends MagicObject
 	 */
 	protected $adminProfileId;
 
-    /**
-	 * Application User ID
+	/**
+	 * Admin ID
 	 * 
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application User ID")
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
 	protected $adminId;
-	
+
 	/**
 	 * Admin
 	 * 
 	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
 	 * @Label(content="Admin")
-	 * @var string
+	 * @var EntityAdmin
 	 */
 	protected $admin;
-    
-    /**
+
+	/**
 	 * Profile Name
 	 * 
 	 * @Column(name="profile_name", type="varchar(100)", length=100, nullable=true)
@@ -53,8 +59,8 @@ class EntityAdminProfile extends MagicObject
 	 * @var string
 	 */
 	protected $profileName;
-    
-    /**
+
+	/**
 	 * Profile Value
 	 * 
 	 * @Column(name="profile_value", type="varchar(100)", length=100, nullable=true)
@@ -71,35 +77,35 @@ class EntityAdminProfile extends MagicObject
 	 * @var string
 	 */
 	protected $userAgent;
-    
-    /**
+
+	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", nullable=true)
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
 	protected $timeCreate;
-    
-    /**
-	 * Admin Edit
+
+	/**
+	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
 	protected $timeEdit;
-    
-    /**
+
+	/**
 	 * IP Create
 	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
 	 * @var string
 	 */
 	protected $ipCreate;
-    
-    /**
+
+	/**
 	 * IP Edit
 	 * 
 	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)

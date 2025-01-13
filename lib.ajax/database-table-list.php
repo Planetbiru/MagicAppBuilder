@@ -10,7 +10,7 @@ try {
 
     
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
-
+    $databaseType = $database->getDatabaseType();
 
     $tables = [];
     if ($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {

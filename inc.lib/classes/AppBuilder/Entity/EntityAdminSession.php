@@ -5,10 +5,16 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityAdminSession is entity of table admin_session. You can join this entity to other entity using annotation JoinColumn. 
- * Don't forget to add "use" statement if the entity is outside the namespace.
+ * The EntityAdminSession class represents an entity in the "admin_session" table.
+ *
+ * This entity maps to the "admin_session" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
+ * @package AppBuilder\Entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_session")
@@ -16,18 +22,18 @@ use MagicObject\MagicObject;
 class EntityAdminSession extends MagicObject
 {
 	/**
-	 * Admin ID
+	 * Admin Session ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
 	 * @Column(name="admin_session_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Admin ID")
+	 * @Label(content="Admin Session ID")
 	 * @var string
 	 */
 	protected $adminSessionId;
 
-    /**
+	/**
 	 * Admin ID
 	 * 
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
@@ -35,7 +41,7 @@ class EntityAdminSession extends MagicObject
 	 * @var string
 	 */
 	protected $adminId;
-	
+
 	/**
 	 * Admin
 	 * 
@@ -44,8 +50,8 @@ class EntityAdminSession extends MagicObject
 	 * @var EntityAdmin
 	 */
 	protected $admin;
-    
-    /**
+
+	/**
 	 * Application ID
 	 * 
 	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
@@ -54,13 +60,14 @@ class EntityAdminSession extends MagicObject
 	 */
 	protected $applicationId;
 
-    /**
-     * Application
-     *
-     * @JoinColumn(name="application_id" referenceColumnName="application_id")
-     * @var EntityApplication
-     */
-    protected $application;
+	/**
+	 * Application
+	 * 
+	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
+	 * @Label(content="Application")
+	 * @var EntityApplication
+	 */
+	protected $application;
 
 	/**
 	 * User Agent
@@ -70,35 +77,35 @@ class EntityAdminSession extends MagicObject
 	 * @var string
 	 */
 	protected $userAgent;
-    
-    /**
+
+	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", nullable=true)
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
 	protected $timeCreate;
-    
-    /**
-	 * Admin Edit
+
+	/**
+	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
 	protected $timeEdit;
-    
-    /**
+
+	/**
 	 * IP Create
 	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
 	 * @var string
 	 */
 	protected $ipCreate;
-    
-    /**
+
+	/**
 	 * IP Edit
 	 * 
 	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)

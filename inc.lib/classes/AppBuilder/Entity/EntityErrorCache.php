@@ -5,10 +5,16 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityErrorCache is entity of table error_cache. You can join this entity to other entity using annotation JoinColumn. 
- * Don't forget to add "use" statement if the entity is outside the namespace.
+ * The EntityErrorCache class represents an entity in the "error_cache" table.
+ *
+ * This entity maps to the "error_cache" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
+ * @package AppBuilder\Entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="error_cache")
@@ -19,6 +25,7 @@ class EntityErrorCache extends MagicObject
 	 * Error Cache ID
 	 * 
 	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
 	 * @Column(name="error_cache_id", type="varchar(2048)", length=2048, nullable=false)
 	 * @Label(content="Error Cache ID")
@@ -34,8 +41,8 @@ class EntityErrorCache extends MagicObject
 	 * @var string
 	 */
 	protected $fileName;
-    
-    /**
+
+	/**
 	 * File Path
 	 * 
 	 * @Column(name="file_path", type="varchar(512)", length=512, nullable=true)
@@ -44,7 +51,7 @@ class EntityErrorCache extends MagicObject
 	 */
 	protected $filePath;
 
-    /**
+	/**
 	 * Modification Time
 	 * 
 	 * @Column(name="modification_time", type="timestamp", length=19, nullable=true)
@@ -53,17 +60,16 @@ class EntityErrorCache extends MagicObject
 	 */
 	protected $modificationTime;
 
-    /**
+	/**
 	 * Error Code
 	 * 
 	 * @Column(name="error_code", type="int(11)", length=11, nullable=true)
-	 * @DefaultColumn(value="1")
 	 * @Label(content="Error Code")
-	 * @var boolean
+	 * @var int
 	 */
 	protected $errorCode;
-    
-    /**
+
+	/**
 	 * Message
 	 * 
 	 * @Column(name="message", type="text", nullable=true)
@@ -72,52 +78,52 @@ class EntityErrorCache extends MagicObject
 	 */
 	protected $message;
 
-    /**
+	/**
 	 * Line Number
 	 * 
 	 * @Column(name="line_number", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Line Number")
-	 * @var string
+	 * @var int
 	 */
 	protected $lineNumber;
-    
-    /**
+
+	/**
 	 * Last Reset Password
 	 * 
-	 * @Column(name="last_reset_password", type="timestamp", nullable=true)
+	 * @Column(name="last_reset_password", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Last Reset Password")
 	 * @var string
 	 */
 	protected $lastResetPassword;
-    
-    /**
+
+	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", nullable=true)
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
 	protected $timeCreate;
-    
-    /**
-	 * Admin Edit
+
+	/**
+	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
 	protected $timeEdit;
-    
-    /**
+
+	/**
 	 * Admin Create
 	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
 	 * @var string
 	 */
 	protected $adminCreate;
-    
-    /**
+
+	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
@@ -125,17 +131,17 @@ class EntityErrorCache extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
-    
-    /**
+
+	/**
 	 * IP Create
 	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
 	 * @var string
 	 */
 	protected $ipCreate;
-    
-    /**
+
+	/**
 	 * IP Edit
 	 * 
 	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
@@ -147,10 +153,10 @@ class EntityErrorCache extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
-	 * @DefaultColumn(value="1")
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 

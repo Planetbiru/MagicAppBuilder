@@ -27,7 +27,7 @@ if($applicationId != null)
 $menuPath = $appConfig->getApplication()->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
 if(!file_exists($menuPath))
 {
-    if(!file_exists(basename($menuPath)))
+    if(!file_exists(dirname($menuPath)))
     {
         mkdir(dirname($menuPath), 0755, true);
     }

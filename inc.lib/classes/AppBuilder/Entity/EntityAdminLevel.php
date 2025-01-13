@@ -5,10 +5,16 @@ namespace AppBuilder\Entity;
 use MagicObject\MagicObject;
 
 /**
- * EntityAdminLevel is entity of table admin_level. You can join this entity to other entity using annotation JoinColumn. 
- * Don't forget to add "use" statement if the entity is outside the namespace.
+ * The EntityAdminLevel class represents an entity in the "admin_level" table.
+ *
+ * This entity maps to the "admin_level" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * You can establish relationships with other entities using the JoinColumn annotation. 
+ * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
+ * 
+ * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
+ * @package AppBuilder\Entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_level")
@@ -20,14 +26,13 @@ class EntityAdminLevel extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @NotNull
-	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Level ID")
 	 * @var string
 	 */
 	protected $adminLevelId;
 
-    /**
+	/**
 	 * Name
 	 * 
 	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
@@ -35,44 +40,62 @@ class EntityAdminLevel extends MagicObject
 	 * @var string
 	 */
 	protected $name;
-    
-    /**
+
+	/**
 	 * Sort Order
 	 * 
-	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
+	 * @Column(name="sort_order", type="int", nullable=true)
 	 * @Label(content="Sort Order")
-	 * @var string
+	 * @var int
 	 */
 	protected $sortOrder;
-    
-    /**
+
+	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", nullable=true)
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
 	protected $timeCreate;
-    
-    /**
-	 * Admin Edit
+
+	/**
+	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
 	protected $timeEdit;
-    
-    /**
+
+	/**
+	 * Admin Create
+	 * 
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Label(content="Admin Create")
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * Admin Edit
+	 * 
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Edit")
+	 * @var string
+	 */
+	protected $adminEdit;
+
+	/**
 	 * IP Create
 	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
 	 * @var string
 	 */
 	protected $ipCreate;
-    
-    /**
+
+	/**
 	 * IP Edit
 	 * 
 	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
@@ -80,5 +103,16 @@ class EntityAdminLevel extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
+
+	/**
+	 * Active
+	 * 
+	 * @NotNull
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=false)
+	 * @DefaultColumn(value="TRUE")
+	 * @Label(content="Active")
+	 * @var bool
+	 */
+	protected $active;
 
 }
