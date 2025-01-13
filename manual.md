@@ -1,14 +1,36 @@
-# MagicAppBuilder Usage Tutorial
+# MagicAppBuilder Usage Guide
 
-## Step 1: Install Server
+MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
-Before you begin using MagicAppBuilder, you need to install a server that consists of the following components:
+## Step 1: Install the Server
+
+Before you can begin using MagicAppBuilder, you must install a server. The server should include the following components:
+
+### Required Components:
 
 1.  **Web Server**: Apache
 2.  **Database**: MySQL or MariaDB
-3.  **PHP**
+3.  **PHP**: For server-side scripting
 
-There are several options available to install these components, such as **WAMP**, **XAMPP**, or **USBWebServer**. Choose the one that best fits your needs and install it accordingly.
+### Installation Options:
+
+There are several options to install these components on your machine:
+
+-   **WAMP** (Windows, Apache, MySQL, PHP)
+-   **XAMPP** (Cross-platform Apache, MySQL, PHP)
+-   **USBWebServer** (Portable version for Windows)
+
+Choose the one that best suits your operating system and requirements. Each of these tools provides a simple installation process with pre-configured components, so you don’t have to manually configure each one.
+
+### Post Installation:
+
+After installation, ensure that all components are running correctly:
+
+-   Start Apache (web server).
+-   Start MySQL or MariaDB (database server).
+-   Verify that PHP is working by accessing the default PHP page (usually [http://localhost](http://localhost)) in your browser.
+
+Once you confirm that your server environment is up and running, you can proceed to the next step.
 
 ## Step 2: Create a Workspace
 
@@ -26,16 +48,16 @@ Once you’ve created a workspace, you’re ready to move on to the next step of
 
 To create an application, you will need to fill out a form with the following required fields:
 
-1.  **Application Name**: Name of your application.
-2.  **Application ID**: Unique identifier for your application.
-3.  **Architecture**: Choose between "Monolith Application" or "Microservices Application".
-4.  **Description**: Brief description of your application.
-5.  **MagicApp Version**: The latest version of MagicApp (this is automatically suggested).
-6.  **Workspace**: Select the workspace you just created.
-7.  **Application Directory**: Define the directory for your application.
-8.  **Base Namespace**: The base namespace for the application code.
-9.  **Author**: Name of the author.
-10.  **Application Path**: The directory where you will create modules for your application.
+1.  **Application Name**: Choose a name for your application.
+2.  **Application ID**: This is a unique identifier for your application. It will be used internally by MagicAppBuilder.
+3.  **Architecture**: Decide whether your application will be a "Monolith" (single, unified structure) or "Microservices" (distributed services) application.
+4.  **Description**: Provide a brief description of the application’s functionality.
+5.  **MagicApp Version**: The latest version of MagicAppBuilder, which is automatically suggested.
+6.  **Workspace**: Select the workspace you created in Step 2.
+7.  **Application Directory**: Define a folder where all application files will be stored.
+8.  **Base Namespace**: The base namespace for your application’s source code, typically formatted like `AppNamespace`.
+9.  **Author**: Specify the author of the application (e.g., your name or company).
+10.  **Application Path**: The directory for creating application-specific modules.
 
 Once all the fields are filled out, click the **Save** button. MagicAppBuilder will display your newly created application in the form of a card.
 
