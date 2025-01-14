@@ -27,15 +27,15 @@ MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for
 
 ## System Requirements
 
--   **Web Server:** Apache Server
--   **PHP Runtime Version:** 5.6 or above
--   **Database:** MariaDB or MySQL
+- **Web Server:** Apache Server
+- **PHP Runtime Version:** 5.6 or above
+- **Database:** MariaDB or MySQL
 
 ## Dependency
 
--   **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
--   **MagicObject:** A library for creating entities from database tables.
--   **Symfony/Yaml:** A library for serializing and deserializing YAML strings and files.
+- **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
+- **MagicObject:** A library for creating entities from database tables.
+- **Symfony/Yaml:** A library for serializing and deserializing YAML strings and files.
 
 ## Advantages of MagicAppBuilder
 
@@ -99,8 +99,8 @@ Data export is a crucial feature for many applications that require reporting an
 
 Whether you are building a monolithic application or developing a microservices-based system, this data management system is flexible enough to support both architectures. It can be integrated into a traditional monolith where everything is handled within a single application, or it can be deployed in a microservices architecture, where different services manage distinct pieces of functionality.
 
--    **Monolithic Architecture**: In this setup, the entire application is managed in one place, and data operations are handled by the same service. This setup is simpler to maintain but may not scale as well as microservices.
--    **Microservices Architecture**: With this approach, different parts of the data management system can be isolated in separate services. For example, the creation and update of data might be handled by one service, while data display and export might be managed by another service. This offers scalability and flexibility but requires more complex architecture.
+- **Monolithic Architecture**: In this setup, the entire application is managed in one place, and data operations are handled by the same service. This setup is simpler to maintain but may not scale as well as microservices.
+- **Microservices Architecture**: With this approach, different parts of the data management system can be isolated in separate services. For example, the creation and update of data might be handled by one service, while data display and export might be managed by another service. This offers scalability and flexibility but requires more complex architecture.
 
 **15. Support for Multiple Languages**
 
@@ -114,108 +114,9 @@ Apart from the features above, the module is also equipped with data filters tha
 
 ## Using MagicAppBuilder
 
-First of all, developers must create an entity relationship diagram or ERD. In a database, table relationships are not created explicitly. This means that a column from one table that refers to a column in another table does not have to be associated with a foreign key explicitly in the database. This relationship will be formed by the application.
+Visit Official user manual on [https://github.com/Planetbiru/MagicAppBuilder/blob/main/manual.md]() 
 
-After the ERD has been created, the developer then exports the ERD to SQL format to be executed on the target database. Some tables may need to be filled in for development needs.
-
-Once the application data structure is ready, next the developer connects MagicAppBuilder to the target database then starts and creates the application configuration.
-
-Next, the developer starts creating application modules by selecting tables from the database.
-
-MagicAppBuilder will display all columns of the selected table. When a developer uses certain features of MagicAppBuilder, MagicAppBuilder may add several columns needed by the application. In this case, developers don't need to be afraid because AppBuilder will create a query to alter tables in the database. Developers can copy the query to run on the database.
-
-As long as all database access by the application is done using entities only, MagicAppBuilder can make queries from automatically created entities. If the developer uses native queries to access the database and adds tables or columns that are not in the existing entity, then the developer must alter the table manually by creating the required alter query himself. Applications generated using MagicAppBuilder almost do not have native queries due to the fact that MagicAppBuilder never uses native queries in applications. Native queries may only be created by developers in conditions where they are needed. Using entities allows developers to create application installers without explicitly including SQL scripts. The installer will create an application script according to the database engine selected by the user.
-
-Users can display Entity Relationship Diagram or ERD based on the entity file that has been created. This ERD can be a guide for developers in the application development phase and also as a guide for users about the relationship between entities in the application. By knowing this relationship, users can determine the sequence in creating data and know the impact of changes to data.
-
-Users can select the entities to be displayed on the ERD, determine how many levels of relationships will be displayed, set the number of entities horizontally to limit the width of the ERD to be created, set the distance between entities and set the width of the ERD edge for aesthetic purposes.
-
-The image format of ERD is SVG. This format can be converted to PNG if needed. Please note that the image quality in PNG format will decrease if rescaled. Therefore, set the appropriate zoom before converting it to PNG format.
-
-### Steps
-
-#### MagicAppBuilder Preparation
-
-1. Prepare the server, which should include:
-	    -   A Web Server, such as Apache Server
-	    -   PHP
-	    -   A Database, such as MySQL, MariaDB, or PostgreSQL For Windows users, it is recommended to use XAMPP or Wamp Server, but a portable web server that includes the web server, PHP, and the database can also be used.
-2. Download the MagicAppBuilder source code.
-3. Place the MagicAppBuilder source code into a directory under the document root in a separate folder, as the document root will also contain the directories for the applications to be created.
-4. Open MagicAppBuilder in a browser using the appropriate server name, port, and path.
-5. Ensure that MagicAppBuilder is running correctly.
-6. Create MagicAppBuilder settings.
-
-#### Project Preparation
-
-
-**Steps to create an application with MagicAppBuilder**
-
-1.  Create a new application in MagicAppBuilder and set it as the default application.
-
-2.  Update the application settings which consist of:
-
--   Application
--   Database
--   Session
--   Reserved columns
-    
-3.  If you don't have a database, create a complete Entity Relationship Diagram (ERD) with the following rules:
-
--   The column for the primary key of a table must be the same as the table name, with the suffix `_id`.
--   Columns that are foreign keys referring to other tables should ideally have the same name as the primary key of the referenced table.
--   If there are multiple columns referring to the primary key of a table, this should be noted when creating the module.
--   Columns with the same purpose across different tables must have the same name.
--   Application features should be defined before creating the entity relationship diagram.
-
-4.  Export the entity relationship diagram to SQL.
-    
-5.  If you do not want to use third-party applications to create the Entity Relationship Diagram, you can use MagicAppBuilder.
-
-6.  Open the Database Manager from MagicAppBuilder and import the SQL from the entity into the selected database type. Currently, MagicAppBuilder supports MySQL, MariaDB, PostgreSQL, and SQLite.
-    
-7.  If you are using a third-party application to create the Entity Relationship Diagram, import the exported SQL code by clicking the "Import Structure" button.
-    
-8.  Enter the SQL code into the provided input and then click the "Import" button.
-    
-9.  Run the converted SQL.
-    
-10.  If you want to use MagicAppBuilder to create the Entity Relationship Diagram, click the "Entity Editor" button.
-    
-11.  Create entities according to the application you desire.
-    
-12.  Check "Export All". MagicAppBuilder will generate SQL code according to the entities you have created.
-    
-13.  Click the "Import" button.
-    
-14.  Run the converted SQL.
-    
-15.  Close the Database Explorer.
-    
-16.  Switch to the "Define Module" tab.
-    
-17.  Click the "Reload Table" button to load all tables from the specified database.
-    
-18.  Select a table from the list. MagicAppBuilder will automatically fill in some fields in the form. You can modify these inputs before continuing.
-    
-19.  Select the path where the module will be placed.
-    
-20.  Click the "Load Column" button. MagicAppBuilder will display a new tab containing the fields or columns from the table.
-    
-21.  Check the checkboxes and radio buttons according to how the module will be created.
-    
-22.  If you choose "select" for the data column or filter column, MagicAppBuilder will display a "Source" button for reference. Click the "Source" button to define the reference you will create. This section will be explained separately.
-    
-23.  Click the "Data Filter" button to define the data filter.
-    
-24.  Click the "Data Order" button to define the order of the data.
-    
-25.  Click the "Module Filter" button to configure the module features.
-    
-26.  Click the "Generate Script" button to automatically generate the script. MagicAppBuilder will create the module script and several entity scripts required by the module. If you check "Update Entity" in step 8, MagicAppBuilder will update the existing entity. Be cautious if you have already defined the entity.
-
-
-### Reserved Column Mapping
+## Reserved Column Mapping
 
 Reserved columns can be mapped to other names according to the native language used by the application and the terminology that will be used in each entity. Each entity must consistently use the full name if it is going to use it.
 
@@ -232,7 +133,7 @@ If the application is built in a language other than English, it would be strang
 The following is an example of column mapping into Indonesian.
 
 | Original Key    | Translated Key   |
-| --------------- | ---------------- | 
+| --------------- | ---------------- |
 | name            | nama             |
 | sort_order      | sort_order       |
 | active          | aktif            |
@@ -255,48 +156,48 @@ Developers for applications that use Indonesian as the native language of the ap
 
 Here is an explanation of the reserved columns above.
 
-| Original Key    | Description      |
-| --------------- | ---------------- | 
-| name            | A column that will represent a single row as a whole in an entity. |
+| Original Key    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name            | A column that will represent a single row as a whole in an entity.                                                                                                                                                                                                                                                                                                                                                                                                      |
 | sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
-| active          | Columns to activate and deactivate data |
-| draft           | Column that marks that the data is new data that has not yet received approval. |
-| waiting_for     | Column that specifies what approvals are required by a row. |
-| admin_create    | Column for user ID who created the data first |
-| admin_edit      | Column for user ID who last changed the data |
-| admin_ask_edit  | Column for user ID who requested the data change |
-| time_create     | Column for time when created the data first |
-| time_edit       | Column for time when last changed the data |
-| time_ask_edit   | Column for time requested the data change |
-| ip_create       | Column for IP Address from where created the data first |
-| ip_edit         | Column for IP Address from where last changed the data |
-| ip_ask_edit     | Column for IP Address from where requested the data change |
-| approval_id     | Column for ID of the data in the approval table |
-| approval_note   | Column for approval note |
-| approval_status | Column for approval status |
+| active          | Columns to activate and deactivate data                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| draft           | Column that marks that the data is new data that has not yet received approval.                                                                                                                                                                                                                                                                                                                                                                                         |
+| waiting_for     | Column that specifies what approvals are required by a row.                                                                                                                                                                                                                                                                                                                                                                                                             |
+| admin_create    | Column for user ID who created the data first                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| admin_edit      | Column for user ID who last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| admin_ask_edit  | Column for user ID who requested the data change                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| time_create     | Column for time when created the data first                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| time_edit       | Column for time when last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| time_ask_edit   | Column for time requested the data change                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ip_create       | Column for IP Address from where created the data first                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ip_edit         | Column for IP Address from where last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ip_ask_edit     | Column for IP Address from where requested the data change                                                                                                                                                                                                                                                                                                                                                                                                              |
+| approval_id     | Column for ID of the data in the approval table                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| approval_note   | Column for approval note                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| approval_status | Column for approval status                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ## User Plan
 
-| Object                                  | Community  | Pro        |
-| --------------------------------------- | ---------- | ---------- |
-| Application starter                     | Yes        | Yes        |
-| Module generator                        | Yes        | Yes        |
-| Entity generator                        | Yes        | Yes        |
-| Entity translator                       | Yes        | Yes        |
-| Application translator                  | Yes        | Yes        |
-| Table creator                           | Yes        | Yes        |
-| Table modifier                          | Yes        | Yes        |
-| Number of project                       | Unlimited  | Unlimited  |
-| Simultaneous projects                   | 1          | Unlimited  |
-| Number of table                         | Unlimited  | Unlimited  |
-| Number of directory                     | Unlimited  | Unlimited  |
-| Number of entity                        | Unlimited  | Unlimited  |
-| Number of module                        | Unlimited  | Unlimited  |
-| Number of theme                         | 1          | 3          |
-| Number of user                          | 1          | 100        |
-| User management                         | No         | Yes        |
-| Collaboration                           | No         | Yes        |
-| Push notification                       | No         | Yes        |
+| Object                 | Community | Pro       |
+| ---------------------- | --------- | --------- |
+| Application starter    | Yes       | Yes       |
+| Module generator       | Yes       | Yes       |
+| Entity generator       | Yes       | Yes       |
+| Entity translator      | Yes       | Yes       |
+| Application translator | Yes       | Yes       |
+| Table creator          | Yes       | Yes       |
+| Table modifier         | Yes       | Yes       |
+| Number of project      | Unlimited | Unlimited |
+| Simultaneous projects  | 1         | Unlimited |
+| Number of table        | Unlimited | Unlimited |
+| Number of directory    | Unlimited | Unlimited |
+| Number of entity       | Unlimited | Unlimited |
+| Number of module       | Unlimited | Unlimited |
+| Number of theme        | 1         | 3         |
+| Number of user         | 1         | 100       |
+| User management        | No        | Yes       |
+| Collaboration          | No        | Yes       |
+| Push notification      | No        | Yes       |
 
 ## Conclusion
 
@@ -304,4 +205,4 @@ MagicAppBuilder is a game-changer for developers, enabling them to quickly build
 
 In the fast-paced world of application development, MagicAppBuilder ensures that developers can focus on building great products, rather than getting bogged down by repetitive coding tasks.
 
-Subscribe to our YouTube channel https://www.youtube.com/@maliktamvan 
+Subscribe to our YouTube channel https://www.youtube.com/@maliktamvan
