@@ -63,19 +63,12 @@ class AppLanguage extends PicoLanguage
     {
         $langFile = $this->appConfig->getBaseDirectoryLanguage() . "/" . $this->currentLanguage . "/app.ini";
 
-        // Create the directory if it does not exist
-        if (!file_exists(dirname($langFile))) {
-            mkdir(dirname($langFile), 0755, true);
+        if(file_exists($langFile))
+        {
+            $data = PicoIniUtil::parseIniFile($langFile);   
+            return isset($data) && is_array($data) ? $data : array();
         }
-
-        // Create the language file if it does not exist
-        if (!file_exists($langFile)) {
-            file_put_contents($langFile, "");
-        }
-
-        $data = PicoIniUtil::parseIniFile($langFile);
-        
-        return isset($data) && is_array($data) ? $data : [];
+        return array();
     }
 
     /**

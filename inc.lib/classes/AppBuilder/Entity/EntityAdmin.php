@@ -169,6 +169,16 @@ class EntityAdmin extends MagicObject
 	protected $lastResetPassword;
 
 	/**
+	 * Bloked
+	 * 
+	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="false")
+	 * @Label(content="Bloked")
+	 * @var bool
+	 */
+	protected $bloked;
+
+	/**
 	 * Time Create
 	 * 
 	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)

@@ -88,7 +88,14 @@ class AppEntityLanguage extends PicoEntityLanguage
         $this->fullClassName = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace(), 1);
         $this->appConfig = $appConfig;
         $this->currentLanguage = $currentLanguage;
-        $this->baseLanguageDirectory = $appConfig->getApplication()->getBaseLanguageDirectory();
+
+        $app = $appConfig->getApplication();
+        if(!isset($app))
+        {
+            $app = new SecretObject();
+        }
+
+        $this->baseLanguageDirectory = $app->getBaseLanguageDirectory();
         
         // Construct the language file path
         $languageFilePath = $this->baseLanguageDirectory . "/" . $currentLanguage . "/Entity/" . $this->fullClassName . ".ini";
