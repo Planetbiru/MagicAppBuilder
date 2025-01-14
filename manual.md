@@ -324,7 +324,7 @@ Here is an explanation of the reserved columns above.
 | approval_note   | Notes for approval.                       |
 | approval_status | Status of the approval.                   |
 
-An example of sortOrder is reference data, such as song genres, which need to be sorted based on the number of genres produced by a studio. Another example is sorting application user types based on their authority level. User types with higher authority can be placed at the top, so when assigning roles, the user can easily identify which types have the highest and lowest authority.
+An example of `sortOrder` is reference data, such as song genres, which need to be sorted based on the number of genres produced by a studio. Another example is sorting application user types based on their authority level. User types with higher authority can be placed at the top, so when assigning roles, the user can easily identify which types have the highest and lowest authority.
 
 These columns should not be modified once the database structure is created.
 
