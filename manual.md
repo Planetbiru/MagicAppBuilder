@@ -2,6 +2,8 @@
 
 MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
+Steps 1 and 2 are preparation. You only need to do them once.
+
 ## Step 1: Install the Server
 
 Before you can begin using MagicAppBuilder, you must install a server. The server should include the following components:
