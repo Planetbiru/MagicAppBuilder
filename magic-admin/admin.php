@@ -3,6 +3,7 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use AppBuilder\Entity\EntityAdminWorkspace;
 use MagicObject\MagicObject;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -31,6 +32,43 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
+/**
+ * Sets or creates an admin workspace relationship in the database.
+ * 
+ * This function checks if an existing admin workspace entry exists for the provided
+ * admin ID and workspace ID. If it doesn't exist, a new entry is created with the provided
+ * information, including the current admin ID, timestamps, and IP address.
+ *
+ * @param object $database The database connection object to interact with the database.
+ * @param int $adminId The ID of the admin user.
+ * @param int $workspaceId The ID of the workspace to associate with the admin.
+ * @param int $currentAdminId The ID of the current admin performing the action, used for tracking who created/edited the record.
+ * 
+ * @return void
+ * 
+ * @throws Exception If there is an issue with finding or inserting the admin workspace record.
+ */
+function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
+{
+	$adminWorkspace = new EntityAdminWorkspace(null, $database);
+	try
+	{
+		$adminWorkspace->findByAdminIdAndWorkspaceId($adminId, $workspaceId);
+	}
+	catch(Exception $e)
+	{
+		$now = date("Y-m-d H:i:s");
+		$adminWorkspace->setAdminCreate($currentAdminId);
+		$adminWorkspace->setAdminEdit($currentAdminId);
+		$adminWorkspace->setTimeCreate($now);
+		$adminWorkspace->setTimeEdit($now);
+		$adminWorkspace->setIpCreate($_SERVER['REMOTE_ADDR']);
+		$adminWorkspace->setIpEdit($_SERVER['REMOTE_ADDR']);
+		$adminWorkspace->setActive(true);
+		$adminWorkspace->insert();
+	}
+}
+
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", "Admin");
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
@@ -41,14 +79,16 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-$dataFilter = null;
+$dataFilter = PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $entityAdmin->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$admin = new Admin(null, $database);
 	$admin->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$hashPassword = sha1(sha1($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true)));
+	$admin->setPassword($hashPassword);
 	$admin->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -68,6 +108,12 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	{
 		$admin->insert();
 		$newId = $admin->getAdminId();
+
+		if($admin->getWorkspaceId() != "")
+		{
+			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+		}
+
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
 	}
 	catch(Exception $e)
@@ -77,13 +123,14 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
+	$hashPassword = sha1(sha1($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true)));
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$admin = new Admin(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setPassword($hashPassword)
 		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -101,7 +148,12 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$updater->update();
 		$newId = $inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
+
+		if($admin->getWorkspaceId() != "")
+		{
+			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+		}
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId, $entityAdmin->getAdminId());
 	}
 	catch(Exception $e)
 	{
@@ -216,7 +268,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="password" id="password"/>
+							<input autocomplete="off" class="form-control" type="password" name="password" id="password"/>
 						</td>
 					</tr>
 					<tr>
@@ -249,19 +301,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getBirthDay();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="birth_day" id="birth_day"/>
+							<input autocomplete="off" class="form-control" type="date" name="birth_day" id="birth_day"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getEmail();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="email" id="email"/>
+							<input autocomplete="off" class="form-control" type="email" name="email" id="email"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="phone" id="phone"/>
+							<input autocomplete="off" class="form-control" type="tel" name="phone" id="phone"/>
 						</td>
 					</tr>
 					<tr>
@@ -361,7 +413,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input class="form-control" type="text" name="password" id="password" value="<?php echo $admin->getPassword();?>" autocomplete="off"/>
+							<input class="form-control" type="password" name="password" id="password" value="<?php echo $admin->getPassword();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -394,19 +446,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getBirthDay();?></td>
 						<td>
-							<input class="form-control" type="text" name="birth_day" id="birth_day" value="<?php echo $admin->getBirthDay();?>" autocomplete="off"/>
+							<input class="form-control" type="date" name="birth_day" id="birth_day" value="<?php echo $admin->getBirthDay();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getEmail();?></td>
 						<td>
-							<input class="form-control" type="text" name="email" id="email" value="<?php echo $admin->getEmail();?>" autocomplete="off"/>
+							<input class="form-control" type="email" name="email" id="email" value="<?php echo $admin->getEmail();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td>
-							<input class="form-control" type="text" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
+							<input class="form-control" type="tel" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -681,11 +733,7 @@ $sortOrderMap = array(
 	"username" => "username",
 	"adminLevelId" => "adminLevelId",
 	"gender" => "gender",
-	"birthDay" => "birthDay",
 	"email" => "email",
-	"phone" => "phone",
-	"applicationId" => "applicationId",
-	"workspaceId" => "workspaceId",
 	"bloked" => "bloked",
 	"active" => "active"
 );
@@ -698,7 +746,16 @@ $specification->addAnd($dataFilter);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "adminLevelId", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	),
+	array(
+		"sortBy" => "name", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new Admin(null, $database);
@@ -836,11 +893,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="username" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUsername();?></a></td>
 								<td data-col-name="admin_level_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdminLevel();?></a></td>
 								<td data-col-name="gender" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGender();?></a></td>
-								<td data-col-name="birth_day" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBirthDay();?></a></td>
 								<td data-col-name="email" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getEmail();?></a></td>
-								<td data-col-name="phone" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPhone();?></a></td>
-								<td data-col-name="application_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplication();?></a></td>
-								<td data-col-name="workspace_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWorkspace();?></a></td>
 								<td data-col-name="bloked" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBloked();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
@@ -875,11 +928,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="username"><?php echo $admin->getUsername();?></td>
 								<td data-col-name="admin_level_id"><?php echo $admin->issetAdminLevel() ? $admin->getAdminLevel()->getName() : "";?></td>
 								<td data-col-name="gender"><?php echo isset($mapForGender) && isset($mapForGender[$admin->getGender()]) && isset($mapForGender[$admin->getGender()]["label"]) ? $mapForGender[$admin->getGender()]["label"] : "";?></td>
-								<td data-col-name="birth_day"><?php echo $admin->getBirthDay();?></td>
 								<td data-col-name="email"><?php echo $admin->getEmail();?></td>
-								<td data-col-name="phone"><?php echo $admin->getPhone();?></td>
-								<td data-col-name="application_id"><?php echo $admin->issetApplication() ? $admin->getApplication()->getName() : "";?></td>
-								<td data-col-name="workspace_id"><?php echo $admin->issetWorkspace() ? $admin->getWorkspace()->getName() : "";?></td>
 								<td data-col-name="bloked"><?php echo $admin->optionBloked($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="active"><?php echo $admin->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
