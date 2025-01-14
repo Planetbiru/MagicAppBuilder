@@ -24,13 +24,73 @@ Choose the one that best suits your operating system and requirements. Each of t
 
 ### Post Installation:
 
-After installation, ensure that all components are running correctly:
+After installing MagicAppBuilder, ensure that all components of the environment are functioning correctly:
 
-- Start Apache (web server).
-- Start MySQL or MariaDB (database server).
-- Verify that PHP is working by accessing the default PHP page (usually [http://localhost](http://localhost)) in your browser.
+1. **Start Apache (Web Server)**
 
-Once you confirm that your server environment is up and running, you can proceed to the next step.
+   Ensure that your Apache web server is running. You can start it via the XAMPP control panel (if you're using XAMPP) or through the relevant management tool for your web server.
+2. **Start MySQL or MariaDB (Database Server)**
+
+   If you're using MySQL or MariaDB as your database, ensure that the database server is running. You can start it from the XAMPP control panel or your respective database management interface.
+3. **Verify PHP is Working**
+
+   To ensure PHP is functioning correctly, access the default PHP page (usually [http://localhost](http://localhost)) in your browser. If you see the expected PHP page, then PHP is installed and working fine.
+
+### Enabling SQLite Driver on Windows:
+
+If you're using **Windows** as your operating system, and **SQLite** is selected as your database in MagicAppBuilder, you must ensure that the **SQLite PHP driver** is enabled in your PHP configuration.
+
+Here are the steps to enable the SQLite driver on a Windows environment:
+
+#### Step 1: Locate the `php.ini` File
+
+The `php.ini` file is the main configuration file for PHP. The location of this file depends on the PHP installation, but for XAMPP, you can typically find it here:
+
+* `C:\xampp\php\php.ini`
+
+#### Step 2: Open the `php.ini` File
+
+Open the `php.ini` file in a text editor (such as Notepad or VSCode).
+
+#### Step 3: Find the SQLite Extension
+
+Search for the following lines in the `php.ini` file (you can use the "Find" function in your text editor, usually by pressing `Ctrl + F`):
+
+* `extension=sqlite3`
+* `extension=pdo_sqlite`
+
+#### Step 4: Uncomment the SQLite Lines
+
+In many cases, these lines will be commented out by default (with a semicolon `;` at the beginning of the line). To enable the SQLite extension, simply remove the semicolon at the beginning of each line:
+
+```ini
+extension=sqlite3
+extension=pdo_sqlite
+```
+
+#### Step 5: Save and Close the `php.ini` File
+
+After uncommenting these lines, save the changes to the `php.ini` file and close your text editor.
+
+#### Step 6: Restart Apache
+
+For the changes to take effect, restart the Apache server. You can do this through the XAMPP control panel by clicking the **Stop** button next to Apache, then clicking **Start** again. Alternatively, restart Apache from your preferred web server management tool.
+
+#### Step 7: Verify SQLite is Enabled
+
+To verify that the SQLite extension is enabled, you can create a simple PHP script that shows the loaded PHP extensions:
+
+1. Create a file called `phpinfo.php` in your web server’s root directory (e.g., `C:\xampp\htdocs` if you're using XAMPP).
+2. Add the following code inside the file:
+   ```php
+   <?php
+   phpinfo();
+   ?>
+   ```
+3. Access this file in your browser by going to `http://localhost/phpinfo.php`.
+4. In the output, search for the **SQLite** section. If the SQLite extension is enabled, you should see entries for **SQLite3** and  **PDO_SQLite** .
+
+After these steps, the SQLite driver will be enabled for PHP on your Windows server. If you have configured MagicAppBuilder to use SQLite, it should now be able to connect to the SQLite database.
 
 ## Step 2: Download and Install MagicAppBuilder on Your Server
 
