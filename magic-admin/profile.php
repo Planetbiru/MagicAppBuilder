@@ -50,12 +50,14 @@ function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
 	$adminWorkspace = new AdminWorkspace(null, $database);
 	try
 	{
-		$adminWorkspace->findByAdminIdAndWorkspaceId($adminId, $workspaceId);
+		$adminWorkspace->findOneByAdminIdAndWorkspaceId($adminId, $workspaceId);
 	}
 	catch(Exception $e)
 	{
 		$now = date("Y-m-d H:i:s");
 		$adminWorkspace = new AdminWorkspace(null, $database);
+		$adminWorkspace->setAdminId($adminId);
+		$adminWorkspace->setWorkspaceId($workspaceId);
 		$adminWorkspace->setAdminCreate($currentAdminId);
 		$adminWorkspace->setAdminEdit($currentAdminId);
 		$adminWorkspace->setTimeCreate($now);

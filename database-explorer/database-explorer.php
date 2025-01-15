@@ -12,8 +12,8 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     exit();
 }
 
-require_once __DIR__ . "/inc.app/sqlite-detector.php";
-require_once __DIR__ . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/sqlite-detector.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 class DataException extends Exception
 {
@@ -2473,16 +2473,16 @@ else {
     <meta name="database-schema" content="<?php echo $schemaName;?>">
     <meta name="application-id" content="<?php echo $applicationId;?>">
     <title>Database Explorer</title>
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="shortcut icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="lib.assets/css/entity-editor.css">
-    <link rel="stylesheet" href="lib.assets/css/database-explorer.css">
-    <script src="lib.assets/js/TableParser.js"></script>
-    <script src="lib.assets/js/SQLConverter.js"></script>
-    <script src="lib.assets/js/EntityEditor.js"></script>
-    <script src="lib.assets/js/EntityRenderer.js"></script>
-    <script src="lib.assets/js/ResizablePanel.js"></script>
-    <script src="lib.assets/js/DatabaseExplorer.js"></script>
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../favicon.png" />
+    <link rel="stylesheet" href="../lib.assets/css/entity-editor.css">
+    <link rel="stylesheet" href="../lib.assets/css/database-explorer.css">
+    <script src="../lib.assets/js/TableParser.js"></script>
+    <script src="../lib.assets/js/SQLConverter.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
+    <script src="../lib.assets/js/EntityRenderer.js"></script>
+    <script src="../lib.assets/js/ResizablePanel.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">

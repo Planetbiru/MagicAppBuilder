@@ -3,6 +3,7 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
@@ -45,7 +46,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$workspace = new Workspace(null, $database);
 	$workspace->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$workspace->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$workspace->setDirectory($inputPost->getDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$workspace->setDirectory(FileDirUtil::normalizePath($inputPost->getDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)));
 	$workspace->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$workspace->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$workspace->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -74,7 +75,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater = $workspace->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setDirectory($inputPost->getDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setDirectory(FileDirUtil::normalizePath($inputPost->getDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)))
 		->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))

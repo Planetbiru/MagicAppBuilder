@@ -5,8 +5,8 @@ use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 
-require_once __DIR__ . "/inc.app/sqlite-detector.php";
-require_once __DIR__ . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/sqlite-detector.php";
+require_once dirname(__DIR__) . "/inc.app/auth-core.php";
 
 if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
 {
@@ -39,4 +39,4 @@ try {
     echo $e->getMessage();
     exit();
 }
-require_once __DIR__ . "/database-explorer.php";
+require_once dirname(__DIR__) . "/database-explorer/database-explorer.php";

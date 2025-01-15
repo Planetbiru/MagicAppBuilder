@@ -48,6 +48,13 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
         
         // Link for the main menu item, add collapse toggle if there are submenus
         $sidebarHTML .= '<a class="nav-link" href="' . $item['href'] . '"';
+        
+        // Add target="_blank" if specified in the JSON (or set default)
+        $target = isset($item['target']) ? $item['target'] : '';
+        if ($target) {
+            $sidebarHTML .= ' target="' . $target . '"';
+        }
+
         if (count($item['submenu']) > 0) {
             $sidebarHTML .= ' data-toggle="collapse" aria-expanded="false"';
         }
@@ -72,7 +79,15 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
             // Loop through each submenu item
             foreach ($item['submenu'] as $subItem) {
                 $sidebarHTML .= '<li class="nav-item">';
-                $sidebarHTML .= '<a class="nav-link" href="' . $subItem['href'] . '"><i class="' . $subItem['icon'] . '"></i> ' . $subItem['title'] . '</a>';
+                $sidebarHTML .= '<a class="nav-link" href="' . $subItem['href'] . '"';
+                
+                // Add target="_blank" for submenu links if specified
+                $subTarget = isset($subItem['target']) ? $subItem['target'] : '';
+                if ($subTarget) {
+                    $sidebarHTML .= ' target="' . $subTarget . '"';
+                }
+
+                $sidebarHTML .= '><i class="' . $subItem['icon'] . '"></i> ' . $subItem['title'] . '</a>';
                 $sidebarHTML .= '</li>';
             }
             
@@ -89,6 +104,7 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
     // Return the generated sidebar HTML
     return $sidebarHTML;
 }
+
 
 
 
@@ -118,7 +134,7 @@ $jsonData = '{
                 },
                 {
                     "title": "Workspace",
-                    "icon": "fas fa-folder",
+                    "icon": "fas fa-building",
                     "href": "workspace.php"
                 },
                 {
@@ -157,9 +173,17 @@ $jsonData = '{
             "icon": "fas fa-desktop",
             "href": "../",
             "submenu": []
+        },
+        {
+            "title": "Database",
+            "icon": "fas fa-database",
+            "href": "../magic-database/",
+            "submenu": [],
+            "target": "_blank"
         }
     ]
-}';
+}
+';
 
 // Call the function to generate the sidebar
 
@@ -213,6 +237,7 @@ $jsonData = '{
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
                             <a class="dropdown-item" href="profile.php">Profile</a> <!-- Profile item -->
                             <a class="dropdown-item" href="setting.php">Settings</a> <!-- Settings item -->
+                            <div class="menu-separator"></div>
                             <a class="dropdown-item" href="logout.php">Logout</a> <!-- Settings item -->
                         </div>
                     </li>
