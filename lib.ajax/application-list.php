@@ -14,8 +14,11 @@ $applicationFinder = new EntityApplication(null, $databaseBuilder);
 
 try
 {
-    $specs = PicoSpecification::getInstance()->addAnd([Field::of()->workspaceId, $activeWorkspace->getWorkspaceId()]);
-    $sorts = new PicoSortable(Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC);
+    $specs = PicoSpecification::getInstance()
+        ->addAnd([Field::of()->workspaceId, $activeWorkspace->getWorkspaceId()])
+        ->addAnd([Field::of()->active, true])
+        ;
+    $sorts = new PicoSortable(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC, Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC);
     $pageData = $applicationFinder->findAll($specs, null, $sorts);
     foreach ($pageData->getResult() as $application) {
 

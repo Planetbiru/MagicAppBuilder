@@ -156,7 +156,7 @@ class AppUserPermission
      */
     public function loadPermission()
     {
-        if($this->appConfig->getRole()->getBypassRole())
+        if($this->appConfig->issetRole() && $this->appConfig->getRole()->getBypassRole())
         {
             $this->allowedList =  true;
             $this->allowedDetail =  true;

@@ -6,5 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'MagicAdmin\\' => array($baseDir . '/classes'),
     'AppBuilder\\' => array($baseDir . '/classes'),
 );

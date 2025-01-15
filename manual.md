@@ -2,6 +2,8 @@
 
 MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
+Steps 1 and 2 are preparation. You only need to do them once.
+
 ## Step 1: Install the Server
 
 Before you can begin using MagicAppBuilder, you must install a server. The server should include the following components:
@@ -264,7 +266,67 @@ There is an important section called **Reserved Columns** that must be configure
 - `approval_note`
 - `approval_status`
 
-It is essential to configure these reserved columns in line with the application's language requirements. These columns should not be modified once the database structure is created.
+Reserved columns can be mapped to other names according to the native language used by the application and the terminology that will be used in each entity. Each entity must consistently use the full name if it is going to use it.
+
+For example:
+
+The `album` entity requires the `sort_order` column to sort the albums. So the `album` entity must use the `sort_order` column and not others to sort the data.
+
+The `album` entity also requires the `active` column to activate and deactivate data. So the `album` entity must use the `active` column and not others to activate and deactivate data.
+
+On the other hand, the `artist` entity only does not need the `sort_order` column because artist data is not sorted by default by the user but still uses the `active` column to activate and deactivate data. So the `artist` entity must use the `active` column and not others to activate and deactivate data.
+
+If the application is built in a language other than English, it would be strange to still use column names such as `active`, `admin_create`, `ip_create` and so on. Therefore, developers are free to choose other names but must create column mappings.
+
+The following is an example of column mapping into Indonesian.
+
+| Original Key    | Translated Key   |
+| --------------- | ---------------- |
+| name            | nama             |
+| sort_order      | sort_order       |
+| active          | aktif            |
+| draft           | draft            |
+| waiting_for     | waiting_for      |
+| admin_create    | admin_buat       |
+| admin_edit      | admin_ubah       |
+| admin_ask_edit  | admin_minta_ubah |
+| time_create     | waktu_buat       |
+| time_edit       | waktu_ubah       |
+| time_ask_edit   | waktu_minta_ubah |
+| ip_create       | ip_buat          |
+| ip_edit         | ip_ubah          |
+| ip_ask_edit     | ip_minta_ubah    |
+| approval_id     | approval_id      |
+| approval_note   | approval_note    |
+| approval_status | approval_status  |
+
+Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
+
+Here is an explanation of the reserved columns above.
+
+| Original Key    | Description                               |
+| --------------- | ----------------------------------------- |
+| name            | Represents a single row in an entity.     |
+| sort_order      | Used for sorting data.                    |
+| active          | To activate or deactivate data.           |
+| draft           | Marks new data awaiting approval.         |
+| waiting_for     | Specifies required approvals.             |
+| admin_create    | User ID who created the data.             |
+| admin_edit      | User ID who last edited the data.         |
+| admin_ask_edit  | User ID who requested the edit.           |
+| time_create     | Timestamp when data was created.          |
+| time_edit       | Timestamp when data was last modified.    |
+| time_ask_edit   | Timestamp when edit was requested.        |
+| ip_create       | IP address where data was created.        |
+| ip_edit         | IP address where data was last modified.  |
+| ip_ask_edit     | IP address where edit was requested.      |
+| approval_id     | ID of the data in the approval table.     |
+| approval_note   | Notes for approval.                       |
+| approval_status | Status of the approval.                   |
+
+An example of `sortOrder` is reference data, such as song genres, which need to be sorted based on the number of genres produced by a studio. Another example is sorting application user types based on their authority level. User types with higher authority can be placed at the top, so when assigning roles, the user can easily identify which types have the highest and lowest authority.
+
+These columns should not be modified once the database structure is created.
 
 After all configurations are filled out, click **Save**. You can always revisit and modify these settings, including the reserved columns, before you start creating the database and modules.
 

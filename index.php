@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/inc.app/sqlite-detector.php";
-require_once __DIR__ . "/inc.app/auth.php";
+require_once __DIR__ . "/inc.app/auth-with-form.php";
 require_once __DIR__ . "/inc.app/navs.php";
 
 $constShowActive = ' show active';
@@ -33,6 +33,9 @@ $constSelected = ' selected';
   <div class="all">
     <div class="tabs">
       <ul class="nav nav-tabs" id="maintab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
+          </li>
         <?php
         $navigators = $appNavs->getNavs();
         foreach ($navigators as $nav) {

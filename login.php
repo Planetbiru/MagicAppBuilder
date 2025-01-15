@@ -19,7 +19,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         $hashPassword = sha1($inputPost->getPassword());
         $entityAdmin->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
         $userLoggedIn = true;
-        $sessions->adminId = $inputPost->getUsername();
+        $sessions->username = $inputPost->getUsername();
         $sessions->userPassword = $hashPassword;
     }
     catch(Exception $e)

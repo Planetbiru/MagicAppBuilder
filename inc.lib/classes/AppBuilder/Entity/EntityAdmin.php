@@ -151,6 +151,15 @@ class EntityAdmin extends MagicObject
 	protected $workspace;
 
 	/**
+	 * Language ID
+	 * 
+	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Language ID")
+	 * @var string
+	 */
+	protected $languageId;
+
+	/**
 	 * Vatidation Code
 	 * 
 	 * @Column(name="vatidation_code", type="text", nullable=true)
@@ -167,6 +176,16 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $lastResetPassword;
+
+	/**
+	 * Bloked
+	 * 
+	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="false")
+	 * @Label(content="Bloked")
+	 * @var bool
+	 */
+	protected $bloked;
 
 	/**
 	 * Time Create
