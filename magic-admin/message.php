@@ -47,13 +47,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$message = new Message(null, $database);
 	$message->setSubject($inputPost->getSubject(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setContent($inputPost->getContent(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$message->setSenderId($inputPost->getSenderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$message->setMessageFolderId($inputPost->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$message->setIsCopy($inputPost->getIsCopy(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$message->setIsOpen($inputPost->getIsOpen(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$message->setTimeOpen($inputPost->getTimeOpen(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$message->setIsDelete($inputPost->getIsDelete(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$message->setAdminCreate($currentAction->getUserId());
 	$message->setTimeCreate($currentAction->getTime());
 	$message->setIpCreate($currentAction->getIp());
@@ -189,6 +183,103 @@ if($inputGet->getUserAction() == UserAction::CREATE)
 $appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
+<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
+<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote-bs4.min.css">
+<script type="text/javascript" src="../lib.assets/popper/popper.min.js"></script>
+<script type="text/javascript" src="../lib.assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote.js"></script>
+<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote-bs4.min.js"></script>
+<style>
+	.note-hint-popover {
+		position: absolute;
+	}
+</style>
+<script>
+	let elements = [];
+	jQuery(function($) {
+		let editors = [];
+		var activeEditor = null;	
+		$('textarea').each(function(index){
+			$(this).attr('data-index', index);
+			$(this).addClass('summernote-source');
+			editors[index] = $(this).summernote({
+				height: 200,
+				hint: {
+					words: [],
+					match: /\b(\w{1,})$/,
+					search: function (keyword, callback) {
+						callback($.grep(this.words, function (item) {
+							return item.indexOf(keyword) === 0;
+						}));
+					}
+				},
+				toolbar: [
+					['style', ['style', 'bold', 'italic', 'underline']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['font', ['fontname', 'fontsize', 'color', 'background']],
+					['insert', ['picture', 'table']],
+				],
+				callbacks: {
+					onImageUpload: function (files) {
+					},
+					onMediaDelete: function (target) {
+					},
+					onFocus: function() {
+						let idx = $(this).attr('data-index');
+						activeEditor = editors[idx];
+					}
+				}
+			});
+			elements[index] = $(this);
+		});
+
+		$('textarea.summernote-source').each(function(index) {
+			$(this).next().closest('.note-editor').on('click', function(e) {
+				activeEditor = editors[index];  
+				if (activeEditor) {
+					activeEditor.summernote('focus');
+				}
+			});
+		});
+
+		$(document).on('change', '.note-image-input.form-control-file.note-form-control.note-input', function(e) {
+			var files = e.target.files;
+
+			if (files.length > 0) {
+				var file = files[0];
+				if (file.type.startsWith('image/')) {
+					let mdl = $(this).closest('.modal-dialog');
+					let btn = mdl.find('.note-image-btn');
+					btn[0].disabled = false;
+				} else {
+					alert("Please select an image file.");
+				}
+			}
+		});
+
+		$(document).on('click', '.note-image-btn', function() {
+			let btn = $(this);
+			if (activeEditor) {
+				var fileInput = $(this).closest('.note-modal').find('.note-image-input.form-control-file.note-form-control.note-input')[0];
+				var file = fileInput.files[0];
+				if (file) {
+					var reader = new FileReader();
+					reader.onload = function(event) {
+						var base64Image = event.target.result;
+						activeEditor.summernote('insertImage', base64Image);
+						fileInput.value = "";
+						btn.closest('.modal').modal('hide');  // Close the modal
+					};
+					reader.readAsDataURL(file);
+				}
+			} else {
+				console.log('No active editor found.');
+			}
+		});
+	});
+
+
+</script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
 		<form name="createform" id="createform" action="" method="post">
@@ -207,23 +298,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getSender();?></td>
-						<td>
-							<select class="form-control" name="sender_id" id="sender_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getReceiver();?></td>
 						<td>
 							<select class="form-control" name="receiver_id" id="receiver_id">
@@ -238,47 +312,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->adminId, Field::of()->name)
 								; ?>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getMessageFolder();?></td>
-						<td>
-							<select class="form-control" name="message_folder_id" id="message_folder_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new MessageFolderMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->messageFolderId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsCopy();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_copy" id="is_copy" value="1"/> <?php echo $appEntityLanguage->getIsCopy();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsOpen();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_open" id="is_open" value="1"/> <?php echo $appEntityLanguage->getIsOpen();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTimeOpen();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="datetime-local" name="time_open" id="time_open"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsDelete();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_delete" id="is_delete" value="1"/> <?php echo $appEntityLanguage->getIsDelete();?></label>
 						</td>
 					</tr>
 				</tbody>

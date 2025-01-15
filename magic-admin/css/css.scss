@@ -234,7 +234,8 @@ body.sidebar-hidden .content {
 }
 
 // Table Styles
-.two-side-responsive-table, table.responsive-two-cols {
+.two-side-responsive-table,
+table.responsive-two-cols {
   width: 100%; // Full width for tables
   border-collapse: collapse; // Collapse table borders
 
@@ -252,7 +253,9 @@ body.sidebar-hidden .content {
 }
 
 @media (max-width: 600px) {
-  .two-side-responsive-table, table.responsive-two-cols {
+
+  .two-side-responsive-table,
+  table.responsive-two-cols {
     width: 100%; // Full width for tables on smaller screens
     display: table;
 
@@ -1091,19 +1094,62 @@ textarea.form-control {
 
 }
 
-.menu-separator
-{
-    display: block;
-    border-bottom: 1px solid #d7d7d7;
-    height: 1px;
-    margin-top: 6px;
-    margin-bottom: 6px;
+.menu-separator {
+  display: block;
+  border-bottom: 1px solid #d7d7d7;
+  height: 1px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
-.dark-mode
-{
-.menu-separator
-{
-  border-bottom: 1px solid #5e5e5e;
-  border-top: 1px solid #444;
+
+.note-editor .note-toolbar .btn-light {
+  background-color: #fff;
 }
+
+.dark-mode {
+  .menu-separator {
+    border-bottom: 1px solid #5e5e5e;
+    border-top: 1px solid #444;
+  }
+
+  .note-editor {
+    background-color: #333;
+
+    .note-dropdown-menu {
+      background-color: #3d3d3d;
+      color: #fff;
+
+      .dropdown-item:focus,
+      .dropdown-item:hover {
+        color: #fff;
+        text-decoration: none;
+        background-color: #575757;
+      }
+    }
+
+    .note-toolbar {
+      .btn-light {
+        background-color: #4f4f4f;
+        color: #FAFAFA;
+      }
+      .note-dropdown-menu.note-check a i{
+        color: #e0e0e0;
+        visibility: hidden;
+      }
+       .note-btn-group .note-table{
+        background-color: #535353;
+      }
+    }
+
+    &.note-frame .note-statusbar .note-resizebar
+    {
+      background-color: #4a4a4a;
+      .note-icon-bar {
+        border-top: 1px solid #979797;
+      }
+    }
+     
+  }
+  
+
 }
