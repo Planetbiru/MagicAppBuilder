@@ -342,7 +342,24 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	$specification->addAnd($dataFilter);
 	$applicationGroup = new ApplicationGroup(null, $database);
 	try{
-		$subqueryMap = null;
+		$subqueryMap = array(
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
+		)
+		);
 		$applicationGroup->findOne($specification, null, $subqueryMap);
 		if($applicationGroup->issetApplicationGroupId())
 		{
@@ -387,11 +404,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $applicationGroup->getAdminCreate();?></td>
+						<td><?php echo $applicationGroup->issetCreator() ? $applicationGroup->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $applicationGroup->getAdminEdit();?></td>
+						<td><?php echo $applicationGroup->issetEditor() ? $applicationGroup->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
@@ -478,7 +495,24 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new ApplicationGroup(null, $database);
 
-$subqueryMap = null;
+$subqueryMap = array(
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
+	"propertyName" => "name"
+)
+);
 
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){

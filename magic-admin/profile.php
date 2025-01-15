@@ -4,8 +4,6 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\Database\PicoPredicate;
-use MagicObject\Database\PicoSort;
-use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
@@ -18,10 +16,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Admin;
-use MagicAdmin\Entity\Data\AdminLevelMin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
-use MagicAdmin\Entity\Data\ApplicationMin;
-use MagicAdmin\Entity\Data\WorkspaceMin;
 
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -274,6 +269,22 @@ else
 			"primaryKey" => "workspace_id",
 			"objectName" => "workspace",
 			"propertyName" => "name"
+		),
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminCreate",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminEdit",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
 		)
 		);
 		$admin->findOne($specification, null, $subqueryMap);
@@ -359,11 +370,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $admin->getAdminCreate();?></td>
+						<td><?php echo $admin->issetCreator() ? $admin->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $admin->getAdminEdit();?></td>
+						<td><?php echo $admin->issetEditor() ? $admin->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>

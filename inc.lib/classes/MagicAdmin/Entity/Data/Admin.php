@@ -215,6 +215,15 @@ class Admin extends MagicObject
 	protected $adminCreate;
 
 	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @Label(content="Creator")
+	 * @var AdminMin
+	 */
+	protected $creator;
+
+	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
@@ -222,6 +231,15 @@ class Admin extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
+
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @Label(content="Editor")
+	 * @var AdminMin
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create

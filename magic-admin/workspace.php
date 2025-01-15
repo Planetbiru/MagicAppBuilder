@@ -371,7 +371,24 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	$specification->addAnd($dataFilter);
 	$workspace = new Workspace(null, $database);
 	try{
-		$subqueryMap = null;
+		$subqueryMap = array(
+			"adminCreate" => array(
+				"columnName" => "admin_create",
+				"entityName" => "AdminCreate",
+				"tableName" => "admin",
+				"primaryKey" => "admin_id",
+				"objectName" => "creator",
+				"propertyName" => "name"
+			), 
+			"adminEdit" => array(
+				"columnName" => "admin_edit",
+				"entityName" => "AdminEdit",
+				"tableName" => "admin",
+				"primaryKey" => "admin_id",
+				"objectName" => "editor",
+				"propertyName" => "name"
+			)
+			);
 		$workspace->findOne($specification, null, $subqueryMap);
 		if($workspace->issetWorkspaceId())
 		{
@@ -424,11 +441,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $workspace->getAdminCreate();?></td>
+						<td><?php echo $workspace->issetCreator() ? $workspace->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $workspace->getAdminEdit();?></td>
+						<td><?php echo $workspace->issetEditor() ? $workspace->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>

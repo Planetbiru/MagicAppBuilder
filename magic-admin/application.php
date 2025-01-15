@@ -423,6 +423,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "workspace_id",
 			"objectName" => "workspace",
 			"propertyName" => "name"
+		),
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminCreate",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminEdit",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
 		)
 		);
 		$application->findOne($specification, null, $subqueryMap);
@@ -492,11 +508,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $application->getAdminCreate();?></td>
+						<td><?php echo $application->issetCreator() ? $application->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $application->getAdminEdit();?></td>
+						<td><?php echo $application->issetEditor() ? $application->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
