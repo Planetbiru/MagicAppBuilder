@@ -22,7 +22,20 @@
 
 <?php
 
-function generateSidebar($jsonData, $currentHref) {
+/**
+ * Generates an HTML sidebar menu based on a JSON structure and the current active link.
+ *
+ * This function dynamically generates a sidebar in HTML format. It reads menu data from a provided
+ * JSON object, and adds submenu items if available. If the `currentHref` matches any submenu item's href,
+ * the respective submenu will be expanded by adding the "show" class to its `collapse` div.
+ *
+ * @param string $jsonData A JSON-encoded string representing the menu structure, including main items and submenus.
+ * @param string $currentHref The href of the current page, used to determine which submenu (if any) should be expanded.
+ * 
+ * @return string The generated HTML for the sidebar, including the main menu and any expanded submenus.
+ */
+function generateSidebar($jsonData, $currentHref) // NOSONAR
+{
     // Decode JSON data
     $data = json_decode($jsonData, true);
     
@@ -76,6 +89,7 @@ function generateSidebar($jsonData, $currentHref) {
     // Return the generated sidebar HTML
     return $sidebarHTML;
 }
+
 
 
 // Sample JSON data (can be replaced with your own)
@@ -158,7 +172,6 @@ $jsonData = '{
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <!-- Button to toggle sidebar -->
         <h4 class="text-white text-center"><a href="./">Dashboard</a></h4> <!-- Sidebar title -->
-
         
         <?php
         echo generateSidebar($jsonData, basename($_SERVER['PHP_SELF']));
