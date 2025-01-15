@@ -194,6 +194,7 @@ class DatabaseExporter
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['sql'];
                 $createTableSql = $this->formatSQL($createTableSql);
                 $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
+                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
                 $this->outputBuffer .= "$createTableSql;\n\n";
             }
         }
@@ -213,6 +214,7 @@ class DatabaseExporter
             {
                 $createTable = $this->db->query("SHOW CREATE TABLE $tableName");
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['Create Table'];
+                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
                 $this->outputBuffer .= "$createTableSql;\n\n";
             }
         }
@@ -303,9 +305,54 @@ class DatabaseExporter
 
                 // Construct CREATE TABLE statement
                 $createTableSql = "CREATE TABLE $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
+                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
                 $this->outputBuffer .= "$createTableSql\n\n";
             }
         }
+    }
+
+    /**
+     * Ensures that the given CREATE TABLE query includes "IF NOT EXISTS" after "CREATE TABLE" and removes unnecessary whitespaces.
+     * If the query does not contain "IF NOT EXISTS", it will add it after "CREATE TABLE". 
+     * It also retains the rest of the query (e.g., table columns and constraints) unchanged.
+     *
+     * @param string $createTableQuery The SQL query that creates a table (can be unformatted or missing "IF NOT EXISTS").
+     * @return string The processed SQL query with "IF NOT EXISTS" correctly inserted and proper formatting.
+     */
+    private function ensureCreateTableIfNotExists($createTableQuery) {
+        // Remove unnecessary whitespace (tabs, newlines, multiple spaces) from the input query.
+        // This ensures the query has only single spaces between tokens.
+        $cleanQuery = preg_replace('/\s+/', ' ', $createTableQuery); // Normalize whitespaces.
+
+        // Define the search strings for "CREATE TABLE IF NOT EXISTS" and "CREATE TABLE".
+        $search1 = "CREATE TABLE IF NOT EXISTS ";
+        $search2 = "CREATE TABLE ";
+
+        // Check if "CREATE TABLE IF NOT EXISTS" is already present in the query.
+        $pos1 = stripos($cleanQuery, $search1, 0);
+        if ($pos1 === false) {
+            // If "CREATE TABLE IF NOT EXISTS" is not found, locate "CREATE TABLE" and adjust the position.
+            $pos1 = stripos($cleanQuery, $search2, 0) + strlen($search2);
+        } else {
+            // If found, update pos1 to point right after "IF NOT EXISTS".
+            $pos1 += strlen($search1);
+        }
+
+        // Locate the position of the first space after the table name, which indicates the end of the table name.
+        $pos2 = strpos($cleanQuery, " ", $pos1);
+
+        // Extract the table name from the query using the positions found.
+        $tableName = substr($cleanQuery, $pos1, $pos2 - $pos1);
+
+        // Find the position of the table name in the original query to extract the part after the table name.
+        $tableStartPos = strpos($createTableQuery, $tableName);
+
+        // Extract everything after the table name to preserve the column definitions and other parts of the query.
+        $afterTableName = substr($createTableQuery, $tableStartPos + strlen($tableName));
+
+        // Reconstruct the SQL query by adding "CREATE TABLE IF NOT EXISTS" and the table name, 
+        // followed by the rest of the query (columns, constraints, etc.).
+        return "CREATE TABLE IF NOT EXISTS " . $tableName . " " . ltrim($afterTableName);
     }
 
     /**

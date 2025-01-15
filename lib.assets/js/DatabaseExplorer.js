@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnTableExport != null)
     {
         btnTableExport.addEventListener('click', function(event) {
+            let tableName = event.target.getAttribute('value');
             event.preventDefault();
             showConfirmationDialog('Are you sure you want to export the data from the table?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
                 if (isConfirmed) {
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = '___export_table___';
-                    hiddenInput.value = 'true';
+                    hiddenInput.value = tableName;
                     event.target.closest('form').appendChild(hiddenInput);
                     event.target.closest('form').submit();  // Submit the form containing the button 
                     event.target.closest('form').removeChild(hiddenInput);
