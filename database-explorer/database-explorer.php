@@ -304,8 +304,7 @@ class DatabaseExporter
                 }
 
                 // Construct CREATE TABLE statement
-                $createTableSql = "CREATE TABLE $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
-                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
+                $createTableSql = "CREATE TABLE IF NOT EXISTS $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
                 $this->outputBuffer .= "$createTableSql\n\n";
             }
         }
