@@ -818,4 +818,9 @@ select[multiple].form-control {
 
 .dark-mode .content h2 a {
   color: #ffffff;
+}
+
+.sidebar .fas {
+  width: 18px !important;
+  text-align: center;
 }/*# sourceMappingURL=css.css.map */

@@ -102,34 +102,28 @@ $jsonData = '{
             "submenu": []
         },
         {
-            "title": "MagicAppBuilder",
-            "icon": "fas fa-tachometer-alt",
-            "href": "../",
-            "submenu": []
-        },
-        {
             "title": "Master",
             "icon": "fas fa-folder",
             "href": "#submenu1",
             "submenu": [
                 {
                     "title": "Application",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-microchip",
                     "href": "application.php"
                 },
                 {
                     "title": "Application Group",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-microchip",
                     "href": "application-group.php"
                 },
                 {
                     "title": "Workspace",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-folder",
                     "href": "workspace.php"
                 },
                 {
                     "title": "Admin",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-user",
                     "href": "admin.php"
                 }
             ]
@@ -141,7 +135,7 @@ $jsonData = '{
             "submenu": [
                 {
                     "title": "Admin Workspace",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-user-check",
                     "href": "admin-workspace.php"
                 }
             ]
@@ -153,10 +147,16 @@ $jsonData = '{
             "submenu": [
                 {
                     "title": "Administrator Level",
-                    "icon": "fas fa-file-alt",
+                    "icon": "fas fa-user-gear",
                     "href": "admin-level.php"
                 }
             ]
+        },
+        {
+            "title": "MagicAppBuilder",
+            "icon": "fas fa-desktop",
+            "href": "../",
+            "submenu": []
         }
     ]
 }';
