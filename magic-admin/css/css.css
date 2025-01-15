@@ -171,7 +171,7 @@ body.sidebar-hidden .content {
   border-collapse: collapse;
 }
 .two-side-responsive-table > tbody > tr > td, table.responsive-two-cols > tbody > tr > td {
-  padding: 0.2rem 0;
+  padding: 0.25rem 0;
 }
 .two-side-responsive-table > tbody > tr > td:nth-child(1), table.responsive-two-cols > tbody > tr > td:nth-child(1) {
   width: 240px;
@@ -379,10 +379,10 @@ thead .data-sort-header {
 .table-row td {
   white-space: nowrap;
   position: relative;
-  padding: 0.4rem 0 0.4rem 0.2rem;
+  padding: 0.25rem 0 0.25rem 0.2rem;
 }
 .table-row td.data-sort {
-  padding: 0.4rem 0 0.4rem 0.2rem;
+  padding: 0.25rem 0 0.25rem 0.2rem;
 }
 .table-row .data-selector {
   padding-left: 0.5rem;
@@ -397,7 +397,7 @@ thead .data-sort-header {
 
 td[data-order-method=asc],
 td[data-order-method=desc] {
-  padding: 0.4rem 1.2rem 0.4rem 0.4rem;
+  padding: 0.25rem 1.2rem 0.25rem 0.4rem;
 }
 
 [data-order-method=asc]::after,

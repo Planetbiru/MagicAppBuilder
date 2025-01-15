@@ -1,6 +1,6 @@
 <?php
 
-namespace MagicAdmin\Entity\Data;
+namespace AppBuilder\Entity;
 
 use MagicObject\MagicObject;
 

@@ -34,7 +34,7 @@ $constSelected = ' selected';
     <div class="tabs">
       <ul class="nav nav-tabs" id="maintab" role="tablist">
         <li class="nav-item" role="presentation">
-            <a href="magic-admin" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
+            <a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
           </li>
         <?php
         $navigators = $appNavs->getNavs();
