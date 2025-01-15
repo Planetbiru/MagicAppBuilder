@@ -3584,6 +3584,27 @@ function generateSelectType(field, args) {
       "datetime",
       "timestamp"
     ],
+    "color": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "month": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "week": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
     date: [
       "date"
     ],
@@ -3600,7 +3621,7 @@ function generateSelectType(field, args) {
     '">\r\n' +
     '<option value="text" title="&lt;input type=&quot;text&quot;&gt;">text</option>\r\n' +
     '<option value="email" title="&lt;input type=&quot;email&quot;&gt;">email</option>\r\n' +
-    '<option value="url" title="&lt;input type=&quot;email&quot;&gt;">url</option>\r\n' +
+    '<option value="url" title="&lt;input type=&quot;url&quot;&gt;">url</option>\r\n' +
     '<option value="tel" title="&lt;input type=&quot;tel&quot;&gt;">tel</option>\r\n' +
     '<option value="password" title="&lt;input type=&quot;password&quot;&gt;">password</option>\r\n' +
     '<option value="int" title="&lt;input type=&quot;number&quot;&gt;">int</option>\r\n' +
@@ -3608,6 +3629,7 @@ function generateSelectType(field, args) {
     '<option value="date" title="&lt;input type=&quot;text&date;&gt;">date</option>\r\n' +
     '<option value="time" title="&lt;input type=&quot;time&quot;&gt;">time</option>\r\n' +
     '<option value="datetime-local" title="&lt;input type=&quot;datetime-local&quot;&gt;">datetime</option>\r\n' +
+    '<option value="week" title="&lt;input type=&quot;month&quot;&gt;">month</option>\r\n' +
     '<option value="week" title="&lt;input type=&quot;week&quot;&gt;">week</option>\r\n' +
     '<option value="color" title="&lt;input type=&quot;color&quot;&gt;">color</option>\r\n' +
     "</select>\r\n"
