@@ -632,51 +632,7 @@ $constSelected = ' selected';
           </div>
         </div>
 
-        <div id="docs" class="tab-pane fade" role="tabpanel" aria-labelledby="docs-tab">
-          <div class="desc">
-            <h4>Column Description</h4>
-            <ol>
-              <li><strong>Field</strong><br />
-                Field is the column name of the table
-              </li>
-              <li><strong>Caption</strong><br />
-                Caption is label of associated column
-              </li>
-              <li><strong>I</strong><br />
-                If the field will included on &quot;insert&quot; section, please check this
-              </li>
-              <li><strong>U</strong><br />
-                If the field will included on &quot;update&quot; section, please check this </li>
-              <li><strong>D</strong><br />
-                If the field will included on &quot;detail&quot; section, please check this </li>
-              <li><strong>L</strong><br />
-                If the field will included on &quot;list&quot; section, please check this </li>
-              <li><strong>K</strong><br />
-                Is the field is primary key of the table, please check this. Each modul must have one key for control data
-              </li>
-              <li><strong>R</strong><br />
-                If input is mandatory to filed, please check this
-              </li>
-              <li><strong>TE</strong><br />
-                Input type is &lt;input type=&quot;text&quot;&gt;, &lt;input type=&quot;email&quot;&gt;, &lt;input type=&quot;tel&quot;&gt;, &lt;input type=&quot;password&quot;&gt;, &lt;input type=&quot;number&quot;&gt;, or &lt;input type=&quot;number&quot; step=&quot;any&quot;&gt; according to data type</li>
-              <li><strong>TA</strong><br />
-                Input type is &lt;textarea&gt;&lt;/textarea&gt;
-              </li>
-              <li><strong>SE</strong><br />
-                Input type is &lt;select&gt;&lt;option value&quot;&quot;&gt;&lt;/option&gt;&lt;/select&gt;
-              </li>
-              <li><strong>CB</strong><br />
-                Input type is &lt;input type=&quot;checkbox&quot;&gt;
-              </li>
-              <li><strong>Data Type</strong><br />
-                Data type for &lt;input&gt;
-              </li>
-              <li><strong>Filter Type</strong><br />
-                Filter type for input sent to server</li>
-            </ol>
-            <p>&lt;input type=&quot;date&quot;&gt;, &lt;input type=&quot;datetime&quot;&gt;, &lt;input type=&quot;time&quot;&gt; and &lt;input type=&quot;color&quot;&gt; are not applied on this generator because not all browsers support these input type. You can use JavaScript library for its.</p>
-          </div>
-        </div>
+        
       </div>
     </div>
   </div>
