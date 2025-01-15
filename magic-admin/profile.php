@@ -88,16 +88,10 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	$admin = new Admin(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setPassword($hashPassword)
-		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
@@ -115,6 +109,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
             $updater->setPassword($hashPassword)->update();
             $sessions->userPassword = sha1($plainPassword);
         }
+
 
         $username = trim($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true), " \t\r\n ");
         if(!empty($username))
@@ -148,234 +143,8 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 		$currentModule->redirectToItself();
 	}
 }
-else if($inputPost->getUserAction() == UserAction::ACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			$admin = new Admin(null, $database);
-			try
-			{
-				$admin->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, true))
-					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(true)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			$admin = new Admin(null, $database);
-			try
-			{
-				$admin->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(false)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DELETE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			try
-			{
-				$specification = PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
-					->addAnd($dataFilter)
-					;
-				$admin = new Admin(null, $database);
-				$admin->where($specification)
-					->delete();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-if($inputGet->getUserAction() == UserAction::CREATE)
-{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-insert">
-	<div class="jambi-wrapper">
-		<form name="createform" id="createform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="name" id="name"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getUsername();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="username" id="username"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getPassword();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="password" name="password" id="password"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdminLevel();?></td>
-						<td>
-							<select class="form-control" name="admin_level_id" id="admin_level_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminLevelMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminLevelId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getGender();?></td>
-						<td>
-							<select class="form-control" name="gender" id="gender">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="M">Man</option>
-								<option value="W">Woman</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBirthDay();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="date" name="birth_day" id="birth_day"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getEmail();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="email" name="email" id="email"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getPhone();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="tel" name="phone" id="phone"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td>
-							<select class="form-control" name="workspace_id" id="workspace_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new WorkspaceMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="language_id" id="language_id"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1"/> <?php echo $appEntityLanguage->getBloked();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1"/> <?php echo $appEntityLanguage->getActive();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-}
-else if($inputGet->getUserAction() == UserAction::UPDATE)
+
+if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstance();
 	$specification->addAnd($dataFilter);
@@ -411,23 +180,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminLevel();?></td>
-						<td>
-							<select class="form-control" name="admin_level_id" id="admin_level_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminLevelMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminLevelId, Field::of()->name, $admin->getAdminLevelId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getGender();?></td>
 						<td>
 							<select class="form-control" name="gender" id="gender" data-value="<?php echo $admin->getGender();?>">
@@ -453,58 +205,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td>
 							<input class="form-control" type="tel" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name, $admin->getApplicationId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td>
-							<select class="form-control" name="workspace_id" id="workspace_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new WorkspaceMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name, $admin->getWorkspaceId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
-						<td>
-							<input class="form-control" type="text" name="language_id" id="language_id" value="<?php echo $admin->getLanguageId();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1" <?php echo $admin->createCheckedBloked();?>/> <?php echo $appEntityLanguage->getBloked();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1" <?php echo $admin->createCheckedActive();?>/> <?php echo $appEntityLanguage->getActive();?></label>
 						</td>
 					</tr>
 				</tbody>

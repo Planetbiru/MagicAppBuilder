@@ -180,7 +180,7 @@ class Admin extends MagicObject
 	/**
 	 * Bloked
 	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
 	 * @DefaultColumn(value="false")
 	 * @Label(content="Bloked")
 	 * @var bool
