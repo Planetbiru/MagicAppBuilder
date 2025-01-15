@@ -98,16 +98,6 @@ body.sidebar-hidden .content {
     width: 100vw;
   }
 }
-.light-mode {
-  background-color: #f8f9fa;
-  color: #212529;
-}
-
-.dark-mode {
-  background-color: #212529;
-  color: #e4e6e8;
-}
-
 .navbar {
   transition: background-color 0.5s;
   padding: 0rem 0rem;
@@ -413,6 +403,15 @@ select:focus {
   text-decoration: none;
 }
 
+.light-mode {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.dark-mode {
+  background-color: #212529;
+  color: #e4e6e8;
+}
 .dark-mode .input-datetime-wrapper::after {
   color: #dddddd;
 }

@@ -132,15 +132,7 @@ body.sidebar-hidden .content {
   }
 }
 
-.light-mode {
-  background-color: $color-light;
-  color: $color-text-light;
-}
 
-.dark-mode {
-  background-color: $color-dark;
-  color: $color-text-dark;
-}
 
 .navbar {
   transition: background-color 0.5s;
@@ -505,9 +497,17 @@ select:focus {
   }
 }
 
+.light-mode {
+  background-color: $color-light;
+  color: $color-text-light;
+}
+
 
 // Dark Mode Styles
 .dark-mode {
+
+  background-color: $color-dark;
+  color: $color-text-dark;
 
   .input-datetime-wrapper::after {
     color: #dddddd;
@@ -534,9 +534,7 @@ select:focus {
   a {
     color: #d8dee4;
   }
-
-
-
+  
   .table {
     color: $color-text-dark;
 
