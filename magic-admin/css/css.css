@@ -807,4 +807,15 @@ select[multiple].form-control {
 .filter-section select.form-control {
   padding-right: 28px;
   box-sizing: border-box;
+}
+
+.content h2 a {
+  color: #212529;
+}
+.content h2 a:hover {
+  text-decoration: none;
+}
+
+.dark-mode .content h2 a {
+  color: #ffffff;
 }/*# sourceMappingURL=css.css.map */

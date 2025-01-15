@@ -18,11 +18,11 @@ if(isset($databaseBuilder))
     $entityAdmin = new EntityAdmin(null, $databaseBuilder);
     $userLoggedIn = false;
 
-    if(isset($sessions->adminId) && isset($sessions->userPassword))
+    if(isset($sessions->username) && isset($sessions->userPassword))
     {
         try
         {
-            $entityAdmin->findOneByUsernameAndPassword($sessions->adminId, sha1($sessions->userPassword));
+            $entityAdmin->findOneByUsernameAndPassword($sessions->username, sha1($sessions->userPassword));
             if($entityAdmin->issetWorkspace())
             {
                 $activeWorkspace = $entityAdmin->getWorkspace();
@@ -42,10 +42,6 @@ if(isset($databaseBuilder))
         }
     }
 
-    if(!$userLoggedIn)
-    {
-        require_once __DIR__ . "/login-form.php";
-        exit();
-    }
+
 }
 require_once __DIR__ . "/database.php";

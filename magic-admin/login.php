@@ -3,9 +3,9 @@
 use AppBuilder\Entity\EntityAdmin;
 use MagicObject\Request\InputPost;
 
-require_once __DIR__ . "/inc.app/app.php";
-require_once __DIR__ . "/inc.app/database-builder.php";
-require_once __DIR__ . "/inc.app/sessions.php";
+require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/database-builder.php";
+require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 

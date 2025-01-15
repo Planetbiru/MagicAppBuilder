@@ -142,6 +142,15 @@ class Admin extends MagicObject
 	protected $workspaceId;
 
 	/**
+	 * Language ID
+	 * 
+	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Language ID")
+	 * @var string
+	 */
+	protected $languageId;
+
+	/**
 	 * Workspace
 	 * 
 	 * @JoinColumn(name="workspace_id", referenceColumnName="workspace_id")

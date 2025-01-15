@@ -34,6 +34,12 @@ else
     $currentAction->setRequestViaAjax(false);
 }
 
+if($entityAdmin->getLanguageId() == null || $entityAdmin->getLanguageId() == "")
+{
+    $entityAdmin->setLanguageId("en");
+}
+
+$appConfig->setBaseDirectoryLanguage(dirname(__DIR__)."/inc.lang");
 $appLanguage = new AppLanguage(
     $appConfig,
     $entityAdmin->getLanguageId(),
@@ -59,3 +65,10 @@ $appLanguage = new AppLanguage(
         PicoIniUtil::writeIniFile($output, $inputSource);
     }
 );
+
+
+if(!$userLoggedIn)
+{
+    require_once __DIR__ . "/login-form.php";
+    exit();
+}

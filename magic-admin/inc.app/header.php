@@ -84,7 +84,13 @@ $jsonData = '{
         {
             "title": "Dashboard Home",
             "icon": "fas fa-tachometer-alt",
-            "href": "index.php",
+            "href": "./",
+            "submenu": []
+        },
+        {
+            "title": "MagicAppBuilder",
+            "icon": "fas fa-tachometer-alt",
+            "href": "../",
             "submenu": []
         },
         {
@@ -152,6 +158,8 @@ $jsonData = '{
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <!-- Button to toggle sidebar -->
         <h4 class="text-white text-center"><a href="./">Dashboard</a></h4> <!-- Sidebar title -->
+
+        
         <?php
         echo generateSidebar($jsonData, basename($_SERVER['PHP_SELF']));
         ?>
@@ -190,8 +198,9 @@ $jsonData = '{
                             <i class="fas fa-user"></i> <!-- Account icon -->
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
-                            <a class="dropdown-item" href="#">Profile</a> <!-- Profile item -->
-                            <a class="dropdown-item" href="#">Settings</a> <!-- Settings item -->
+                            <a class="dropdown-item" href="profile.php">Profile</a> <!-- Profile item -->
+                            <a class="dropdown-item" href="setting.php">Settings</a> <!-- Settings item -->
+                            <a class="dropdown-item" href="logout.php">Logout</a> <!-- Settings item -->
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -200,9 +209,9 @@ $jsonData = '{
                             <i class="fas fa-globe"></i> <!-- Language selection icon -->
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageDropdown">
-                            <a class="dropdown-item" href="#"><img src="css/id.svg" class="language-flag" alt="ID">
+                            <a class="dropdown-item" href="set-language.php?language_id=id"><img src="css/id.svg" class="language-flag" alt="ID">
                                 Bahasa Indonesia</a> <!-- Language option -->
-                            <a class="dropdown-item" href="#"><img src="css/us.svg" class="language-flag" alt="EN">
+                            <a class="dropdown-item" href="set-language.php?language_id=en"><img src="css/us.svg" class="language-flag" alt="EN">
                                 English</a>
                         </div>
                     </li>
@@ -213,4 +222,4 @@ $jsonData = '{
                 </ul>
             </div>
         </nav>
-        <h2><?php echo $currentModule->getModuleTitle();?></h2> <!-- Main content title -->
+        <h2><a href="<?php echo basename($_SERVER['PHP_SELF']);?>"><?php echo $currentModule->getModuleTitle();?></a></h2> <!-- Main content title -->

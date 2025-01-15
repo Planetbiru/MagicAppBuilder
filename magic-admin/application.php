@@ -45,10 +45,10 @@ $dataFilter = null;
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$application = new Application(null, $database);
-	$application->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$application->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$application->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$application->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$application->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$application->setProjectDirectory($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$application->setBaseApplicationDirectory($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$application->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -77,10 +77,10 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification->addAnd($dataFilter);
 	$application = new Application(null, $database);
 	$updater = $application->where($specification)
-		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setProjectDirectory($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBaseApplicationDirectory($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -227,6 +227,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getName();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="name" id="name"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getDescription();?></td>
+						<td>
+							<textarea class="form-control" name="description" id="description" spellcheck="false"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
+						<td>
+							<select class="form-control" name="architecture" id="architecture">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="monolith">Monolith</option>
+								<option value="microservices">Microservices</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
 						<td>
 							<select class="form-control" name="workspace_id" id="workspace_id">
@@ -241,24 +263,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->workspaceId, Field::of()->name)
 								; ?>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="architecture" id="architecture"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="name" id="name"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDescription();?></td>
-						<td>
-							<textarea class="form-control" name="description" id="description" spellcheck="false"></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -328,6 +332,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getName();?></td>
+						<td>
+							<input class="form-control" type="text" name="name" id="name" value="<?php echo $application->getName();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getDescription();?></td>
+						<td>
+							<textarea class="form-control" name="description" id="description" spellcheck="false"><?php echo $application->getDescription();?></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
+						<td>
+							<select class="form-control" name="architecture" id="architecture" data-value="<?php echo $application->getArchitecture();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="monolith" <?php echo AppFormBuilder::selected($application->getArchitecture(), 'monolith');?>>Monolith</option>
+								<option value="microservices" <?php echo AppFormBuilder::selected($application->getArchitecture(), 'microservices');?>>Microservices</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
 						<td>
 							<select class="form-control" name="workspace_id" id="workspace_id">
@@ -342,24 +368,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->workspaceId, Field::of()->name, $application->getWorkspaceId())
 								; ?>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
-						<td>
-							<input class="form-control" type="text" name="architecture" id="architecture" value="<?php echo $application->getArchitecture();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input class="form-control" type="text" name="name" id="name" value="<?php echo $application->getName();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDescription();?></td>
-						<td>
-							<textarea class="form-control" name="description" id="description" spellcheck="false"><?php echo $application->getDescription();?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -452,7 +460,10 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 $appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
-			
+			$mapForArchitecture = array(
+				"monolith" => array("value" => "monolith", "label" => "Monolith", "default" => "false"),
+				"microservices" => array("value" => "microservices", "label" => "Microservices", "default" => "false")
+			);
 ?>
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
@@ -469,20 +480,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
-						<td><?php echo $application->getArchitecture();?></td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td><?php echo $application->getName();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getDescription();?></td>
 						<td><?php echo $application->getDescription();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
+						<td><?php echo isset($mapForArchitecture) && isset($mapForArchitecture[$application->getArchitecture()]) && isset($mapForArchitecture[$application->getArchitecture()]["label"]) ? $mapForArchitecture[$application->getArchitecture()]["label"] : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
+						<td><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
@@ -572,15 +583,19 @@ require_once $appInclude->mainAppFooter(__DIR__);
 else 
 {
 $appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
-
+$mapForArchitecture = array(
+	"monolith" => array("value" => "monolith", "label" => "Monolith", "default" => "false"),
+	"microservices" => array("value" => "microservices", "label" => "Microservices", "default" => "false")
+);
 $specMap = array(
-	"workspaceId" => PicoSpecification::filter("workspaceId", "fulltext"),
-	"name" => PicoSpecification::filter("name", "fulltext")
+	"name" => PicoSpecification::filter("name", "fulltext"),
+	"architecture" => PicoSpecification::filter("architecture", "fulltext"),
+	"workspaceId" => PicoSpecification::filter("workspaceId", "fulltext")
 );
 $sortOrderMap = array(
-	"workspaceId" => "workspaceId",
-	"architecture" => "architecture",
 	"name" => "name",
+	"architecture" => "architecture",
+	"workspaceId" => "workspaceId",
 	"author" => "author",
 	"sortOrder" => "sortOrder",
 	"active" => "active"
@@ -624,6 +639,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getName();?></span>
+					<span class="filter-control">
+						<input type="text" name="name" class="form-control" value="<?php echo $inputGet->getName();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getArchitecture();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="architecture" data-value="<?php echo $inputGet->getArchitecture();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="monolith" <?php echo AppFormBuilder::selected($inputGet->getArchitecture(), 'monolith');?>>Monolith</option>
+								<option value="microservices" <?php echo AppFormBuilder::selected($inputGet->getArchitecture(), 'microservices');?>>Microservices</option>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getWorkspace();?></span>
 					<span class="filter-control">
 							<select class="form-control" name="workspace_id">
@@ -638,13 +671,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->workspaceId, Field::of()->name, $inputGet->getWorkspaceId())
 								; ?>
 							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getName();?></span>
-					<span class="filter-control">
-						<input type="text" name="name" class="form-control" value="<?php echo $inputGet->getName();?>" autocomplete="off"/>
 					</span>
 				</span>
 				
@@ -702,9 +728,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="workspace_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWorkspace();?></a></td>
-								<td data-col-name="architecture" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getArchitecture();?></a></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
+								<td data-col-name="architecture" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getArchitecture();?></a></td>
+								<td data-col-name="workspace_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWorkspace();?></a></td>
 								<td data-col-name="author" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAuthor();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
@@ -739,9 +765,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="workspace_id"><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
-								<td data-col-name="architecture"><?php echo $application->getArchitecture();?></td>
 								<td data-col-name="name"><?php echo $application->getName();?></td>
+								<td data-col-name="architecture"><?php echo isset($mapForArchitecture) && isset($mapForArchitecture[$application->getArchitecture()]) && isset($mapForArchitecture[$application->getArchitecture()]["label"]) ? $mapForArchitecture[$application->getArchitecture()]["label"] : "";?></td>
+								<td data-col-name="workspace_id"><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 								<td data-col-name="author"><?php echo $application->getAuthor();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $application->getSortOrder();?></td>
 								<td data-col-name="active"><?php echo $application->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>

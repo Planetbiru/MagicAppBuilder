@@ -62,7 +62,6 @@ class AppLanguage extends PicoLanguage
     private function loadLanguageData()
     {
         $langFile = $this->appConfig->getBaseDirectoryLanguage() . "/" . $this->currentLanguage . "/app.ini";
-
         if(file_exists($langFile))
         {
             $data = PicoIniUtil::parseIniFile($langFile);   

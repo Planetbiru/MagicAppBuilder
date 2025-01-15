@@ -1026,3 +1026,15 @@ select[multiple].form-control {
   padding-right: 28px;
   box-sizing: border-box;
 }
+
+.content h2 a{
+  color: $color-dark;
+  &:hover{
+    text-decoration: none;
+  }
+}
+.dark-mode{
+.content h2 a{
+  color: #ffffff;
+}
+}

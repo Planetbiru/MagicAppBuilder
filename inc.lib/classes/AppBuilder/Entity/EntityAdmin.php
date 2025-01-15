@@ -151,6 +151,15 @@ class EntityAdmin extends MagicObject
 	protected $workspace;
 
 	/**
+	 * Language ID
+	 * 
+	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Language ID")
+	 * @var string
+	 */
+	protected $languageId;
+
+	/**
 	 * Vatidation Code
 	 * 
 	 * @Column(name="vatidation_code", type="text", nullable=true)
