@@ -33,10 +33,15 @@ $constSelected = ' selected';
   <div class="all">
     <div class="tabs">
       <ul class="nav nav-tabs" id="maintab" role="tablist">
+        <?php
+        if(isset($entityAdmin) && $entityAdmin->getAdminLevelId() == "superuser")
+        {
+        ?>
         <li class="nav-item" role="presentation">
             <a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
           </li>
         <?php
+        }
         $navigators = $appNavs->getNavs();
         foreach ($navigators as $nav) {
         ?>
