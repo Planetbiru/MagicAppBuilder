@@ -29,7 +29,7 @@ body {
   transition: background-color 0.1s, color 0.1s; // Smooth transition for color and background changes
 
   .content {
-    margin-left: 240px; // Sidebar space
+    margin-left: 280px; // Sidebar space
     padding: 1rem; // Padding around the content
     transition: margin 0.3s ease; // Smooth transition when margin changes
 
@@ -56,7 +56,7 @@ a {
 // Sidebar styles
 .sidebar {
   height: 100vh; // Full viewport height
-  width: 240px; // Sidebar width
+  width: 280px; // Sidebar width
   position: fixed; // Fixed position on the screen
   padding-top: 20px; // Padding on top of the sidebar
   transition: transform 0.3s ease; // Smooth transition for sidebar movement
@@ -110,7 +110,7 @@ a {
 
 
 .sidebar-hidden .sidebar {
-  transform: translateX(-240px); // Move sidebar off-screen when hidden
+  transform: translateX(-280px); // Move sidebar off-screen when hidden
 }
 
 .sidebar {
@@ -144,7 +144,7 @@ body.sidebar-hidden .content {
 // Media Queries for responsive design
 @media screen and (max-width: 992px) {
   .sidebar {
-    transform: translateX(-240px); // Hide sidebar on smaller screens
+    transform: translateX(-280px); // Hide sidebar on smaller screens
   }
 
   body .content {
@@ -166,7 +166,7 @@ body.sidebar-hidden .content {
   }
 }
 
-@media screen and (max-width: 240px) {
+@media screen and (max-width: 280px) {
   .sidebar-show .sidebar {
     width: 100vw; // Full width for sidebar on very small screens
   }

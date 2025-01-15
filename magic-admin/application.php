@@ -42,36 +42,7 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 
 $dataFilter = null;
 
-if($inputPost->getUserAction() == UserAction::CREATE)
-{
-	$application = new Application(null, $database);
-	$application->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setProjectDirectory($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setBaseApplicationDirectory($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$application->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$application->setAdminCreate($currentAction->getUserId());
-	$application->setTimeCreate($currentAction->getTime());
-	$application->setIpCreate($currentAction->getIp());
-	$application->setAdminEdit($currentAction->getUserId());
-	$application->setTimeEdit($currentAction->getTime());
-	$application->setIpEdit($currentAction->getIp());
-	try
-	{
-		$application->insert();
-		$newId = $application->getApplicationId();
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->application_id, $newId);
-	}
-	catch(Exception $e)
-	{
-		$currentModule->redirectToItself();
-	}
-}
-else if($inputPost->getUserAction() == UserAction::UPDATE)
+if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->applicationId, $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
@@ -677,12 +648,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
-				</span>
-				<?php } ?>
+
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">

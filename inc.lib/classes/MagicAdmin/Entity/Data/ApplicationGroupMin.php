@@ -5,9 +5,9 @@ namespace MagicAdmin\Entity\Data;
 use MagicObject\MagicObject;
 
 /**
- * The ApplicationGroupMember class represents an entity in the "application_group_member" table.
+ * The ApplicationGroupMin class represents an entity in the "application_group" table.
  *
- * This entity maps to the "application_group_member" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "application_group" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -16,58 +16,49 @@ use MagicObject\MagicObject;
  * 
  * @package MagicAdmin\Entity\Data
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application_group_member")
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
+ * @Table(name="application_group")
  */
-class ApplicationGroupMember extends MagicObject
+class ApplicationGroupMin extends MagicObject
 {
 	/**
-	 * Application Group Member ID
+	 * Application Group ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_group_member_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Application Group Member ID")
-	 * @var string
-	 */
-	protected $applicationGroupMemberId;
-
-	/**
-	 * Application Group ID
-	 * 
-	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Application Group ID")
 	 * @var string
 	 */
 	protected $applicationGroupId;
 
 	/**
-	 * Application Group
+	 * Name
 	 * 
-	 * @JoinColumn(name="application_group_id", referenceColumnName="application_group_id")
-	 * @Label(content="Application Group ID")
+	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Name")
 	 * @var string
 	 */
-	protected $applicationGroup;
+	protected $name;
 
 	/**
-	 * Admin ID
+	 * Icon
 	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
+	 * @Column(name="icon", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Icon")
 	 * @var string
 	 */
-	protected $adminId;
+	protected $icon;
 
 	/**
-	 * Admin
+	 * Sort Order
 	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var AdminMin
+	 * @Column(name="sort_order", type="int", nullable=true)
+	 * @Label(content="Sort Order")
+	 * @var int
 	 */
-	protected $admin;
+	protected $sortOrder;
 
 	/**
 	 * Time Create

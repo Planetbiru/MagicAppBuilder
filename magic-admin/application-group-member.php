@@ -21,6 +21,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\ApplicationGroupMember;
+use MagicAdmin\Entity\Data\ApplicationGroupMin;
 use MagicAdmin\Entity\Data\AdminMin;
 
 
@@ -182,9 +183,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplicationGroupId();?></td>
+						<td><?php echo $appEntityLanguage->getApplicationGroup();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="application_group_id" id="application_group_id"/>
+							<select class="form-control" name="application_group_id" id="application_group_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationGroupMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->applicationGroupId, Field::of()->name)
+								; ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
@@ -247,9 +259,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplicationGroupId();?></td>
+						<td><?php echo $appEntityLanguage->getApplicationGroup();?></td>
 						<td>
-							<input class="form-control" type="text" name="application_group_id" id="application_group_id" value="<?php echo $applicationGroupMember->getApplicationGroupId();?>" autocomplete="off"/>
+							<select class="form-control" name="application_group_id" id="application_group_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationGroupMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->applicationGroupId, Field::of()->name, $applicationGroupMember->getApplicationGroupId())
+								; ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
@@ -320,6 +343,14 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	$applicationGroupMember = new ApplicationGroupMember(null, $database);
 	try{
 		$subqueryMap = array(
+		"applicationGroupId" => array(
+			"columnName" => "application_group_id",
+			"entityName" => "ApplicationGroupMin",
+			"tableName" => "application_group",
+			"primaryKey" => "application_group_id",
+			"objectName" => "application_group",
+			"propertyName" => "name"
+		), 
 		"adminId" => array(
 			"columnName" => "admin_id",
 			"entityName" => "AdminMin",
@@ -352,8 +383,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplicationGroupId();?></td>
-						<td><?php echo $applicationGroupMember->getApplicationGroupId();?></td>
+						<td><?php echo $appEntityLanguage->getApplicationGroup();?></td>
+						<td><?php echo $applicationGroupMember->issetApplicationGroup() ? $applicationGroupMember->getApplicationGroup()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdmin();?></td>
@@ -433,6 +464,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new ApplicationGroupMember(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
+	"applicationGroupId" => PicoSpecification::filter("applicationGroupId", "fulltext"),
 	"adminId" => PicoSpecification::filter("adminId", "fulltext")
 );
 $sortOrderMap = array(
@@ -455,6 +487,14 @@ $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConf
 $dataLoader = new ApplicationGroupMember(null, $database);
 
 $subqueryMap = array(
+"applicationGroupId" => array(
+	"columnName" => "application_group_id",
+	"entityName" => "ApplicationGroupMin",
+	"tableName" => "application_group",
+	"primaryKey" => "application_group_id",
+	"objectName" => "application_group",
+	"propertyName" => "name"
+), 
 "adminId" => array(
 	"columnName" => "admin_id",
 	"entityName" => "AdminMin",
@@ -473,6 +513,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getApplicationGroup();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="application_group_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationGroupMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->applicationGroupId, Field::of()->name, $inputGet->getApplicationGroupId())
+								; ?>
+							</select>
+					</span>
+				</span>
+				
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getAdmin();?></span>
 					<span class="filter-control">
@@ -542,7 +600,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="application_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplicationGroupId();?></a></td>
+								<td data-col-name="application_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplicationGroup();?></a></td>
 								<td data-col-name="admin_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdmin();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
@@ -573,7 +631,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="application_group_id"><?php echo $applicationGroupMember->getApplicationGroupId();?></td>
+								<td data-col-name="application_group_id"><?php echo $applicationGroupMember->issetApplicationGroup() ? $applicationGroupMember->getApplicationGroup()->getName() : "";?></td>
 								<td data-col-name="admin_id"><?php echo $applicationGroupMember->issetAdmin() ? $applicationGroupMember->getAdmin()->getName() : "";?></td>
 								<td data-col-name="active"><?php echo $applicationGroupMember->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>

@@ -153,6 +153,11 @@ $jsonData = '{
                     "title": "Admin Workspace",
                     "icon": "fas fa-user-check",
                     "href": "admin-workspace.php"
+                },
+                {
+                    "title": "Application Group Member",
+                    "icon": "fas fa-user-check",
+                    "href": "application-group-member.php"
                 }
             ]
         },

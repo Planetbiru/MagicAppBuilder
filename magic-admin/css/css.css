@@ -3,7 +3,7 @@ body {
   transition: background-color 0.1s, color 0.1s;
 }
 body .content {
-  margin-left: 240px;
+  margin-left: 280px;
   padding: 1rem;
   transition: margin 0.3s ease;
 }
@@ -26,7 +26,7 @@ a {
 
 .sidebar {
   height: 100vh;
-  width: 240px;
+  width: 280px;
   position: fixed;
   padding-top: 20px;
   transition: transform 0.3s ease;
@@ -64,7 +64,7 @@ a {
 }
 
 .sidebar-hidden .sidebar {
-  transform: translateX(-240px);
+  transform: translateX(-280px);
 }
 
 .sidebar .nav-link:hover {
@@ -88,7 +88,7 @@ body.sidebar-hidden .content {
 
 @media screen and (max-width: 992px) {
   .sidebar {
-    transform: translateX(-240px);
+    transform: translateX(-280px);
   }
   body .content {
     margin-left: 0px;
@@ -105,7 +105,7 @@ body.sidebar-hidden .content {
     margin-left: 0px;
   }
 }
-@media screen and (max-width: 240px) {
+@media screen and (max-width: 280px) {
   .sidebar-show .sidebar {
     width: 100vw;
   }
