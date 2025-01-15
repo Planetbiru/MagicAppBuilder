@@ -62,24 +62,12 @@ a {
 .sidebar a {
   color: #313131;
 }
-
-.sidebar-hidden .sidebar {
-  transform: translateX(-280px);
-}
-
 .sidebar .nav-link:hover {
   background-color: #eaeaea;
 }
 
-.dark-mode .sidebar {
-  border-right: 1px solid #464646;
-  background: #212529;
-}
-.dark-mode .sidebar a {
-  color: #FAFAFA;
-}
-.dark-mode .sidebar .nav-link:hover {
-  background-color: #495057;
+.sidebar-hidden .sidebar {
+  transform: translateX(-280px);
 }
 
 body.sidebar-hidden .content {
@@ -283,11 +271,6 @@ table.responsive-two-cols > tbody > tr > td:nth-child(1) {
   border: 1px solid #dddfeb;
 }
 
-.dark-mode .page-selector a {
-  line-height: 1.25;
-  color: #4e73df;
-}
-
 .pagination-number > .page-selector:first-child a {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -423,6 +406,13 @@ select:focus {
   width: 20px;
 }
 
+.content h2 a {
+  color: #212529;
+}
+.content h2 a:hover {
+  text-decoration: none;
+}
+
 .dark-mode .input-datetime-wrapper::after {
   color: #dddddd;
 }
@@ -467,7 +457,16 @@ select:focus {
   border-color: #212529;
   color: #e4e6e8;
 }
-
+.dark-mode .sidebar {
+  border-right: 1px solid #464646;
+  background: #212529;
+}
+.dark-mode .sidebar a {
+  color: #FAFAFA;
+}
+.dark-mode .sidebar .nav-link:hover {
+  background-color: #495057;
+}
 .dark-mode .dropdown-menu-right {
   background-color: #535353;
 }
@@ -489,6 +488,7 @@ select:focus {
   color: #d7d7d7;
   background-color: #262323;
   border: 1px solid #555;
+  line-height: 1.25;
 }
 .dark-mode thead .data-sort-header {
   background-color: #6a6a6a;
@@ -546,6 +546,9 @@ select:focus {
   background-color: #a41e2b;
   border-color: #931a25;
 }
+.dark-mode .content h2 a {
+  color: #ffffff;
+}
 
 textarea.form-control {
   min-height: 38px;
@@ -561,17 +564,6 @@ textarea.form-control {
   box-sizing: border-box;
 }
 
-.content h2 a {
-  color: #212529;
-}
-.content h2 a:hover {
-  text-decoration: none;
-}
-
-.dark-mode .content h2 a {
-  color: #ffffff;
-}
-
 .sidebar .fas {
   width: 18px !important;
   text-align: center;
@@ -583,46 +575,6 @@ textarea.form-control {
   height: 1px;
   margin-top: 6px;
   margin-bottom: 6px;
-}
-
-/** Summernote **/
-.note-editor .note-toolbar .btn-light {
-  background-color: #fff;
-}
-
-.dark-mode .menu-separator {
-  border-bottom: 1px solid #5e5e5e;
-  border-top: 1px solid #444;
-}
-.dark-mode .note-editor {
-  background-color: #333;
-}
-.dark-mode .note-editor .note-dropdown-menu {
-  background-color: #3d3d3d;
-  color: #fff;
-}
-.dark-mode .note-editor .note-dropdown-menu .dropdown-item:focus,
-.dark-mode .note-editor .note-dropdown-menu .dropdown-item:hover {
-  color: #fff;
-  text-decoration: none;
-  background-color: #575757;
-}
-.dark-mode .note-editor .note-toolbar .btn-light {
-  background-color: #4f4f4f;
-  color: #FAFAFA;
-}
-.dark-mode .note-editor .note-toolbar .note-dropdown-menu.note-check a i {
-  color: #e0e0e0;
-  visibility: hidden;
-}
-.dark-mode .note-editor .note-toolbar .note-btn-group .note-table {
-  background-color: #535353;
-}
-.dark-mode .note-editor.note-frame .note-statusbar .note-resizebar {
-  background-color: #4a4a4a;
-}
-.dark-mode .note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar {
-  border-top: 1px solid #979797;
 }
 
 select[multiple].form-control {
