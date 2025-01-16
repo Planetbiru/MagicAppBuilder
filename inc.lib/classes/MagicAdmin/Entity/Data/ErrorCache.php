@@ -88,15 +88,6 @@ class ErrorCache extends MagicObject
 	protected $lineNumber;
 
 	/**
-	 * Last Reset Password
-	 * 
-	 * @Column(name="last_reset_password", type="timestamp", length=19, nullable=true)
-	 * @Label(content="Last Reset Password")
-	 * @var string
-	 */
-	protected $lastResetPassword;
-
-	/**
 	 * Time Create
 	 * 
 	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
