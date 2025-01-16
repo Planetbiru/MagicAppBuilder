@@ -13,10 +13,17 @@ namespace AppBuilder\Generator\MocroServices;
  *
  * @package AppBuilder\Generator\MocroServices
  */
-class UserFormInputUpdate
+class UserFormInputUpdate extends ObjectToString
 {
     /**
-     * An array of input fields to be updated in the form.
+     * Primary key
+     *
+     * @var string[]
+     */
+    protected $primaryKey;
+    
+    /**
+     * An array of input fields to be updated into the form.
      * Each field is represented by an InputFieldUpdate object.
      *
      * @var InputFieldUpdate[]
@@ -24,10 +31,41 @@ class UserFormInputUpdate
     protected $input;
     
     /**
-     * A list of allowed actions that can be performed on the form fields.
-     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
+     * Add an allowed action to the input.
      *
-     * @var string[]
+     * This method adds an `InputFieldUpdate` object to the list of input that can be performed on the form fields. 
+     *
+     * @param InputFieldUpdate $input The `InputFieldUpdate` object to be added.
      */
-    protected $allowedAction;
+    public function addInput($input)
+    {
+        if (!isset($this->input)) {
+            $this->input = [];
+        }
+        $this->input[] = $input;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return  string[]
+     */ 
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set primary key
+     *
+     * @param  string[]  $primaryKey  Primary key
+     *
+     * @return  self
+     */ 
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
 }

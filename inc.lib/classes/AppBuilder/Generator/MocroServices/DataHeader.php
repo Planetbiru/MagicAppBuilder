@@ -11,7 +11,7 @@ namespace AppBuilder\Generator\MocroServices;
  *
  * @package AppBuilder\Generator\MocroServices
  */
-class DataHeader extends ValueLabelConstructor
+class DataHeader extends ObjectToString
 {
     /**
      * The field name, which is typically used as the key for sorting or identifying the field.
@@ -35,16 +35,32 @@ class DataHeader extends ValueLabelConstructor
      * - `DESC` for descending order,
      * - `null` if no sorting order is defined.
      *
-     * @var string
+     * @var string|null
      */
     protected $sort;
+
+    /**
+     * DataHeader constructor.
+     *
+     * Initializes the data header with a field name, a label, and an optional sorting order.
+     *
+     * @param mixed $value The field name, used as the key for sorting or identifying the field.
+     * @param string $label The label for the field, typically used for display to the user.
+     * @param string|null $sort The sorting order for the field (optional).
+     */
+    public function __construct($value, $label, $sort = null)
+    {
+        $this->value = $value;
+        $this->label = $label;
+        $this->sort = $sort;
+    }
 
     /**
      * Get the sort order.
      *
      * This method returns the current sort order, which can be a value such as `ASC`, `DESC`, or `null`.
      *
-     * @return string The current sort order.
+     * @return string|null The current sort order.
      */
     public function getSort()
     {
@@ -66,5 +82,4 @@ class DataHeader extends ValueLabelConstructor
 
         return $this;
     }
-
 }

@@ -14,6 +14,13 @@ namespace AppBuilder\Generator\MocroServices;
 class UserFormInputInsert extends ObjectToString
 {
     /**
+     * Primary key
+     *
+     * @var string[]
+     */
+    protected $primaryKey;
+    
+    /**
      * An array of input fields to be inserted into the form.
      * Each field is represented by an InputFieldInsert object.
      *
@@ -34,5 +41,29 @@ class UserFormInputInsert extends ObjectToString
             $this->input = [];
         }
         $this->input[] = $input;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return  string[]
+     */ 
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set primary key
+     *
+     * @param  string[]  $primaryKey  Primary key
+     *
+     * @return  self
+     */ 
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
     }
 }

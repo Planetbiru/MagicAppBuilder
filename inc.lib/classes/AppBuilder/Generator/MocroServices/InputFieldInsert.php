@@ -66,8 +66,7 @@ class InputFieldInsert extends ObjectToString
      * Constructor for InputFieldInsert.
      * Initializes the input field properties with provided values.
      *
-     * @param string $field The name or identifier for the input field.
-     * @param string $label The label for the input field.
+     * @param InputField $inputField Input field
      * @param string $inputType The type of the input field.
      * @param string $dataType The data type of the input field.
      * @param string|null $optionSource Optional source for options (e.g., for a select dropdown).
@@ -75,16 +74,19 @@ class InputFieldInsert extends ObjectToString
      * @param string|null $pattern Optional regular expression pattern for validation.
      */
     public function __construct(
-        $field,
-        $label,
+        $inputField,
         $inputType,
         $dataType,
         $optionSource = null,
         $map = null,
         $pattern = null
     ) {
-        $this->field = $field;
-        $this->label = $label;
+        if(isset($inputField))
+        {
+            $this->field = $inputField->getValue();
+            $this->label = $inputField->getLabel();
+        }
+        
         $this->inputType = $inputType;
         $this->dataType = $dataType;
         if(isset($optionSource))

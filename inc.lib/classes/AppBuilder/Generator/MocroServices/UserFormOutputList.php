@@ -21,6 +21,13 @@ class UserFormOutputList extends ObjectToString
      * @var DataHeader[]
      */
     protected $header;
+
+    /**
+     * Primary key
+     *
+     * @var string[]
+     */
+    protected $primaryKey;
     
     /**
      * An array of `OutputDataItem` objects representing the items in the output list.
@@ -85,5 +92,29 @@ class UserFormOutputList extends ObjectToString
             $this->allowedActions = [];
         }
         $this->allowedActions[] = $allowedAction;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return  string[]
+     */ 
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set primary key
+     *
+     * @param  string[]  $primaryKey  Primary key
+     *
+     * @return  self
+     */ 
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
     }
 }

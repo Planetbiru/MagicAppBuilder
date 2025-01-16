@@ -16,6 +16,13 @@ namespace AppBuilder\Generator\MocroServices;
 class UserFormOutputApproval extends ObjectToString
 {
     /**
+     * Primary key
+     *
+     * @var string[]
+     */
+    protected $primaryKey;
+
+    /**
      * An array of output fields to be displayed in the form for approval.
      * Each field is represented by an `OutputFieldApproval` object.
      *
@@ -91,6 +98,30 @@ class UserFormOutputApproval extends ObjectToString
     public function setWaitingfor($waitingfor)
     {
         $this->waitingfor = $waitingfor;
+
+        return $this;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return  string[]
+     */ 
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set primary key
+     *
+     * @param  string[]  $primaryKey  Primary key
+     *
+     * @return  self
+     */ 
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
 
         return $this;
     }
