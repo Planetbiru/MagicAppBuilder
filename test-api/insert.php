@@ -1,9 +1,9 @@
 <?php
 
-use AppBuilder\Generator\MocroServices\InputFieldInsert;
-use AppBuilder\Generator\MocroServices\InputFieldOption;
-use AppBuilder\Generator\MocroServices\ResponseBody;
-use AppBuilder\Generator\MocroServices\UserFormInputInsert;
+use MagicApp\AppDto\MocroServices\InputFieldInsert;
+use MagicApp\AppDto\MocroServices\InputFieldOption;
+use MagicApp\AppDto\MocroServices\ResponseBody;
+use MagicApp\AppDto\MocroServices\UserFormInputInsert;
 use MagicAdmin\Entity\Data\Workspace;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";

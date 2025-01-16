@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Generator\MocroServices;
+namespace MagicApp\AppDto\MocroServices;
 
 /**
  * Base class to construct an object with a `value` and `label`.

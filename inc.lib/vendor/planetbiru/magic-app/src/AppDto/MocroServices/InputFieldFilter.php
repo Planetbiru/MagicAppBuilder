@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Generator\MocroServices;
+namespace MagicApp\AppDto\MocroServices;
 
 /**
  * Class InputFieldFilter

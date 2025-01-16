@@ -1,19 +1,19 @@
 <?php
 
-namespace AppBuilder\Generator\MocroServices;
+namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserFormOutputApproval
+ * Class UserFormOutputDetail
  *
- * Represents a collection of output fields for a user form during an approval operation.
- * This class manages multiple `OutputFieldApproval` objects, each representing a field 
- * to be displayed in the form for approval or rejection. It also includes an array of allowed actions 
- * (e.g., `approve`, `reject`, `update`) that define the possible operations that can be performed on the form fields, 
- * as well as the current status of the field, such as whether it is waiting for an action like approval.
+ * Represents a collection of input fields for a user form during an insert operation. 
+ * This class manages multiple `OutputFieldDetail` objects, each representing a field 
+ * to be inserted into the form. It also includes an array of allowed actions (e.g., 
+ * `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`) that define 
+ * the possible operations that can be performed on the form fields.
  *
  * @package AppBuilder\Generator\MocroServices
  */
-class UserFormOutputApproval extends ObjectToString
+class UserFormOutputDetail extends DataConstructor
 {
     /**
      * Primary key
@@ -22,37 +22,37 @@ class UserFormOutputApproval extends ObjectToString
      */
     protected $primaryKey;
 
+
     /**
-     * An array of output fields to be displayed in the form for approval.
-     * Each field is represented by an `OutputFieldApproval` object.
+     * An array of input fields to be inserted into the form.
+     * Each field is represented by an `OutputFieldDetail` object.
      *
-     * @var OutputFieldApproval[]
+     * @var OutputFieldDetail[]
      */
     protected $output;
     
     /**
      * A list of allowed actions that can be performed on the form fields.
-     * Each action is represented by an `AllowedAction` object.
+     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
      * @var AllowedAction[]
      */
     protected $allowedActions;
     
     /**
-     * The current status of the field, typically used to indicate whether the field
-     * is waiting for a specific action, such as approval or rejection.
-     * This is represented by a `FieldWaitingFor` object.
+     * A list of allowed actions that can be performed on the form fields.
+     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
      * @var FieldWaitingFor
      */
     protected $waitingfor;
     
     /**
-     * Add an allowed action to the output approval.
+     * Add an allowed action to the output detail.
      *
-     * This method adds an `OutputFieldApproval` object to the list of output that can be performed on the form fields. 
+     * This method adds an `OutputFieldDetail` object to the list of output that can be performed on the form fields. 
      *
-     * @param OutputFieldApproval $output The `OutputFieldApproval` object to be added.
+     * @param OutputFieldDetail $output The `OutputFieldDetail` object to be added.
      */
     public function addOutput($output)
     {
@@ -63,7 +63,7 @@ class UserFormOutputApproval extends ObjectToString
     }
     
     /**
-     * Add an allowed action to the output approval.
+     * Add an allowed action to the output detail.
      *
      * This method adds an `AllowedAction` object to the list of actions that can be performed on the form fields. 
      * These actions could include operations like updating, activating, or deleting records.
@@ -77,7 +77,7 @@ class UserFormOutputApproval extends ObjectToString
         }
         $this->allowedActions[] = $allowedAction;
     }
-    
+
     /**
      * Get examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
@@ -115,7 +115,7 @@ class UserFormOutputApproval extends ObjectToString
     /**
      * Set primary key
      *
-     * @param  string[]  $primaryKey  Primary key
+     * @param  string[] $primaryKey  Primary key
      *
      * @return  self
      */ 

@@ -1,11 +1,11 @@
 <?php
 
-use AppBuilder\Generator\MocroServices\InputField;
-use AppBuilder\Generator\MocroServices\InputFieldUpdate;
-use AppBuilder\Generator\MocroServices\InputFieldOption;
-use AppBuilder\Generator\MocroServices\InputFieldValue;
-use AppBuilder\Generator\MocroServices\ResponseBody;
-use AppBuilder\Generator\MocroServices\UserFormInputUpdate;
+use MagicApp\AppDto\MocroServices\InputField;
+use MagicApp\AppDto\MocroServices\InputFieldUpdate;
+use MagicApp\AppDto\MocroServices\InputFieldOption;
+use MagicApp\AppDto\MocroServices\InputFieldValue;
+use MagicApp\AppDto\MocroServices\ResponseBody;
+use MagicApp\AppDto\MocroServices\UserFormInputUpdate;
 use MagicAdmin\Entity\Data\Workspace;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";

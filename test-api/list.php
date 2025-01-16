@@ -1,11 +1,11 @@
 <?php
 
-use AppBuilder\Generator\MocroServices\AllowedAction;
-use AppBuilder\Generator\MocroServices\DataHeader;
-use AppBuilder\Generator\MocroServices\FieldWaitingFor;
-use AppBuilder\Generator\MocroServices\OutputDataItem;
-use AppBuilder\Generator\MocroServices\ResponseBody;
-use AppBuilder\Generator\MocroServices\UserFormOutputList;
+use MagicApp\AppDto\MocroServices\AllowedAction;
+use MagicApp\AppDto\MocroServices\DataHeader;
+use MagicApp\AppDto\MocroServices\FieldWaitingFor;
+use MagicApp\AppDto\MocroServices\OutputDataItem;
+use MagicApp\AppDto\MocroServices\ResponseBody;
+use MagicApp\AppDto\MocroServices\UserFormOutputList;
 use MagicAdmin\Entity\Data\Workspace;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
