@@ -33,7 +33,7 @@ try
         $path1 = $baseDir."/".$entityName.".php";
         if(file_exists($path1))
         {
-            $return_var = ErrorChecker::errorCheck($cacheDir, $path1);
+            $return_var = ErrorChecker::errorCheck($databaseBuilder, $path1);
             if($return_var == 0)
             {
                 include_once $path1;                  
@@ -93,7 +93,7 @@ try
         $path2 = $baseDir."/".$entityName.".php";
         if(file_exists($path2))
         {
-            $return_var = ErrorChecker::errorCheck($cacheDir, $path2);
+            $return_var = ErrorChecker::errorCheck($databaseBuilder, $path2);
             if($return_var == 0)
             {
                 include_once $path2;                  

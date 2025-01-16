@@ -117,7 +117,7 @@ try {
     foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
@@ -160,7 +160,7 @@ try {
     foreach ($list as $idx => $file) {
         $entity = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));

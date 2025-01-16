@@ -41,7 +41,7 @@ if($inputPost->getUserAction() == 'get')
             
             if(file_exists($path))
             {          
-                $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+                $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
                 
                 if($return_var == 0)
                 {  

@@ -34,7 +34,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
             {
                 $appInstaller = new AppInstaller();
 
-                $sql = $appInstaller->generateInstallerQuery($databaseBuilder, $cacheDir);
+                $sql = $appInstaller->generateInstallerQuery($databaseBuilder);
                 $queries = PicoDatabaseUtil::splitSql($sql);
                 try
                 {
