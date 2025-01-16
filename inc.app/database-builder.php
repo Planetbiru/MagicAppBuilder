@@ -19,9 +19,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
         $installed = false;
     }
 
-    $databaseBuilder = new PicoDatabase($databaseConfigBuilder, null, function($sql){
-        //echo $sql."\r\n\r\n";
-    });
+    $databaseBuilder = new PicoDatabase($databaseConfigBuilder);
     
     try
     {
@@ -34,7 +32,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
             {
                 $appInstaller = new AppInstaller();
 
-                $sql = $appInstaller->generateInstallerQuery($databaseBuilder, $cacheDir);
+                $sql = $appInstaller->generateInstallerQuery($databaseBuilder);
                 $queries = PicoDatabaseUtil::splitSql($sql);
                 try
                 {

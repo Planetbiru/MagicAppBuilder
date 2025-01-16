@@ -47,7 +47,7 @@ try {
         $entity = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {          
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
@@ -99,7 +99,7 @@ try {
         $entity = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {
             $tableInfo = EntityUtil::getTableName($file);
             $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;

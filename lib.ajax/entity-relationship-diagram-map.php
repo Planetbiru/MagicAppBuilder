@@ -47,6 +47,7 @@ try
         $entityRelationshipDiagram->setMaximumColumn($inputGet->getMaximumColumn());
         $entityRelationshipDiagram->setZoom($zoom);
         $entityRelationshipDiagram->setCacheDir($cacheDir);
+        $entityRelationshipDiagram->setDatabaseBuilder($databaseBuilder);
         
         foreach($inputEntity as $idx=>$entityName)
         {

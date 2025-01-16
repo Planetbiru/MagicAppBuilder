@@ -67,7 +67,7 @@ try
                 $path = $baseDir."/".$entityName.".php";
                 if(file_exists($path))
                 {
-                    $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+                    $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
                     if($return_var == 0)
                     {
                         include_once $path;                  
@@ -124,7 +124,7 @@ try
                 $path = $baseDir."/".$entityName.".php"; 
                 if(file_exists($path))
                 {
-                    $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+                    $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
                     if($return_var == 0)
                     {         
                         include_once $path;                     

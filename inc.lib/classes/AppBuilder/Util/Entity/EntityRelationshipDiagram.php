@@ -4,6 +4,7 @@ namespace AppBuilder\Util\Entity;
 
 use AppBuilder\Util\Error\ErrorChecker;
 use Exception;
+use MagicObject\Database\PicoDatabase;
 use MagicObject\Geometry\Area;
 use MagicObject\Geometry\Point;
 use MagicObject\Geometry\Polygon;
@@ -159,6 +160,14 @@ class EntityRelationshipDiagram //NOSONAR
      * @var string
      */
     private $cacheDir;
+
+    /**
+     * Database connection
+     *
+     * @var PicoDatabase
+     */
+    private $databaseBuilder;
+
     /**
      * Constructor
      *
@@ -180,6 +189,18 @@ class EntityRelationshipDiagram //NOSONAR
         {
             $this->addEntities($entities);
         }
+    }
+
+    /**
+     * Set database connection
+     *
+     * @param PicoDatabase $databaseBuilder
+     * @return self
+     */
+    public function setDatabaseBuilder($databaseBuilder)
+    {
+        $this->databaseBuilder = $databaseBuilder;
+        return $this;
     }
     
     public function addEntities($entities)
@@ -321,7 +342,7 @@ class EntityRelationshipDiagram //NOSONAR
         
         if(file_exists($path))
         {
-            $return_var = ErrorChecker::errorCheck($this->getCacheDir(), $path);
+            $return_var = ErrorChecker::errorCheck($this->databaseBuilder, $path);
             if($return_var == 0)
             {
                 require_once $path;
