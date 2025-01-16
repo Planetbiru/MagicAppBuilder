@@ -19,9 +19,7 @@ if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == Pi
         $installed = false;
     }
 
-    $databaseBuilder = new PicoDatabase($databaseConfigBuilder, null, function($sql){
-        //echo $sql."\r\n\r\n";
-    });
+    $databaseBuilder = new PicoDatabase($databaseConfigBuilder);
     
     try
     {
