@@ -2,6 +2,7 @@
 
 use AppBuilder\Generator\MocroServices\AllowedAction;
 use AppBuilder\Generator\MocroServices\FieldWaitingFor;
+use AppBuilder\Generator\MocroServices\InputField;
 use AppBuilder\Generator\MocroServices\InputFieldValue;
 use AppBuilder\Generator\MocroServices\OutputFieldDetail;
 use AppBuilder\Generator\MocroServices\ResponseBody;
@@ -12,8 +13,8 @@ require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
 $data = new UserFormOutputDetail();
 
-$data->addOutput(new OutputFieldDetail("userId", "User ID", "string", new InputFieldValue(1, "1")));
-$data->addOutput(new OutputFieldDetail("admin", "Admin", "string", new InputFieldValue(2, "Didi")));
+$data->addOutput(new OutputFieldDetail(new InputField("userId", "User ID"), "string", new InputFieldValue(1, "1")));
+$data->addOutput(new OutputFieldDetail(new InputField("admin", "Admin"), "string", new InputFieldValue(2, "Didi")));
 
 
 $data->addAllowedAction(new AllowedAction("delete", "Delete"));

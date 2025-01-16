@@ -6,7 +6,7 @@ namespace AppBuilder\Generator\MocroServices;
  * Class OutputFieldDetail
  *
  * Represents the details of an output field in a form or data display context. 
- * This class is used to manage the field's name, label, data type, and its current value, 
+ * This class manages the field's name, label, data type, and its current value, 
  * which is useful for displaying the field in a form or outputting it in a user interface. 
  * It also handles the value associated with the field when editing or updating a record.
  *
@@ -38,24 +38,26 @@ class OutputFieldDetail extends DataConstructor
     /**
      * The current value of the field, typically used when editing or updating a record.
      *
-     * @var InputFieldValue
+     * @var InputFieldValue|null
      */
     protected $currentValue;
     
     /**
-     * Constructor for OutputFieldDetail.
+     * OutputFieldDetail constructor.
      *
-     * Initializes the properties of the field, label, dataType, and currentValue.
-     * 
-     * @param string $field The name or identifier for the field.
-     * @param string $label The label to be displayed alongside the field.
+     * Initializes the properties of the field, label, data type, and current value.
+     * If no current value is provided, it defaults to `null`.
+     *
+     * @param InputField $inputField The input field object that contains the field's value and label.
      * @param string $dataType The data type of the field (e.g., string, integer, date).
-     * @param InputFieldValue|null $currentValue The current value of the field, typically used for editing or updating.
+     * @param InputFieldValue|null $currentValue The current value of the field, used for editing/updating (optional).
      */
-    public function __construct($field, $label, $dataType = "string", $currentValue = null)
+    public function __construct($inputField, $dataType = "string", $currentValue = null)
     {
-        $this->field = $field;
-        $this->label = $label;
+        if (isset($inputField)) {
+            $this->field = $inputField->getValue();
+            $this->label = $inputField->getLabel();
+        }
         $this->dataType = $dataType;
         
         // Initialize current value if provided
@@ -67,7 +69,9 @@ class OutputFieldDetail extends DataConstructor
     /**
      * Get the current value of the input field.
      *
-     * @return InputFieldValue The current value of the input field.
+     * Returns the value of the field, which can be used when displaying or editing the field.
+     *
+     * @return InputFieldValue|null The current value of the input field or null if not set.
      */
     public function getCurrentValue()
     {
@@ -77,7 +81,9 @@ class OutputFieldDetail extends DataConstructor
     /**
      * Set the current value of the input field.
      *
-     * @param InputFieldValue $currentValue The current value to set for the input field.
+     * Allows updating the current value of the field, which is useful for editing or saving data.
+     *
+     * @param InputFieldValue $currentValue The new current value to set for the input field.
      * 
      * @return self Returns the current instance for method chaining.
      */

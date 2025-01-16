@@ -16,24 +16,24 @@ class OutputFieldApproval extends OutputFieldDetail
     /**
      * Draft value made by another user, awaiting approval or rejection.
      *
-     * @var InputFieldValue
+     * @var InputFieldValue|null
      */
     protected $proposedValue;
     
     /**
-     * Constructor for OutputFieldDetail.
+     * OutputFieldApproval constructor.
      *
-     * Initializes the properties of the field, label, dataType, and currentValue.
+     * Initializes the properties of the field, label, data type, current value, and proposed value.
+     * This constructor ensures that the proposed value (if provided) is assigned to the appropriate property.
      * 
-     * @param string $field The name or identifier for the field.
-     * @param string $label The label to be displayed alongside the field.
+     * @param InputField $inputField The input field object containing the field's value and label.
      * @param string $dataType The data type of the field (e.g., string, integer, date).
      * @param InputFieldValue|null $currentValue The current value of the field, typically used for editing or updating.
-     * @param InputFieldValue|null $currentValue The proposed value of the field, typically used for approval.
+     * @param InputFieldValue|null $proposedValue The proposed value of the field, typically used for approval (optional).
      */
-    public function __construct($field, $label, $dataType = "string", $currentValue = null, $proposedValue = null)
+    public function __construct($inputField, $dataType = "string", $currentValue = null, $proposedValue = null)
     {
-        parent::__construct($field, $label, $dataType, $currentValue);
+        parent::__construct($inputField, $dataType, $currentValue);
         
         // Initialize proposed value if provided
         if ($proposedValue !== null) {
