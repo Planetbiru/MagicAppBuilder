@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class PrimaryKeyValue
+class PrimaryKeyValue extends ObjectToString
 {
     /**
      * Name of the primary key

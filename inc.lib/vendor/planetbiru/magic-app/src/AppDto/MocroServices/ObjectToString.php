@@ -157,7 +157,7 @@ class ObjectToString
         if (is_array($value)) {
             // If an item in the array is an object, call toArray() on each object
             $data[$this->applyCaseFormat($key)] = array_map(function ($item) {
-                if (is_object($item)) {
+                if (is_object($item) && $item instanceof self) {
                     $item->switchCaseTo($this->__caseFormat);
                     return $this->toObject($item->toArray(), $item);
                 } else {
