@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * the definition of field properties such as the name, label, input type, and more.
  * It also supports pattern matching, data types, option sources, and mapping input options.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputFieldInsert extends ObjectToString
 {

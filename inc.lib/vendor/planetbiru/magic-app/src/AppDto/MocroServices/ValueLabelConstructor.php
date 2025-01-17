@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * accepts a required `value` and an optional `label`. If no label is provided, 
  * the `value` is used as the default label.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class ValueLabelConstructor extends ObjectToString
 {

@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * name, its label for display purposes, and the sorting order (ASC, DESC, or null). 
  * It is used for defining the structure and sorting behavior of data headers in a user interface.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class DataHeader extends ObjectToString
 {

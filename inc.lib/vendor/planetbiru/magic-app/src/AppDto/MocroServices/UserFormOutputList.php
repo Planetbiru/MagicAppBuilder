@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * It also includes a list of allowed actions that can be performed on the fields within the form, such as updating, 
  * activating, or deleting records.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class UserFormOutputList extends ObjectToString
 {

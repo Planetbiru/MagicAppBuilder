@@ -2,8 +2,6 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
-use MagicObject\MagicDto;
-
 /**
  * Class OutputDataItem
  *
@@ -13,9 +11,9 @@ use MagicObject\MagicDto;
  * indicating the current status of the item, such as whether it is active, draft, or awaiting approval 
  * or other actions.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
-class OutputDataItem extends DataConstructor
+class OutputDataItem extends EntityData
 {
     /**
      * Associated data for the item. Each key represents a field name, 
@@ -24,6 +22,13 @@ class OutputDataItem extends DataConstructor
      * @var array
      */
     protected $data;
+
+    /**
+     * Primary key value
+     *
+     * @var PrimaryKeyValue[]
+     */
+    protected $primaryKeyValue;
 
     /**
      * The current status of the data item, typically used to indicate 

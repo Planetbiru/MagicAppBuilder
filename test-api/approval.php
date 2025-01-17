@@ -16,14 +16,16 @@ $data = new UserFormOutputApproval();
 $data->addOutput(new OutputFieldApproval(new InputField("userId", "User ID"), "string", new InputFieldValue(1, "Wowo"), new InputFieldValue(1, "Sisi")));
 $data->addOutput(new OutputFieldApproval(new InputField("admin", "Admin"), "string", new InputFieldValue(2, "Didi"), new InputFieldValue(3, "Dede")));
 
-
 $data->addAllowedAction(new AllowedAction("delete", "Delete"));
 $data->addAllowedAction(new AllowedAction("approve", "Approve"));
 $data->setWaitingfor(new FieldWaitingFor("new", "new"));
 
+$adminProfile = new AdminProfile();
+$adminProfile->setAdminProfileId("123");
+
 echo ResponseBody::getInstance()
     ->setData($data)
-    ->setEntity(new AdminProfile())
+    ->setEntity($adminProfile)
     ->switchCaseTo("camelCase")
     ->setResponseCode("000")
     ->setResponseText("Success")

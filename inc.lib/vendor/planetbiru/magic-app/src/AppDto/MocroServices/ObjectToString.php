@@ -16,7 +16,7 @@ use stdClass;
  * (by calling their `toArray()` method) before being included in the final JSON string.
  * Additionally, this class supports converting property names between camelCase and snake_case.
  * 
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class ObjectToString
 {

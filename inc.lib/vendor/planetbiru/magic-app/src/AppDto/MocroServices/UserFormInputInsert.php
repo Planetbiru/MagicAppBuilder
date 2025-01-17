@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * This class is used to manage multiple `InputFieldInsert` objects, allowing 
  * for the definition and insertion of multiple fields in a form.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class UserFormInputInsert extends ObjectToString
 {

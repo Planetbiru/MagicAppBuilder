@@ -18,7 +18,7 @@ namespace MagicApp\AppDto\MocroServices;
  * - `delete` = 5
  * - `sort-order` = 6
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class FieldWaitingFor extends ValueLabelConstructor
 {

@@ -11,17 +11,10 @@ namespace MagicApp\AppDto\MocroServices;
  * `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`) that define 
  * the possible operations that can be performed on the form fields.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
-class UserFormOutputDetail extends DataConstructor
+class UserFormOutputDetail extends EntityData
 {
-    /**
-     * Primary key
-     *
-     * @var string[]
-     */
-    protected $primaryKey;
-
 
     /**
      * An array of input fields to be inserted into the form.
@@ -98,30 +91,6 @@ class UserFormOutputDetail extends DataConstructor
     public function setWaitingfor($waitingfor)
     {
         $this->waitingfor = $waitingfor;
-
-        return $this;
-    }
-
-    /**
-     * Get primary key
-     *
-     * @return  string[]
-     */ 
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
-    }
-
-    /**
-     * Set primary key
-     *
-     * @param  string[] $primaryKey  Primary key
-     *
-     * @return  self
-     */ 
-    public function setPrimaryKey($primaryKey)
-    {
-        $this->primaryKey = $primaryKey;
 
         return $this;
     }

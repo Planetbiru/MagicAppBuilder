@@ -8,7 +8,7 @@
  * an individual filter field that can be applied to the data list. Filters are 
  * added to the list using the constructor or the `addFilter` method.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class UserFormFilterList
 {

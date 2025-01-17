@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * (such as the value saved to a database) and its corresponding label 
  * (which is typically used for displaying the value in the user interface).
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputFieldValue extends ValueLabelConstructor
 {

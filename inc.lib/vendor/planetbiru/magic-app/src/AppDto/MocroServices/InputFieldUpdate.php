@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * current value of an input field. This class is useful for cases where input fields
  * need to reflect an existing value, such as in form edit scenarios.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputFieldUpdate extends InputFieldInsert
 {

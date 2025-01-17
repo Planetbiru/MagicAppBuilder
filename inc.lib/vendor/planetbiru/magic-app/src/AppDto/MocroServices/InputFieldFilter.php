@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * the current value of the input, which is typically sent by the user 
  * during a previous action, such as a search or filter operation.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputFieldFilter extends InputFieldInsert
 {

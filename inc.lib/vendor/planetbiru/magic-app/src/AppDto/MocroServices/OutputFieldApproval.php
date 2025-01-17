@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * This class is useful in scenarios where a field's value is being reviewed or moderated, 
  * allowing users to propose changes that can later be approved or rejected.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class OutputFieldApproval extends OutputFieldDetail
 {

@@ -2,6 +2,7 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
+use MagicApp\AppDto\MicroServices\PrimaryKeyValue;
 use MagicObject\MagicObject;
 
 /**
@@ -13,7 +14,7 @@ use MagicObject\MagicObject;
  * are used to convert this response object into a JSON string or an associative array. 
  * This class is designed to help format the response into a structured and readable format.
  * 
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class ResponseBody extends ObjectToString
 {
@@ -34,7 +35,7 @@ class ResponseBody extends ObjectToString
     /**
      * The data returned in the response, which can be of any type.
      *
-     * @var mixed
+     * @var EntityData
      */
     protected $data;
 
@@ -127,6 +128,49 @@ class ResponseBody extends ObjectToString
     }
 
     /**
+     * Adds a primary key to the associated data.
+     *
+     * This method checks if the data object is not null, and if so, resets the primary key collection
+     * and adds the provided primary key to it.
+     *
+     * @param string $primaryKey The primary key to add
+     * @return self Returns the current instance for method chaining
+     */
+    public function addPrimaryKey($primaryKey)
+    {
+        if ($this->getData() != null) {
+            if($this->data->getPrimaryKey() == null)
+            {
+                $this->getData()->setPrimaryKey([]);
+            }
+            $this->getData()->addPrimaryKey($primaryKey);
+        }
+        return $this;
+    }
+
+    /**
+     * Adds a primary key value to the associated data.
+     *
+     * This method checks if the data object is not null, and if so, resets the primary key value collection
+     * and adds a new `PrimaryKeyValue` object with the provided primary key and value.
+     *
+     * @param string $primaryKey The primary key to add
+     * @param mixed $value The value associated with the primary key
+     * @return self Returns the current instance for method chaining
+     */
+    public function addPrimaryKeyValue($primaryKey, $value)
+    {
+        if ($this->data != null) {
+            if($this->data->getPrimaryKeyValue() == null)
+            {
+                $this->data->setPrimaryKeyValue([]);
+            }
+            $this->data->addPrimaryKeyValue($primaryKey, $value);
+        }
+        return $this;
+    }
+
+    /**
      * Set the entity for the response and automatically determine the primary key.
      *
      * This method sets the primary key based on the table information from the provided entity.
@@ -137,7 +181,12 @@ class ResponseBody extends ObjectToString
     public function setEntity($entity)
     {
         $tableInfo = $entity->tableInfo();
-        $this->setPrimaryKey(array_keys($tableInfo->getPrimaryKeys()));
+        $pk = array_keys($tableInfo->getPrimaryKeys());
+        foreach($pk as $primaryKey)
+        {
+            $this->addPrimaryKey($primaryKey);
+            $this->addPrimaryKeyValue($primaryKey, $entity->get($primaryKey));
+        }
         return $this;
     }
 

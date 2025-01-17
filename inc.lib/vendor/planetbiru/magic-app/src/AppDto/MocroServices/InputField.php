@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * the structure of form fields or input elements, where each field has a value (which can be of any type)
  * and a label (which is a string for display to the user).
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputField extends ValueLabelConstructor
 {

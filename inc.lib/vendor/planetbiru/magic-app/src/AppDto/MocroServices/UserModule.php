@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * code, and path. It also includes the allowed actions that can be 
  * performed within the module and any child modules that may be nested within it.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class UserModule
 {
@@ -27,6 +27,13 @@ class UserModule
      * @var string
      */
     protected $code;
+
+    /**
+     * The namespace where the module is located, such as "/", "/admin", "/supervisor", etc.
+     *
+     * @var string
+     */
+    protected $namespace;
     
     /**
      * The path or URL where the module can be accessed within the application.

@@ -10,9 +10,9 @@ namespace MagicApp\AppDto\MocroServices;
  * which is useful for displaying the field in a form or outputting it in a user interface. 
  * It also handles the value associated with the field when editing or updating a record.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
-class OutputFieldDetail extends DataConstructor
+class OutputFieldDetail extends ObjectToString
 {
     /**
      * The name or identifier for the field.

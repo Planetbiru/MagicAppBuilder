@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * module that the user has access to. It provides a structure for storing and 
  * managing multiple modules.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class UserModuleList
 {

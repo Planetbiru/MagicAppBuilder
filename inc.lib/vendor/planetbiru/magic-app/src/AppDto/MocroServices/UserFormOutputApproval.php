@@ -11,17 +11,10 @@ namespace MagicApp\AppDto\MocroServices;
  * (e.g., `approve`, `reject`, `update`) that define the possible operations that can be performed on the form fields, 
  * as well as the current status of the field, such as whether it is waiting for an action like approval.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
-class UserFormOutputApproval extends ObjectToString
+class UserFormOutputApproval extends EntityData
 {
-    /**
-     * Primary key
-     *
-     * @var string[]
-     */
-    protected $primaryKey;
-
     /**
      * An array of output fields to be displayed in the form for approval.
      * Each field is represented by an `OutputFieldApproval` object.
@@ -98,30 +91,6 @@ class UserFormOutputApproval extends ObjectToString
     public function setWaitingfor($waitingfor)
     {
         $this->waitingfor = $waitingfor;
-
-        return $this;
-    }
-
-    /**
-     * Get primary key
-     *
-     * @return  string[]
-     */ 
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
-    }
-
-    /**
-     * Set primary key
-     *
-     * @param  string[]  $primaryKey  Primary key
-     *
-     * @return  self
-     */ 
-    public function setPrimaryKey($primaryKey)
-    {
-        $this->primaryKey = $primaryKey;
 
         return $this;
     }

@@ -9,7 +9,7 @@ namespace MagicApp\AppDto\MocroServices;
  * This class manages the value and label associated with the action, 
  * which can be used to define permitted operations or actions within a system.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class AllowedAction extends ValueLabelConstructor
 {

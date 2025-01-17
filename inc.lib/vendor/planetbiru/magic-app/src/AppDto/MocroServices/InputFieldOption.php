@@ -10,7 +10,7 @@ namespace MagicApp\AppDto\MocroServices;
  * It also supports adding non-standard `data-` attributes to the option element, enabling additional
  * custom data storage.
  *
- * @package AppBuilder\Generator\MocroServices
+ * @package MagicApp\AppDto\MocroServices
  */
 class InputFieldOption extends ObjectToString
 {
