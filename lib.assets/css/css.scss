@@ -875,6 +875,31 @@ input[type=number][name="database_port"] {
     visibility: visible;
     opacity: 1;
 }
+.tooltip.multiline {
+    height: auto !important;
+	.horizontal-line{
+		border-top: 1px solid #262626;
+  		border-bottom: 1px solid #535353;
+		height: 1px;
+		margin-top: 5px;
+		margin-bottom: 2px;
+	}
+
+	table {
+		tr {
+			td{
+				white-space: nowrap;
+				font-size: 0.82rem;
+				line-height: 1.1;
+			}
+
+			& > td:first-child {
+				padding-right: 5px;
+			}
+		}
+	}
+}
+
 
 .tooltip-top {
     bottom: 100%; 

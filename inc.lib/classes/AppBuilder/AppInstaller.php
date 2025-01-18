@@ -57,8 +57,8 @@ class AppInstaller {
                 {
                     include_once $fileName;                  
                     $entity = new $className(null, $database);
-                    $tableInfo = EntityUtil::getTableName($fileName);
-                    $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+                    $entityInfo = EntityUtil::getTableName($fileName);
+                    $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
                     
                     // Initialize the entities and entityNames arrays for the table if not set
                     if(!isset($entities[$tableName]))

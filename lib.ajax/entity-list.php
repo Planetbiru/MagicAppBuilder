@@ -44,22 +44,22 @@ try {
     $liData = [];
 
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
-        $filetime = date('Y-m-d H:i:s', filemtime($file));
+        $entityName = basename($file, '.php');
+        $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {          
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liData[$tableName])) {
                 $liData[$tableName] = [];
             }
-            $liData[$tableName][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format1, $dir, $entity, $filetime, $entity)];
+            $liData[$tableName][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName)];
         } else {
             if (!isset($liData[$idx])) {
                 $liData[$idx] = [];
             }
-            $liData[$idx][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format2, $dir, $entity, $filetime, $entity)];
+            $liData[$idx][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName)];
         }
     }
 
@@ -96,22 +96,22 @@ try {
     $liApp = [];
 
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
-        $filetime = date('Y-m-d H:i:s', filemtime($file));
+        $entityName = basename($file, '.php');
+        $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liApp[$tableName])) {
                 $liApp[$tableName] = [];
             }
-            $liApp[$tableName][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format1, $dir, $entity, $filetime, $entity)];
+            $liApp[$tableName][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName)];
         } else {
             if (!isset($liApp[$idx])) {
                 $liApp[$idx] = [];
             }
-            $liApp[$idx][] = ['name'=>sprintf($format3, $dir, $entity), 'html'=>sprintf($format2, $dir, $entity, $filetime, $entity)];
+            $liApp[$idx][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName)];
         }
     }
 

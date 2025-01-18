@@ -1436,12 +1436,17 @@ function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
     let tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
+    let isHtml = $(this).attr('data-html') == 'true';
 
     // Append the tooltip to the body and make it visible
     $('body').append(tooltip);
 
     // Show the tooltip when the area element is hovered
     tooltip.addClass('visible');
+    if(isHtml)
+    {
+      tooltip.addClass('multiline');
+    }
 
     // Calculate tooltip position based on the cursor coordinates
     $(document).on('mousemove', function (e) {

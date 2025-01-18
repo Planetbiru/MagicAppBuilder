@@ -39,7 +39,7 @@ try {
 
             foreach ($list as $file) {
                 $module = basename($file, '.php');
-                $filetime = date('Y-m-d H:i:s', filemtime($file));
+                $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
                 $path = str_replace("\\", "//", trim($target . '/' . $module, "//"));
 
                 // Create a list item for each file

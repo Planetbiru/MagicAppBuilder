@@ -72,8 +72,8 @@ try
                     {
                         include_once $path;                  
                         $entity = new $className(null, $database);
-                        $tableInfo = EntityUtil::getTableName($path);
-                        $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+                        $entityInfo = EntityUtil::getTableName($path);
+                        $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
                         if(!isset($entities[$tableName]))
                         {
                             $entities[$tableName] = [];
