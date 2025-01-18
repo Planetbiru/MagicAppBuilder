@@ -11,7 +11,7 @@ $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE
 
 if(!isset($applicationId) || empty($applicationId))
 {
-    $applicationId = $builderConfig->getCurrentApplication()->getId();
+    $applicationId = $activeApplication->getApplicationId();
 }
 
 if($applicationId != null)

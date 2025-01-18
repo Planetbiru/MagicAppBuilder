@@ -7,6 +7,10 @@ use MagicObject\SecretObject;
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
 $builderConfig = new AppSecretObject(null);
+if($builderConfig->getApplication() == null)
+{
+    $builderConfig->setApplication(new SecretObject());
+}
 
 $cacheDir = dirname(__DIR__) . "/.cache/";
 $builderConfigPath = dirname(__DIR__) . "/inc.cfg/core.yml";
