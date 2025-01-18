@@ -3,46 +3,33 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserFormInputUpdate
+ * Class PicoUserFormInputUpdate
  *
  * Represents a collection of input fields for a user form during an update operation.
- * This class manages multiple `InputFieldUpdate` objects, each representing a field 
+ * This class manages multiple `PicoInputFieldUpdate` objects, each representing a field 
  * to be updated in the form. It also includes an array of allowed actions (e.g., 
  * `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`) that define 
  * the possible operations that can be performed on the form fields.
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormInputUpdate extends ObjectToString
+class PicoUserFormInputUpdate extends PicoEntityData
 {
-    /**
-     * Primary key
-     *
-     * @var string[]
-     */
-    protected $primaryKey;
-
-    /**
-     * Primary key value
-     *
-     * @var PrimaryKeyValue[]
-     */
-    protected $primaryKeyValue;
     
     /**
      * An array of input fields to be updated into the form.
-     * Each field is represented by an InputFieldUpdate object.
+     * Each field is represented by an PicoInputFieldUpdate object.
      *
-     * @var InputFieldUpdate[]
+     * @var PicoInputFieldUpdate[]
      */
     protected $input;
     
     /**
      * Add an allowed action to the input.
      *
-     * This method adds an `InputFieldUpdate` object to the list of input that can be performed on the form fields. 
+     * This method adds an `PicoInputFieldUpdate` object to the list of input that can be performed on the form fields. 
      *
-     * @param InputFieldUpdate $input The `InputFieldUpdate` object to be added.
+     * @param PicoInputFieldUpdate $input The `PicoInputFieldUpdate` object to be added.
      */
     public function addInput($input)
     {

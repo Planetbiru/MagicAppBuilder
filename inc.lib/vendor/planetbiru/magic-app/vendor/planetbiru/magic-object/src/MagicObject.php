@@ -2752,12 +2752,19 @@ class MagicObject extends stdClass // NOSONAR
             }
             if(!empty($var) && !isset($this->_label[$var]))
             {
-                $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
-                $parameters = $reflexProp->getParameters();
-                if(isset($parameters['Label']))
+                try
                 {
-                    $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
-                    $this->_label[$var] = $label->getContent();
+                    $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
+                    $parameters = $reflexProp->getParameters();
+                    if(isset($parameters['Label']))
+                    {
+                        $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
+                        $this->_label[$var] = $label->getContent();
+                    }
+                }
+                catch(Exception $e)
+                {
+                    $this->_label[$var] = PicoStringUtil::camelToTitle($var);
                 }
             }
             if(isset($this->_label[$var]))

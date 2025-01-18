@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class ValueLabelConstructor extends ObjectToString
+class PicoValueLabelConstructor extends PicoObjectToString
 {
     /**
      * The value assigned to the object.
@@ -53,9 +53,9 @@ class ValueLabelConstructor extends ObjectToString
     /**
      * Set the value assigned to the object.
      *
-     * @param  mixed  $value  The value assigned to the object.
+     * @param mixed  $value  The value assigned to the object.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setValue($value)
     {
@@ -79,7 +79,7 @@ class ValueLabelConstructor extends ObjectToString
      *
      * @param string $label The label associated with the value.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setLabel($label)
     {

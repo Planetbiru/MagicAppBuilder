@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserFormOutputApproval
+ * Class PicoUserFormOutputApproval
  *
  * Represents a collection of output fields for a user form during an approval operation.
  * This class manages multiple `OutputFieldApproval` objects, each representing a field 
@@ -13,7 +13,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormOutputApproval extends EntityData
+class PicoUserFormOutputApproval extends PicoEntityData
 {
     /**
      * An array of output fields to be displayed in the form for approval.
@@ -22,15 +22,7 @@ class UserFormOutputApproval extends EntityData
      * @var OutputFieldApproval[]
      */
     protected $output;
-    
-    /**
-     * A list of allowed actions that can be performed on the form fields.
-     * Each action is represented by an `AllowedAction` object.
-     *
-     * @var AllowedAction[]
-     */
-    protected $allowedActions;
-    
+
     /**
      * The current status of the field, typically used to indicate whether the field
      * is waiting for a specific action, such as approval or rejection.
@@ -54,22 +46,7 @@ class UserFormOutputApproval extends EntityData
         }
         $this->output[] = $output;
     }
-    
-    /**
-     * Add an allowed action to the output approval.
-     *
-     * This method adds an `AllowedAction` object to the list of actions that can be performed on the form fields. 
-     * These actions could include operations like updating, activating, or deleting records.
-     *
-     * @param AllowedAction $allowedAction The `AllowedAction` object to be added.
-     */
-    public function addAllowedAction($allowedAction)
-    {
-        if (!isset($this->allowedActions)) {
-            $this->allowedActions = [];
-        }
-        $this->allowedActions[] = $allowedAction;
-    }
+
     
     /**
      * Get examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
@@ -84,9 +61,9 @@ class UserFormOutputApproval extends EntityData
     /**
      * Set examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @param  FieldWaitingFor  $waitingfor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
+     * @param FieldWaitingFor  $waitingfor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setWaitingfor($waitingfor)
     {

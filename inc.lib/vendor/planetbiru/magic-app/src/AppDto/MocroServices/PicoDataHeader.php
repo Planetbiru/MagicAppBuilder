@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class DataHeader
+ * Class PicoDataHeader
  *
  * Represents the header information for a data table or list. This class manages the field 
  * name, its label for display purposes, and the sorting order (ASC, DESC, or null). 
@@ -11,7 +11,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class DataHeader extends ObjectToString
+class PicoDataHeader extends PicoObjectToString
 {
     /**
      * The field name, which is typically used as the key for sorting or identifying the field.
@@ -40,7 +40,7 @@ class DataHeader extends ObjectToString
     protected $sort;
 
     /**
-     * DataHeader constructor.
+     * PicoDataHeader constructor.
      *
      * Initializes the data header with a field name, a label, and an optional sorting order.
      *

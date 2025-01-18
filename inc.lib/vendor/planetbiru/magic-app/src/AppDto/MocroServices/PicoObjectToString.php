@@ -6,7 +6,7 @@ use MagicObject\Util\PicoStringUtil;
 use stdClass;
 
 /**
- * Class ObjectToString
+ * Class PicoObjectToString
  *
  * This class provides functionality to convert an object into a JSON string representation. 
  * It overrides the `__toString()` method to return a JSON-encoded string of the object. 
@@ -18,7 +18,7 @@ use stdClass;
  * 
  * @package MagicApp\AppDto\MocroServices
  */
-class ObjectToString
+class PicoObjectToString
 {
     /**
      * @var string Flag to determine the case format (camelCase or snake_case).

@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class AllowedAction
+ * Class PicoAllowedAction
  *
  * Represents an allowed action that can be performed on a field or entity. 
  * This class manages the value and label associated with the action, 
@@ -11,7 +11,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class AllowedAction extends ValueLabelConstructor
+class PicoAllowedAction extends PicoValueLabelConstructor
 {
     /**
      * The actual value representing the allowed action.

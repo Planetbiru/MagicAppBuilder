@@ -143,7 +143,10 @@ class AppUserPermission
         }
         $this->currentModule = $currentModule;
         $this->currentUser = $currentUser;
-        $this->userLevelId = $currentUser->getUserLevelId();
+        if(isset($currentUser))
+        {
+            $this->userLevelId = $currentUser->getUserLevelId();
+        }
     }
     
     /**

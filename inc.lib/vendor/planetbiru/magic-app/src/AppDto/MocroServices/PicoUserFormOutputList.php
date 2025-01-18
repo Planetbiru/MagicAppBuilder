@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormOutputList extends ObjectToString
+class PicoUserFormOutputList extends PicoEntityData
 {
     /**
      * An array of `DataHeader` objects representing the headers of the output list.
@@ -30,21 +30,12 @@ class UserFormOutputList extends ObjectToString
     protected $primaryKey;
     
     /**
-     * An array of `OutputDataItem` objects representing the items in the output list.
-     * Each item contains associated data for the fields in the list.
+     * An array of `PicoOutputDataItem` objects representing the items in the output row.
+     * Each item contains associated data for the fields in the row.
      *
-     * @var OutputDataItem[]
+     * @var PicoOutputDataItem[]
      */
-    protected $list;
-    
-    /**
-     * A list of allowed actions that can be performed on the form fields.
-     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, and `reject`.
-     * These actions are represented by `AllowedAction` objects.
-     *
-     * @var AllowedAction[]
-     */
-    protected $allowedActions;
+    protected $row;
     
     /**
      * Add a header to the output list.
@@ -65,33 +56,17 @@ class UserFormOutputList extends ObjectToString
     /**
      * Add a data item to the output list.
      *
-     * This method adds an `OutputDataItem` object to the list of data items. Each data item represents an individual 
+     * This method adds an `PicoOutputDataItem` object to the list of data items. Each data item represents an individual 
      * item in the list or table, containing the data for each field.
      *
-     * @param OutputDataItem $dataItem The `OutputDataItem` object to be added.
+     * @param PicoOutputDataItem $dataItem The `PicoOutputDataItem` object to be added.
      */
     public function addDataItem($dataItem)
     {
-        if (!isset($this->list)) {
-            $this->list = [];
+        if (!isset($this->row)) {
+            $this->row = [];
         }
-        $this->list[] = $dataItem;
-    }
-    
-    /**
-     * Add an allowed action to the output list.
-     *
-     * This method adds an `AllowedAction` object to the list of actions that can be performed on the form fields. 
-     * These actions could include operations like updating, activating, or deleting records.
-     *
-     * @param AllowedAction $allowedAction The `AllowedAction` object to be added.
-     */
-    public function addAllowedAction($allowedAction)
-    {
-        if (!isset($this->allowedActions)) {
-            $this->allowedActions = [];
-        }
-        $this->allowedActions[] = $allowedAction;
+        $this->row[] = $dataItem;
     }
 
     /**
@@ -107,9 +82,9 @@ class UserFormOutputList extends ObjectToString
     /**
      * Set primary key
      *
-     * @param  string[]  $primaryKey  Primary key
+     * @param string[]  $primaryKey  Primary key
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setPrimaryKey($primaryKey)
     {

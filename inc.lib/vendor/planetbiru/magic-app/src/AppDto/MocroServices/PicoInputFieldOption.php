@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class InputFieldOption
+ * Class PicoInputFieldOption
  *
  * Represents an individual option element for a form input, typically used in select dropdowns.
  * This class allows setting the value, label, selection state, and HTML attributes for an option.
@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class InputFieldOption extends ObjectToString
+class PicoInputFieldOption extends PicoObjectToString
 {
     /**
      * The value of the option, typically submitted when the option is selected.
@@ -51,11 +51,11 @@ class InputFieldOption extends ObjectToString
     protected $data;
 
     /**
-     * Factory method to create an instance of InputFieldOption.
+     * Factory method to create an instance of PicoInputFieldOption.
      *
-     * This static method provides an alternative way to instantiate the InputFieldOption class.
+     * This static method provides an alternative way to instantiate the PicoInputFieldOption class.
      * 
-     * @return InputFieldOption A new instance of InputFieldOption.
+     * @return PicoInputFieldOption A new instance of PicoInputFieldOption.
      */
     public static function getInstance()
     {
@@ -63,7 +63,7 @@ class InputFieldOption extends ObjectToString
     }
 
     /**
-     * InputFieldOption constructor.
+     * PicoInputFieldOption constructor.
      *
      * Initializes the option with a value, label, and an optional selected state.
      *
@@ -187,9 +187,9 @@ class InputFieldOption extends ObjectToString
     /**
      * Set indicates whether the option is selected by default.
      *
-     * @param  bool|null  $selected  Indicates whether the option is selected by default.
+     * @param bool|null  $selected  Indicates whether the option is selected by default.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setSelected($selected)
     {

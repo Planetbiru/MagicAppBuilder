@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class InputField
+ * Class PicoInputField
  *
  * This class represents an input field, which includes a value and a label. It is used to model 
  * the structure of form fields or input elements, where each field has a value (which can be of any type)
@@ -11,7 +11,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class InputField extends ValueLabelConstructor
+class PicoInputField extends PicoValueLabelConstructor
 {
     /**
      * The value associated with the input field.
@@ -34,7 +34,7 @@ class InputField extends ValueLabelConstructor
     /**
      * Get this can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      *
-     * @return  mixed
+     * @return mixed
      */ 
     public function getValue()
     {
@@ -44,9 +44,9 @@ class InputField extends ValueLabelConstructor
     /**
      * Set this can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      *
-     * @param  mixed  $value  This can be of any type, depending on the context of the field (e.g., string, integer, etc.).
+     * @param mixed $value This can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      *
-     * @return  self
+     * @return self
      */ 
     public function setValue($value)
     {
@@ -58,7 +58,7 @@ class InputField extends ValueLabelConstructor
     /**
      * Get this is a string used for displaying a label to the user for the input field.
      *
-     * @return  string
+     * @return string
      */ 
     public function getLabel()
     {
@@ -68,9 +68,9 @@ class InputField extends ValueLabelConstructor
     /**
      * Set this is a string used for displaying a label to the user for the input field.
      *
-     * @param  string  $label  This is a string used for displaying a label to the user for the input field.
+     * @param string $label This is a string used for displaying a label to the user for the input field.
      *
-     * @return  self
+     * @return self
      */ 
     public function setLabel($label)
     {

@@ -1,7 +1,9 @@
 <?php
 
+namespace MagicApp\AppDto\MocroServices;
+
 /**
- * Class UserFormFilterList
+ * Class PicoUserFormFilterList
  *
  * Represents a list of filters to be displayed above a data list in a user form. 
  * This class holds a collection of `InputFieldFilter` objects, each representing 
@@ -10,7 +12,7 @@
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormFilterList
+class PicoUserFormFilterList extends PicoObjectToString
 {
     /**
      * An array of filter fields to be applied to the data list.

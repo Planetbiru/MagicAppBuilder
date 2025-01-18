@@ -3,13 +3,13 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class PrimaryKeyValue
+ * Class PicoPrimaryKeyValue
  *
  * Represents a primary key and its value for an entity.
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class PrimaryKeyValue extends ObjectToString
+class PicoPrimaryKeyValue extends PicoObjectToString
 {
     /**
      * Name of the primary key

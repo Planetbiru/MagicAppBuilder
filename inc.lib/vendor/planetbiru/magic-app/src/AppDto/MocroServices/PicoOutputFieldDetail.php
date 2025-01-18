@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class OutputFieldDetail
+ * Class PicoOutputFieldDetail
  *
  * Represents the details of an output field in a form or data display context. 
  * This class manages the field's name, label, data type, and its current value, 
@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class OutputFieldDetail extends ObjectToString
+class PicoOutputFieldDetail extends PicoObjectToString
 {
     /**
      * The name or identifier for the field.
@@ -43,7 +43,7 @@ class OutputFieldDetail extends ObjectToString
     protected $currentValue;
     
     /**
-     * OutputFieldDetail constructor.
+     * PicoOutputFieldDetail constructor.
      *
      * Initializes the properties of the field, label, data type, and current value.
      * If no current value is provided, it defaults to `null`.

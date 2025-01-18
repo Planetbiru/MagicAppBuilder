@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserFormInputInsert
+ * Class PicoUserFormInputInsert
  *
  * Represents a collection of input fields for a user form during an insert operation. 
  * This class is used to manage multiple `InputFieldInsert` objects, allowing 
@@ -11,14 +11,8 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormInputInsert extends ObjectToString
+class PicoUserFormInputInsert extends PicoEntityData
 {
-    /**
-     * Primary key
-     *
-     * @var string[]
-     */
-    protected $primaryKey;
     
     /**
      * An array of input fields to be inserted into the form.
@@ -56,9 +50,9 @@ class UserFormInputInsert extends ObjectToString
     /**
      * Set primary key
      *
-     * @param  string[]  $primaryKey  Primary key
+     * @param string[]  $primaryKey  Primary key
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
     public function setPrimaryKey($primaryKey)
     {

@@ -2,11 +2,12 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
-use MagicApp\AppDto\MicroServices\PrimaryKeyValue;
+use MagicApp\AppUserPermission;
+use MagicApp\PicoModule;
 use MagicObject\MagicObject;
 
 /**
- * Class ResponseBody
+ * Class PicoResponseBody
  *
  * This class represents the response body of an API or service response. It encapsulates
  * information such as the response code, response text, and the data returned by the service. 
@@ -16,7 +17,7 @@ use MagicObject\MagicObject;
  * 
  * @package MagicApp\AppDto\MocroServices
  */
-class ResponseBody extends ObjectToString
+class PicoResponseBody extends PicoObjectToString
 {
     /**
      * The response code from the service or API.
@@ -31,6 +32,13 @@ class ResponseBody extends ObjectToString
      * @var string
      */
     protected $responseText;
+
+    /**
+     * Module
+     *
+     * @var ModuleInfo
+     */
+    protected $module;
     
     /**
      * The data returned in the response, which can be of any type.
@@ -40,7 +48,7 @@ class ResponseBody extends ObjectToString
     protected $data;
 
     /**
-     * Constructor for ResponseBody.
+     * Constructor for PicoResponseBody.
      *
      * Initializes the response code, response text, data, and an optional primary key.
      * This constructor allows setting the values of these properties when creating a new instance of the class.
@@ -65,12 +73,12 @@ class ResponseBody extends ObjectToString
     }
 
     /**
-     * Get a new instance of ResponseBody.
+     * Get a new instance of PicoResponseBody.
      *
-     * This static method provides a way to create an instance of ResponseBody
+     * This static method provides a way to create an instance of PicoResponseBody
      * without setting any values initially.
      * 
-     * @return ResponseBody A new instance of ResponseBody with default values.
+     * @return PicoResponseBody A new instance of PicoResponseBody with default values.
      */
     public static function getInstance()
     {
@@ -78,16 +86,16 @@ class ResponseBody extends ObjectToString
     }
     
     /**
-     * Factory method to create an instance of ResponseBody with specific values.
+     * Factory method to create an instance of PicoResponseBody with specific values.
      *
-     * This static method provides an alternative way to instantiate the ResponseBody class,
+     * This static method provides an alternative way to instantiate the PicoResponseBody class,
      * allowing you to set the properties directly via parameters.
      * 
      * @param mixed $data The data returned in the response (optional).
      * @param string $responseCode The response code from the service.
      * @param string $responseText The response text or message.
      * 
-     * @return ResponseBody A new instance of ResponseBody with the specified values.
+     * @return PicoResponseBody A new instance of PicoResponseBody with the specified values.
      */
     public static function instanceOf(
         $data = null,
@@ -138,7 +146,7 @@ class ResponseBody extends ObjectToString
      */
     public function addPrimaryKey($primaryKey)
     {
-        if ($this->getData() != null) {
+        if ($this->data != null) {
             if($this->data->getPrimaryKey() == null)
             {
                 $this->getData()->setPrimaryKey([]);
@@ -176,16 +184,20 @@ class ResponseBody extends ObjectToString
      * This method sets the primary key based on the table information from the provided entity.
      *
      * @param MagicObject $entity The entity object that contains table information.
+     * @param bool $setValue
      * @return self The current instance for method chaining.
      */
-    public function setEntity($entity)
+    public function setEntity($entity, $setValue = false)
     {
         $tableInfo = $entity->tableInfo();
-        $pk = array_keys($tableInfo->getPrimaryKeys());
-        foreach($pk as $primaryKey)
+        $primaryKeys = array_keys($tableInfo->getPrimaryKeys());
+        foreach($primaryKeys as $primaryKey)
         {
             $this->addPrimaryKey($primaryKey);
-            $this->addPrimaryKeyValue($primaryKey, $entity->get($primaryKey));
+            if($setValue)
+            {
+                $this->addPrimaryKeyValue($primaryKey, $entity->get($primaryKey));
+            }
         }
         return $this;
     }
@@ -195,7 +207,7 @@ class ResponseBody extends ObjectToString
      *
      * This method returns the data associated with the response, which can be of any type.
      * 
-     * @return mixed The data returned in the response.
+     * @return EntityData The data returned in the response.
      */
     public function getData()
     {
@@ -207,7 +219,7 @@ class ResponseBody extends ObjectToString
      *
      * This method sets the data associated with the response, which can be of any type.
      * 
-     * @param mixed $data The data to set for the response.
+     * @param EntityData $data The data to set for the response.
      * 
      * @return self The current instance for method chaining.
      */
@@ -284,4 +296,48 @@ class ResponseBody extends ObjectToString
         parent::switchCaseTo($caseFormat);
         return $this;
     }
+
+    /**
+     * Get module
+     *
+     * @return  ModuleInfo
+     */ 
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * Set module
+     *
+     * @param ModuleInfo|PicoModule  $module Module
+     * @param string $section Module section
+     *
+     * @return  self
+     */ 
+    public function setModule($module, $section = null)
+    {
+        if(isset($module) && $module instanceof PicoModule)
+        {
+            $this->module = new PicoModuleInfo($module->getModuleName(), $module->getModuleTitle(), $section);
+        }
+        else
+        {
+            $this->module = $module;
+        }
+
+        return $this;
+    }
+    
+    /**
+     * Undocumented function
+     *
+     * @param AppUserPermission $appUserPermission
+     * @return self
+     */
+    public function setPermission($appUserPermission)
+    {
+        return $this;
+    }
+
 }

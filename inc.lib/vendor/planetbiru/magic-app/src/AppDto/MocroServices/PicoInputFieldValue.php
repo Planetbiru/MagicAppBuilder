@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class InputFieldValue
+ * Class PicoInputFieldValue
  *
  * Represents the value of an input field along with its display label. 
  * This class is used to manage and store the actual value of a form field 
@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class InputFieldValue extends ValueLabelConstructor
+class PicoInputFieldValue extends PicoInputFieldInsert
 {
     /**
      * The actual value saved to the database.

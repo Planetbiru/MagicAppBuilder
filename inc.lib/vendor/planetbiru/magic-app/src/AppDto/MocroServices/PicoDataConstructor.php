@@ -2,7 +2,7 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
-class DataConstructor extends ObjectToString
+class PicoDataConstructor extends PicoObjectToString
 {
     
 }

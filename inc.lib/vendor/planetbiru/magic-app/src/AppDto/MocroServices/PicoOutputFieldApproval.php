@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class OutputFieldApproval
+ * Class PicoOutputFieldApproval
  *
  * Extends the OutputFieldDetail class to include a proposed value for approval or rejection. 
  * This class is useful in scenarios where a field's value is being reviewed or moderated, 
@@ -11,7 +11,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class OutputFieldApproval extends OutputFieldDetail
+class PicoOutputFieldApproval extends PicoOutputFieldDetail
 {
     /**
      * Draft value made by another user, awaiting approval or rejection.
@@ -21,7 +21,7 @@ class OutputFieldApproval extends OutputFieldDetail
     protected $proposedValue;
     
     /**
-     * OutputFieldApproval constructor.
+     * PicoOutputFieldApproval constructor.
      *
      * Initializes the properties of the field, label, data type, current value, and proposed value.
      * This constructor ensures that the proposed value (if provided) is assigned to the appropriate property.

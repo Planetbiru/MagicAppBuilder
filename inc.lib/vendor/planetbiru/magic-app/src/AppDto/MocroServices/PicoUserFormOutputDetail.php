@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserFormOutputDetail
+ * Class PicoUserFormOutputDetail
  *
  * Represents a collection of input fields for a user form during an insert operation. 
  * This class manages multiple `OutputFieldDetail` objects, each representing a field 
@@ -13,7 +13,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserFormOutputDetail extends EntityData
+class PicoUserFormOutputDetail extends PicoEntityData
 {
 
     /**
@@ -28,17 +28,9 @@ class UserFormOutputDetail extends EntityData
      * A list of allowed actions that can be performed on the form fields.
      * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @var AllowedAction[]
-     */
-    protected $allowedActions;
-    
-    /**
-     * A list of allowed actions that can be performed on the form fields.
-     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
-     *
      * @var FieldWaitingFor
      */
-    protected $waitingfor;
+    protected $waitingFor;
     
     /**
      * Add an allowed action to the output detail.
@@ -54,22 +46,6 @@ class UserFormOutputDetail extends EntityData
         }
         $this->output[] = $output;
     }
-    
-    /**
-     * Add an allowed action to the output detail.
-     *
-     * This method adds an `AllowedAction` object to the list of actions that can be performed on the form fields. 
-     * These actions could include operations like updating, activating, or deleting records.
-     *
-     * @param AllowedAction $allowedAction The `AllowedAction` object to be added.
-     */
-    public function addAllowedAction($allowedAction)
-    {
-        if (!isset($this->allowedActions)) {
-            $this->allowedActions = [];
-        }
-        $this->allowedActions[] = $allowedAction;
-    }
 
     /**
      * Get examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
@@ -78,19 +54,19 @@ class UserFormOutputDetail extends EntityData
      */ 
     public function getWaitingfor()
     {
-        return $this->waitingfor;
+        return $this->waitingFor;
     }
 
     /**
      * Set examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @param  FieldWaitingFor  $waitingfor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
+     * @param FieldWaitingFor  $waitingFor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @return  self
+     * @return self The current instance for method chaining.
      */ 
-    public function setWaitingfor($waitingfor)
+    public function setWaitingfor($waitingFor)
     {
-        $this->waitingfor = $waitingfor;
+        $this->waitingFor = $waitingFor;
 
         return $this;
     }

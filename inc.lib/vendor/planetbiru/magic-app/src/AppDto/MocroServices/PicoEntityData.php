@@ -3,13 +3,13 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class EntityData
+ * Class PicoEntityData
  *
  * Represents the data associated with an entity, including its primary key and primary key values.
  *
  * @package MagicApp\AppDto\MicroServices
  */
-class EntityData extends ObjectToString
+class PicoEntityData extends PicoObjectToString
 {
     /**
      * Primary key
@@ -101,6 +101,6 @@ class EntityData extends ObjectToString
         if (!isset($this->primaryKeyValue)) {
             $this->primaryKeyValue = [];
         }
-        $this->primaryKeyValue[] = new PrimaryKeyValue($name, $value);
+        $this->primaryKeyValue[] = new PicoPrimaryKeyValue($name, $value);
     }
 }

@@ -3,7 +3,7 @@
 namespace MagicApp\AppDto\MocroServices;
 
 /**
- * Class UserModuleList
+ * Class PicoUserModuleList
  *
  * Represents a collection of user modules that are accessible by the current user.
  * This class manages a list of `UserModule` objects, each of which represents a 
@@ -12,7 +12,7 @@ namespace MagicApp\AppDto\MocroServices;
  *
  * @package MagicApp\AppDto\MocroServices
  */
-class UserModuleList
+class PicoUserModuleList
 {
     /**
      * An array of `UserModule` objects representing the modules that the user has access to.

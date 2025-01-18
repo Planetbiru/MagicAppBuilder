@@ -146,14 +146,15 @@ class PicoResponse
             }
             ob_start(); // Mulai output buffering
         }
+        header("Connection: close");
 
         // Jika body tidak null, kirimkan
-        if ($body !== null) {
+        if ($body !== null && $async) {
             echo $body; // Tampilkan body
         }
 
         // Mengatur header koneksi
-        header("Connection: close");
+        
 
         // Jika dalam mode asinkron, lakukan flush
         if ($async) {
