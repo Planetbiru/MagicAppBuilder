@@ -4,8 +4,6 @@ use MagicApp\AppDto\ResponseDto\ButtonFormData;
 use MagicApp\AppDto\ResponseDto\DetailDataDto;
 use MagicApp\AppDto\ResponseDto\DetailDto;
 use MagicApp\AppDto\ResponseDto\MetadataDetailDto;
-use MagicApp\AppDto\ResponseDto\NameValueDto;
-use MagicApp\AppDto\ResponseDto\PrimaryKeyValueDto;
 use MagicApp\AppDto\ResponseDto\ValueDto;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
