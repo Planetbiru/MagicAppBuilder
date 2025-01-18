@@ -45,7 +45,7 @@ try {
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
-        $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {          
@@ -54,12 +54,27 @@ try {
             if (!isset($liData[$tableName])) {
                 $liData[$tableName] = [];
             }
-            $liData[$tableName][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName)];
+
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+
+            $liData[$tableName][] = [
+                'name'=>sprintf($format3, $dir, $entityName), 
+                'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName),
+                'filetime'=>$filetime,
+                'entityName'=>$entityName,
+                'className'=>$className,
+                'path'=>$path
+            ];
         } else {
             if (!isset($liData[$idx])) {
                 $liData[$idx] = [];
             }
-            $liData[$idx][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName)];
+            $liData[$idx][] = [
+                'name'=>sprintf($format3, $dir, $entityName), 
+                'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName),
+                'filetime'=>$filetime
+            ];
         }
     }
 
@@ -73,7 +88,23 @@ try {
             $a->setAttribute('data-entity-name', $item['name']);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
-            $a->setAttribute('data-title', $filetime);
+            if(isset($item['entityName']) && isset($item['className']) && isset($item['path']))
+            {
+                $entityName = $item['entityName'];
+                $className = $item['className'];
+                $path = $item['path'];
+                include_once $path;                  
+                $entity = new $className(null, $database);
+                $tableInfo = $entity->tableInfo();
+                $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
+
+                $a->setAttribute('data-title', $title);
+                $a->setAttribute('data-html', 'true');
+            }
+            else
+            {
+                $a->setAttribute('data-title', 'Last Update '.$item['filetime']);
+            }
             $li->appendChild($a);
             $ulData->appendChild($li);
         }
@@ -97,7 +128,7 @@ try {
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
-        $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
         $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         if ($return_var === 0) {
@@ -106,12 +137,27 @@ try {
             if (!isset($liApp[$tableName])) {
                 $liApp[$tableName] = [];
             }
-            $liApp[$tableName][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName)];
+
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+
+            $liApp[$tableName][] = [
+                'name'=>sprintf($format3, $dir, $entityName), 
+                'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName),
+                'filetime'=>$filetime,
+                'entityName'=>$entityName,
+                'className'=>$className,
+                'path'=>$path
+            ];
         } else {
             if (!isset($liApp[$idx])) {
                 $liApp[$idx] = [];
             }
-            $liApp[$idx][] = ['name'=>sprintf($format3, $dir, $entityName), 'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName)];
+            $liApp[$idx][] = [
+                'name'=>sprintf($format3, $dir, $entityName), 
+                'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName),
+                'filetime'=>$filetime
+            ];
         }
     }
 
@@ -125,7 +171,26 @@ try {
             $a->setAttribute('data-entity-name', $item['name']);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
-            $a->setAttribute('data-title', $filetime);
+            
+            if(isset($item['entityName']) && isset($item['className']) && isset($item['path']))
+            {
+                $entityName = $item['entityName'];
+                $className = $item['className'];
+                $path = $item['path'];
+                include_once $path;                  
+                $entity = new $className(null, $database);
+                $tableInfo = $entity->tableInfo();
+                $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
+
+                $a->setAttribute('data-title', $title);
+                $a->setAttribute('data-html', 'true');
+            }
+            else
+            {
+                $a->setAttribute('data-title', 'Last Update '.$item['filetime']);
+            }
+
+
             $li->appendChild($a);
             $ulApp->appendChild($li);
         }

@@ -126,4 +126,71 @@ class EntityUtil
             return $pair;
         }
     }
+
+    /**
+     * Formats the title and table information for an entity.
+     *
+     * This method generates an HTML string that represents the entity's name,
+     * table name, last update time, and details about its columns, primary keys,
+     * and join columns.
+     *
+     * @param string $entityName The name of the entity.
+     * @param string $filetime The timestamp of the last update.
+     * @param PicoTableInfo $entityInfo The entity information, which includes table name,
+     *        columns, primary keys, and join columns.
+     * 
+     * @return string The formatted HTML content that includes entity details and table structure.
+     */
+    public static function formatTitle($entityName, $filetime, $entityInfo)
+    {
+        // Table for basic entity info
+        $table1 = '<table><tbody>
+        <tr><td>Entity Name</td><td>'.$entityName.'</td></tr>
+        <tr><td>Table Name</td><td>'.$entityInfo->getTableName().'</td></tr>
+        <tr><td>Last Update</td><td>'.$filetime.'</td></tr>
+        </tbody></table>';
+
+        // Initialize the table to hold column details
+        $table = '';
+        $columns = $entityInfo->getColumns();
+        $primaryKeys = $entityInfo->getPrimaryKeys();
+        $joinColumns = $entityInfo->getJoinColumns();
+
+        // Start table for columns, primary keys, and join columns
+        $table .= '<table><tbody>';
+
+        $table .= '<tr><td colspan="2">Columns</td></tr>';
+        if (isset($columns) && is_array($columns)) {
+            foreach ($columns as $column) {
+                $table .= '<tr><td>'.$column['name'].'</td><td>'.$column['type'].'</td></tr>';
+            }
+        }
+
+        // Add primary keys to the table
+        if (isset($primaryKeys) && is_array($primaryKeys)) {
+            $table .= '<tr><td colspan="2">Primary Keys</td></tr>';
+            foreach ($primaryKeys as $column) {
+                $table .= '<tr><td>'.$column['name'].'</td><td></td></tr>';
+            }
+        }
+
+        // Add join columns to the table
+        if (isset($joinColumns) && is_array($joinColumns)) {
+            $table .= '<tr><td colspan="2">Join Columns</td></tr>';
+            foreach ($joinColumns as $column) {
+                $ref = isset($column['refernceColumnName']) ? $column['refernceColumnName'] : $column['name'];
+                $table .= '<tr><td>'.$column['name'].'</td><td>'.$ref.'</td></tr>';
+            }
+        }
+
+        $table .= '</tbody></table>';
+
+        // Return the final formatted HTML structure
+        return '<div>'
+            .$table1
+            .'<div class="horizontal-line"></div>'
+            .$table
+            .'</div>';
+    }
+
 }
