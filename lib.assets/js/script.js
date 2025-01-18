@@ -471,7 +471,7 @@ jQuery(function () {
           magic_app_version: magic_app_version
         },
         success: function (data) {
-          reloadApplicationList();
+          loadAllResource();
         },
         error: function (e1, e2) {
         }
@@ -808,7 +808,7 @@ jQuery(function () {
             new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
           );
         }
-        reloadApplicationList();
+        loadAllResource();
         createBtn[0].disabled = false;
       }
     });
@@ -1101,7 +1101,7 @@ jQuery(function () {
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
-        reloadApplicationList();
+        loadAllResource();
         updateBtn[0].disabled = false;
       }
     });
@@ -1139,7 +1139,7 @@ jQuery(function () {
       dataType: 'html',
       success: function (data) {
         $('#modal-application-menu .modal-body').empty().append(data);
-        reloadApplicationList();
+        loadAllResource();
         updateBtn[0].disabled = false;
         initMenu();
       }
@@ -1233,7 +1233,7 @@ jQuery(function () {
       url: 'lib.ajax/workspace-scan.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1246,7 +1246,7 @@ jQuery(function () {
       url: 'lib.ajax/workspace-default.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1259,7 +1259,7 @@ jQuery(function () {
       url: 'lib.ajax/application-default.php',
       data: { applicationId: applicationId },
       success: function (data) {
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1277,7 +1277,7 @@ jQuery(function () {
 
   $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
-    reloadApplicationList();
+    loadAllResource();
   });
 
   $(document).on('click', '.button-save-workspace', function (e) {
@@ -1293,7 +1293,7 @@ jQuery(function () {
       data: { workspaceName: workspaceName, workspaceDirectory:workspaceDirectory, workspaceDescription:workspaceDescription, phpPath:phpPath },
       success: function (data) {
         modal.modal('hide');
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1413,15 +1413,12 @@ jQuery(function () {
     })
   });
 
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-language-list.php',
-    dataType: 'json',
-    success: function (data) {
-      setLanguage(data);
-    }
-  });
+  loadAllResource();
+  
+});
 
+function loadAllResource()
+{
   reloadApplicationList();
   loadTable();
   loadMenu();
@@ -1430,7 +1427,7 @@ jQuery(function () {
   updateEntityFile();
   updateModuleFile();
   initTooltip();
-});
+}
 
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
@@ -3116,7 +3113,7 @@ function updateCurrentApplivation(dataToPost) {
       if (val != null && val != "") {
         $('select[name="source_table"]').val(val);
       }
-      reloadApplicationList();
+      loadAllResource();
     }
   });
 }

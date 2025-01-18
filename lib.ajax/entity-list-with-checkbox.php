@@ -131,11 +131,7 @@ try {
 
             $className = "\\".$baseEntity."\\".$entityName;
             $path = $baseDir."/".$entityName.".php";
-            include_once $path;                  
-            $entity = new $className(null, $database);
-            $tableInfo = $entity->tableInfo();
-            $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
-
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
             $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {
@@ -182,11 +178,7 @@ try {
 
             $className = "\\".$baseEntity."\\".$entityName;
             $path = $baseDir."/".$entityName.".php";
-            include_once $path;                  
-            $entity = new $className(null, $database);
-            $tableInfo = $entity->tableInfo();
-            $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
-
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
             $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {

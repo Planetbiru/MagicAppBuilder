@@ -55,11 +55,7 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             
-            $className = "\\".$baseEntity."\\".$entityName;
-            $path = $baseDir."/".$entityName.".php";
-            include_once $path;                  
-            $entity = new $className(null, $database);
-            $tableInfo = $entity->tableInfo();
+            
 
             // Create the checkbox input
             $input = $dom->createElement('input');
@@ -74,7 +70,9 @@ try {
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
-            $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
 
             // Create the link (a) element
             $a = $dom->createElement('a', $entityName);
@@ -157,12 +155,6 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
 
-            $className = "\\".$baseEntity."\\".$entityName;
-            $path = $baseDir."/".$entityName.".php";
-            include_once $path;                  
-            $entity = new $className(null, $database);
-            $tableInfo = $entity->tableInfo();
-
             // Create the checkbox input
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
@@ -176,7 +168,9 @@ try {
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
-            $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
 
             // Create the link (a) element
             $a = $dom->createElement('a', $entityName);

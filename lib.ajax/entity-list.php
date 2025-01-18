@@ -93,11 +93,7 @@ try {
                 $entityName = $item['entityName'];
                 $className = $item['className'];
                 $path = $item['path'];
-                include_once $path;                  
-                $entity = new $className(null, $database);
-                $tableInfo = $entity->tableInfo();
-                $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
-
+                $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
             }
@@ -177,11 +173,7 @@ try {
                 $entityName = $item['entityName'];
                 $className = $item['className'];
                 $path = $item['path'];
-                include_once $path;                  
-                $entity = new $className(null, $database);
-                $tableInfo = $entity->tableInfo();
-                $title = EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
-
+                $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
             }
