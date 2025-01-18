@@ -41,7 +41,7 @@ if($inputPost->getUserAction() == 'get')
     $response = [];
     try
     {
-        $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
+        $baseDir = $activeApplication->getBaseApplicationDirectory();
         $targetLanguage = $inputPost->getTargetLanguage();
         $filter = $inputPost->getFilter();
 
@@ -143,7 +143,7 @@ if($inputPost->getUserAction() == 'set')
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
     
-    $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
+    $baseDir = $activeApplication->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
     $dirname = dirname($pathTrans);

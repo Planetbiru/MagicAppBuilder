@@ -9,7 +9,7 @@ $inputGet = new InputGet();
 
 try
 {
-	$baseModuleDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
+	$baseModuleDirectory = $activeApplication->getBaseApplicationDirectory();
     $module = $inputGet->getModule().".php";
     $path = trim($baseModuleDirectory."/".$module);
     if(file_exists($path))

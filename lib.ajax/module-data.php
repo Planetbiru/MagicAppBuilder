@@ -9,7 +9,7 @@ $inputGet = new InputGet();
 
 try
 {
-	$baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
+	$baseDirectory = $activeApplication->getBaseApplicationDirectory();
     $moduleFile = $inputGet->getModuleFile();
     $target = trim($inputGet->getTarget(), "/\\");
     if(!empty($target))

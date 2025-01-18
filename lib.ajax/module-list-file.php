@@ -29,7 +29,7 @@ try {
                 $target = "/" . $target;
             }
 
-            $baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
+            $baseDirectory = $activeApplication->getBaseApplicationDirectory();
             $dir = $baseDirectory . "$target";
             $pattern = $baseDirectory . "$target/*.php";
             $list = glob($pattern);

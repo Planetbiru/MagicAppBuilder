@@ -59,6 +59,10 @@ try
         $workspaceAdmin->setIpEdit($_SERVER['REMOTE_ADDR']);
         $workspaceAdmin->setActive(true);
         $workspaceAdmin->insert();
+
+        // Scan new workspace
+        $_GET['workspaceId'] = $workspaceId;
+        require_once __DIR__ . "/workspace-scan.php";
     }
 }
 catch(Exception $e)

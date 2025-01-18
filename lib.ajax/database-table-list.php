@@ -6,9 +6,14 @@ use MagicObject\Database\PicoDatabaseType;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+if(!$database->isConnected())
+{
+    ResponseUtil::sendJSON(new stdClass);
+    exit();
+}
+
 try {
 
-    
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
     $databaseType = $database->getDatabaseType();
 
