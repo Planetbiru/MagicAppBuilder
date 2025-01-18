@@ -407,12 +407,14 @@ class ScriptGenerator //NOSONAR
         
         $usesSection = implode("\r\n", $uses);
         $includeSection = implode("\r\n", $includes);
+
+        $upperModuleName = str_replace(" ", "", ucwords(strtolower($request->getModuleName())));
         
         $declaration = array();
         $declaration[] = AppBuilderBase::VAR."inputGet = new InputGet();";
         $declaration[] = AppBuilderBase::VAR."inputPost = new InputPost();";
         $declaration[] = '';
-        $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", "'.$request->getModuleName().'");';
+        $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", $appLanguage->get'.$upperModuleName.'());';
         $declaration[] = '$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
         $declaration[] = '$appInclude = new AppIncludeImpl($appConfig, $currentModule);';
         $declaration[] = '';

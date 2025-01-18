@@ -6,3 +6,4 @@ tmp/*
 
 .cache/*
 inc.cfg/*
+inc.cfg/database.sqlite
