@@ -144,6 +144,10 @@ body.sidebar-hidden .content {
   color: #e4e6e8;
 }
 
+.light-mode {
+  background-color: #f8f9fa;
+  color: #212529;
+}
 .light-mode .sidebar .toggle-sidebar * {
   color: #333333;
 }
@@ -407,14 +411,21 @@ select:focus {
   text-decoration: none;
 }
 
-.light-mode {
-  background-color: #f8f9fa;
-  color: #212529;
+.menu-separator {
+  display: block;
+  border-bottom: 1px solid #d7d7d7;
+  height: 1px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .dark-mode {
   background-color: #212529;
   color: #e4e6e8;
+}
+.dark-mode .menu-separator {
+  border-top: 1px solid #484848;
+  border-bottom: 1px solid #5e5e5e;
 }
 .dark-mode .input-datetime-wrapper::after {
   color: #dddddd;
@@ -570,14 +581,6 @@ textarea.form-control {
 .sidebar .fas {
   width: 18px !important;
   text-align: center;
-}
-
-.menu-separator {
-  display: block;
-  border-bottom: 1px solid #d7d7d7;
-  height: 1px;
-  margin-top: 6px;
-  margin-bottom: 6px;
 }
 
 select[multiple].form-control {

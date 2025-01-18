@@ -184,6 +184,8 @@ body.sidebar-hidden .content {
 
 .light-mode
 {
+  background-color: $color-light;
+  color: $color-text-light;
   .sidebar {
     .toggle-sidebar {
       * {
@@ -506,17 +508,27 @@ select:focus {
   }
 }
 
-.light-mode {
-  background-color: $color-light;
-  color: $color-text-light;
-}
 
+
+.menu-separator {
+  display: block;
+  border-bottom: 1px solid #d7d7d7;
+  height: 1px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
 
 // Dark Mode Styles
 .dark-mode {
 
   background-color: $color-dark;
   color: $color-text-dark;
+
+  .menu-separator
+  {
+    border-top: 1px solid #484848;
+    border-bottom: 1px solid #5e5e5e;
+  }
 
   .input-datetime-wrapper::after {
     color: #dddddd;
@@ -720,13 +732,3 @@ textarea.form-control {
   text-align: center;
 
 }
-
-.menu-separator {
-  display: block;
-  border-bottom: 1px solid #d7d7d7;
-  height: 1px;
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-
-

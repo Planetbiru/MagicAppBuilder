@@ -169,7 +169,7 @@ $newApp->setCurrentAction([
 
 $paginationConfig = new SecretObject([
     'page_size' => 20,
-    'page_margin' => 30,
+    'page_range' => 3,
     'prev' => '<i class="fa-solid fa-angle-left"></i>',
     'next' => '<i class="fa-solid fa-angle-right"></i>',
     'first' => '<i class="fa-solid fa-angles-left"></i>',

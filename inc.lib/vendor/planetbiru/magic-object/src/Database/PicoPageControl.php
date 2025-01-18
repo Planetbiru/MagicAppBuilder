@@ -174,6 +174,23 @@ class PicoPageControl
     }
 
     /**
+     * Sets the range for pagination controls.
+     *
+     * This defines how many pages to show before and after the current page.
+     *
+     * @param int $range Range (number of pages before and after the current page).
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setRange($range)
+    {
+        if(isset($range) && $range > 0)
+        {
+            $this->pageData->generatePagination($range);
+        }
+        return $this;
+    }
+
+    /**
      * Gets the template for rendering specific page numbers.
      *
      * @return string The current format for rendering page numbers.
