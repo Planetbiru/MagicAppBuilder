@@ -54,7 +54,7 @@ class EntityAdminSession extends MagicObject
 	/**
 	 * Application ID
 	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Application ID")
 	 * @var string
 	 */

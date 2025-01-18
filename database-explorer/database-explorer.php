@@ -2536,7 +2536,7 @@ else {
         <?php
         try {
             // Show the sidebar with databases if not from default app and not using SQLite
-            if (!$fromDefaultApp && $dbType != 'sqlite') {
+            if (!$fromDefaultApp && $dbType != 'sqlite' && $accessedFrom == 'database-explorer') {
                 echo DatabaseExplorer::showSidebarDatabases($pdo, $applicationId, $databaseName, $schemaName, $databaseConfig);
             }
 

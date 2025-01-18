@@ -9,7 +9,11 @@ require_once __DIR__ . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 
-$entityAdmin = new EntityAdmin(null, $databaseBuilder);
+$entityAdmin = new EntityAdmin();
+if(isset($databaseBuilder) && $databaseBuilder->isConnected())
+{
+    $entityAdmin->currentDatabase($databaseBuilder);
+}
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {

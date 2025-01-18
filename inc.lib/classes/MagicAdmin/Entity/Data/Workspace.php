@@ -27,7 +27,7 @@ class Workspace extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="workspace_id", type="varchar(255)", length=255, nullable=false)
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Workspace ID")
 	 * @var string
 	 */

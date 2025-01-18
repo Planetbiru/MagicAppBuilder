@@ -1246,7 +1246,7 @@ jQuery(function () {
       url: 'lib.ajax/workspace-default.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
-        loadAllResource();
+        onSetDefaultWorkspace();
       }
     });
   });
@@ -1259,7 +1259,7 @@ jQuery(function () {
       url: 'lib.ajax/application-default.php',
       data: { applicationId: applicationId },
       success: function (data) {
-        loadAllResource();
+        onSetDefaultApplication();
       }
     });
   });
@@ -1417,9 +1417,80 @@ jQuery(function () {
   
 });
 
+function loadWorkspaceList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/workspace-list.php',
+    success: function (data) {
+      $('.workspace-card').empty().append(data);
+    }
+  });
+}
+
+function loadApplicationList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-list.php',
+    success: function (data) {
+      $('.application-card').empty().append(data);
+    }
+  });
+}
+
+function loadLanguageList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-path-list.php',
+    dataType: 'json',
+    success: function (data) {
+      $('[name="current_module_location"]').empty();
+      for (let i in data) {
+        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
+      }
+    }
+  });
+}
+
+function loadPathList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-language-list.php',
+    dataType: 'json',
+    success: function (data) {
+      setLanguage(data);
+    }
+  });
+}
+
 function loadAllResource()
 {
-  reloadApplicationList();
+  loadWorkspaceList();
+  loadApplicationList();
+  loadTable();
+  loadPathList();
+  loadLanguageList();
+
+  loadMenu();
+  updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
+  updateEntityFile();
+  updateModuleFile();
+  initTooltip();
+}
+
+function onSetDefaultWorkspace()
+{
+  loadWorkspaceList();
+  loadApplicationList();
+}
+
+function onSetDefaultApplication()
+{
+  loadApplicationList();
   loadTable();
   loadMenu();
   updateEntityQuery(false);
@@ -1427,6 +1498,7 @@ function loadAllResource()
   updateEntityFile();
   updateModuleFile();
   initTooltip();
+  
 }
 
 function initTooltip() {
@@ -1782,60 +1854,7 @@ function moveDown(element) {
   }
 }
 
-/**
- * Reloads the application and path lists via AJAX requests.
- *
- * This function performs two AJAX GET requests:
- * 1. It fetches the application list from `lib.ajax/application-list.php`
- *    and updates the content of elements with the class `application-card`.
- * 2. It retrieves the path list from `lib.ajax/application-path-list.php`, expecting
- *    a JSON response, and populates a select element named
- *    `current_module_location` with options based on the retrieved data.
- *
- * Each option displays the module name and its corresponding path,
- * with the ability to set the active state of the options based on the
- * `active` property in the JSON response.
- *
- * @returns {void} This function does not return a value.
- */
-function reloadApplicationList() {
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-list.php',
-    success: function (data) {
-      $('.application-card').empty().append(data);
-    }
-  });
-  
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/workspace-list.php',
-    success: function (data) {
-      $('.workspace-card').empty().append(data);
-    }
-  });
 
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-path-list.php',
-    dataType: 'json',
-    success: function (data) {
-      $('[name="current_module_location"]').empty();
-      for (let i in data) {
-        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
-      }
-    }
-  });
-
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-language-list.php',
-    dataType: 'json',
-    success: function (data) {
-      setLanguage(data);
-    }
-  });
-}
 
 /**
  * Reloads translations based on the specified context.

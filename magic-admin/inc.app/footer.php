@@ -7,19 +7,19 @@
 
         // Notification data from the server in JSON format
         const notifications = {
-            "totalData": 129,
+            "totalData": 0,
             "data": [
-            { "id": 1, "link": "notification.php?any=1", "message": "Notification 1", "time": "5 min" },
-            { "id": 2, "link": "notification.php?any=2", "message": "Notification 2", "time": "100 day" }
+            //{ "id": 1, "link": "notification.php?any=1", "message": "Notification 1", "time": "5 min" },
+            //{ "id": 2, "link": "notification.php?any=2", "message": "Notification 2", "time": "100 day" }
         ]}
         ;
 
         // Message data from the server in JSON format
         const messages = {
-            "totalData": 88,
+            "totalData": 0,
             "data": [
-            { "id": 1, "link": "message.php?any=1", "message": "Message 1", "time": "1 min" },
-            { "id": 2, "link": "message.php?any=2", "message": "Message 2", "time": "3 min" }
+            //{ "id": 1, "link": "message.php?any=1", "message": "Message 1", "time": "1 min" },
+            //{ "id": 2, "link": "message.php?any=2", "message": "Message 2", "time": "3 min" }
         ]};
 
     </script>

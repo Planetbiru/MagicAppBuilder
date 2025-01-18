@@ -26,7 +26,7 @@ class EntitySetting extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="setting_id", type="varchar(255)", length=255, nullable=true)
+	 * @Column(name="setting_id", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Setting ID")
 	 * @var string
 	 */

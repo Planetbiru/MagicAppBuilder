@@ -70,5 +70,5 @@ if (file_exists($appConfigPath)) {
     exit();
 }
 
-
+$accessedFrom = "database-explorer";
 require_once __DIR__ . "/database-explorer.php";

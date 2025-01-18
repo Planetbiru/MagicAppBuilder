@@ -11,12 +11,14 @@ require_once __DIR__ . "/sessions.php";
 $activeWorkspace = new EntityWorkspace();
 $activeApplication = new EntityApplication();
 
+$userLoggedIn = false;
+
 $appBaseConfigPath = "";
 $configTemplatePath = "";
 if(isset($databaseBuilder))
 {
     $entityAdmin = new EntityAdmin(null, $databaseBuilder);
-    $userLoggedIn = false;
+    
 
     if(isset($sessions->username) && isset($sessions->userPassword))
     {
