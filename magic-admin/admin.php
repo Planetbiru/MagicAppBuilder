@@ -622,16 +622,16 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		"adminCreate" => array(
 			"columnName" => "admin_create",
 			"entityName" => "AdminCreate",
-			"tableName" => "admin_create",
-			"primaryKey" => "admin_create",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
 			"objectName" => "creator",
 			"propertyName" => "name"
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
 			"entityName" => "AdminEdit",
-			"tableName" => "admin_edit",
-			"primaryKey" => "admin_edit",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
 			"objectName" => "editor",
 			"propertyName" => "name"
 		)

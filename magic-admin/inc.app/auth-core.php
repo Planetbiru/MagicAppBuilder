@@ -11,11 +11,6 @@ use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(dirname(__DIR__))."/inc.app/auth-core.php";
 
-if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
-{
-    exit(); // Bye non superuser
-}
-
 $appModule = new AppModule();
 $appUserRole = new AppUserRole();
 $currentUser = new AppUser($entityAdmin);

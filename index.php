@@ -42,6 +42,14 @@ $constSelected = ' selected';
           </li>
         <?php
         }
+        else 
+        {
+          ?>
+          <li class="nav-item" role="presentation">
+              <a href="magic-admin/profile.php" class="nav-link" type="button" role="tab" aria-controls="config">Profile</a>
+            </li>
+          <?php
+          }
         $navigators = $appNavs->getNavs();
         foreach ($navigators as $nav) {
         ?>

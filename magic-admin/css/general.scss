@@ -182,6 +182,17 @@ body.sidebar-hidden .content {
   color: $color-text-dark;
 }
 
+.light-mode
+{
+  .sidebar {
+    .toggle-sidebar {
+      * {
+        color: #333333;
+      }
+    }
+  }
+}
+
 .two-side-responsive-table,
 table.responsive-two-cols {
   width: 100%;

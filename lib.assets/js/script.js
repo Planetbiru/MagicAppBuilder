@@ -1269,6 +1269,11 @@ jQuery(function () {
     let path = $(this).closest('.application-item').attr('data-path');
     window.location = 'vscode://file/' + path;
   });
+  $(document).on('click', '.button-workspace-open', function (e) {
+    e.preventDefault();
+    let path = $(this).closest('.workspace-item').attr('data-path');
+    window.location = 'vscode://file/' + path;
+  });
 
   $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
