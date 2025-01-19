@@ -12,7 +12,7 @@ if($inputPost->getAction() == "update")
 {
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
         
         $paths = $inputPost->getPaths();
@@ -60,7 +60,7 @@ else if($inputPost->getAction() == "get")
 {
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
         $appConf = $appConfig->getApplication(); 
         $currentPaths = $appConf->getBaseModuleDirectory();
@@ -81,7 +81,7 @@ else if($inputPost->getAction() == "default")
     $selected = $inputPost->getSelectedPath();
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
         $appConf = $appConfig->getApplication();
         if(!isset($appConf))

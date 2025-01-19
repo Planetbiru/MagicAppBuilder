@@ -23,6 +23,9 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Application;
 use MagicAdmin\Entity\Data\WorkspaceMin;
+use MagicAdmin\Entity\Data\AdminMin;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
 
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -30,7 +33,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application", "Application");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application", $appLanguage->getApplication());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -42,36 +45,7 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 
 $dataFilter = null;
 
-if($inputPost->getUserAction() == UserAction::CREATE)
-{
-	$application = new Application(null, $database);
-	$application->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setProjectDirectory($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setBaseApplicationDirectory($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$application->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$application->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$application->setAdminCreate($currentAction->getUserId());
-	$application->setTimeCreate($currentAction->getTime());
-	$application->setIpCreate($currentAction->getIp());
-	$application->setAdminEdit($currentAction->getUserId());
-	$application->setTimeEdit($currentAction->getTime());
-	$application->setIpEdit($currentAction->getIp());
-	try
-	{
-		$application->insert();
-		$newId = $application->getApplicationId();
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->application_id, $newId);
-	}
-	catch(Exception $e)
-	{
-		$currentModule->redirectToItself();
-	}
-}
-else if($inputPost->getUserAction() == UserAction::UPDATE)
+if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->applicationId, $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
@@ -452,6 +426,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "workspace_id",
 			"objectName" => "workspace",
 			"propertyName" => "name"
+		), 
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
 		)
 		);
 		$application->findOne($specification, null, $subqueryMap);
@@ -521,11 +511,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $application->getAdminCreate();?></td>
+						<td><?php echo $application->issetCreator() ? $application->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $application->getAdminEdit();?></td>
+						<td><?php echo $application->issetEditor() ? $application->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
@@ -627,9 +617,76 @@ $subqueryMap = array(
 	"primaryKey" => "workspace_id",
 	"objectName" => "workspace",
 	"propertyName" => "name"
+), 
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
+	"propertyName" => "name"
 )
 );
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getApplicationId() => $headerFormat->getApplicationId(),
+		$appEntityLanguage->getName() => $headerFormat->getName(),
+		$appEntityLanguage->getDescription() => $headerFormat->asString(),
+		$appEntityLanguage->getArchitecture() => $headerFormat->asString(),
+		$appEntityLanguage->getWorkspace() => $headerFormat->asString(),
+		$appEntityLanguage->getProjectDirectory() => $headerFormat->getProjectDirectory(),
+		$appEntityLanguage->getBaseApplicationDirectory() => $headerFormat->getBaseApplicationDirectory(),
+		$appEntityLanguage->getAuthor() => $headerFormat->getAuthor(),
+		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
+		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
+		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
+		$appEntityLanguage->getAdminCreate() => $headerFormat->asString(),
+		$appEntityLanguage->getAdminEdit() => $headerFormat->asString(),
+		$appEntityLanguage->getIpCreate() => $headerFormat->getIpCreate(),
+		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
+		$appEntityLanguage->getActive() => $headerFormat->asString()
+	), 
+	function($index, $row, $appLanguage){
+		global $mapForArchitecture;
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getApplicationId(),
+			$row->getName(),
+			$row->getDescription(),
+			isset($mapForArchitecture) && isset($mapForArchitecture[$row->getArchitecture()]) && isset($mapForArchitecture[$row->getArchitecture()]["label"]) ? $mapForArchitecture[$row->getArchitecture()]["label"] : "",
+			$row->issetWorkspace() ? $row->getWorkspace()->getName() : "",
+			$row->getProjectDirectory(),
+			$row->getBaseApplicationDirectory(),
+			$row->getAuthor(),
+			$row->getSortOrder(),
+			$row->getTimeCreate(),
+			$row->getTimeEdit(),
+			$row->issetCreator() ? $row->getCreator()->getName() : "",
+			$row->issetEditor() ? $row->getEditor()->getName() : "",
+			$row->getIpCreate(),
+			$row->getIpEdit(),
+			$row->optionActive($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -677,10 +734,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
+				<?php if($userPermission->isAllowedDetail()){ ?>
 		
 				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -696,7 +753,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
 				        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
 				    )
-				    ->setMargin($dataControlConfig->getPageMargin())
+				    ->setRange($dataControlConfig->getPageRange())
 				    ;
 			?>
 			<div class="pagination pagination-top">
@@ -789,7 +846,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedSortOrder()){ ?>
-						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getSaveCurrentOrder();?></button>
+						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

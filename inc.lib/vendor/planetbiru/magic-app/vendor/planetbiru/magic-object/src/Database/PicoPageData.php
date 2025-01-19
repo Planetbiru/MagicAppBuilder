@@ -251,17 +251,17 @@ class PicoPageData // NOSONAR
      *
      * This method constructs an array of pagination controls based on the current page number and total pages.
      *
-     * @param int $margin Number of pages to show before and after the current page.
+     * @param int $range Number of pages to show before and after the current page.
      * @return self Returns the current instance for method chaining.
      */
-    public function generatePagination($margin = 3)
+    public function generatePagination($range = 3)
     {
-        $margin = max(1, $margin);
+        $range = max(1, $range);
         $curPage = $this->pageNumber;
         $totalPage = $this->totalPage;
 
-        $minPage = max(1, $curPage - $margin);
-        $maxPage = $this->byCountResult ? $totalPage : min($curPage + $margin, $totalPage);
+        $minPage = max(1, $curPage - $range);
+        $maxPage = $this->byCountResult ? $totalPage : min($curPage + $range, $totalPage);
 
         $this->pagination = array();
         for ($i = $minPage; $i <= $maxPage; $i++) {

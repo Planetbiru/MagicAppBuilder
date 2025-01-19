@@ -57,7 +57,7 @@ try {
     
     $list = glob($baseDir . "/*.php");
     $li = [];
-    $format1 = function($idx, $dir, $entity, $chk, $filetime) use ($dom) {
+    $format1 = function($idx, $dir, $entityName, $chk, $filetime) use ($dom) {
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
         
@@ -65,21 +65,23 @@ try {
         $input->setAttribute('type', 'checkbox');
         $input->setAttribute('class', 'entity-checkbox entity-checkbox-query');
         $input->setAttribute('name', "entity[$idx]");
-        $input->setAttribute('value', "$dir\\$entity");
+        $input->setAttribute('value', "$dir\\$entityName");
         if ($chk) {
             $input->setAttribute('checked', 'checked');
         }
+        
         
         // Add space after checkbox (using span with &nbsp;)
         $span = $dom->createElement('span');
         $span->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
         
-        $a = $dom->createElement('a', $entity);
+        $a = $dom->createElement('a', $entityName);
         $a->setAttribute('href', '#');
-        $a->setAttribute('data-entity-name', "$dir\\$entity");
+        $a->setAttribute('data-entity-name', "$dir\\$entityName");
         $a->setAttribute('data-toggle', 'tooltip');
         $a->setAttribute('data-placement', 'top');
         $a->setAttribute('data-title', $filetime);
+        $a->setAttribute('data-html', 'true');
         
         $li->appendChild($input);
         $li->appendChild($span); // Add space
@@ -88,7 +90,7 @@ try {
         return $li;
     };
     
-    $format2 = function($idx, $dir, $entity, $filetime) use ($dom) {
+    $format2 = function($idx, $dir, $entityName, $filetime) use ($dom) {
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li file-syntax-error');
         
@@ -96,7 +98,7 @@ try {
         $input->setAttribute('type', 'checkbox');
         $input->setAttribute('class', 'entity-checkbox entity-checkbox-query');
         $input->setAttribute('name', "entity[$idx]");
-        $input->setAttribute('value', "$dir\\$entity");
+        $input->setAttribute('value', "$dir\\$entityName");
         $input->setAttribute('disabled', 'disabled');
         $input->setAttribute('data-toggle', 'tooltip');
         $input->setAttribute('data-placement', 'top');
@@ -108,30 +110,34 @@ try {
         
         $li->appendChild($input);
         $li->appendChild($span); // Add space
-        $li->appendChild($dom->createTextNode($entity));
+        $li->appendChild($dom->createTextNode($entityName));
         
         return $li;
     };
     
 
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
+        $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($li[$tableName])) {
                 $li[$tableName] = [];
             }
-            $li[$tableName][] = $format1($idx, $dir, $entity, $chk, $filetime);
+
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
+            $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {
                 $li[$idx] = [];
             }
-            $li[$idx][] = $format2($idx, $dir, $entity, $filetime);
+            $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
         }
     }
 
@@ -158,23 +164,27 @@ try {
     $li = [];
 
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
+        $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($li[$tableName])) {
                 $li[$tableName] = [];
             }
-            $li[$tableName][] = $format1($idx, $dir, $entity, $chk, $filetime);
+
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
+            $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {
                 $li[$idx] = [];
             }
-            $li[$idx][] = $format2($idx, $dir, $entity, $filetime);
+            $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
         }
     }
     

@@ -11,7 +11,7 @@ $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE
 
 if(!isset($applicationId) || empty($applicationId))
 {
-    $applicationId = $builderConfig->getCurrentApplication()->getId();
+    $applicationId = $activeApplication->getApplicationId();
 }
 
 if($applicationId != null)
@@ -23,7 +23,7 @@ if($applicationId != null)
         $appConfig->loadYamlFile($appConfigPath, false, true, true);
     }
 }
-$menuPath = $appConfig->getApplication()->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
+$menuPath = $activeApplication->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
 if(!file_exists($menuPath))
 {
     if(!file_exists(basename($menuPath)))

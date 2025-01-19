@@ -20,6 +20,8 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\ErrorCache;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
 
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -27,7 +29,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "error-cache", "Error Cache");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "error-cache", $appLanguage->getErrorCache());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -48,7 +50,6 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$errorCache->setErrorCode($inputPost->getErrorCode(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$errorCache->setMessage($inputPost->getMessage(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$errorCache->setLineNumber($inputPost->getLineNumber(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$errorCache->setLastResetPassword($inputPost->getLastResetPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$errorCache->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$errorCache->setAdminCreate($currentAction->getUserId());
 	$errorCache->setTimeCreate($currentAction->getTime());
@@ -79,7 +80,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setErrorCode($inputPost->getErrorCode(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setMessage($inputPost->getMessage(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setLineNumber($inputPost->getLineNumber(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
-		->setLastResetPassword($inputPost->getLastResetPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
@@ -226,12 +226,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="datetime-local" name="last_reset_password" id="last_reset_password"/>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getActive();?></td>
 						<td>
 							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1"/> <?php echo $appEntityLanguage->getActive();?></label>
@@ -307,12 +301,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getLineNumber();?></td>
 						<td>
 							<input class="form-control" type="number" step="1" name="line_number" id="line_number" value="<?php echo $errorCache->getLineNumber();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>
-						<td>
-							<input class="form-control" type="datetime-local" name="last_reset_password" id="last_reset_password" value="<?php echo $errorCache->getLastResetPassword();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -413,10 +401,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $errorCache->getLineNumber();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>
-						<td><?php echo $errorCache->getLastResetPassword();?></td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
 						<td><?php echo $errorCache->getTimeCreate();?></td>
 					</tr>
@@ -490,7 +474,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new ErrorCache(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	
+	"fileName" => PicoSpecification::filter("fileName", "fulltext")
 );
 $sortOrderMap = array(
 	"fileName" => "fileName",
@@ -499,7 +483,6 @@ $sortOrderMap = array(
 	"errorCode" => "errorCode",
 	"message" => "message",
 	"lineNumber" => "lineNumber",
-	"lastResetPassword" => "lastResetPassword",
 	"active" => "active"
 );
 
@@ -511,13 +494,69 @@ $specification->addAnd($dataFilter);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "modificationTime", 
+		"sortType" => PicoSort::ORDER_TYPE_DESC
+	),
+	array(
+		"sortBy" => "fileName", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new ErrorCache(null, $database);
 
 $subqueryMap = null;
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getErrorCacheId() => $headerFormat->getErrorCacheId(),
+		$appEntityLanguage->getFileName() => $headerFormat->getFileName(),
+		$appEntityLanguage->getFilePath() => $headerFormat->getFilePath(),
+		$appEntityLanguage->getModificationTime() => $headerFormat->getModificationTime(),
+		$appEntityLanguage->getErrorCode() => $headerFormat->getErrorCode(),
+		$appEntityLanguage->getMessage() => $headerFormat->getMessage(),
+		$appEntityLanguage->getLineNumber() => $headerFormat->getLineNumber(),
+		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
+		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
+		$appEntityLanguage->getAdminCreate() => $headerFormat->getAdminCreate(),
+		$appEntityLanguage->getAdminEdit() => $headerFormat->getAdminEdit(),
+		$appEntityLanguage->getIpCreate() => $headerFormat->getIpCreate(),
+		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
+		$appEntityLanguage->getActive() => $headerFormat->asString()
+	), 
+	function($index, $row, $appLanguage){
+		
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getErrorCacheId(),
+			$row->getFileName(),
+			$row->getFilePath(),
+			$row->getModificationTime(),
+			$row->getErrorCode(),
+			$row->getMessage(),
+			$row->getLineNumber(),
+			$row->getTimeCreate(),
+			$row->getTimeEdit(),
+			$row->getAdminCreate(),
+			$row->getAdminEdit(),
+			$row->getIpCreate(),
+			$row->getIpEdit(),
+			$row->optionActive($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -527,8 +566,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getFileName();?></span>
+					<span class="filter-control">
+						<input type="text" name="file_name" class="form-control" value="<?php echo $inputGet->getFileName();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
+				<?php if($userPermission->isAllowedDetail()){ ?>
+		
+				<span class="filter-group">
+					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
+				</span>
+				<?php } ?>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
@@ -548,7 +600,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
 				        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
 				    )
-				    ->setMargin($dataControlConfig->getPageMargin())
+				    ->setRange($dataControlConfig->getPageRange())
 				    ;
 			?>
 			<div class="pagination pagination-top">
@@ -583,7 +635,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="error_code" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getErrorCode();?></a></td>
 								<td data-col-name="message" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getMessage();?></a></td>
 								<td data-col-name="line_number" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLineNumber();?></a></td>
-								<td data-col-name="last_reset_password" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLastResetPassword();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -619,7 +670,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="error_code"><?php echo $errorCache->getErrorCode();?></td>
 								<td data-col-name="message"><?php echo $errorCache->getMessage();?></td>
 								<td data-col-name="line_number"><?php echo $errorCache->getLineNumber();?></td>
-								<td data-col-name="last_reset_password"><?php echo $errorCache->getLastResetPassword();?></td>
 								<td data-col-name="active"><?php echo $errorCache->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 

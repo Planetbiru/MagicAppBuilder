@@ -12,6 +12,7 @@ if ($appConfig->getApplication() == null) {
     exit();
 }
 
+
 try {
     $inputGet = new InputGet();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
@@ -41,9 +42,9 @@ try {
 
     // Process each file
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
+        $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
@@ -51,15 +52,17 @@ try {
 
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
+            
+            
 
             // Create the checkbox input
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
             $input->setAttribute('name', sprintf($nameFormat, $idx));
-            $input->setAttribute('value', $dir . '\\' . $entity);
+            $input->setAttribute('value', $dir . '\\' . $entityName);
             if ($inputGet->getAutoload() == 'true') {
                 $input->setAttribute('checked', 'checked');
             }
@@ -67,13 +70,18 @@ try {
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
+
             // Create the link (a) element
-            $a = $dom->createElement('a', $entity);
+            $a = $dom->createElement('a', $entityName);
             $a->setAttribute('href', '#');
-            $a->setAttribute('data-entity-name', $dir . '\\' . $entity);
+            $a->setAttribute('data-entity-name', $dir . '\\' . $entityName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
-            $a->setAttribute('data-title', $filetime);
+            $a->setAttribute('data-title', $title);
+            $a->setAttribute('data-html', 'true');            
 
             // Append the input, whitespace, and a elements to the li element
             $li->appendChild($input);
@@ -89,17 +97,18 @@ try {
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
             $input->setAttribute('name', sprintf($nameFormat, $idx));
-            $input->setAttribute('value', $dir . '\\' . $entity);
+            $input->setAttribute('value', $dir . '\\' . $entityName);
             $input->setAttribute('disabled', 'disabled');
             $input->setAttribute('data-toggle', 'tooltip');
             $input->setAttribute('data-placement', 'top');
             $input->setAttribute('data-title', $filetime);
+            
 
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
             // Create the span element for entity name
-            $span = $dom->createElement('span', $entity);
+            $span = $dom->createElement('span', $entityName);
 
             // Append the input, whitespace, and span elements to the li element
             $li->appendChild($input);
@@ -133,9 +142,9 @@ try {
     $liElements = [];
 
     foreach ($list as $idx => $file) {
-        $entity = basename($file, '.php');
+        $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($cacheDir, $file);
+        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
 
         // Create <li> elements for valid app files
         $li = $dom->createElement('li');
@@ -143,15 +152,15 @@ try {
 
         if ($return_var === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
-            $tableInfo = EntityUtil::getTableName($file);
-            $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+            $entityInfo = EntityUtil::getTableName($file);
+            $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
 
             // Create the checkbox input
             $input = $dom->createElement('input');
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
             $input->setAttribute('name', sprintf($nameFormat, $idx));
-            $input->setAttribute('value', $dir . '\\' . $entity);
+            $input->setAttribute('value', $dir . '\\' . $entityName);
             if ($inputGet->getAutoload() == 'true') {
                 $input->setAttribute('checked', 'checked');
             }
@@ -159,13 +168,18 @@ try {
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
+            $className = "\\".$baseEntity."\\".$entityName;
+            $path = $baseDir."/".$entityName.".php";
+            $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
+
             // Create the link (a) element
-            $a = $dom->createElement('a', $entity);
+            $a = $dom->createElement('a', $entityName);
             $a->setAttribute('href', '#');
-            $a->setAttribute('data-entity-name', $dir . '\\' . $entity);
+            $a->setAttribute('data-entity-name', $dir . '\\' . $entityName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
-            $a->setAttribute('data-title', $filetime);
+            $a->setAttribute('data-title', $title);
+            $a->setAttribute('data-html', 'true');
 
             // Append the input, whitespace, and a elements to the li element
             $li->appendChild($input);
@@ -181,7 +195,7 @@ try {
             $input->setAttribute('type', 'checkbox');
             $input->setAttribute('class', 'entity-checkbox');
             $input->setAttribute('name', sprintf($nameFormat, $idx));
-            $input->setAttribute('value', $dir . '\\' . $entity);
+            $input->setAttribute('value', $dir . '\\' . $entityName);
             $input->setAttribute('disabled', 'disabled');
             $input->setAttribute('data-toggle', 'tooltip');
             $input->setAttribute('data-placement', 'top');
@@ -191,7 +205,7 @@ try {
             $whitespace = $dom->createTextNode(' ');
 
             // Create the span element for entity name
-            $span = $dom->createElement('span', $entity);
+            $span = $dom->createElement('span', $entityName);
 
             // Append the input, whitespace, and span elements to the li element
             $li->appendChild($input);

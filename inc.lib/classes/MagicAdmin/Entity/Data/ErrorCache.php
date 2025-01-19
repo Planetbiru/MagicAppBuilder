@@ -27,7 +27,7 @@ class ErrorCache extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="error_cache_id", type="varchar(2048)", length=2048, nullable=false)
+	 * @Column(name="error_cache_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Error Cache ID")
 	 * @var string
 	 */
@@ -86,15 +86,6 @@ class ErrorCache extends MagicObject
 	 * @var int
 	 */
 	protected $lineNumber;
-
-	/**
-	 * Last Reset Password
-	 * 
-	 * @Column(name="last_reset_password", type="timestamp", length=19, nullable=true)
-	 * @Label(content="Last Reset Password")
-	 * @var string
-	 */
-	protected $lastResetPassword;
 
 	/**
 	 * Time Create

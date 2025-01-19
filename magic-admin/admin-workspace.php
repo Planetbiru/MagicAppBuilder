@@ -405,6 +405,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "workspace_id",
 			"objectName" => "workspace",
 			"propertyName" => "name"
+		), 
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
 		)
 		);
 		$adminWorkspace->findOne($specification, null, $subqueryMap);
@@ -451,11 +467,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $adminWorkspace->getAdminCreate();?></td>
+						<td><?php echo $adminWorkspace->issetCreator() ? $adminWorkspace->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $adminWorkspace->getAdminEdit();?></td>
+						<td><?php echo $adminWorkspace->issetEditor() ? $adminWorkspace->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
@@ -533,7 +549,12 @@ $specification->addAnd($dataFilter);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new AdminWorkspace(null, $database);
@@ -553,6 +574,22 @@ $subqueryMap = array(
 	"tableName" => "workspace",
 	"primaryKey" => "workspace_id",
 	"objectName" => "workspace",
+	"propertyName" => "name"
+), 
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
 	"propertyName" => "name"
 )
 );
@@ -623,7 +660,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
 				        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
 				    )
-				    ->setMargin($dataControlConfig->getPageMargin())
+				    ->setRange($dataControlConfig->getPageRange())
 				    ;
 			?>
 			<div class="pagination pagination-top">
@@ -712,7 +749,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedSortOrder()){ ?>
-						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getSaveCurrentOrder();?></button>
+						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

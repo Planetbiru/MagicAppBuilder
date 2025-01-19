@@ -471,7 +471,7 @@ jQuery(function () {
           magic_app_version: magic_app_version
         },
         success: function (data) {
-          reloadApplicationList();
+          loadAllResource();
         },
         error: function (e1, e2) {
         }
@@ -808,7 +808,7 @@ jQuery(function () {
             new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
           );
         }
-        reloadApplicationList();
+        loadAllResource();
         createBtn[0].disabled = false;
       }
     });
@@ -927,6 +927,7 @@ jQuery(function () {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
+
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
@@ -1100,7 +1101,7 @@ jQuery(function () {
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
-        reloadApplicationList();
+        loadAllResource();
         updateBtn[0].disabled = false;
       }
     });
@@ -1138,7 +1139,7 @@ jQuery(function () {
       dataType: 'html',
       success: function (data) {
         $('#modal-application-menu .modal-body').empty().append(data);
-        reloadApplicationList();
+        loadAllResource();
         updateBtn[0].disabled = false;
         initMenu();
       }
@@ -1232,7 +1233,7 @@ jQuery(function () {
       url: 'lib.ajax/workspace-scan.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1245,7 +1246,7 @@ jQuery(function () {
       url: 'lib.ajax/workspace-default.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
-        reloadApplicationList();
+        onSetDefaultWorkspace();
       }
     });
   });
@@ -1258,7 +1259,7 @@ jQuery(function () {
       url: 'lib.ajax/application-default.php',
       data: { applicationId: applicationId },
       success: function (data) {
-        reloadApplicationList();
+        onSetDefaultApplication();
       }
     });
   });
@@ -1268,10 +1269,15 @@ jQuery(function () {
     let path = $(this).closest('.application-item').attr('data-path');
     window.location = 'vscode://file/' + path;
   });
+  $(document).on('click', '.button-workspace-open', function (e) {
+    e.preventDefault();
+    let path = $(this).closest('.workspace-item').attr('data-path');
+    window.location = 'vscode://file/' + path;
+  });
 
   $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
-    reloadApplicationList();
+    loadAllResource();
   });
 
   $(document).on('click', '.button-save-workspace', function (e) {
@@ -1287,7 +1293,7 @@ jQuery(function () {
       data: { workspaceName: workspaceName, workspaceDirectory:workspaceDirectory, workspaceDescription:workspaceDescription, phpPath:phpPath },
       success: function (data) {
         modal.modal('hide');
-        reloadApplicationList();
+        loadAllResource();
       }
     });
   });
@@ -1407,6 +1413,49 @@ jQuery(function () {
     })
   });
 
+  loadAllResource();
+  
+});
+
+function loadWorkspaceList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/workspace-list.php',
+    success: function (data) {
+      $('.workspace-card').empty().append(data);
+    }
+  });
+}
+
+function loadApplicationList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-list.php',
+    success: function (data) {
+      $('.application-card').empty().append(data);
+    }
+  });
+}
+
+function loadLanguageList()
+{
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-path-list.php',
+    dataType: 'json',
+    success: function (data) {
+      $('[name="current_module_location"]').empty();
+      for (let i in data) {
+        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
+      }
+    }
+  });
+}
+
+function loadPathList()
+{
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-language-list.php',
@@ -1415,8 +1464,33 @@ jQuery(function () {
       setLanguage(data);
     }
   });
+}
 
-  reloadApplicationList();
+function loadAllResource()
+{
+  loadWorkspaceList();
+  loadApplicationList();
+  loadTable();
+  loadPathList();
+  loadLanguageList();
+
+  loadMenu();
+  updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
+  updateEntityFile();
+  updateModuleFile();
+  initTooltip();
+}
+
+function onSetDefaultWorkspace()
+{
+  loadWorkspaceList();
+  loadApplicationList();
+}
+
+function onSetDefaultApplication()
+{
+  loadApplicationList();
   loadTable();
   loadMenu();
   updateEntityQuery(false);
@@ -1424,18 +1498,33 @@ jQuery(function () {
   updateEntityFile();
   updateModuleFile();
   initTooltip();
-});
+  
+}
+
+function onModuleCreated()
+{
+  updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
+  updateEntityFile();
+  updateModuleFile();
+  initTooltip();
+}
 
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
     let tooltip = $('<div class="tooltip"></div>').html(tooltipText); // Create the tooltip
+    let isHtml = $(this).attr('data-html') == 'true';
 
     // Append the tooltip to the body and make it visible
     $('body').append(tooltip);
 
     // Show the tooltip when the area element is hovered
     tooltip.addClass('visible');
+    if(isHtml)
+    {
+      tooltip.addClass('multiline');
+    }
 
     // Calculate tooltip position based on the cursor coordinates
     $(document).on('mousemove', function (e) {
@@ -1774,60 +1863,7 @@ function moveDown(element) {
   }
 }
 
-/**
- * Reloads the application and path lists via AJAX requests.
- *
- * This function performs two AJAX GET requests:
- * 1. It fetches the application list from `lib.ajax/application-list.php`
- *    and updates the content of elements with the class `application-card`.
- * 2. It retrieves the path list from `lib.ajax/application-path-list.php`, expecting
- *    a JSON response, and populates a select element named
- *    `current_module_location` with options based on the retrieved data.
- *
- * Each option displays the module name and its corresponding path,
- * with the ability to set the active state of the options based on the
- * `active` property in the JSON response.
- *
- * @returns {void} This function does not return a value.
- */
-function reloadApplicationList() {
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-list.php',
-    success: function (data) {
-      $('.application-card').empty().append(data);
-    }
-  });
-  
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/workspace-list.php',
-    success: function (data) {
-      $('.workspace-card').empty().append(data);
-    }
-  });
 
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-path-list.php',
-    dataType: 'json',
-    success: function (data) {
-      $('[name="current_module_location"]').empty();
-      for (let i in data) {
-        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
-      }
-    }
-  });
-
-  $.ajax({
-    type: 'GET',
-    url: 'lib.ajax/application-language-list.php',
-    dataType: 'json',
-    success: function (data) {
-      setLanguage(data);
-    }
-  });
-}
 
 /**
  * Reloads translations based on the specified context.
@@ -3072,13 +3108,13 @@ function generateAllCode(dataToPost) {
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
       if (data.success) {
+        onModuleCreated();
         showAlertUI(data.title, data.message);
         setTimeout(function () { closeAlertUI() }, 2000);
       }
     },
   });
 }
-
 
 /**
  * Updates the current application by fetching and populating source tables.
@@ -3105,7 +3141,7 @@ function updateCurrentApplivation(dataToPost) {
       if (val != null && val != "") {
         $('select[name="source_table"]').val(val);
       }
-      reloadApplicationList();
+      loadAllResource();
     }
   });
 }

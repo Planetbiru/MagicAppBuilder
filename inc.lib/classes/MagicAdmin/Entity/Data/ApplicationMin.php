@@ -27,7 +27,7 @@ class ApplicationMin extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=false)
 	 * @Label(content="Application ID")
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class ApplicationMin extends MagicObject
 	/**
 	 * Workspace ID
 	 * 
-	 * @Column(name="workspace_id", type="varchar(255)", length=255, nullable=true)
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Workspace ID")
 	 * @var string
 	 */

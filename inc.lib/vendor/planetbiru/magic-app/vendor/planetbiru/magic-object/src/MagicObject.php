@@ -11,6 +11,7 @@ use MagicObject\Database\PicoDatabasePersistence;
 use MagicObject\Database\PicoDatabasePersistenceExtended;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoDatabaseQueryTemplate;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoSort;
@@ -1801,12 +1802,13 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+
+                    $match = $this->countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
                 else
                 {
-                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+                    $match = $this->countDataCustom($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData->setFindOption($findOption);
@@ -1891,12 +1893,12 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+                    $match = $this->countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
                 else
                 {
-                    $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+                    $match = $this->countDataCustom($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, null, $stmt, $this, $subqueryMap);
                 }
                 return $pageData->setFindOption($findOption);
@@ -1918,6 +1920,56 @@ class MagicObject extends stdClass // NOSONAR
         {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
+    }
+
+    /**
+     * Counts the total number of records for a given query, with special handling for SQLite.
+     * 
+     * @param PicoDatabasePersistence $persist The persistence object to interact with the database.
+     * @param PicoSpecification|null $specification The specification used to filter the results.
+     * @param PicoPageable|string|null $pageable Pagination information.
+     * @param PicoSortable|string|null $sortable Sorting information.
+     * @param int $findOption The find option flag indicating how the query should be executed.
+     * @param mixed $result The result set to count.
+     * 
+     * @return int The total number of matching records.
+     */
+    private function countDataCustom($persist, $specification, $pageable, $sortable, $findOption, $result)
+    {
+        if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $match = isset($result) && is_array($result) ? count($result) : 1;
+        }
+        else
+        {
+            $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+        }
+        return $match;
+    }
+
+    /**
+     * Counts the total number of records for a given query with pagination, with special handling for SQLite.
+     * 
+     * @param PicoDatabasePersistence $persist The persistence object to interact with the database.
+     * @param PicoSpecification|null $specification The specification used to filter the results.
+     * @param PicoPageable|string|null $pageable Pagination information.
+     * @param PicoSortable|string|null $sortable Sorting information.
+     * @param int $findOption The find option flag indicating how the query should be executed.
+     * @param mixed $result The result set to count.
+     * 
+     * @return int The total number of matching records considering pagination.
+     */
+    private function countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result)
+    {
+        if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
+        }
+        else
+        {
+            $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
+        }
+        return $match;
     }
 
     /**
@@ -2700,12 +2752,19 @@ class MagicObject extends stdClass // NOSONAR
             }
             if(!empty($var) && !isset($this->_label[$var]))
             {
-                $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
-                $parameters = $reflexProp->getParameters();
-                if(isset($parameters['Label']))
+                try
                 {
-                    $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
-                    $this->_label[$var] = $label->getContent();
+                    $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
+                    $parameters = $reflexProp->getParameters();
+                    if(isset($parameters['Label']))
+                    {
+                        $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
+                        $this->_label[$var] = $label->getContent();
+                    }
+                }
+                catch(Exception $e)
+                {
+                    $this->_label[$var] = PicoStringUtil::camelToTitle($var);
                 }
             }
             if(isset($this->_label[$var]))

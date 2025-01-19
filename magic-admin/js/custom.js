@@ -330,7 +330,7 @@ function splitWithTail(str, delimiter, count) {
 
 /**
  * Initializes notifications in the dropdown menu.
- * @param {Array} notifications Array of notification objects containing message, time, and link.
+ * @param {Array} notifications Array of notification objects containing title, time, and link.
  */
 function initNotifications(notifications) {
   const notificationMenu = document.querySelector('#notificationMenu');
@@ -338,7 +338,7 @@ function initNotifications(notifications) {
       const a = document.createElement('a');
       a.className = 'dropdown-item';
       a.href = notification.link;
-      a.innerHTML = `${notification.message} <small class="text-muted">${notification.time}</small>`;
+      a.innerHTML = `${notification.title} <small class="text-muted">${notification.time}</small>`;
       a.dataset.id = notification.id; // Adding ID to the notification item
       notificationMenu.appendChild(a);
   });
@@ -356,7 +356,7 @@ function initNotifications(notifications) {
 
 /**
  * Initializes messages in the dropdown menu.
- * @param {Array} messages Array of message objects containing message, time, and link.
+ * @param {Array} messages Array of message objects containing title, time, and link.
  */
 function initMessages(messages) {
   const messageMenu = document.querySelector('#messageMenu');
@@ -364,7 +364,7 @@ function initMessages(messages) {
       const a = document.createElement('a');
       a.className = 'dropdown-item';
       a.href = message.link;
-      a.innerHTML = `${message.message} <small class="text-muted">${message.time}</small>`;
+      a.innerHTML = `${message.title} <small class="text-muted">${message.time}</small>`;
       a.dataset.id = message.id; // Adding ID to the message item
       messageMenu.appendChild(a);
   });

@@ -23,7 +23,6 @@ if($inputPost->getConfig() != null)
     {
         mkdir(dirname($path), 0755, true);
     }
-    error_log($path);
     file_put_contents($path, $config);
     ResponseUtil::sendJSON([]);
 }
@@ -35,7 +34,6 @@ else
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
     $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
-    error_log($path);
     if(!file_exists($path))
     {
         $json = [

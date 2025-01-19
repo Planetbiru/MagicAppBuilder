@@ -47,7 +47,14 @@
             }
         ],
         "allowed_actions": [
-            "update", "delete"
+            {
+                "label": "Approve",
+                "value": "approve"
+            },
+            {
+                "label": "Reject",
+                "value": "reject"
+            }
         ],
         "waiting_for": {
             "label": "none",

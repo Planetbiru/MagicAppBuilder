@@ -39,4 +39,5 @@ try {
     echo $e->getMessage();
     exit();
 }
+$accessedFrom = "magic-database";
 require_once dirname(__DIR__) . "/database-explorer/database-explorer.php";

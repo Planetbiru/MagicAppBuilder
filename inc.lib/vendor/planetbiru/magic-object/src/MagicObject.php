@@ -1802,7 +1802,6 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-
                     $match = $this->countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
@@ -1963,7 +1962,19 @@ class MagicObject extends stdClass // NOSONAR
     {
         if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
-            $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
+            if($findOption & self::FIND_OPTION_NO_FETCH_DATA)
+            {
+                $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
+            }
+            else
+            {
+                $resultCount = count($result);
+                if($resultCount == $pageable->getPage()->getPageSize())
+                {
+                    $resultCount++;
+                }
+                $match = $pageable->getPage()->getOffset() + $resultCount;
+            }
         }
         else
         {
@@ -2752,12 +2763,19 @@ class MagicObject extends stdClass // NOSONAR
             }
             if(!empty($var) && !isset($this->_label[$var]))
             {
-                $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
-                $parameters = $reflexProp->getParameters();
-                if(isset($parameters['Label']))
+                try
                 {
-                    $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
-                    $this->_label[$var] = $label->getContent();
+                    $reflexProp = new PicoAnnotationParser(get_class($this), $var, PicoAnnotationParser::PROPERTY);
+                    $parameters = $reflexProp->getParameters();
+                    if(isset($parameters['Label']))
+                    {
+                        $label = $reflexProp->parseKeyValueAsObject($parameters['Label']);
+                        $this->_label[$var] = $label->getContent();
+                    }
+                }
+                catch(Exception $e)
+                {
+                    $this->_label[$var] = PicoStringUtil::camelToTitle($var);
                 }
             }
             if(isset($this->_label[$var]))

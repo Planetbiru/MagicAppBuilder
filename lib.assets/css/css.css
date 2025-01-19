@@ -416,7 +416,8 @@ li.file-syntax-error a {
   box-shadow: 0 0 0 0.2rem rgba(168, 54, 54, 0.1215686275);
 }
 
-.target-language, .filter-translate {
+.target-language,
+.filter-translate {
   display: inline;
   width: auto;
 }
@@ -429,11 +430,13 @@ li.file-syntax-error a {
   padding: 2px 0px 10px 0px;
 }
 
-.application-container, .workspace-container {
+.application-container,
+.workspace-container {
   padding-left: 0;
   padding-right: 0;
 }
-.application-container .card .card-text, .workspace-container .card .card-text {
+.application-container .card .card-text,
+.workspace-container .card .card-text {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -449,7 +452,8 @@ li.file-syntax-error a {
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-.table td, .table th {
+.table td,
+.table th {
   padding: 0.4rem 0.5rem;
 }
 
@@ -462,13 +466,16 @@ h3.entity-table-name {
   margin-bottom: 20px;
 }
 
-.workspace-card > div, .application-card > div {
+.workspace-card > div,
+.application-card > div {
   margin-bottom: 1rem;
 }
-.workspace-card .card-body, .application-card .card-body {
+.workspace-card .card-body,
+.application-card .card-body {
   padding-bottom: 0.8rem;
 }
-.workspace-card .card-body .btn, .application-card .card-body .btn {
+.workspace-card .card-body .btn,
+.application-card .card-body .btn {
   margin-bottom: 0.45rem;
 }
 
@@ -504,7 +511,11 @@ h3.entity-table-name {
 }
 
 .entity-column-selected {
-  background-color: #EEEEEE;
+  background-color: #FDF3F3;
+}
+
+.entity-column-primary-key {
+  background-color: #e8faff;
 }
 
 .animation-wave,
@@ -704,11 +715,13 @@ h3.entity-table-name {
   font-size: 0.95rem;
 }
 
-.nonfile-base, .file-base {
+.nonfile-base,
+.file-base {
   display: none;
 }
 
-.nonfile-base[data-current-database-type=nonfile-base], .file-base[data-current-database-type=file-base] {
+.nonfile-base[data-current-database-type=nonfile-base],
+.file-base[data-current-database-type=file-base] {
   display: table-row;
 }
 
@@ -743,6 +756,31 @@ input[type=number][name=database_port] {
 .tooltip.visible {
   visibility: visible;
   opacity: 1;
+}
+
+.tooltip.multiline {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  height: auto !important;
+}
+.tooltip.multiline .horizontal-line {
+  border-top: 1px solid #262626;
+  border-bottom: 1px solid #535353;
+  height: 1px;
+  margin-top: 4px;
+}
+.tooltip.multiline table tr td {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  line-height: 0.85;
+}
+.tooltip.multiline table tr td[colspan="2"] {
+  text-align: center;
+  padding: 4px 0 2px 0;
+  font-weight: bold;
+}
+.tooltip.multiline table tr > td:first-child {
+  padding-right: 5px;
 }
 
 .tooltip-top {

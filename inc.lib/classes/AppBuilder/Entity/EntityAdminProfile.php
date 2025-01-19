@@ -114,4 +114,14 @@ class EntityAdminProfile extends MagicObject
 	 */
 	protected $ipEdit;
 
+	/**
+	 * Active
+	 * 
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Active")
+	 * @var bool
+	 */
+	protected $active;
+
 }

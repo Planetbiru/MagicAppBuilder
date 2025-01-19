@@ -22,13 +22,22 @@ try
         $path = $baseDir."/".$entityName.".php";
         if(file_exists($path))
         {
-            $return_var = ErrorChecker::errorCheck($cacheDir, $path);
+            $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
             if($return_var == 0)
             {
                 include_once $path;                  
                 $entity = new $className(null, null);
                 $tableInfo = $entity->tableInfo();
                 $columns = $tableInfo->getColumns();
+                $primaryKeys = $tableInfo->getPrimaryKeys();
+                $pkeys = [];
+                if(isset($primaryKeys) && is_array($primaryKeys))
+                {
+                    foreach($primaryKeys as $primaryKey)
+                    {
+                        $pkeys[] = $primaryKey['name'];
+                    }
+                }
                 ?>
                 <h3 class="entity-table-name">Entity Name: <?php echo $entityName;?></h3>
                 <h3 class="entity-table-name">Table Name: <?php echo $tableInfo->getTableName();?></h3>
@@ -52,7 +61,7 @@ try
                 {
                     $no++;
                     ?>
-                        <tr>
+                        <tr class="entity-column<?php echo in_array($column['name'], $pkeys) ? ' entity-column-primary-key' : '';?>">
                             <td align="right"><?php echo $no;?></td>
                             <td><?php echo $column['name'];?></td>
                             <td><?php echo $column['type'];?></td>

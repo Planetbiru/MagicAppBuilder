@@ -44,7 +44,7 @@ try {
                 $target = "/" . $target;
             }
 
-            $baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
+            $baseDirectory = $activeApplication->getBaseApplicationDirectory();
             $dir = $baseDirectory . "$target";
             $pattern = $baseDirectory . "$target/*.php";
             $list = glob($pattern);
@@ -56,7 +56,7 @@ try {
 
             foreach ($list as $file) {
                 $module = basename($file, '.php');
-                $filetime = date('Y-m-d H:i:s', filemtime($file));
+                $filetime = 'Last Update '.date('Y-m-d H:i:s', filemtime($file));
                 $path = str_replace("\\", "//", trim($target . '/' . $module, "//")) . ".php";
 
                 // Create list item with checkbox for each file

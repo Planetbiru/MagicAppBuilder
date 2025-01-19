@@ -1,0 +1,70 @@
+{
+    "response_code": "0001",
+    "response_text": "Success",
+    "primary_key_name": "pekerjaanId",
+    "primary_key_value": "01",
+    "data": {
+        "header": [
+            {
+                "field": "pekerjaanId",
+                "label": "Pekerjaan",
+                "sort": "ASC"
+            },
+            {
+                "field": "acuanPengawasanId",
+                "label": "Acuan Pengawasan"
+                
+            },
+            {
+                "field": "tanggal",
+                "label": "Tanggal"
+                
+            },
+            {
+                "field": "aktif",
+                "label": "Aktif"
+            }
+        ],
+        "list": [
+            {
+                "data": {
+                    "pekerjaanId": 1,
+                    "acuanPengawasanId": 1,
+                    "tanggal": "2024-01-01 00:00:00",
+                    "aktif": "Yes"
+                },
+                "waitingFor": {
+                    "label": "none",
+                    "value": 0
+                }
+                
+            },
+            {
+                "data": {
+                    "pekerjaanId": 2,
+                    "acuanPengawasanId": 1,
+                    "tanggal": "2024-01-02 00:00:00",
+                    "aktif": "Yes"
+                }
+            },
+            {
+                "data": {
+                    "pekerjaanId": 4,
+                    "acuanPengawasanId": 1,
+                    "tanggal": "2024-01-04 00:00:00",
+                    "aktif": "Yes"
+                }
+            }
+        ],
+        "allowed_actions": [
+            {
+                "label": "Approve",
+                "value": "approve"
+            },
+            {
+                "label": "Reject",
+                "value": "reject"
+            }
+        ]
+    }
+}

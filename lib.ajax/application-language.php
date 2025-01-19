@@ -12,7 +12,7 @@ if($inputPost->getAction() == "update")
 {
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
         
         $languages = $inputPost->getLanguages();
@@ -55,7 +55,7 @@ else if($inputPost->getAction() == "get")
 {
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
@@ -75,7 +75,7 @@ else if($inputPost->getAction() == "default")
     $selected = $inputPost->getSelectedLanguage();
     try
     {
-        $appId = $builderConfig->getCurrentApplication()->getId();
+        $appId = $activeApplication->getApplicationId();
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
 
         $currentLanguages = $appConfig->getLanguages();

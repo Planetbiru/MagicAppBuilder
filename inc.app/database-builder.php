@@ -10,31 +10,95 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
 $databaseConfigBuilder = $builderConfig->getDatabase();
-
-if($databaseConfigBuilder != null &&  ($databaseConfigBuilder->getDriver() == PicoDatabaseType::DATABASE_TYPE_SQLITE && $databaseConfigBuilder->getDatabaseFilePath()))
+$databaseConfigured = false;
+$installed = false;
+if($databaseConfigBuilder != null)
 {
-    $installed = true;
-    if(!file_exists($databaseConfigBuilder->getDatabaseFilePath()))
+    if($databaseConfigBuilder->getDriver() == PicoDatabaseType::DATABASE_TYPE_SQLITE && $databaseConfigBuilder->getDatabaseFilePath())
     {
-        $installed = false;
+        $installed = true;
+        if(!file_exists($databaseConfigBuilder->getDatabaseFilePath()))
+        {
+            $installed = false;
+        }
+        $databaseBuilder = new PicoDatabase($databaseConfigBuilder);
+        $databaseConfigured = true;
     }
+    else
+    {
+        $databaseBuilder = new PicoDatabase($databaseConfigBuilder);
+        $databaseConfigured = true;
+    }
+}
 
-    $databaseBuilder = new PicoDatabase($databaseConfigBuilder, null, function($sql){
-        //echo $sql."\r\n\r\n";
-    });
-    
+if($databaseConfigured)
+{
     try
     {
-        $databaseBuilder->connect();
-
-        
-        if(!$installed)
+        if($databaseBuilder->getDatabaseType() != PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
             try
             {
-                $appInstaller = new AppInstaller();
+                $databaseBuilder->connect();
+            }
+            catch(Exception $e)
+            {
+                try
+                {
+                    $databaseBuilder->connect(false);
+                    $databaseBuilder->query("CREATE DATABASE ".$databaseConfigBuilder->getDatabaseName());
+                    $databaseBuilder->disconnect();
+                    $databaseBuilder->connect();
+                }
+                catch(Exception $e)
+                {
+                    error_log($e->getMessage());
+                }
+            }
+        }
+        else
+        {
+            $databaseBuilder->connect();
+        }
+        
+        $appInstaller = new AppInstaller();
 
-                $sql = $appInstaller->generateInstallerQuery($databaseBuilder, $cacheDir);
+        if($databaseBuilder->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL)
+        {
+            $ad = new EntityAdmin(null);
+            $tableName = $ad->tableInfo()->getTableName();
+            $schemaName = $databaseConfigBuilder->getDatabaseSchema();
+            $sql = "SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = '$schemaName'  
+                AND table_name = '$tableName'
+            )";
+            $stmt = $databaseBuilder->query($sql);
+            $installed = $stmt->rowCount() > 0;
+        }
+        else if($databaseBuilder->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL 
+        || $databaseBuilder->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB)
+        {
+            $ad = new EntityAdmin(null);
+            $tableName = $ad->tableInfo()->getTableName();
+            $schemaName = $databaseConfigBuilder->getDatabaseName();
+            $sql = "SELECT COUNT(*)
+                FROM information_schema.tables
+                WHERE table_schema = '$schemaName' 
+                AND table_name = '$tableName';";
+            $res = $databaseBuilder->fetch($sql, PDO::FETCH_COLUMN);
+            $installed = $res > 0;
+        }
+
+        
+        if(!$installed && $databaseBuilder->isConnected())
+        {
+            try
+            {
+                
+
+                $sql = $appInstaller->generateInstallerQuery($databaseBuilder);
                 $queries = PicoDatabaseUtil::splitSql($sql);
                 try
                 {

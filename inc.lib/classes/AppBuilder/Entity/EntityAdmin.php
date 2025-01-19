@@ -117,7 +117,7 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Application ID
 	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Application ID")
 	 * @var string
 	 */
@@ -180,7 +180,7 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Bloked
 	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
 	 * @DefaultColumn(value="false")
 	 * @Label(content="Bloked")
 	 * @var bool

@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnTableExport != null)
     {
         btnTableExport.addEventListener('click', function(event) {
+            let tableName = event.target.getAttribute('value');
             event.preventDefault();
             showConfirmationDialog('Are you sure you want to export the data from the table?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
                 if (isConfirmed) {
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = '___export_table___';
-                    hiddenInput.value = 'true';
+                    hiddenInput.value = tableName;
                     event.target.closest('form').appendChild(hiddenInput);
                     event.target.closest('form').submit();  // Submit the form containing the button 
                     event.target.closest('form').removeChild(hiddenInput);
@@ -569,15 +570,15 @@ function fetchConfigFromServer(applicationId, databaseType, databaseName, databa
 function buildUrl(type, applicationId, databaseType, databaseName, databaseSchema, entities) {
     if(type == 'template')
     {
-        return `lib.ajax/load-template-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+        return `../lib.ajax/load-template-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     }
     else if(type == 'config')
     {
-        return `lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+        return `../lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     } 
     else
     {
-        return `lib.ajax/load-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+        return `../lib.ajax/load-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     }
 }
 

@@ -117,7 +117,7 @@ class Admin extends MagicObject
 	/**
 	 * Application ID
 	 * 
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Application ID")
 	 * @var string
 	 */
@@ -180,7 +180,7 @@ class Admin extends MagicObject
 	/**
 	 * Bloked
 	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
 	 * @DefaultColumn(value="false")
 	 * @Label(content="Bloked")
 	 * @var bool
@@ -215,6 +215,15 @@ class Admin extends MagicObject
 	protected $adminCreate;
 
 	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @Label(content="Creator")
+	 * @var AdminMin
+	 */
+	protected $creator;
+
+	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
@@ -222,6 +231,15 @@ class Admin extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
+
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @Label(content="Editor")
+	 * @var AdminMin
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create

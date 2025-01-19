@@ -43,6 +43,15 @@ class ApplicationGroupMember extends MagicObject
 	protected $applicationGroupId;
 
 	/**
+	 * Application Group
+	 * 
+	 * @JoinColumn(name="application_group_id", referenceColumnName="application_group_id")
+	 * @Label(content="Application Group ID")
+	 * @var string
+	 */
+	protected $applicationGroup;
+
+	/**
 	 * Admin ID
 	 * 
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)

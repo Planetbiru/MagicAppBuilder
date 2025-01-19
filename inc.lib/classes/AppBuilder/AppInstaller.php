@@ -4,6 +4,7 @@ namespace AppBuilder;
 
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
+use MagicObject\Database\PicoDatabase;
 use MagicObject\Generator\PicoDatabaseDump;
 
 /**
@@ -17,7 +18,7 @@ use MagicObject\Generator\PicoDatabaseDump;
  * @package AppBuilder
  */
 class AppInstaller {
-    
+
     /**
      * Generates the installer SQL queries for the database schema.
      *
@@ -25,13 +26,12 @@ class AppInstaller {
      * and generates SQL queries for creating or altering tables based on the entity definitions.
      *
      * @param string $database The database connection or database name to be used for generating queries.
-     * @param string $cacheDir The directory path used for error checking and validation.
      * @param bool $createIfNotExists Flag to indicate whether to create the table if it doesn't exist.
      * @param bool $dropIfExists Flag to indicate whether to drop existing columns before adding new ones.
      * 
      * @return string The generated SQL queries for installing or altering the database schema.
      */
-    public function generateInstallerQuery($database, $cacheDir, $createIfNotExists = false, $dropIfExists = false)
+    public function generateInstallerQuery($database, $createIfNotExists = false, $dropIfExists = false)
     {
         $entities = [];
         $entityNames = [];
@@ -48,15 +48,17 @@ class AppInstaller {
             if(file_exists($fileName))
             {
                 // Check for errors in the entity file
-                $return_var = ErrorChecker::errorCheck($cacheDir, $fileName);
+                $phpError = ErrorChecker::phpTest($fileName);
+
+                $return_var = $phpError->errorCode;
                 
                 // If no errors, include the entity class and process it
                 if($return_var == 0)
                 {
                     include_once $fileName;                  
                     $entity = new $className(null, $database);
-                    $tableInfo = EntityUtil::getTableName($fileName);
-                    $tableName = isset($tableInfo['name']) ? $tableInfo['name'] : $idx;
+                    $entityInfo = EntityUtil::getTableName($fileName);
+                    $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
                     
                     // Initialize the entities and entityNames arrays for the table if not set
                     if(!isset($entities[$tableName]))

@@ -16,5 +16,4 @@ $appNavs = (new AppNavs())
     ->add(new AppNav('entity-query', 'Query'))
     ->add(new AppNav('translate-entity', 'Translate Entity'))
     ->add(new AppNav('translate-application', 'Translate Module'))
-    ->add(new AppNav('docs', 'Docs'))
 ;

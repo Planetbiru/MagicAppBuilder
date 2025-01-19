@@ -9,15 +9,58 @@ use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+/**
+ * Fixes the default label values by replacing them with their corresponding user-friendly labels.
+ *
+ * This function searches for predefined labels in the input string and replaces them
+ * with simplified or user-friendly values based on an internal mapping.
+ *
+ * @param string $original The original label(s) from the application that need to be fixed.
+ * @return string The modified label(s) with the correct values to be displayed to the user.
+ */
+function fixValue($original)
+{
+    $labels = [
+        'Button Save' => 'Save',
+        'Button Cancel' => 'Cancel',
+        'Message Data Not Found' => 'Data Not Found',
+        'Yes' => 'Yes',
+        'No' => 'No',
+        'Button Update' => 'Update',
+        'Button Back To List' => 'Back To List',
+        'Button Search' => 'Search',
+        'Button Add' => 'Add',
+        'Numero' => 'Numero',
+        'Button Activate' => 'Activate',
+        'Button Deactivate' => 'Deactivate',
+        'Warning Delete Confirmation' => 'Delete Confirmation',
+        'Button Delete' => 'Delete',
+        'Button Save Current Order' => 'Save Current Order',
+        'Label Option Select One' => 'Option Select One'
+    ];
+    return str_replace(
+        array_keys($labels), 
+        array_values($labels), 
+        $original
+    );
+}
 
-$inputPost = new InputPost();
-
+/**
+ * Extracts and converts language keys from a given file path.
+ *
+ * This function reads the contents of a file, searches for occurrences of `$appLanguage->`,
+ * and extracts the language keys by processing the string. The extracted keys are then
+ * converted to snake_case format using the `PicoStringUtil::snakeize` method.
+ *
+ * @param string $path The path to the file from which language keys will be extracted.
+ * @return array An array of language keys in snake_case format.
+ */
 function getKeys($path)
 {
     $result = [];
     $content = file_get_contents($path);
     $p2 = 0;
-    do{
+    do {
         $p1 = strpos($content, '$appLanguage->', $p2);
         if($p1 !== false)
         {
@@ -35,13 +78,15 @@ function getKeys($path)
     return $result;
 }
 
+$inputPost = new InputPost();
+
 if($inputPost->getUserAction() == 'get')
 {
     $allKeys = [];
     $response = [];
     try
     {
-        $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
+        $baseDir = $activeApplication->getBaseApplicationDirectory();
         $targetLanguage = $inputPost->getTargetLanguage();
         $filter = $inputPost->getFilter();
 
@@ -50,16 +95,15 @@ if($inputPost->getUserAction() == 'get')
             foreach($inputPost->getModules() as $module)
             {
                 $module = trim($module);
-                $path = $baseDir."/".$module;
+                $path = $baseDir."/".$module;               
                 if(file_exists($path))
                 {  
                     $keys = getKeys($path); 
                     $allKeys = array_merge($allKeys, $keys);
                 }
             }
-            
-            $allKeys = array_unique($allKeys);
-            
+        
+            $allKeys = array_unique($allKeys);        
             $parsed = [];
             foreach($allKeys as $key)
             {
@@ -82,6 +126,7 @@ if($inputPost->getUserAction() == 'get')
                 foreach($keys as $key)
                 {
                     $original = $parsedLanguage->get($key);
+                    $original = fixValue($original);
                     $translated = $langs->get($key);
                     if($translated == null)
                     {
@@ -143,7 +188,7 @@ if($inputPost->getUserAction() == 'set')
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
     
-    $baseDir = $appConfig->getApplication()->getBaseApplicationDirectory();
+    $baseDir = $activeApplication->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
     $dirname = dirname($pathTrans);

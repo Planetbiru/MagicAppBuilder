@@ -9,7 +9,7 @@ $inputPost = new InputPost();
 
 try
 {
-	$baseDirectory = $appConfig->getApplication()->getBaseApplicationDirectory();
+	$baseDirectory = $activeApplication->getBaseApplicationDirectory();
     $module = $inputPost->getModule();
     if(isset($module) && !empty($module))
     {

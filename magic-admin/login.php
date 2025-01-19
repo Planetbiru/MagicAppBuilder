@@ -31,6 +31,10 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         require_once __DIR__ . "/inc.app/login-form.php";
         exit();
     }
+    else if($entityAdmin->getAdminLevelId() != 'superuser')
+    {
+        header("Location: ./profile.php");
+    }
     else
     {
         header("Location: ./");
