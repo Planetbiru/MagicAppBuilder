@@ -19,9 +19,9 @@ body {
 
     h2,
     h3 {
-      margin-top: 6px;
-      margin-bottom: 6px;
-      font-size: 1.75rem;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      font-size: 1.7rem;
     }
   }
 }
@@ -203,7 +203,7 @@ table.responsive-two-cols {
   >tbody {
     >tr {
       >td {
-        padding: 0.25rem 0;
+        padding: 0.24rem 0;
 
         &:nth-child(1) {
           width: 240px;
@@ -385,7 +385,7 @@ table.responsive-two-cols {
 }
 
 .data-section {
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 // Sort Table
@@ -418,10 +418,10 @@ thead .data-sort-header {
   td {
     white-space: nowrap;
     position: relative;
-    padding: 0.25rem 0 0.25rem 0.2rem;
+    padding: 0.24rem 0 0.24rem 0.2rem;
 
     &.data-sort {
-      padding: 0.25rem 0 0.25rem 0.2rem;
+      padding: 0.24rem 0 0.24rem 0.2rem;
     }
   }
 
@@ -442,7 +442,7 @@ thead .data-sort-header {
 
 td[data-order-method="asc"],
 td[data-order-method="desc"] {
-  padding: 0.25rem 1.2rem 0.25rem 0.4rem;
+  padding: 0.24rem 1.2rem 0.24rem 0.4rem;
 }
 
 [data-order-method="asc"]::after,
