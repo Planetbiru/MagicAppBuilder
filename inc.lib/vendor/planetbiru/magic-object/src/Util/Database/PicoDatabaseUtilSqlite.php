@@ -230,7 +230,6 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Fetch and display the column details
         $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            error_log(json_encode($row, JSON_PRETTY_PRINT));
             $rows[] = array(
                 "Field"   => $row['name'],
                 "Type"    => $row['type'],

@@ -36,7 +36,7 @@ if(isset($databaseBuilder))
             $userLoggedIn = true;
 
             $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
-            $configTemplatePath = $activeWorkspace->getDirectory()."/application-template.yml";
+            $configTemplatePath = dirname(__DIR__)."/inc.cfg/application-template.yml";
         }
         catch(Exception $e)
         {

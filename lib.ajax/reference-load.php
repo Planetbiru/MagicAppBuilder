@@ -11,7 +11,7 @@ $inputGet = new InputGet();
 if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
     header("Content-type: application/json");
     $path = sprintf(
-        "%s/applications/%d/reference/%s-%s.json",
+        "%s/applications/%s/reference/%s-%s.json",
         $activeWorkspace->getDirectory(),
         $activeApplication->getApplicationId(),
         $inputGet->getFieldName(),

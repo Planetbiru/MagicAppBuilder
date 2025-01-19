@@ -46,7 +46,6 @@ if($databaseConfigured)
                 try
                 {
                     $databaseBuilder->connect(false);
-                    error_log("CREATE DATABASE ".$databaseConfigBuilder->getDatabaseName());
                     $databaseBuilder->query("CREATE DATABASE ".$databaseConfigBuilder->getDatabaseName());
                     $databaseBuilder->disconnect();
                     $databaseBuilder->connect();
@@ -106,7 +105,6 @@ if($databaseConfigured)
                     foreach($queries as $query)
                     {
                         $query = $query['query'];
-                        error_log($query);
                         $databaseBuilder->execute($query);
                     }
                 }

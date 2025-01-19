@@ -205,6 +205,8 @@ file_put_contents($path3, $configYaml);
 $now = date("Y-m-d H:i:s");
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
+try
+{
 $entityApplication->setApplicationId($newAppId);
 $entityApplication->setName($applicationName);
 $entityApplication->setDescription($applicationDescription);
@@ -223,3 +225,8 @@ $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
 $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
 $entityApplication->setActive(true);
 $entityApplication->save();
+}
+catch(Exception $e)
+{
+    error_log($e->getMessage());
+}

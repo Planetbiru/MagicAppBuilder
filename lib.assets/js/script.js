@@ -1501,6 +1501,15 @@ function onSetDefaultApplication()
   
 }
 
+function onModuleCreated()
+{
+  updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
+  updateEntityFile();
+  updateModuleFile();
+  initTooltip();
+}
+
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
@@ -3099,13 +3108,13 @@ function generateAllCode(dataToPost) {
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
       if (data.success) {
+        onModuleCreated();
         showAlertUI(data.title, data.message);
         setTimeout(function () { closeAlertUI() }, 2000);
       }
     },
   });
 }
-
 
 /**
  * Updates the current application by fetching and populating source tables.
