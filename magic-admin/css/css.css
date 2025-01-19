@@ -583,6 +583,11 @@ textarea.form-control {
   text-align: center;
 }
 
+blockquote {
+  padding-left: 10px;
+  border-left: 10px solid #7b7b7b;
+}
+
 select[multiple].form-control {
   height: 38px;
 }

@@ -581,4 +581,9 @@ textarea.form-control {
 .sidebar .fas {
   width: 18px !important;
   text-align: center;
+}
+
+blockquote {
+  padding-left: 10px;
+  border-left: 10px solid #7b7b7b;
 }/*# sourceMappingURL=general.css.map */

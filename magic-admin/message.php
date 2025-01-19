@@ -24,7 +24,6 @@ use MagicAdmin\Entity\Data\Message;
 use MagicAdmin\Entity\Data\AdminMin;
 use MagicAdmin\Entity\Data\MessageFolderMin;
 
-
 require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
@@ -59,36 +58,6 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	{
 		$message->insert();
 		$newId = $message->getMessageId();
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_id, $newId);
-	}
-	catch(Exception $e)
-	{
-		$currentModule->redirectToItself();
-	}
-}
-else if($inputPost->getUserAction() == UserAction::UPDATE)
-{
-	$specification = PicoSpecification::getInstanceOf(Field::of()->messageId, $inputPost->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-	$specification->addAnd($dataFilter);
-	$message = new Message(null, $database);
-	$updater = $message->where($specification)
-		->setSubject($inputPost->getSubject(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setContent($inputPost->getContent(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setSenderId($inputPost->getSenderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setMessageFolderId($inputPost->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setIsCopy($inputPost->getIsCopy(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-		->setIsOpen($inputPost->getIsOpen(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-		->setTimeOpen($inputPost->getTimeOpen(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setIsDelete($inputPost->getIsDelete(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-	;
-	$updater->setAdminEdit($currentAction->getUserId());
-	$updater->setTimeEdit($currentAction->getTime());
-	$updater->setIpEdit($currentAction->getIp());
-	try
-	{
-		$updater->update();
-		$newId = $inputPost->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_id, $newId);
 	}
 	catch(Exception $e)
@@ -196,7 +165,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	}
 </style>
 <script>
-	let elements = [];
+	var elements = [];
 	jQuery(function($) {
 		let editors = [];
 		var activeEditor = null;	
@@ -204,6 +173,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			$(this).attr('data-index', index);
 			$(this).addClass('summernote-source');
 			editors[index] = $(this).summernote({
+				spellcheck: false,
 				height: 200,
 				hint: {
 					words: [],
@@ -228,6 +198,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					onFocus: function() {
 						let idx = $(this).attr('data-index');
 						activeEditor = editors[idx];
+						$('.note-editable').attr('spellcheck', 'false');
 					}
 				}
 			});
@@ -347,6 +318,105 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 $appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
+<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
+<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote-bs4.min.css">
+<script type="text/javascript" src="../lib.assets/popper/popper.min.js"></script>
+<script type="text/javascript" src="../lib.assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote.js"></script>
+<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote-bs4.min.js"></script>
+<style>
+	.note-hint-popover {
+		position: absolute;
+	}
+</style>
+<script>
+	var elements = [];
+	jQuery(function($) {
+		let editors = [];
+		var activeEditor = null;	
+		$('textarea').each(function(index){
+			$(this).attr('data-index', index);
+			$(this).addClass('summernote-source');
+			editors[index] = $(this).summernote({
+				spellcheck: false,
+				height: 200,
+				hint: {
+					words: [],
+					match: /\b(\w{1,})$/,
+					search: function (keyword, callback) {
+						callback($.grep(this.words, function (item) {
+							return item.indexOf(keyword) === 0;
+						}));
+					}
+				},
+				toolbar: [
+					['style', ['style', 'bold', 'italic', 'underline']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['font', ['fontname', 'fontsize', 'color', 'background']],
+					['insert', ['picture', 'table']],
+				],
+				callbacks: {
+					onImageUpload: function (files) {
+					},
+					onMediaDelete: function (target) {
+					},
+					onFocus: function() {
+						let idx = $(this).attr('data-index');
+						activeEditor = editors[idx];
+						$('.note-editable').attr('spellcheck', 'false');
+					}
+				}
+			});
+			elements[index] = $(this);
+		});
+
+		$('textarea.summernote-source').each(function(index) {
+			$(this).next().closest('.note-editor').on('click', function(e) {
+				activeEditor = editors[index];  
+				if (activeEditor) {
+					activeEditor.summernote('focus');
+				}
+			});
+		});
+
+		$(document).on('change', '.note-image-input.form-control-file.note-form-control.note-input', function(e) {
+			var files = e.target.files;
+
+			if (files.length > 0) {
+				var file = files[0];
+				if (file.type.startsWith('image/')) {
+					let mdl = $(this).closest('.modal-dialog');
+					let btn = mdl.find('.note-image-btn');
+					btn[0].disabled = false;
+				} else {
+					alert("Please select an image file.");
+				}
+			}
+		});
+
+		$(document).on('click', '.note-image-btn', function() {
+			let btn = $(this);
+			if (activeEditor) {
+				var fileInput = $(this).closest('.note-modal').find('.note-image-input.form-control-file.note-form-control.note-input')[0];
+				var file = fileInput.files[0];
+				if (file) {
+					var reader = new FileReader();
+					reader.onload = function(event) {
+						var base64Image = event.target.result;
+						activeEditor.summernote('insertImage', base64Image);
+						fileInput.value = "";
+						btn.closest('.modal').modal('hide');  // Close the modal
+					};
+					reader.readAsDataURL(file);
+				}
+			} else {
+				console.log('No active editor found.');
+			}
+		});
+	});
+
+
+</script>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
 		<form name="updateform" id="updateform" action="" method="post">
@@ -361,7 +431,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getContent();?></td>
 						<td>
-							<textarea class="form-control" name="content" id="content" spellcheck="false"><?php echo $message->getContent();?></textarea>
+							<textarea class="form-control" name="content" id="content" spellcheck="false">
+&lt;p&gt;&nbsp;&lt;/p&gt;
+&lt;p&gt;Original message&lt;/p&gt;
+&lt;blockquote&gt;<?php echo $message->getContent();?>&lt;/blockquote&gt;
+</textarea>
 						</td>
 					</tr>
 					<tr>
@@ -578,10 +652,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->message_id, $message->getMessageId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
-							<?php } ?>
-		
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('reply', Field::of()->message_id, $message->getMessageId());?>';"><?php echo $appLanguage->getButtonReply();?></button>		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 							<input type="hidden" name="message_id" value="<?php echo $message->getMessageId();?>"/>
 						</td>

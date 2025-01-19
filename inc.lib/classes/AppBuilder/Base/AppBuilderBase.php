@@ -1882,7 +1882,7 @@ $subqueryMap = '.$referece.';
             $order->setAttribute('name', 'user_action');
             $order->setAttribute('value', 'sort_order');
             $order->setAttribute('disabled', 'disabled');
-            $order->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getSaveCurrentOrder();'.self::PHP_CLOSE_TAG));
+            $order->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonSaveCurrentOrder();'.self::PHP_CLOSE_TAG));
 
             $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
             $wrapper->appendChild($order);
