@@ -7,6 +7,7 @@ use MagicObject\MagicObject;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
@@ -19,6 +20,8 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\ErrorCache;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
 
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -26,7 +29,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "error-cache", "Error Cache");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "error-cache", $appLanguage->getErrorCache());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -471,7 +474,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new ErrorCache(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	
+	"fileName" => PicoSpecification::filter("fileName", "fulltext")
 );
 $sortOrderMap = array(
 	"fileName" => "fileName",
@@ -491,13 +494,69 @@ $specification->addAnd($dataFilter);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "modificationTime", 
+		"sortType" => PicoSort::ORDER_TYPE_DESC
+	),
+	array(
+		"sortBy" => "fileName", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new ErrorCache(null, $database);
 
 $subqueryMap = null;
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getErrorCacheId() => $headerFormat->getErrorCacheId(),
+		$appEntityLanguage->getFileName() => $headerFormat->getFileName(),
+		$appEntityLanguage->getFilePath() => $headerFormat->getFilePath(),
+		$appEntityLanguage->getModificationTime() => $headerFormat->getModificationTime(),
+		$appEntityLanguage->getErrorCode() => $headerFormat->getErrorCode(),
+		$appEntityLanguage->getMessage() => $headerFormat->getMessage(),
+		$appEntityLanguage->getLineNumber() => $headerFormat->getLineNumber(),
+		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
+		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
+		$appEntityLanguage->getAdminCreate() => $headerFormat->getAdminCreate(),
+		$appEntityLanguage->getAdminEdit() => $headerFormat->getAdminEdit(),
+		$appEntityLanguage->getIpCreate() => $headerFormat->getIpCreate(),
+		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
+		$appEntityLanguage->getActive() => $headerFormat->asString()
+	), 
+	function($index, $row, $appLanguage){
+		
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getErrorCacheId(),
+			$row->getFileName(),
+			$row->getFilePath(),
+			$row->getModificationTime(),
+			$row->getErrorCode(),
+			$row->getMessage(),
+			$row->getLineNumber(),
+			$row->getTimeCreate(),
+			$row->getTimeEdit(),
+			$row->getAdminCreate(),
+			$row->getAdminEdit(),
+			$row->getIpCreate(),
+			$row->getIpEdit(),
+			$row->optionActive($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -507,8 +566,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getFileName();?></span>
+					<span class="filter-control">
+						<input type="text" name="file_name" class="form-control" value="<?php echo $inputGet->getFileName();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
+				<?php if($userPermission->isAllowedDetail()){ ?>
+		
+				<span class="filter-group">
+					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
+				</span>
+				<?php } ?>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">

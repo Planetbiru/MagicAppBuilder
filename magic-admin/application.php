@@ -23,6 +23,9 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Application;
 use MagicAdmin\Entity\Data\WorkspaceMin;
+use MagicAdmin\Entity\Data\AdminMin;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
 
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -30,7 +33,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application", "Application");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application", $appLanguage->getApplication());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -423,10 +426,10 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "workspace_id",
 			"objectName" => "workspace",
 			"propertyName" => "name"
-		),
+		), 
 		"adminCreate" => array(
 			"columnName" => "admin_create",
-			"entityName" => "AdminCreate",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "creator",
@@ -434,7 +437,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
-			"entityName" => "AdminEdit",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "editor",
@@ -614,9 +617,76 @@ $subqueryMap = array(
 	"primaryKey" => "workspace_id",
 	"objectName" => "workspace",
 	"propertyName" => "name"
+), 
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
+	"propertyName" => "name"
 )
 );
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getApplicationId() => $headerFormat->getApplicationId(),
+		$appEntityLanguage->getName() => $headerFormat->getName(),
+		$appEntityLanguage->getDescription() => $headerFormat->asString(),
+		$appEntityLanguage->getArchitecture() => $headerFormat->asString(),
+		$appEntityLanguage->getWorkspace() => $headerFormat->asString(),
+		$appEntityLanguage->getProjectDirectory() => $headerFormat->getProjectDirectory(),
+		$appEntityLanguage->getBaseApplicationDirectory() => $headerFormat->getBaseApplicationDirectory(),
+		$appEntityLanguage->getAuthor() => $headerFormat->getAuthor(),
+		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
+		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
+		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
+		$appEntityLanguage->getAdminCreate() => $headerFormat->asString(),
+		$appEntityLanguage->getAdminEdit() => $headerFormat->asString(),
+		$appEntityLanguage->getIpCreate() => $headerFormat->getIpCreate(),
+		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
+		$appEntityLanguage->getActive() => $headerFormat->asString()
+	), 
+	function($index, $row, $appLanguage){
+		global $mapForArchitecture;
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getApplicationId(),
+			$row->getName(),
+			$row->getDescription(),
+			isset($mapForArchitecture) && isset($mapForArchitecture[$row->getArchitecture()]) && isset($mapForArchitecture[$row->getArchitecture()]["label"]) ? $mapForArchitecture[$row->getArchitecture()]["label"] : "",
+			$row->issetWorkspace() ? $row->getWorkspace()->getName() : "",
+			$row->getProjectDirectory(),
+			$row->getBaseApplicationDirectory(),
+			$row->getAuthor(),
+			$row->getSortOrder(),
+			$row->getTimeCreate(),
+			$row->getTimeEdit(),
+			$row->issetCreator() ? $row->getCreator()->getName() : "",
+			$row->issetEditor() ? $row->getEditor()->getName() : "",
+			$row->getIpCreate(),
+			$row->getIpEdit(),
+			$row->optionActive($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -664,7 +734,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-
+				<?php if($userPermission->isAllowedDetail()){ ?>
+		
+				<span class="filter-group">
+					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
+				</span>
+				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
