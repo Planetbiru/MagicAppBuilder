@@ -1,3 +1,8 @@
+<?php
+
+use AppBuilder\AppFeed;
+
+?>
 </div>
 
     <!-- Importing JavaScript for Bootstrap and jQuery -->
@@ -6,21 +11,10 @@
     <script>
 
         // Notification data from the server in JSON format
-        const notifications = {
-            "totalData": 0,
-            "data": [
-            //{ "id": 1, "link": "notification.php?any=1", "message": "Notification 1", "time": "5 min" },
-            //{ "id": 2, "link": "notification.php?any=2", "message": "Notification 2", "time": "100 day" }
-        ]}
-        ;
+        const notifications = <?php echo AppFeed::getNotifications($databaseBuilder, $entityAdmin, 5); ?>;
 
         // Message data from the server in JSON format
-        const messages = {
-            "totalData": 0,
-            "data": [
-            //{ "id": 1, "link": "message.php?any=1", "message": "Message 1", "time": "1 min" },
-            //{ "id": 2, "link": "message.php?any=2", "message": "Message 2", "time": "3 min" }
-        ]};
+        const messages = <?php echo AppFeed::getMessages($databaseBuilder, $entityAdmin, 5); ?>;
 
     </script>
     <script src="js/js.js"></script>
