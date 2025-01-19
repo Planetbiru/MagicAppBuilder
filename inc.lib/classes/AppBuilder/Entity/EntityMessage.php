@@ -26,7 +26,7 @@ class EntityMessage extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message ID")
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class EntityMessage extends MagicObject
 	 * Subject
 	 * 
 	 * @NotNull
-	 * @Column(name="subject", type="text", nullable=false)
+	 * @Column(name="subject", type="text", nullable=true)
 	 * @Label(content="Subject")
 	 * @var string
 	 */
@@ -46,7 +46,7 @@ class EntityMessage extends MagicObject
 	 * Content
 	 * 
 	 * @NotNull
-	 * @Column(name="content", type="text", nullable=false)
+	 * @Column(name="content", type="text", nullable=true)
 	 * @Label(content="Content")
 	 * @var string
 	 */
@@ -56,7 +56,7 @@ class EntityMessage extends MagicObject
 	 * Sender ID
 	 * 
 	 * @NotNull
-	 * @Column(name="sender_id", type="varchar(50)", length=50, nullable=false)
+	 * @Column(name="sender_id", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Sender")
 	 * @var string
 	 */
@@ -75,7 +75,7 @@ class EntityMessage extends MagicObject
 	 * Receiver ID
 	 * 
 	 * @NotNull
-	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Receiver")
 	 * @var string
 	 */
@@ -94,7 +94,7 @@ class EntityMessage extends MagicObject
 	 * Message Folder ID
 	 * 
 	 * @NotNull
-	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Message Folder ID")
 	 * @var string
 	 */
@@ -113,7 +113,7 @@ class EntityMessage extends MagicObject
 	 * Is Copy
 	 * 
 	 * @NotNull
-	 * @Column(name="is_copy", type="tinyint(1)", length=1, nullable=false)
+	 * @Column(name="is_copy", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Is Copy")
 	 * @var bool
 	 */
@@ -133,7 +133,7 @@ class EntityMessage extends MagicObject
 	 * Is Open
 	 * 
 	 * @NotNull
-	 * @Column(name="is_open", type="tinyint(1)", length=1, nullable=false)
+	 * @Column(name="is_open", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Is Open")
 	 * @var bool
 	 */
@@ -143,7 +143,7 @@ class EntityMessage extends MagicObject
 	 * Time Open
 	 * 
 	 * @NotNull
-	 * @Column(name="time_open", type="timestamp", length=19, nullable=false)
+	 * @Column(name="time_open", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Open")
 	 * @var string
 	 */
@@ -153,7 +153,7 @@ class EntityMessage extends MagicObject
 	 * Is Delete
 	 * 
 	 * @NotNull
-	 * @Column(name="is_delete", type="tinyint(1)", length=1, nullable=false)
+	 * @Column(name="is_delete", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Is Delete")
 	 * @var bool
 	 */

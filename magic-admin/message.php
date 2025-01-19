@@ -46,7 +46,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$message = new Message(null, $database);
 	$message->setSubject($inputPost->getSubject(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$message->setContent($inputPost->getContent(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$message->setContent($inputPost->getContent(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
+	$message->setSenderId($entityAdmin->getAdminId());
 	$message->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setAdminCreate($currentAction->getUserId());
 	$message->setTimeCreate($currentAction->getTime());
@@ -286,6 +287,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getReceiver();?></td>
+						<td>
+							<select class="form-control" name="receiver_id" id="receiver_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false))
+									->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $entityAdmin->getAdminId())), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->adminId, Field::of()->name)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSubject();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="subject" id="subject"/>
@@ -295,23 +314,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getContent();?></td>
 						<td>
 							<textarea class="form-control" name="content" id="content" spellcheck="false"></textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getReceiver();?></td>
-						<td>
-							<select class="form-control" name="receiver_id" id="receiver_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name)
-								; ?>
-							</select>
 						</td>
 					</tr>
 				</tbody>

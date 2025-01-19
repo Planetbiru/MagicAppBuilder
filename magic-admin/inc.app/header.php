@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MagicAppBuilder - <?php echo $currentModule->getModuleTitle();?></title>
+    <title>MagicAppBuilder - <?php
+
+use MagicObject\SecretObject;
+
+ echo $currentModule->getModuleTitle();?></title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome/all.min.css">
     <link rel="stylesheet" href="css/css.css">
@@ -58,7 +62,7 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
         if (count($item['submenu']) > 0) {
             $sidebarHTML .= ' data-toggle="collapse" aria-expanded="false"';
         }
-        $sidebarHTML .= '><i class="' . $item['icon'] . '"></i> ' . $item['title'] . '</a>';
+        $sidebarHTML .= '><i class="' . $item['icon'] . '"></i> ' . $item['title'] . '</a>'."\r\n";
         
         // Check if there are submenus
         if (count($item['submenu']) > 0) {
@@ -73,8 +77,8 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
             
             // Add class "show" if the currentHref matches any submenu item
             $collapseClass = $isActive ? 'collapse show' : 'collapse';
-            $sidebarHTML .= '<div id="' . substr($item['href'], 1) . '" class="' . $collapseClass . '">';
-            $sidebarHTML .= '<ul class="nav flex-column pl-3">';
+            $sidebarHTML .= '<div id="' . substr($item['href'], 1) . '" class="' . $collapseClass . '">'."\r\n";
+            $sidebarHTML .= '<ul class="nav flex-column pl-3">'."\r\n";
             
             // Loop through each submenu item
             foreach ($item['submenu'] as $subItem) {
@@ -88,14 +92,14 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
                 }
 
                 $sidebarHTML .= '><i class="' . $subItem['icon'] . '"></i> ' . $subItem['title'] . '</a>';
-                $sidebarHTML .= '</li>';
+                $sidebarHTML .= '</li>'."\r\n";
             }
             
-            $sidebarHTML .= '</ul>';
-            $sidebarHTML .= '</div>';
+            $sidebarHTML .= '</ul>'."\r\n";
+            $sidebarHTML .= '</div>'."\r\n";
         }
 
-        $sidebarHTML .= '</li>';
+        $sidebarHTML .= '</li>'."\r\n";
     }
 
     // Close the sidebar HTML structure
@@ -109,86 +113,8 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
 
 
 // Sample JSON data (can be replaced with your own)
-$jsonData = '{
-    "menu": [
-        {
-            "title": "Dashboard Home",
-            "icon": "fas fa-tachometer-alt",
-            "href": "./",
-            "submenu": []
-        },
-        {
-            "title": "Master",
-            "icon": "fas fa-folder",
-            "href": "#submenu1",
-            "submenu": [
-                {
-                    "title": "Application",
-                    "icon": "fas fa-microchip",
-                    "href": "application.php"
-                },
-                {
-                    "title": "Application Group",
-                    "icon": "fas fa-microchip",
-                    "href": "application-group.php"
-                },
-                {
-                    "title": "Workspace",
-                    "icon": "fas fa-building",
-                    "href": "workspace.php"
-                },
-                {
-                    "title": "Admin",
-                    "icon": "fas fa-user",
-                    "href": "admin.php"
-                }
-            ]
-        },
-        {
-            "title": "Role",
-            "icon": "fas fa-folder",
-            "href": "#submenu2",
-            "submenu": [
-                {
-                    "title": "Admin Workspace",
-                    "icon": "fas fa-user-check",
-                    "href": "admin-workspace.php"
-                },
-                {
-                    "title": "Application Group Member",
-                    "icon": "fas fa-user-check",
-                    "href": "application-group-member.php"
-                }
-            ]
-        },
-        {
-            "title": "Reference",
-            "icon": "fas fa-folder",
-            "href": "#submenu3",
-            "submenu": [
-                {
-                    "title": "Administrator Level",
-                    "icon": "fas fa-user-gear",
-                    "href": "admin-level.php"
-                }
-            ]
-        },
-        {
-            "title": "MagicAppBuilder",
-            "icon": "fas fa-desktop",
-            "href": "../",
-            "submenu": []
-        },
-        {
-            "title": "Database",
-            "icon": "fas fa-database",
-            "href": "../magic-database/",
-            "submenu": [],
-            "target": "_blank"
-        }
-    ]
-}
-';
+$menuLoader = new SecretObject();
+$jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
 
 // Call the function to generate the sidebar
 

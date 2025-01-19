@@ -26,7 +26,7 @@ class MessageFolderMin extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message Folder ID")
 	 * @var string
 	 */
@@ -45,7 +45,7 @@ class MessageFolderMin extends MagicObject
 	 * Sort Order
 	 * 
 	 * @NotNull
-	 * @Column(name="sort_order", type="int", nullable=false)
+	 * @Column(name="sort_order", type="int", nullable=true)
 	 * @Label(content="Sort Order")
 	 * @var int
 	 */
@@ -109,7 +109,7 @@ class MessageFolderMin extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=false)
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=true)
 	 * @DefaultColumn(value="TRUE")
 	 * @Label(content="Active")
 	 * @var bool

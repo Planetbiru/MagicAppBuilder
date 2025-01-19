@@ -26,7 +26,7 @@ class EntityNotification extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Notification ID")
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class EntityNotification extends MagicObject
 	 * Title
 	 * 
 	 * @NotNull
-	 * @Column(name="title", type="text", nullable=false)
+	 * @Column(name="title", type="text", nullable=true)
 	 * @Label(content="Title")
 	 * @var string
 	 */
@@ -46,7 +46,7 @@ class EntityNotification extends MagicObject
 	 * Content
 	 * 
 	 * @NotNull
-	 * @Column(name="content", type="text", nullable=false)
+	 * @Column(name="content", type="text", nullable=true)
 	 * @Label(content="Content")
 	 * @var string
 	 */
@@ -56,7 +56,7 @@ class EntityNotification extends MagicObject
 	 * Url
 	 * 
 	 * @NotNull
-	 * @Column(name="url", type="text", nullable=false)
+	 * @Column(name="url", type="text", nullable=true)
 	 * @Label(content="Url")
 	 * @var string
 	 */
@@ -66,7 +66,7 @@ class EntityNotification extends MagicObject
 	 * Receiver ID
 	 * 
 	 * @NotNull
-	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Receiver")
 	 * @var string
 	 */
@@ -95,7 +95,7 @@ class EntityNotification extends MagicObject
 	 * Is Open
 	 * 
 	 * @NotNull
-	 * @Column(name="is_open", type="tinyint(1)", length=1, nullable=false)
+	 * @Column(name="is_open", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Is Open")
 	 * @var bool
 	 */
@@ -105,7 +105,7 @@ class EntityNotification extends MagicObject
 	 * Time Open
 	 * 
 	 * @NotNull
-	 * @Column(name="time_open", type="timestamp", length=19, nullable=false)
+	 * @Column(name="time_open", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Time Open")
 	 * @var string
 	 */
@@ -115,7 +115,7 @@ class EntityNotification extends MagicObject
 	 * Is Delete
 	 * 
 	 * @NotNull
-	 * @Column(name="is_delete", type="tinyint(1)", length=1, nullable=false)
+	 * @Column(name="is_delete", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Is Delete")
 	 * @var bool
 	 */
