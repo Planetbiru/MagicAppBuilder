@@ -126,20 +126,29 @@ class ErrorChecker
     }
 
     /**
-     * Save the error cache record for a given PHP file.
+     * Saves the error cache record for a given PHP file after a syntax check.
      *
-     * This method stores the result of a PHP syntax check into the database. The cache includes error code,
-     * modification time, and an optional message and line number.
+     * This method stores the results of a PHP syntax check into the database. The cache includes
+     * the PHP file's error code, modification time, an optional error message, and the line number
+     * where the error occurred (if applicable).
      *
-     * @param PicoDatabase $databaseBuilder The database connection object for managing error cache.
-     * @param string $normalizedPath The normalized path of the PHP file.
-     * @param int $ft File modification time.
-     * @param PhpError $phpError The `PhpError` object containing the syntax check result.
+     * If no syntax errors are detected, the error message will be set to an empty string.
+     *
+     * @param PicoDatabase $databaseBuilder The database connection object used for managing the error cache.
+     * @param string $normalizedPath The normalized path to the PHP file being checked.
+     * @param int $ft The file modification time as a Unix timestamp.
+     * @param PhpError $phpError The `PhpError` object containing the result of the PHP syntax check.
+     * 
      * @return void
      */
     public static function saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError)
     {
         $now = date("Y-m-d H:i:s");
+        $errorMessage = implode("\r\n", $phpError->errors);
+        if(stripos($errorMessage, 'No syntax errors detected') !== false)
+        {
+            $errorMessage = "";
+        }
         $errorCache = new PhpErrorCache(null, $databaseBuilder);
         $errorCacheId = md5($normalizedPath);
         $errorCache->setErrorCacheId($errorCacheId);
@@ -147,7 +156,7 @@ class ErrorChecker
         $errorCache->setFilePath($normalizedPath);
         $errorCache->setErrorCode($phpError->errorCode);
         $errorCache->setModificationTime(date("Y-m-d H:i:s", $ft));
-        $errorCache->setMessage(implode("\r\n", $phpError->errors));
+        $errorCache->setMessage($errorMessage);
         $errorCache->setLineNumber($phpError->lineNumber);
         $errorCache->setTimeCreate($now);
         $errorCache->save();
