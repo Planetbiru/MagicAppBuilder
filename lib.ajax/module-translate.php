@@ -45,8 +45,16 @@ function fixValue($original)
     );
 }
 
-$inputPost = new InputPost();
-
+/**
+ * Extracts and converts language keys from a given file path.
+ *
+ * This function reads the contents of a file, searches for occurrences of `$appLanguage->`,
+ * and extracts the language keys by processing the string. The extracted keys are then
+ * converted to snake_case format using the `PicoStringUtil::snakeize` method.
+ *
+ * @param string $path The path to the file from which language keys will be extracted.
+ * @return array An array of language keys in snake_case format.
+ */
 function getKeys($path)
 {
     $result = [];
@@ -69,6 +77,8 @@ function getKeys($path)
     while($p1 !== false && $p2 !== false);
     return $result;
 }
+
+$inputPost = new InputPost();
 
 if($inputPost->getUserAction() == 'get')
 {
