@@ -40,6 +40,13 @@ menu:
     icon: "fas fa-message"
     href: "message.php"
     submenu: []
+  - title: "Cache"
+    icon: "fas fa-folder"
+    href: "#submenu4"
+    submenu:
+      - title: "Error Cache"
+        icon: "fas fa-hdd"
+        href: "error-cache.php"
   - title: "MagicAppBuilder"
     icon: "fas fa-desktop"
     href: "../"
