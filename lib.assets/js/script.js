@@ -777,7 +777,8 @@ jQuery(function () {
   });
 
   $(document).on('click', '.create-new-application', function (e) {
-    let createBtn = $('#modal-create-application #create_new_app');
+    let modal = $('#modal-create-application');
+    let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
@@ -790,26 +791,38 @@ jQuery(function () {
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-        $('[name="application_name"]').val(data.application_name);
-        $('[name="application_id"]').val(data.application_id);
-        $('[name="application_architecture"]').val(data.application_architecture);
-        $('[name="application_directory"]').val(data.application_directory);
-        
-        
-        $('[name="application_namespace"]').val(data.application_namespace);
 
-
-        $('[name="application_workspace"]').val(data.application_workspace);
-        $('[name="application_author"]').val(data.application_author);
-        $('[name="application_description"]').val(data.application_description);
-        for (let i in data.magic_app_versions) {
-          let latest = data.magic_app_versions[i]['latest'];
-          $('[name="magic_app_version"]')[0].appendChild(
-            new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
-          );
+        if(data.application_workspace == '')
+        {
+          if(modal.find('.alert').length > 0)
+          {
+            modal.find('.alert').remove();
+          }
+          var alertDiv = $('<div />');
+          alertDiv.addClass('alert alert-warning');
+          alertDiv.html('Please select a workspace before creating a new application.');
+          modal.find('form').prepend(alertDiv);
+          createBtn[0].disabled = true;
         }
-        loadAllResource();
-        createBtn[0].disabled = false;
+        else
+        {
+          $('[name="application_name"]').val(data.application_name);
+          $('[name="application_id"]').val(data.application_id);
+          $('[name="application_architecture"]').val(data.application_architecture);
+          $('[name="application_directory"]').val(data.application_directory);
+          $('[name="application_namespace"]').val(data.application_namespace);
+          $('[name="application_workspace"]').val(data.application_workspace);
+          $('[name="application_author"]').val(data.application_author);
+          $('[name="application_description"]').val(data.application_description);
+          for (let i in data.magic_app_versions) {
+            let latest = data.magic_app_versions[i]['latest'];
+            $('[name="magic_app_version"]')[0].appendChild(
+              new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
+            );
+          }
+          loadAllResource();
+          createBtn[0].disabled = false;
+        }
       }
     });
   });
@@ -2588,9 +2601,9 @@ function updateEntityQuery(autoload) {
     success: function (data) {
       $(".entity-container-query .entity-list").empty().append(data);
       let ents = getEntitySelection();
-      let merged = $(".entity-merge")[0].checked;
-      if (autoload) {
-        getEntityQuery(ents, merged);
+      let merged = $(".entity-merge");
+      if (merged.length > 0 && autoload) {
+        getEntityQuery(ents, merged[0].checked);
       }
     },
   });

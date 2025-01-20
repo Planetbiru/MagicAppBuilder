@@ -9,6 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 try
 {
     $inputPost = new InputPost();
+    $now = date('Y-m-d H:i:s');
     if(isset($entityAdmin) && $entityAdmin->issetAdminId())
     {
         $appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
@@ -20,6 +21,7 @@ try
             // Update
             $activeApplicationHistory
                 ->setApplicationId($entityAdmin->getApplicationId())
+                ->setTimeEdit($now)
                 ->update()
                 ;
         }
@@ -30,6 +32,9 @@ try
                 ->setAdminId($entityAdmin->getAdminId())
                 ->setWorkspaceId($entityAdmin->getWorkspaceId())
                 ->setApplicationId($entityAdmin->getApplicationId())
+                ->setTimeCreate($now)
+                ->setTimeEdit($now)
+                ->setActive(true)
                 ->insert()
                 ;
         }

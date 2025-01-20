@@ -26,7 +26,7 @@ class EntityMessageFolder extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message Folder ID")
 	 * @var string
 	 */

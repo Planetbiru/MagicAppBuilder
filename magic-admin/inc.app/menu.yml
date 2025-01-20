@@ -37,12 +37,18 @@ menu:
         icon: "fas fa-user-gear"
         href: "admin-level.php"
   - title: "Message"
-    icon: "fas fa-message"
-    href: "message.php"
-    submenu: []
-  - title: "Cache"
     icon: "fas fa-folder"
     href: "#submenu4"
+    submenu:  
+      - title: "Message"
+        icon: "fas fa-message"
+        href: "message.php"
+      - title: "Notification"
+        icon: "fas fa-message"
+        href: "notification.php"
+  - title: "Cache"
+    icon: "fas fa-folder"
+    href: "#submenu5"
     submenu:
       - title: "Error Cache"
         icon: "fas fa-hdd"

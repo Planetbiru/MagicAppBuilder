@@ -26,7 +26,7 @@ class EntityActiveApplicationHistory extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="active_application_history_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="active_application_history_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Active Application History ID")
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class EntityActiveApplicationHistory extends MagicObject
 	 * Admin ID
 	 * 
 	 * @NotNull
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin ID")
 	 * @var string
 	 */
@@ -55,7 +55,7 @@ class EntityActiveApplicationHistory extends MagicObject
 	 * Workspace ID
 	 * 
 	 * @NotNull
-	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Workspace ID")
 	 * @var string
 	 */
@@ -74,7 +74,7 @@ class EntityActiveApplicationHistory extends MagicObject
 	 * Application ID
 	 * 
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="application_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Application ID")
 	 * @var string
 	 */
