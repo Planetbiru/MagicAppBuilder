@@ -1117,8 +1117,10 @@ $constSelected = ' selected';
       </div>
   </div>
 
-  <style>
+  <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
     
-  </style>
+  </div>
+
+
 </body>
 </html>

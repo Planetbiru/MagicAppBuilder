@@ -3138,10 +3138,54 @@ function generateAllCode(dataToPost) {
       updateEntityRelationshipDiagram();
       if (data.success) {
         onModuleCreated();
-        showAlertUI(data.title, data.message);
+        showToast(data.title, data.message);
         setTimeout(function () { closeAlertUI() }, 2000);
       }
     },
+  });
+}
+
+/**
+ * Creates and shows a dynamic Bootstrap toast notification.
+ *
+ * This function generates a toast element with a custom header and body, then appends it
+ * to the toast container. The toast is displayed using Bootstrap's Toast API and is
+ * automatically removed from the DOM after it disappears.
+ *
+ * @param {string} header The header text of the toast.
+ * @param {string} body The body content of the toast.
+ */
+function showToast(header, body) {
+  // Generate a unique ID for the toast element using a timestamp
+  var toastId = 'toast-' + new Date().getTime(); // Use timestamp as a unique ID
+  
+  // Construct the HTML structure for the toast dynamically
+  var toastHTML = `
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000" id="${toastId}">
+      <div class="toast-header">
+        <strong class="mr-auto">${header}&nbsp;&nbsp;</strong>
+        <small>just now</small>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        ${body}
+      </div>
+    </div>
+  `;
+
+  // Append the toast to the beginning of the toast container
+  $('.toast-container').prepend(toastHTML);
+
+  // Get the toast element by its unique ID and initialize Bootstrap Toast
+  let toastEl = $('#' + toastId)[0];  // Get the toast element using the unique ID
+  let toast = new bootstrap.Toast(toastEl);
+  toast.show(); // Show the toast notification
+
+  // Remove the toast element from the DOM once it has fully disappeared
+  $(toastEl).on('hidden.bs.toast', function () {
+    $(toastEl).remove(); // Remove the toast element after it disappears
   });
 }
 
