@@ -1473,7 +1473,6 @@ function loadAllResource()
   loadTable();
   loadPathList();
   loadLanguageList();
-
   loadMenu();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
@@ -1486,6 +1485,13 @@ function onSetDefaultWorkspace()
 {
   loadWorkspaceList();
   loadApplicationList();
+  loadTable();
+  loadMenu();
+  updateEntityQuery(false);
+  updateEntityRelationshipDiagram();
+  updateEntityFile();
+  updateModuleFile();
+  initTooltip();
 }
 
 function onSetDefaultApplication()
@@ -1498,7 +1504,6 @@ function onSetDefaultApplication()
   updateEntityFile();
   updateModuleFile();
   initTooltip();
-  
 }
 
 function onModuleCreated()
