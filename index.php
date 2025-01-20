@@ -298,6 +298,7 @@ $constSelected = ' selected';
                               <td width="40%">Column</td>
                               <td>Value</td>
                               <td width="42">Rem</td>
+                              <td colspan="2">Move</td>
                             </tr>
                           </thead>
                           <tbody>
@@ -305,11 +306,13 @@ $constSelected = ' selected';
                               <td><input class="form-control data-filter-column-name" type="text" value=""></td>
                               <td><input class="form-control data-filter-column-value" type="text" value=""></td>
                               <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                              <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                              <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
                             </tr>
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td colspan="3"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
+                              <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
                             </tr>
                           </tfoot>
                         </table>
@@ -336,9 +339,10 @@ $constSelected = ' selected';
                         <table class="table table-reference table-data-order" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
                           <thead>
                             <tr>
-                              <td width="65%">Column</td>
+                              <td width="55%">Column</td>
                               <td>Value</td>
                               <td width="42">Rem</td>
+                              <td colspan="2">Move</td>
                             </tr>
                           </thead>
                           <tbody>
@@ -349,11 +353,13 @@ $constSelected = ' selected';
                                   <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
                                 </select></td>
                               <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                              <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                              <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
                             </tr>
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td colspan="3"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
+                              <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
                             </tr>
                           </tfoot>
                         </table>

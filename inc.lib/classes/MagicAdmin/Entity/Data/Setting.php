@@ -26,7 +26,7 @@ class Setting extends MagicObject
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="setting_id", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="setting_id", type="varchar(100)", length=100, nullable=false)
 	 * @Label(content="Setting ID")
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class Setting extends MagicObject
 	 * Content
 	 * 
 	 * @NotNull
-	 * @Column(name="content", type="text", nullable=false)
+	 * @Column(name="content", type="text", nullable=true)
 	 * @Label(content="Content")
 	 * @var string
 	 */

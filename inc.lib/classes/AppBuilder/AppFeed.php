@@ -73,7 +73,7 @@ class AppFeed extends PicoObjectToString
                 $instance->appendData(
                     new AppFeedData(
                         $record->getNotificationId(),
-                        $record->getLink(),
+                        $record->getUrl(),
                         $record->getTitle(),
                         $record->getTimeCreate(),
                         strtotime($record->getTimeCreate())

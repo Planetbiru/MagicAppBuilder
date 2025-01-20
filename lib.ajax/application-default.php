@@ -6,12 +6,10 @@ use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-// Record the start time
-$startTime = microtime(true);
-
 try
 {
     $inputPost = new InputPost();
+    $now = date('Y-m-d H:i:s');
     if(isset($entityAdmin) && $entityAdmin->issetAdminId())
     {
         $appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
@@ -23,6 +21,7 @@ try
             // Update
             $activeApplicationHistory
                 ->setApplicationId($entityAdmin->getApplicationId())
+                ->setTimeEdit($now)
                 ->update()
                 ;
         }
@@ -33,6 +32,9 @@ try
                 ->setAdminId($entityAdmin->getAdminId())
                 ->setWorkspaceId($entityAdmin->getWorkspaceId())
                 ->setApplicationId($entityAdmin->getApplicationId())
+                ->setTimeCreate($now)
+                ->setTimeEdit($now)
+                ->setActive(true)
                 ->insert()
                 ;
         }
@@ -43,12 +45,3 @@ catch(Exception $e)
     error_log($e->getMessage());
     // do nothing
 }
-
-// Record the end time
-$endTime = microtime(true);
-
-// Calculate the duration in seconds
-$executionTime = $endTime - $startTime;
-
-// Log the execution time
-error_log("Execution Time: " . number_format($executionTime, 4) . " seconds");
