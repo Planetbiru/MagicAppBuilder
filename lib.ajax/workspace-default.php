@@ -1,5 +1,6 @@
 <?php
 
+use MagicAdmin\Entity\Data\ActiveApplicationHistory;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -10,6 +11,19 @@ if($inputPost->getWorkspaceId())
     $workspaceId = $inputPost->getWorkspaceId();
     if(isset($entityAdmin))
     {
-        $entityAdmin->setWorkspaceId($workspaceId)->update();
+        $entityAdmin->setWorkspaceId($workspaceId);
+
+        $activeApplicationHistory = new ActiveApplicationHistory(null, $databaseBuilder);
+        try 
+        {
+            $activeApplicationHistory->findOneByAdminIdAndWorkspaceId($entityAdmin->getAdminId(), $workspaceId);
+            $entityAdmin->setApplicationId($activeApplicationHistory->getApplicationId());
+        }
+        catch(Exception $e)
+        {
+            // No selected application
+            $entityAdmin->setApplicationId(null);
+        }
+        $entityAdmin->update();
     }
 }
