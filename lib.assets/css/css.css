@@ -511,11 +511,11 @@ h3.entity-table-name {
 }
 
 .entity-column-selected {
-  background-color: #FDF3F3;
+  background-color: #e8faff;
 }
 
 .entity-column-primary-key {
-  background-color: #e8faff;
+  background-color: #FDF3F3;
 }
 
 .animation-wave,
@@ -857,4 +857,14 @@ input[type=number][name=database_port] {
 
 .nav-tabs a.nav-link {
   color: #000000;
+}
+
+.toast-container {
+  right: 0;
+  bottom: 0;
+}
+
+.toast {
+  right: 0;
+  bottom: 0;
 }/*# sourceMappingURL=css.css.map */
