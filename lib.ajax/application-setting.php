@@ -77,6 +77,26 @@ else
     $databases->setSelectedBase('nonfile-base');
 }
 
+$nameInIndonesian = array(
+    "name" => "nama",
+    "sort_order" => "sort_order",
+    "active" => "aktif",
+    "draft" => "draft",
+    "waiting_for" => "waiting_for",
+    "admin_create" => "admin_buat",
+    "admin_edit" => "admin_ubah",
+    "admin_ask_edit" => "admin_minta_ubah",
+    "time_create" => "waktu_buat",
+    "time_edit" => "waktu_ubah",
+    "time_ask_edit" => "waktu_minta_ubah",
+    "ip_create" => "ip_buat",
+    "ip_edit" => "ip_ubah",
+    "ip_ask_edit" => "ip_minta_ubah",
+    "approval_id" => "approval_id",
+    "approval_note" => "approval_note",
+    "approval_status" => "approval_status"
+);
+
 ?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
         <div id="accordion" class="accordion">
@@ -304,14 +324,22 @@ else
                             ?>
                                 <tr>
                                 <td><?php echo $key ?></td>
-                                <td><input class="form-control" type="text" name="entity_info_<?php echo $key ?>" value="<?php echo $value; ?>"></td>
+                                <td><input class="form-control entity-info-key" type="text" name="entity_info_<?php echo $key ?>" value="<?php echo $value; ?>" data-original="<?php echo $key; ?>" data-indonesian="<?php echo $nameInIndonesian[$key]; ?>"></td>
                                 </tr>
                             <?php
                             }
                             }
                             ?>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-primary use-indonesian" type="button">Use Indonesian</button>
+                                    <button class="btn btn-primary use-original" type="button">Use Original</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
+                    
                     <input type="hidden" name="application_id" value="<?php echo $applicationId;?>">
                 </div>
             </div>

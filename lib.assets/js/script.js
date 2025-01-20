@@ -1426,6 +1426,17 @@ jQuery(function () {
     })
   });
 
+  $(document).on('click', '.use-original', function(e){
+    $('.entity-info-key').each(function(e2){
+      $(this).val($(this).attr('data-original'));
+    });
+  });
+  $(document).on('click', '.use-indonesian', function(e){
+    $('.entity-info-key').each(function(e2){
+      $(this).val($(this).attr('data-indonesian'));
+    });
+  })
+
   loadAllResource();
   
 });
