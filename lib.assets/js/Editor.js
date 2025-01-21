@@ -12,6 +12,71 @@ let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
 
+function clearModuleFile()
+{
+  cmEditorModule.getDoc().setValue('');
+    setTimeout(function () {
+      cmEditorModule.refresh();
+    }, 1);
+}
+
+function clearEntityFile()
+{
+  cmEditorFile.getDoc().setValue('');
+    setTimeout(function () {
+      cmEditorFile.refresh();
+    }, 1);
+}
+
+function clearEditorSQL()
+{
+  cmEditorSQL.getDoc().setValue('');
+    setTimeout(function () {
+      cmEditorSQL.refresh();
+    }, 1);
+}
+
+function clearEditorSQLExecute()
+{
+  cmEditorSQLExecute.getDoc().setValue('');
+    setTimeout(function () {
+      cmEditorSQLExecute.refresh();
+    }, 1);
+}
+
+function clearTtransEd1()
+{
+  transEd1.getDoc().setValue('');
+    setTimeout(function () {
+      transEd1.refresh();
+    }, 1);
+}
+
+function clearTtransEd2()
+{
+  transEd2.getDoc().setValue('');
+    setTimeout(function () {
+      transEd2.refresh();
+    }, 1);
+}
+
+function clearTtransEd3()
+{
+  transEd3.getDoc().setValue('');
+    setTimeout(function () {
+      transEd3.refresh();
+    }, 1);
+}
+
+function clearTtransEd4()
+{
+  transEd4.getDoc().setValue('');
+    setTimeout(function () {
+      transEd4.refresh();
+    }, 1);
+}
+
+
 function format() {
   let totalLinesModule = cmEditorModule.lineCount();
   cmEditorModule.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesModule });

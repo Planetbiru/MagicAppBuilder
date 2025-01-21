@@ -5,7 +5,30 @@ let currentEntity2Translated = "";
 let lastErrorLine = -1;
 
 // A comma-separated string of SQL keywords.
-let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,view,when,whenever,where,with,without,work,write,year,zone";
+let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,"
++"array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,"
++"breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,"
++"class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,"
++"constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,"
++"current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,"
++"deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,"
++"destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,"
++"each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,"
++"fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,"
++"grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,"
++"insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,"
++"lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,"
++"minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,"
++"object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,"
++"overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,"
++"preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,"
++"relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,"
++"schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,"
++"some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,"
++"statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,"
++"timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,"
++"under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,"
++"view,when,whenever,where,with,without,work,write,year,zone";
 
 /**
  * Compares two strings for equality, ignoring case differences.
@@ -178,11 +201,11 @@ jQuery(function () {
       module_location: []
     };
 
-    form.find('.path-manager tbody tr').each(function(e2){
+    form.find('.path-manager tbody tr').each(function (e2) {
       let name = $(this).find('[name^="name"]');
       let path = $(this).find('[name^="path"]');
       let checked = $(this).find('[name^="checked"]');
-      dataToPost.module_location.push({name:name.val(), path:path.val(), active:checked[0].checked});
+      dataToPost.module_location.push({ name: name.val(), path: path.val(), active: checked[0].checked });
     });
 
     for (let i in inputs) {
@@ -204,22 +227,21 @@ jQuery(function () {
 
   $(document).on("click", "#generate_script", function (e) {
     e.preventDefault();
-    
     asyncAlert(
       'Do you want to generate the module and entities and replace the existing files?',  // Message to display in the modal
-      'Confirmation',  // Modal title
+      'Confirmation',  
       [
         {
-          'caption': 'Yes',  // Caption for the button
+          'caption': 'Yes',  
           'fn': () => {
             generateScript($(".main-table tbody"));
-          },  // Callback for OK button
-          'class': 'btn-primary'  // Bootstrap class for styling
+          },  
+          'class': 'btn-primary'  
         },
         {
-          'caption': 'No',  // Caption for the button
-          'fn': () => { },  // Callback for Cancel button
-          'class': 'btn-secondary'  // Bootstrap class for styling
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
         }
       ]
     );
@@ -368,20 +390,20 @@ jQuery(function () {
     if (nrow > 1) {
       let row = $(this).closest('tr');
       asyncAlert(
-        'Do you want to remove this row?',  
-        'Deletion Confirmation',  
+        'Do you want to remove this row?',
+        'Deletion Confirmation',
         [
           {
-            'caption': 'Yes',  
+            'caption': 'Yes',
             'fn': () => {
               row.remove();
-            },  
-            'class': 'btn-primary'  
+            },
+            'class': 'btn-primary'
           },
           {
-            'caption': 'No',  
-            'fn': () => { },  
-            'class': 'btn-secondary' 
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
           }
         ]
       );
@@ -442,7 +464,6 @@ jQuery(function () {
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
-
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);
@@ -490,7 +511,6 @@ jQuery(function () {
         for (let d in data) {
           if (d > 0) {
             let clone = $('#modal-update-path table.path-manager > tbody > tr:first').clone();
-
             $('#modal-update-path table.path-manager > tbody').append(clone);
           }
           let clone2 = $('#modal-update-path table.path-manager > tbody > tr:nth-child(' + (parseInt(d) + 1) + ')');
@@ -615,11 +635,10 @@ jQuery(function () {
       },
     });
   });
-  
+
   $(document).on('click', '.add_subfix', function (e) {
     let entityName = $('.rd-entity-name').val();
-    if(!entityName.endsWith('Min'))
-    {
+    if (!entityName.endsWith('Min')) {
       entityName += 'Min';
       $('.rd-entity-name').val(entityName);
     }
@@ -631,10 +650,10 @@ jQuery(function () {
 
     asyncAlert(
       'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
-      'Entity Generation Confirmation',  // Modal title
+      'Entity Generation Confirmation',  
       [
         {
-          'caption': 'Yes',  // Caption for the button
+          'caption': 'Yes', 
           'fn': () => {
             $.ajax({
               method: "POST",
@@ -646,13 +665,13 @@ jQuery(function () {
                 updateEntityRelationshipDiagram();
               },
             });
-          },  // Callback for OK button
-          'class': 'btn-primary'  // Bootstrap class for styling
+          },  
+          'class': 'btn-primary'  
         },
         {
-          'caption': 'No',  // Caption for the button
-          'fn': () => { },  // Callback for Cancel button
-          'class': 'btn-secondary'  // Bootstrap class for styling
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
         }
       ]
     );
@@ -725,24 +744,22 @@ jQuery(function () {
   $(document).on('click', 'table.path-manager .path-remover', function (e) {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      // Display the alert when the page loads
-      // Example of calling asyncAlert with dynamic buttons
       let row = $(this).closest('tr');
       asyncAlert(
         'Deleting this path will not remove the directory or its files. <br>Do you want to delete this path?',  // Message to display in the modal
-        'Deletion Confirmation',  // Modal title
+        'Deletion Confirmation',  
         [
           {
-            'caption': 'Yes',  // Caption for the button
+            'caption': 'Yes',  
             'fn': () => {
               row.remove();
-            },  // Callback for OK button
-            'class': 'btn-primary'  // Bootstrap class for styling
+            },  
+            'class': 'btn-primary'  
           },
           {
-            'caption': 'No',  // Caption for the button
-            'fn': () => { },  // Callback for Cancel button
-            'class': 'btn-secondary'  // Bootstrap class for styling
+            'caption': 'No',  
+            'fn': () => { },  
+            'class': 'btn-secondary'  
           }
         ]
       );
@@ -757,16 +774,14 @@ jQuery(function () {
     $(this).closest('table').find('tbody').append(clone);
     fixPathForm();
   });
-  
-  $(document).on('change', '[name="application_namespace"]', function(e){
+
+  $(document).on('change', '[name="application_namespace"]', function (e) {
     let ctrl = $(this);
     let val = ctrl.val();
-    if(val == 'MagicObject' || val == 'MagicApp')
-    {
+    if (val == 'MagicObject' || val == 'MagicApp') {
       ctrl.addClass('invalid-input');
     }
-    else
-    {
+    else {
       ctrl.removeClass('invalid-input');
     }
   });
@@ -786,11 +801,8 @@ jQuery(function () {
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-
-        if(data.application_workspace == '')
-        {
-          if(modal.find('.alert').length > 0)
-          {
+        if (data.application_workspace == '') {
+          if (modal.find('.alert').length > 0) {
             modal.find('.alert').remove();
           }
           let alertDiv = $('<div />');
@@ -799,8 +811,7 @@ jQuery(function () {
           modal.find('form').prepend(alertDiv);
           createBtn[0].disabled = true;
         }
-        else
-        {
+        else {
           $('[name="application_name"]').val(data.application_name);
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
@@ -865,7 +876,7 @@ jQuery(function () {
 
   $(document).on('change', '.target-language', function (e) {
     let val = $(this).val();
-    let translateFor = $(this).attr('data-translate-for');   
+    let translateFor = $(this).attr('data-translate-for');
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
@@ -900,24 +911,22 @@ jQuery(function () {
   $(document).on('click', 'table.language-manager .language-remover', function (e) {
     let count = $(this).closest('tbody').find('tr').length;
     if (count > 1) {
-      // Display the alert when the page loads
-      // Example of calling asyncAlert with dynamic buttons
       let row = $(this).closest('tr');
       asyncAlert(
         'Deleting this language will not remove the directory or its files. <br>Do you want to delete this language?',  // Message to display in the modal
         'Deletion Confirmation',  // Modal title
         [
           {
-            'caption': 'Yes',  // Caption for the button
+            'caption': 'Yes',  
             'fn': () => {
               row.remove();
-            },  // Callback for OK button
-            'class': 'btn-primary'  // Bootstrap class for styling
+            },  
+            'class': 'btn-primary'  
           },
           {
-            'caption': 'No',  // Caption for the button
-            'fn': () => { },  // Callback for Cancel button
-            'class': 'btn-secondary'  // Bootstrap class for styling
+            'caption': 'No',  
+            'fn': () => { },  
+            'class': 'btn-secondary'  
           }
         ]
       );
@@ -987,15 +996,15 @@ jQuery(function () {
     $('#modal-update-language').modal('hide');
   });
 
-  $(document).on('click', '.button-execute-query', function(e){
+  $(document).on('click', '.button-execute-query', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     asyncAlert(
       'Do you want to execute the queries on the current database?',  // Message to display in the modal
-      'Query Execution Confirmation',  // Modal title
+      'Query Execution Confirmation',  
       [
         {
-          'caption': 'Yes',  // Caption for the button
+          'caption': 'Yes', 
           'fn': () => {
             let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
@@ -1004,24 +1013,23 @@ jQuery(function () {
               url: "lib.ajax/query-execute.php",
               data: { action: 'execute', query: query },
               success: function (data) {
-                // reload query
                 let ents = getEntitySelection();
                 let merged = $(".entity-merge")[0].checked;
                 getEntityQuery(ents, merged);
                 modal.modal('hide');
               },
             });
-          },  // Callback for OK button
-          'class': 'btn-primary'  // Bootstrap class for styling
+          },  
+          'class': 'btn-primary'  
         },
         {
-          'caption': 'No',  // Caption for the button
-          'fn': () => { },  // Callback for Cancel button
-          'class': 'btn-secondary'  // Bootstrap class for styling
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
         }
       ]
     );
-    
+
   });
 
   $(document).on('click', '.default-language', function (e) {
@@ -1114,13 +1122,13 @@ jQuery(function () {
       }
     });
   });
-  
+
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-database-explorer .database-explorer').html('<iframe src="database-explorer/?applicationId='+applicationId+'"></iframe>');
+    $('#modal-database-explorer .database-explorer').html('<iframe src="database-explorer/?applicationId=' + applicationId + '"></iframe>');
     $('#modal-database-explorer').modal('show');
-    
+
   });
 
   $(document).on('click', '#button_explore_database', function (e) {
@@ -1261,7 +1269,7 @@ jQuery(function () {
       }
     });
   });
-  
+
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
@@ -1304,7 +1312,7 @@ jQuery(function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-create.php',
-      data: { workspaceName: workspaceName, workspaceDirectory:workspaceDirectory, workspaceDescription:workspaceDescription, phpPath:phpPath },
+      data: { workspaceName: workspaceName, workspaceDirectory: workspaceDirectory, workspaceDescription: workspaceDescription, phpPath: phpPath },
       success: function (data) {
         modal.modal('hide');
         loadAllResource();
@@ -1427,13 +1435,13 @@ jQuery(function () {
     })
   });
 
-  $(document).on('click', '.use-original', function(e){
-    $('.entity-info-key').each(function(e2){
+  $(document).on('click', '.use-original', function (e) {
+    $('.entity-info-key').each(function (e2) {
       $(this).val($(this).attr('data-original'));
     });
   });
-  $(document).on('click', '.use-indonesian', function(e){
-    $('.entity-info-key').each(function(e2){
+  $(document).on('click', '.use-indonesian', function (e) {
+    $('.entity-info-key').each(function (e2) {
       $(this).val($(this).attr('data-indonesian'));
     });
   })
@@ -1450,33 +1458,28 @@ jQuery(function () {
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
 
-function resetCheckActiveWorkspace()
-{
+function resetCheckActiveWorkspace() {
   clearInterval(toCheckActiveWorkspace);
-  toCheckActiveWorkspace = setInterval(function(){
+  toCheckActiveWorkspace = setInterval(function () {
     let val1 = window.localStorage.getItem('workspace-id') || '';
     let val2 = $('meta[name="workspace-id"]').attr('content');
-    if(val1 != '' && val2 != '' && val2 != val1)
-    {
+    if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
   }, 20000);
 }
-function resetCheckActiveApplication()
-{
+function resetCheckActiveApplication() {
   clearInterval(toCheckActiveApplication);
-  toCheckActiveApplication = setInterval(function(){
+  toCheckActiveApplication = setInterval(function () {
     let val1 = window.localStorage.getItem('application-id') || '';
     let val2 = $('meta[name="application-id"]').attr('content');
-    if(val1 != '' && val2 != '' && val2 != val1)
-    {
+    if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
   }, 22000);
 }
 
-function loadWorkspaceList()
-{
+function loadWorkspaceList() {
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/workspace-list.php',
@@ -1489,8 +1492,7 @@ function loadWorkspaceList()
   });
 }
 
-function loadApplicationList()
-{
+function loadApplicationList() {
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-list.php',
@@ -1503,8 +1505,7 @@ function loadApplicationList()
   });
 }
 
-function loadLanguageList()
-{
+function loadLanguageList() {
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-path-list.php',
@@ -1518,8 +1519,7 @@ function loadLanguageList()
   });
 }
 
-function loadPathList()
-{
+function loadPathList() {
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-language-list.php',
@@ -1530,8 +1530,13 @@ function loadPathList()
   });
 }
 
-function loadAllResource()
+function updateQuery()
 {
+  clearEditorSQL();
+  clearEditorSQLExecute();
+}
+
+function loadAllResource() {
   loadWorkspaceList();
   loadApplicationList();
   loadTable();
@@ -1545,8 +1550,7 @@ function loadAllResource()
   initTooltip();
 }
 
-function onSetDefaultWorkspace()
-{
+function onSetDefaultWorkspace() {
   loadWorkspaceList();
   loadApplicationList();
   loadTable();
@@ -1558,8 +1562,7 @@ function onSetDefaultWorkspace()
   initTooltip();
 }
 
-function onSetDefaultApplication()
-{
+function onSetDefaultApplication() {
   loadApplicationList();
   loadTable();
   loadMenu();
@@ -1570,13 +1573,18 @@ function onSetDefaultApplication()
   initTooltip();
 }
 
-function onModuleCreated()
-{
+function onModuleCreated() {
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
   initTooltip();
+}
+
+function updateErd()
+{
+  $('.erd-image').empty();
+  $('[name="erd-map"]').empty();
 }
 
 function initTooltip() {
@@ -1590,8 +1598,7 @@ function initTooltip() {
 
     // Show the tooltip when the area element is hovered
     tooltip.addClass('visible');
-    if(isHtml)
-    {
+    if (isHtml) {
       tooltip.addClass('multiline');
     }
 
@@ -1746,11 +1753,11 @@ async function asyncAlert(message, title, buttons) {
 
 async function getUserInput(message, title, buttons, initialValue) {
   const result = await asyncPrompt(
-    message, 
-    title, 
+    message,
+    title,
     buttons,
-    initialValue, 
-    function(){
+    initialValue,
+    function () {
       $('#alertOverlay').css({ 'display': 'none' });
       $('.modal').css({ 'overflow': '', 'overflow-y': 'auto' })
     }
@@ -2314,7 +2321,7 @@ function onChangeMapKey(obj) {
   else if (obj.hasClass('input-invalid-value')) {
     obj.removeClass('input-invalid-value');
   }
-  
+
 }
 
 /**
@@ -2431,7 +2438,7 @@ function saveEntityAs() {
       {
         'caption': 'Yes',  // Caption for the button
         'fn': () => {
-          let newEntity = $('.prompt-input').val();        
+          let newEntity = $('.prompt-input').val();
           $.ajax({
             type: "POST",
             url: "lib.ajax/entity-save-as.php",
@@ -2449,7 +2456,7 @@ function saveEntityAs() {
               }
             },
           });
-          
+
         },  // Callback for OK button
         'class': 'btn-primary'  // Bootstrap class for styling
       },
@@ -2458,8 +2465,8 @@ function saveEntityAs() {
         'fn': () => { },  // Callback for Cancel button
         'class': 'btn-secondary'  // Bootstrap class for styling
       }
-    ], 
-    currentEntity);
+    ],
+      currentEntity);
   } else {
     showAlertUI("Alert", "No file open");
   }
@@ -2596,6 +2603,7 @@ function getEntityFile(entity, clbk) {
   });
 }
 
+
 /**
  * Fetches the content of a module file and updates the editor.
  *
@@ -2626,6 +2634,8 @@ function getModuleFile(module, clbk) {
     },
   });
 }
+
+
 
 /**
  * Updates the entity query based on the current selection.
@@ -2669,6 +2679,7 @@ function updateEntityRelationshipDiagram() {
     dataType: "html",
     success: function (data) {
       $(".entity-container-relationship .entity-list").empty().append(data);
+      updateErd();
     },
   });
 }
@@ -2689,6 +2700,9 @@ function updateEntityFile() {
     success: function (data) {
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
+      clearEntityFile();
+      clearTtransEd3();
+      clearTtransEd4();
     },
   });
 }
@@ -2708,6 +2722,7 @@ function updateModuleFile() {
     dataType: "html",
     success: function (data) {
       $(".module-container .module-list-file").empty().append(data);
+      clearModuleFile();
     },
   });
 
@@ -2717,6 +2732,8 @@ function updateModuleFile() {
     dataType: "html",
     success: function (data) {
       $(".container-translate-module .module-list-translate").empty().append(data);
+      clearTtransEd1();
+      clearTtransEd2();
     },
   });
 }
@@ -2958,8 +2975,8 @@ function generateScript(selector) {
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
-  
-  
+
+
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let entity = {
@@ -3192,7 +3209,7 @@ function generateAllCode(dataToPost) {
 function showToast(header, body) {
   // Generate a unique ID for the toast element using a timestamp
   let toastId = 'toast-' + new Date().getTime(); // Use timestamp as a unique ID
-  
+
   // Construct the HTML structure for the toast dynamically
   let toastHTML = `
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000" id="${toastId}">
