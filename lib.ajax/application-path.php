@@ -81,29 +81,36 @@ else if($inputPost->getAction() == "default")
     $selected = $inputPost->getSelectedPath();
     try
     {
-        $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
-        $appConf = $appConfig->getApplication();
-        if(!isset($appConf))
+        if(isset($activeApplication))
         {
-            $appConf = new SecretObject();
-        }
-        $currentPaths = $appConf->getBaseModuleDirectory();
-        if(!isset($currentPaths) || !is_array($currentPaths))
-        {
-            $currentPaths = [];
-        }
-        foreach($currentPaths as $idx=>$p)
-        {
-            $currentPaths[$idx]->setActive(false);
-            if($p->getPath() == $selected)
+            $appId = $activeApplication->getApplicationId();
+            $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
+            $appConf = $appConfig->getApplication();
+            if(!isset($appConf))
             {
-                $currentPaths[$idx]->setActive(true);
+                $appConf = new SecretObject();
             }
+            $currentPaths = $appConf->getBaseModuleDirectory();
+            if(!isset($currentPaths) || !is_array($currentPaths))
+            {
+                $currentPaths = [];
+            }
+            foreach($currentPaths as $idx=>$p)
+            {
+                $currentPaths[$idx]->setActive(false);
+                if($p->getPath() == $selected)
+                {
+                    $currentPaths[$idx]->setActive(true);
+                }
+            }
+            $appConf->setBaseModuleDirectory($currentPaths);
+            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+            ResponseUtil::sendJSON($currentPaths);
         }
-        $appConf->setBaseModuleDirectory($currentPaths);
-        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
-        ResponseUtil::sendJSON($currentPaths);
+        else
+        {
+            ResponseUtil::sendJSON([]);
+        }
     }
     catch(Exception $e)
     {
