@@ -7,11 +7,16 @@ require_once __DIR__ . "/inc.app/navs.php";
 $constShowActive = ' show active';
 $constSelected = ' selected';
 
+$workspaceId = isset($activeWorkspace) ? $activeWorkspace->getWorkspaceId() : "";
+$applicationId = isset($activeApplication) ? $activeApplication->getApplicationId() : "";
+
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="workspace-id" content="<?php echo $workspaceId;?>">
+  <meta name="application-id" content="<?php echo $applicationId;?>">
   <title>MagicAppBuilder</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="shortcut icon" type="image/png" href="favicon.png" />

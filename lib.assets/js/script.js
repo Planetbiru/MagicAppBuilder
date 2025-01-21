@@ -366,24 +366,22 @@ jQuery(function () {
   $(document).on("click", ".btn-remove-row", function (e) {
     let nrow = $(this).closest("tbody").find("tr").length;
     if (nrow > 1) {
-      // Display the alert when the page loads
-      // Example of calling asyncAlert with dynamic buttons
       let row = $(this).closest('tr');
       asyncAlert(
-        'Do you want to remove this row?',  // Message to display in the modal
-        'Deletion Confirmation',  // Modal title
+        'Do you want to remove this row?',  
+        'Deletion Confirmation',  
         [
           {
-            'caption': 'Yes',  // Caption for the button
+            'caption': 'Yes',  
             'fn': () => {
               row.remove();
-            },  // Callback for OK button
-            'class': 'btn-primary'  // Bootstrap class for styling
+            },  
+            'class': 'btn-primary'  
           },
           {
-            'caption': 'No',  // Caption for the button
-            'fn': () => { },  // Callback for Cancel button
-            'class': 'btn-secondary'  // Bootstrap class for styling
+            'caption': 'No',  
+            'fn': () => { },  
+            'class': 'btn-secondary' 
           }
         ]
       );
@@ -478,7 +476,6 @@ jQuery(function () {
       });
     }
     $(modal).modal('hide');
-
   });
 
   $('#modal-update-path').on('show.bs.modal', function (e) {
@@ -627,7 +624,6 @@ jQuery(function () {
       $('.rd-entity-name').val(entityName);
     }
   });
-  
 
   $(document).on('click', '.generate_entity', function (e) {
     let entityName = $('.rd-entity-name').val();
@@ -750,7 +746,6 @@ jQuery(function () {
           }
         ]
       );
-
     }
     fixPathForm();
   });
@@ -798,7 +793,7 @@ jQuery(function () {
           {
             modal.find('.alert').remove();
           }
-          var alertDiv = $('<div />');
+          let alertDiv = $('<div />');
           alertDiv.addClass('alert alert-warning');
           alertDiv.html('Please select a workspace before creating a new application.');
           modal.find('form').prepend(alertDiv);
@@ -1260,6 +1255,9 @@ jQuery(function () {
       data: { workspaceId: workspaceId },
       success: function (data) {
         onSetDefaultWorkspace();
+        $('meta[name="workspace-id"]').attr('content', workspaceId);
+        window.localStorage.setItem('workspace-id', workspaceId);
+        resetCheckActiveWorkspace();
       }
     });
   });
@@ -1273,6 +1271,9 @@ jQuery(function () {
       data: { applicationId: applicationId },
       success: function (data) {
         onSetDefaultApplication();
+        $('meta[name="application-id"]').attr('content', applicationId);
+        window.localStorage.setItem('application-id', applicationId);
+        resetCheckActiveApplication();
       }
     });
   });
@@ -1437,9 +1438,42 @@ jQuery(function () {
     });
   })
 
+  let val1 = $('meta[name="workspace-id"]').attr('content');
+  let val2 = $('meta[name="application-id"]').attr('content');
+  window.localStorage.setItem('workspace-id', val1);
+  window.localStorage.setItem('application-id', val2);
   loadAllResource();
-  
+  resetCheckActiveWorkspace();
+  resetCheckActiveApplication();
 });
+
+let toCheckActiveWorkspace = setInterval('', 10000000);
+let toCheckActiveApplication = setInterval('', 10000000);
+
+function resetCheckActiveWorkspace()
+{
+  clearInterval(toCheckActiveWorkspace);
+  toCheckActiveWorkspace = setInterval(function(){
+    let val1 = window.localStorage.getItem('workspace-id') || '';
+    let val2 = $('meta[name="workspace-id"]').attr('content');
+    if(val1 != '' && val2 != '' && val2 != val1)
+    {
+      loadAllResource();
+    }
+  }, 20000);
+}
+function resetCheckActiveApplication()
+{
+  clearInterval(toCheckActiveApplication);
+  toCheckActiveApplication = setInterval(function(){
+    let val1 = window.localStorage.getItem('application-id') || '';
+    let val2 = $('meta[name="application-id"]').attr('content');
+    if(val1 != '' && val2 != '' && val2 != val1)
+    {
+      loadAllResource();
+    }
+  }, 22000);
+}
 
 function loadWorkspaceList()
 {
@@ -1448,6 +1482,9 @@ function loadWorkspaceList()
     url: 'lib.ajax/workspace-list.php',
     success: function (data) {
       $('.workspace-card').empty().append(data);
+      let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id');
+      window.localStorage.setItem('workspace-id', val1);
+      $('meta[name="workspace-id"]').attr('content', val1);
     }
   });
 }
@@ -1459,6 +1496,9 @@ function loadApplicationList()
     url: 'lib.ajax/application-list.php',
     success: function (data) {
       $('.application-card').empty().append(data);
+      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id');
+      window.localStorage.setItem('application-id', val1);
+      $('meta[name="application-id"]').attr('content', val1);
     }
   });
 }
@@ -1892,8 +1932,6 @@ function moveDown(element) {
   }
 }
 
-
-
 /**
  * Reloads translations based on the specified context.
  *
@@ -1958,10 +1996,6 @@ function translateEntity(clbk) {
         transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
         lastLine1 = -1; //NOSONAR
-      },
-      error: function(e1, e2)
-      {
-        console.error(e1, e2)
       }
     });
   }
@@ -3157,10 +3191,10 @@ function generateAllCode(dataToPost) {
  */
 function showToast(header, body) {
   // Generate a unique ID for the toast element using a timestamp
-  var toastId = 'toast-' + new Date().getTime(); // Use timestamp as a unique ID
+  let toastId = 'toast-' + new Date().getTime(); // Use timestamp as a unique ID
   
   // Construct the HTML structure for the toast dynamically
-  var toastHTML = `
+  let toastHTML = `
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000" id="${toastId}">
       <div class="toast-header">
         <strong class="mr-auto">${header}&nbsp;&nbsp;</strong>
