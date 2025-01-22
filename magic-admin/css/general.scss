@@ -518,6 +518,18 @@ select:focus {
   margin-bottom: 6px;
 }
 
+.btn-warning {
+  color: #e8e8e8;
+  background-color: #ea7208;
+  border-color: #ea7208;
+}
+
+.btn-warning:hover, .btn-warning:focus-visible {
+  color: #e8e8e8;
+  background-color: #dd6d0a;
+  border-color: #dd6d0a;
+}
+
 // Dark Mode Styles
 .dark-mode {
 
@@ -681,16 +693,17 @@ select:focus {
     border-color: #4f4f4f;
   }
 
+
   .btn-warning {
     color: #e8e8e8;
-    background-color: #c90;
-    border-color: #bb8c00;
+    background-color: #e06c06;
+    border-color: #e06c06;
   }
-
-  .btn-warning:hover {
+  
+  .btn-warning:hover, .btn-warning:focus-visible {
     color: #e8e8e8;
-    background-color: #e0a800;
-    border-color: #d39e00;
+    background-color: #db6905;
+    border-color: #db6905;
   }
 
   .btn-danger {
