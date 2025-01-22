@@ -4,7 +4,7 @@ use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\SecretObject;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 
 $inputPost = new InputPost();
@@ -13,7 +13,7 @@ if($inputPost->getAction() == "update")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath); 
         
         $paths = $inputPost->getPaths();
         $currentPaths = [];
@@ -46,7 +46,7 @@ if($inputPost->getAction() == "update")
                 }
             }
             $appConf->setBaseModuleDirectory($currentPaths);
-            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
         }
         ResponseUtil::sendJSON($currentPaths);
     }
@@ -61,7 +61,7 @@ else if($inputPost->getAction() == "get")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);
         $appConf = $appConfig->getApplication(); 
         $currentPaths = $appConf->getBaseModuleDirectory();
         if(!isset($currentPaths) || !is_array($currentPaths))
@@ -84,7 +84,7 @@ else if($inputPost->getAction() == "default")
         if(isset($activeApplication))
         {
             $appId = $activeApplication->getApplicationId();
-            $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
+            $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);      
             $appConf = $appConfig->getApplication();
             if(!isset($appConf))
             {
@@ -104,7 +104,7 @@ else if($inputPost->getAction() == "default")
                 }
             }
             $appConf->setBaseModuleDirectory($currentPaths);
-            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
             ResponseUtil::sendJSON($currentPaths);
         }
         else

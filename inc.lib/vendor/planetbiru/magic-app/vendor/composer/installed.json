@@ -2,24 +2,24 @@
     "packages": [
         {
             "name": "planetbiru/magic-object",
-            "version": "2.14.8",
-            "version_normalized": "2.14.8.0",
+            "version": "2.14.9",
+            "version_normalized": "2.14.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "1b51738937b4e96b25939e4a55153612a5bbbe29"
+                "reference": "0d6da1605cf6f3bf2a2a2158dd7978b2c92d730a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/1b51738937b4e96b25939e4a55153612a5bbbe29",
-                "reference": "1b51738937b4e96b25939e4a55153612a5bbbe29",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/0d6da1605cf6f3bf2a2a2158dd7978b2c92d730a",
+                "reference": "0d6da1605cf6f3bf2a2a2158dd7978b2c92d730a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "symfony/yaml": "^3.4"
             },
-            "time": "2025-01-20T14:58:37+00:00",
+            "time": "2025-01-22T02:37:46+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -39,7 +39,7 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/2.14.8"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/2.14.9"
             },
             "install-path": "../planetbiru/magic-object"
         },
@@ -71,8 +71,8 @@
             "type": "library",
             "extra": {
                 "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
                 }
             },
             "installation-source": "dist",

@@ -13,7 +13,7 @@ if($inputPost->getAction() == "update")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath); 
         
         $languages = $inputPost->getLanguages();
         $currentLanguages = [];
@@ -41,7 +41,7 @@ if($inputPost->getAction() == "update")
                 }
             }
             $appConfig->setLanguages($currentLanguages);
-            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
         }
         ResponseUtil::sendJSON($currentLanguages);
     }
@@ -56,7 +56,7 @@ else if($inputPost->getAction() == "get")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
@@ -76,7 +76,7 @@ else if($inputPost->getAction() == "default")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);      
 
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
@@ -92,7 +92,7 @@ else if($inputPost->getAction() == "default")
             }
         }
         $appConfig->setLanguages($currentLanguages);
-        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+        AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
         ResponseUtil::sendJSON($currentLanguages);
     }
     catch(Exception $e)
