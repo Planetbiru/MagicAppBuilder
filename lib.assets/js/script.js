@@ -4,6 +4,8 @@ let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
 
+let ajaxPending = 0;
+
 // A comma-separated string of SQL keywords.
 let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,"
 +"array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,"
@@ -474,6 +476,7 @@ jQuery(function () {
     });
 
     if (name != "" && id != "" && directory != "" && author != "") {
+      ajaxPending++;
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
@@ -491,8 +494,10 @@ jQuery(function () {
         },
         success: function (data) {
           loadAllResource();
+          ajaxPending--;
         },
         error: function (e1, e2) {
+          ajaxPending--;
         }
       });
     }
@@ -500,11 +505,13 @@ jQuery(function () {
   });
 
   $('#modal-update-path').on('show.bs.modal', function (e) {
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'get' },
       success: function (data) {
+        ajaxPending--;
         while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
           $('#modal-update-path table.path-manager > tbody > tr:last').remove();
         }
@@ -535,11 +542,13 @@ jQuery(function () {
     });
     let select = $('#current_module_location');
     if (paths.length > 0) {
+      ajaxPending++;
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
         data: { action: 'update', paths: paths },
         success: function (data) {
+          ajaxPending--;
           select.empty();
           for (let d in data) {
             select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -560,11 +569,13 @@ jQuery(function () {
   $(document).on('click', '#update_current_location', function (e) {
     e.preventDefault();
     let select = $('#current_module_location');
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'default', selected_path: select.val() },
       success: function (data) {
+        ajaxPending--;
         select.empty();
         for (let d in data) {
           select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -655,11 +666,13 @@ jQuery(function () {
         {
           'caption': 'Yes', 
           'fn': () => {
+            ajaxPending++;
             $.ajax({
               method: "POST",
               url: "lib.ajax/entity-generator.php",
               data: { entityName: entityName, tableName: tableName },
               success: function (data) {
+                ajaxPending--;
                 updateEntityFile();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -797,10 +810,12 @@ jQuery(function () {
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
+    ajaxPending++;
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
+        ajaxPending--;
         if (data.application_workspace == '') {
           if (modal.find('.alert').length > 0) {
             modal.find('.alert').remove();
@@ -850,12 +865,14 @@ jQuery(function () {
     let entityName = $('.entity-name').val();
     let propertyNames = $('.entity-property-name').val();
     let targetLanguage = $('.target-language').val();
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
       data: { userAction: 'set', entityName: entityName, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
+        ajaxPending--;
       },
     });
   });
@@ -864,12 +881,14 @@ jQuery(function () {
     let translated = transEd4.getDoc().getValue();
     let propertyNames = $('.module-property-name').val();
     let targetLanguage = $('.target-language').val();
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/module-translate.php",
       dataType: "json",
       data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
+        ajaxPending--;
       },
     });
   });
@@ -935,6 +954,7 @@ jQuery(function () {
   });
 
   $('#modal-update-language').on('show.bs.modal', function (e) {
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
@@ -944,6 +964,7 @@ jQuery(function () {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
+          ajaxPending--;
 
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
@@ -971,11 +992,13 @@ jQuery(function () {
     });
     let select = $('.target-language');
     if (languages.length > 0) {
+      ajaxPending++;
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
         data: { action: 'update', languages: languages },
         success: function (data) {
+          ajaxPending--;
           select.empty();
           for (let d in data) {
             for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1008,11 +1031,13 @@ jQuery(function () {
           'fn': () => {
             let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
+            ajaxPending++;
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
               data: { action: 'execute', query: query },
               success: function (data) {
+                ajaxPending--;
                 let ents = getEntitySelection();
                 let merged = $(".entity-merge")[0].checked;
                 getEntityQuery(ents, merged);
@@ -1035,11 +1060,13 @@ jQuery(function () {
   $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');
+    ajaxPending++;
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
       data: { action: 'default', selected_language: select.val() },
       success: function (data) {
+        ajaxPending--;
         select.empty();
         for (let d in data) {
           for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1086,12 +1113,14 @@ jQuery(function () {
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
+    ajaxPending++;
     $.ajax({
       type: 'GET',
       dataType: 'html',
       url: url,
       data: request,
       success: function (data) {
+        ajaxPending--;
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
       }
@@ -1105,12 +1134,14 @@ jQuery(function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
+    ajaxPending++;
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-setting.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
+        ajaxPending--;
         $('#modal-application-setting .application-setting').empty().append(data);
         setTimeout(function () {
           // set database_password to be empty
@@ -1147,13 +1178,14 @@ jQuery(function () {
     modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     modal.attr('data-application-id', applicationId);
     modal.modal('show');
-
+    ajaxPending++;
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-menu.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
+        ajaxPending--;
         $('#modal-application-menu .modal-body').empty().append(data);
         loadAllResource();
         updateBtn[0].disabled = false;

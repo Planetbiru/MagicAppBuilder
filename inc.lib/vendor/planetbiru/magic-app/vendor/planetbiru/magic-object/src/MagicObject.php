@@ -1802,7 +1802,6 @@ class MagicObject extends stdClass // NOSONAR
                 }
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
-
                     $match = $this->countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result);
                     $pageData = new PicoPageData($this->toArrayObject($result, $passive), $startTime, $match, $pageable, $stmt, $this, $subqueryMap);
                 }
@@ -1963,7 +1962,19 @@ class MagicObject extends stdClass // NOSONAR
     {
         if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
-            $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
+            if($findOption & self::FIND_OPTION_NO_FETCH_DATA)
+            {
+                $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
+            }
+            else
+            {
+                $resultCount = count($result);
+                if($resultCount == $pageable->getPage()->getPageSize())
+                {
+                    $resultCount++;
+                }
+                $match = $pageable->getPage()->getOffset() + $resultCount;
+            }
         }
         else
         {
@@ -2108,12 +2119,11 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSortable|string|null $sortable The sorting criteria
      * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
-     * @param int $findOption The find option
      * @return PicoPageData The paginated data
      * @throws NoRecordFoundException if no records are found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
-    private function findBy($method, $params, $pageable = null, $sortable = null, $passive = false)
+    private function findBy($method, $params, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null)
     {
         $startTime = microtime(true);
         try
@@ -2122,7 +2132,7 @@ class MagicObject extends stdClass // NOSONAR
             if($this->_databaseConnected())
             {
                 $persist = new PicoDatabasePersistence($this->_database, $this);
-                $result = $persist->findBy($method, $params, $pageable, $sortable);
+                $result = $persist->findBy($method, $params, $pageable, $sortable, $subqueryMap);
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
                     $match = $persist->countBy($method, $params);

@@ -699,12 +699,27 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			$result = (string)$value;
 		} elseif (is_array($value) || is_object($value)) {
 			// Convert array or object to JSON and escape
-			return $this->implodeValues($value);
+			return $this->escapedJSONValues($value);
 		} else {
 			// Force convert to string and escape
 			$result = "'" . $this->escapeSQL((string)$value) . "'";
 		}
 		return $result;
+	}
+
+	/**
+	 * Escapes the JSON-encoded values.
+	 *
+	 * This function takes an input value, encodes it into JSON format, and then escapes
+	 * the resulting JSON string to ensure it is safe for use (e.g., preventing injection or
+	 * special character issues).
+	 *
+	 * @param mixed $values The input values to be encoded into JSON and escaped.
+	 * @return string The escaped JSON string.
+	 */
+	public function escapedJSONValues($values)
+	{
+		return $this->escapeValue(json_encode($values));
 	}
 	
 	/**
@@ -716,7 +731,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * @param mixed $value The value to be converted.
 	 * @return string The boolean representation as a string.
 	 */
-	private function createBoolean($value)
+	public function createBoolean($value)
 	{
 		if($this->isSqlite())
 		{
@@ -731,7 +746,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * @param array $values The array of values.
 	 * @return string The comma-separated list.
 	 */
-	private function implodeValues($values)
+	public function implodeValues($values)
 	{
 		foreach ($values as $key => $value) {
 			$values[$key] = $this->escapeValue($value);

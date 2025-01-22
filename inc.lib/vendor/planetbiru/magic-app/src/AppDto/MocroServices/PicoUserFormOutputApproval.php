@@ -46,7 +46,6 @@ class PicoUserFormOutputApproval extends PicoEntityData
         }
         $this->output[] = $output;
     }
-
     
     /**
      * Get examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
