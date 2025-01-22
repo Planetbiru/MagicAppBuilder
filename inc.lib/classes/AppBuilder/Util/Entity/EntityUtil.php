@@ -166,14 +166,14 @@ class EntityUtil
         $table .= '<table><tbody>';
 
         $table .= '<tr><td colspan="2">Columns</td></tr>';
-        if (isset($columns) && is_array($columns)) {
+        if (isset($columns) && is_array($columns) && !empty($columns)) {
             foreach ($columns as $column) {
                 $table .= '<tr><td>'.$column['name'].'</td><td>'.$column['type'].'</td></tr>'; // NOSONAR
             }
         }
 
         // Add primary keys to the table
-        if (isset($primaryKeys) && is_array($primaryKeys)) {
+        if (isset($primaryKeys) && is_array($primaryKeys) && !empty($primaryKeys)) {
             $table .= '<tr><td colspan="2">Primary Keys</td></tr>';
             foreach ($primaryKeys as $column) {
                 $table .= '<tr><td>'.$column['name'].'</td><td></td></tr>'; // NOSONAR
@@ -181,7 +181,7 @@ class EntityUtil
         }
 
         // Add join columns to the table
-        if (isset($joinColumns) && is_array($joinColumns)) {
+        if (isset($joinColumns) && is_array($joinColumns) && !empty($joinColumns)) {
             $table .= '<tr><td colspan="2">Join Columns</td></tr>';
             foreach ($joinColumns as $column) {
                 $ref = isset($column['refernceColumnName']) ? $column['refernceColumnName'] : $column['name'];
