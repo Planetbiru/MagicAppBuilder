@@ -1,11 +1,11 @@
-var cm = window.localStorage.getItem('colorMode');
-var hd = window.localStorage.getItem('sidebarHidden');
-if(cm == null || cm == '')
+let templateColorMode = window.localStorage.getItem('colorMode');
+let templateHideSidebar = window.localStorage.getItem('sidebarHidden');
+if(templateColorMode == null || templateColorMode == '')
 {
-    cm = 'light-mode';
+    templateColorMode = 'light-mode';
 }
-document.querySelector('body').classList.add(cm);
-if(hd == 'true')
+document.querySelector('body').classList.add(templateColorMode);
+if(templateHideSidebar == 'true')
 {
     document.querySelector('body').classList.add('sidebar-hidden');
 }
