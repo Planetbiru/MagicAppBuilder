@@ -133,6 +133,7 @@ else if($inputPost->getUserAction() == 'set')
             }
             PicoIniUtil::writeIniFile($original, $path);
         }
+        ResponseUtil::sendJSON([]);
     }
     catch(Exception $e)
     {
