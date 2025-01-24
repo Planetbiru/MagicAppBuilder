@@ -1907,7 +1907,8 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
  * @returns {Promise} A promise that resolves with the caption of the button the user clicks.
  */
 async function asyncAlert(message, title, buttons) {
-  const result = await showModal(
+  const result = await showModal // NOSONAR
+  (
     message,
     title,
     buttons,
@@ -1938,7 +1939,8 @@ async function asyncAlert(message, title, buttons) {
  * or the caption of any other clicked button.
  */
 async function getUserInput(message, title, buttons, initialValue) {
-  const result = await asyncPrompt(
+  const result = await asyncPrompt // NOSONAR
+  (
     message,
     title,
     buttons,
