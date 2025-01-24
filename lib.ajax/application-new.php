@@ -74,7 +74,7 @@ try
 }
 catch(Exception $e)
 {
-    
+    // Do nothing
 }
 
 $data = [
