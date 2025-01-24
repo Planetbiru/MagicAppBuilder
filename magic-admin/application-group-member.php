@@ -30,7 +30,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application-group-member", "Application Group Member");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "application-group-member", $appLanguage->getApplicationGroupMember());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 

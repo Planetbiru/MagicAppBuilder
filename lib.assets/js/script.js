@@ -487,6 +487,7 @@ jQuery(function () {
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
+    let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
     let paths = [];
@@ -511,6 +512,7 @@ jQuery(function () {
           description: description,
           directory: directory,
           namespace: namespace,
+          workspace_id: workspace_id,
           author: author,
           paths: paths,
           magic_app_version: magic_app_version
@@ -829,7 +831,7 @@ jQuery(function () {
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
     $('[name="application_directory"]').val('');
-    $('[name="application_workspace"]').val('');
+    $('[name="application_workspace_id"]').val('');
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
@@ -839,7 +841,7 @@ jQuery(function () {
       url: 'lib.ajax/application-new.php',
       success: function (data) {
         decreaseAjaxPending();
-        if (data.application_workspace == '') {
+        if (data.application_workspace.length == 0) {
           if (modal.find('.alert').length > 0) {
             modal.find('.alert').remove();
           }
@@ -854,8 +856,22 @@ jQuery(function () {
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
           $('[name="application_directory"]').val(data.application_directory);
+          
+          
           $('[name="application_namespace"]').val(data.application_namespace);
-          $('[name="application_workspace"]').val(data.application_workspace);
+
+          $('[name="application_workspace_id"]').empty();
+          for(let workspace of data.application_workspace)
+          {
+            let opt = $('<option />');
+            opt.text(workspace.label);
+            opt.attr('value', workspace.value);
+            if(workspace.selected)
+            {
+              opt.attr('selected', 'selected');
+            }
+            $('[name="application_workspace_id"]').append(opt);
+          }
           $('[name="application_author"]').val(data.application_author);
           $('[name="application_description"]').val(data.application_description);
           for (let i in data.magic_app_versions) {
@@ -1313,7 +1329,7 @@ jQuery(function () {
 
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
-    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1331,7 +1347,7 @@ jQuery(function () {
 
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
-    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1517,8 +1533,8 @@ jQuery(function () {
     });
   })
 
-  let val1 = $('meta[name="workspace-id"]').attr('content');
-  let val2 = $('meta[name="application-id"]').attr('content');
+  let val1 = $('meta[name="workspace-id"]').attr('content') || '';
+  let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
   window.localStorage.setItem('application-id', val2);
   loadAllResource();
@@ -1582,7 +1598,7 @@ function loadWorkspaceList() {
     success: function (data) {
       decreaseAjaxPending();
       $('.workspace-card').empty().append(data);
-      let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id');
+      let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id') || '';
       window.localStorage.setItem('workspace-id', val1);
       $('meta[name="workspace-id"]').attr('content', val1);
     }
@@ -1605,7 +1621,7 @@ function loadApplicationList() {
     success: function (data) {
       decreaseAjaxPending();
       $('.application-card').empty().append(data);
-      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id');
+      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
       window.localStorage.setItem('application-id', val1);
       $('meta[name="application-id"]').attr('content', val1);
     }
@@ -1722,6 +1738,8 @@ function onSetDefaultWorkspace() {
 function onSetDefaultApplication() {
   loadApplicationList();
   loadTable();
+  loadPathList();
+  loadLanguageList();
   loadMenu();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();

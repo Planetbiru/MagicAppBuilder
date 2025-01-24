@@ -711,7 +711,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                 </tr>
                 <tr>
                   <td>Workspace</td>
-                  <td><input class="form-control" type="text" name="application_workspace" readonly></td>
+                  <td><select class="form-control" name="application_workspace_id"></select></td>
                 </tr>
                 <tr>
                   <td>Application Directory</td>

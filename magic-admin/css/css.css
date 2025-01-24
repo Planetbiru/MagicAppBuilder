@@ -369,11 +369,12 @@ td[data-order-method=desc] {
 
 [data-order-method=asc]::after {
   transform: rotate(135deg);
-  top: 19px;
+  top: 15px;
 }
 
 [data-order-method=desc]::after {
   transform: rotate(-45deg);
+  top: 12px;
 }
 
 select {
@@ -434,6 +435,11 @@ select:focus {
 .dark-mode {
   background-color: #212529;
   color: #e4e6e8;
+}
+.dark-mode .alert-info {
+  color: #e4e4e4;
+  background-color: #212529;
+  border-color: #464646;
 }
 .dark-mode .menu-separator {
   border-top: 1px solid #484848;

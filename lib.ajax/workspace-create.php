@@ -46,7 +46,7 @@ try
 
     if(isset($entityAdmin) && $entityAdmin->getAdminId() != null)
     {
-        $entityAdmin->setWorkspaceId($workspaceId)->update();
+        $entityAdmin->setWorkspaceId($workspaceId)->setApplicationId(null)->update();
         
         $workspaceAdmin = new EntityAdminWorkspace(null, $databaseBuilder);
 

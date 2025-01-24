@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
     <title>Login to MagicAppBuilder</title>
     <link rel="stylesheet" type="text/css" href="../lib.assets/bootstrap/css/bootstrap.min.css">
     <style>

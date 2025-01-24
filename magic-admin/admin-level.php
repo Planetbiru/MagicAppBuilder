@@ -28,7 +28,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-level", "Admin Level");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-level", $appLanguage->getAdminLevel());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 

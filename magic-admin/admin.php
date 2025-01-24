@@ -72,7 +72,7 @@ function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
 	}
 }
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", "Admin");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", $appLanguage->getAdmin());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
