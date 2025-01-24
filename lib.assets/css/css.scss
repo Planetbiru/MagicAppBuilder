@@ -1011,11 +1011,27 @@ input[type=number][name="database_port"] {
 
 .toast-container{
 	right: 0;
-	bottom: 0;
+	bottom: 20px;
 }
-
 
 .toast{
 	right: 0;
 	bottom: 0;
+}
+
+.status-bar-container {
+	bottom: 0;
+	right: 0;
+	box-sizing: border-box;
+}
+
+.status-bar{
+	display: inline-block;
+	vertical-align: bottom;
+}
+
+.ajax-pending{
+	background-color: #007ac8;
+	height: 10px;
+	width: 0px;
 }

@@ -157,7 +157,7 @@ if($inputPost->getUserAction() == 'get')
     ResponseUtil::sendJSON($response);
 }
 
-if($inputPost->getUserAction() == 'set')
+else if($inputPost->getUserAction() == 'set')
 {
     $allKeys = [];
     $response = [];
@@ -207,4 +207,9 @@ if($inputPost->getUserAction() == 'set')
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
     
     PicoIniUtil::writeIniFile($storedTranslatedLabel, $pathTrans);
+    ResponseUtil::sendJSON(new stdClass);
+}
+else
+{
+    ResponseUtil::sendJSON(new stdClass);
 }

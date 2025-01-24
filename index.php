@@ -1134,9 +1134,11 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   </div>
 
   <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
-    
   </div>
-
-
+  <div class="status-bar-container position-fixed bottom-0 right-0 p-3">
+    <div class="status-bar">
+        <div class="ajax-pending"></div>
+    </div>
+  </div>
 </body>
 </html>

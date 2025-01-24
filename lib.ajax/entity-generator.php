@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\Request\InputPost;
 
@@ -27,3 +28,4 @@ catch(Exception $e)
     error_log($e->getMessage());
     // do nothing
 }
+ResponseUtil::sendJSON(new stdClass);

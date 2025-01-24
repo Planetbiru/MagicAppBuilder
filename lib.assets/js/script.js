@@ -3,8 +3,31 @@ let currentEntity = "";
 let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
-
 let ajaxPending = 0;
+
+/**
+ * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
+ */
+function increaseAjaxPending() {
+  ajaxPending++;
+  updatePendingBar();
+}
+
+/**
+ * Decrements the `ajaxPending` counter and updates the visual representation of the pending bar.
+ */
+function decreaseAjaxPending() {
+  ajaxPending--;
+  updatePendingBar();
+}
+
+/**
+ * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
+ * The width is calculated as `ajaxPending * 20` pixels.
+ */
+function updatePendingBar() {
+  $('.ajax-pending').css('width', (ajaxPending * 20) + 'px');
+}
 
 // A comma-separated string of SQL keywords.
 let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,"
@@ -476,7 +499,7 @@ jQuery(function () {
     });
 
     if (name != "" && id != "" && directory != "" && author != "") {
-      ajaxPending++;
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
@@ -494,10 +517,10 @@ jQuery(function () {
         },
         success: function (data) {
           loadAllResource();
-          ajaxPending--;
+          decreaseAjaxPending();
         },
         error: function (e1, e2) {
-          ajaxPending--;
+          decreaseAjaxPending();
         }
       });
     }
@@ -505,13 +528,13 @@ jQuery(function () {
   });
 
   $('#modal-update-path').on('show.bs.modal', function (e) {
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'get' },
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
           $('#modal-update-path table.path-manager > tbody > tr:last').remove();
         }
@@ -542,13 +565,13 @@ jQuery(function () {
     });
     let select = $('#current_module_location');
     if (paths.length > 0) {
-      ajaxPending++;
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
         data: { action: 'update', paths: paths },
         success: function (data) {
-          ajaxPending--;
+          decreaseAjaxPending();
           select.empty();
           for (let d in data) {
             select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -569,13 +592,13 @@ jQuery(function () {
   $(document).on('click', '#update_current_location', function (e) {
     e.preventDefault();
     let select = $('#current_module_location');
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'default', selected_path: select.val() },
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         select.empty();
         for (let d in data) {
           select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -666,13 +689,13 @@ jQuery(function () {
         {
           'caption': 'Yes', 
           'fn': () => {
-            ajaxPending++;
+            increaseAjaxPending();
             $.ajax({
               method: "POST",
               url: "lib.ajax/entity-generator.php",
               data: { entityName: entityName, tableName: tableName },
               success: function (data) {
-                ajaxPending--;
+                decreaseAjaxPending();
                 updateEntityFile();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -810,12 +833,12 @@ jQuery(function () {
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         if (data.application_workspace == '') {
           if (modal.find('.alert').length > 0) {
             modal.find('.alert').remove();
@@ -865,14 +888,14 @@ jQuery(function () {
     let entityName = $('.entity-name').val();
     let propertyNames = $('.entity-property-name').val();
     let targetLanguage = $('.target-language').val();
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
       data: { userAction: 'set', entityName: entityName, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
       },
     });
   });
@@ -881,14 +904,14 @@ jQuery(function () {
     let translated = transEd4.getDoc().getValue();
     let propertyNames = $('.module-property-name').val();
     let targetLanguage = $('.target-language').val();
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/module-translate.php",
       dataType: "json",
       data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
       },
     });
   });
@@ -954,7 +977,7 @@ jQuery(function () {
   });
 
   $('#modal-update-language').on('show.bs.modal', function (e) {
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
@@ -964,7 +987,7 @@ jQuery(function () {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
-          ajaxPending--;
+          decreaseAjaxPending();
 
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
@@ -992,13 +1015,13 @@ jQuery(function () {
     });
     let select = $('.target-language');
     if (languages.length > 0) {
-      ajaxPending++;
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
         data: { action: 'update', languages: languages },
         success: function (data) {
-          ajaxPending--;
+          decreaseAjaxPending();
           select.empty();
           for (let d in data) {
             for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1031,13 +1054,13 @@ jQuery(function () {
           'fn': () => {
             let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
-            ajaxPending++;
+            increaseAjaxPending();
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
               data: { action: 'execute', query: query },
               success: function (data) {
-                ajaxPending--;
+                decreaseAjaxPending();
                 let ents = getEntitySelection();
                 let merged = $(".entity-merge")[0].checked;
                 getEntityQuery(ents, merged);
@@ -1060,13 +1083,13 @@ jQuery(function () {
   $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
       data: { action: 'default', selected_language: select.val() },
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         select.empty();
         for (let d in data) {
           for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1113,14 +1136,14 @@ jQuery(function () {
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       dataType: 'html',
       url: url,
       data: request,
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
       }
@@ -1134,14 +1157,14 @@ jQuery(function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-setting.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         $('#modal-application-setting .application-setting').empty().append(data);
         setTimeout(function () {
           // set database_password to be empty
@@ -1177,14 +1200,14 @@ jQuery(function () {
     modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     modal.attr('data-application-id', applicationId);
     modal.modal('show');
-    ajaxPending++;
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-menu.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
-        ajaxPending--;
+        decreaseAjaxPending();
         $('#modal-application-menu .modal-body').empty().append(data);
         loadAllResource();
         updateBtn[0].disabled = false;
@@ -1198,11 +1221,13 @@ jQuery(function () {
     let modal = $(this).closest('.modal');
     let applicationId = modal.attr('data-application-id');
     const jsonOutput = JSON.stringify(serializeMenu());
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-menu-update.php',
       data: { applicationId: applicationId, data: jsonOutput },
       success: function (data) {
+        decreaseAjaxPending();
         modal.modal('hide');
         loadMenu();
       }
@@ -1274,11 +1299,13 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-scan', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/workspace-scan.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
+        decreaseAjaxPending();
         loadAllResource();
       }
     });
@@ -1287,11 +1314,13 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-default.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
+        decreaseAjaxPending();
         onSetDefaultWorkspace();
         $('meta[name="workspace-id"]').attr('content', workspaceId);
         window.localStorage.setItem('workspace-id', workspaceId);
@@ -1303,11 +1332,13 @@ jQuery(function () {
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-default.php',
       data: { applicationId: applicationId },
       success: function (data) {
+        decreaseAjaxPending();
         onSetDefaultApplication();
         $('meta[name="application-id"]').attr('content', applicationId);
         window.localStorage.setItem('application-id', applicationId);
@@ -1339,11 +1370,13 @@ jQuery(function () {
     let workspaceDescription = modal.find('[name="workspace_description"]').val();
     let workspaceDirectory = modal.find('[name="workspace_directory"]').val();
     let phpPath = modal.find('[name="php_path"]').val();
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-create.php',
       data: { workspaceName: workspaceName, workspaceDirectory: workspaceDirectory, workspaceDescription: workspaceDescription, phpPath: phpPath },
       success: function (data) {
+        decreaseAjaxPending();
         modal.modal('hide');
         loadAllResource();
       }
@@ -1398,12 +1431,14 @@ jQuery(function () {
         input[$(this).attr('name')] = $(this).val();
       }
     });
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/database-test.php',
       data: input,
       dataType: 'json',
       success: function (data) {
+        decreaseAjaxPending();
         if (data.conneted1) {
           if (!data.conneted2) {
             $('#create-database').css({ 'display': 'inline' });
@@ -1420,6 +1455,7 @@ jQuery(function () {
         }
       },
       error: function (xhr, status, error) {
+        decreaseAjaxPending();
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1434,12 +1470,14 @@ jQuery(function () {
         input[$(this).attr('name')] = $(this).val();
       }
     });
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/database-create.php',
       data: input,
       dataType: 'json',
       success: function (data) {
+        decreaseAjaxPending();
         if (data.conneted1) {
           if (!data.conneted2) {
             $('#create-database').css({ 'display': 'inline' });
@@ -1456,6 +1494,7 @@ jQuery(function () {
         }
       },
       error: function (xhr, status, error) {
+        decreaseAjaxPending();
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1529,10 +1568,12 @@ function resetCheckActiveApplication() {
  * in `localStorage`, and sets the `workspace-id` meta tag with the selected value.
  */
 function loadWorkspaceList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/workspace-list.php',
     success: function (data) {
+      decreaseAjaxPending();
       $('.workspace-card').empty().append(data);
       let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id');
       window.localStorage.setItem('workspace-id', val1);
@@ -1542,10 +1583,12 @@ function loadWorkspaceList() {
 }
 
 function loadApplicationList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-list.php',
     success: function (data) {
+      decreaseAjaxPending();
       $('.application-card').empty().append(data);
       let val1 = $('.application-item[data-selected="true"]').attr('data-application-id');
       window.localStorage.setItem('application-id', val1);
@@ -1563,11 +1606,13 @@ function loadApplicationList() {
  * in `localStorage`, and sets the `application-id` meta tag with the selected value.
  */
 function loadLanguageList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-path-list.php',
     dataType: 'json',
     success: function (data) {
+      decreaseAjaxPending();
       $('[name="current_module_location"]').empty();
       for (let i in data) {
         $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
@@ -1584,11 +1629,13 @@ function loadLanguageList() {
  * The retrieved data is then passed to the `setLanguage` function for further processing.
  */
 function loadPathList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-language-list.php',
     dataType: 'json',
     success: function (data) {
+      decreaseAjaxPending();
       setLanguage(data);
     }
   });
@@ -2242,12 +2289,14 @@ function translateEntity(clbk) {
   if (entityName != '') {
     let targetLanguage = $('.target-language').val();
     let filter = $('.filter-translate').val();
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
       data: { userAction: 'get', entityName: entityName, targetLanguage: targetLanguage, filter: filter },
       success: function (data) {
+        decreaseAjaxPending();
         let textOut1 = [];
         let textOut2 = [];
         let propertyNames = [];
@@ -2298,13 +2347,14 @@ function translateModule() {
       modules.push($(this).val());
     }
   });
-
+  increaseAjaxPending();
   $.ajax({
     method: "POST",
     url: "lib.ajax/module-translate.php",
     dataType: "json",
     data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter: filter },
     success: function (data) {
+      decreaseAjaxPending();
       let textOut1 = [];
       let textOut2 = [];
       let propertyNames = [];
@@ -2645,12 +2695,14 @@ function saveModule() {
   if (currentModule != "") {
     $("#button_save_module_file").attr("disabled", "disabled");
     let fileContent = cmEditorModule.getDoc().getValue();
+    increaseAjaxPending();
     $.ajax({
       type: "POST",
       url: "lib.ajax/module-update.php",
       data: { content: fileContent, module: currentModule },
       dataType: "html",
       success: function (data) {
+        decreaseAjaxPending();
         $("#button_save_module_file").removeAttr("disabled");
       },
     });
@@ -2674,14 +2726,18 @@ function saveEntity() {
   if (currentEntity != "") {
     $("#button_save_entity_file").attr("disabled", "disabled");
     let fileContent = cmEditorFile.getDoc().getValue();
+    increaseAjaxPending();
     $.ajax({
       type: "POST",
       url: "lib.ajax/entity-update.php",
       dataType: "json",
       data: { content: fileContent, entity: currentEntity },
       success: function (data) {
+        decreaseAjaxPending();
         $("#button_save_entity_file").removeAttr("disabled");
-        updateEntityFile();
+        updateEntityFile(function(){
+          setEntityFile(fileContent);
+        });
         updateEntityQuery(true);
         updateEntityRelationshipDiagram();
         removeHilightLineError();
@@ -2717,12 +2773,14 @@ function saveEntityAs() {
         'caption': 'Yes',  // Caption for the button
         'fn': () => {
           let newEntity = $('.prompt-input').val();
+          increaseAjaxPending();
           $.ajax({
             type: "POST",
             url: "lib.ajax/entity-save-as.php",
             dataType: "json",
             data: { content: fileContent, entity: currentEntity, newEntity: newEntity },
             success: function (data) {
+              decreaseAjaxPending();
               updateEntityFile();
               updateEntityQuery(true);
               updateEntityRelationshipDiagram();
@@ -2835,12 +2893,14 @@ function getEntitySelection() {
  * @returns {void} This function does not return a value.
  */
 function getEntityQuery(entity, merged) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/entity-query.php",
     data: { entity: entity, merged: merged ? 1 : 0 },
     dataType: "text",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorSQL.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorSQL.refresh();
@@ -2862,12 +2922,14 @@ function getEntityQuery(entity, merged) {
  * @returns {void} This function does not return a value.
  */
 function getEntityFile(entity, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/entity-file.php",
     data: { entity: entity },
     dataType: "text",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorFile.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorFile.refresh();
@@ -2894,12 +2956,14 @@ function getEntityFile(entity, clbk) {
  * @returns {void} This function does not return a value.
  */
 function getModuleFile(module, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-file.php",
     data: { module: module },
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorModule.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorModule.refresh();
@@ -2926,12 +2990,14 @@ function getModuleFile(module, clbk) {
  */
 function updateEntityQuery(autoload) {
   autoload = autoload || false;
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list-with-checkbox.php",
     data: { autoload: autoload },
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-query .entity-list").empty().append(data);
       let ents = getEntitySelection();
       let merged = $(".entity-merge");
@@ -2951,11 +3017,13 @@ function updateEntityQuery(autoload) {
  * @returns {void} This function does not return a value.
  */
 function updateEntityRelationshipDiagram() {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list-for-diagram.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-relationship .entity-list").empty().append(data);
       updateErd();
     },
@@ -2970,15 +3038,21 @@ function updateEntityRelationshipDiagram() {
  *
  * @returns {void} This function does not return a value.
  */
-function updateEntityFile() {
+function updateEntityFile(clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
       clearEntityFile();
+      if(typeof clbk == 'function')
+      {
+        clbk();
+      }
       clearTtransEd3();
       clearTtransEd4();
     },
@@ -2994,21 +3068,24 @@ function updateEntityFile() {
  * @returns {void} This function does not return a value.
  */
 function updateModuleFile() {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-list-file.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".module-container .module-list-file").empty().append(data);
       clearModuleFile();
     },
   });
-
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-list-translate.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".container-translate-module .module-list-translate").empty().append(data);
       clearTtransEd1();
       clearTtransEd2();
@@ -3028,12 +3105,15 @@ function updateModuleFile() {
  * @returns {void} This function does not return a value.
  */
 function saveReference(fieldName, key, value) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/reference-save.php",
     data: { fieldName: fieldName, key: key, value: value },
     dataType: "json",
-    success: function (data) { },
+    success: function (data) {
+      decreaseAjaxPending();
+    },
   });
 }
 
@@ -3050,12 +3130,14 @@ function saveReference(fieldName, key, value) {
  * @returns {void} This function does not return a value.
  */
 function loadReference(fieldName, key, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/reference-load.php",
     data: { fieldName: fieldName, key: key },
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       clbk(data);
     },
   });
@@ -3172,12 +3254,14 @@ function prepareReferenceFilter(checkedValue, ctrl) {
  * @returns {void} This function does not return a value.
  */
 function switchApplication(currentApplication) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/application-switch.php",
     dataType: "json",
     data: { currentApplication: currentApplication },
     success: function (data) {
+      decreaseAjaxPending();
       window.location.reload();
     },
   });
@@ -3459,12 +3543,14 @@ function parseJsonData(text)  //NOSONAR
  * @param {Object} dataToPost - The data to send to the server for code generation.
  */
 function generateAllCode(dataToPost) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/script-generator.php",
     dataType: "json",
     data: dataToPost,
     success: function (data) {
+      decreaseAjaxPending();
       updateEntityFile();
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
@@ -3531,11 +3617,13 @@ function showToast(header, body) {
  * @param {Object} dataToPost - The data used to update the application.
  */
 function updateCurrentApplivation(dataToPost) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/application-update.php",
     data: dataToPost,
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="source_table"]').empty();
       for (let i in data) {
         $('select[name="source_table"]')[0].append(
@@ -3559,11 +3647,13 @@ function updateCurrentApplivation(dataToPost) {
  * on the options if available.
  */
 function loadTable() {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/database-table-list.php",
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="source_table"]').empty();
       $('select[name="source_table"]')[0].append(
         new Option("- Select Table -", "")
@@ -3597,11 +3687,13 @@ function loadTable() {
 }
 
 function loadMenu() {
+  increaseAjaxPending();
   $.ajax({
     type: "get",
     url: "lib.ajax/application-menu-json.php",
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="module_menu"]').empty();
       for (let i in data) {
         if (data.hasOwnProperty(i)) {
@@ -3624,12 +3716,14 @@ function loadMenu() {
  * @param {string} selector - The jQuery selector where the column rows will be appended.
  */
 function loadColumn(tableName, selector) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/database-column-list.php",
     data: { table_name: tableName },
     dataType: "json",
     success: function (answer) {
+      decreaseAjaxPending();
       $(selector).empty();
       let data = answer.fields;
       let i;
@@ -3852,12 +3946,14 @@ function restoreForm(data)  //NOSONAR
  *        This function is called whether the request is successful or fails.
  */
 function loadSavedModuleData(moduleFile, target, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-data.php",
     data: { moduleFile: moduleFile, target: target },
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       restoreForm(data)
       clbk();
     },

@@ -49,6 +49,7 @@ if($inputPost->getAction() == "update")
     {
         error_log($e->getMessage());
         // do nothing
+        ResponseUtil::sendJSON(new stdClass);
     }
 }
 else if($inputPost->getAction() == "get")
@@ -68,6 +69,7 @@ else if($inputPost->getAction() == "get")
     {
         error_log($e->getMessage());
         // do nothing
+        ResponseUtil::sendJSON(new stdClass);
     }
 }
 else if($inputPost->getAction() == "default")
@@ -99,5 +101,10 @@ else if($inputPost->getAction() == "default")
     {
         error_log($e->getMessage());
         // do nothing
+        ResponseUtil::sendJSON(new stdClass);
     }
+}
+else
+{
+    ResponseUtil::sendJSON(new stdClass);
 }

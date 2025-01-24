@@ -3,6 +3,7 @@
 use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Entity\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
@@ -69,3 +70,4 @@ catch(Exception $e)
 {
     error_log($e->getMessage());
 }
+ResponseUtil::sendJSON(new stdClass);

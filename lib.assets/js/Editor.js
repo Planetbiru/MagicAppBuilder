@@ -27,7 +27,13 @@ function clearEntityFile()
       cmEditorFile.refresh();
     }, 1);
 }
-
+function setEntityFile(content)
+{
+  cmEditorFile.getDoc().setValue(content);
+    setTimeout(function () {
+      cmEditorFile.refresh();
+    }, 1);
+}
 function clearEditorSQL()
 {
   cmEditorSQL.getDoc().setValue('');

@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicAdmin\Entity\Data\ActiveApplicationHistory;
 use MagicObject\Request\InputPost;
 
@@ -27,3 +28,4 @@ if($inputPost->getWorkspaceId())
         $entityAdmin->update();
     }
 }
+ResponseUtil::sendJSON(new stdClass);

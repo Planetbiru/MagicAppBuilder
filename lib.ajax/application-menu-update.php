@@ -1,8 +1,8 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
-use MagicObject\SecretObject;
 use MagicObject\Util\PicoYamlUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -34,3 +34,4 @@ if(!file_exists($menuPath))
 $data = json_decode($inputPost->getData(), true);
 $yaml = PicoYamlUtil::dump($data, 0, 2, 0);
 file_put_contents($menuPath, $yaml);
+ResponseUtil::sendJSON(new stdClass);

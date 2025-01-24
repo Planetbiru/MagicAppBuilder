@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
@@ -23,3 +24,4 @@ if($database->isConnected())
         }
     }
 }
+ResponseUtil::sendJSON(new stdClass);
