@@ -1,0 +1,220 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.page {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    overflow: scroll;
+    background-color: #f4f4f4;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+}
+
+.mainbar {
+    flex: 1;
+    height: 100vh;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.mainbar a {
+    color: #0070d3;
+    text-decoration: none;
+}
+
+.mainbar a:hover {
+    color: #0088ff;
+}
+
+.sidebar h3 {
+    padding: 5px 16px;
+    margin: 0;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar ul>li {
+    padding-left: 16px;
+    margin: 0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 0px;
+    margin-bottom: 5px;
+    color: #0d84c9;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    color: #035e92;
+}
+
+.mainbar .content {
+    margin-bottom: 20px;
+}
+
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333333;
+}
+
+
+.method,
+.property {
+    border-bottom: 1px solid #dddddd;
+    margin-bottom: 10px;
+}
+
+.property-declaratiopn,
+.class-declaration,
+.method-declaratiopn {
+    font-family: monospace;
+    overflow: auto;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+pre {
+    font-family: monospace;
+    background-color: #f8f8f8;
+    padding: 10px;
+    border: 1px solid #ccc;
+    overflow: auto;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+code {
+    font-family: monospace;
+    overflow: auto;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+pre code {
+    background-color: transparent;
+}
+
+.class-declaration {
+    white-space: pre-wrap;
+}
+
+.php-keyword,
+.hljs-keyword {
+    color: #218ae3;
+}
+
+.php-comment,
+.hljs-comment {
+    color: rgb(1, 145, 37);
+}
+
+.access-level {
+    color: #9500aa;
+}
+
+.method-name,
+.hljs-title.function_.invoke__ {
+    color: #00578a;
+}
+
+.property-identity,
+.method-identity {
+    font-weight: bold;
+}
+
+.property-name,
+.parameter-name,
+.constant-name,
+.class-name,
+.hljs-title.class_ {
+    color: #014e91;
+}
+
+.property-type,
+.parameter-type,
+.return-type {
+    color: #005dae;
+}
+
+.parameter-type .parameter-equal-sign {
+    color: #333333;
+}
+
+.parameter-default,
+.property-default,
+.constant-value {
+    color: #936;
+}
+
+.property-default,
+.constant-value {
+    white-space: pre-wrap;
+}
+
+.hljs-meta{
+    color: #D50B1E;
+}
+
+.language-javascript {
+    color: #f1e05a;
+}
+
+.language-javascript .hljs-keyword {
+    font-weight: bold;
+}
+
+.language-javascript .hljs-string {
+    color: #6a8759;
+}
+
+.language-javascript .hljs-function {
+    color: #f8f8f2;
+}
+
+.language-php {
+    color: #4F5D95;
+}
+
+.language-php .hljs-string {
+    color: #db0000;
+}
+
+.language-html {
+    color: #e34c26;
+}
+
+.language-html .hljs-tag {
+    color: #ff7f2a;
+}
+
+.language-html .hljs-attribute {
+    color: #21649b;
+}
+
+.language-html .hljs-value {
+    color: #991f00;
+}

@@ -23,7 +23,6 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Application;
 use MagicAdmin\Entity\Data\WorkspaceMin;
-use MagicAdmin\Entity\Data\AdminMin;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 

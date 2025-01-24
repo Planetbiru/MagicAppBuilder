@@ -1159,7 +1159,6 @@ jQuery(function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-database-explorer .database-explorer').html('<iframe src="database-explorer/?applicationId=' + applicationId + '"></iframe>');
     $('#modal-database-explorer').modal('show');
-
   });
 
   $(document).on('click', '#button_explore_database', function (e) {
@@ -1235,7 +1234,6 @@ jQuery(function () {
 
     if (!invalidName) {
       let newMenuStr = '';
-
       newMenuStr += '<li class="sortable-menu-item">' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-up" onclick="moveUp(this)"></span>' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-down" onclick="moveDown(this)"></span>' + "\r\n";
@@ -1361,8 +1359,6 @@ jQuery(function () {
     editMenu(el);
   });
 
-
-
   $(document).on('blur', '.sortable-menu-item > input[type="text"], .sortable-submenu-item > input[type="text"]', function (e) {
     e.preventDefault();
     let input = $(this);
@@ -1371,7 +1367,6 @@ jQuery(function () {
     menu.text(input.val())
     menu.css({ display: '' });
   });
-
 
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
@@ -1490,6 +1485,11 @@ jQuery(function () {
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
 
+/**
+ * Resets and initializes a periodic check for active workspace changes.
+ * Compares the current workspace ID in localStorage with the meta tag value,
+ * and reloads resources if they differ.
+ */
 function resetCheckActiveWorkspace() {
   clearInterval(toCheckActiveWorkspace);
   toCheckActiveWorkspace = setInterval(function () {
@@ -1500,6 +1500,15 @@ function resetCheckActiveWorkspace() {
     }
   }, 20000);
 }
+
+/**
+ * Resets and initializes a periodic check for active application changes.
+ * This function compares the current application ID stored in `localStorage` 
+ * with the value in the `application-id` meta tag. If the IDs differ, it triggers 
+ * the `loadAllResource` function to reload all resources.
+ * 
+ * The check is performed every 22 seconds.
+ */
 function resetCheckActiveApplication() {
   clearInterval(toCheckActiveApplication);
   toCheckActiveApplication = setInterval(function () {
@@ -1511,6 +1520,14 @@ function resetCheckActiveApplication() {
   }, 22000);
 }
 
+/**
+ * Loads the list of workspaces via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of workspaces from 
+ * the server. The returned data is used to update the `.workspace-card` element.
+ * It also identifies the currently selected workspace, updates the `workspace-id`
+ * in `localStorage`, and sets the `workspace-id` meta tag with the selected value.
+ */
 function loadWorkspaceList() {
   $.ajax({
     type: 'GET',
@@ -1537,6 +1554,14 @@ function loadApplicationList() {
   });
 }
 
+/**
+ * Loads the list of applications via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of applications from 
+ * the server. The returned data is used to update the `.application-card` element.
+ * It identifies the currently selected application, updates the `application-id`
+ * in `localStorage`, and sets the `application-id` meta tag with the selected value.
+ */
 function loadLanguageList() {
   $.ajax({
     type: 'GET',
@@ -1551,6 +1576,13 @@ function loadLanguageList() {
   });
 }
 
+/**
+ * Loads the list of application languages or paths via an AJAX request.
+ *
+ * This function makes a GET request to fetch data from 
+ * `lib.ajax/application-language-list.php`. The response is expected to be in JSON format. 
+ * The retrieved data is then passed to the `setLanguage` function for further processing.
+ */
 function loadPathList() {
   $.ajax({
     type: 'GET',
@@ -1562,12 +1594,31 @@ function loadPathList() {
   });
 }
 
+/**
+ * Updates the SQL query editor by clearing its content and execution results.
+ *
+ * This function calls `clearEditorSQL` to clear the SQL editor's current content 
+ * and `clearEditorSQLExecute` to clear the execution results of the SQL query. 
+ * It ensures that the editor is reset to a clean state.
+ */
 function updateQuery()
 {
   clearEditorSQL();
   clearEditorSQLExecute();
 }
 
+/**
+ * Loads all necessary resources for the application.
+ *
+ * This function sequentially calls other functions to load:
+ * - Workspace list
+ * - Application list
+ * - Tables
+ * - Paths
+ * - Languages
+ * - Menus
+ * It also updates queries, entity diagrams, and files, and initializes tooltips.
+ */
 function loadAllResource() {
   loadWorkspaceList();
   loadApplicationList();
@@ -1582,6 +1633,12 @@ function loadAllResource() {
   initTooltip();
 }
 
+/**
+ * Sets the default workspace and loads the necessary resources.
+ *
+ * This function reloads the workspace list, application list, tables, and menus.
+ * It also updates entity queries, diagrams, files, and initializes tooltips for the default workspace.
+ */
 function onSetDefaultWorkspace() {
   loadWorkspaceList();
   loadApplicationList();
@@ -1594,6 +1651,12 @@ function onSetDefaultWorkspace() {
   initTooltip();
 }
 
+/**
+ * Sets the default application and loads the necessary resources.
+ *
+ * This function reloads the application list, tables, and menus. It also updates 
+ * entity queries, diagrams, files, and initializes tooltips for the default application.
+ */
 function onSetDefaultApplication() {
   loadApplicationList();
   loadTable();
@@ -1605,6 +1668,12 @@ function onSetDefaultApplication() {
   initTooltip();
 }
 
+/**
+ * Updates resources when a new module is created.
+ *
+ * This function updates entity queries, diagrams, and files, and reinitializes tooltips 
+ * to reflect the changes caused by the creation of a new module.
+ */
 function onModuleCreated() {
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
@@ -1613,12 +1682,27 @@ function onModuleCreated() {
   initTooltip();
 }
 
+/**
+ * Clears the content of the entity relationship diagram (ERD).
+ *
+ * This function empties the `.erd-image` element and the `[name="erd-map"]` element 
+ * to reset the ERD display.
+ */
 function updateErd()
 {
   $('.erd-image').empty();
   $('[name="erd-map"]').empty();
 }
 
+/**
+ * Initializes tooltips for elements with the `data-toggle="tooltip"` attribute 
+ * or areas inside an element with `name="erd-map"`. 
+ *
+ * This function listens for `mouseenter` and `mouseleave` events to show and hide 
+ * tooltips. It dynamically positions the tooltip based on mouse movement to ensure 
+ * that the tooltip does not go off-screen. The tooltip's content is fetched from 
+ * the `data-title` or `title` attribute of the element.
+ */
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
@@ -1670,7 +1754,25 @@ function initTooltip() {
   });
 }
 
-// Function to display the modal with dynamic buttons
+/**
+ * Displays a custom modal with dynamic buttons and message.
+ *
+ * This function creates and displays a modal with the specified message, title, 
+ * and a set of dynamic buttons. Each button is associated with a caption, a class 
+ * (optional), and a callback function that is executed when the button is clicked.
+ * The modal also listens for the `hidden.bs.modal` event to execute a provided callback 
+ * when the modal is closed.
+ *
+ * @param {string} message The content/message to be displayed inside the modal.
+ * @param {string} title The title to be displayed at the top of the modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {Function} [onHideCallback] (Optional) A callback function to be executed when the modal is hidden.
+ *
+ * @returns {Promise} A promise that resolves when a button is clicked, with the button's caption as the resolved value.
+ */
 function showModal(message, title, buttons, onHideCallback) {
   return new Promise((resolve, reject) => {
     const modal = $('#customAlert');
@@ -1713,7 +1815,26 @@ function showModal(message, title, buttons, onHideCallback) {
   });
 }
 
-// Function to display a prompt modal with a text input
+/**
+ * Displays a prompt modal with a text input field and dynamic buttons.
+ *
+ * This function creates and displays a modal with a message, a title, a text input field, 
+ * and a set of dynamic buttons. The user can enter a value into the input field and click one 
+ * of the buttons to submit the value or cancel the action. The modal also listens for the 
+ * `hidden.bs.modal` event to execute a provided callback when the modal is closed.
+ *
+ * @param {string} message The content/message to be displayed inside the modal.
+ * @param {string} title The title to be displayed at the top of the modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {string} initialValue The initial value to be displayed in the input field (optional).
+ * @param {Function} [onHideCallback] (Optional) A callback function to be executed when the modal is hidden.
+ *
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * or the caption of any other clicked button.
+ */
 function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
   return new Promise((resolve, reject) => {
     const modal = $('#customAlert');
@@ -1770,7 +1891,21 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
   });
 }
 
-// Async function to wait for the result of the modal (any button press)
+/**
+ * Displays an alert modal with dynamic buttons and waits for the user's interaction.
+ * 
+ * This function shows a modal with a message, title, and dynamically created buttons. It waits for the user to press one of the buttons and resolves the action. 
+ * Once the modal is closed, it hides the overlay and restores the overflow styles of the modal.
+ *
+ * @param {string} message The content/message to display in the alert.
+ * @param {string} title The title to display at the top of the alert modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ *
+ * @returns {Promise} A promise that resolves with the caption of the button the user clicks.
+ */
 async function asyncAlert(message, title, buttons) {
   const result = await showModal(
     message,
@@ -1783,6 +1918,25 @@ async function asyncAlert(message, title, buttons) {
   );
 }
 
+/**
+ * Prompts the user for input using the `asyncPrompt` function and returns the user's input.
+ *
+ * This function displays a prompt modal with a message, title, and initial input value. It also 
+ * takes dynamic buttons and returns the value entered by the user when they click the 'OK' button, 
+ * or the caption of the button clicked if other than 'OK'. Once the modal is closed, it hides the 
+ * overlay and restores the overflow styles of the modal.
+ *
+ * @param {string} message The content/message to display in the prompt.
+ * @param {string} title The title to display at the top of the prompt modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {string} initialValue The initial value to be displayed in the input field (optional).
+ *
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * or the caption of any other clicked button.
+ */
 async function getUserInput(message, title, buttons, initialValue) {
   const result = await asyncPrompt(
     message,
@@ -1832,6 +1986,18 @@ function initMenu() {
   });
 }
 
+/**
+ * Enables inline editing of a menu item by replacing its text with an input field.
+ *
+ * This function transforms the menu item's text into an editable input field. 
+ * When invoked, it finds the text associated with the menu item, hides it, and replaces it with a text input field 
+ * that contains the current text. The input field is automatically focused and selected for easy editing.
+ * After the input field is populated with the menu's current text, the user can modify it.
+ *
+ * @param {HTMLElement} el The menu item element (typically a button or link) that triggered the edit action.
+ *
+ * @returns {void} This function does not return any value. It modifies the DOM by replacing the text with an input field.
+ */
 function editMenu(el) {
   let elem = $(el);
   let parent = elem.closest('li');
@@ -1851,6 +2017,20 @@ function editMenu(el) {
 
 let draggedItem = null;
 
+/**
+ * Handles the start of a drag event for sortable submenu items.
+ *
+ * This function is triggered when a drag operation begins on an element. It checks if the dragged element 
+ * is a valid submenu item and sets up the `draggedItem` for the drag operation. It also ensures that the 
+ * drag operation is allowed and sets the `effectAllowed` to 'move', indicating that the item will be moved during the drag.
+ *
+ * The function also supports cases where the target element is a child of a valid draggable element, 
+ * by traversing the DOM to find the closest parent that is a valid sortable item.
+ *
+ * @param {DragEvent} e The drag event triggered by the user. It contains information about the element being dragged.
+ * 
+ * @returns {void} This function does not return any value. It sets up the dragged element and the drag effect.
+ */
 function dragStart(e) {
   if (e.target.classList.contains('sortable-submenu-item')) {
     draggedItem = e.target;
@@ -1867,10 +2047,35 @@ function dragStart(e) {
   }
 }
 
+/**
+ * Handles the dragover event to allow an element to be a valid drop target.
+ *
+ * This function is triggered during the drag operation when an element is being dragged over a potential drop target. 
+ * The `e.preventDefault()` method is called to prevent the default behavior, allowing the drop event to be triggered 
+ * later. Without this, the drop action will not be allowed.
+ *
+ * @param {DragEvent} e The drag event triggered when the dragged item is over a potential drop target.
+ * 
+ * @returns {void} This function does not return any value. It prevents the default action to allow the drop event.
+ */
 function dragOver(e) {
   e.preventDefault();
 }
 
+/**
+ * Handles the drop event to place a dragged item into a menu or submenu.
+ * 
+ * This function is triggered when an item is dropped into a valid drop target. 
+ * It first checks if there is an item being dragged, then determines the 
+ * appropriate drop target based on its class and structure. It supports adding 
+ * the dragged item to either a top-level menu item or a submenu, and handles 
+ * the expansion of the target menu items.
+ * 
+ * @param {DragEvent} e The drop event triggered when an item is dropped onto a target.
+ * 
+ * @returns {void} This function does not return any value. It modifies the DOM 
+ * by adding the dragged item to the target menu or submenu.
+ */
 function dropToMenu(e) {
   e.preventDefault(); // Prevent default behavior to allow the drop
 
@@ -1955,6 +2160,17 @@ function serializeMenu() {
   return menu; // Return the constructed menu array
 }
 
+/**
+ * Moves the specified item up in the list (either a menu item or a submenu item).
+ * 
+ * This function moves the target item (either a menu or submenu item) up by one 
+ * position in the DOM relative to its previous sibling. If the item is already at the 
+ * top, it remains in place.
+ *
+ * @param {HTMLElement} element The DOM element that is clicked to trigger the move up.
+ * 
+ * @returns {void} This function modifies the DOM by moving the item up, it does not return any value.
+ */
 function moveUp(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const prevItem = item.previousElementSibling;
@@ -1963,6 +2179,17 @@ function moveUp(element) {
   }
 }
 
+/**
+ * Moves the specified item down in the list (either a menu item or a submenu item).
+ * 
+ * This function moves the target item (either a menu or submenu item) down by one 
+ * position in the DOM relative to its next sibling. If the item is already at the 
+ * bottom, it remains in place.
+ *
+ * @param {HTMLElement} element The DOM element that is clicked to trigger the move down.
+ * 
+ * @returns {void} This function modifies the DOM by moving the item down, it does not return any value.
+ */
 function moveDown(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const nextItem = item.nextElementSibling;
@@ -2298,16 +2525,33 @@ function loadDiagramMultiple() {
   $('[name="erd-map"]').load(urlMap, function (e) {
     img.attr('usemap', '#erd-map');
   });
-
-
 }
 
+/**
+ * Downloads the SVG image by opening its URL in a new tab.
+ * 
+ * This function retrieves the URL of the SVG image from the `src` attribute of the
+ * `<img>` tag within the `.erd-image` container. It then opens the image URL in 
+ * a new browser tab, allowing the user to download or view the image.
+ * 
+ * @returns {void} This function does not return any value.
+ */
 function downloadSVG() {
   const imageSVG = document.querySelector('.erd-image img');
   let url = imageSVG.getAttribute('src');
   window.open(url);
 }
 
+/**
+ * Downloads the SVG image as a PNG file by rendering it to a canvas and converting it to a PNG data URL.
+ * 
+ * This function retrieves the URL of the SVG image from the `src` attribute of the 
+ * `<img>` tag within the `.erd-image` container, draws the image onto a canvas, 
+ * and then converts the canvas to a PNG data URL. It opens the PNG image in a new 
+ * browser tab, allowing the user to download the image as a PNG file.
+ * 
+ * @returns {void} This function does not return any value.
+ */
 function downloadPNG() {
   const imageSVG = document.querySelector('.erd-image img');
   let url = imageSVG.getAttribute('src');
@@ -2861,7 +3105,6 @@ function updateTableName(
   $('[name="module_name"]').val(moduleName);
 }
 
-
 /**
  * Capitalizes the first letter of each word in a string.
  *
@@ -3007,8 +3250,6 @@ function generateScript(selector) {
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
-
-
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let entity = {
@@ -3094,14 +3335,20 @@ function getSpecificationModule() {
         tr.find(".data-filter-column-name").length &&
         tr.find(".data-filter-column-value").length
       ) {
-        let column = tr.find(".data-filter-column-name").val();
-        let value = tr.find(".data-filter-column-value").val();
+        let column = tr.find(".data-filter-column-name").val() || '';
+        let value = tr.find(".data-filter-column-value").val() || '';
+        let comparison = tr.find(".data-filter-column-comparison").val() || '';
+        if(comparison == '')
+        {
+          comparison = 'equals';
+        }
         column = column ? column.trim() : "";
         value = value ? value.trim() : "";
         if (column.length > 0) {
           result.push({
             column: column,
             value: value,
+            comparison: comparison,
           });
         }
       }
@@ -3493,6 +3740,7 @@ function restoreForm(data)  //NOSONAR
 
   if (typeof data.specification == 'undefined' || data.specification.length == 0) {
     $(selector).find('.data-filter-column-name').val('');
+    $(selector).find('.data-filter-column-comparison').val('');
     $(selector).find('.data-filter-column-value').val('');
   }
   else {
@@ -3502,8 +3750,12 @@ function restoreForm(data)  //NOSONAR
           let trHtml = $(selector)[0].outerHTML;
           $(selector).parent().append(trHtml);
         }
-        $(selector).find('.data-filter-column-name').val(data.specification[i].column);
-        $(selector).find('.data-filter-column-value').val(data.specification[i].value);
+        let column = data.specification[i].column || '';
+        let comparison = data.specification[i].comparison || '';
+        let value = data.specification[i].value || '';
+        $(selector).find('.data-filter-column-name').val(column);
+        $(selector).find('.data-filter-column-comparison').val(comparison);
+        $(selector).find('.data-filter-column-value').val(value);
         cnt++;
       }
     }
@@ -4240,8 +4492,16 @@ function setSpecificationData(data) {
       }
       let tr = table.find("tr:last-child");
       let row = specification[i];
-      tr.find(".rd-column-name").val(row.column);
-      tr.find(".rd-value").val(row.value);
+      let comparison = row.comparison || '';
+      let column = row.column || '';
+      let value = row.value || '';
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
+      tr.find(".rd-column-name").val(column);
+      tr.find(".rd-comparison").val(comparison);
+      tr.find(".rd-value").val(value);
     }
   }
 }
@@ -4259,12 +4519,18 @@ function getSpecificationData() {
     .find("tr")
     .each(function (e) {
       let tr = $(this);
-      let column = tr.find(".rd-column-name").val().trim();
-      let value = tr.find(".rd-value").val().trim();
+      let column = tr.find(".rd-column-name").val() || '';
+      let value = tr.find(".rd-value").val() || '';
+      let comparison = tr.find(".rd-comparison").val() || '';
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
       if (column.length > 0) {
         result.push({
-          column: column,
-          value: fixValue(value),
+          column: column.trim(),
+          value: fixValue(value.trim()),
+          comparison: comparison.trim(),
         });
       }
     });
@@ -4483,7 +4749,6 @@ function getMapData() {
   return result;
 }
 
-
 /**
  * Fixes the value by converting it to appropriate types (boolean, null, number, or string).
  *
@@ -4638,7 +4903,8 @@ function getReferenceResource() {
               <table data-name="specification" class="table table-reference" data-empty-on-remove="true">
                   <thead>
                       <tr>
-                          <td width="45%">Column Name</td>
+                          <td width="40%">Column Name</td>
+                          <td width="8%">Comp</td>
                           <td>Value</td>
                           <td width="42">Rem</td>
                           <td colspan="2">Move</td>
@@ -4647,6 +4913,16 @@ function getReferenceResource() {
                   <tbody>
                       <tr>
                           <td><input class="form-control rd-column-name" type="text" value=""></td>
+                          <td>
+                            <select class="form-control rd-comparison">
+                              <option value="equals">=</option>
+                              <option value="notEquals">!=</option>
+                              <option value="greaterThan">&gt;</option>
+                              <option value="greaterThanOrEquals">&gt;=</option>
+                              <option value="lessThan">&lt;</option>
+                              <option value="lessThanOrEquals">&lt;=</option>
+                            </select>
+                          </td>
                           <td><input class="form-control rd-value" type="text" value=""></td>
                           <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
                           <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
