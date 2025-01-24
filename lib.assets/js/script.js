@@ -1523,6 +1523,8 @@ jQuery(function () {
 
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
+let checkIntervalWorkspace = 10000;
+let checkIntervalApplication = 12000;
 
 /**
  * Resets and initializes a periodic check for active workspace changes.
@@ -1537,7 +1539,7 @@ function resetCheckActiveWorkspace() {
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
-  }, 20000);
+  }, checkIntervalWorkspace);
 }
 
 /**
@@ -1556,7 +1558,7 @@ function resetCheckActiveApplication() {
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
-  }, 22000);
+  }, checkIntervalApplication);
 }
 
 /**
@@ -1582,6 +1584,14 @@ function loadWorkspaceList() {
   });
 }
 
+/**
+ * Loads the list of applications via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of applications from 
+ * the server. The returned data is used to update the `.application-card` element.
+ * It also identifies the currently selected application, updates the `application-id`
+ * in `localStorage`, and sets the `application-id` meta tag with the selected value.
+ */
 function loadApplicationList() {
   increaseAjaxPending();
   $.ajax({

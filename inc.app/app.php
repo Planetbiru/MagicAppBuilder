@@ -46,6 +46,14 @@ data:
     next: '<i class=\"fa-solid fa-angle-right\"></i>'
     first: '<i class=\"fa-solid fa-angles-left\"></i>'
     last: '<i class=\"fa-solid fa-angles-right\"></i>'
+
+languages:
+    -
+        name: English
+        code: en
+    -
+        name: Indonesia
+        code: id
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

@@ -181,7 +181,7 @@ class PicoPageControl
      * @param int $range Range (number of pages before and after the current page).
      * @return self Returns the current instance for method chaining.
      */
-    public function setPageRange($range)
+    public function setRange($range)
     {
         return $this->setPageRange($range);
     }

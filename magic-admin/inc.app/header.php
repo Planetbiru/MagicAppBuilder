@@ -178,10 +178,20 @@ $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
                             <i class="fas fa-globe"></i> <!-- Language selection icon -->
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageDropdown">
-                            <a class="dropdown-item" href="set-language.php?language_id=id"><img src="css/id.svg" class="language-flag" alt="ID">
-                                Bahasa Indonesia</a> <!-- Language option -->
-                            <a class="dropdown-item" href="set-language.php?language_id=en"><img src="css/us.svg" class="language-flag" alt="EN">
-                                English</a>
+                            <?php
+                            $languages = $appConfig->getLanguages();
+                            foreach($languages as $language)
+                            {
+                                if($language->getCode() != null && $language->getName() != null)
+                                {
+                                    ?>
+                                    <a class="dropdown-item" href="set-language.php?language_id=<?php echo $language->getCode();?>"><img src="css/flag/<?php echo $language->getCode();?>.svg" class="language-flag" alt="<?php echo $language->getCode();?>">
+                                    <?php echo $language->getName();?></a>
+                                    <?php
+                                }
+                            }
+                            ?>
+
                         </div>
                     </li>
                     <li class="nav-item">
