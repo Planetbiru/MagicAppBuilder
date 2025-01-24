@@ -77,6 +77,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
           <div class="main-menu">
             <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace">Create New</button>
             <button type="button" class="btn btn-primary refresh-workspace-list">Refresh</button>
+            <input type="text" class="form-control" id="search-workspace" placeholder="Type to search...">
           </div>
           
           <div class="container-fluid workspace-container">
@@ -93,6 +94,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
           <div class="main-menu">
             <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">Create New</button>
             <button type="button" class="btn btn-primary refresh-application-list">Refresh</button>
+            <input type="text" class="form-control" id="search-application" placeholder="Type to search...">
           </div>
 
           <div class="container-fluid application-container">

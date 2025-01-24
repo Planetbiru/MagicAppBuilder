@@ -1036,3 +1036,9 @@ input[type=number][name="database_port"] {
 	width: 0px;
 	transition: width ease-in-out 0.1s;
 }
+
+#search-application.form-control, #search-workspace.form-control
+{
+	width: 200px;
+	display: inline-block;
+}

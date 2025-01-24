@@ -1531,7 +1531,33 @@ jQuery(function () {
     $('.entity-info-key').each(function (e2) {
       $(this).val($(this).attr('data-indonesian'));
     });
-  })
+  });
+
+  $(document).on("keyup", "#search-workspace", function (e) {
+    let searchValue = $(this).val().toLowerCase();
+    $(".workspace-card > div").filter(function () {
+      $(this).toggle(
+        $(this)
+          .find(".card-title")
+          .text()
+          .toLowerCase()
+          .includes(searchValue)
+      );
+    });
+  });
+
+  $(document).on("keyup", "#search-application", function (e) {
+    let searchValue = $(this).val().toLowerCase();
+    $(".application-card > div").filter(function () {
+      $(this).toggle(
+        $(this)
+          .find(".card-title")
+          .text()
+          .toLowerCase()
+          .includes(searchValue)
+      );
+    });
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
