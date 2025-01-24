@@ -1379,6 +1379,11 @@ jQuery(function () {
         decreaseAjaxPending();
         modal.modal('hide');
         loadAllResource();
+      },
+      error(e)
+      {
+        decreaseAjaxPending();
+        console.log(e)
       }
     });
   });

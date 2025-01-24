@@ -69,5 +69,5 @@ try
 catch(Exception $e)
 {
     error_log($e->getMessage());
+    ResponseUtil::sendJSON(new stdClass);
 }
-ResponseUtil::sendJSON(new stdClass);

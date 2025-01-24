@@ -29,7 +29,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "workspace", "Workspace");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "workspace", $appLanguage->getWorkspace());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -372,23 +372,23 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	$workspace = new Workspace(null, $database);
 	try{
 		$subqueryMap = array(
-			"adminCreate" => array(
-				"columnName" => "admin_create",
-				"entityName" => "AdminCreate",
-				"tableName" => "admin",
-				"primaryKey" => "admin_id",
-				"objectName" => "creator",
-				"propertyName" => "name"
-			), 
-			"adminEdit" => array(
-				"columnName" => "admin_edit",
-				"entityName" => "AdminEdit",
-				"tableName" => "admin",
-				"primaryKey" => "admin_id",
-				"objectName" => "editor",
-				"propertyName" => "name"
-			)
-			);
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminMin",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
+		)
+		);
 		$workspace->findOne($specification, null, $subqueryMap);
 		if($workspace->issetWorkspaceId())
 		{
@@ -509,6 +509,7 @@ $specMap = array(
 );
 $sortOrderMap = array(
 	"name" => "name",
+	"directory" => "directory",
 	"author" => "author",
 	"sortOrder" => "sortOrder",
 	"active" => "active"
@@ -532,7 +533,24 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new Workspace(null, $database);
 
-$subqueryMap = null;
+$subqueryMap = array(
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
+	"propertyName" => "name"
+)
+);
 
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
@@ -604,6 +622,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
+								<td data-col-name="directory" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDirectory();?></a></td>
 								<td data-col-name="author" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAuthor();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
@@ -639,6 +658,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="name"><?php echo $workspace->getName();?></td>
+								<td data-col-name="directory"><?php echo $workspace->getDirectory();?></td>
 								<td data-col-name="author"><?php echo $workspace->getAuthor();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $workspace->getSortOrder();?></td>
 								<td data-col-name="active"><?php echo $workspace->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
