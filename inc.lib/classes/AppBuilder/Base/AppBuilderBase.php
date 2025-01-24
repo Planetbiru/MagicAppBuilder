@@ -1402,7 +1402,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
         $dataControlConfig->getFirst(), $dataControlConfig->getLast()
     )
-    ->setRange($dataControlConfig->getPageRange())
+    ->setPageRange($dataControlConfig->getPageRange())
     ;';
         $paginationVar = str_replace("\r\n", "\n", $paginationVar);
         $pagination1 = $dom->createTextNode($this->createPagination("pagination-top", '$pageControl'));

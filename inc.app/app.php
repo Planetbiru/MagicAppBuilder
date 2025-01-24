@@ -17,7 +17,11 @@ $builderConfigPath = dirname(__DIR__) . "/inc.cfg/core.yml";
 
 if(!file_exists($builderConfigPath))
 {
-    $defaultDatabasePath = FileDirUtil::normalizePath(dirname(__DIR__) . "/inc.cfg/database.sqlite");
+    $defaultDatabasePath = FileDirUtil::normalizePath(dirname(__DIR__) . "/inc.database/database.sqlite");
+    if(!file_exists(dirname($defaultDatabasePath)))
+    {
+        mkdir(dirname($defaultDatabasePath), 0755, true);
+    }
     $builderConfig->loadYamlString("
 dataLimit: 20
 database:

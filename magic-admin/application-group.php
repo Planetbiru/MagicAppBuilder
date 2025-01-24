@@ -551,7 +551,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
 				        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
 				    )
-				    ->setRange($dataControlConfig->getPageRange())
+				    ->setPageRange($dataControlConfig->getPageRange())
 				    ;
 			?>
 			<div class="pagination pagination-top">
