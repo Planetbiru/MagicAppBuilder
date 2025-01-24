@@ -124,7 +124,7 @@ class ButtonFormData extends ToString
      * Set the element type.
      *
      * @param string $element The element type (e.g., 'button', 'input').
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setElement($element)
     {
@@ -150,7 +150,7 @@ class ButtonFormData extends ToString
      * Sets the type of the button (such as 'submit', 'reset', or 'button').
      * 
      * @param string $type The button type (e.g., 'submit', 'reset', 'button').
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setType($type)
     {
@@ -172,7 +172,7 @@ class ButtonFormData extends ToString
      * Set the CSS class for the button.
      *
      * @param string $class The CSS class to apply to the button.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setClass($class)
     {
@@ -194,7 +194,7 @@ class ButtonFormData extends ToString
      * Set the ID of the button.
      *
      * @param string $id The unique identifier for the button.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setId($id)
     {
@@ -216,7 +216,7 @@ class ButtonFormData extends ToString
      * Set the name of the button.
      *
      * @param string $name The name of the button.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setName($name)
     {
@@ -238,7 +238,7 @@ class ButtonFormData extends ToString
      * Set the value of the button.
      *
      * @param string $value The value to set for the button.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setValue($value)
     {
@@ -260,7 +260,7 @@ class ButtonFormData extends ToString
      * Set the text content of the button.
      *
      * @param string $textContent The text content inside the button element.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setTextContent($textContent)
     {
@@ -282,7 +282,7 @@ class ButtonFormData extends ToString
      * Set the additional attributes for the button.
      *
      * @param array $attribute The associative array of attributes to set for the button.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setAttribute($attribute)
     {
@@ -296,7 +296,7 @@ class ButtonFormData extends ToString
      *
      * @param string $key   The attribute key (e.g., 'data-toggle')
      * @param string $value The attribute value (e.g., 'modal')
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addAttribute($key, $value)
     {

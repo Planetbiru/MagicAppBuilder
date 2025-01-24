@@ -113,7 +113,7 @@ class MetadataDto extends ToString
      * Set the primary key.
      *
      * @param array $primaryKey An array representing the primary key.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKey($primaryKey)
     {
@@ -135,7 +135,7 @@ class MetadataDto extends ToString
      * Set the waiting status.
      *
      * @param int $waitingFor An integer representing the new operation status.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setWaitingFor($waitingFor)
     {
@@ -157,7 +157,7 @@ class MetadataDto extends ToString
      * Set the active status.
      *
      * @param bool $active A boolean indicating if the metadata should be active.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setActive($active)
     {

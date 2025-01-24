@@ -70,7 +70,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Returns the current instance for method chaining.
      *
      * @param string $active
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setActive($active)
     {
@@ -93,7 +93,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Returns the current instance for method chaining.
      *
      * @param string $draft
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDraft($draft)
     {
@@ -116,7 +116,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Returns the current instance for method chaining.
      *
      * @param string $waitingFor
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setWaitingFor($waitingFor)
     {
@@ -139,7 +139,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Returns the current instance for method chaining.
      *
      * @param string $approvalId
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setApprovalId($approvalId)
     {

@@ -19,69 +19,69 @@ class AppFormOption
      *
      * @var string
      */
-    private $textNode;
+    public $label;
 
     /**
      * Value associated with the option.
      *
      * @var string
      */
-    private $value;
+    public $value;
 
     /**
      * Indicates whether the option is selected.
      *
      * @var boolean
      */
-    private $selected;
-
-    /**
-     * Format for the text node, allowing dynamic content.
-     *
-     * @var string
-     */
-    private $format;
-
-    /**
-     * Parameters for dynamic formatting of the text node.
-     *
-     * @var string[]
-     */
-    private $params;
-
-    /**
-     * Data associated with the option, typically from a MagicObject.
-     *
-     * @var MagicObject
-     */
-    private $data;
+    public $selected;
 
     /**
      * Additional attributes for the option.
      *
      * @var string[]
      */
-    private $attributes;
+    public $attributes;
+
+    /**
+     * Format for the text node, allowing dynamic content.
+     *
+     * @var string
+     */
+    protected $format;
+
+    /**
+     * Parameters for dynamic formatting of the text node.
+     *
+     * @var string[]
+     */
+    protected $params;
+
+    /**
+     * Data associated with the option, typically from a MagicObject.
+     *
+     * @var MagicObject
+     */
+    protected $data;
 
     /**
      * Padding to format the output, e.g., for nested options.
      *
      * @var string
      */
-    private $pad = "";
+    protected $pad = "";
 
     /**
      * Constructor to initialize the option with text, value, selected state, attributes, and data.
      *
-     * @param string $textNode The display text for the option
+     * @param string $label The display text for the option
      * @param string|null $value The value of the option
      * @param boolean $selected Indicates if the option is selected
      * @param string[]|null $attributes Additional HTML attributes for the option
      * @param MagicObject|null $data Associated data for dynamic value retrieval
      */
-    public function __construct($textNode, $value = null, $selected = false, $attributes = null, $data = null)
+    public function __construct($label, $value = null, $selected = false, $attributes = null, $data = null)
     {
-        $this->textNode = $textNode;
+        $this->label = $label;
         $this->value = $value;
         $this->selected = $selected;
         $this->attributes = $attributes;
@@ -201,10 +201,10 @@ class AppFormOption
         $attrs = $this->createAttributes();
         if (isset($this->format) && isset($this->params)) {
             $values = $this->getValues();
-            $textNode = vsprintf($this->format, $values);
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . $textNode . '</option>';
+            $label = vsprintf($this->format, $values);
+            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . $label . '</option>';
         } else {
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . htmlspecialchars($this->textNode) . '</option>';
+            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . htmlspecialchars($this->label) . '</option>';
         }
     }
 
@@ -230,7 +230,7 @@ class AppFormOption
      */ 
     public function getTextNode()
     {
-        return $this->textNode;
+        return $this->label;
     }
 
     /**
@@ -238,12 +238,12 @@ class AppFormOption
      *
      * This method allows setting a new text value for the option.
      *
-     * @param string $textNode The text node to set
+     * @param string $label The text node to set
      * @return self The current instance, allowing method chaining
      */ 
-    public function setTextNode($textNode)
+    public function setTextNode($label)
     {
-        $this->textNode = $textNode;
+        $this->label = $label;
         return $this;
     }
 
@@ -259,4 +259,34 @@ class AppFormOption
     {
         return $this->data;
     }
+
+    /**
+     * Get additional attributes for the option.
+     *
+     * This method returns the additional attributes that are associated with the option. 
+     * These attributes could be HTML attributes or any custom metadata assigned to the option.
+     *
+     * @return array|null An associative array of attributes, or null if no attributes are set.
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Set additional attributes for the option.
+     *
+     * This method allows you to assign additional attributes to the option. 
+     * These can be any valid HTML attributes or custom data attributes you wish to associate with the option.
+     *
+     * @param array|null $attributes An associative array of attributes to set, or null to clear attributes.
+     *
+     * @return self The current instance of the class, allowing for method chaining.
+     */
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+        return $this;
+    }
+
 }

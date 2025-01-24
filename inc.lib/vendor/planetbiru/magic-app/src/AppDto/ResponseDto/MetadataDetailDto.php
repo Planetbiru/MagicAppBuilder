@@ -99,7 +99,7 @@ class MetadataDetailDto extends MetadataDto
      * Set the primary key associated with the metadata.
      *
      * @param array $primaryKey The primary key to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKey($primaryKey)
     {
@@ -121,7 +121,7 @@ class MetadataDetailDto extends MetadataDto
      * Set the active status of the metadata.
      *
      * @param bool $active The active status to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setActive($active)
     {
@@ -143,7 +143,7 @@ class MetadataDetailDto extends MetadataDto
      * Set the operation status represented by the waitingFor property.
      *
      * @param int $waitingFor The operation status to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setWaitingFor($waitingFor)
     {
@@ -165,7 +165,7 @@ class MetadataDetailDto extends MetadataDto
      * Set the code representing the waiting status.
      *
      * @param string $waitingForCode The waiting status code to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setWaitingForCode($waitingForCode)
     {
@@ -187,7 +187,7 @@ class MetadataDetailDto extends MetadataDto
      * Set the message associated with the waiting status.
      *
      * @param string $waitingForMessage The waiting status message to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setWaitingForMessage($waitingForMessage)
     {

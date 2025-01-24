@@ -58,6 +58,38 @@ class AppFormBuilder
     }
 
     /**
+     * Create select options for a form element.
+     *
+     * This method retrieves data from the specified entity using the given specification
+     * and sorting parameters. It then builds a select option list based on the retrieved
+     * data, marking the current value as selected if applicable.
+     *
+     * @param MagicObject $entity The entity to fetch data from
+     * @param PicoSpecification $specification The specification for the query
+     * @param PicoSortable $sortable The sorting parameters for the results
+     * @param string $primaryKey The key used for the option values
+     * @param mixed $valueKey The key used for the option labels
+     * @param mixed|null $currentValue The currently selected value (if any)
+     * @param string[]|null $additionalOutput Additional attributes to include in each option
+     * @return AppJsonLabelValue The select option data
+     */
+    public function createJsonData($entity, $specification, $sortable, $primaryKey, $valueKey, $currentValue = null, $additionalOutput = null)
+    {
+        $selectOption = new AppJsonLabelValue();
+        $pageData = $entity->findAll($specification, null, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+        
+        while ($row = $pageData->fetch()) {
+            $value = $row->get($primaryKey);
+            $label = $row->get($valueKey);
+            $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
+            $attrs = $this->createAttributes($additionalOutput, $row);
+            $selectOption->add($label, $value, $selected, $attrs, $row);
+        }
+        
+        return $selectOption;
+    }
+
+    /**
      * Create attributes from additional output keys.
      *
      * This method retrieves specified attributes from a given row and constructs

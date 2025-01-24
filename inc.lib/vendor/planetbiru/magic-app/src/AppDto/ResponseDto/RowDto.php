@@ -62,7 +62,7 @@ class RowDto extends ToString
      * Set the data object and return the current instance for method chaining.
      *
      * @param MagicObject $data The new data object.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setData($data)
     {
@@ -84,7 +84,7 @@ class RowDto extends ToString
      * Set the metadata object and return the current instance for method chaining.
      *
      * @param MetadataDto $metadata The new metadata object.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setMetadata($metadata)
     {

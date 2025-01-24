@@ -30,9 +30,9 @@ class PicoMultilanguage
      * Load languages
      *
      * @param array $languages An array of language codes and their corresponding translations.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
-    public function loadLanguages(array $languages)
+    public function loadLanguages($languages)
     {
         // Code to load languages can be implemented here.
         return $this;

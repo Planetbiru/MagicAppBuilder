@@ -93,7 +93,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @param string $value The value of the option.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setValue(string $value)
     {
@@ -117,7 +117,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @param string $label The label to display for the option.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setLabel($label)
     {
@@ -141,7 +141,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @param array|null $attributes The HTML attributes for the <option> element.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setAttributes($attributes)
     {
@@ -165,7 +165,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @param array|null $data The `data-` attributes for the <option> element.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setData($data)
     {
@@ -189,7 +189,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @param bool|null  $selected  Indicates whether the option is selected by default.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setSelected($selected)
     {

@@ -75,7 +75,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
      * Set the numeric value representing the action.
      *
      * @param integer $value The action code.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setValue($value)
     {
@@ -97,7 +97,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
      * Set the human-readable code for the action.
      *
      * @param string $code The action code.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setCode($code)
     {
@@ -119,7 +119,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
      * Set the label describing the action for user-friendly display.
      *
      * @param string $label The action label.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setLabel($label)
     {

@@ -2,6 +2,8 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
+use MagicApp\AppLabelValueData;
+
 /**
  * Class PicoInputField
  *
@@ -46,7 +48,7 @@ class PicoInputField extends PicoValueLabelConstructor
      *
      * @param mixed $value This can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setValue($value)
     {
@@ -70,12 +72,35 @@ class PicoInputField extends PicoValueLabelConstructor
      *
      * @param string $label This is a string used for displaying a label to the user for the input field.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setLabel($label)
     {
         $this->label = $label;
 
         return $this;
+    }
+
+    /**
+     * Retrieves the selected value from a list of options.
+     *
+     * This method iterates over an array of AppLabelValueData objects and 
+     * returns a new instance of PicoInputField with the value and label 
+     * of the selected option.
+     *
+     * @param AppLabelValueData[] $options An array of AppLabelValueData objects.
+     *
+     * @return PicoInputField|null Returns a new PicoInputField instance for the selected option, or null if none is selected.
+     */
+    public static function getSelectedValue($options)
+    {
+        if (isset($options) && is_array($options)) {
+            foreach ($options as $option) {
+                if ($option->selected) {
+                    return new PicoInputField($option->value, $option->label);
+                }
+            }
+        }
+        return null;
     }
 }

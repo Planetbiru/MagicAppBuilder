@@ -72,7 +72,7 @@ class DetailDataDto extends ToString
      * Set the name of the primary key in the data structure.
      *
      * @param string[]|null $primaryKeyName The name of the primary key.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKeyName($primaryKeyName)
     {
@@ -114,7 +114,7 @@ class DetailDataDto extends ToString
      * @param bool $readonly Indicates if the field is read-only.
      * @param bool $hidden Indicates if the field is hidden.
      * @param mixed $valueDraft The draft value associated with the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addData($field, $value, $type, $label, $readonly, $hidden, $valueDraft)
     {
@@ -140,7 +140,7 @@ class DetailDataDto extends ToString
      * Set an array of column, each represented as a ColumnDto.
      *
      * @param ColumnDto[] $column An array of column to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setColumn($column)
     {

@@ -99,7 +99,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      *
      * @param string $propertyName Name of the property to set.
      * @param mixed $propertyValue Value to assign to the property.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function set($propertyName, $propertyValue)
     {

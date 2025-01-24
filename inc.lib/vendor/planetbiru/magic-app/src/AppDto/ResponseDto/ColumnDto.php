@@ -104,7 +104,7 @@ class ColumnDto extends ToString
      * Sets the metadata associated with the row.
      *
      * @param MetadataDto $metadata The metadata to set for the column.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setMetadata($metadata)
     {

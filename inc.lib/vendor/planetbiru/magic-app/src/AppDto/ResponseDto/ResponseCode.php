@@ -58,7 +58,7 @@ class ResponseCode extends ToString
      * Set the response code.
      *
      * @param string $responseCode The response code.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseCode($responseCode)
     {
@@ -80,7 +80,7 @@ class ResponseCode extends ToString
      * Set the response message.
      *
      * @param string $responseMessage The response message.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseMessage($responseMessage)
     {

@@ -95,7 +95,7 @@ class ListDataDto extends ToString
      * Set the name of the primary key in the data structure.
      *
      * @param string[]|null $primaryKeyName The name of the primary key.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setPrimaryKeyName($primaryKeyName)
     {
@@ -128,7 +128,7 @@ class ListDataDto extends ToString
      * Append a column title to the table.
      *
      * @param ListDataTitleDto $title The title to append.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addTitle($title)
     {
@@ -145,7 +145,7 @@ class ListDataDto extends ToString
      * Append a data map to the table.
      *
      * @param DataMap $dataMap The data map to append.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addDataMap($dataMap)
     {
@@ -166,7 +166,7 @@ class ListDataDto extends ToString
      *
      * @param MagicObject $data The row data to append.
      * @param MetadataDto $metadata The metadata associated with the row data.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addData($data, $metadata)
     {
@@ -192,7 +192,7 @@ class ListDataDto extends ToString
     /**
      * Reset the column titles to an empty array.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function resetTitle()
     {
@@ -213,7 +213,7 @@ class ListDataDto extends ToString
     /**
      * Reset the data map to an empty array.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function resetDataMap()
     {
@@ -234,7 +234,7 @@ class ListDataDto extends ToString
     /**
      * Reset the row to an empty array.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function resetRow()
     {
@@ -257,7 +257,7 @@ class ListDataDto extends ToString
      *
      * @param PageDto $page Current page
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setPage($page)
     {
@@ -281,7 +281,7 @@ class ListDataDto extends ToString
      *
      * @param string[] $primaryKeyDataType An associative array mapping primary key names to their data types.
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setPrimaryKeyDataType($primaryKeyDataType)
     {
@@ -295,7 +295,7 @@ class ListDataDto extends ToString
      *
      * @param DataMap[]  $dataMap  An array of data maps for the data table.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setDataMap($dataMap)
     {

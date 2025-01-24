@@ -59,7 +59,7 @@ class PicoInputFieldUpdate extends PicoInputFieldInsert
      *
      * @param InputFieldValue  $currentValue  The current value of the input field, typically used when editing or updating a record.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setCurrentValue($currentValue)
     {

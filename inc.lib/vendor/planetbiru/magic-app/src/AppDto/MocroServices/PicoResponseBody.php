@@ -124,7 +124,7 @@ class PicoResponseBody extends PicoObjectToString
      * 
      * @param string[] $primaryKey The primary key to associate with the response.
      * 
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setPrimaryKey($primaryKey)
     {
@@ -185,7 +185,7 @@ class PicoResponseBody extends PicoObjectToString
      *
      * @param MagicObject $entity The entity object that contains table information.
      * @param bool $setValue
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setEntity($entity, $setValue = false)
     {
@@ -221,7 +221,7 @@ class PicoResponseBody extends PicoObjectToString
      * 
      * @param EntityData $data The data to set for the response.
      * 
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setData($data)
     {
@@ -249,7 +249,7 @@ class PicoResponseBody extends PicoObjectToString
      * 
      * @param string $responseCode The response code to set.
      * 
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseCode($responseCode)
     {
@@ -277,7 +277,7 @@ class PicoResponseBody extends PicoObjectToString
      * 
      * @param string $responseText The response message or text to set.
      * 
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseText($responseText)
     {
@@ -289,7 +289,7 @@ class PicoResponseBody extends PicoObjectToString
     /**
      * Sets the case format to specified format.
      * This method allows switching the format for property names to specified format.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function switchCaseTo($caseFormat)
     {
@@ -333,7 +333,7 @@ class PicoResponseBody extends PicoObjectToString
      * Undocumented function
      *
      * @param AppUserPermission $appUserPermission
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setPermission($appUserPermission)
     {
