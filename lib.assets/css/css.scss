@@ -1034,4 +1034,5 @@ input[type=number][name="database_port"] {
 	background-color: #007ac8;
 	height: 10px;
 	width: 0px;
+	transition: width ease-in-out 0.1s;
 }
