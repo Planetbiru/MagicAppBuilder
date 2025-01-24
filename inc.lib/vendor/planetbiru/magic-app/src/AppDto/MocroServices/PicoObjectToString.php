@@ -28,7 +28,7 @@ class PicoObjectToString
     /**
      * Sets the case format to camelCase.
      * This method allows switching the format for property names to camelCase.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function toCamelCase()
     {
@@ -39,7 +39,7 @@ class PicoObjectToString
     /**
      * Sets the case format to snake_case.
      * This method allows switching the format for property names to snake_case.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function toSnakeCase()
     {
@@ -50,7 +50,7 @@ class PicoObjectToString
     /**
      * Sets the case format to specified format.
      * This method allows switching the format for property names to specified format.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function switchCaseTo($caseFormat)
     {

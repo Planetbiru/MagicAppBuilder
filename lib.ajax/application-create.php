@@ -3,6 +3,7 @@
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Generator\ScriptGenerator;
 use AppBuilder\Util\FileDirUtil;
+use MagicAdmin\Entity\Data\Admin;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
@@ -60,7 +61,7 @@ if(!file_exists($baseApplicationDirectory))
 {
     mkdir($baseApplicationDirectory, 0755, true);
 }
-$workspaceId = $activeWorkspace->getWorkspaceId();
+$workspaceId = trim($inputPost->getWorkspaceId());
 $applicationName = trim($inputPost->getName());
 $applicationArchitecture = trim($inputPost->getArchitecture());
 $applicationDirectory = trim($baseApplicationDirectory);
@@ -207,24 +208,31 @@ $now = date("Y-m-d H:i:s");
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
-$entityApplication->setApplicationId($newAppId);
-$entityApplication->setName($applicationName);
-$entityApplication->setDescription($applicationDescription);
-$entityApplication->setProjectDirectory($projectDirectory);
-$entityApplication->setBaseApplicationDirectory($applicationDirectory);
-$entityApplication->setArchitecture($applicationArchitecture);
-$entityApplication->setAuthor($author);
+    $entityApplication->setApplicationId($newAppId);
+    $entityApplication->setName($applicationName);
+    $entityApplication->setDescription($applicationDescription);
+    $entityApplication->setProjectDirectory($projectDirectory);
+    $entityApplication->setBaseApplicationDirectory($applicationDirectory);
+    $entityApplication->setArchitecture($applicationArchitecture);
+    $entityApplication->setAuthor($author);
 
-$entityApplication->setAdminId($adminId);
-$entityApplication->setWorkspaceId($workspaceId);
-$entityApplication->setAdminCreate($adminId);
-$entityApplication->setAdminEdit($adminId);   
-$entityApplication->setTimeCreate($now);
-$entityApplication->setTimeEdit($now);
-$entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
-$entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
-$entityApplication->setActive(true);
-$entityApplication->save();
+    $entityApplication->setAdminId($adminId);
+    $entityApplication->setWorkspaceId($workspaceId);
+    $entityApplication->setAdminCreate($adminId);
+    $entityApplication->setAdminEdit($adminId);   
+    $entityApplication->setTimeCreate($now);
+    $entityApplication->setTimeEdit($now);
+    $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
+    $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+    $entityApplication->setActive(true);
+    $entityApplication->save();
+
+    $admin = new Admin(null, $databaseBuilder);
+    $admin
+        ->setAdminId($adminId)
+        ->setWorkspaceId($workspaceId)
+        ->setApplicationId($newAppId)
+        ->update();
 }
 catch(Exception $e)
 {

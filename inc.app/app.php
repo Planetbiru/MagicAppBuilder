@@ -17,7 +17,11 @@ $builderConfigPath = dirname(__DIR__) . "/inc.cfg/core.yml";
 
 if(!file_exists($builderConfigPath))
 {
-    $defaultDatabasePath = FileDirUtil::normalizePath(dirname(__DIR__) . "/inc.cfg/database.sqlite");
+    $defaultDatabasePath = FileDirUtil::normalizePath(dirname(__DIR__) . "/inc.database/database.sqlite");
+    if(!file_exists(dirname($defaultDatabasePath)))
+    {
+        mkdir(dirname($defaultDatabasePath), 0755, true);
+    }
     $builderConfig->loadYamlString("
 dataLimit: 20
 database:
@@ -42,6 +46,14 @@ data:
     next: '<i class=\"fa-solid fa-angle-right\"></i>'
     first: '<i class=\"fa-solid fa-angles-left\"></i>'
     last: '<i class=\"fa-solid fa-angles-right\"></i>'
+
+languages:
+    -
+        name: English
+        code: en
+    -
+        name: Indonesia
+        code: id
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

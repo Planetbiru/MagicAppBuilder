@@ -589,6 +589,7 @@ class EntityEditor {
                     tr.querySelector('.column-type').value = _this.primaryKeyDataType;
                     _this.updateColumnLengthInput(tr.querySelector('.column-type'));
                     tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
+                    tr.querySelector('.column-nullable').checked = false;
                 }
             }
         });
@@ -814,6 +815,7 @@ class EntityEditor {
         let countStr = count <= 0 ? '' : count + 1;
         let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
         let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
+        column.nullable = true;
         this.addColumnToTable(column, focus);
         const element = document.querySelector(this.selector+' .entity-container .table-container');
         element.scrollTop = element.scrollHeight;

@@ -3,6 +3,7 @@
 use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Entity\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
@@ -45,7 +46,7 @@ try
 
     if(isset($entityAdmin) && $entityAdmin->getAdminId() != null)
     {
-        $entityAdmin->setWorkspaceId($workspaceId)->update();
+        $entityAdmin->setWorkspaceId($workspaceId)->setApplicationId(null)->update();
         
         $workspaceAdmin = new EntityAdminWorkspace(null, $databaseBuilder);
 
@@ -68,4 +69,5 @@ try
 catch(Exception $e)
 {
     error_log($e->getMessage());
+    ResponseUtil::sendJSON(new stdClass);
 }

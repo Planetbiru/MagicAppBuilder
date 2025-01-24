@@ -6236,427 +6236,6 @@ foreach($result-&gt;getResult() as $row)
 {
     echo $row;
 }</code></pre>
-<h3>Find All with Option</h3>
-<ol>
-<li><code>MagicObject::FIND_OPTION_NO_COUNT_DATA</code></li>
-<li><code>MagicObject::FIND_OPTION_NO_FETCH_DATA</code></li>
-</ol>
-<p>If the <code>MagicObject::FIND_OPTION_NO_COUNT_DATA</code> option is provided, the MagicObject will not count data even if a PicoPageable is provided. This will reduce data processing time but the user does not know how much data actually is. This option can be choosed when dealing with very large data.</p>
-<p>If the <code>MagicObject::FIND_OPTION_NO_FETCH_DATA</code> option is given, MagicObject will not directly fetch data and store it in the object. Users must retrieve data one by one using the fetch method. Every time an application receives data from the database, it sends it directly to either a file or an output buffer instead of collecting it in a list in memory. This option can be choosed when handling very large data so that it does not consume much memory. </p>
-<p>Example:</p>
-<pre><code class="language-php">/**
- * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
- * @Table(name="album")
- */
-class EntityAlbum extends MagicObject
-{
-    /**
-     * Album ID
-     * 
-     * @Id
-     * @GeneratedValue(strategy=GenerationType.UUID)
-     * @NotNull
-     * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
-     * @Label(content="Album ID")
-     * @var string
-     */
-    protected $albumId;
-
-    /**
-     * Name
-     * 
-     * @Column(name="name", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="Name")
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * Title
-     * 
-     * @Column(name="title", type="text", nullable=true)
-     * @Label(content="Title")
-     * @var string
-     */
-    protected $title;
-
-    /**
-     * Description
-     * 
-     * @Column(name="description", type="longtext", nullable=true)
-     * @Label(content="Description")
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * Producer ID
-     * 
-     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=true)
-     * @Label(content="Producer ID")
-     * @var string
-     */
-    protected $producerId;
-
-    /**
-     * Producer
-     * 
-     * @JoinColumn(name="producer_id")
-     * @Label(content="Producer")
-     * @var Producer
-     */
-    protected $producer;
-
-    /**
-     * Release Date
-     * 
-     * @Column(name="release_date", type="date", nullable=true)
-     * @Label(content="Release Date")
-     * @var string
-     */
-    protected $releaseDate;
-
-    /**
-     * Number Of Song
-     * 
-     * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
-     * @Label(content="Number Of Song")
-     * @var integer
-     */
-    protected $numberOfSong;
-
-    /**
-     * Duration
-     * 
-     * @Column(name="duration", type="float", nullable=true)
-     * @Label(content="Duration")
-     * @var double
-     */
-    protected $duration;
-
-    /**
-     * Image Path
-     * 
-     * @Column(name="image_path", type="text", nullable=true)
-     * @Label(content="Image Path")
-     * @var string
-     */
-    protected $imagePath;
-
-    /**
-     * Sort Order
-     * 
-     * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
-     * @Label(content="Sort Order")
-     * @var integer
-     */
-    protected $sortOrder;
-
-    /**
-     * Time Create
-     * 
-     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
-     * @Label(content="Time Create")
-     * @var string
-     */
-    protected $timeCreate;
-
-    /**
-     * Time Edit
-     * 
-     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
-     * @Label(content="Time Edit")
-     * @var string
-     */
-    protected $timeEdit;
-
-    /**
-     * Admin Create
-     * 
-     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-     * @Label(content="Admin Create")
-     * @var string
-     */
-    protected $adminCreate;
-
-    /**
-     * Admin Edit
-     * 
-     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-     * @Label(content="Admin Edit")
-     * @var string
-     */
-    protected $adminEdit;
-
-    /**
-     * IP Create
-     * 
-     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
-     * @Label(content="IP Create")
-     * @var string
-     */
-    protected $ipCreate;
-
-    /**
-     * IP Edit
-     * 
-     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="IP Edit")
-     * @var string
-     */
-    protected $ipEdit;
-
-    /**
-     * Active
-     * 
-     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
-     * @DefaultColumn(value="1")
-     * @Label(content="Active")
-     * @var boolean
-     */
-    protected $active;
-
-    /**
-     * As Draft
-     * 
-     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
-     * @DefaultColumn(value="1")
-     * @var boolean
-     */
-    protected $asDraft;
-
-}
-
-/**
- * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
- * @Table(name="producer")
- */
-class Producer extends MagicObject
-{
-    /**
-     * Producer ID
-     * 
-     * @Id
-     * @GeneratedValue(strategy=GenerationType.UUID)
-     * @NotNull
-     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=false)
-     * @Label(content="Producer ID")
-     * @var string
-     */
-    protected $producerId;
-
-    /**
-     * Name
-     * 
-     * @Column(name="name", type="varchar(100)", length=100, nullable=true)
-     * @Label(content="Name")
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * Gender
-     * 
-     * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
-     * @Label(content="Gender")
-     * @var string
-     */
-    protected $gender;
-
-    /**
-     * Birth Day
-     * 
-     * @Column(name="birth_day", type="date", nullable=true)
-     * @Label(content="Birth Day")
-     * @var string
-     */
-    protected $birthDay;
-
-    /**
-     * Phone
-     * 
-     * @Column(name="phone", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="Phone")
-     * @var string
-     */
-    protected $phone;
-
-    /**
-     * Phone2
-     * 
-     * @Column(name="phone2", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="Phone2")
-     * @var string
-     */
-    protected $phone2;
-
-    /**
-     * Phone3
-     * 
-     * @Column(name="phone3", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="Phone3")
-     * @var string
-     */
-    protected $phone3;
-
-    /**
-     * Email
-     * 
-     * @Column(name="email", type="varchar(100)", length=100, nullable=true)
-     * @Label(content="Email")
-     * @var string
-     */
-    protected $email;
-
-    /**
-     * Email2
-     * 
-     * @Column(name="email2", type="varchar(100)", length=100, nullable=true)
-     * @Label(content="Email2")
-     * @var string
-     */
-    protected $email2;
-
-    /**
-     * Email3
-     * 
-     * @Column(name="email3", type="varchar(100)", length=100, nullable=true)
-     * @Label(content="Email3")
-     * @var string
-     */
-    protected $email3;
-
-    /**
-     * Website
-     * 
-     * @Column(name="website", type="text", nullable=true)
-     * @Label(content="Website")
-     * @var string
-     */
-    protected $website;
-
-    /**
-     * Address
-     * 
-     * @Column(name="address", type="text", nullable=true)
-     * @Label(content="Address")
-     * @var string
-     */
-    protected $address;
-
-    /**
-     * Picture
-     * 
-     * @Column(name="picture", type="tinyint(1)", length=1, nullable=true)
-     * @var boolean
-     */
-    protected $picture;
-
-    /**
-     * Image Path
-     * 
-     * @Column(name="image_path", type="text", nullable=true)
-     * @Label(content="Image Path")
-     * @var string
-     */
-    protected $imagePath;
-
-    /**
-     * Image Update
-     * 
-     * @Column(name="image_update", type="timestamp", length=19, nullable=true)
-     * @Label(content="Image Update")
-     * @var string
-     */
-    protected $imageUpdate;
-
-    /**
-     * Time Create
-     * 
-     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
-     * @Label(content="Time Create")
-     * @var string
-     */
-    protected $timeCreate;
-
-    /**
-     * Time Edit
-     * 
-     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
-     * @Label(content="Time Edit")
-     * @var string
-     */
-    protected $timeEdit;
-
-    /**
-     * Admin Create
-     * 
-     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-     * @Label(content="Admin Create")
-     * @var string
-     */
-    protected $adminCreate;
-
-    /**
-     * Admin Edit
-     * 
-     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-     * @Label(content="Admin Edit")
-     * @var string
-     */
-    protected $adminEdit;
-
-    /**
-     * IP Create
-     * 
-     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
-     * @Label(content="IP Create")
-     * @var string
-     */
-    protected $ipCreate;
-
-    /**
-     * IP Edit
-     * 
-     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
-     * @Label(content="IP Edit")
-     * @var string
-     */
-    protected $ipEdit;
-
-    /**
-     * Active
-     * 
-     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
-     * @DefaultColumn(value="1")
-     * @Label(content="Active")
-     * @var boolean
-     */
-    protected $active;
-
-}
-
-$album = new EntityAlbum(null, $database);
-
-$subqueryMap = array(
-    'producer'=&gt;array(
-        'entityName'=&gt;'Producer',
-        'tableName'=&gt;'producer',
-        'primaryKey'=&gt;'producer_id',
-        'columnName'=&gt;'producer_id',
-        'objectName'=&gt;'producer',
-        'propertyName'=&gt;'name'
-    )
-);
-
-$result = $album-&gt;findAll(null, null, null, true, null, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
-
-while($data = $result-&gt;fetch())
-{
-    echo $data;
-}</code></pre>
 <h3>Method</h3>
 <p><strong>1. find</strong></p>
 <p>&raquo; search data from database by primary key value given and return one record. This method require database connection.</p>
@@ -7723,6 +7302,430 @@ $pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
 </article>
 
 <article class="article" id="part19">
+<h2>Find All with Option</h2>
+<ol>
+<li><code>MagicObject::FIND_OPTION_NO_COUNT_DATA</code></li>
+<li><code>MagicObject::FIND_OPTION_NO_FETCH_DATA</code></li>
+</ol>
+<p>If the <code>MagicObject::FIND_OPTION_NO_COUNT_DATA</code> option is provided, the MagicObject will not count the data, even if a PicoPageable is provided. This will reduce data processing time, but the user will not know how much data there actually is. This option can be chosen when dealing with very large datasets.</p>
+<p>If the <code>MagicObject::FIND_OPTION_NO_FETCH_DATA</code> option is given, the MagicObject will not directly fetch data and store it in the object. Users must retrieve data one by one using the fetch method. Every time the application receives data from the database, it can process it and send it directly to a file or an output buffer, instead of collecting it in a list in memory. This option can be chosen when handling very large datasets to prevent excessive memory consumption.</p>
+<p>Example:</p>
+<pre><code class="language-php">/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
+ * @Table(name="album")
+ */
+class EntityAlbum extends MagicObject
+{
+    /**
+     * Album ID
+     * 
+     * @Id
+     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @NotNull
+     * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
+     * @Label(content="Album ID")
+     * @var string
+     */
+    protected $albumId;
+
+    /**
+     * Name
+     * 
+     * @Column(name="name", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Name")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Title
+     * 
+     * @Column(name="title", type="text", nullable=true)
+     * @Label(content="Title")
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * Description
+     * 
+     * @Column(name="description", type="longtext", nullable=true)
+     * @Label(content="Description")
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * Producer ID
+     * 
+     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Producer ID")
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * Producer
+     * 
+     * @JoinColumn(name="producer_id")
+     * @Label(content="Producer")
+     * @var Producer
+     */
+    protected $producer;
+
+    /**
+     * Release Date
+     * 
+     * @Column(name="release_date", type="date", nullable=true)
+     * @Label(content="Release Date")
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * Number Of Song
+     * 
+     * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
+     * @Label(content="Number Of Song")
+     * @var integer
+     */
+    protected $numberOfSong;
+
+    /**
+     * Duration
+     * 
+     * @Column(name="duration", type="float", nullable=true)
+     * @Label(content="Duration")
+     * @var double
+     */
+    protected $duration;
+
+    /**
+     * Image Path
+     * 
+     * @Column(name="image_path", type="text", nullable=true)
+     * @Label(content="Image Path")
+     * @var string
+     */
+    protected $imagePath;
+
+    /**
+     * Sort Order
+     * 
+     * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
+     * @Label(content="Sort Order")
+     * @var integer
+     */
+    protected $sortOrder;
+
+    /**
+     * Time Create
+     * 
+     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
+
+    /**
+     * Time Edit
+     * 
+     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
+
+    /**
+     * Admin Create
+     * 
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @var string
+     */
+    protected $adminCreate;
+
+    /**
+     * Admin Edit
+     * 
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @var string
+     */
+    protected $adminEdit;
+
+    /**
+     * IP Create
+     * 
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @var string
+     */
+    protected $ipCreate;
+
+    /**
+     * IP Edit
+     * 
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @var string
+     */
+    protected $ipEdit;
+
+    /**
+     * Active
+     * 
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @Label(content="Active")
+     * @var boolean
+     */
+    protected $active;
+
+    /**
+     * As Draft
+     * 
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var boolean
+     */
+    protected $asDraft;
+
+}
+
+/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
+ * @Table(name="producer")
+ */
+class Producer extends MagicObject
+{
+    /**
+     * Producer ID
+     * 
+     * @Id
+     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @NotNull
+     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=false)
+     * @Label(content="Producer ID")
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * Name
+     * 
+     * @Column(name="name", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Name")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Gender
+     * 
+     * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
+     * @Label(content="Gender")
+     * @var string
+     */
+    protected $gender;
+
+    /**
+     * Birth Day
+     * 
+     * @Column(name="birth_day", type="date", nullable=true)
+     * @Label(content="Birth Day")
+     * @var string
+     */
+    protected $birthDay;
+
+    /**
+     * Phone
+     * 
+     * @Column(name="phone", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone")
+     * @var string
+     */
+    protected $phone;
+
+    /**
+     * Phone2
+     * 
+     * @Column(name="phone2", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone2")
+     * @var string
+     */
+    protected $phone2;
+
+    /**
+     * Phone3
+     * 
+     * @Column(name="phone3", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone3")
+     * @var string
+     */
+    protected $phone3;
+
+    /**
+     * Email
+     * 
+     * @Column(name="email", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email")
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * Email2
+     * 
+     * @Column(name="email2", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email2")
+     * @var string
+     */
+    protected $email2;
+
+    /**
+     * Email3
+     * 
+     * @Column(name="email3", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email3")
+     * @var string
+     */
+    protected $email3;
+
+    /**
+     * Website
+     * 
+     * @Column(name="website", type="text", nullable=true)
+     * @Label(content="Website")
+     * @var string
+     */
+    protected $website;
+
+    /**
+     * Address
+     * 
+     * @Column(name="address", type="text", nullable=true)
+     * @Label(content="Address")
+     * @var string
+     */
+    protected $address;
+
+    /**
+     * Picture
+     * 
+     * @Column(name="picture", type="tinyint(1)", length=1, nullable=true)
+     * @var boolean
+     */
+    protected $picture;
+
+    /**
+     * Image Path
+     * 
+     * @Column(name="image_path", type="text", nullable=true)
+     * @Label(content="Image Path")
+     * @var string
+     */
+    protected $imagePath;
+
+    /**
+     * Image Update
+     * 
+     * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+     * @Label(content="Image Update")
+     * @var string
+     */
+    protected $imageUpdate;
+
+    /**
+     * Time Create
+     * 
+     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
+
+    /**
+     * Time Edit
+     * 
+     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
+
+    /**
+     * Admin Create
+     * 
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @var string
+     */
+    protected $adminCreate;
+
+    /**
+     * Admin Edit
+     * 
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @var string
+     */
+    protected $adminEdit;
+
+    /**
+     * IP Create
+     * 
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @var string
+     */
+    protected $ipCreate;
+
+    /**
+     * IP Edit
+     * 
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @var string
+     */
+    protected $ipEdit;
+
+    /**
+     * Active
+     * 
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @Label(content="Active")
+     * @var boolean
+     */
+    protected $active;
+
+}
+
+$album = new EntityAlbum(null, $database);
+
+$subqueryMap = array(
+    'producer'=&gt;array(
+        'entityName'=&gt;'Producer',
+        'tableName'=&gt;'producer',
+        'primaryKey'=&gt;'producer_id',
+        'columnName'=&gt;'producer_id',
+        'objectName'=&gt;'producer',
+        'propertyName'=&gt;'name'
+    )
+);
+
+$result = $album-&gt;findAll(null, null, null, true, null, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+
+while($data = $result-&gt;fetch())
+{
+    echo $data;
+}</code></pre>
+</article>
+
+<article class="article" id="part20">
 <h2>Filtering, Ordering and Pagination</h2>
 <p>MagicObject will filter data according to the given criteria. On the other hand, MagicObject will only retrieve data on the specified page by specifying <code>limit</code> and <code>offset</code> data in the <code>select</code> query.</p>
 <p>Example parameters:</p>
@@ -8605,7 +8608,7 @@ require_once "inc/footer.php";
 ?&gt;</code></pre>
 </article>
 
-<article class="article" id="part20">
+<article class="article" id="part21">
 <h2>Native Query</h2>
 <p>In MagicObject version 2, native queries have been introduced as an efficient way to interact with the database.</p>
 <p>Native queries offer significant performance improvements when handling large volumes of data, allowing users to craft highly efficient queries that meet diverse requirements.</p>
@@ -9368,7 +9371,7 @@ $result = $explort-&gt;exportActive($aktif, $pageable, $sortable, $template);</c
 <p>By leveraging the native query feature in MagicObject, you can create efficient and maintainable database interactions, enhancing your application's performance and security.</p>
 </article>
 
-<article class="article" id="part21">
+<article class="article" id="part22">
 <h2>Multiple Database Connections</h2>
 <p>MagicObject version 2 introduces support for multiple database connections, enabling users to manage entities stored across different databases seamlessly. When performing operations such as JOINs with entities from multiple databases, it is essential to define a database connection for each entity involved.</p>
 <h3>Example Scenario</h3>
@@ -9533,7 +9536,7 @@ $song-&gt;databaseEntity($databaseEntity);</code></pre>
 <p>With MagicObject version 2, managing entities across multiple database connections is straightforward. By defining the correct associations and utilizing the provided methods, users can effectively work with complex data structures that span multiple databases. Make sure to handle exceptions properly to ensure robustness in your application.</p>
 </article>
 
-<article class="article" id="part22">
+<article class="article" id="part23">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <h3>Database Dump Overview</h3>
@@ -10047,7 +10050,7 @@ $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL, new 
 <p>This approach allows developers to quickly switch between database types and manage their database schemas and data efficiently. The use of dedicated instances of PicoDatabaseDump for multiple tables ensures clarity and organization in your database operations.</p>
 </article>
 
-<article class="article" id="part23">
+<article class="article" id="part24">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -10172,7 +10175,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part24">
+<article class="article" id="part25">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -10439,7 +10442,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part25">
+<article class="article" id="part26">
 <h2>PicoSqlite</h2>
 <h3>Overview</h3>
 <p><code>PicoSqlite</code> is a PHP class designed for simplified interactions with SQLite databases using PDO (PHP Data Objects). This class extends <code>PicoDatabase</code> and provides methods for connecting to the database, creating tables, and performing basic CRUD (Create, Read, Update, Delete) operations.</p>
@@ -10806,7 +10809,7 @@ catch(Exception $e)
 <p><code>PicoSqlite</code> provides an efficient way to interact with SQLite databases. Its straightforward API allows developers to perform common database operations with minimal code. For more advanced database operations, consider extending the class or using additional PDO features.</p>
 </article>
 
-<article class="article" id="part26">
+<article class="article" id="part27">
 <h2>File Upload</h2>
 <h3>Overview</h3>
 <p>Uploading files can be challenging, especially for novice developers. This guide explains how to manage single and multiple file uploads in PHP, highlighting the differences and providing straightforward examples.</p>
@@ -10873,7 +10876,7 @@ else
 <p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like <code>getAll()</code> and <code>isMultiple()</code>, developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
 </article>
 
-<article class="article" id="part27">
+<article class="article" id="part28">
 <h2>Resumable File Download</h2>
 <h3>Namespace</h3>
 <p><code>MagicObject\File</code></p>
@@ -10942,7 +10945,7 @@ if($finished &amp;&amp; file_exists($path))
 </ul>
 </article>
 
-<article class="article" id="part28">
+<article class="article" id="part29">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>
@@ -11162,7 +11165,7 @@ $apa = $rumah;
 echo $apa;</code></pre>
 </article>
 
-<article class="article" id="part29">
+<article class="article" id="part30">
 <h2>Database Migration</h2>
 <p>MagicObject allows users to import data from a database with different table names and column names between the source database and the destination database. This feature is used by developers who develop applications that are already used in production environments.</p>
 <p>On the one hand, the application requires a new database structure according to what is defined by the developer. On the other hand, users want to use existing data.</p>

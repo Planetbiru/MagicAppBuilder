@@ -195,7 +195,7 @@ class EntityRelationshipDiagram //NOSONAR
      * Set database connection
      *
      * @param PicoDatabase $databaseBuilder
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function setDatabaseBuilder($databaseBuilder)
     {
@@ -217,7 +217,7 @@ class EntityRelationshipDiagram //NOSONAR
      *
      * @param MagicObject $entity
      * @param integer $level
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function addEntity($entity, $level = 1)
     {
@@ -240,7 +240,7 @@ class EntityRelationshipDiagram //NOSONAR
      * @param string $namespace
      * @param PicoTableInfo $info
      * @param integer $level
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     private function updateDiagram($reflectionClass, $entityName, $namespace, $info, $level)
     {

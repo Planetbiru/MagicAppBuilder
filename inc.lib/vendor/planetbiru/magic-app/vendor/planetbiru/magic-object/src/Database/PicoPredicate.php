@@ -354,7 +354,7 @@ class PicoPredicate // NOSONAR
     /**
      * Get an instance of this class.
      *
-     * @return self A new instance of the class.
+     * @return self A new instance of PicoPredicate.
      */
     public static function getInstance()
     {

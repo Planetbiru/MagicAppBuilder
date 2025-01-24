@@ -22,7 +22,7 @@ class PicoTableInfoExtended extends PicoTableInfo
     /**
      * Gets an instance of PicoTableInfoExtended.
      *
-     * @return self A new instance of the class.
+     * @return self A new instance of PicoPredicate.
      */
     public static function getInstance()
     {

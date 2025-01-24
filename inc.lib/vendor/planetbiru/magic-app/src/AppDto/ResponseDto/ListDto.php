@@ -96,7 +96,7 @@ class ListDto extends ToString
      * Set the namespace where the module is located.
      *
      * @param string $namespace The namespace to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setNamespace($namespace)
     {
@@ -132,7 +132,7 @@ class ListDto extends ToString
      * Append a column title to the table.
      *
      * @param ListDataTitleDto $title The title to append.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addTitle($title)
     {
@@ -154,7 +154,7 @@ class ListDto extends ToString
      * stored in the data structure.
      *
      * @param DataMap $dataMap The DataMap instance to add.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addDataMap($dataMap)
     {
@@ -239,7 +239,7 @@ class ListDto extends ToString
      *
      * @param MagicObject $data The row data to append.
      * @param MetadataDto $metadata The metadata associated with the row data.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function addData($data, $metadata)
     {
@@ -266,7 +266,7 @@ class ListDto extends ToString
      *
      * @param string|null $responseCode The response code indicating the status of the request.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setResponseCode($responseCode)
     {
@@ -290,7 +290,7 @@ class ListDto extends ToString
      *
      * @param string|null  $responseMessage  A message providing additional information about the response.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setResponseMessage($responseMessage)
     {

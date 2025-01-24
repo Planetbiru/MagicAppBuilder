@@ -112,7 +112,7 @@ class PicoOutputDataItem extends PicoEntityData
      *
      * @param MagicObject $entity The entity from which to extract primary key values.
      * @param string[] $primaryKey List of primary keys.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     private function setPrimaryKeyValueFromEntity($entity, $primaryKey)
     {

@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf0a9c08200ce30dbac5740e2c7431ad",
+    "content-hash": "7d8c53e4643b3e3b310cfb748b546bc8",
     "packages": [
         {
             "name": "planetbiru/magic-object",
-            "version": "2.14.7",
+            "version": "2.14.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "c0d24a58b8d19fcdd56fead704262be2a8188d7c"
+                "reference": "eabb9a5ae7a2e99a61d5255c232f37f10cb54c2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/c0d24a58b8d19fcdd56fead704262be2a8188d7c",
-                "reference": "c0d24a58b8d19fcdd56fead704262be2a8188d7c",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/eabb9a5ae7a2e99a61d5255c232f37f10cb54c2b",
+                "reference": "eabb9a5ae7a2e99a61d5255c232f37f10cb54c2b",
                 "shasum": ""
             },
             "require": {
@@ -42,9 +42,9 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/2.14.7"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/2.14.10"
             },
-            "time": "2025-01-18T17:08:52+00:00"
+            "time": "2025-01-24T01:49:15+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",

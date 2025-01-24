@@ -459,11 +459,12 @@ td[data-order-method="desc"] {
 
 [data-order-method="asc"]::after {
   transform: rotate(135deg);
-  top: 19px;
+  top: 15px;
 }
 
 [data-order-method="desc"]::after {
   transform: rotate(-45deg);
+  top: 12px;
 }
 
 select {
@@ -518,12 +519,29 @@ select:focus {
   margin-bottom: 6px;
 }
 
+.btn-warning {
+  color: #e8e8e8;
+  background-color: #ea7208;
+  border-color: #ea7208;
+}
+
+.btn-warning:hover, .btn-warning:focus-visible {
+  color: #e8e8e8;
+  background-color: #dd6d0a;
+  border-color: #dd6d0a;
+}
+
 // Dark Mode Styles
 .dark-mode {
 
   background-color: $color-dark;
   color: $color-text-dark;
 
+  .alert-info {
+    color: #e4e4e4;
+    background-color: #212529;
+    border-color: #464646;
+  }
   .menu-separator
   {
     border-top: 1px solid #484848;
@@ -681,16 +699,17 @@ select:focus {
     border-color: #4f4f4f;
   }
 
+
   .btn-warning {
     color: #e8e8e8;
-    background-color: #c90;
-    border-color: #bb8c00;
+    background-color: #e06c06;
+    border-color: #e06c06;
   }
-
-  .btn-warning:hover {
+  
+  .btn-warning:hover, .btn-warning:focus-visible {
     color: #e8e8e8;
-    background-color: #e0a800;
-    border-color: #d39e00;
+    background-color: #db6905;
+    border-color: #db6905;
   }
 
   .btn-danger {

@@ -334,24 +334,31 @@ function splitWithTail(str, delimiter, count) {
  */
 function initNotifications(notifications) {
   const notificationMenu = document.querySelector('#notificationMenu');
-  notifications.data.forEach(notification => {
+  if(typeof notifications.data != 'undefined')
+  {
+    notifications.data.forEach(notification => {
       const a = document.createElement('a');
       a.className = 'dropdown-item';
       a.href = notification.link;
       a.innerHTML = `${notification.title} <small class="text-muted">${notification.time}</small>`;
       a.dataset.id = notification.id; // Adding ID to the notification item
       notificationMenu.appendChild(a);
-  });
-  let badge = '';
-  if(notifications.totalData > 99)
-  {
-    badge = '99+';
+    });
+    let badge = '';
+    if(notifications.totalData > 99)
+    {
+      badge = '99+';
+    }
+    else if(notifications.totalData > 0 && notifications.totalData <= 99)
+    {
+      badge = notifications.totalData;
+    }
+    notificationMenu.closest('li.nav-item').setAttribute('data-badge', badge);
   }
-  else if(notifications.totalData > 0 && notifications.totalData <= 99)
+  else
   {
-    badge = notifications.totalData;
+    notificationMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
-  notificationMenu.closest('li.nav-item').setAttribute('data-badge', badge);
 }
 
 /**
@@ -360,24 +367,31 @@ function initNotifications(notifications) {
  */
 function initMessages(messages) {
   const messageMenu = document.querySelector('#messageMenu');
-  messages.data.forEach(message => {
+  if(typeof messages.data != 'undefined')
+  {
+    messages.data.forEach(message => {
       const a = document.createElement('a');
       a.className = 'dropdown-item';
       a.href = message.link;
       a.innerHTML = `${message.title} <small class="text-muted">${message.time}</small>`;
       a.dataset.id = message.id; // Adding ID to the message item
       messageMenu.appendChild(a);
-  });
-  let badge = '';
-  if(messages.totalData > 99)
-  {
-    badge = '99+';
+    });
+    let badge = '';
+    if(messages.totalData > 99)
+    {
+      badge = '99+';
+    }
+    else if(messages.totalData > 0 && messages.totalData <= 99)
+    {
+      badge = messages.totalData;
+    }
+    messageMenu.closest('li.nav-item').setAttribute('data-badge', badge);
   }
-  else if(messages.totalData > 0 && messages.totalData <= 99)
+  else
   {
-    badge = messages.totalData;
+    messageMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
-  messageMenu.closest('li.nav-item').setAttribute('data-badge', badge);
 
 }
 

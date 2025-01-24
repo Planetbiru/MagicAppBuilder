@@ -55,7 +55,7 @@ class PicoValueLabelConstructor extends PicoObjectToString
      *
      * @param mixed  $value  The value assigned to the object.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setValue($value)
     {
@@ -79,7 +79,7 @@ class PicoValueLabelConstructor extends PicoObjectToString
      *
      * @param string $label The label associated with the value.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setLabel($label)
     {

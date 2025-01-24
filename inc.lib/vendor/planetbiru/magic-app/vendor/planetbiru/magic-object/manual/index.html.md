@@ -30,6 +30,7 @@ includes:
   - orm
   - specification
   - pagable
+  - find-all-with-option
   - pagination
   - native-query
   - multiple-database

@@ -161,6 +161,7 @@ class EntityModule extends MagicObject
 }
 
 $entity = new EntityModule();
+$entity->setUserId("anyId");
 $data = new PicoUserFormOutputApproval();
 
 $data->addOutput(
@@ -172,10 +173,9 @@ $data->addOutput(
 	)
 );
 
-
 $data->setWaitingfor(new PicoFieldWaitingFor(1, "new", "new"));
 
-$picoModule = new PicoModuleInfo("any", "Any", "detail");
+$picoModule = new PicoModuleInfo("any", "Any", "detail", "code", "namespace");
 
 $picoModule
 ->addAllowedAction(new PicoAllowedAction("delete", "Delete"))

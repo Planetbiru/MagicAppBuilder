@@ -100,7 +100,7 @@ class PicoTableInfo // NOSONAR
     /**
      * Gets an instance of PicoTableInfo.
      *
-     * @return self A new instance of the class.
+     * @return self A new instance of PicoPredicate.
      */
     public static function getInstance()
     {

@@ -62,7 +62,7 @@ class PicoUserFormOutputDetail extends PicoEntityData
      *
      * @param FieldWaitingFor  $waitingFor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setWaitingfor($waitingFor)
     {

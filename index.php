@@ -300,7 +300,8 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                         <table class="table table-reference table-data-filter" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
                           <thead>
                             <tr>
-                              <td width="40%">Column</td>
+                              <td width="35%">Column</td>
+                              <td width="12%">Comp</td>
                               <td>Value</td>
                               <td width="42">Rem</td>
                               <td colspan="2">Move</td>
@@ -309,6 +310,16 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                           <tbody>
                             <tr>
                               <td><input class="form-control data-filter-column-name" type="text" value=""></td>
+                              <td>
+                                <select class="form-control data-filter-column-comparison">
+                                  <option value="equals">=</option>
+                                  <option value="notEquals">!=</option>
+                                  <option value="greaterThan">&gt;</option>
+                                  <option value="greaterThanOrEquals">&gt;=</option>
+                                  <option value="lessThan">&lt;</option>
+                                  <option value="lessThanOrEquals">&lt;=</option>
+                                </select>
+                              </td>
                               <td><input class="form-control data-filter-column-value" type="text" value=""></td>
                               <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
                               <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
@@ -700,7 +711,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                 </tr>
                 <tr>
                   <td>Workspace</td>
-                  <td><input class="form-control" type="text" name="application_workspace" readonly></td>
+                  <td><select class="form-control" name="application_workspace_id"></select></td>
                 </tr>
                 <tr>
                   <td>Application Directory</td>
@@ -1123,9 +1134,11 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   </div>
 
   <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
-    
   </div>
-
-
+  <div class="status-bar-container position-fixed bottom-0 right-0 p-3">
+    <div class="status-bar">
+        <div class="ajax-pending"></div>
+    </div>
+  </div>
 </body>
 </html>

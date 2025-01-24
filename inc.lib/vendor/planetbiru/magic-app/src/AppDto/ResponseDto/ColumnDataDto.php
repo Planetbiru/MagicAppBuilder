@@ -135,7 +135,7 @@ class ColumnDataDto extends ToString
      * Set the name of the field and return the current instance for method chaining.
      *
      * @param string $field The name of the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setField($field)
     {
@@ -157,7 +157,7 @@ class ColumnDataDto extends ToString
      * Set the value associated with the field and return the current instance for method chaining.
      *
      * @param mixed $value The value to associate with the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setValue($value)
     {
@@ -179,7 +179,7 @@ class ColumnDataDto extends ToString
      * Set the type of the field and return the current instance for method chaining.
      *
      * @param string $type The type to set for the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setType($type)
     {
@@ -201,7 +201,7 @@ class ColumnDataDto extends ToString
      * Set the label for the field and return the current instance for method chaining.
      *
      * @param string $label The label to set for the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setLabel($label)
     {
@@ -223,7 +223,7 @@ class ColumnDataDto extends ToString
      * Set the read-only status of the field and return the current instance for method chaining.
      *
      * @param bool $readonly Indicates if the field should be read-only.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setReadonly($readonly)
     {
@@ -245,7 +245,7 @@ class ColumnDataDto extends ToString
      * Set the hidden status of the field and return the current instance for method chaining.
      *
      * @param bool $hidden Indicates if the field should be hidden.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setHidden($hidden)
     {
@@ -267,7 +267,7 @@ class ColumnDataDto extends ToString
      * Set the draft value associated with the field and return the current instance for method chaining.
      *
      * @param mixed $valueDraft The draft value to associate with the field.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setValueDraft($valueDraft)
     {

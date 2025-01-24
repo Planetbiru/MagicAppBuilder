@@ -208,7 +208,7 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Admin Create
 	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Create")
 	 * @var string
 	 */

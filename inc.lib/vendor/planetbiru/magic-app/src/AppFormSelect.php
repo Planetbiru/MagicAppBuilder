@@ -29,16 +29,16 @@ class AppFormSelect
      * This method adds a new option to the select element, which consists of display text, a value, a selected status,
      * optional HTML attributes, and associated data.
      *
-     * @param string $textNode The display text for the option
+     * @param string $label The display text for the option
      * @param string|null $value The value of the option
      * @param boolean $selected Indicates if the option is selected
      * @param string[]|null $attributes Additional HTML attributes for the option
      * @param MagicObject|null $data Associated data for the option
      * @return self The current instance, allowing method chaining
      */
-    public function add($textNode, $value = null, $selected = false, $attributes = null, $data = null)
+    public function add($label, $value = null, $selected = false, $attributes = null, $data = null)
     {
-        $this->options[] = new AppFormOption($textNode, $value, $selected, $attributes, $data);
+        $this->options[] = new AppFormOption($label, $value, $selected, $attributes, $data);
         return $this;
     }
 

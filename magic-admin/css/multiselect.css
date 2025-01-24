@@ -190,7 +190,7 @@ select[multiple].form-control {
   padding-left: 20px;
 }
 .multi-select .multi-select-options-container {
-  height: 140px;
+  max-height: 140px;
   overflow-y: auto;
   border-top: 1px solid #dee2e6;
   margin-top: 5px;

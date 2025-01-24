@@ -9,7 +9,6 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
-    header("Content-type: application/json");
     $path = sprintf(
         "%s/applications/%s/reference/%s-%s.json",
         $activeWorkspace->getDirectory(),
@@ -21,7 +20,7 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
         mkdir(dirname($path), 0755, true);
     }
     if (file_exists($path)) {
-        echo file_get_contents($path);
+        ResponseUtil::sendJSON(file_get_contents($path));
     } else {
         $entityConstant = new SecretObject($appConfig->getEntityInfo());
         if (empty($entityConstant->valueArray())) {
@@ -82,4 +81,8 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
         ];
         ResponseUtil::sendJSON($data);
     }
+}
+else
+{
+    ResponseUtil::sendJSON(new stdClass);
 }

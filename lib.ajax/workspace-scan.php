@@ -3,6 +3,7 @@
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Entity\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
@@ -88,3 +89,4 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
         // Do nothing
     }
 }
+ResponseUtil::sendJSON(new stdClass);

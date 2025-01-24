@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -24,3 +25,4 @@ catch(Exception $e)
     error_log($e->getMessage());
     // do nothing
 }
+ResponseUtil::sendJSON(new stdClass);

@@ -1,18 +1,14 @@
 <?php
-use AppBuilder\AppBuilder;
-use AppBuilder\AppSecretObject;
+
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
-use MagicApp\Field;
-use MagicObject\Database\PicoPredicate;
-use MagicObject\Database\PicoSpecification;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
 
 try
 {
@@ -144,3 +140,4 @@ catch(Exception $e)
     error_log($e->getMessage());
     // do nothing
 }
+ResponseUtil::sendJSON(new stdClass);

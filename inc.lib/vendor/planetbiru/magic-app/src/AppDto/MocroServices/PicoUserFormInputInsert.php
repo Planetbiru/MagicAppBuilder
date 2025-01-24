@@ -52,7 +52,7 @@ class PicoUserFormInputInsert extends PicoEntityData
      *
      * @param string[]  $primaryKey  Primary key
      *
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setPrimaryKey($primaryKey)
     {

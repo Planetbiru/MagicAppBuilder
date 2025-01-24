@@ -91,7 +91,7 @@ class DetailDto extends ToString
      * Set the namespace where the module is located.
      *
      * @param string $namespace The namespace to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setNamespace($namespace)
     {
@@ -153,7 +153,7 @@ class DetailDto extends ToString
      * Set metadata associated with the row.
      *
      * @param MetadataDto $metadata Metadata associated with the row.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setMetadata($metadata)
     {

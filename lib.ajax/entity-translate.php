@@ -86,7 +86,7 @@ if($inputPost->getUserAction() == 'get')
     }
     ResponseUtil::sendJSON([]);
 }
-if($inputPost->getUserAction() == 'set')
+else if($inputPost->getUserAction() == 'set')
 {
     $entityName = $inputPost->getEntityName();
     $translated = $inputPost->getTranslated();
@@ -133,9 +133,15 @@ if($inputPost->getUserAction() == 'set')
             }
             PicoIniUtil::writeIniFile($original, $path);
         }
+        ResponseUtil::sendJSON([]);
     }
     catch(Exception $e)
     {
         // do nothing
+        ResponseUtil::sendJSON([]);
     }
+}
+else
+{
+    ResponseUtil::sendJSON([]);
 }

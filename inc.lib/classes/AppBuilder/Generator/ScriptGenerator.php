@@ -438,10 +438,15 @@ class ScriptGenerator //NOSONAR
                 {
                     $column = trim(AppBuilderBase::getStringOf($values->getColumn()));
                     $value = trim($values->getValue());
+                    $comparison = trim($values->getComparison());
+                    if($comparison == "")
+                    {
+                        $comparison = "equals";
+                    }
 
                     $value = AppBuilderBase::fixValue($value);
 
-                    $arr1[] = '$dataFilter->addAnd(PicoPredicate::getInstance()->equals('.$column.', '.$value.'));';
+                    $arr1[] = '$dataFilter->addAnd(PicoPredicate::getInstance()->'.$comparison.'('.$column.', '.$value.'));';
                 }
             }
             if(!empty($arr1))

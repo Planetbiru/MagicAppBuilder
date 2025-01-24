@@ -133,11 +133,10 @@ if($databaseConfigured)
                             
                 $userUpdate = new EntityAdmin(null, $databaseBuilder);
                 $userUpdate
-                    ->setApplicationUserId($admin->getApplicationUserId())
-                    ->setAdminCreate($admin->getApplicationUserId())
-                    ->setAdminEdit($admin->getApplicationUserId())
+                    ->setAdminId($admin->getAdminId())
+                    ->setAdminCreate($admin->getAdminId())
+                    ->setAdminEdit($admin->getAdminId())
                     ->update();
-                    
                 
                 $userLevel = new EntityAdminLevel(null, $databaseBuilder);
                 $userLevel->setAdminLevelId("superuser");

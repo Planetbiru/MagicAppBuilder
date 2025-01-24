@@ -62,7 +62,7 @@ class ValueDto extends ToString
      * Set the data to be displayed and return the current instance for method chaining.
      *
      * @param mixed $display The data to set for display.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setDisplay($display)
     {
@@ -84,7 +84,7 @@ class ValueDto extends ToString
      * Set the raw data and return the current instance for method chaining.
      *
      * @param mixed $raw The raw data to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setRaw($raw)
     {

@@ -102,6 +102,7 @@ try
                     {
                         $entNames = array_unique($entityNames[$tableName]);
                         $entityName = implode(", ", $entNames);
+                        $entityName = str_replace("\\", ".", $entityName);
                         $allQueries[] = "-- SQL for $entityName begin";
                         $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                         $allQueries[] = "-- SQL for $entityName end\r\n";
@@ -145,6 +146,7 @@ try
                             }
                             if(!empty($entityQueries))
                             {
+                                $entityName = str_replace("\\", ".", $entityName);
                                 $allQueries[] = "-- SQL for $entityName begin";
                                 $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                                 $allQueries[] = "-- SQL for $entityName end\r\n";

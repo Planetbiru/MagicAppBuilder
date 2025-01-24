@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -15,3 +16,4 @@ if($inputPost->getFieldName() != null && $inputPost->getKey() != null && $inputP
     }
     file_put_contents($path, $inputPost->getValue());
 }
+ResponseUtil::sendJSON(new stdClass);

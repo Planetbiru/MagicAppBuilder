@@ -4,6 +4,7 @@ use MagicApp\AppLanguage;
 use MagicApp\Entity\AppModule;
 use MagicApp\Entity\AppUser;
 use MagicApp\Entity\AppUserRole;
+use MagicObject\SecretObject;
 use MagicObject\SetterGetter;
 use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
@@ -38,8 +39,15 @@ if($entityAdmin->getLanguageId() == null || $entityAdmin->getLanguageId() == "")
 {
     $entityAdmin->setLanguageId("en");
 }
-
+if($appConfig->getApplication() == null)
+{
+    $appConfig->setApplication(new SecretObject());
+}
 $appConfig->getApplication()->setBaseLanguageDirectory(dirname(__DIR__)."/inc.lang");
+if($appConfig->getLanguages() == null)
+{
+    $appConfig->setLanguages([new SecretObject()]);
+}
 $appLanguage = new AppLanguage(
     $appConfig->getApplication(),
     $entityAdmin->getLanguageId(),

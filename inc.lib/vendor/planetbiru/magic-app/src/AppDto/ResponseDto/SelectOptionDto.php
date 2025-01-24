@@ -113,7 +113,7 @@ class SelectOptionDto extends ToString
      * Set the namespace where the module is located.
      *
      * @param string $namespace The namespace to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setNamespace($namespace)
     {

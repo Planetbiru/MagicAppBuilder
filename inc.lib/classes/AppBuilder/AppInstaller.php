@@ -120,6 +120,7 @@ class AppInstaller {
             if(!empty($entityQueries))
             {
                 $entityName = implode(", ", $entityNames[$tableName]);
+                $entityName = str_replace("\\", ".", $entityName);
                 $allQueries[] = "-- SQL for $entityName begin";
                 $allQueries[] = implode("\r\n", $entityQueries);
                 $allQueries[] = "-- SQL for $entityName end\r\n";

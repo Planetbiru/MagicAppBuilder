@@ -1,17 +1,13 @@
-/** Summernote **/
 .note-editor .note-toolbar .btn-light {
     background-color: #fff;
 }
 
-
 .dark-mode {
     .note-editor {
         background-color: #333;
-
         .note-dropdown-menu {
             background-color: #3d3d3d;
             color: #fff;
-
             .dropdown-item:focus,
             .dropdown-item:hover {
                 color: #fff;
@@ -25,12 +21,10 @@
                 background-color: #4f4f4f;
                 color: #FAFAFA;
             }
-
             .note-dropdown-menu.note-check a i {
                 color: #e0e0e0;
                 visibility: hidden;
             }
-
             .note-btn-group .note-table {
                 background-color: #535353;
             }
@@ -43,6 +37,5 @@
                 border-top: 1px solid #979797;
             }
         }
-
     }
 }

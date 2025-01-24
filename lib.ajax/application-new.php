@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\AppArchitecture;
+use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Util\Composer\ComposerUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtil;
@@ -47,11 +48,40 @@ catch(Exception $e)
 
 $magicAppList = array_slice($magicAppList, 0, 20);
 
+
+$workspaceFinder = new EntityAdminWorkspace(null, $databaseBuilder);
+$workspaceList = array();
+try
+{
+    $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
+    $currentWorkspaceId = isset($entityAdmin) && $entityAdmin->issetWorkspaceId() ? $entityAdmin->getWorkspaceId() : null;
+    $pageData = $workspaceFinder->findDescByAdminIdAndActive($adminId, true);
+    if($pageData->getTotalResult() > 0)
+    {
+        foreach($pageData->getResult() as $row)
+        {
+            if($row->issetWorkspace())
+            {
+                $workspace = $row->getWorkspace();
+                $workspaceList[] = array(
+                    "label"=>$workspace->getName(),
+                    "value"=>$workspace->getWorkspaceId(),
+                    "selected"=>$currentWorkspaceId == $workspace->getWorkspaceId()
+                );
+            }
+        }
+    }
+}
+catch(Exception $e)
+{
+    // Do nothing
+}
+
 $data = [
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
-    'application_workspace' => $workspaceName,
+    'application_workspace' => $workspaceList,
     'application_namespace' => 'ApplicationName',
     'application_author' => $author,
     'application_architecture' => AppArchitecture::MONOLITH,

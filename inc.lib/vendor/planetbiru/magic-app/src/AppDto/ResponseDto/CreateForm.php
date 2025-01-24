@@ -90,7 +90,7 @@ class CreateForm extends ToString
      * Set the namespace where the module is located.
      *
      * @param string $namespace The namespace to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setNamespace($namespace)
     {
@@ -112,7 +112,7 @@ class CreateForm extends ToString
      * Set the module ID associated with the data.
      *
      * @param string $moduleId The module ID to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setModuleId($moduleId)
     {
@@ -134,7 +134,7 @@ class CreateForm extends ToString
      * Set the module name associated with the data.
      *
      * @param string $moduleName The module name to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setModuleName($moduleName)
     {
@@ -156,7 +156,7 @@ class CreateForm extends ToString
      * Set the module title associated with the data.
      *
      * @param string $moduleTitle The module title to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setModuleTitle($moduleTitle)
     {
@@ -178,7 +178,7 @@ class CreateForm extends ToString
      * Set the response code indicating the status of the request.
      *
      * @param string|null $responseCode The response code to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseCode($responseCode)
     {
@@ -200,7 +200,7 @@ class CreateForm extends ToString
      * Set the response message providing additional information about the response.
      *
      * @param string|null $responseMessage The response message to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setResponseMessage($responseMessage)
     {
@@ -222,7 +222,7 @@ class CreateForm extends ToString
      * Set the main data structure containing the list form.
      *
      * @param CreateFormData|null $data The data structure to set.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setData($data)
     {

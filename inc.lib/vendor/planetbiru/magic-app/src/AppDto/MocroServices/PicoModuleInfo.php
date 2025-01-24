@@ -139,7 +139,7 @@ class PicoModuleInfo extends PicoObjectToString
      * These actions could include operations like updating, activating, or deleting records.
      *
      * @param AllowedAction $allowedAction The `AllowedAction` object to be added.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function addAllowedAction($allowedAction)
     {

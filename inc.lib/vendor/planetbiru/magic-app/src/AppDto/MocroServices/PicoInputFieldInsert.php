@@ -2,6 +2,8 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
+use MagicApp\AppLabelValueData;
+
 /**
  * Class PicoInputFieldInsert
  *
@@ -104,19 +106,18 @@ class PicoInputFieldInsert extends PicoObjectToString
         
         if (isset($optionSource)) {
             $this->optionSource = $optionSource;
-        }
-        
-        if (isset($map)) {
-            if(is_array($map) && isset($map[0]) && $map[0] instanceof PicoInputFieldOption)
-            {
-                $this->optionMap = $map;
+
+            if (isset($map)) {
+                if(is_array($map) && isset($map[0]) && ($map[0] instanceof PicoInputFieldOption || $map[0] instanceof AppLabelValueData))
+                {
+                    $this->optionMap = $map;
+                }
+                else
+                {
+                    $this->optionUrl = $map;
+                }
             }
-            else
-            {
-                $this->optionUrl = $map;
-            }
         }
-        
         if (isset($pattern)) {
             $this->pattern = $pattern;
         }

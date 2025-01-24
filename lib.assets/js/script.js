@@ -3,6 +3,31 @@ let currentEntity = "";
 let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
+let ajaxPending = 0;
+
+/**
+ * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
+ */
+function increaseAjaxPending() {
+  ajaxPending++;
+  updatePendingBar();
+}
+
+/**
+ * Decrements the `ajaxPending` counter and updates the visual representation of the pending bar.
+ */
+function decreaseAjaxPending() {
+  ajaxPending--;
+  updatePendingBar();
+}
+
+/**
+ * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
+ * The width is calculated as `ajaxPending * 20` pixels.
+ */
+function updatePendingBar() {
+  $('.ajax-pending').css('width', (ajaxPending * 20) + 'px');
+}
 
 // A comma-separated string of SQL keywords.
 let keyWords = "absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,"
@@ -462,6 +487,7 @@ jQuery(function () {
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
+    let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
     let paths = [];
@@ -474,6 +500,7 @@ jQuery(function () {
     });
 
     if (name != "" && id != "" && directory != "" && author != "") {
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
@@ -485,14 +512,17 @@ jQuery(function () {
           description: description,
           directory: directory,
           namespace: namespace,
+          workspace_id: workspace_id,
           author: author,
           paths: paths,
           magic_app_version: magic_app_version
         },
         success: function (data) {
           loadAllResource();
+          decreaseAjaxPending();
         },
         error: function (e1, e2) {
+          decreaseAjaxPending();
         }
       });
     }
@@ -500,11 +530,13 @@ jQuery(function () {
   });
 
   $('#modal-update-path').on('show.bs.modal', function (e) {
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'get' },
       success: function (data) {
+        decreaseAjaxPending();
         while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
           $('#modal-update-path table.path-manager > tbody > tr:last').remove();
         }
@@ -535,11 +567,13 @@ jQuery(function () {
     });
     let select = $('#current_module_location');
     if (paths.length > 0) {
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
         data: { action: 'update', paths: paths },
         success: function (data) {
+          decreaseAjaxPending();
           select.empty();
           for (let d in data) {
             select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -560,11 +594,13 @@ jQuery(function () {
   $(document).on('click', '#update_current_location', function (e) {
     e.preventDefault();
     let select = $('#current_module_location');
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
       data: { action: 'default', selected_path: select.val() },
       success: function (data) {
+        decreaseAjaxPending();
         select.empty();
         for (let d in data) {
           select[0].options[select[0].options.length] = new Option(data[d].name + ' - ' + data[d].path, data[d].path);
@@ -655,11 +691,13 @@ jQuery(function () {
         {
           'caption': 'Yes', 
           'fn': () => {
+            increaseAjaxPending();
             $.ajax({
               method: "POST",
               url: "lib.ajax/entity-generator.php",
               data: { entityName: entityName, tableName: tableName },
               success: function (data) {
+                decreaseAjaxPending();
                 updateEntityFile();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -793,15 +831,17 @@ jQuery(function () {
     $('[name="application_name"]').val('');
     $('[name="application_id"]').val('');
     $('[name="application_directory"]').val('');
-    $('[name="application_workspace"]').val('');
+    $('[name="application_workspace_id"]').val('');
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-        if (data.application_workspace == '') {
+        decreaseAjaxPending();
+        if (data.application_workspace.length == 0) {
           if (modal.find('.alert').length > 0) {
             modal.find('.alert').remove();
           }
@@ -816,8 +856,22 @@ jQuery(function () {
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
           $('[name="application_directory"]').val(data.application_directory);
+          
+          
           $('[name="application_namespace"]').val(data.application_namespace);
-          $('[name="application_workspace"]').val(data.application_workspace);
+
+          $('[name="application_workspace_id"]').empty();
+          for(let workspace of data.application_workspace)
+          {
+            let opt = $('<option />');
+            opt.text(workspace.label);
+            opt.attr('value', workspace.value);
+            if(workspace.selected)
+            {
+              opt.attr('selected', 'selected');
+            }
+            $('[name="application_workspace_id"]').append(opt);
+          }
           $('[name="application_author"]').val(data.application_author);
           $('[name="application_description"]').val(data.application_description);
           for (let i in data.magic_app_versions) {
@@ -850,12 +904,14 @@ jQuery(function () {
     let entityName = $('.entity-name').val();
     let propertyNames = $('.entity-property-name').val();
     let targetLanguage = $('.target-language').val();
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
       data: { userAction: 'set', entityName: entityName, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
+        decreaseAjaxPending();
       },
     });
   });
@@ -864,12 +920,14 @@ jQuery(function () {
     let translated = transEd4.getDoc().getValue();
     let propertyNames = $('.module-property-name').val();
     let targetLanguage = $('.target-language').val();
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/module-translate.php",
       dataType: "json",
       data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
       success: function (data) {
+        decreaseAjaxPending();
       },
     });
   });
@@ -935,6 +993,7 @@ jQuery(function () {
   });
 
   $('#modal-update-language').on('show.bs.modal', function (e) {
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
@@ -944,6 +1003,7 @@ jQuery(function () {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
+          decreaseAjaxPending();
 
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
@@ -971,11 +1031,13 @@ jQuery(function () {
     });
     let select = $('.target-language');
     if (languages.length > 0) {
+      increaseAjaxPending();
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
         data: { action: 'update', languages: languages },
         success: function (data) {
+          decreaseAjaxPending();
           select.empty();
           for (let d in data) {
             for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1008,11 +1070,13 @@ jQuery(function () {
           'fn': () => {
             let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
+            increaseAjaxPending();
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
               data: { action: 'execute', query: query },
               success: function (data) {
+                decreaseAjaxPending();
                 let ents = getEntitySelection();
                 let merged = $(".entity-merge")[0].checked;
                 getEntityQuery(ents, merged);
@@ -1035,11 +1099,13 @@ jQuery(function () {
   $(document).on('click', '.default-language', function (e) {
     e.preventDefault();
     let select = $('.target-language');
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
       data: { action: 'default', selected_language: select.val() },
       success: function (data) {
+        decreaseAjaxPending();
         select.empty();
         for (let d in data) {
           for (let i = 0; i < select.length; i++) //NOSONAR
@@ -1086,12 +1152,14 @@ jQuery(function () {
     $('.entity-detail').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $('#modal-entity-detail .modal-title').html(modalTitle);
     $('#modal-entity-detail').modal('show');
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       dataType: 'html',
       url: url,
       data: request,
       success: function (data) {
+        decreaseAjaxPending();
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
       }
@@ -1105,12 +1173,14 @@ jQuery(function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-setting.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
+        decreaseAjaxPending();
         $('#modal-application-setting .application-setting').empty().append(data);
         setTimeout(function () {
           // set database_password to be empty
@@ -1128,7 +1198,6 @@ jQuery(function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-database-explorer .database-explorer').html('<iframe src="database-explorer/?applicationId=' + applicationId + '"></iframe>');
     $('#modal-database-explorer').modal('show');
-
   });
 
   $(document).on('click', '#button_explore_database', function (e) {
@@ -1147,13 +1216,14 @@ jQuery(function () {
     modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     modal.attr('data-application-id', applicationId);
     modal.modal('show');
-
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-menu.php',
       data: { applicationId: applicationId },
       dataType: 'html',
       success: function (data) {
+        decreaseAjaxPending();
         $('#modal-application-menu .modal-body').empty().append(data);
         loadAllResource();
         updateBtn[0].disabled = false;
@@ -1167,11 +1237,13 @@ jQuery(function () {
     let modal = $(this).closest('.modal');
     let applicationId = modal.attr('data-application-id');
     const jsonOutput = JSON.stringify(serializeMenu());
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-menu-update.php',
       data: { applicationId: applicationId, data: jsonOutput },
       success: function (data) {
+        decreaseAjaxPending();
         modal.modal('hide');
         loadMenu();
       }
@@ -1203,7 +1275,6 @@ jQuery(function () {
 
     if (!invalidName) {
       let newMenuStr = '';
-
       newMenuStr += '<li class="sortable-menu-item">' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-up" onclick="moveUp(this)"></span>' + "\r\n";
       newMenuStr += '<span class="sortable-icon icon-move-down" onclick="moveDown(this)"></span>' + "\r\n";
@@ -1244,11 +1315,13 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-scan', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    increaseAjaxPending();
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/workspace-scan.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
+        decreaseAjaxPending();
         loadAllResource();
       }
     });
@@ -1256,12 +1329,14 @@ jQuery(function () {
 
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
-    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-default.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
+        decreaseAjaxPending();
         onSetDefaultWorkspace();
         $('meta[name="workspace-id"]').attr('content', workspaceId);
         window.localStorage.setItem('workspace-id', workspaceId);
@@ -1272,12 +1347,14 @@ jQuery(function () {
 
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
-    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-default.php',
       data: { applicationId: applicationId },
       success: function (data) {
+        decreaseAjaxPending();
         onSetDefaultApplication();
         $('meta[name="application-id"]').attr('content', applicationId);
         window.localStorage.setItem('application-id', applicationId);
@@ -1309,13 +1386,20 @@ jQuery(function () {
     let workspaceDescription = modal.find('[name="workspace_description"]').val();
     let workspaceDirectory = modal.find('[name="workspace_directory"]').val();
     let phpPath = modal.find('[name="php_path"]').val();
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/workspace-create.php',
       data: { workspaceName: workspaceName, workspaceDirectory: workspaceDirectory, workspaceDescription: workspaceDescription, phpPath: phpPath },
       success: function (data) {
+        decreaseAjaxPending();
         modal.modal('hide');
         loadAllResource();
+      },
+      error(e)
+      {
+        decreaseAjaxPending();
+        console.log(e)
       }
     });
   });
@@ -1329,8 +1413,6 @@ jQuery(function () {
     editMenu(el);
   });
 
-
-
   $(document).on('blur', '.sortable-menu-item > input[type="text"], .sortable-submenu-item > input[type="text"]', function (e) {
     e.preventDefault();
     let input = $(this);
@@ -1339,7 +1421,6 @@ jQuery(function () {
     menu.text(input.val())
     menu.css({ display: '' });
   });
-
 
   $(document).on('click', '#button_execute_entity_query', function (e) {
     e.preventDefault();
@@ -1371,12 +1452,14 @@ jQuery(function () {
         input[$(this).attr('name')] = $(this).val();
       }
     });
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/database-test.php',
       data: input,
       dataType: 'json',
       success: function (data) {
+        decreaseAjaxPending();
         if (data.conneted1) {
           if (!data.conneted2) {
             $('#create-database').css({ 'display': 'inline' });
@@ -1393,6 +1476,7 @@ jQuery(function () {
         }
       },
       error: function (xhr, status, error) {
+        decreaseAjaxPending();
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1407,12 +1491,14 @@ jQuery(function () {
         input[$(this).attr('name')] = $(this).val();
       }
     });
+    increaseAjaxPending();
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/database-create.php',
       data: input,
       dataType: 'json',
       success: function (data) {
+        decreaseAjaxPending();
         if (data.conneted1) {
           if (!data.conneted2) {
             $('#create-database').css({ 'display': 'inline' });
@@ -1429,6 +1515,7 @@ jQuery(function () {
         }
       },
       error: function (xhr, status, error) {
+        decreaseAjaxPending();
         $('#create-database').css('display', 'none');
         showAlertUI('Database Connection Test', 'There was an error connecting to the server: ' + error);
       }
@@ -1446,8 +1533,8 @@ jQuery(function () {
     });
   })
 
-  let val1 = $('meta[name="workspace-id"]').attr('content');
-  let val2 = $('meta[name="application-id"]').attr('content');
+  let val1 = $('meta[name="workspace-id"]').attr('content') || '';
+  let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
   window.localStorage.setItem('application-id', val2);
   loadAllResource();
@@ -1457,7 +1544,14 @@ jQuery(function () {
 
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
+let checkIntervalWorkspace = 10000;
+let checkIntervalApplication = 12000;
 
+/**
+ * Resets and initializes a periodic check for active workspace changes.
+ * Compares the current workspace ID in localStorage with the meta tag value,
+ * and reloads resources if they differ.
+ */
 function resetCheckActiveWorkspace() {
   clearInterval(toCheckActiveWorkspace);
   toCheckActiveWorkspace = setInterval(function () {
@@ -1466,8 +1560,17 @@ function resetCheckActiveWorkspace() {
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
-  }, 20000);
+  }, checkIntervalWorkspace);
 }
+
+/**
+ * Resets and initializes a periodic check for active application changes.
+ * This function compares the current application ID stored in `localStorage` 
+ * with the value in the `application-id` meta tag. If the IDs differ, it triggers 
+ * the `loadAllResource` function to reload all resources.
+ * 
+ * The check is performed every 22 seconds.
+ */
 function resetCheckActiveApplication() {
   clearInterval(toCheckActiveApplication);
   toCheckActiveApplication = setInterval(function () {
@@ -1476,41 +1579,71 @@ function resetCheckActiveApplication() {
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
     }
-  }, 22000);
+  }, checkIntervalApplication);
 }
 
+/**
+ * Loads the list of workspaces via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of workspaces from 
+ * the server. The returned data is used to update the `.workspace-card` element.
+ * It also identifies the currently selected workspace, updates the `workspace-id`
+ * in `localStorage`, and sets the `workspace-id` meta tag with the selected value.
+ */
 function loadWorkspaceList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/workspace-list.php',
     success: function (data) {
+      decreaseAjaxPending();
       $('.workspace-card').empty().append(data);
-      let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id');
+      let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id') || '';
       window.localStorage.setItem('workspace-id', val1);
       $('meta[name="workspace-id"]').attr('content', val1);
     }
   });
 }
 
+/**
+ * Loads the list of applications via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of applications from 
+ * the server. The returned data is used to update the `.application-card` element.
+ * It also identifies the currently selected application, updates the `application-id`
+ * in `localStorage`, and sets the `application-id` meta tag with the selected value.
+ */
 function loadApplicationList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-list.php',
     success: function (data) {
+      decreaseAjaxPending();
       $('.application-card').empty().append(data);
-      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id');
+      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
       window.localStorage.setItem('application-id', val1);
       $('meta[name="application-id"]').attr('content', val1);
     }
   });
 }
 
+/**
+ * Loads the list of applications via an AJAX request and updates the UI.
+ *
+ * This function makes a GET request to fetch the list of applications from 
+ * the server. The returned data is used to update the `.application-card` element.
+ * It identifies the currently selected application, updates the `application-id`
+ * in `localStorage`, and sets the `application-id` meta tag with the selected value.
+ */
 function loadLanguageList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-path-list.php',
     dataType: 'json',
     success: function (data) {
+      decreaseAjaxPending();
       $('[name="current_module_location"]').empty();
       for (let i in data) {
         $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
@@ -1519,23 +1652,51 @@ function loadLanguageList() {
   });
 }
 
+/**
+ * Loads the list of application languages or paths via an AJAX request.
+ *
+ * This function makes a GET request to fetch data from 
+ * `lib.ajax/application-language-list.php`. The response is expected to be in JSON format. 
+ * The retrieved data is then passed to the `setLanguage` function for further processing.
+ */
 function loadPathList() {
+  increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-language-list.php',
     dataType: 'json',
     success: function (data) {
+      decreaseAjaxPending();
       setLanguage(data);
     }
   });
 }
 
+/**
+ * Updates the SQL query editor by clearing its content and execution results.
+ *
+ * This function calls `clearEditorSQL` to clear the SQL editor's current content 
+ * and `clearEditorSQLExecute` to clear the execution results of the SQL query. 
+ * It ensures that the editor is reset to a clean state.
+ */
 function updateQuery()
 {
   clearEditorSQL();
   clearEditorSQLExecute();
 }
 
+/**
+ * Loads all necessary resources for the application.
+ *
+ * This function sequentially calls other functions to load:
+ * - Workspace list
+ * - Application list
+ * - Tables
+ * - Paths
+ * - Languages
+ * - Menus
+ * It also updates queries, entity diagrams, and files, and initializes tooltips.
+ */
 function loadAllResource() {
   loadWorkspaceList();
   loadApplicationList();
@@ -1550,6 +1711,12 @@ function loadAllResource() {
   initTooltip();
 }
 
+/**
+ * Sets the default workspace and loads the necessary resources.
+ *
+ * This function reloads the workspace list, application list, tables, and menus.
+ * It also updates entity queries, diagrams, files, and initializes tooltips for the default workspace.
+ */
 function onSetDefaultWorkspace() {
   loadWorkspaceList();
   loadApplicationList();
@@ -1562,9 +1729,17 @@ function onSetDefaultWorkspace() {
   initTooltip();
 }
 
+/**
+ * Sets the default application and loads the necessary resources.
+ *
+ * This function reloads the application list, tables, and menus. It also updates 
+ * entity queries, diagrams, files, and initializes tooltips for the default application.
+ */
 function onSetDefaultApplication() {
   loadApplicationList();
   loadTable();
+  loadPathList();
+  loadLanguageList();
   loadMenu();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
@@ -1573,6 +1748,12 @@ function onSetDefaultApplication() {
   initTooltip();
 }
 
+/**
+ * Updates resources when a new module is created.
+ *
+ * This function updates entity queries, diagrams, and files, and reinitializes tooltips 
+ * to reflect the changes caused by the creation of a new module.
+ */
 function onModuleCreated() {
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
@@ -1581,12 +1762,27 @@ function onModuleCreated() {
   initTooltip();
 }
 
+/**
+ * Clears the content of the entity relationship diagram (ERD).
+ *
+ * This function empties the `.erd-image` element and the `[name="erd-map"]` element 
+ * to reset the ERD display.
+ */
 function updateErd()
 {
   $('.erd-image').empty();
   $('[name="erd-map"]').empty();
 }
 
+/**
+ * Initializes tooltips for elements with the `data-toggle="tooltip"` attribute 
+ * or areas inside an element with `name="erd-map"`. 
+ *
+ * This function listens for `mouseenter` and `mouseleave` events to show and hide 
+ * tooltips. It dynamically positions the tooltip based on mouse movement to ensure 
+ * that the tooltip does not go off-screen. The tooltip's content is fetched from 
+ * the `data-title` or `title` attribute of the element.
+ */
 function initTooltip() {
   $(document).on('mouseenter', '[name="erd-map"] area, [data-toggle="tooltip"]', function (e) {
     let tooltipText = $(this).attr('data-title') || $(this).attr('title');  // Get the tooltip text
@@ -1638,7 +1834,25 @@ function initTooltip() {
   });
 }
 
-// Function to display the modal with dynamic buttons
+/**
+ * Displays a custom modal with dynamic buttons and message.
+ *
+ * This function creates and displays a modal with the specified message, title, 
+ * and a set of dynamic buttons. Each button is associated with a caption, a class 
+ * (optional), and a callback function that is executed when the button is clicked.
+ * The modal also listens for the `hidden.bs.modal` event to execute a provided callback 
+ * when the modal is closed.
+ *
+ * @param {string} message The content/message to be displayed inside the modal.
+ * @param {string} title The title to be displayed at the top of the modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {Function} [onHideCallback] (Optional) A callback function to be executed when the modal is hidden.
+ *
+ * @returns {Promise} A promise that resolves when a button is clicked, with the button's caption as the resolved value.
+ */
 function showModal(message, title, buttons, onHideCallback) {
   return new Promise((resolve, reject) => {
     const modal = $('#customAlert');
@@ -1681,7 +1895,26 @@ function showModal(message, title, buttons, onHideCallback) {
   });
 }
 
-// Function to display a prompt modal with a text input
+/**
+ * Displays a prompt modal with a text input field and dynamic buttons.
+ *
+ * This function creates and displays a modal with a message, a title, a text input field, 
+ * and a set of dynamic buttons. The user can enter a value into the input field and click one 
+ * of the buttons to submit the value or cancel the action. The modal also listens for the 
+ * `hidden.bs.modal` event to execute a provided callback when the modal is closed.
+ *
+ * @param {string} message The content/message to be displayed inside the modal.
+ * @param {string} title The title to be displayed at the top of the modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {string} initialValue The initial value to be displayed in the input field (optional).
+ * @param {Function} [onHideCallback] (Optional) A callback function to be executed when the modal is hidden.
+ *
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * or the caption of any other clicked button.
+ */
 function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
   return new Promise((resolve, reject) => {
     const modal = $('#customAlert');
@@ -1738,9 +1971,24 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
   });
 }
 
-// Async function to wait for the result of the modal (any button press)
+/**
+ * Displays an alert modal with dynamic buttons and waits for the user's interaction.
+ * 
+ * This function shows a modal with a message, title, and dynamically created buttons. It waits for the user to press one of the buttons and resolves the action. 
+ * Once the modal is closed, it hides the overlay and restores the overflow styles of the modal.
+ *
+ * @param {string} message The content/message to display in the alert.
+ * @param {string} title The title to display at the top of the alert modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ *
+ * @returns {Promise} A promise that resolves with the caption of the button the user clicks.
+ */
 async function asyncAlert(message, title, buttons) {
-  const result = await showModal(
+  const result = await showModal // NOSONAR
+  (
     message,
     title,
     buttons,
@@ -1751,8 +1999,28 @@ async function asyncAlert(message, title, buttons) {
   );
 }
 
+/**
+ * Prompts the user for input using the `asyncPrompt` function and returns the user's input.
+ *
+ * This function displays a prompt modal with a message, title, and initial input value. It also 
+ * takes dynamic buttons and returns the value entered by the user when they click the 'OK' button, 
+ * or the caption of the button clicked if other than 'OK'. Once the modal is closed, it hides the 
+ * overlay and restores the overflow styles of the modal.
+ *
+ * @param {string} message The content/message to display in the prompt.
+ * @param {string} title The title to display at the top of the prompt modal.
+ * @param {Array} buttons An array of button objects, each containing:
+ * - caption: The text to display on the button.
+ * - class: (Optional) The CSS class to apply to the button (defaults to 'btn-secondary').
+ * - fn: The callback function to execute when the button is clicked.
+ * @param {string} initialValue The initial value to be displayed in the input field (optional).
+ *
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * or the caption of any other clicked button.
+ */
 async function getUserInput(message, title, buttons, initialValue) {
-  const result = await asyncPrompt(
+  const result = await asyncPrompt // NOSONAR
+  (
     message,
     title,
     buttons,
@@ -1800,6 +2068,18 @@ function initMenu() {
   });
 }
 
+/**
+ * Enables inline editing of a menu item by replacing its text with an input field.
+ *
+ * This function transforms the menu item's text into an editable input field. 
+ * When invoked, it finds the text associated with the menu item, hides it, and replaces it with a text input field 
+ * that contains the current text. The input field is automatically focused and selected for easy editing.
+ * After the input field is populated with the menu's current text, the user can modify it.
+ *
+ * @param {HTMLElement} el The menu item element (typically a button or link) that triggered the edit action.
+ *
+ * @returns {void} This function does not return any value. It modifies the DOM by replacing the text with an input field.
+ */
 function editMenu(el) {
   let elem = $(el);
   let parent = elem.closest('li');
@@ -1819,6 +2099,20 @@ function editMenu(el) {
 
 let draggedItem = null;
 
+/**
+ * Handles the start of a drag event for sortable submenu items.
+ *
+ * This function is triggered when a drag operation begins on an element. It checks if the dragged element 
+ * is a valid submenu item and sets up the `draggedItem` for the drag operation. It also ensures that the 
+ * drag operation is allowed and sets the `effectAllowed` to 'move', indicating that the item will be moved during the drag.
+ *
+ * The function also supports cases where the target element is a child of a valid draggable element, 
+ * by traversing the DOM to find the closest parent that is a valid sortable item.
+ *
+ * @param {DragEvent} e The drag event triggered by the user. It contains information about the element being dragged.
+ * 
+ * @returns {void} This function does not return any value. It sets up the dragged element and the drag effect.
+ */
 function dragStart(e) {
   if (e.target.classList.contains('sortable-submenu-item')) {
     draggedItem = e.target;
@@ -1835,10 +2129,35 @@ function dragStart(e) {
   }
 }
 
+/**
+ * Handles the dragover event to allow an element to be a valid drop target.
+ *
+ * This function is triggered during the drag operation when an element is being dragged over a potential drop target. 
+ * The `e.preventDefault()` method is called to prevent the default behavior, allowing the drop event to be triggered 
+ * later. Without this, the drop action will not be allowed.
+ *
+ * @param {DragEvent} e The drag event triggered when the dragged item is over a potential drop target.
+ * 
+ * @returns {void} This function does not return any value. It prevents the default action to allow the drop event.
+ */
 function dragOver(e) {
   e.preventDefault();
 }
 
+/**
+ * Handles the drop event to place a dragged item into a menu or submenu.
+ * 
+ * This function is triggered when an item is dropped into a valid drop target. 
+ * It first checks if there is an item being dragged, then determines the 
+ * appropriate drop target based on its class and structure. It supports adding 
+ * the dragged item to either a top-level menu item or a submenu, and handles 
+ * the expansion of the target menu items.
+ * 
+ * @param {DragEvent} e The drop event triggered when an item is dropped onto a target.
+ * 
+ * @returns {void} This function does not return any value. It modifies the DOM 
+ * by adding the dragged item to the target menu or submenu.
+ */
 function dropToMenu(e) {
   e.preventDefault(); // Prevent default behavior to allow the drop
 
@@ -1923,6 +2242,17 @@ function serializeMenu() {
   return menu; // Return the constructed menu array
 }
 
+/**
+ * Moves the specified item up in the list (either a menu item or a submenu item).
+ * 
+ * This function moves the target item (either a menu or submenu item) up by one 
+ * position in the DOM relative to its previous sibling. If the item is already at the 
+ * top, it remains in place.
+ *
+ * @param {HTMLElement} element The DOM element that is clicked to trigger the move up.
+ * 
+ * @returns {void} This function modifies the DOM by moving the item up, it does not return any value.
+ */
 function moveUp(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const prevItem = item.previousElementSibling;
@@ -1931,6 +2261,17 @@ function moveUp(element) {
   }
 }
 
+/**
+ * Moves the specified item down in the list (either a menu item or a submenu item).
+ * 
+ * This function moves the target item (either a menu or submenu item) down by one 
+ * position in the DOM relative to its next sibling. If the item is already at the 
+ * bottom, it remains in place.
+ *
+ * @param {HTMLElement} element The DOM element that is clicked to trigger the move down.
+ * 
+ * @returns {void} This function modifies the DOM by moving the item down, it does not return any value.
+ */
 function moveDown(element) {
   const item = element.closest('.sortable-submenu-item') || element.closest('.sortable-menu-item');
   const nextItem = item.nextElementSibling;
@@ -1981,12 +2322,14 @@ function translateEntity(clbk) {
   if (entityName != '') {
     let targetLanguage = $('.target-language').val();
     let filter = $('.filter-translate').val();
+    increaseAjaxPending();
     $.ajax({
       method: "POST",
       url: "lib.ajax/entity-translate.php",
       dataType: "json",
       data: { userAction: 'get', entityName: entityName, targetLanguage: targetLanguage, filter: filter },
       success: function (data) {
+        decreaseAjaxPending();
         let textOut1 = [];
         let textOut2 = [];
         let propertyNames = [];
@@ -2037,13 +2380,14 @@ function translateModule() {
       modules.push($(this).val());
     }
   });
-
+  increaseAjaxPending();
   $.ajax({
     method: "POST",
     url: "lib.ajax/module-translate.php",
     dataType: "json",
     data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter: filter },
     success: function (data) {
+      decreaseAjaxPending();
       let textOut1 = [];
       let textOut2 = [];
       let propertyNames = [];
@@ -2266,16 +2610,33 @@ function loadDiagramMultiple() {
   $('[name="erd-map"]').load(urlMap, function (e) {
     img.attr('usemap', '#erd-map');
   });
-
-
 }
 
+/**
+ * Downloads the SVG image by opening its URL in a new tab.
+ * 
+ * This function retrieves the URL of the SVG image from the `src` attribute of the
+ * `<img>` tag within the `.erd-image` container. It then opens the image URL in 
+ * a new browser tab, allowing the user to download or view the image.
+ * 
+ * @returns {void} This function does not return any value.
+ */
 function downloadSVG() {
   const imageSVG = document.querySelector('.erd-image img');
   let url = imageSVG.getAttribute('src');
   window.open(url);
 }
 
+/**
+ * Downloads the SVG image as a PNG file by rendering it to a canvas and converting it to a PNG data URL.
+ * 
+ * This function retrieves the URL of the SVG image from the `src` attribute of the 
+ * `<img>` tag within the `.erd-image` container, draws the image onto a canvas, 
+ * and then converts the canvas to a PNG data URL. It opens the PNG image in a new 
+ * browser tab, allowing the user to download the image as a PNG file.
+ * 
+ * @returns {void} This function does not return any value.
+ */
 function downloadPNG() {
   const imageSVG = document.querySelector('.erd-image img');
   let url = imageSVG.getAttribute('src');
@@ -2367,12 +2728,14 @@ function saveModule() {
   if (currentModule != "") {
     $("#button_save_module_file").attr("disabled", "disabled");
     let fileContent = cmEditorModule.getDoc().getValue();
+    increaseAjaxPending();
     $.ajax({
       type: "POST",
       url: "lib.ajax/module-update.php",
       data: { content: fileContent, module: currentModule },
       dataType: "html",
       success: function (data) {
+        decreaseAjaxPending();
         $("#button_save_module_file").removeAttr("disabled");
       },
     });
@@ -2396,14 +2759,18 @@ function saveEntity() {
   if (currentEntity != "") {
     $("#button_save_entity_file").attr("disabled", "disabled");
     let fileContent = cmEditorFile.getDoc().getValue();
+    increaseAjaxPending();
     $.ajax({
       type: "POST",
       url: "lib.ajax/entity-update.php",
       dataType: "json",
       data: { content: fileContent, entity: currentEntity },
       success: function (data) {
+        decreaseAjaxPending();
         $("#button_save_entity_file").removeAttr("disabled");
-        updateEntityFile();
+        updateEntityFile(function(){
+          setEntityFile(fileContent);
+        });
         updateEntityQuery(true);
         updateEntityRelationshipDiagram();
         removeHilightLineError();
@@ -2439,12 +2806,14 @@ function saveEntityAs() {
         'caption': 'Yes',  // Caption for the button
         'fn': () => {
           let newEntity = $('.prompt-input').val();
+          increaseAjaxPending();
           $.ajax({
             type: "POST",
             url: "lib.ajax/entity-save-as.php",
             dataType: "json",
             data: { content: fileContent, entity: currentEntity, newEntity: newEntity },
             success: function (data) {
+              decreaseAjaxPending();
               updateEntityFile();
               updateEntityQuery(true);
               updateEntityRelationshipDiagram();
@@ -2557,12 +2926,14 @@ function getEntitySelection() {
  * @returns {void} This function does not return a value.
  */
 function getEntityQuery(entity, merged) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/entity-query.php",
     data: { entity: entity, merged: merged ? 1 : 0 },
     dataType: "text",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorSQL.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorSQL.refresh();
@@ -2584,12 +2955,14 @@ function getEntityQuery(entity, merged) {
  * @returns {void} This function does not return a value.
  */
 function getEntityFile(entity, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/entity-file.php",
     data: { entity: entity },
     dataType: "text",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorFile.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorFile.refresh();
@@ -2616,12 +2989,14 @@ function getEntityFile(entity, clbk) {
  * @returns {void} This function does not return a value.
  */
 function getModuleFile(module, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-file.php",
     data: { module: module },
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       cmEditorModule.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorModule.refresh();
@@ -2648,12 +3023,14 @@ function getModuleFile(module, clbk) {
  */
 function updateEntityQuery(autoload) {
   autoload = autoload || false;
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list-with-checkbox.php",
     data: { autoload: autoload },
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-query .entity-list").empty().append(data);
       let ents = getEntitySelection();
       let merged = $(".entity-merge");
@@ -2673,11 +3050,13 @@ function updateEntityQuery(autoload) {
  * @returns {void} This function does not return a value.
  */
 function updateEntityRelationshipDiagram() {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list-for-diagram.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-relationship .entity-list").empty().append(data);
       updateErd();
     },
@@ -2692,15 +3071,21 @@ function updateEntityRelationshipDiagram() {
  *
  * @returns {void} This function does not return a value.
  */
-function updateEntityFile() {
+function updateEntityFile(clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/entity-list.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
       clearEntityFile();
+      if(typeof clbk == 'function')
+      {
+        clbk();
+      }
       clearTtransEd3();
       clearTtransEd4();
     },
@@ -2716,21 +3101,24 @@ function updateEntityFile() {
  * @returns {void} This function does not return a value.
  */
 function updateModuleFile() {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-list-file.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".module-container .module-list-file").empty().append(data);
       clearModuleFile();
     },
   });
-
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-list-translate.php",
     dataType: "html",
     success: function (data) {
+      decreaseAjaxPending();
       $(".container-translate-module .module-list-translate").empty().append(data);
       clearTtransEd1();
       clearTtransEd2();
@@ -2750,12 +3138,15 @@ function updateModuleFile() {
  * @returns {void} This function does not return a value.
  */
 function saveReference(fieldName, key, value) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/reference-save.php",
     data: { fieldName: fieldName, key: key, value: value },
     dataType: "json",
-    success: function (data) { },
+    success: function (data) {
+      decreaseAjaxPending();
+    },
   });
 }
 
@@ -2772,12 +3163,14 @@ function saveReference(fieldName, key, value) {
  * @returns {void} This function does not return a value.
  */
 function loadReference(fieldName, key, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/reference-load.php",
     data: { fieldName: fieldName, key: key },
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       clbk(data);
     },
   });
@@ -2828,7 +3221,6 @@ function updateTableName(
   $('[name="module_code"]').val(moduleCode);
   $('[name="module_name"]').val(moduleName);
 }
-
 
 /**
  * Capitalizes the first letter of each word in a string.
@@ -2895,12 +3287,14 @@ function prepareReferenceFilter(checkedValue, ctrl) {
  * @returns {void} This function does not return a value.
  */
 function switchApplication(currentApplication) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/application-switch.php",
     dataType: "json",
     data: { currentApplication: currentApplication },
     success: function (data) {
+      decreaseAjaxPending();
       window.location.reload();
     },
   });
@@ -2975,8 +3369,6 @@ function generateScript(selector) {
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
-
-
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let entity = {
@@ -3062,14 +3454,20 @@ function getSpecificationModule() {
         tr.find(".data-filter-column-name").length &&
         tr.find(".data-filter-column-value").length
       ) {
-        let column = tr.find(".data-filter-column-name").val();
-        let value = tr.find(".data-filter-column-value").val();
+        let column = tr.find(".data-filter-column-name").val() || '';
+        let value = tr.find(".data-filter-column-value").val() || '';
+        let comparison = tr.find(".data-filter-column-comparison").val() || '';
+        if(comparison == '')
+        {
+          comparison = 'equals';
+        }
         column = column ? column.trim() : "";
         value = value ? value.trim() : "";
         if (column.length > 0) {
           result.push({
             column: column,
             value: value,
+            comparison: comparison,
           });
         }
       }
@@ -3178,12 +3576,14 @@ function parseJsonData(text)  //NOSONAR
  * @param {Object} dataToPost - The data to send to the server for code generation.
  */
 function generateAllCode(dataToPost) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/script-generator.php",
     dataType: "json",
     data: dataToPost,
     success: function (data) {
+      decreaseAjaxPending();
       updateEntityFile();
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
@@ -3250,11 +3650,13 @@ function showToast(header, body) {
  * @param {Object} dataToPost - The data used to update the application.
  */
 function updateCurrentApplivation(dataToPost) {
+  increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/application-update.php",
     data: dataToPost,
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="source_table"]').empty();
       for (let i in data) {
         $('select[name="source_table"]')[0].append(
@@ -3278,11 +3680,13 @@ function updateCurrentApplivation(dataToPost) {
  * on the options if available.
  */
 function loadTable() {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/database-table-list.php",
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="source_table"]').empty();
       $('select[name="source_table"]')[0].append(
         new Option("- Select Table -", "")
@@ -3316,11 +3720,13 @@ function loadTable() {
 }
 
 function loadMenu() {
+  increaseAjaxPending();
   $.ajax({
     type: "get",
     url: "lib.ajax/application-menu-json.php",
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       $('select[name="module_menu"]').empty();
       for (let i in data) {
         if (data.hasOwnProperty(i)) {
@@ -3343,12 +3749,14 @@ function loadMenu() {
  * @param {string} selector - The jQuery selector where the column rows will be appended.
  */
 function loadColumn(tableName, selector) {
+  increaseAjaxPending();
   $.ajax({
     type: "post",
     url: "lib.ajax/database-column-list.php",
     data: { table_name: tableName },
     dataType: "json",
     success: function (answer) {
+      decreaseAjaxPending();
       $(selector).empty();
       let data = answer.fields;
       let i;
@@ -3461,6 +3869,7 @@ function restoreForm(data)  //NOSONAR
 
   if (typeof data.specification == 'undefined' || data.specification.length == 0) {
     $(selector).find('.data-filter-column-name').val('');
+    $(selector).find('.data-filter-column-comparison').val('');
     $(selector).find('.data-filter-column-value').val('');
   }
   else {
@@ -3470,8 +3879,12 @@ function restoreForm(data)  //NOSONAR
           let trHtml = $(selector)[0].outerHTML;
           $(selector).parent().append(trHtml);
         }
-        $(selector).find('.data-filter-column-name').val(data.specification[i].column);
-        $(selector).find('.data-filter-column-value').val(data.specification[i].value);
+        let column = data.specification[i].column || '';
+        let comparison = data.specification[i].comparison || '';
+        let value = data.specification[i].value || '';
+        $(selector).find('.data-filter-column-name').val(column);
+        $(selector).find('.data-filter-column-comparison').val(comparison);
+        $(selector).find('.data-filter-column-value').val(value);
         cnt++;
       }
     }
@@ -3566,12 +3979,14 @@ function restoreForm(data)  //NOSONAR
  *        This function is called whether the request is successful or fails.
  */
 function loadSavedModuleData(moduleFile, target, clbk) {
+  increaseAjaxPending();
   $.ajax({
     type: "GET",
     url: "lib.ajax/module-data.php",
     data: { moduleFile: moduleFile, target: target },
     dataType: "json",
     success: function (data) {
+      decreaseAjaxPending();
       restoreForm(data)
       clbk();
     },
@@ -4208,8 +4623,16 @@ function setSpecificationData(data) {
       }
       let tr = table.find("tr:last-child");
       let row = specification[i];
-      tr.find(".rd-column-name").val(row.column);
-      tr.find(".rd-value").val(row.value);
+      let comparison = row.comparison || '';
+      let column = row.column || '';
+      let value = row.value || '';
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
+      tr.find(".rd-column-name").val(column);
+      tr.find(".rd-comparison").val(comparison);
+      tr.find(".rd-value").val(value);
     }
   }
 }
@@ -4227,12 +4650,18 @@ function getSpecificationData() {
     .find("tr")
     .each(function (e) {
       let tr = $(this);
-      let column = tr.find(".rd-column-name").val().trim();
-      let value = tr.find(".rd-value").val().trim();
+      let column = tr.find(".rd-column-name").val() || '';
+      let value = tr.find(".rd-value").val() || '';
+      let comparison = tr.find(".rd-comparison").val() || '';
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
       if (column.length > 0) {
         result.push({
-          column: column,
-          value: fixValue(value),
+          column: column.trim(),
+          value: fixValue(value.trim()),
+          comparison: comparison.trim(),
         });
       }
     });
@@ -4451,7 +4880,6 @@ function getMapData() {
   return result;
 }
 
-
 /**
  * Fixes the value by converting it to appropriate types (boolean, null, number, or string).
  *
@@ -4606,7 +5034,8 @@ function getReferenceResource() {
               <table data-name="specification" class="table table-reference" data-empty-on-remove="true">
                   <thead>
                       <tr>
-                          <td width="45%">Column Name</td>
+                          <td width="40%">Column Name</td>
+                          <td width="8%">Comp</td>
                           <td>Value</td>
                           <td width="42">Rem</td>
                           <td colspan="2">Move</td>
@@ -4615,6 +5044,16 @@ function getReferenceResource() {
                   <tbody>
                       <tr>
                           <td><input class="form-control rd-column-name" type="text" value=""></td>
+                          <td>
+                            <select class="form-control rd-comparison">
+                              <option value="equals">=</option>
+                              <option value="notEquals">!=</option>
+                              <option value="greaterThan">&gt;</option>
+                              <option value="greaterThanOrEquals">&gt;=</option>
+                              <option value="lessThan">&lt;</option>
+                              <option value="lessThanOrEquals">&lt;=</option>
+                            </select>
+                          </td>
                           <td><input class="form-control rd-value" type="text" value=""></td>
                           <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
                           <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>

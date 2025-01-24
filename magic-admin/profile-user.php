@@ -64,7 +64,7 @@ function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
 	}
 }
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", "Profile");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -266,7 +266,7 @@ else
 		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
-			"entityName" => "AdminCreate",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "creator",
@@ -274,7 +274,7 @@ else
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
-			"entityName" => "AdminEdit",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "editor",

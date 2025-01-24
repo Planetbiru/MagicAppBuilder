@@ -166,9 +166,9 @@ class PicoPageData // NOSONAR
         $result = null,
         $startTime = null,
         $totalResult = 0,
-        PicoPageable $pageable = null,
-        PDOStatement $stmt = null,
-        MagicObject $entity = null,
+        $pageable = null,
+        $stmt = null,
+        $entity = null,
         $subqueryMap = null
     ) {
         // Set the start time
@@ -251,17 +251,17 @@ class PicoPageData // NOSONAR
      *
      * This method constructs an array of pagination controls based on the current page number and total pages.
      *
-     * @param int $range Number of pages to show before and after the current page.
+     * @param int $pageRange Number of pages to show before and after the current page.
      * @return self Returns the current instance for method chaining.
      */
-    public function generatePagination($range = 3)
+    public function generatePagination($pageRange = 3)
     {
-        $range = max(1, $range);
+        $pageRange = max(1, $pageRange);
         $curPage = $this->pageNumber;
         $totalPage = $this->totalPage;
 
-        $minPage = max(1, $curPage - $range);
-        $maxPage = $this->byCountResult ? $totalPage : min($curPage + $range, $totalPage);
+        $minPage = max(1, $curPage - $pageRange);
+        $maxPage = $this->byCountResult ? $totalPage : min($curPage + $pageRange, $totalPage);
 
         $this->pagination = array();
         for ($i = $minPage; $i <= $maxPage; $i++) {

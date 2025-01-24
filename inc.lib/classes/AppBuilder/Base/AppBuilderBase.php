@@ -1402,7 +1402,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
         $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
         $dataControlConfig->getFirst(), $dataControlConfig->getLast()
     )
-    ->setRange($dataControlConfig->getPageRange())
+    ->setPageRange($dataControlConfig->getPageRange())
     ;';
         $paginationVar = str_replace("\r\n", "\n", $paginationVar);
         $pagination1 = $dom->createTextNode($this->createPagination("pagination-top", '$pageControl'));
@@ -4729,7 +4729,7 @@ $subqueryMap = '.$referece.';
      * This method updates the target property with the provided value.
      *
      * @param string $target The new target value.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setTarget($target)
     {
@@ -4756,7 +4756,7 @@ $subqueryMap = '.$referece.';
      * This method updates the updateEntity property with the provided boolean value.
      *
      * @param boolean $updateEntity The new status for updateEntity.
-     * @return self The current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setUpdateEntity($updateEntity)
     {

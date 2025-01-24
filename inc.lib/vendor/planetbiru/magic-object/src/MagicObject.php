@@ -1038,7 +1038,7 @@ class MagicObject extends stdClass // NOSONAR
      * This method begins a new database transaction. It delegates the actual transaction 
      * initiation to the `transactionalCommand` method, passing the "start" command.
      *
-     * @return self The current instance of the class for method chaining.
+     * @return self Returns the current instance for method chaining.
      * 
      * @throws NoDatabaseConnectionException If there is no active database connection.
      * @throws PDOException If there is an error while starting the transaction.
@@ -1056,7 +1056,7 @@ class MagicObject extends stdClass // NOSONAR
      * changes made during the transaction permanent. It delegates to the `transactionalCommand` method 
      * with the "commit" command.
      *
-     * @return self The current instance of the class for method chaining.
+     * @return self Returns the current instance for method chaining.
      * 
      * @throws NoDatabaseConnectionException If there is no active database connection.
      * @throws PDOException If there is an error during the commit process.
@@ -1073,7 +1073,7 @@ class MagicObject extends stdClass // NOSONAR
      * This method rolls back the current transaction, undoing all database changes made
      * during the transaction. It calls the `transactionalCommand` method with the "rollback" command.
      *
-     * @return self The current instance of the class for method chaining.
+     * @return self Returns the current instance for method chaining.
      * 
      * @throws NoDatabaseConnectionException If there is no active database connection.
      * @throws PDOException If there is an error during the rollback process.
@@ -2119,12 +2119,11 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoSortable|string|null $sortable The sorting criteria
      * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
-     * @param int $findOption The find option
      * @return PicoPageData The paginated data
      * @throws NoRecordFoundException if no records are found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
-    private function findBy($method, $params, $pageable = null, $sortable = null, $passive = false)
+    private function findBy($method, $params, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null)
     {
         $startTime = microtime(true);
         try
@@ -2133,7 +2132,7 @@ class MagicObject extends stdClass // NOSONAR
             if($this->_databaseConnected())
             {
                 $persist = new PicoDatabasePersistence($this->_database, $this);
-                $result = $persist->findBy($method, $params, $pageable, $sortable);
+                $result = $persist->findBy($method, $params, $pageable, $sortable, $subqueryMap);
                 if($pageable != null && $pageable instanceof PicoPageable)
                 {
                     $match = $persist->countBy($method, $params);
