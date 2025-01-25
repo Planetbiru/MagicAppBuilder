@@ -17,8 +17,6 @@ application:
         namespace: YourApplication
         directory: classes
     psr4_base_directory: 
-    magic_object:
-        version: 1.6  
 database:
   driver: mysql
   host: localhost
