@@ -1885,12 +1885,12 @@ function initTooltip() {
       // Check if the tooltip exceeds the window height and adjust if necessary
       if (mouseY + tooltipHeight > $(window).height()) {
         mouseY = e.pageY - tooltipHeight - 15; // Position it to the top if it goes off the bottom
-        if(mouseY < 0)
+        if(mouseY < 16)
         {
-          mouseY = 0;
+          mouseY = 16;
         }
       }
-
+      
       // Update the position of the tooltip based on the cursor position
       tooltip.css({
         left: mouseX,
@@ -2687,27 +2687,33 @@ function loadDiagramMultiple() {
 }
 
 /**
- * Downloads the SVG image by opening its URL in a new tab.
+ * Downloads the SVG image directly as a file.
  * 
  * This function retrieves the URL of the SVG image from the `src` attribute of the
- * `<img>` tag within the `.erd-image` container. It then opens the image URL in 
- * a new browser tab, allowing the user to download or view the image.
+ * `<img>` tag within the `.erd-image` container. It creates a temporary `<a>` element 
+ * with the `download` attribute, which triggers the download of the SVG file.
  * 
  * @returns {void} This function does not return any value.
  */
 function downloadSVG() {
   const imageSVG = document.querySelector('.erd-image img');
-  let url = imageSVG.getAttribute('src');
-  window.open(url);
-}
+  const url = imageSVG.getAttribute('src');
 
+  // Create a temporary <a> element
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'downloaded-image.svg'; // Default file name
+  document.body.appendChild(link); // Append the link to the document
+  link.click(); // Trigger the download
+  document.body.removeChild(link); // Clean up by removing the link
+}
 /**
  * Downloads the SVG image as a PNG file by rendering it to a canvas and converting it to a PNG data URL.
  * 
  * This function retrieves the URL of the SVG image from the `src` attribute of the 
  * `<img>` tag within the `.erd-image` container, draws the image onto a canvas, 
- * and then converts the canvas to a PNG data URL. It opens the PNG image in a new 
- * browser tab, allowing the user to download the image as a PNG file.
+ * and then converts the canvas to a PNG data URL. It triggers the download process 
+ * so the user can save the image as a PNG file.
  * 
  * @returns {void} This function does not return any value.
  */
@@ -2719,12 +2725,21 @@ function downloadPNG() {
   canvas.width = imageSVG.width;
   canvas.height = imageSVG.height;
   const img = new Image();
+
   img.onload = function () {
     ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
     const pngData = canvas.toDataURL('image/png');
-    window.open(pngData);
+
+    // Create a temporary <a> element to trigger the download
+    const link = document.createElement('a');
+    link.href = pngData;
+    link.download = 'downloaded-image.png'; // Default file name
+    document.body.appendChild(link); // Append the link to the document
+    link.click(); // Trigger the download
+    document.body.removeChild(link); // Clean up by removing the link
   };
+
   img.src = url;
 }
 
@@ -2756,7 +2771,6 @@ function onChangeMapKey(obj) {
   else if (obj.hasClass('input-invalid-value')) {
     obj.removeClass('input-invalid-value');
   }
-
 }
 
 /**
@@ -2899,7 +2913,6 @@ function saveEntityAs() {
               }
             },
           });
-
         },  // Callback for OK button
         'class': 'btn-primary'  // Bootstrap class for styling
       },
@@ -3083,8 +3096,6 @@ function getModuleFile(module, clbk) {
     },
   });
 }
-
-
 
 /**
  * Updates the entity query based on the current selection.
@@ -3934,7 +3945,6 @@ function restoreForm(data)  //NOSONAR
           tr.find('.input-field-data-type').val(data.fields[i].dataType)
           tr.find('.input-data-filter').val(data.fields[i].inputFilter)
         }
-
       }
     }
   }
