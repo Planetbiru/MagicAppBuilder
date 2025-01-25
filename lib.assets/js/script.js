@@ -1534,7 +1534,7 @@ jQuery(function () {
   });
 
   $(document).on("keyup", "#search-workspace", function (e) {
-    let searchValue = $(this).val().toLowerCase();
+    let searchValue = $(this).val().toLowerCase().trim();
     $(".workspace-card > div").filter(function () {
       $(this).toggle(
         $(this)
@@ -1547,7 +1547,7 @@ jQuery(function () {
   });
 
   $(document).on("keyup", "#search-application", function (e) {
-    let searchValue = $(this).val().toLowerCase();
+    let searchValue = $(this).val().toLowerCase().trim();
     $(".application-card > div").filter(function () {
       $(this).toggle(
         $(this)
