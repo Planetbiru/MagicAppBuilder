@@ -22,6 +22,32 @@ function decreaseAjaxPending() {
 }
 
 /**
+ * Reset the workspace search input field to an empty value and trigger the workspace filtering logic.
+ *
+ * This function clears the value of the workspace search input field (`#search-workspace`)
+ * and calls `doFilterWorkspace` to reapply the filtering logic with an empty search value,
+ * effectively resetting the workspace filter.
+ */
+function resetWorkspaceSearch()
+{
+  $('#search-workspace').val('');
+  doFilterWorkspace($('#search-workspace'));
+}
+
+/**
+ * Reset the application search input field to an empty value and trigger the application filtering logic.
+ *
+ * This function clears the value of the application search input field (`#search-application`)
+ * and calls `doFilterApplication` to reapply the filtering logic with an empty search value,
+ * effectively resetting the application filter.
+ */
+function resetApplicationSearch()
+{
+  $('#search-application').val('');
+  doFilterApplication($('#search-application'));
+}
+
+/**
  * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
  * The width is calculated as `ajaxPending * 20` pixels.
  */
@@ -529,6 +555,10 @@ jQuery(function () {
     $(modal).modal('hide');
   });
 
+  $('#modal-workspace').on('show.bs.modal', function (e) {
+    resetWorkspaceSearch();
+  })
+
   $('#modal-update-path').on('show.bs.modal', function (e) {
     increaseAjaxPending();
     $.ajax({
@@ -825,6 +855,7 @@ jQuery(function () {
   });
 
   $(document).on('click', '.create-new-application', function (e) {
+    resetApplicationSearch();
     let modal = $('#modal-create-application');
     let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
@@ -1315,6 +1346,7 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-scan', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    resetWorkspaceSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'GET',
@@ -1330,6 +1362,7 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
+    resetWorkspaceSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1348,6 +1381,7 @@ jQuery(function () {
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
+    resetApplicationSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1376,6 +1410,7 @@ jQuery(function () {
 
   $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
+    resetApplicationSearch();
     loadAllResource();
   });
 
@@ -1534,29 +1569,11 @@ jQuery(function () {
   });
 
   $(document).on("keyup", "#search-workspace", function (e) {
-    let searchValue = $(this).val().toLowerCase().trim();
-    $(".workspace-card > div").filter(function () {
-      $(this).toggle(
-        $(this)
-          .find(".card-title")
-          .text()
-          .toLowerCase()
-          .includes(searchValue)
-      );
-    });
+    doFilterWorkspace($(this));
   });
 
   $(document).on("keyup", "#search-application", function (e) {
-    let searchValue = $(this).val().toLowerCase().trim();
-    $(".application-card > div").filter(function () {
-      $(this).toggle(
-        $(this)
-          .find(".card-title")
-          .text()
-          .toLowerCase()
-          .includes(searchValue)
-      );
-    });
+    doFilterApplication($(this));
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -1567,6 +1584,33 @@ jQuery(function () {
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
 });
+
+function doFilterWorkspace(elem)
+{
+  let searchValue = $(elem).val().toLowerCase().trim();
+  $(".workspace-card > div").filter(function () {
+    $(this).toggle(
+      $(this)
+        .find(".card-title")
+        .text()
+        .toLowerCase()
+        .includes(searchValue)
+    );
+  });
+}
+function doFilterApplication(elem)
+{
+  let searchValue = $(elem).val().toLowerCase().trim();
+    $(".application-card > div").filter(function () {
+      $(this).toggle(
+        $(this)
+          .find(".card-title")
+          .text()
+          .toLowerCase()
+          .includes(searchValue)
+      );
+    });
+}
 
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
