@@ -3,7 +3,6 @@ inc.cfg/core.yml
 inc.cfg/entity/*
 inc.cfg/entities/*
 tmp/*
-
 .cache/*
 inc.cfg/*
-inc.cfg/database.sqlite
+inc.database/database.sqlite
