@@ -90,14 +90,11 @@ if($databaseConfigured)
             $res = $databaseBuilder->fetch($sql, PDO::FETCH_COLUMN);
             $installed = $res > 0;
         }
-
         
         if(!$installed && $databaseBuilder->isConnected())
         {
             try
             {
-                
-
                 $sql = $appInstaller->generateInstallerQuery($databaseBuilder);
                 $queries = PicoDatabaseUtil::splitSql($sql);
                 try
@@ -114,16 +111,29 @@ if($databaseConfigured)
                 }
 
                 $now = date('Y-m-d H:i:s');
+
+                $password = 'administrator';
+                $hash = hash('sha1', $password);
+                $hash = hash('sha1', $hash);
+
+                $userLevel = new EntityAdminLevel(null, $databaseBuilder);
+                $userLevel->setAdminLevelId("superuser");
+                $userLevel->setName("Super User");
+                $userLevel->setSortOrder(1);
+                $userLevel->setTimeCreate($now);
+                $userLevel->setTimeEdit($now);
+                $userLevel->setIpCreate($_SERVER['REMOTE_ADDR']);
+                $userLevel->setIpEdit($_SERVER['REMOTE_ADDR']);
+                $userLevel->setActive(true);
+                $userLevel->insert();
                         
                 $admin = new EntityAdmin(null, $databaseBuilder);
                 $admin->setUsername("administrator");
                 $admin->setName("Administrator");
-                $password = 'administrator';
-                $hash = hash('sha1', $password);
-                $hash = hash('sha1', $hash);
                 $admin->setPassword($hash);    
                 $admin->setLastResetPassword($now);
                 $admin->setAdminLevelId("superuser");
+                $admin->setLanguageId("en");
                 $admin->setTimeCreate($now);
                 $admin->setTimeEdit($now);
                 $admin->setIpCreate($_SERVER['REMOTE_ADDR']);
@@ -137,17 +147,6 @@ if($databaseConfigured)
                     ->setAdminCreate($admin->getAdminId())
                     ->setAdminEdit($admin->getAdminId())
                     ->update();
-                
-                $userLevel = new EntityAdminLevel(null, $databaseBuilder);
-                $userLevel->setAdminLevelId("superuser");
-                $userLevel->setName("Super User");
-                $userLevel->setSortOrder(1);
-                $userLevel->setTimeCreate($now);
-                $userLevel->setTimeEdit($now);
-                $userLevel->setIpCreate($_SERVER['REMOTE_ADDR']);
-                $userLevel->setIpEdit($_SERVER['REMOTE_ADDR']);
-                $userLevel->setActive(true);
-                $userLevel->insert();
             }
             catch(Exception $e)
             {
