@@ -7,3 +7,4 @@ tmp/*
 .cache/*
 inc.cfg/*
 inc.cfg/database.sqlite
+inc.database/database.sqlite
