@@ -1885,6 +1885,10 @@ function initTooltip() {
       // Check if the tooltip exceeds the window height and adjust if necessary
       if (mouseY + tooltipHeight > $(window).height()) {
         mouseY = e.pageY - tooltipHeight - 15; // Position it to the top if it goes off the bottom
+        if(mouseY < 0)
+        {
+          mouseY = 0;
+        }
       }
 
       // Update the position of the tooltip based on the cursor position
