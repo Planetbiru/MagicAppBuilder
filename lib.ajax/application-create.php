@@ -21,7 +21,6 @@ if (!file_exists($dir2))
     mkdir($dir2, 0755, true);
 }
 
-
 $author = $entityAdmin->getName();
 $adminId = $entityAdmin->getAdminId();
 
@@ -30,7 +29,6 @@ $baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseAp
 $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
 $baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
-
 
 $path2 = $dir2 . "/default.yml";
 
