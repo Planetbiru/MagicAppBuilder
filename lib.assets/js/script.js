@@ -22,6 +22,32 @@ function decreaseAjaxPending() {
 }
 
 /**
+ * Reset the workspace search input field to an empty value and trigger the workspace filtering logic.
+ *
+ * This function clears the value of the workspace search input field (`#search-workspace`)
+ * and calls `doFilterWorkspace` to reapply the filtering logic with an empty search value,
+ * effectively resetting the workspace filter.
+ */
+function resetWorkspaceSearch()
+{
+  $('#search-workspace').val('');
+  doFilterWorkspace($('#search-workspace'));
+}
+
+/**
+ * Reset the application search input field to an empty value and trigger the application filtering logic.
+ *
+ * This function clears the value of the application search input field (`#search-application`)
+ * and calls `doFilterApplication` to reapply the filtering logic with an empty search value,
+ * effectively resetting the application filter.
+ */
+function resetApplicationSearch()
+{
+  $('#search-application').val('');
+  doFilterApplication($('#search-application'));
+}
+
+/**
  * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
  * The width is calculated as `ajaxPending * 20` pixels.
  */
@@ -529,6 +555,10 @@ jQuery(function () {
     $(modal).modal('hide');
   });
 
+  $('#modal-workspace').on('show.bs.modal', function (e) {
+    resetWorkspaceSearch();
+  })
+
   $('#modal-update-path').on('show.bs.modal', function (e) {
     increaseAjaxPending();
     $.ajax({
@@ -825,6 +855,7 @@ jQuery(function () {
   });
 
   $(document).on('click', '.create-new-application', function (e) {
+    resetApplicationSearch();
     let modal = $('#modal-create-application');
     let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
@@ -880,7 +911,6 @@ jQuery(function () {
               new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
             );
           }
-          loadAllResource();
           createBtn[0].disabled = false;
         }
       }
@@ -1315,6 +1345,7 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-scan', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    resetWorkspaceSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'GET',
@@ -1330,6 +1361,7 @@ jQuery(function () {
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
+    resetWorkspaceSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1348,6 +1380,7 @@ jQuery(function () {
   $(document).on('click', '.button-application-default', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
+    resetApplicationSearch();
     increaseAjaxPending();
     $.ajax({
       type: 'POST',
@@ -1376,6 +1409,7 @@ jQuery(function () {
 
   $(document).on('click', '.refresh-application-list, .refresh-workspace-list', function (e) {
     e.preventDefault();
+    resetApplicationSearch();
     loadAllResource();
   });
 
@@ -1531,7 +1565,15 @@ jQuery(function () {
     $('.entity-info-key').each(function (e2) {
       $(this).val($(this).attr('data-indonesian'));
     });
-  })
+  });
+
+  $(document).on("keyup", "#search-workspace", function (e) {
+    doFilterWorkspace($(this));
+  });
+
+  $(document).on("keyup", "#search-application", function (e) {
+    doFilterApplication($(this));
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -1541,6 +1583,33 @@ jQuery(function () {
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
 });
+
+function doFilterWorkspace(elem)
+{
+  let searchValue = $(elem).val().toLowerCase().trim();
+  $(".workspace-card > div").filter(function () {
+    $(this).toggle(
+      $(this)
+        .find(".card-title")
+        .text()
+        .toLowerCase()
+        .includes(searchValue)
+    );
+  });
+}
+function doFilterApplication(elem)
+{
+  let searchValue = $(elem).val().toLowerCase().trim();
+    $(".application-card > div").filter(function () {
+      $(this).toggle(
+        $(this)
+          .find(".card-title")
+          .text()
+          .toLowerCase()
+          .includes(searchValue)
+      );
+    });
+}
 
 let toCheckActiveWorkspace = setInterval('', 10000000);
 let toCheckActiveApplication = setInterval('', 10000000);
@@ -1815,8 +1884,12 @@ function initTooltip() {
       // Check if the tooltip exceeds the window height and adjust if necessary
       if (mouseY + tooltipHeight > $(window).height()) {
         mouseY = e.pageY - tooltipHeight - 15; // Position it to the top if it goes off the bottom
+        if(mouseY < 16)
+        {
+          mouseY = 16;
+        }
       }
-
+      
       // Update the position of the tooltip based on the cursor position
       tooltip.css({
         left: mouseX,
@@ -2613,27 +2686,33 @@ function loadDiagramMultiple() {
 }
 
 /**
- * Downloads the SVG image by opening its URL in a new tab.
+ * Downloads the SVG image directly as a file.
  * 
  * This function retrieves the URL of the SVG image from the `src` attribute of the
- * `<img>` tag within the `.erd-image` container. It then opens the image URL in 
- * a new browser tab, allowing the user to download or view the image.
+ * `<img>` tag within the `.erd-image` container. It creates a temporary `<a>` element 
+ * with the `download` attribute, which triggers the download of the SVG file.
  * 
  * @returns {void} This function does not return any value.
  */
 function downloadSVG() {
   const imageSVG = document.querySelector('.erd-image img');
-  let url = imageSVG.getAttribute('src');
-  window.open(url);
-}
+  const url = imageSVG.getAttribute('src');
 
+  // Create a temporary <a> element
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'downloaded-image.svg'; // Default file name
+  document.body.appendChild(link); // Append the link to the document
+  link.click(); // Trigger the download
+  document.body.removeChild(link); // Clean up by removing the link
+}
 /**
  * Downloads the SVG image as a PNG file by rendering it to a canvas and converting it to a PNG data URL.
  * 
  * This function retrieves the URL of the SVG image from the `src` attribute of the 
  * `<img>` tag within the `.erd-image` container, draws the image onto a canvas, 
- * and then converts the canvas to a PNG data URL. It opens the PNG image in a new 
- * browser tab, allowing the user to download the image as a PNG file.
+ * and then converts the canvas to a PNG data URL. It triggers the download process 
+ * so the user can save the image as a PNG file.
  * 
  * @returns {void} This function does not return any value.
  */
@@ -2645,12 +2724,21 @@ function downloadPNG() {
   canvas.width = imageSVG.width;
   canvas.height = imageSVG.height;
   const img = new Image();
+
   img.onload = function () {
     ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
     const pngData = canvas.toDataURL('image/png');
-    window.open(pngData);
+
+    // Create a temporary <a> element to trigger the download
+    const link = document.createElement('a');
+    link.href = pngData;
+    link.download = 'downloaded-image.png'; // Default file name
+    document.body.appendChild(link); // Append the link to the document
+    link.click(); // Trigger the download
+    document.body.removeChild(link); // Clean up by removing the link
   };
+
   img.src = url;
 }
 
@@ -2682,7 +2770,6 @@ function onChangeMapKey(obj) {
   else if (obj.hasClass('input-invalid-value')) {
     obj.removeClass('input-invalid-value');
   }
-
 }
 
 /**
@@ -2825,7 +2912,6 @@ function saveEntityAs() {
               }
             },
           });
-
         },  // Callback for OK button
         'class': 'btn-primary'  // Bootstrap class for styling
       },
@@ -3009,8 +3095,6 @@ function getModuleFile(module, clbk) {
     },
   });
 }
-
-
 
 /**
  * Updates the entity query based on the current selection.
@@ -3454,19 +3538,30 @@ function getSpecificationModule() {
         tr.find(".data-filter-column-name").length &&
         tr.find(".data-filter-column-value").length
       ) {
-        let column = tr.find(".data-filter-column-name").val() || '';
-        let value = tr.find(".data-filter-column-value").val() || '';
-        let comparison = tr.find(".data-filter-column-comparison").val() || '';
+        let column = tr.find(".data-filter-column-name").val();
+        let value = tr.find(".data-filter-column-value").val();
+        let comparison = tr.find(".data-filter-column-comparison").val();
+
+        if(typeof column == 'undefined')
+        {
+          column = '';
+        }
+        if(typeof value == 'undefined')
+        {
+          value = '';
+        }
+        if(typeof comparison == 'undefined')
+        {
+          comparison = '';
+        }
         if(comparison == '')
         {
           comparison = 'equals';
         }
-        column = column ? column.trim() : "";
-        value = value ? value.trim() : "";
         if (column.length > 0) {
           result.push({
-            column: column,
-            value: value,
+            column: column.trim(),
+            value: value.trim(),
             comparison: comparison,
           });
         }
@@ -3849,7 +3944,6 @@ function restoreForm(data)  //NOSONAR
           tr.find('.input-field-data-type').val(data.fields[i].dataType)
           tr.find('.input-data-filter').val(data.fields[i].inputFilter)
         }
-
       }
     }
   }
@@ -3882,6 +3976,22 @@ function restoreForm(data)  //NOSONAR
         let column = data.specification[i].column || '';
         let comparison = data.specification[i].comparison || '';
         let value = data.specification[i].value || '';
+        if(typeof column == 'undefined')
+        {
+          column = '';
+        }
+        if(typeof value == 'undefined')
+        {
+          value = '';
+        }
+        if(typeof comparison == 'undefined')
+        {
+          comparison = '';
+        }
+        if(comparison == '')
+        {
+          comparison = 'equals';
+        }
         $(selector).find('.data-filter-column-name').val(column);
         $(selector).find('.data-filter-column-comparison').val(comparison);
         $(selector).find('.data-filter-column-value').val(value);
@@ -4608,7 +4718,8 @@ function getEntityData() {
  *
  * @param {Object} data - The object containing specification data to populate the form.
  */
-function setSpecificationData(data) {
+function setSpecificationData(data) // NOSONAR
+{
   let selector = '[data-name="specification"]';
   let table = $(selector);
   let specification = data.entity.specification;
@@ -4623,9 +4734,21 @@ function setSpecificationData(data) {
       }
       let tr = table.find("tr:last-child");
       let row = specification[i];
-      let comparison = row.comparison || '';
-      let column = row.column || '';
-      let value = row.value || '';
+      let comparison = row.comparison;
+      let column = row.column;
+      let value = row.value;
+      if(typeof column == 'undefined')
+      {
+        column = '';
+      }
+      if(typeof value == 'undefined')
+      {
+        value = '';
+      }
+      if(typeof comparison == 'undefined')
+      {
+        comparison = '';
+      }
       if(comparison == '')
       {
         comparison = 'equals';
@@ -4650,9 +4773,25 @@ function getSpecificationData() {
     .find("tr")
     .each(function (e) {
       let tr = $(this);
-      let column = tr.find(".rd-column-name").val() || '';
-      let value = tr.find(".rd-value").val() || '';
-      let comparison = tr.find(".rd-comparison").val() || '';
+      let column = tr.find(".rd-column-name").val();
+      let value = tr.find(".rd-value").val();
+      let comparison = tr.find(".rd-comparison").val();
+      if(typeof column == 'undefined')
+      {
+        column = '';
+      }
+      if(typeof value == 'undefined')
+      {
+        value = '';
+      }
+      if(typeof comparison == 'undefined')
+      {
+        comparison = '';
+      }
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
       if(comparison == '')
       {
         comparison = 'equals';

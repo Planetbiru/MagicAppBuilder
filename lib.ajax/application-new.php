@@ -4,6 +4,7 @@ use AppBuilder\AppArchitecture;
 use AppBuilder\Entity\EntityAdminWorkspace;
 use AppBuilder\Util\Composer\ComposerUtil;
 use AppBuilder\Util\ResponseUtil;
+use MagicAdmin\Entity\Data\GeneralCache;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -26,19 +27,40 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 try
 {
-    $cachePath = $activeWorkspace->getDirectory()."/magic-app-version.json";
-    if(!file_exists($cachePath) || filemtime($cachePath) < strtotime('-6 hours'))
+    $cache = new GeneralCache(null, $databaseBuilder);
+    $needUpdate = false;
+    
+    try
+    {
+        $cache->findOneByGeneralCacheId("magic-app-version");
+        $timestamp = strtotime($cache->getExpire());
+        if($timestamp < time())
+        {
+            // Expire
+            $magicAppList = ComposerUtil::getMagicAppVersionList();
+            $needUpdate = true;
+        }
+        else
+        {
+            // Fresh from the oven
+            $magicAppList = json_decode($cache->getContent());
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $magicAppList = ComposerUtil::getMagicAppVersionList();
+                $needUpdate = true;
+            }
+        }
+    }
+    catch(Exception $e)
     {
         $magicAppList = ComposerUtil::getMagicAppVersionList();
-        file_put_contents($cachePath, json_encode($magicAppList));
+        $needUpdate = true;
     }
-    else
+    if($needUpdate)
     {
-        $magicAppList = json_decode(file_get_contents($cachePath));
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $magicAppList = ComposerUtil::getMagicAppVersionList();
-            file_put_contents($cachePath, json_encode($magicAppList));
-        }
+        $cache->setGeneralCacheId("magic-app-version");
+        $cache->setContent(json_encode($magicAppList));
+        $cache->setExpire(date("Y-m-d H:i:s", strtotime("6 hours")));
+        $cache->save();
     }
 }
 catch(Exception $e)
