@@ -3528,9 +3528,22 @@ function getSpecificationModule() {
         tr.find(".data-filter-column-name").length &&
         tr.find(".data-filter-column-value").length
       ) {
-        let column = tr.find(".data-filter-column-name").val() || '';
-        let value = tr.find(".data-filter-column-value").val() || '';
-        let comparison = tr.find(".data-filter-column-comparison").val() || '';
+        let column = tr.find(".data-filter-column-name").val();
+        let value = tr.find(".data-filter-column-value").val();
+        let comparison = tr.find(".data-filter-column-comparison").val();
+
+        if(typeof column == 'undefined')
+        {
+          column = '';
+        }
+        if(typeof value == 'undefined')
+        {
+          value = '';
+        }
+        if(typeof comparison == 'undefined')
+        {
+          comparison = '';
+        }
         if(comparison == '')
         {
           comparison = 'equals';
@@ -3956,6 +3969,22 @@ function restoreForm(data)  //NOSONAR
         let column = data.specification[i].column || '';
         let comparison = data.specification[i].comparison || '';
         let value = data.specification[i].value || '';
+        if(typeof column == 'undefined')
+        {
+          column = '';
+        }
+        if(typeof value == 'undefined')
+        {
+          value = '';
+        }
+        if(typeof comparison == 'undefined')
+        {
+          comparison = '';
+        }
+        if(comparison == '')
+        {
+          comparison = 'equals';
+        }
         $(selector).find('.data-filter-column-name').val(column);
         $(selector).find('.data-filter-column-comparison').val(comparison);
         $(selector).find('.data-filter-column-value').val(value);
@@ -4697,9 +4726,25 @@ function setSpecificationData(data) {
       }
       let tr = table.find("tr:last-child");
       let row = specification[i];
-      let comparison = row.comparison || '';
-      let column = row.column || '';
-      let value = row.value || '';
+      let comparison = row.comparison;
+      let column = row.column;
+      let value = row.value;
+      if(typeof column == 'undefined')
+      {
+        column = '';
+      }
+      if(typeof value == 'undefined')
+      {
+        value = '';
+      }
+      if(typeof comparison == 'undefined')
+      {
+        comparison = '';
+      }
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
       if(comparison == '')
       {
         comparison = 'equals';
@@ -4724,9 +4769,25 @@ function getSpecificationData() {
     .find("tr")
     .each(function (e) {
       let tr = $(this);
-      let column = tr.find(".rd-column-name").val() || '';
-      let value = tr.find(".rd-value").val() || '';
-      let comparison = tr.find(".rd-comparison").val() || '';
+      let column = tr.find(".rd-column-name").val();
+      let value = tr.find(".rd-value").val();
+      let comparison = tr.find(".rd-comparison").val();
+      if(typeof column == 'undefined')
+      {
+        column = '';
+      }
+      if(typeof value == 'undefined')
+      {
+        value = '';
+      }
+      if(typeof comparison == 'undefined')
+      {
+        comparison = '';
+      }
+      if(comparison == '')
+      {
+        comparison = 'equals';
+      }
       if(comparison == '')
       {
         comparison = 'equals';
