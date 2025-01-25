@@ -12,6 +12,12 @@ let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
 
+/**
+ * Clears the content of the module editor.
+ * 
+ * This function resets the content of the `cmEditorModule` editor by setting 
+ * its value to an empty string and refreshing it to ensure updates are visible.
+ */
 function clearModuleFile()
 {
   cmEditorModule.getDoc().setValue('');
@@ -20,6 +26,12 @@ function clearModuleFile()
     }, 1);
 }
 
+/**
+ * Clears the content of the entity file editor.
+ * 
+ * This function resets the content of the `cmEditorFile` editor by setting 
+ * its value to an empty string and refreshing it.
+ */
 function clearEntityFile()
 {
   cmEditorFile.getDoc().setValue('');
@@ -27,6 +39,12 @@ function clearEntityFile()
       cmEditorFile.refresh();
     }, 1);
 }
+
+/**
+ * Sets the content of the entity file editor.
+ * 
+ * @param {string} content - The new content to be set in the editor.
+ */
 function setEntityFile(content)
 {
   cmEditorFile.getDoc().setValue(content);
@@ -34,6 +52,13 @@ function setEntityFile(content)
       cmEditorFile.refresh();
     }, 1);
 }
+
+/**
+ * Clears the content of the SQL editor.
+ * 
+ * This function resets the content of the `cmEditorSQL` editor by setting 
+ * its value to an empty string and refreshing it.
+ */
 function clearEditorSQL()
 {
   cmEditorSQL.getDoc().setValue('');
@@ -42,6 +67,12 @@ function clearEditorSQL()
     }, 1);
 }
 
+/**
+ * Clears the content of the SQL execute editor.
+ * 
+ * This function resets the content of the `cmEditorSQLExecute` editor by setting 
+ * its value to an empty string and refreshing it.
+ */
 function clearEditorSQLExecute()
 {
   cmEditorSQLExecute.getDoc().setValue('');
@@ -50,6 +81,9 @@ function clearEditorSQLExecute()
     }, 1);
 }
 
+/**
+ * Clears the content of the first translation editor.
+ */
 function clearTtransEd1()
 {
   transEd1.getDoc().setValue('');
@@ -58,6 +92,9 @@ function clearTtransEd1()
     }, 1);
 }
 
+/**
+ * Clears the content of the second translation editor.
+ */
 function clearTtransEd2()
 {
   transEd2.getDoc().setValue('');
@@ -66,6 +103,9 @@ function clearTtransEd2()
     }, 1);
 }
 
+/**
+ * Clears the content of the third translation editor.
+ */
 function clearTtransEd3()
 {
   transEd3.getDoc().setValue('');
@@ -74,6 +114,9 @@ function clearTtransEd3()
     }, 1);
 }
 
+/**
+ * Clears the content of the fourth translation editor.
+ */
 function clearTtransEd4()
 {
   transEd4.getDoc().setValue('');
@@ -82,7 +125,12 @@ function clearTtransEd4()
     }, 1);
 }
 
-
+/**
+ * Formats the content of all editors using auto-formatting.
+ * 
+ * This function calculates the total number of lines in each editor and applies 
+ * automatic formatting to improve code readability.
+ */
 function format() {
   let totalLinesModule = cmEditorModule.lineCount();
   cmEditorModule.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesModule });
@@ -109,6 +157,12 @@ function format() {
   transEd4.autoFormatRange({ line: 0, ch: 0 }, { line: totalLinesEntityTran4 });
 }
 
+/**
+ * Checks if an element is hidden.
+ * 
+ * @param {HTMLElement} el - The HTML element to check.
+ * @returns {boolean} True if the element is hidden; otherwise, false.
+ */
 function isHidden(el) {
   return el.display == 'none' ||
     el.visibility == 'hidden';
@@ -350,6 +404,9 @@ jQuery(function () {
 
 });
 
+/**
+ * Highlights the current line in the first translation editor.
+ */
 function hilightLine1() {
   let cursor = transEd1.getCursor();
   let lineNumber = cursor.line;
@@ -363,6 +420,9 @@ function hilightLine1() {
   lastLine1 = lineNumber;
 }
 
+/**
+ * Highlights the current line in the second translation editor.
+ */
 function hilightLine2() {
   let cursor = transEd2.getCursor();
   let lineNumber = cursor.line;
@@ -376,6 +436,9 @@ function hilightLine2() {
   lastLine1 = lineNumber;
 }
 
+/**
+ * Highlights the current line in the third translation editor.
+ */
 function hilightLine3() {
   let cursor = transEd3.getCursor();
   let lineNumber = cursor.line;
@@ -389,6 +452,9 @@ function hilightLine3() {
   lastLine1 = lineNumber;
 }
 
+/**
+ * Highlights the current line in the fourth translation editor.
+ */
 function hilightLine4() {
   let cursor = transEd4.getCursor();
   let lineNumber = cursor.line;
