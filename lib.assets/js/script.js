@@ -3548,12 +3548,10 @@ function getSpecificationModule() {
         {
           comparison = 'equals';
         }
-        column = column ? column.trim() : "";
-        value = value ? value.trim() : "";
         if (column.length > 0) {
           result.push({
-            column: column,
-            value: value,
+            column: column.trim(),
+            value: value.trim(),
             comparison: comparison,
           });
         }
@@ -4711,7 +4709,8 @@ function getEntityData() {
  *
  * @param {Object} data - The object containing specification data to populate the form.
  */
-function setSpecificationData(data) {
+function setSpecificationData(data) // NOSONAR
+{
   let selector = '[data-name="specification"]';
   let table = $(selector);
   let specification = data.entity.specification;
@@ -4740,10 +4739,6 @@ function setSpecificationData(data) {
       if(typeof comparison == 'undefined')
       {
         comparison = '';
-      }
-      if(comparison == '')
-      {
-        comparison = 'equals';
       }
       if(comparison == '')
       {
