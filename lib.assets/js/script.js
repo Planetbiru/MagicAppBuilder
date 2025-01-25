@@ -911,7 +911,6 @@ jQuery(function () {
               new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
             );
           }
-          loadAllResource();
           createBtn[0].disabled = false;
         }
       }

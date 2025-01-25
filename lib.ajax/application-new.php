@@ -27,9 +27,7 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 try
 {
-    $cachePath = $activeWorkspace->getDirectory()."/magic-app-version.json";
     $cache = new GeneralCache(null, $databaseBuilder);
-
     $needUpdate = false;
     
     try
