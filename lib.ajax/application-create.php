@@ -213,7 +213,6 @@ try
     $entityApplication->setBaseApplicationDirectory($applicationDirectory);
     $entityApplication->setArchitecture($applicationArchitecture);
     $entityApplication->setAuthor($author);
-
     $entityApplication->setAdminId($adminId);
     $entityApplication->setWorkspaceId($workspaceId);
     $entityApplication->setAdminCreate($adminId);
