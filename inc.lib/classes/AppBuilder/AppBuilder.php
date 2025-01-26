@@ -235,8 +235,8 @@ class AppBuilder extends AppBuilderBase
             $objectTrashName = lcfirst($entityTrashName);
 
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."specification = PicoSpecification::getInstance()";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf($camelPkName).", \$rowId))";
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf($camelPkName).", \$rowId))"; // NOSONAR
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)"; // NOSONAR
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.";";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectNameBk, $entityName);
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
