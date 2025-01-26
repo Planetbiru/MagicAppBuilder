@@ -3,6 +3,8 @@
 use AppBuilder\Entity\EntityAdmin;
 use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Entity\EntityWorkspace;
+use AppBuilder\Util\FileDirUtil;
+use MagicObject\SecretObject;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/database-builder.php";
@@ -43,7 +45,22 @@ if(isset($databaseBuilder))
             $userLoggedIn = false;
         }
     }
-
-
 }
-require_once __DIR__ . "/database.php";
+
+$appConfig = new SecretObject(null);
+
+$yml = FileDirUtil::normalizePath($activeApplication->getProjectDirectory()."/default.yml");
+if(file_exists($yml))
+{
+    $appConfig->loadYamlFile($yml, false, true, true);
+    $app = $appConfig->getApplication();
+    $databaseConfig = new SecretObject($appConfig->getDatabase());
+}
+if(!isset($app))
+{
+    $app = new SecretObject();
+}
+if(!isset($databaseConfig))
+{
+    $databaseConfig = new SecretObject();
+}
