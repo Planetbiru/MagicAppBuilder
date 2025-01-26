@@ -2375,8 +2375,6 @@ $query = $inputPost->getQuery();
 // Get the row limit per page
 $limit = $builderConfig->getDataLimit(); // Rows per page
 
-
-
 // Ensure the page number is at least 1
 if ($page < 1) {
     $page = 1;
@@ -2386,7 +2384,6 @@ if ($page < 1) {
 if ($limit < 1) {
     $limit = 1;
 }
-
 
 // Get the PDO instance and set error mode
 $pdo = $database->getDatabaseConnection();

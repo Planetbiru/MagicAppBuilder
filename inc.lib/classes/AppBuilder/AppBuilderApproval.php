@@ -119,7 +119,7 @@ class AppBuilderApproval extends AppBuilderBase
      * @param callable $callbackFailed Callback function to be executed on failed update.
      * @return string The generated code for the update approval section.
      */
-    public function createUpdateApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity, $callbackSuccess, $callbackFailed)    
+    public function createUpdateApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity, $callbackSuccess, $callbackFailed)    // NOSONAR
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
@@ -139,7 +139,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1."try";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         
-        $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
+        $lines[] = parent::TAB1.parent::TAB1.'$specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));"; // NOSONAR
         $lines[] = parent::TAB1.parent::TAB1.'$specification->addAnd($dataFilter);';
         
         $lines[] = "";

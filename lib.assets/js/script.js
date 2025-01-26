@@ -1769,10 +1769,10 @@ function updateQuery()
 function loadAllResource() {
   loadWorkspaceList();
   loadApplicationList();
-  loadTable();
   loadPathList();
   loadLanguageList();
   loadMenu();
+  loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
@@ -1789,8 +1789,8 @@ function loadAllResource() {
 function onSetDefaultWorkspace() {
   loadWorkspaceList();
   loadApplicationList();
-  loadTable();
   loadMenu();
+  loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
@@ -1806,10 +1806,10 @@ function onSetDefaultWorkspace() {
  */
 function onSetDefaultApplication() {
   loadApplicationList();
-  loadTable();
   loadPathList();
   loadLanguageList();
   loadMenu();
+  loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
   updateEntityFile();
@@ -3787,7 +3787,7 @@ function updateCurrentApplivation(dataToPost) {
 function loadTable() {
   increaseAjaxPending();
   $.ajax({
-    type: "post",
+    type: "GET",
     url: "lib.ajax/database-table-list.php",
     dataType: "json",
     success: function (data) {

@@ -331,7 +331,7 @@ class ScriptGenerator //NOSONAR
      * @return int The number of entity files that were generated. It generates and writes the application module script
      * to the specified location, as defined in the request.
      */
-    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo)
+    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) // NOSONAR
     {
         $insertFields = array();
         $editFields = array();

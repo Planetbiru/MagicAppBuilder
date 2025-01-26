@@ -158,6 +158,4 @@ if($databaseConfigured)
     {
         echo $e->getMessage();
     }
-    
-    
 }
