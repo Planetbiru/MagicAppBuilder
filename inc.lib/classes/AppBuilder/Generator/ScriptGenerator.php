@@ -1086,12 +1086,12 @@ class ScriptGenerator //NOSONAR
         {
             $sourceDir = dirname(__DIR__)."/App";
             $arr = array(
+                "AppAdminImpl.php",
+                "AppAdminLevelImpl.php",
+                "AppAdminRoleImpl.php",
                 "AppModuleGroupImpl.php",
                 "AppModuleImpl.php",
-                "AppNotificationImpl.php",
-                "AppUserImpl.php",
-                "AppUserLevelImpl.php",
-                "AppUserRoleImpl.php",          
+                "AppNotificationImpl.php",          
             );
             foreach($arr as $file)
             {
