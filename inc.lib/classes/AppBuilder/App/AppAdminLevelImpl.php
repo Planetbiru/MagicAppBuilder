@@ -2,28 +2,28 @@
 
 namespace AppBuilder\App\Entity\App;
 
-use MagicApp\Entity\AppUserLevel;
+use MagicObject\MagicObject;
 
 /**
- * AppUserLevelImpl 
+ * AppAdminLevelImpl 
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="user_level")
+ * @Table(name="admin_level")
  */
-class AppUserLevelImpl extends AppUserLevel
+class AppAdminLevelImpl extends MagicObject
 {
 	/**
-	 * User Level ID
+	 * Admin Level ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="user_level_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
 	 * @DefaultColumn(value="NULL")
-	 * @Label(content="User ID")
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $userLevelId;
+	protected $adminLevelId;
 
 	/**
 	 * Name
