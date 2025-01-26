@@ -15,7 +15,6 @@ $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZ
 if($applicationId != null)
 {
     $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
-    
     if(file_exists($appConfigPath))
     {
         $appConfig->loadYamlFile($appConfigPath, false, true, true);

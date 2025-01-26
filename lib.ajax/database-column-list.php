@@ -16,7 +16,7 @@ try {
     $tableName = $inputPost->getTableName();
     $databaseType = $database->getDatabaseType();
 
-    $excludeColumns = [];
+    $excludeColumns = array();
     $excludeColumns[] = $appConfig->entityInfo->getDraft();
     $excludeColumns[] = $appConfig->entityInfo->getWaitingFor();
     $excludeColumns[] = $appConfig->entityInfo->getAdminAskEdit();
@@ -77,7 +77,7 @@ try {
         $queryBuilder = "PRAGMA table_info('$tableName')";
         $rs = $database->executeQuery($queryBuilder);
         $rawRows = $rs->fetchAll(PDO::FETCH_ASSOC);
-        $rows = [];
+        $rows = array();
         foreach($rawRows as $row)
         {
             if(!in_array($row['name'], $excludeColumns))
@@ -95,11 +95,11 @@ try {
     $column = "";
     $i = 0;
 
-    $fields = [];
-    $cols = [];
-    $primaryKeys = [];
-
+    $fields = array();
+    $cols = array();
+    $primaryKeys = array();
     $skipped = array();
+    
     $skipped[] = $appConfig->entityInfo->get('draft');
     $skipped[] = $appConfig->entityInfo->get('waitingFor');
     $skipped[] = $appConfig->entityInfo->get('approvalNote');

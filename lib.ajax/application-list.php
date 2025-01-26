@@ -21,17 +21,13 @@ try
     $sorts = new PicoSortable(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC, Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC);
     $pageData = $applicationFinder->findAll($specs, null, $sorts);
     foreach ($pageData->getResult() as $application) {
-
         $currentApplicationId = isset($entityAdmin) && $entityAdmin->issetApplicationId() ? $entityAdmin->getApplicationId() : null;
-
         if ($application->getApplicationId() == $currentApplicationId) {
             $selected = 'true';
         } else {
             $selected = '';
         }
-
         $yml = FileDirUtil::normalizePath($application->getProjectDirectory()."/default.yml");
-        
         if(file_exists($yml))
         {
             $config = new SecretObject(null);

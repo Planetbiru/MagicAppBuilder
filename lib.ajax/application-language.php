@@ -16,10 +16,10 @@ if($inputPost->getAction() == "update")
         $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath); 
         
         $languages = $inputPost->getLanguages();
-        $currentLanguages = [];
+        $currentLanguages = array();
         if(is_array($languages) && !empty($languages))
         {
-            $currentLanguages = [];
+            $currentLanguages = array();
             $selected = '';
             foreach($languages as $p)
             {
@@ -61,7 +61,7 @@ else if($inputPost->getAction() == "get")
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
-            $currentLanguages = [];
+            $currentLanguages = array();
         }
         ResponseUtil::sendJSON($currentLanguages);
     }
@@ -83,7 +83,7 @@ else if($inputPost->getAction() == "default")
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
-            $currentLanguages = [];
+            $currentLanguages = array();
         }
         foreach($currentLanguages as $idx=>$p)
         {

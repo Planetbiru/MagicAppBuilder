@@ -30,8 +30,6 @@ try
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
 	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
-
-    $yml = FileDirUtil::normalizePath($applicationToUpdate->getProjectDirectory()."/default.yml");
     $appConfig = new SecretObject(null);
 
     if(file_exists($yml))
@@ -55,7 +53,6 @@ try
 		$appConfig->getApplication()->setDescription($description);
 		$appConfig->getApplication()->setArchitecture($architecture);
 
-
         if($inputPost->getBaseApplicationDirectory() != null)
         {
             $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory();
@@ -68,7 +65,6 @@ try
             $appConfig->getApplication()->setBaseLanguageDirectory($baseLanguageDirectory);
 
         }
-
 	}
 
     $moduleLocations = $inputPost->getModuleLocation();
@@ -118,7 +114,8 @@ try
 
     $yamlData = $appConfig->dumpYaml();
 
-    file_put_contents($applicationToUpdate->getProjectDirectory()."/default.yml", $yamlData);
+    // Update application config in workspace direcory
+    file_put_contents($yml, $yamlData);
 
 	$workspaceDirectory = $activeWorkspace->getDirectory();
     if(PicoStringUtil::startsWith($workspaceDirectory, "./"))
@@ -126,13 +123,33 @@ try
         $workspaceDirectory = dirname(__DIR__) . "/" . substr($workspaceDirectory, 2);
     }
 
+    // Update application config in application directory
+    $yml2 = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.cfg/application.yml");
+
+    $appConfig2 = new SecretObject();
+    $appConfig2->loadYamlFile($yml2, true, true, true);
+    $appConfig2->setDatabase($existingDatabase);
+	$appConfig2->setSessions($existingSessions);
+    $appConfig2->setEntityInfo($appConfig->getEntityInfo());
+
+    if($appConfig2->getApplication() == null)
+    {
+        $appConfig2->setApplication(new SecretObject());
+    }
+    $appConfig2->getApplication()->setName($appConfig->getApplication()->getName());
+    $appConfig2->getApplication()->setDescription($appConfig->getApplication()->getDescription());
+    $appConfig2->getApplication()->setArchitecture($appConfig->getApplication()->getArchitecture());
+    $appConfig2->getApplication()->setBaseModuleDirectory($appConfig->getApplication()->getBaseModuleDirectory());
+
+    $yamlData2 = $appConfig2->dumpYaml();
+    file_put_contents($yml2, $yamlData2);
 
     $applicationToUpdate
-    ->setName($applicationName)
-    ->setDescription($description)
-    ->setArchitecture($architecture)
-    ->setBaseApplicationDirectory($baseApplicationDirectory)
-    ->update();
+        ->setName($applicationName)
+        ->setDescription($description)
+        ->setArchitecture($architecture)
+        ->setBaseApplicationDirectory($baseApplicationDirectory)
+        ->update();
     
 }
 catch(Exception $e)

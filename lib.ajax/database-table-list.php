@@ -17,7 +17,7 @@ try {
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
     $databaseType = $database->getDatabaseType();
 
-    $tables = [];
+    $tables = array();
     if ($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
         // PostgreSQL query to get primary keys
         $sql = "SELECT 
@@ -66,7 +66,7 @@ try {
             $columnsQuery = "PRAGMA table_info($tableName);";
             $columnsRs = $database->executeQuery($columnsQuery);
             
-            $primaryKeys = [];
+            $primaryKeys = array();
             while ($columnRow = $columnsRs->fetch()) {
 				
                 if ($columnRow['pk'] == 1) {  // Check for primary key

@@ -65,11 +65,10 @@ try
 }
 catch(Exception $e)
 {
-    $magicAppList = [];
+    $magicAppList = array();
 }
 
 $magicAppList = array_slice($magicAppList, 0, 20);
-
 
 $workspaceFinder = new EntityAdminWorkspace(null, $databaseBuilder);
 $workspaceList = array();

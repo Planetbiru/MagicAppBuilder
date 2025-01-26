@@ -38,7 +38,6 @@ $data->addInput(
 );
 
 
-
 echo PicoResponseBody::getInstance()
     ->setData($data)
     ->setEntity($entity)
