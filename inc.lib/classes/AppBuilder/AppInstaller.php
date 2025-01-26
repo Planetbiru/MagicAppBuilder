@@ -4,7 +4,6 @@ namespace AppBuilder;
 
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
-use MagicObject\Database\PicoDatabase;
 use MagicObject\Generator\PicoDatabaseDump;
 
 /**
