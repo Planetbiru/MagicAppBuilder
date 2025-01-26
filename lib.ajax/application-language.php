@@ -6,14 +6,14 @@ use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $inputPost = new InputPost();
+$appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
 if($inputPost->getAction() == "update")
 {
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath); 
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
         
         $languages = $inputPost->getLanguages();
         $currentLanguages = array();
@@ -41,7 +41,7 @@ if($inputPost->getAction() == "update")
                 }
             }
             $appConfig->setLanguages($currentLanguages);
-            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
+            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
         }
         ResponseUtil::sendJSON($currentLanguages);
     }
@@ -57,7 +57,7 @@ else if($inputPost->getAction() == "get")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
@@ -78,7 +78,7 @@ else if($inputPost->getAction() == "default")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);      
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
 
         $currentLanguages = $appConfig->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
@@ -94,7 +94,7 @@ else if($inputPost->getAction() == "default")
             }
         }
         $appConfig->setLanguages($currentLanguages);
-        AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
+        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
         ResponseUtil::sendJSON($currentLanguages);
     }
     catch(Exception $e)

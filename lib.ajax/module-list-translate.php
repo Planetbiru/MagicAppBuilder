@@ -2,7 +2,6 @@
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $separatorNLT = "\r\n\t";
 
 if ($appConfig->getApplication() == null) {

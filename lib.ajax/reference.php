@@ -12,7 +12,6 @@ use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 try
 {
     $inputGet = new InputGet();

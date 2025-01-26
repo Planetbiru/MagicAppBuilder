@@ -12,7 +12,6 @@ if ($appConfig->getApplication() == null) {
     exit();
 }
 
-
 try {
     $inputGet = new InputGet();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();

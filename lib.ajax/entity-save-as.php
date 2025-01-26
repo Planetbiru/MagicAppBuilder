@@ -5,7 +5,6 @@ use AppBuilder\Util\ResponseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $inputPost = new InputPost();
 
 try {
