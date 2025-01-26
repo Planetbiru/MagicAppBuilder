@@ -4,7 +4,6 @@ use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $inputPost = new InputPost();
 header("Content-type: text/plain");
 

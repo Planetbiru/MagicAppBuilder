@@ -7,7 +7,6 @@ use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $inputPost = new InputPost();
 
 $result = new stdClass;

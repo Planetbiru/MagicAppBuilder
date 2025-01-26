@@ -6,7 +6,6 @@ use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
 $inputPost = new InputPost();
 $inputGet = new InputGet();
 
