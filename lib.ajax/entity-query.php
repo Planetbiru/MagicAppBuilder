@@ -23,7 +23,7 @@ try
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);
         $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-        $allQueries = [];
+        $allQueries = array();
 
         $dbType = "";
         if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
@@ -60,8 +60,8 @@ try
             if($inputPost->getEntity() != null && $inputPost->countableEntity())
             {
                 $inputEntity = $inputPost->getEntity();
-                $entities = [];
-                $entityNames = [];
+                $entities = array();
+                $entityNames = array();
                 foreach($inputEntity as $idx=>$entityName)
                 {
                     $className = "\\".$baseEntity."\\".$entityName;
@@ -78,8 +78,8 @@ try
                             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
                             if(!isset($entities[$tableName]))
                             {
-                                $entities[$tableName] = [];
-                                $entityNames[$tableName] = [];
+                                $entities[$tableName] = array();
+                                $entityNames[$tableName] = array();
                             }
                             $entities[$tableName][] = $entity;
                             $entityNames[$tableName][] = $entityName;
@@ -88,7 +88,7 @@ try
                 }
                 foreach($entities as $tableName=>$entity)
                 {
-                    $entityQueries = [];
+                    $entityQueries = array();
                     $dumper = new PicoDatabaseDump();   
                     $quertArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database);
                     foreach($quertArr as $sql)
@@ -136,7 +136,7 @@ try
                             $dumper = new PicoDatabaseDump();
                 
                             $quertArr = $dumper->createAlterTableAdd($entity);
-                            $entityQueries = [];
+                            $entityQueries = array();
                             foreach($quertArr as $sql)
                             {
                                 if(!empty($sql))

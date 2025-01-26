@@ -141,4 +141,37 @@ class PicoArrayUtil
             unset($value);
         }
     }
+
+    /**
+     * Recursively normalizes array indices by converting string integer keys 
+     * into numeric sequential indices, while retaining non-integer keys.
+     *
+     * This method processes multi-dimensional arrays of unlimited depth.
+     * If a key is a string that represents an integer (e.g., "0", "1"), 
+     * it is converted into a numeric sequential index. 
+     * Non-integer or non-string keys remain unchanged.
+     *
+     * @param array $array The input array to normalize.
+     * @return array The normalized array with modified indices.
+     */
+    public static function normalizeArrayIndicesRecursive($array) {
+        $normalizedArray = array();
+
+        foreach ($array as $key => $value) {
+            if (is_string($key) && ctype_digit($key)) {
+                // If the key is a string integer, add the value to the array sequentially.
+                $normalizedArray[] = is_array($value) 
+                    ? self::normalizeArrayIndicesRecursive($value) // Recursively normalize if the value is an array.
+                    : $value;
+            } else {
+                // If the key is not a string integer, retain the key and value as-is.
+                $normalizedArray[$key] = is_array($value) 
+                    ? self::normalizeArrayIndicesRecursive($value) // Recursively normalize if the value is an array.
+                    : $value;
+            }
+        }
+
+        return $normalizedArray;
+    }
+
 }

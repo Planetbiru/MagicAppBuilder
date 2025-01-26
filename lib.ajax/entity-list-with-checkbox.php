@@ -56,7 +56,7 @@ try {
     $baseDir = rtrim($baseDirectory, "\\/") . "/" . str_replace("\\", "/", trim($baseEntity, "\\/"));
     
     $list = glob($baseDir . "/*.php");
-    $li = [];
+    $li = array();
     $format1 = function($idx, $dir, $entityName, $chk, $filetime) use ($dom) {
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
@@ -126,7 +126,7 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($li[$tableName])) {
-                $li[$tableName] = [];
+                $li[$tableName] = array();
             }
 
             $className = "\\".$baseEntity."\\".$entityName;
@@ -135,7 +135,7 @@ try {
             $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {
-                $li[$idx] = [];
+                $li[$idx] = array();
             }
             $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
         }
@@ -143,7 +143,7 @@ try {
 
     ksort($li);
 
-    $lim = [];
+    $lim = array();
     foreach ($li as $elem) {
         $lim = array_merge($lim, $elem);
     }
@@ -161,7 +161,7 @@ try {
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/") . "/" . str_replace("\\", "/", trim($baseEntity, "\\/"));
     $list = glob($baseDir . "/*.php");
-    $li = [];
+    $li = array();
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
@@ -173,7 +173,7 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($li[$tableName])) {
-                $li[$tableName] = [];
+                $li[$tableName] = array();
             }
 
             $className = "\\".$baseEntity."\\".$entityName;
@@ -182,7 +182,7 @@ try {
             $li[$tableName][] = $format1($idx, $dir, $entityName, $chk, $title);
         } else {
             if (!isset($li[$idx])) {
-                $li[$idx] = [];
+                $li[$idx] = array();
             }
             $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
         }
@@ -190,7 +190,7 @@ try {
     
     ksort($li);
  
-    $lim = [];
+    $lim = array();
     foreach ($li as $elem) {
         $lim = array_merge($lim, $elem);
     }

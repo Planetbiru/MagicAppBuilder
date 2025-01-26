@@ -38,7 +38,7 @@ else
     error_log($path);
     if(!file_exists($path))
     {
-        $columns = [];
+        $columns = array();
 
         $curApp = $builderConfig->getCurrentApplication();
         $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";

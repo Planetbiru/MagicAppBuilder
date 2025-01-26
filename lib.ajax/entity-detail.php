@@ -13,7 +13,7 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
-    $allQueries = [];
+    $allQueries = array();
     if($inputGet->getNamespaceName() != '' && $inputGet->getEntityName() != '')
     {
         $entityName = $inputGet->getNamespaceName() . "\\" . $inputGet->getEntityName();
@@ -30,7 +30,7 @@ try
                 $tableInfo = $entity->tableInfo();
                 $columns = $tableInfo->getColumns();
                 $primaryKeys = $tableInfo->getPrimaryKeys();
-                $pkeys = [];
+                $pkeys = array();
                 if(isset($primaryKeys) && is_array($primaryKeys))
                 {
                     foreach($primaryKeys as $primaryKey)

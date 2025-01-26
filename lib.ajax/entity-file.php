@@ -14,7 +14,7 @@ try
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
-    $lines = [];
+    $lines = array();
 
     if($inputPost->getEntity() != null && $inputPost->countableEntity())
     {
@@ -23,7 +23,7 @@ try
         {
             $entityName = trim($entityName);
             $path = $baseDir."/".$entityName.".php";
-            $entityQueries = [];
+            $entityQueries = array();
 
             if(file_exists($path))
             {                

@@ -36,7 +36,7 @@ try {
 
     // Get list of PHP files
     $list = glob($baseDir . "/*.php");
-    $liElements = [];
+    $liElements = array();
 
     $nameFormat = 'entity[%d]';
 
@@ -139,7 +139,7 @@ try {
 
     // Get list of PHP files
     $list = glob($baseDir . "/*.php");
-    $liElements = [];
+    $liElements = array();
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');

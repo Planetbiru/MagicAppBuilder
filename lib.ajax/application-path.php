@@ -8,15 +8,16 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 
 $inputPost = new InputPost();
+$applicationsDirectory = $activeWorkspace->getDirectory()."/applications";
 if($inputPost->getAction() == "update")
 {
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath); 
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $applicationsDirectory, $configTemplatePath); 
         
         $paths = $inputPost->getPaths();
-        $currentPaths = [];
+        $currentPaths = array();
         if(is_array($paths) && !empty($paths))
         {
             $appConf = $appConfig->getApplication();
@@ -24,7 +25,7 @@ if($inputPost->getAction() == "update")
             {
                 $appConf = new SecretObject();
             }
-            $currentPaths = [];
+            $currentPaths = array();
             $selected = '';
             foreach($paths as $p)
             {
@@ -46,7 +47,7 @@ if($inputPost->getAction() == "update")
                 }
             }
             $appConf->setBaseModuleDirectory($currentPaths);
-            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
+            AppBuilder::updateConfig($appId, $applicationsDirectory, $appConfig);
         }
         ResponseUtil::sendJSON($currentPaths);
     }
@@ -62,12 +63,12 @@ else if($inputPost->getAction() == "get")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);
+        $appConfig = AppBuilder::loadOrCreateConfig($appId, $applicationsDirectory, $configTemplatePath);
         $appConf = $appConfig->getApplication(); 
         $currentPaths = $appConf->getBaseModuleDirectory();
         if(!isset($currentPaths) || !is_array($currentPaths))
         {
-            $currentPaths = [];
+            $currentPaths = array();
         }
         ResponseUtil::sendJSON($currentPaths);
     }
@@ -86,7 +87,7 @@ else if($inputPost->getAction() == "default")
         if(isset($activeApplication))
         {
             $appId = $activeApplication->getApplicationId();
-            $appConfig = AppBuilder::loadOrCreateConfig($appId, $activeWorkspace->getDirectory()."/applications", $configTemplatePath);      
+            $appConfig = AppBuilder::loadOrCreateConfig($appId, $applicationsDirectory, $configTemplatePath);      
             $appConf = $appConfig->getApplication();
             if(!isset($appConf))
             {
@@ -95,7 +96,7 @@ else if($inputPost->getAction() == "default")
             $currentPaths = $appConf->getBaseModuleDirectory();
             if(!isset($currentPaths) || !is_array($currentPaths))
             {
-                $currentPaths = [];
+                $currentPaths = array();
             }
             foreach($currentPaths as $idx=>$p)
             {
@@ -106,7 +107,7 @@ else if($inputPost->getAction() == "default")
                 }
             }
             $appConf->setBaseModuleDirectory($currentPaths);
-            AppBuilder::updateConfig($appId, $activeWorkspace->getDirectory()."/applications", $appConfig);
+            AppBuilder::updateConfig($appId, $applicationsDirectory, $appConfig);
             ResponseUtil::sendJSON($currentPaths);
         }
         else

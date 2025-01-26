@@ -41,7 +41,7 @@ try {
     $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
     $format3 = "%s\\%s";
 
-    $liData = [];
+    $liData = array();
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
@@ -52,7 +52,7 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liData[$tableName])) {
-                $liData[$tableName] = [];
+                $liData[$tableName] = array();
             }
 
             $className = "\\".$baseEntity."\\".$entityName;
@@ -68,7 +68,7 @@ try {
             ];
         } else {
             if (!isset($liData[$idx])) {
-                $liData[$idx] = [];
+                $liData[$idx] = array();
             }
             $liData[$idx][] = [
                 'name'=>sprintf($format3, $dir, $entityName), 
@@ -120,7 +120,7 @@ try {
     $ulApp->setAttribute('class', 'entity-ul');
     $div->appendChild($ulApp);
 
-    $liApp = [];
+    $liApp = array();
 
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
@@ -131,7 +131,7 @@ try {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liApp[$tableName])) {
-                $liApp[$tableName] = [];
+                $liApp[$tableName] = array();
             }
 
             $className = "\\".$baseEntity."\\".$entityName;
@@ -147,7 +147,7 @@ try {
             ];
         } else {
             if (!isset($liApp[$idx])) {
-                $liApp[$idx] = [];
+                $liApp[$idx] = array();
             }
             $liApp[$idx][] = [
                 'name'=>sprintf($format3, $dir, $entityName), 

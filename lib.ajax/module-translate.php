@@ -57,7 +57,7 @@ function fixValue($original)
  */
 function getKeys($path)
 {
-    $result = [];
+    $result = array();
     $content = file_get_contents($path);
     $p2 = 0;
     do {
@@ -82,8 +82,8 @@ $inputPost = new InputPost();
 
 if($inputPost->getUserAction() == 'get')
 {
-    $allKeys = [];
-    $response = [];
+    $allKeys = array();
+    $response = array();
     try
     {
         $baseDir = $activeApplication->getBaseApplicationDirectory();
@@ -104,7 +104,7 @@ if($inputPost->getUserAction() == 'get')
             }
         
             $allKeys = array_unique($allKeys);        
-            $parsed = [];
+            $parsed = array();
             foreach($allKeys as $key)
             {
                 $camel = PicoStringUtil::camelize($key);
@@ -159,8 +159,8 @@ if($inputPost->getUserAction() == 'get')
 
 else if($inputPost->getUserAction() == 'set')
 {
-    $allKeys = [];
-    $response = [];
+    $allKeys = array();
+    $response = array();
     
     $translated = $inputPost->getTranslated();
     $propertyNames = $inputPost->getPropertyNames();
@@ -201,7 +201,7 @@ else if($inputPost->getUserAction() == 'set')
     }
     if(!isset($storedTranslatedLabel) || !is_array($storedTranslatedLabel))
     {
-        $storedTranslatedLabel = [];
+        $storedTranslatedLabel = array();
     }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
