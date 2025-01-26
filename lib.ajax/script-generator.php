@@ -9,6 +9,8 @@ use AppBuilder\Util\ResponseUtil;
 $timeStart = microtime(true);
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/database.php";
+
 
 $entityInfo = $appConfig->getEntityInfo();
 $entityApvInfo = $appConfig->getEntityApvInfo();

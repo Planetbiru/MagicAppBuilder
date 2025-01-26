@@ -58,9 +58,9 @@ try
             
             if(file_exists($path))
             {
-                $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
+                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
 
-                if($return_var == 0)
+                if($returnVar == 0)
                 {
                     include_once $path;   
                     $entity = new $className(null);

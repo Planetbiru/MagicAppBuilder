@@ -119,9 +119,9 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
         
-        if ($return_var === 0) {
+        if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
@@ -166,9 +166,9 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
         
-        if ($return_var === 0) {
+        if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;

@@ -14,7 +14,6 @@ $inputPost = new InputPost();
 $workspace = new EntityWorkspace(null, $databaseBuilder);
 try
 {
-    
     $name = $inputPost->getWorkspaceName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
     $directory = FileDirUtil::normalizePath($inputPost->getWorkspaceDirectory(PicoFilterConstant::FILTER_DEFAULT));
     $description = $inputPost->getWorkspaceDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);

@@ -19,7 +19,7 @@ try {
         $path = $baseDir . "/" . $entityName . ".php";
         file_put_contents($path, $content);
 
-        exec("php -l $path 2>&1", $output, $return_var);
+        exec("php -l $path 2>&1", $output, $returnVar);
 
         $errors = array();
         if (isset($output) && is_array($output)) {
@@ -28,7 +28,7 @@ try {
             }
         }
 
-        if ($return_var !== 0) {
+        if ($returnVar !== 0) {
             $errorMessage = implode("\r\n", $errors);
             $lineNumber = 0;
             $p1 = stripos($errorMessage, 'PHP Parse error');

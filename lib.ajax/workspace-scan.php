@@ -5,24 +5,20 @@ use AppBuilder\Entity\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Exceptions\NoRecordFoundException;
-use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 if(isset($entityAdmin) && $entityAdmin->issetAdminId())
 {
     $inputGet = new InputGet();
-
     $workspaceId = $inputGet->getWorkspaceId();
-
     $workspace = new EntityWorkspace(null, $databaseBuilder);
     try
     {
         $workspace->find($workspaceId);
-
         $adminId = $entityAdmin->getAdminId();
-
         $author = $entityAdmin->getName();
         $workspaceDirectory = FileDirUtil::normalizePath($workspace->getDirectory()."/applications");
         $dirs = FileDirUtil::scanDirectory($workspaceDirectory);
@@ -34,12 +30,12 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                 $yml = FileDirUtil::normalizePath($dir."/default.yml");
                 if(file_exists($yml))
                 {
-                    $config = new MagicObject(null);
+                    $config = new SecretObject(null);
                     $config->loadYamlFile($yml, false, true, true);
                     $app = $config->getApplication();
                     if(!isset($app))
                     {
-                        $app = new MagicObject();
+                        $app = new SecretObject();
                     }
 
                     $applicationId = $app->getId();
@@ -64,7 +60,6 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                         $application->setBaseApplicationDirectory($applicationDirectory);
                         $application->setArchitecture($applicationArchitecture);
                         $application->setAuthor($author);
-
                         $application->setAdminId($adminId);
                         $application->setWorkspaceId($workspaceId);
                         $application->setAdminCreate($adminId);

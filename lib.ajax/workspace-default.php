@@ -13,7 +13,6 @@ if($inputPost->getWorkspaceId())
     if(isset($entityAdmin))
     {
         $entityAdmin->setWorkspaceId($workspaceId);
-
         $activeApplicationHistory = new ActiveApplicationHistory(null, $databaseBuilder);
         try 
         {
