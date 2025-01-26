@@ -5,25 +5,25 @@ namespace AppBuilder\App\Entity\App;
 use MagicObject\MagicObject;
 
 /**
- * AppUserImpl 
+ * AppAdminImpl 
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="app_user")
+ * @Table(name="admin")
  */
-class AppUserImpl extends MagicObject
+class AppAdminImpl extends MagicObject
 {
 	/**
-	 * User ID
+	 * Admin ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="user_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=false)
 	 * @DefaultColumn(value="NULL")
-	 * @Label(content="User ID")
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $userId;
+	protected $adminId;
 
 	/**
 	 * Name
@@ -36,24 +36,24 @@ class AppUserImpl extends MagicObject
 	protected $name;
 	
 	/**
-	 * User Level ID
+	 * Admin Level ID
 	 * 
 	 * @NotNull
-	 * @Column(name="user_level_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
-	 * @Label(content="User Level ID")
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Admin Level ID")
 	 * @var string
 	 */
-	protected $userLevelId;
+	protected $adminLevelId;
 	
 	/**
-	 * User Level
+	 * Admin Level
 	 * 
 	 * @NotNull
-	 * @JoinColumn(name="user_level_id", referenceColumnName="user_level_id")
-	 * @Label(content="User Level")
-	 * @var AppUserLevelImpl
+	 * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+	 * @Label(content="Admin Level")
+	 * @var AppAdminLevelImpl
 	 */
-	protected $userLevel;
+	protected $adminLevel;
 
 	/**
 	 * Default Data

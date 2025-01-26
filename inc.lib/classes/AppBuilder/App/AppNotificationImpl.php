@@ -7,7 +7,7 @@ use MagicObject\MagicObject;
 /**
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="app_notification")
+ * @Table(name="notification")
  */
 class AppNotificationImpl extends MagicObject
 {
@@ -24,67 +24,67 @@ class AppNotificationImpl extends MagicObject
 	protected $notification;
 
 	/**
-	 * User Group
+	 * Admin Group
 	 * 
-	 * @Column(name="user_group", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Group")
+	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Group")
 	 * @var string
 	 */
-	protected $userGroup;
+	protected $adminGroup;
 
 	/**
-	 * User Group 1 ID
+	 * Admin Group 1 ID
 	 * 
-	 * @Column(name="user_group_1", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Group 1 ID")
+	 * @Column(name="admin_group_1", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Group 1 ID")
 	 * @var string
 	 */
-	protected $userGroup1Id;
+	protected $adminGroup1Id;
 	
 	/**
-	 * User Group 2 ID
+	 * Admin Group 2 ID
 	 * 
-	 * @Column(name="user_group_2", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Group 2 ID")
+	 * @Column(name="admin_group_2", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Group 2 ID")
 	 * @var string
 	 */
-	protected $userGroup2Id;
+	protected $adminGroup2Id;
 	
 	/**
-	 * User Group 3 ID
+	 * Admin Group 3 ID
 	 * 
-	 * @Column(name="user_group_3", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="User Group 3 ID")
+	 * @Column(name="admin_group_3", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Group 3 ID")
 	 * @var string
 	 */
-	protected $userGroup3Id;
+	protected $adminGroup3Id;
 	
 	/**
-	 * User Group 1
+	 * Admin Group 1
 	 * 
-	 * @JoinColumn(name="user_group_1", referenceColumnName="user_group_1")
-	 * @Label(content="User Group 1")
-	 * @var AppUserImpl
+	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_group_1")
+	 * @Label(content="Admin Group 1")
+	 * @var AppAdminImpl
 	 */
-	protected $userGroup1;
+	protected $adminGroup1;
 	
 	/**
-	 * User Group 2
+	 * Admin Group 2
 	 * 
-	 * @JoinColumn(name="user_group_2", referenceColumnName="user_group_2")
-	 * @Label(content="User Group 2")
-	 * @var AppUserImpl
+	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_group_2")
+	 * @Label(content="Admin Group 2")
+	 * @var AppAdminImpl
 	 */
-	protected $userGroup2;
+	protected $adminGroup2;
 	
 	/**
-	 * User Group 3
+	 * Admin Group 3
 	 * 
-	 * @JoinColumn(name="user_group_3", referenceColumnName="user_group_3")
-	 * @Label(content="User Group 3")
-	 * @var AppUserImpl
+	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_group_3")
+	 * @Label(content="Admin Group 3")
+	 * @var AppAdminImpl
 	 */
-	protected $userGroup3;
+	protected $adminGroup3;
 	
 	/**
 	 * Icon

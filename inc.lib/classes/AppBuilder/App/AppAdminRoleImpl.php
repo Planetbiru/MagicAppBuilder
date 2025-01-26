@@ -5,45 +5,45 @@ namespace AppBuilder\App\Entity\App;
 use MagicObject\MagicObject;
 
 /**
- * AppUserRoleImpl 
+ * AppAdminRoleImpl 
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="app_user_role")
+ * @Table(name="admin_role")
  */
-class AppUserRoleImpl extends MagicObject
+class AppAdminRoleImpl extends MagicObject
 {
     /**
-     * User Role ID
+     * Admin Role ID
      * 
      * @Id
      * @GeneratedValue(strategy=GenerationType.UUID)
-     * @Column(name="user_role_id", type="varchar(40)", length=40, nullable=false)
+     * @Column(name="admin_role_id", type="varchar(40)", length=40, nullable=false)
      * @DefaultColumn(value="NULL")
-     * @Label(content="User ID")
+     * @Label(content="Admin ID")
      * @var string
      */
-    protected $userRoleld;
+    protected $adminRoleld;
 
     /**
-     * User Level ID
+     * Admin Level ID
      * 
      * @NotNull
-     * @Column(name="user_level_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
-     * @Label(content="User Level ID")
+     * @Column(name="admin_level_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Label(content="Admin Level ID")
      * @var string
      */
-    protected $userLevelId;
+    protected $adminLevelId;
 
     /**
-     * User Level
+     * Admin Level
      * 
      * @NotNull
-     * @JoinColumn(name="user_level_id", referenceColumnName="user_level_id")
-     * @Label(content="User Level")
-     * @var AppUserLevelImpl
+     * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+     * @Label(content="Admin Level")
+     * @var AppAdminLevelImpl
      */
-    protected $userLevel;
+    protected $adminLevel;
 
     /**
      * Module ID
@@ -126,6 +126,15 @@ class AppUserRoleImpl extends MagicObject
      * @var boolean
      */
     protected $allowedSortOrder;
+
+    /**
+     * Allowed export
+     *
+     * @Column(name="allowed_export", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Label(content="Allowed Export")
+     * @var boolean
+     */
+    protected $allowedSortExport;
 
     /**
      * Active
