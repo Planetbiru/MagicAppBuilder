@@ -70,8 +70,8 @@ try
                     $path = $baseDir."/".$entityName.".php";
                     if(file_exists($path))
                     {
-                        $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
-                        if($return_var == 0)
+                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                        if($returnVar == 0)
                         {
                             include_once $path;                  
                             $entity = new $className(null, $database);
@@ -128,8 +128,8 @@ try
                     $path = $baseDir."/".$entityName.".php"; 
                     if(file_exists($path))
                     {
-                        $return_var = ErrorChecker::errorCheck($databaseBuilder, $path);
-                        if($return_var == 0)
+                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                        if($returnVar == 0)
                         {         
                             include_once $path;                     
                             $className = "\\".$baseEntity."\\".$entityName;

@@ -46,8 +46,8 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
-        if ($return_var === 0) {          
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        if ($returnVar === 0) {          
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liData[$tableName])) {
@@ -125,8 +125,8 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
-        if ($return_var === 0) {
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        if ($returnVar === 0) {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
             if (!isset($liApp[$tableName])) {

@@ -49,10 +49,10 @@ class AppInstaller {
                 // Check for errors in the entity file
                 $phpError = ErrorChecker::phpTest($fileName);
 
-                $return_var = $phpError->errorCode;
+                $returnVar = $phpError->errorCode;
                 
                 // If no errors, include the entity class and process it
-                if($return_var == 0)
+                if($returnVar == 0)
                 {
                     include_once $fileName;                  
                     $entity = new $className(null, $database);

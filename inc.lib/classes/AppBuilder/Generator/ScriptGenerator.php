@@ -536,6 +536,7 @@ class ScriptGenerator //NOSONAR
         $this->prepareApplication($builderConfig, $appConf, $baseDir);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
+        error_log($path);
         
         $this->prepareDirContainer($path);     
         $this->createFinalScript($path, $merged);

@@ -35,12 +35,12 @@ else
     $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
     if(!file_exists($path))
     {
-        $json = [
+        $json = array(
             'primaryKeyDataType'=> 'VARCHAR',
             'primaryKeyDataLength'=> 40,
             'defaultDataType'=> 'VARCHAR',
             'defaultDataLength'=> 50
-        ];
+        );
     }
     else
     {

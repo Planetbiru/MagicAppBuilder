@@ -31,24 +31,24 @@ class ErrorChecker
     {
         $normalizedPath = FileDirUtil::normalizePath($path);
         $ft = filemtime($path);
-        $return_var = 1;
+        $returnVar = 1;
 
         try {
             // Check if cached error result exists
             $errorCache = self::getErrorCode($databaseBuilder, $normalizedPath, $ft);
-            $return_var = intval($errorCache->getErrorCode());
+            $returnVar = intval($errorCache->getErrorCode());
 
             // If the file has been modified since last check, run a new PHP syntax check
             if (strtotime($errorCache->getModificationTime()) < $ft) {
                 $phpError = self::phpTest($path);
-                $return_var = $phpError->errorCode;
+                $returnVar = $phpError->errorCode;
                 ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError);
             }
 
         } catch (Exception $e) {
             // No record found in cache, perform syntax check
             $phpError = self::phpTest($path);
-            $return_var = $phpError->errorCode;
+            $returnVar = $phpError->errorCode;
 
             try {
                 ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError);
@@ -57,7 +57,7 @@ class ErrorChecker
             }
         }
 
-        return $return_var;
+        return $returnVar;
     }
 
     /**
@@ -72,7 +72,7 @@ class ErrorChecker
     public static function phpTest($path)
     {
         $phpError = new PhpError();
-        exec("php -l $path 2>&1", $output, $return_var);
+        exec("php -l $path 2>&1", $output, $returnVar);
 
         $errors = [];
         if (isset($output) && is_array($output)) {
@@ -84,7 +84,7 @@ class ErrorChecker
         $lineNumber = -1;
         $lineNumberRaw = "";
 
-        if ($return_var !== 0) {
+        if ($returnVar !== 0) {
             $errorMessage = implode("\r\n", $errors);
             $lineNumber = 0;
             $p1 = stripos($errorMessage, 'PHP Parse error');
@@ -99,7 +99,7 @@ class ErrorChecker
             }
         }
 
-        $phpError->errorCode = $return_var;
+        $phpError->errorCode = $returnVar;
         $phpError->lineNumber = $lineNumber;
         $phpError->lineNumberRaw = $lineNumberRaw;
         $phpError->errors = $errors;

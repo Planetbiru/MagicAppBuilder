@@ -1,7 +1,6 @@
 <?php
 
 use AppBuilder\Entity\EntityAdminWorkspace;
-use AppBuilder\Entity\EntityWorkspace;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 $selected = "false";
@@ -14,14 +13,12 @@ try
     $pageData = $workspaceFinder->findDescByAdminIdAndActive($adminId, true);
     if($pageData->getTotalResult() > 0)
     {
-        
         foreach($pageData->getResult() as $row)
         {
             if($row->issetWorkspace())
             {
-            $workspace = $row->getWorkspace();
-
-            $selected = $currentWorkspaceId == $workspace->getWorkspaceId() ? "true" : "false";
+                $workspace = $row->getWorkspace();
+                $selected = $currentWorkspaceId == $workspace->getWorkspaceId() ? "true" : "false";
 
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
@@ -43,9 +40,9 @@ try
     </div>
 </div>
 <?php
+            }
         }
     }
-}
 }
 catch(Exception $e)
 {

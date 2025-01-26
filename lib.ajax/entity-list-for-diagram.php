@@ -43,13 +43,13 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
 
-        if ($return_var === 0) {
+        if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
@@ -143,13 +143,13 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $return_var = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
 
         // Create <li> elements for valid app files
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
 
-        if ($return_var === 0) {
+        if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
