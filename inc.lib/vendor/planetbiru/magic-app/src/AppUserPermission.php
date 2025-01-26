@@ -87,6 +87,13 @@ class AppUserPermission
     private $allowedSortOrder;
 
     /**
+     * Allowed export
+     *
+     * @var boolean
+     */
+    private $allowedExport;
+
+    /**
      * Allowed batch action
      *
      * @var boolean
@@ -168,6 +175,7 @@ class AppUserPermission
             $this->allowedDelete =  true;
             $this->allowedApprove =  true;
             $this->allowedSortOrder =  true;
+            $this->allowedExport =  true;
         }
         else
         {
@@ -183,6 +191,7 @@ class AppUserPermission
                     $this->allowedDelete = $this->entity->getAllowedDelete();
                     $this->allowedApprove = $this->entity->getAllowedApprove();
                     $this->allowedSortOrder = $this->entity->getAllowedSortOrder();
+                    $this->allowedExport = $this->entity->getAllowedExport();
                 }
                 
                 $this->initialized = true;
@@ -292,6 +301,7 @@ class AppUserPermission
             $this->allowedDelete =  true;
             $this->allowedApprove =  true;
             $this->allowedSortOrder =  true;
+            $this->allowedExport =  true;
             return true;
         }
         else
@@ -310,6 +320,7 @@ class AppUserPermission
                 || ($userAction == UserAction::SORT_ORDER && !$this->isAllowedSortOrder())
                 || ($userAction == UserAction::APPROVE && !$this->isAllowedApprove())
                 || ($userAction == UserAction::REJECT && !$this->isAllowedApprove())
+                || ($userAction == UserAction::EXPORT && !$this->isAllowedExport())
                 )
                 ;  
             }
@@ -423,6 +434,20 @@ class AppUserPermission
             $this->loadPermission();
         }
         return $this->allowedSortOrder;
+    }
+
+    /**
+     * Get allowed export permission.
+     *
+     * @return boolean True if the user is allowed to perform sorting, false otherwise.
+     */
+    public function isAllowedExport()
+    {
+        if(!$this->initialized)
+        {
+            $this->loadPermission();
+        }
+        return $this->allowedExport;
     }
 
     /**

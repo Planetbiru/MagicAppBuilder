@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Util\PicoParsedown;
+use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -566,7 +567,6 @@ class PhpDocumentCreator // NOSONAR
         return $output; // Return the accumulated output
     }
 
-    
     /**
      * Displays constants and their values with formatted HTML output.
      *
@@ -580,10 +580,15 @@ class PhpDocumentCreator // NOSONAR
             $str .= "<h2>Constants</h2>\r\n";
             foreach ($constants as $name => $value) {
 
+                $constantValue = str_replace(["(\n)", "(\r\n)"], "()", htmlspecialchars(str_replace(["\t", "\r", "\n"], ["\\t", "\\r", "\\n"], var_export($value, true))));
+                if(PicoStringUtil::startsWith($constantValue, "'") && PicoStringUtil::endsWith($constantValue, "'"))
+                {
+                    $constantValue = '"'.str_replace("\"", "\\\"", substr($constantValue, 1, strlen($constantValue) - 2)).'"';
+                }
                 $str .= "<div class=\"php-constant\">";
                 $str .= "<span class=\"php-keyword\">const</span> "
                     ."<span class=\"constant-name\">$name</span> = <span class=\"constant-value\">" 
-                    .str_replace(["(\n)", "(\r\n)"], "()", htmlspecialchars(var_export($value, true)))."</span>;";
+                    .$constantValue."</span>;";
                 $str .= "</div>";
             }
         }
@@ -1087,7 +1092,7 @@ class PhpDocumentCreator // NOSONAR
 
 <?php
 
-$srcDir = dirname(__DIR__) . '/src/MagicApp';
+$srcDir = dirname(__DIR__) . '/src';
 
 if (is_dir($srcDir)) {
     $docCreator = new PhpDocumentCreator();
