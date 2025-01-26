@@ -2857,6 +2857,7 @@ function saveEntity() {
         $("#button_save_entity_file").removeAttr("disabled");
         updateEntityFile(function(){
           setEntityFile(fileContent);
+          updateSelectedEntity();
         });
         updateEntityQuery(true);
         updateEntityRelationshipDiagram();
@@ -2871,6 +2872,15 @@ function saveEntity() {
   } else {
     showAlertUI("Alert", "No file open");
   }
+}
+
+/**
+ * Updates the selected entity in the list by highlighting the relevant item.
+ */
+function updateSelectedEntity()
+{
+  $('.entity-list .entity-li').removeClass('selected-file');
+  $('.entity-list [data-entity-name="'+currentEntity.split('\\').join('\\\\')+'"]').closest('.entity-li').addClass('selected-file');
 }
 
 /**
