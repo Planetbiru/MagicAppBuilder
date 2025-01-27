@@ -3,6 +3,7 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
@@ -54,9 +55,9 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setArchitecture($inputPost->getArchitecture(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setProjectDirectory($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setBaseApplicationDirectory($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setProjectDirectory(FileDirUtil::normalizePath($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)))
+		->setBaseApplicationDirectory(FileDirUtil::normalizePath($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -239,6 +240,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAuthor();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="author" id="author"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="project_directory" id="project_directory"/>
@@ -248,12 +255,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="base_application_directory" id="base_application_directory"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAuthor();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="author" id="author"/>
 						</td>
 					</tr>
 					<tr>
@@ -344,6 +345,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAuthor();?></td>
+						<td>
+							<input class="form-control" type="text" name="author" id="author" value="<?php echo $application->getAuthor();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
 						<td>
 							<input class="form-control" type="text" name="project_directory" id="project_directory" value="<?php echo $application->getProjectDirectory();?>" autocomplete="off"/>
@@ -353,12 +360,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
 						<td>
 							<input class="form-control" type="text" name="base_application_directory" id="base_application_directory" value="<?php echo $application->getBaseApplicationDirectory();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAuthor();?></td>
-						<td>
-							<input class="form-control" type="text" name="author" id="author" value="<?php echo $application->getAuthor();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -485,16 +486,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAuthor();?></td>
+						<td><?php echo $application->getAuthor();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
 						<td><?php echo $application->getProjectDirectory();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
 						<td><?php echo $application->getBaseApplicationDirectory();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAuthor();?></td>
-						<td><?php echo $application->getAuthor();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -582,10 +583,12 @@ $specMap = array(
 	"workspaceId" => PicoSpecification::filter("workspaceId", "fulltext")
 );
 $sortOrderMap = array(
+	"applicationId" => "applicationId",
 	"name" => "name",
 	"architecture" => "architecture",
 	"workspaceId" => "workspaceId",
 	"author" => "author",
+	"baseApplicationDirectory" => "baseApplicationDirectory",
 	"sortOrder" => "sortOrder",
 	"active" => "active"
 );
@@ -650,9 +653,9 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getDescription() => $headerFormat->asString(),
 		$appEntityLanguage->getArchitecture() => $headerFormat->asString(),
 		$appEntityLanguage->getWorkspace() => $headerFormat->asString(),
+		$appEntityLanguage->getAuthor() => $headerFormat->getAuthor(),
 		$appEntityLanguage->getProjectDirectory() => $headerFormat->getProjectDirectory(),
 		$appEntityLanguage->getBaseApplicationDirectory() => $headerFormat->getBaseApplicationDirectory(),
-		$appEntityLanguage->getAuthor() => $headerFormat->getAuthor(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
 		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
@@ -671,9 +674,9 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getDescription(),
 			isset($mapForArchitecture) && isset($mapForArchitecture[$row->getArchitecture()]) && isset($mapForArchitecture[$row->getArchitecture()]["label"]) ? $mapForArchitecture[$row->getArchitecture()]["label"] : "",
 			$row->issetWorkspace() ? $row->getWorkspace()->getName() : "",
+			$row->getAuthor(),
 			$row->getProjectDirectory(),
 			$row->getBaseApplicationDirectory(),
-			$row->getAuthor(),
 			$row->getSortOrder(),
 			$row->getTimeCreate(),
 			$row->getTimeEdit(),
@@ -739,6 +742,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
 				</span>
 				<?php } ?>
+				<?php if($userPermission->isAllowedCreate()){ ?>
+		
+				<span class="filter-group">
+					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+				</span>
+				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
@@ -784,10 +793,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
+								<td data-col-name="application_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplicationId();?></a></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
 								<td data-col-name="architecture" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getArchitecture();?></a></td>
 								<td data-col-name="workspace_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWorkspace();?></a></td>
 								<td data-col-name="author" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAuthor();?></a></td>
+								<td data-col-name="base_application_directory" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
@@ -821,10 +832,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
+								<td data-col-name="application_id"><?php echo $application->getApplicationId();?></td>
 								<td data-col-name="name"><?php echo $application->getName();?></td>
 								<td data-col-name="architecture"><?php echo isset($mapForArchitecture) && isset($mapForArchitecture[$application->getArchitecture()]) && isset($mapForArchitecture[$application->getArchitecture()]["label"]) ? $mapForArchitecture[$application->getArchitecture()]["label"] : "";?></td>
 								<td data-col-name="workspace_id"><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 								<td data-col-name="author"><?php echo $application->getAuthor();?></td>
+								<td data-col-name="base_application_directory"><?php echo $application->getBaseApplicationDirectory();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $application->getSortOrder();?></td>
 								<td data-col-name="active"><?php echo $application->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
