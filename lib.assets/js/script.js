@@ -516,6 +516,7 @@ jQuery(function () {
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
+    let composer_online = modal.find('[name="composer_online"]').val().trim();
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);
@@ -541,7 +542,8 @@ jQuery(function () {
           workspace_id: workspace_id,
           author: author,
           paths: paths,
-          magic_app_version: magic_app_version
+          magic_app_version: magic_app_version,
+          composer_online: composer_online
         },
         success: function (data) {
           loadAllResource();
@@ -866,6 +868,7 @@ jQuery(function () {
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
+    $('[name="dependencies-installation"]').val('');  
     increaseAjaxPending();
     $.ajax({
       type: 'GET',
@@ -887,8 +890,9 @@ jQuery(function () {
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
           $('[name="application_directory"]').val(data.application_directory);
+          $('[name="dependencies-installation"]').val(data.composer_online ? 'Online' : 'Offline');        
           
-          
+          $('[name="composer_online"]').val(data.composer_online ? 1 : 0);
           $('[name="application_namespace"]').val(data.application_namespace);
 
           $('[name="application_workspace_id"]').empty();

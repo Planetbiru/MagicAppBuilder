@@ -712,6 +712,12 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                   </td>
                 </tr>
                 <tr>
+                  <td>Dependencies Installation</td>
+                  <td><input class="form-control" type="text" name="dependencies-installation" readonly>
+                      <input type="hidden" name="composer_online" value="1">
+                  </td>
+                </tr>
+                <tr>
                   <td>Workspace</td>
                   <td><select class="form-control" name="application_workspace_id"></select></td>
                 </tr>
