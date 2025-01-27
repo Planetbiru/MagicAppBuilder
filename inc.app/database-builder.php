@@ -111,7 +111,6 @@ if($databaseConfigured)
                 }
 
                 $now = date('Y-m-d H:i:s');
-
                 $password = 'administrator';
                 $hash = hash('sha1', $password);
                 $hash = hash('sha1', $hash);

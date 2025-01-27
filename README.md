@@ -176,6 +176,51 @@ Here is an explanation of the reserved columns above.
 | approval_note   | Column for approval note                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | approval_status | Column for approval status                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
+
+## Offline Usage Guide
+
+**MagicAppBuilder** enables users to create applications offline without requiring an internet connection. In offline mode, the application will not retrieve the latest versions of **MagicApp** or **MagicObject**. Instead, it will use the versions bundled with **MagicAppBuilder**. Composer will only set up the application's namespace during this process.
+
+### Updating Dependencies
+
+To update the application's dependencies, follow these steps:
+
+1.  Navigate to the `inc.lib` directory within your application:
+
+```bash
+cd yourapp/inc.lib
+```
+
+2. Run the following command to update the dependencies:
+
+```bash
+composer update --ignore-platform-reqs
+```
+
+If Composer is not installed on your system, you can use the `composer.phar` file included in the application directory:
+
+1.  Navigate to the `inc.lib` directory within your application:
+
+```bash
+cd yourapp/inc.lib
+```
+
+2. Run the following command to update the dependencies:
+
+```bash
+php composer.phar update --ignore-platform-reqs
+```
+
+**Notes:**
+
+-   The `--ignore-platform-reqs` flag is used to bypass platform-specific requirements, which may be useful in certain offline scenarios.
+-   If your goal is to update only the autoloader (e.g., after changing namespaces), you can use:
+```bash
+composer dump-autoload
+```
+-   Adding or downloading new dependencies requires an active internet connection.
+
+
 ## User Plan
 
 | Object                 | Community | Pro       |
