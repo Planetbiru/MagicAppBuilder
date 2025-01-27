@@ -216,7 +216,7 @@ php composer.phar update --ignore-platform-reqs
 -   The `--ignore-platform-reqs` flag is used to bypass platform-specific requirements, which may be useful in certain offline scenarios.
 -   If your goal is to update only the autoloader (e.g., after changing namespaces), you can use:
 ```bash
-composer dump-autoload
+composer dump-autoload --ignore-platform-reqs
 ```
 -   Adding or downloading new dependencies requires an active internet connection.
 
