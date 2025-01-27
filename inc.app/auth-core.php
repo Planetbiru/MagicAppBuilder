@@ -20,8 +20,6 @@ $configTemplatePath = "";
 if(isset($databaseBuilder))
 {
     $entityAdmin = new EntityAdmin(null, $databaseBuilder);
-    
-
     if(isset($sessions->username) && isset($sessions->userPassword))
     {
         try

@@ -12,5 +12,4 @@ else
 {
     $sessions = new PicoSession();
 }
-
 $sessions->startSession();

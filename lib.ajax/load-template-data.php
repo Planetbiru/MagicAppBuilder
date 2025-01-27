@@ -34,7 +34,6 @@ else
     $databaseSchema = $inputGet->getDatabaseSchema();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
     $path = $activeWorkspace->getDirectory()."/entity/template/$filename";
-    error_log($path);
     if(!file_exists($path))
     {
         $columns = array();
@@ -67,8 +66,6 @@ else
                     $appConfig->setApplication($fixApp);
                 }
             }
-            
-            
         }
         $entityInfo = null;
         if(isset($appConfig) && $appConfig->getEntityInfo() != null)

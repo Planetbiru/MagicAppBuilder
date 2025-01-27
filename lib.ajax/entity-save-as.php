@@ -31,7 +31,6 @@ try {
         }
         else
         {
-
             $baseEntityName = basename($entityName);
             $baseNewEntityName = basename($newEntityName);
 

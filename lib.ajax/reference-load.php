@@ -55,11 +55,13 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
                 "specification" => [
                     [
                         "column" => PicoStringUtil::camelize($active),
-                        "value" => true
+                        "value" => true,
+                        "comparison"=> "equals"
                     ],
                     [
                         "column" => PicoStringUtil::camelize($draft),
-                        "value" => false
+                        "value" => false,
+                        "comparison"=> "equals"
                     ]
                 ],
                 "sortable" => [

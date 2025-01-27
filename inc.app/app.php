@@ -57,10 +57,8 @@ languages:
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
-
     file_put_contents($builderConfigPath, $yaml);
 }
-
 
 if(file_exists($builderConfigPath))
 {
