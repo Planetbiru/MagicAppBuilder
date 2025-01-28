@@ -55,9 +55,9 @@ Updating data is a breeze with this system. Whether you need to update a single 
 
 In many business scenarios, records need to be toggled between an "active" and "inactive" state. The system includes an activate function to mark records as active, which can then be used for visibility in front-end applications, reports, or any part of your workflow that requires active data.
 
-**4. Disable Data**
+**4. Deactivate Data**
 
-Similar to activating data, the system also provides functionality to disable data. This is especially useful for workflows where data needs to be temporarily hidden or disabled without being permanently deleted. You can mark records as inactive and keep them in the system for later reactivation or auditing purposes.
+Similar to activating data, the system also provides functionality to deactive data. This is especially useful for workflows where data needs to be temporarily hidden or disabled without being permanently deleted. You can mark records as inactive and keep them in the system for later reactivation or auditing purposes.
 
 **5. Delete Data**
 
