@@ -26,8 +26,8 @@ $data->setWaitingfor(new PicoFieldWaitingFor(1, "new", "new"));
 $picoModule = new PicoModuleInfo("any", "Any", "detail");
 
 $picoModule
-->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
-->addAllowedAction(new PicoAllowedAction("approve", "Approve"))
+    ->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
+    ->addAllowedAction(new PicoAllowedAction("approve", "Approve"))
 ;
 
 $body = PicoResponseBody::getInstance()

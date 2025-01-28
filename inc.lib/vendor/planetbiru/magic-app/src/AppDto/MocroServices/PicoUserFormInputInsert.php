@@ -20,7 +20,7 @@ class PicoUserFormInputInsert extends PicoEntityData
      *
      * @var InputFieldInsert[]
      */
-    protected $input;
+    protected $fields;
     
     /**
      * Add an allowed action to the input.
@@ -31,10 +31,10 @@ class PicoUserFormInputInsert extends PicoEntityData
      */
     public function addInput($input)
     {
-        if (!isset($this->input)) {
-            $this->input = [];
+        if (!isset($this->fields)) {
+            $this->fields = [];
         }
-        $this->input[] = $input;
+        $this->fields[] = $input;
     }
 
     /**

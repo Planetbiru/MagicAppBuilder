@@ -35,6 +35,7 @@ PicoSortable::getInstance()
     ->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
     ->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
 Field::of()->adminLevelId, Field::of()->name, $inputGet->getAdminLevelId())->getOptions();
+
 $data->addFilter(
     new PicoInputFieldFilter(
         new PicoInputField("adminId", "Admin"), 

@@ -43,7 +43,7 @@ class PicoResponseBody extends PicoObjectToString
     /**
      * The data returned in the response, which can be of any type.
      *
-     * @var EntityData
+     * @var PicoEntityData
      */
     protected $data;
 
