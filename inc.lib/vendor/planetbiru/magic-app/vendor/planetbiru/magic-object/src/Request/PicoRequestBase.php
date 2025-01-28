@@ -261,7 +261,7 @@ class PicoRequestBase extends stdClass // NOSONAR
         {
             // If application require scalar but user give non-scalar, MagicObject will return null
             // It mean that application will not process invalid input type
-            return null;
+            return $this->getScalarValue($val);
         }
         if(!isset($val) || is_scalar($val))
         {
@@ -284,6 +284,27 @@ class PicoRequestBase extends stdClass // NOSONAR
             }
         }
         return $ret;
+    }
+
+    /**
+     * Returns the first scalar value from an array or `null` if no scalar value is found.
+     *
+     * This method extracts scalar values from arrays and ignores other types.
+     *
+     * @param mixed $val The value to process. Typically an array or mixed type.
+     * @return mixed|null The first scalar value found, or `null` if no scalar value exists.
+     */
+    public function getScalarValue($val)
+    {
+        if(is_array($val) && !empty($val))
+        {
+            $values = array_values($val);
+            if(is_scalar($values[0]))
+            {
+                return $values[0];
+            }
+        }
+        return null;
     }
 
     /**

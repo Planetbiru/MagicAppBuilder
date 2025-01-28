@@ -27,16 +27,9 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 $bundeledMagicAppVersion = "2.15.18";
 
-function checkInternetConnection($host = 'packagist.org', $port = 443, $timeout = 5) {
-    $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
-    if ($connection) {
-        fclose($connection);
-        return true; 
-    }
-    return false;
-}
 
-if (checkInternetConnection()) {
+
+if (ComposerUtil::checkInternetConnection()) {
     // Online
     try
     {

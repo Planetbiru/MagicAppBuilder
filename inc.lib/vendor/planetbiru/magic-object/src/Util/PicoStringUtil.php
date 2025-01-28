@@ -343,4 +343,41 @@ class PicoStringUtil
         return $input;
     }
 
+    /**
+     * Splits a string into chunks of a specified length without breaking words.
+     *
+     * This method ensures that words are not split between chunks, making it
+     * ideal for scenarios where maintaining the integrity of words is crucial.
+     * The chunks are separated by the specified delimiter.
+     *
+     * @param string $input The input string to be chunked.
+     * @param int $length The maximum length of each chunk. Defaults to 76.
+     * @param string $delimiter The delimiter to append between chunks. Defaults to "\n".
+     * @return string The chunked string with the specified delimiter between chunks.
+     */
+    public static function wordChunk($input, $length = 76, $delimiter = "\n") {
+        $words = explode(' ', $input); // Split the input string into words based on spaces
+        $currentChunk = ''; // The current chunk being built
+        $result = []; // Array to hold all chunks
+
+        foreach ($words as $word) {
+            // If adding the current word exceeds the chunk length, save the current chunk
+            if (strlen($currentChunk) + strlen($word) + 1 > $length) {
+                $result[] = trim($currentChunk); // Add the completed chunk to the result
+                $currentChunk = ''; // Reset the current chunk
+            }
+
+            // Append the word to the current chunk
+            $currentChunk .= ($currentChunk === '' ? '' : ' ') . $word;
+        }
+
+        // Add the last chunk if it exists
+        if (!empty($currentChunk)) {
+            $result[] = trim($currentChunk);
+        }
+
+        // Combine all chunks with the specified delimiter and return the result
+        return implode($delimiter, $result);
+    }
+
 }

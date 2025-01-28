@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Generator\ScriptGenerator;
+use AppBuilder\Util\Composer\ComposerUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
@@ -14,6 +15,8 @@ require_once dirname(__DIR__) . "/inc.app/database.php";
 
 $entityInfo = $appConfig->getEntityInfo();
 $entityApvInfo = $appConfig->getEntityApvInfo();
+
+$composerOnline = ComposerUtil::checkInternetConnection();
 
 header("Content-type: application/json");
 
@@ -42,7 +45,7 @@ if (isset($_POST) && !empty($_POST)) {
     if ($request->issetFields()) {
         require_once dirname(__DIR__) . "/inc.app/database.php";
         $scriptGenerator = new ScriptGenerator();
-        $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo);
+        $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);
     }
 }
 

@@ -17,24 +17,83 @@ class XLSXWriter //NOSONAR
 	const EXCEL_2007_MAX_ROW = 1048576;
 	const EXCEL_2007_MAX_COL = 16384;
 	//------------------------------------------------------------------
+	
+	/**
+	 * @var string $title The title of the document.
+	 */
 	protected $title;
+
+	/**
+	 * @var string $subject The subject of the document.
+	 */
 	protected $subject;
+
+	/**
+	 * @var string $author The author of the document.
+	 */
 	protected $author;
+
+	/**
+	 * @var bool $isRightToLeft Flag indicating whether the document is right-to-left.
+	 */
 	protected $isRightToLeft;
+
+	/**
+	 * @var string $company The company associated with the document.
+	 */
 	protected $company;
+
+	/**
+	 * @var string $description A description of the document.
+	 */
 	protected $description;
+
+	/**
+	 * @var array $keywords Keywords related to the document for search purposes.
+	 */
 	protected $keywords = array();
 
+	/**
+	 * @var mixed $current_sheet Reference to the currently active sheet.
+	 * @note The NOSONAR comment is used to suppress analysis warnings related to this property.
+	 */
 	protected $current_sheet; // NOSONAR
+
+	/**
+	 * @var array $sheets List of all sheets within the document.
+	 */
 	protected $sheets = array();
+
+	/**
+	 * @var array $temp_files Array holding temporary file paths.
+	 * @note The NOSONAR comment is used to suppress analysis warnings related to this property.
+	 */
 	protected $temp_files = array(); // NOSONAR
+
+	/**
+	 * @var array $cell_styles Array holding the cell styles used in the document.
+	 * @note The NOSONAR comment is used to suppress analysis warnings related to this property.
+	 */
 	protected $cell_styles = array(); // NOSONAR
+
+	/**
+	 * @var array $number_formats Array of custom number formats used within the document.
+	 * @note The NOSONAR comment is used to suppress analysis warnings related to this property.
+	 */
 	protected $number_formats = array(); // NOSONAR
 
+	/**
+	 * @var string $tempdir Temporary directory path used for intermediate files.
+	 */
 	protected $tempdir = "";
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * Initializes the class by defining constants, setting the default timezone,
+	 * validating the write permissions for the temporary directory, and checking
+	 * for required dependencies such as the `ZipArchive` class. Also initializes
+	 * a default cell style.
 	 */
 	public function __construct()
 	{
@@ -46,10 +105,10 @@ class XLSXWriter //NOSONAR
 	}
 
 	/**
-	 * Set title
+	 * Set the title of the document.
 	 *
-	 * @param string $title
-	 * @return self The current instance, allowing method chaining
+	 * @param string $title The title to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setTitle($title = '')
 	{
@@ -58,10 +117,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set subject
+	 * Set the subject of the document.
 	 *
-	 * @param string $subject
-	 * @return self The current instance, allowing method chaining
+	 * @param string $subject The subject to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setSubject($subject = '')
 	{
@@ -70,10 +129,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set author
+	 * Set the author of the document.
 	 *
-	 * @param string $author
-	 * @return self The current instance, allowing method chaining
+	 * @param string $author The author to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setAuthor($author = '')
 	{
@@ -82,10 +141,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set company
+	 * Set the company name associated with the document.
 	 *
-	 * @param string $company
-	 * @return self The current instance, allowing method chaining
+	 * @param string $company The company name to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setCompany($company = '')
 	{
@@ -94,10 +153,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set keywords
+	 * Set the keywords associated with the document.
 	 *
-	 * @param string $keywords
-	 * @return self The current instance, allowing method chaining
+	 * @param string $keywords The keywords to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setKeywords($keywords = '')
 	{
@@ -106,10 +165,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set description
+	 * Set the description of the document.
 	 *
-	 * @param string $description
-	 * @return self The current instance, allowing method chaining
+	 * @param string $description The description to set.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setDescription($description = '')
 	{
@@ -118,10 +177,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set temporary directory
+	 * Set the directory for temporary files.
 	 *
-	 * @param string $tempdir
-	 * @return self The current instance, allowing method chaining
+	 * @param string $tempdir The temporary directory to use.
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setTempDir($tempdir = '')
 	{
@@ -130,10 +189,10 @@ class XLSXWriter //NOSONAR
 	}
 	
 	/**
-	 * Set right to left
+	 * Enable or disable right-to-left text direction.
 	 *
-	 * @param boolean $isRightToLeft
-	 * @return self The current instance, allowing method chaining
+	 * @param bool $isRightToLeft Whether to set right-to-left text direction (default: false).
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function setRightToLeft($isRightToLeft = false)
 	{
@@ -142,7 +201,10 @@ class XLSXWriter //NOSONAR
 	}
 
 	/**
-	 * Destructor
+	 * Class Destructor
+	 *
+	 * Cleans up temporary files created during the instance's lifetime by
+	 * attempting to delete each file in the `$temp_files` array.
 	 */
 	public function __destruct()
 	{
@@ -154,9 +216,14 @@ class XLSXWriter //NOSONAR
 	}
 
 	/**
-	 * Get temporary file name
+	 * Generate a temporary file name.
 	 *
-	 * @return string
+	 * Creates a temporary file in the specified temporary directory or the system's
+	 * default temporary directory. If the file cannot be created, it throws an
+	 * exception indicating a possible issue with open file handles.
+	 *
+	 * @return string The full path of the created temporary file.
+	 * @throws IOException If the temporary file cannot be created.
 	 */
 	protected function tempFilename()
 	{
@@ -174,9 +241,9 @@ class XLSXWriter //NOSONAR
 	}
 
 	/**
-	 * Read file and write it to sdtout
+	 * Writes the contents of the current sheets to stdout.
 	 *
-	 * @return self The current instance, allowing method chaining
+	 * @return self The current instance, allowing method chaining.
 	 */
 	public function writeToStdOut()
 	{
@@ -186,6 +253,11 @@ class XLSXWriter //NOSONAR
 		return $this;
 	}
 
+	/**
+	 * Writes the contents of the current sheets to a string.
+	 *
+	 * @return string The contents of the file as a string.
+	 */
 	public function writeToString()
 	{
 		$temp_file = $this->tempFilename();
@@ -193,6 +265,11 @@ class XLSXWriter //NOSONAR
 		return file_get_contents($temp_file);
 	}
 
+	/**
+	 * Writes the current sheets to a specified file.
+	 *
+	 * @param string $filename The filename to write the contents to.
+	 */
 	public function writeToFile($filename)
 	{
 		foreach ($this->sheets as $sheet_name => $sheet) {
@@ -238,6 +315,15 @@ class XLSXWriter //NOSONAR
 		$zip->close();
 	}
 
+	/**
+	 * Initializes a new sheet with the specified properties.
+	 *
+	 * @param string $sheet_name The name of the sheet to initialize.
+	 * @param array $col_widths Optional array of column widths.
+	 * @param bool $auto_filter Whether to enable auto-filtering.
+	 * @param bool $freeze_rows Number of rows to freeze.
+	 * @param bool $freeze_columns Number of columns to freeze.
+	 */
 	protected function initializeSheet($sheet_name, $col_widths = array(), $auto_filter = false, $freeze_rows = false, $freeze_columns = false)
 	{
 		//if already initialized
@@ -305,6 +391,13 @@ class XLSXWriter //NOSONAR
 		$sheet->file_writer->write('<sheetData>');
 	}
 
+	/**
+	 * Adds a cell style and returns its index.
+	 *
+	 * @param string $number_format The number format to apply.
+	 * @param string|null $cell_style_string Optional style string.
+	 * @return int Index of the cell style.
+	 */
 	private function addCellStyle($number_format, $cell_style_string)
 	{
 		$number_format_idx = self::add_to_list_get_index($this->number_formats, $number_format);
@@ -312,6 +405,12 @@ class XLSXWriter //NOSONAR
 		return self::add_to_list_get_index($this->cell_styles, $lookup_string);
 	}
 
+	/**
+	 * Initializes column types based on the provided header types.
+	 *
+	 * @param array $header_types An array of header types (e.g., 'string', 'date', etc.).
+	 * @return array Returns an array of column type definitions, including number format, type, and default cell style.
+	 */
 	private function initializeColumnTypes($header_types)
 	{
 		$column_types = array();
@@ -328,6 +427,14 @@ class XLSXWriter //NOSONAR
 		return $column_types;
 	}
 
+	/**
+	 * Writes the header row to the specified sheet and initializes its column types.
+	 *
+	 * @param string $sheet_name The name of the sheet to write to.
+	 * @param array $header_types An associative array defining column headers and their types.
+	 * @param array|null $col_options Optional settings for the columns, such as widths, auto-filter, and freeze options.
+	 * @return void
+	 */
 	public function writeSheetHeader($sheet_name, array $header_types, $col_options = null) //NOSONAR
 	{
 		if (empty($sheet_name) || empty($header_types) || !empty($this->sheets[$sheet_name])) {
@@ -362,6 +469,14 @@ class XLSXWriter //NOSONAR
 		$this->current_sheet = $sheet_name;
 	}
 
+	/**
+	 * Writes a data row to the specified sheet.
+	 *
+	 * @param string $sheet_name The name of the sheet to write to.
+	 * @param array $row An array containing the values for the row.
+	 * @param array|null $row_options Optional settings for the row, such as height, hidden, or collapsed state.
+	 * @return void
+	 */
 	public function writeSheetRow($sheet_name, array $row, $row_options = null) //NOSONAR
 	{
 		if (empty($sheet_name)) {
@@ -399,12 +514,24 @@ class XLSXWriter //NOSONAR
 		$this->current_sheet = $sheet_name;
 	}
 
+	/**
+	 * Counts the number of rows in a specified sheet.
+	 *
+	 * @param string $sheet_name The name of the sheet to count rows for. Defaults to the current sheet.
+	 * @return int The number of rows in the sheet.
+	 */
 	public function countSheetRows($sheet_name = '')
 	{
 		$sheet_name = $sheet_name ? $sheet_name : $this->current_sheet;
 		return array_key_exists($sheet_name, $this->sheets) ? $this->sheets[$sheet_name]->row_count : 0;
 	}
 
+	/**
+	 * Finalizes a sheet by writing the necessary closing tags and metadata.
+	 *
+	 * @param string $sheet_name The name of the sheet to finalize.
+	 * @return void
+	 */
 	protected function finalizeSheet($sheet_name)
 	{
 		if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized) {
@@ -446,6 +573,16 @@ class XLSXWriter //NOSONAR
 		$sheet->finalized = true;
 	}
 
+	/**
+	 * Marks a range of cells as merged in the specified sheet.
+	 *
+	 * @param string $sheet_name The name of the sheet.
+	 * @param int $start_cell_row The starting row of the merged range.
+	 * @param int $start_cell_column The starting column of the merged range.
+	 * @param int $end_cell_row The ending row of the merged range.
+	 * @param int $end_cell_column The ending column of the merged range.
+	 * @return void
+	 */
 	public function markMergedCell($sheet_name, $start_cell_row, $start_cell_column, $end_cell_row, $end_cell_column)
 	{
 		if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized) {
@@ -460,6 +597,14 @@ class XLSXWriter //NOSONAR
 		$sheet->merge_cells[] = $startCell . ":" . $endCell;
 	}
 
+	/**
+	 * Writes an entire sheet with the provided data, header, and optional sheet name.
+	 *
+	 * @param array $data The data to write to the sheet.
+	 * @param string $sheet_name The name of the sheet. Defaults to 'Sheet1' if not provided.
+	 * @param array $header_types An optional associative array for defining column headers and their types.
+	 * @return void
+	 */
 	public function writeSheet($data, $sheet_name = '', $header_types = array())
 	{
 		$sheet_name = empty($sheet_name) ? 'Sheet1' : $sheet_name;
@@ -474,6 +619,17 @@ class XLSXWriter //NOSONAR
 		$this->finalizeSheet($sheet_name);
 	}
 
+	/**
+	 * Writes a cell to the specified sheet file with the given value and style.
+	 *
+	 * @param XLSXBuffererWriter $file The file writer object for the sheet.
+	 * @param int $row_number The row number where the cell will be written.
+	 * @param int $column_number The column number where the cell will be written.
+	 * @param mixed $value The value of the cell.
+	 * @param string $num_format_type The number format type of the cell (e.g., 'n_string', 'n_date').
+	 * @param int $cell_style_idx The index of the cell's style.
+	 * @return void
+	 */
 	protected function writeCell(XLSXBuffererWriter &$file, $row_number, $column_number, $value, $num_format_type, $cell_style_idx) //NOSONAR
 	{
 		$cell_name = self::xlsCell($row_number, $column_number);
@@ -501,8 +657,18 @@ class XLSXWriter //NOSONAR
 	}
 
 	/**
-	 * Style font indexes
-	 * @return array
+	 * Generates font and style indexes based on cell styles.
+	 *
+	 * This function processes a collection of cell styles, extracting relevant font, border, and fill properties 
+	 * to create the necessary indexes for each style. It then returns the corresponding font, fill, and border 
+	 * definitions along with the final style index mappings. This method is primarily used to handle Excel cell styles
+	 * and create appropriate references for the styles used in the spreadsheet.
+	 *
+	 * @return array An array containing:
+	 *               - 'fills' (array): An array of fill color references.
+	 *               - 'fonts' (array): An array of font style definitions.
+	 *               - 'borders' (array): An array of border style definitions.
+	 *               - 'styles' (array): An array of style indexes with associated formatting details.
 	 */
 	protected function styleFontIndexes() //NOSONAR
 	{
@@ -595,6 +761,23 @@ class XLSXWriter //NOSONAR
 		return array('fills' => $fills, 'fonts' => $fonts, 'borders' => $borders, 'styles' => $style_indexes);
 	}
 
+	/**
+	 * Generates the XML content for the styles of an Excel spreadsheet (XLSX format).
+	 * This method creates the `styles.xml` file which contains information about fonts,
+	 * fills, borders, and cell styles used in the workbook. It writes the XML data to
+	 * a temporary file and returns the filename.
+	 *
+	 * The XML structure includes:
+	 * - Number Formats
+	 * - Fonts
+	 * - Fills
+	 * - Borders
+	 * - Cell Styles
+	 * - Cell StyleXfs
+	 * - Cell Xfs
+	 * 
+	 * @return string The temporary filename where the generated `styles.xml` is stored.
+	 */
 	protected function writeStylesXML() //NOSONAR
 	{
 		$r = self::styleFontIndexes();
@@ -730,6 +913,17 @@ class XLSXWriter //NOSONAR
 		return $temporary_filename;
 	}
 
+	/**
+	 * Generates the XML content for the application properties of an Excel spreadsheet (XLSX format).
+	 * This method creates the `app.xml` file which contains extended properties for the workbook, 
+	 * including the total time spent, company name, and other metadata.
+	 *
+	 * The XML structure includes:
+	 * - TotalTime (set to 0)
+	 * - Company name (escaped with `xmlspecialchars`)
+	 *
+	 * @return string The XML content representing the application properties for the workbook.
+	 */
 	protected function buildAppXML()
 	{
 		$app_xml = "";
@@ -741,6 +935,22 @@ class XLSXWriter //NOSONAR
 		return $app_xml;
 	}
 
+	/**
+	 * Generates the XML content for the core properties of an Excel spreadsheet (XLSX format).
+	 * This method creates the `core.xml` file which contains core metadata for the workbook,
+	 * such as the creation date, title, subject, creator, keywords, description, and revision number.
+	 *
+	 * The XML structure includes:
+	 * - Created date (formatted in W3CDTF)
+	 * - Title
+	 * - Subject
+	 * - Creator (author)
+	 * - Keywords (optional, if provided)
+	 * - Description
+	 * - Revision number (set to 0)
+	 *
+	 * @return string The XML content representing the core properties for the workbook.
+	 */
 	protected function buildCoreXML()
 	{
 		$core_xml = "";
@@ -759,6 +969,19 @@ class XLSXWriter //NOSONAR
 		return $core_xml;
 	}
 
+	/**
+	 * Generates the XML content for the relationships of an Excel spreadsheet (XLSX format).
+	 * This method creates the `rels.xml` file, which defines the relationships between the
+	 * main workbook file and other associated files, such as the core properties and
+	 * extended properties.
+	 *
+	 * The XML structure includes:
+	 * - Relationship with the workbook (`rId1`)
+	 * - Relationship with the core properties (`rId2`)
+	 * - Relationship with the extended properties (`rId3`)
+	 *
+	 * @return string The XML content representing the relationships for the workbook.
+	 */
 	protected function buildRelationshipsXML()
 	{
 		$rels_xml = "";
@@ -772,6 +995,22 @@ class XLSXWriter //NOSONAR
 		return $rels_xml;
 	}
 
+	/**
+	 * Generates the XML content for the workbook part of an Excel spreadsheet (XLSX format).
+	 * This method creates the `workbook.xml` file, which contains the workbook's metadata
+	 * and structure, such as sheet details, defined names (e.g., for auto-filter ranges), 
+	 * and workbook-level properties.
+	 *
+	 * The XML structure includes:
+	 * - File version information (e.g., app name)
+	 * - Workbook properties (e.g., backup file, date1904)
+	 * - Views and layout settings for the workbook
+	 * - Sheet definitions (e.g., sheet names, IDs, and relationships)
+	 * - Defined names (e.g., for auto-filter ranges)
+	 * - Calculation properties (e.g., iteration settings)
+	 *
+	 * @return string The XML content representing the workbook part of the XLSX file.
+	 */
 	protected function buildWorkbookXML()
 	{
 		$i = 0;
@@ -801,6 +1040,19 @@ class XLSXWriter //NOSONAR
 		return $workbook_xml;
 	}
 
+	/**
+	 * Generates the XML content for the workbook relationships part of an Excel spreadsheet (XLSX format).
+	 * This method creates the `workbook.xml.rels` file, which defines the relationships between 
+	 * the workbook and other parts of the document such as worksheets and styles.
+	 *
+	 * The XML structure includes:
+	 * - Relationship to the styles.xml file
+	 * - Relationships to each worksheet, based on the sheets in the workbook
+	 *
+	 * The relationships are represented with unique IDs and specify the target files for each relationship.
+	 * 
+	 * @return string The XML content representing the workbook relationships part of the XLSX file.
+	 */
 	protected function buildWorkbookRelsXML()
 	{
 		$i = 0;
@@ -818,6 +1070,18 @@ class XLSXWriter //NOSONAR
 		return $wkbkrels_xml;
 	}
 
+	/**
+	 * Generates the XML content for the content types part of an Excel spreadsheet (XLSX format).
+	 * This method creates the `[Content_Types].xml` file, which specifies the content types for each part
+	 * of the spreadsheet package. This includes the types for various XML files, relationships, and other parts
+	 * of the document, ensuring that each part is correctly identified by its MIME type.
+	 *
+	 * The XML structure includes:
+	 * - Overrides for each part (such as worksheets, styles, and core properties) with specific content types.
+	 * - Content types are defined for the relationships file, the workbook file, worksheets, styles, and properties.
+	 *
+	 * @return string The XML content representing the content types part of the XLSX file.
+	 */
 	protected function buildContentTypesXML()
 	{
 		$content_types_xml = "";
@@ -838,13 +1102,19 @@ class XLSXWriter //NOSONAR
 		return $content_types_xml;
 	}
 
-	//------------------------------------------------------------------
-	/*
-	 * @param $row_number int, zero based
-	 * @param $column_number int, zero based
-	 * @param $absolute bool
-	 * @return Cell label/coordinates, ex: A1, C3, AA42 (or if $absolute==true: $A$1, $C$3, $AA$42)
-	 * */
+	/**
+	 * Converts a row and column number into an Excel-style cell reference.
+	 *
+	 * This function takes a zero-based row and column index and returns a corresponding cell reference in the format
+	 * used by Excel (e.g., A1, C3, AA42). Optionally, it can return the reference as an absolute reference (e.g., $A$1, $C$3).
+	 *
+	 * @param int  $row_number   The row number (zero-based index).
+	 * @param int  $column_number The column number (zero-based index).
+	 * @param bool $absolute      Whether to return an absolute reference. If true, the result will include dollar signs
+	 *                            (e.g., $A$1). If false (default), it will return a relative reference (e.g., A1).
+	 *
+	 * @return string The Excel-style cell reference, e.g., A1, C3, or $A$1, $C$3, depending on the value of $absolute.
+	 */
 	public static function xlsCell($row_number, $column_number, $absolute = false)
 	{
 		$n = $column_number;
@@ -856,12 +1126,41 @@ class XLSXWriter //NOSONAR
 		}
 		return $r . ($row_number + 1);
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Logs a string or an array to the error log with a timestamp.
+	 *
+	 * This method logs a message to the error log with the current date and time (formatted as `Y-m-d H:i:s`).
+	 * If the provided input is an array, it is converted to a JSON string. Otherwise, the input string is logged directly.
+	 * A newline character is added at the end of each log entry.
+	 *
+	 * @param string|array $string The message or data to log. If an array is passed, it will be converted to JSON.
+	 *
+	 * @return void
+	 *
+	 * @note This method utilizes PHP's `error_log()` function to log messages. The log is written in the default error log,
+	 *       and a timestamp is added for each logged entry.
+	 */
 	public static function log($string)
 	{
 		error_log(date("Y-m-d H:i:s:") . rtrim(is_array($string) ? json_encode($string) : $string) . "\n");
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Sanitize a filename to remove invalid or non-printable characters.
+	 *
+	 * This method removes characters that are not allowed in filenames according to the Windows operating system 
+	 * (as outlined in the MSDN documentation: http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx).
+	 * It eliminates non-printing characters (ASCII values 0-31) as well as other common invalid characters, such as 
+	 * `<`, `>`, `?`, `"`, `:`, `|`, `\`, `/`, `*`, and `&`.
+	 *
+	 * @param string $filename The filename to be sanitized.
+	 *
+	 * @return string The sanitized filename with invalid characters removed.
+	 *
+	 * @note This method ensures that the filename is free from characters that might cause issues in file systems or 
+	 *       operating systems that have restrictions on filename characters.
+	 */
 	public static function sanitize_filename($filename) //http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
 	{
 		$nonprinting = array_map('chr', range(0, 31));
@@ -869,7 +1168,21 @@ class XLSXWriter //NOSONAR
 		$all_invalids = array_merge($nonprinting, $invalid_chars);
 		return str_replace($all_invalids, "", $filename);
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Sanitize a sheet name to ensure it is valid for use in a spreadsheet.
+	 *
+	 * This method removes or replaces characters that are not allowed in sheet names (such as `\`, `/`, `?`, `*`, `:`, `[`, and `]`) 
+	 * and ensures the sheet name does not exceed the maximum length of 31 characters. It also trims any excess spaces and removes 
+	 * surrounding single quotes. If the resulting sheet name is empty, a default name is generated.
+	 *
+	 * @param string $sheetname The input sheet name to be sanitized.
+	 *
+	 * @return string The sanitized sheet name, ensuring it is valid and within the allowed length, or a default name if the input is invalid.
+	 *
+	 * @note The method ensures the sheet name is no longer than 31 characters and that it contains no invalid characters for sheet names.
+	 *       If the name is empty after sanitization, a default name is generated in the form of `SheetXXX`, where `XXX` is a random number between 100 and 999.
+	 */
 	public static function sanitize_sheetname($sheetname)
 	{
 		static $badchars  = '\\/?*:[]';
@@ -879,28 +1192,73 @@ class XLSXWriter //NOSONAR
 		$sheetname = trim(trim(trim($sheetname), "'")); //trim before and after trimming single quotes
 		return !empty($sheetname) ? $sheetname : 'Sheet' . ((rand() % 900) + 100);
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Convert special characters to HTML entities, with additional handling for bad characters.
+	 *
+	 * This method is a customized version of `htmlspecialchars` that also replaces certain control characters
+	 * with spaces. The characters it replaces are typically considered invalid in XML and HTML, ensuring
+	 * that the resulting string is suitable for use in an XML document. This function improves the behavior
+	 * of `htmlspecialchars` by handling a broader set of invalid characters.
+	 *
+	 * @param string $val The input string to be converted.
+	 *
+	 * @return string The converted string with special characters replaced by their corresponding HTML entities
+	 *                and invalid characters replaced by spaces.
+	 * 
+	 * @note The characters being replaced include control characters such as `\x00`, `\x01`, `\x02`, etc.
+	 *       The characters `\t`, `\n`, and `\r` are not considered bad characters.
+	 */
 	public static function xmlspecialchars($val)
 	{
 		//note, badchars does not include \t\n\r (\x09\x0a\x0d)
 		static $badchars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f";
 		static $goodchars = "                              ";
 		return strtr(htmlspecialchars($val, ENT_QUOTES | ENT_XML1), $badchars, $goodchars); //strtr appears to be faster than str_replace
-	}
-	//------------------------------------------------------------------
-	
+	}	
+
 	/**
-	 * Reset
+	 * Retrieve the first key of an array.
 	 *
-	 * @param array $arr
-	 * @return array|object|int|string|null
+	 * This method resets the internal pointer of the array and returns the key of the first element.
+	 * It can be useful when you need to access the first key of an array without modifying its contents.
+	 *
+	 * @param array $arr The input array whose first key is to be retrieved.
+	 *
+	 * @return array|object|int|string|null The key of the first element in the array. If the array is empty, 
+	 *                         it returns null.
+	 * 
+	 * @note This function resets the internal array pointer to the first element before retrieving the key.
+	 *       If the array is empty, it will return `null`.
 	 */
 	public static function array_first_key($arr)
 	{
 		reset($arr);
 		return key($arr);
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Determines the type of a number format based on a given format string.
+	 * 
+	 * This method analyzes the provided number format string and returns a corresponding format type.
+	 * It supports a variety of number formats such as general, string, numeric, date, and datetime. 
+	 * It also handles formats with special characters like percentage (%), dollar sign ($), or time-related patterns.
+	 * The method ignores certain color specifiers within square brackets (e.g., [Red], [Blue]) when performing the analysis.
+	 * 
+	 * @param string $num_format The number format string to analyze. This string can represent different 
+	 *                           types of number formatting, such as 'GENERAL', '@', '0', time or date formats, 
+	 *                           or custom patterns.
+	 * 
+	 * @return string The determined number format type. Possible return values include:
+	 *                - 'n_auto' (default/general)
+	 *                - 'n_string' (for string format)
+	 *                - 'n_numeric' (for numeric formats, including percentage and dollar)
+	 *                - 'n_datetime' (for datetime formats)
+	 *                - 'n_date' (for date formats)
+	 *
+	 * @note This method handles both common and custom number formats. It performs regular expression 
+	 *       checks to identify specific patterns for time, date, and numeric formats.
+	 */
 	private static function determineNumberFormatType($num_format) //NOSONAR
 	{
 		$num_format = preg_replace("/\[(Black|Blue|Cyan|Green|Magenta|Red|White|Yellow)\]/i", "", $num_format);
@@ -944,7 +1302,26 @@ class XLSXWriter //NOSONAR
 		}
 		return 'n_auto';
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Standardizes a given number format string by mapping common format types to specific patterns.
+	 * The function also escapes certain characters in the format string to ensure compatibility with 
+	 * formatting standards.
+	 * 
+	 * This method supports a variety of number formats such as "money", "number", "string", "integer", 
+	 * "date", "datetime", "time", "price", "dollar", and "euro", converting them into predefined formats.
+	 * Additionally, it escapes special characters like spaces, dashes, parentheses, and square brackets 
+	 * to ensure proper handling.
+	 *
+	 * @param string $num_format The number format type to standardize. Possible values include:
+	 *                           'money', 'number', 'string', 'integer', 'date', 'datetime', 
+	 *                           'time', 'price', 'dollar', and 'euro'.
+	 *
+	 * @return string The standardized number format string with special characters escaped.
+	 * 
+	 * @note The function modifies the input format string by replacing the format type with a 
+	 *       predefined one and escapes certain characters to ensure compatibility.
+	 */
 	private static function numberFormatStandardized($num_format) //NOSONAR
 	{
 		if ($num_format == 'money') {
@@ -990,7 +1367,23 @@ class XLSXWriter //NOSONAR
 		}
 		return $escaped;
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Adds an item to an array if it is not already present and returns its index.
+	 * If the item already exists in the array, its index is returned. If it doesn't exist, 
+	 * the item is appended to the array, and the new index is returned.
+	 *
+	 * This method ensures that each unique item appears only once in the list and 
+	 * returns the index of the item (whether newly added or existing).
+	 *
+	 * @param array $haystack The array to which the item should be added if not already present.
+	 * @param mixed $needle The item to search for and potentially add to the array.
+	 * 
+	 * @return int The index of the item in the array after the operation.
+	 * 
+	 * @note This function uses strict comparison (`===`) to check for existing items, 
+	 *       ensuring that only identical values are considered matches (type and value must be the same).
+	 */
 	public static function add_to_list_get_index(&$haystack, $needle)
 	{
 		$existing_idx = array_search($needle, $haystack, $strict = true); //NOSONAR
@@ -1000,7 +1393,26 @@ class XLSXWriter //NOSONAR
 		}
 		return $existing_idx;
 	}
-	//------------------------------------------------------------------
+	
+	/**
+	 * Converts a date-time string into the number of days since the Excel 1900 epoch (with time as a fraction of the day).
+	 * This method handles Excel's unique date system, which uses January 1, 1900, as the start date, and incorrectly considers
+	 * 1900 as a leap year. It also adjusts for special cases like the false leap day (1900-02-29).
+	 *
+	 * The function parses the input date-time string and computes the total number of days since the Excel epoch, adjusting
+	 * for leap years, leap days, and special cases where Excel's date system deviates from the Gregorian calendar.
+	 *
+	 * @param string $date_input The date-time string in the format "YYYY-MM-DD HH:MM:SS".
+	 * 
+	 * @return float The number of days since the Excel 1900 epoch, with the time portion as a fraction of the day.
+	 *               Returns 0 for invalid or out-of-range dates.
+	 *
+	 * @see https://en.wikipedia.org/wiki/Excel_serial_date#Excel_1900_date_system
+	 * 
+	 * @note Special handling is included for the following Excel-specific issues:
+	 * - February 29th, 1900 (Excel's false leap day).
+	 * - The incorrect leap year assumption for 1900 (Excel considers 1900 a leap year, but it isn't).
+	 */
 	public static function convert_date_time($date_input)  //NOSONAR //thanks to Excel::Writer::XLSX::Worksheet.pm (perl)
 	{
 		$days    = 0;    # Number of days since epoch
@@ -1072,11 +1484,7 @@ class XLSXWriter //NOSONAR
 
 		return $days + $seconds;
 	}
-	//------------------------------------------------------------------
 }
-
-
-
 
 
 // vim: set filetype=php expandtab tabstop=4 shiftwidth=4 autoindent smartindent:

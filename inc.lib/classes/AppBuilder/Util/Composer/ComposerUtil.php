@@ -111,4 +111,13 @@ class ComposerUtil
         }
         return false;
     }
+
+    public static function checkInternetConnection($host = 'packagist.org', $port = 443, $timeout = 5) {
+        $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
+        if ($connection) {
+            fclose($connection);
+            return true; 
+        }
+        return false;
+    }
 }
