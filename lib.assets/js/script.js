@@ -49,10 +49,10 @@ function resetApplicationSearch()
 
 /**
  * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
- * The width is calculated as `ajaxPending * 20` pixels.
+ * The width is calculated as `ajaxPending * 16` pixels.
  */
 function updatePendingBar() {
-  $('.ajax-pending').css('width', (ajaxPending * 20) + 'px');
+  $('.ajax-pending').css('width', (ajaxPending * 16) + 'px');
 }
 
 // A comma-separated string of SQL keywords.
