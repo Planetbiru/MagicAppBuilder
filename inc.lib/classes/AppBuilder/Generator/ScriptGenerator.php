@@ -23,6 +23,8 @@ use stdClass;
 
 class ScriptGenerator //NOSONAR
 {
+    const COMPOSER_PHAR = "composer.phar";
+    
     /**
      * Create delete section without approval.
      *
@@ -1001,8 +1003,8 @@ class ScriptGenerator //NOSONAR
         }
         $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory());
         $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
-        $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.phar";
-        $sourcePath = dirname(dirname(dirname(__DIR__)))."/composer.phar";
+        $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/".self::COMPOSER_PHAR;
+        $sourcePath = dirname(dirname(dirname(__DIR__)))."/".self::COMPOSER_PHAR;
         $success = copy($sourcePath, $targetPath);
         if($success)
         {
@@ -1031,8 +1033,8 @@ class ScriptGenerator //NOSONAR
     {
         $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory());
         $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
-        $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.phar";
-        $sourcePath = dirname(dirname(dirname(__DIR__)))."/composer.phar";
+        $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/".self::COMPOSER_PHAR;
+        $sourcePath = dirname(dirname(dirname(__DIR__)))."/".self::COMPOSER_PHAR;
         $success = copy($sourcePath, $targetPath);
         if($success)
         {

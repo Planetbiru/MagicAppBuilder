@@ -90,6 +90,19 @@ class PicoSpecificationFilter
     }
 
     /**
+     * Checks if the data type represents an array.
+     *
+     * This method determines whether the data type contains 
+     * an array-like structure based on the presence of square brackets (`[]`).
+     *
+     * @return bool True if the data type represents an array, false otherwise.
+     */
+    public function isArray()
+    {
+        return strpos($this->dataType, "[") !== false;
+    }
+
+    /**
      * Converts a value to an array of numbers.
      *
      * @param mixed $stringValue The value to convert.

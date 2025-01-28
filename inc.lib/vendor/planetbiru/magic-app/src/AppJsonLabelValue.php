@@ -5,37 +5,36 @@ namespace MagicApp;
 /**
  * Class AppJsonLabelValue
  *
- * This class is used to represent a collection of options for a select element in JSON format.
- * It allows the addition of options (each with a label, value, selected status, and additional data)
- * and provides methods to retrieve and serialize the options to JSON format.
- *
- * The options are represented as instances of the AppLabelValueData class, which encapsulate
- * the data for each option.
+ * Represents a collection of options for a select element in JSON format.
+ * This class allows adding options, retrieving them, and serializing the
+ * collection to JSON. Each option is represented by an instance of the
+ * `AppLabelValueData` class, which encapsulates details such as label, value,
+ * selected status, and additional data or attributes.
  *
  * @package MagicApp
  */
 class AppJsonLabelValue
 {
     /**
-     * Array of options for the select element.
-     *
-     * @var AppLabelValueData[] Array of AppLabelValueData objects representing each option.
+     * Array of AppLabelValueData objects representing each option.
+     * 
+     * @var AppLabelValueData[] 
      */
     private $options = array();
 
     /**
-     * Add a new option to the list.
+     * Adds a new option to the options array.
      *
-     * This method creates a new AppLabelValueData object with the provided parameters
-     * and adds it to the options array. The new option represents a single item in the select dropdown.
+     * Creates a new instance of `AppLabelValueData` with the provided details
+     * and appends it to the options array. This method supports method chaining.
      *
-     * @param string $label The label text to be displayed for the option.
-     * @param mixed|null $value The value associated with the option.
-     * @param bool $selected Whether the option should be marked as selected.
-     * @param mixed|null $attributes Additional attributes for the option.
-     * @param mixed|null $data Additional data associated with the option.
+     * @param string $label The label text to display for the option.
+     * @param mixed|null $value The value associated with the option (can be null).
+     * @param bool $selected Whether the option should be pre-selected (default: false).
+     * @param mixed|null $attributes Additional attributes for the option (optional).
+     * @param mixed|null $data Any extra data associated with the option (optional).
      *
-     * @return self The current instance of the class to allow method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function add($label, $value = null, $selected = false, $attributes = null, $data = null)
     {
@@ -44,13 +43,12 @@ class AppJsonLabelValue
     }
 
     /**
-     * Convert the options to JSON format.
+     * Converts the options collection to a JSON-encoded string.
      *
-     * This method iterates over the options array and converts each AppLabelValueData object
-     * into its JSON representation using the toJson method. The resulting array is then
-     * encoded into a JSON string and returned.
+     * Iterates over the options array, calling the `toJson` method on each
+     * `AppLabelValueData` object, and compiles the results into a JSON string.
      *
-     * @return string A JSON-encoded string representing all options.
+     * @return string A JSON-encoded string representing the options array.
      */
     public function __toString()
     {
@@ -62,12 +60,11 @@ class AppJsonLabelValue
     }
 
     /**
-     * Get the array of options for the select element.
+     * Retrieves the current array of options.
      *
-     * This method returns the current array of options, where each option is represented
-     * by an instance of the AppLabelValueData class.
+     * Returns the list of options as an array of `AppLabelValueData` objects.
      *
-     * @return AppLabelValueData[] Array of AppLabelValueData objects.
+     * @return AppLabelValueData[] The array of options.
      */
     public function getOptions()
     {
@@ -75,14 +72,14 @@ class AppJsonLabelValue
     }
 
     /**
-     * Set the array of options for the select element.
+     * Sets the options array directly.
      *
-     * This method allows you to set the options array directly. It replaces any existing options
-     * with the provided array.
+     * Replaces the current options array with the provided array of
+     * `AppLabelValueData` objects.
      *
-     * @param AppLabelValueData[] $options Array of AppLabelValueData objects to be set as options.
+     * @param AppLabelValueData[] $options An array of `AppLabelValueData` objects.
      *
-     * @return self The current instance of the class to allow method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setOptions($options)
     {

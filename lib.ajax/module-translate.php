@@ -21,21 +21,21 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 function fixValue($original)
 {
     $labels = [
-        'Button Save' => 'Save',
-        'Button Cancel' => 'Cancel',
         'Message Data Not Found' => 'Data Not Found',
         'Yes' => 'Yes',
         'No' => 'No',
+        'Button Save' => 'Save',
+        'Button Cancel' => 'Cancel',
         'Button Update' => 'Update',
         'Button Back To List' => 'Back To List',
         'Button Search' => 'Search',
         'Button Add' => 'Add',
-        'Numero' => 'Numero',
-        'Button Activate' => 'Activate',
-        'Button Deactivate' => 'Deactivate',
-        'Warning Delete Confirmation' => 'Delete Confirmation',
         'Button Delete' => 'Delete',
         'Button Save Current Order' => 'Save Current Order',
+        'Button Activate' => 'Activate',
+        'Button Deactivate' => 'Deactivate',
+        'Numero' => 'Numero',
+        'Warning Delete Confirmation' => 'Delete Confirmation',
         'Label Option Select One' => 'Option Select One'
     ];
     return str_replace(

@@ -43,9 +43,9 @@ try
     <div 
     class="card application-item" 
     data-selected="<?php echo $selected;?>"
-    data-application-id="<?php echo $app->getId(); ?>" 
-    data-application-name="<?php echo htmlspecialchars($app->getName()); ?>"
-    data-path="<?php echo str_replace("\\", "/", $app->getDocumentRoot()); ?>"
+    data-application-id="<?php echo $app->getId();?>" 
+    data-application-name="<?php echo htmlspecialchars($app->getName());?>"
+    data-path="<?php echo str_replace("\\", "/", $app->getDocumentRoot());?>"
     >
         <div class="card-body">
             <h5 class="card-title"><?php echo htmlspecialchars($app->getName()); ?></h5>

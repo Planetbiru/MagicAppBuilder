@@ -468,6 +468,7 @@ class PicoSpecification // NOSONAR
         if (self::isArray($map)) {
             foreach ($map as $key => $filter) {
                 $filterValue = $request->get($key);
+                $filterValue = self::fixInput($filterValue, $filter);
                 if ($filterValue !== null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter) {
                     if ($filter->isNumber() || $filter->isBoolean() || $filter->isArrayNumber() || $filter->isArrayBoolean() || $filter->isArrayString()) {
                         $specification->addAnd(PicoPredicate::getInstance()->equals($filter->getColumnName(), $filter->valueOf($filterValue)));
@@ -480,6 +481,26 @@ class PicoSpecification // NOSONAR
             }
         }
         return $specification;
+    }
+
+    /**
+     * Adjusts the filter value based on the filter's configuration.
+     *
+     * This method ensures that the input value aligns with the filter type.
+     * If the filter does not expect an array but the input is an array, 
+     * the first value in the array is selected. If no adjustment is needed, 
+     * the input value is returned as-is.
+     *
+     * @param mixed $filterValue The raw user input value.
+     * @param PicoSpecificationFilter $filter The filter object specifying expected data type.
+     * @return mixed The adjusted value, based on the filter's configuration.
+     */
+    private static function fixInput($filterValue, $filter)
+    {
+        if(!$filter->isArray() && is_array($filterValue) && !empty($filterValue)) {
+            $filterValue = array_values($filterValue)[0];
+        }
+        return $filterValue;
     }
 
     /**

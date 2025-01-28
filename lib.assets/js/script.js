@@ -890,11 +890,9 @@ jQuery(function () {
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
           $('[name="application_directory"]').val(data.application_directory);
-          $('[name="dependencies-installation"]').val(data.composer_online ? 'Online' : 'Offline');        
-          
+          $('[name="dependencies-installation"]').val(data.composer_online ? 'Online' : 'Offline');         
           $('[name="composer_online"]').val(data.composer_online ? 1 : 0);
           $('[name="application_namespace"]').val(data.application_namespace);
-
           $('[name="application_workspace_id"]').empty();
           for(let workspace of data.application_workspace)
           {

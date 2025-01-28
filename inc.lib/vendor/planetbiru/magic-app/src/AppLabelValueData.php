@@ -2,7 +2,6 @@
 
 namespace MagicApp;
 
-use MagicApp\AppFormOption;
 use stdClass;
 
 /**
