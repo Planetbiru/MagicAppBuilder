@@ -64,6 +64,7 @@ $applicationName = trim($inputPost->getName());
 $applicationArchitecture = trim($inputPost->getArchitecture());
 $applicationDirectory = trim($baseApplicationDirectory);
 $applicationDescription = trim($inputPost->getDescription());
+$composerOnline = $inputPost->getComposerOnline() == 1;
 $projectDirectory = $dir2;
 
 $application->setId($newAppId);
@@ -191,7 +192,7 @@ $newApp->loadYamlFile($path2, false, true, true);
 
 $appConf = $newApp->getApplication();
 $baseDir = $appConf->getBaseApplicationDirectory();
-$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir);
+$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $composerOnline);
 
 $dir3 = $baseDir."/inc.cfg";
 if(!file_exists($dir3))

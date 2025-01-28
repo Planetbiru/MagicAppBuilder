@@ -327,11 +327,12 @@ class ScriptGenerator //NOSONAR
      * @param AppSecretObject $appConfig Application-specific configuration, including feature flags.
      * @param EntityInfo $entityInfo Information about the main entity being processed.
      * @param EntityApvInfo $entityApvInfo Information about the approval process for the entity.
+     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode
      *
      * @return int The number of entity files that were generated. It generates and writes the application module script
      * to the specified location, as defined in the request.
      */
-    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo) // NOSONAR
+    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline) // NOSONAR
     {
         $insertFields = array();
         $editFields = array();
@@ -533,7 +534,7 @@ class ScriptGenerator //NOSONAR
         $moduleFile = $request->getModuleFile();
 
         $baseDir = $appConf->getBaseApplicationDirectory();
-        $this->prepareApplication($builderConfig, $appConf, $baseDir);
+        $this->prepareApplication($builderConfig, $appConf, $baseDir, $composerOnline);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
         error_log($path);
@@ -928,9 +929,10 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param string $baseDir Base directory for the application.
+     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode
      * @return void
      */
-    public function prepareApplication($builderConfig, $appConf, $baseDir)
+    public function prepareApplication($builderConfig, $appConf, $baseDir, $composerOnline)
     {
         $composer = new MagicObject($appConf->getComposer());
         $magicApp = new MagicObject($appConf->getMagicApp());
@@ -942,7 +944,7 @@ class ScriptGenerator //NOSONAR
         if(!file_exists($libDir)) 
         {
             $this->prepareDir($libDir);
-            $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp);
+            $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp, $composerOnline);
                   
             $baseAppBuilder = $appConf->getBaseEntityDirectory()."";
             $this->prepareDir($baseAppBuilder);
@@ -958,7 +960,31 @@ class ScriptGenerator //NOSONAR
     /**
      * Prepare the composer setup.
      *
-     * Sets up the composer configuration and copies the composer.phar file to the target directory.
+     * Sets up the composer configuration and determines whether to use online or offline mode.
+     *
+     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
+     * @param SecretObject $appConf Application configuration object.
+     * @param MagicObject $composer Composer configuration object.
+     * @param MagicObject $magicApp MagicApp configuration object.
+     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode.
+     * @return void
+     */
+    public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $composerOnline)
+    {
+        if($composerOnline)
+        {
+            $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
+        }
+        else
+        {
+            $this->prepareComposerOffline($builderConfig, $appConf, $composer);
+        }
+    }
+
+    /**
+     * Prepare Composer in online mode.
+     *
+     * Downloads and sets up Composer dependencies in online mode.
      *
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
@@ -966,7 +992,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $magicApp MagicApp configuration object.
      * @return void
      */
-    public function prepareComposer($builderConfig, $appConf, $composer, $magicApp)
+    public function prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp)
     {
         $version = $magicApp->getVersion();
         if(!empty($version))
@@ -985,10 +1011,89 @@ class ScriptGenerator //NOSONAR
             {
                 $phpPath = "php";
             }
-            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar require planetbiru/magic-app$version";
+            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar require planetbiru/magic-app$version --ignore-platform-reqs";
             exec($cmd);     
             $this->updateComposer($builderConfig, $appConf, $composer);
         }
+    }
+
+    /**
+     * Prepare Composer in offline mode.
+     *
+     * Copies the composer.phar file and regenerates the autoloader in offline mode.
+     *
+     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
+     * @param SecretObject $appConf Application configuration object.
+     * @param MagicObject $composer Composer configuration object.
+     * @return void
+     */
+    public function prepareComposerOffline($builderConfig, $appConf, $composer)
+    {
+        $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory());
+        $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
+        $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/composer.phar";
+        $sourcePath = dirname(dirname(dirname(__DIR__)))."/composer.phar";
+        $success = copy($sourcePath, $targetPath);
+        if($success)
+        {
+            $phpPath = trim($builderConfig->getPhpPath());
+            if(empty($phpPath))
+            {
+                $phpPath = "php";
+            }
+            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar composer dump-autoload --ignore-platform-reqs";
+            exec($cmd);     
+            $this->updateComposer($builderConfig, $appConf, $composer);
+        }
+    }
+
+    /**
+     * Copy a directory and its contents recursively.
+     *
+     * Recursively copies all files and subdirectories from the source directory to the destination directory.
+     *
+     * @param string $source The source directory path.
+     * @param string $destination The destination directory path.
+     * @return bool Returns true if the operation is successful, false otherwise.
+     */
+    public function copyDirectory($source, $destination)
+    {
+        // Ensure the source directory exists
+        if (!is_dir($source)) {
+            return false;
+        }
+
+        // Create the destination directory if it doesn't exist
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Open the source directory
+        $directory = opendir($source);
+        if (!$directory) {
+            return false;
+        }
+
+        // Copy each file and subdirectory
+        while (($file = readdir($directory)) !== false) {
+            if ($file === '.' || $file === '..') {
+                continue; // Skip special directories
+            }
+
+            $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
+            $destinationPath = $destination . DIRECTORY_SEPARATOR . $file;
+
+            if (is_dir($sourcePath)) {
+                // Recursively copy subdirectories
+                $this->copyDirectory($sourcePath, $destinationPath);
+            } else {
+                // Copy individual files
+                copy($sourcePath, $destinationPath);
+            }
+        }
+
+        closedir($directory);
+        return true;
     }
     
     /**

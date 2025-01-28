@@ -25,53 +25,76 @@ $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
 $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
-try
-{
-    $cache = new GeneralCache(null, $databaseBuilder);
-    $needUpdate = false;
-    
+$bundeledMagicAppVersion = "2.15.18";
+
+function checkInternetConnection($host = 'packagist.org', $port = 443, $timeout = 5) {
+    $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
+    if ($connection) {
+        fclose($connection);
+        return true; 
+    }
+    return false;
+}
+
+if (checkInternetConnection()) {
+    // Online
     try
     {
-        $cache->findOneByGeneralCacheId("magic-app-version");
-        $timestamp = strtotime($cache->getExpire());
-        if($timestamp < time())
+        $cache = new GeneralCache(null, $databaseBuilder);
+        $needUpdate = false;
+        
+        try
         {
-            // Expire
-            $magicAppList = ComposerUtil::getMagicAppVersionList();
-            $needUpdate = true;
-        }
-        else
-        {
-            // Fresh from the oven
-            $magicAppList = json_decode($cache->getContent());
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            $cache->findOneByGeneralCacheId("magic-app-version");
+            $timestamp = strtotime($cache->getExpire());
+            if($timestamp < time())
+            {
+                // Expire
                 $magicAppList = ComposerUtil::getMagicAppVersionList();
                 $needUpdate = true;
             }
+            else
+            {
+                // Fresh from the oven
+                $magicAppList = json_decode($cache->getContent());
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $magicAppList = ComposerUtil::getMagicAppVersionList();
+                    $needUpdate = true;
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            $magicAppList = ComposerUtil::getMagicAppVersionList();
+            $needUpdate = true;
+        }
+        if($needUpdate)
+        {
+            $cache->setGeneralCacheId("magic-app-version");
+            $cache->setContent(json_encode($magicAppList));
+            $cache->setExpire(date("Y-m-d H:i:s", strtotime("6 hours")));
+            $cache->save();
         }
     }
     catch(Exception $e)
     {
-        $magicAppList = ComposerUtil::getMagicAppVersionList();
-        $needUpdate = true;
+        $magicAppList = array();
     }
-    if($needUpdate)
-    {
-        $cache->setGeneralCacheId("magic-app-version");
-        $cache->setContent(json_encode($magicAppList));
-        $cache->setExpire(date("Y-m-d H:i:s", strtotime("6 hours")));
-        $cache->save();
-    }
+    $composerOnline = true;
 }
-catch(Exception $e)
+else
 {
-    $magicAppList = array();
+    $magicAppList = array(
+        array("key"=>$bundeledMagicAppVersion, "value"=>"$bundeledMagicAppVersion (Offline)", "latest"=>false)
+    );
+    $composerOnline = false;
 }
 
 $magicAppList = array_slice($magicAppList, 0, 20);
 
 $workspaceFinder = new EntityAdminWorkspace(null, $databaseBuilder);
 $workspaceList = array();
+
 try
 {
     $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
@@ -107,7 +130,8 @@ $data = [
     'application_author' => $author,
     'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
-    'magic_app_versions' => $magicAppList
+    'magic_app_versions' => $magicAppList,
+    'composer_online' => $composerOnline
 ];
 
 ResponseUtil::sendJSON($data, false, true);
