@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\Entity\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoOutputDataItem;
 use MagicApp\AppDto\MocroServices\PicoDataHeader;
@@ -8,38 +8,45 @@ use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputList;
-use MagicApp\AppUserPermission;
-use MagicApp\PicoModule;
 
 require_once __DIR__ . "/database.php";
 
-$entity = new EntityAdmin(null, $database);
+$entity = new EntityApplication(null, $database);
 
 $pageData = $entity->findAll();
 
 $picoEntityInfo = new PicoEntityInfo("active");
-$picoModule = new PicoModuleInfo("any", "Any", "detail");
+$picoModule = new PicoModuleInfo("application", "Application", "list");
 $primaryKeys = array_keys($entity->tableInfo()->getPrimaryKeys());
 
 $picoModule
-->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
-->addAllowedAction(new PicoAllowedAction("approve", "Approve"))
+	->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
+	->addAllowedAction(new PicoAllowedAction("approve", "Approve"))
 ;
 
 $data = new PicoUserFormOutputList();
 
-$data->addHeader(new PicoDataHeader("adminId", $entity->label("adminId"), "ASC"));
+$data->addHeader(new PicoDataHeader("applicationId", $entity->label("applicationId"), "ASC"));
 $data->addHeader(new PicoDataHeader("name", $entity->label("name")));
-$data->addHeader(new PicoDataHeader("username", $entity->label("username")));
-
+$data->addHeader(new PicoDataHeader("description", $entity->label("description")));
+$data->addHeader(new PicoDataHeader("workspace", $entity->label("workspace")));
+$data->addHeader(new PicoDataHeader("architecture", $entity->label("architecture")));
+$data->addHeader(new PicoDataHeader("projectDirectory", $entity->label("projectDirectory")));
+$data->addHeader(new PicoDataHeader("baseApplicationDirectory", $entity->label("baseApplicationDirectory")));
+$data->addHeader(new PicoDataHeader("author", $entity->label("author")));
 foreach($pageData->getResult() as $row)
 {
 	$data->addDataItem(
 		new PicoOutputDataItem(
 			[
-				"adminId"=>$row->get("adminId"), 
+				"applicationId"=>$row->get("applicationId"), 
 				"name"=>$row->get("name"),
-				"username"=>$row->get("username")
+				"description"=>$row->get("description"),
+				"workspace"=>$row->hasValue("workspace") ? $row->get("workspace")->get("name") : null,
+				"architecture"=>$row->get("architecture"),
+				"projectDirectory"=>$row->get("projectDirectory"),
+				"baseApplicationDirectory"=>$row->get("baseApplicationDirectory"),
+				"author"=>$row->get("author")
 			],
 			$row,
 			$primaryKeys,
@@ -48,17 +55,11 @@ foreach($pageData->getResult() as $row)
 	);
 }
 
-
-$currentModule = new PicoModule($appConfig, $database, $entity, "/", "umk", "Umk");
-$userPermission = new AppUserPermission(null, null, null, null, null);
-
-
-
 echo PicoResponseBody::getInstance()
 	->setModule($picoModule)
     ->setData($data)
     ->setEntity($entity)
-    ->switchCaseTo("camelCase")
+    ->switchCaseTo("snake_case")
     ->setResponseCode("000")
     ->setResponseText("Success")
     ;
