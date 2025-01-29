@@ -62,6 +62,6 @@ echo PicoResponseBody::getInstance()
     ->setEntity($entity)
     ->setResponseCode("000")
     ->setResponseText("Success")
-	->switchCaseTo("snake_case")
+	->switchCaseTo("camelCase")
 	->prettify(true)
     ;

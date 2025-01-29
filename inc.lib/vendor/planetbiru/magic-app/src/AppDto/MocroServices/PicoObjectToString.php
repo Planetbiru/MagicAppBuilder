@@ -65,7 +65,7 @@ class PicoObjectToString
      * 
      * @return self Returns the current instance for method chaining.
      */
-    public function prettify($pretty)
+    public function prettify($pretty = true)
     {
         $this->__prettify = $pretty;
         return $this;
