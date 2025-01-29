@@ -106,7 +106,7 @@ class PicoObjectToString
     
     /**
      * Helper method to determine if a property should be skipped in the conversion.
-     * This method skips the `__caseFormat` property and any property with a null value.
+     * This method skips the `__caseFormat` and `__prettify` property and any property with a null value.
      *
      * @param string $key The property name.
      * @param mixed $value The property value.
@@ -114,7 +114,7 @@ class PicoObjectToString
      */
     private function shouldBeSkipped($key, $value)
     {
-        return $key === '__caseFormat' || $value === null;
+        return $key === '__caseFormat' || $key === '__prettify' || $value === null;
     }
 
     /**
