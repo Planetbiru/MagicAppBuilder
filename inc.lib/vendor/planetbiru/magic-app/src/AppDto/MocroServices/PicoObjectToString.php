@@ -22,8 +22,19 @@ class PicoObjectToString
 {
     /**
      * @var string Flag to determine the case format (camelCase or snake_case).
+     * 
+     * This property controls the case format used in the class, allowing for either camelCase or snake_case. 
+     * It helps manage how the property names are formatted, depending on the desired case style.
      */
     protected $__caseFormat = 'camelCase'; //NOSONAR
+
+    /**
+     * @var bool Flag to indicate whether to prettify the output.
+     * 
+     * This property is a boolean flag that determines if the output should be formatted in a prettier, more readable manner.
+     * When set to `true`, the output will be prettified; otherwise, it will remain in its default format.
+     */
+    protected $__prettify = false; //NOSONAR
 
     /**
      * Sets the case format to camelCase.
@@ -44,6 +55,19 @@ class PicoObjectToString
     public function toSnakeCase()
     {
         $this->__caseFormat = 'snakeCase';
+        return $this;
+    }
+
+    /**
+     * Set the prettify flag for formatting the output.
+     * 
+     * @param bool $pretty Flag to enable or disable prettifying the output. If `true`, the output will be prettified.
+     * 
+     * @return self Returns the current instance for method chaining.
+     */
+    public function prettify($pretty)
+    {
+        $this->__prettify = $pretty;
         return $this;
     }
     
@@ -234,6 +258,13 @@ class PicoObjectToString
         $data = $this->toArray();
 
         // Convert the object array into a JSON string with pretty print formatting
-        return json_encode($data, JSON_PRETTY_PRINT);
+        if($this->__prettify)
+        {
+            return json_encode($data, JSON_PRETTY_PRINT);
+        }
+        else
+        {
+            return json_encode($data);
+        }
     }
 }
