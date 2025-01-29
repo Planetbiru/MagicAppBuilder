@@ -15,10 +15,10 @@ namespace MagicApp\AppDto\MocroServices;
 class PicoUserFormOutputList extends PicoEntityData
 {
     /**
-     * An array of `DataHeader` objects representing the headers of the output list.
+     * An array of `PicoDataHeader` objects representing the headers of the output list.
      * Each header defines the structure and sorting behavior for the list.
      *
-     * @var DataHeader[]
+     * @var PicoDataHeader[]
      */
     protected $header;
 
@@ -40,10 +40,11 @@ class PicoUserFormOutputList extends PicoEntityData
     /**
      * Add a header to the output list.
      *
-     * This method adds a `DataHeader` object to the list of headers. The header defines the structure and sorting
+     * This method adds a `PicoDataHeader` object to the list of headers. The header defines the structure and sorting
      * behavior for the fields in the list or table.
      *
-     * @param DataHeader $header The `DataHeader` object to be added.
+     * @param PicoDataHeader $header The `PicoDataHeader` object to be added.
+     * @return self Returns the current instance for method chaining.
      */
     public function addHeader($header)
     {
@@ -51,6 +52,7 @@ class PicoUserFormOutputList extends PicoEntityData
             $this->header = [];
         }
         $this->header[] = $header;
+        return $this;
     }
     
     /**
@@ -60,6 +62,8 @@ class PicoUserFormOutputList extends PicoEntityData
      * item in the list or table, containing the data for each field.
      *
      * @param PicoOutputDataItem $dataItem The `PicoOutputDataItem` object to be added.
+     * 
+     * @return self Returns the current instance for method chaining.
      */
     public function addDataItem($dataItem)
     {
@@ -67,29 +71,59 @@ class PicoUserFormOutputList extends PicoEntityData
             $this->row = [];
         }
         $this->row[] = $dataItem;
+        return $this;
     }
 
     /**
-     * Get primary key
+     * Get the primary key.
      *
-     * @return  string[]
-     */ 
+     * This method returns the primary key array which is used to identify the unique records in the output list.
+     *
+     * @return string[] The primary key array.
+     */
     public function getPrimaryKey()
     {
         return $this->primaryKey;
     }
 
     /**
-     * Set primary key
+     * Set the primary key.
      *
-     * @param string[]  $primaryKey  Primary key
+     * This method sets the primary key for the output list, which is used for identifying unique records.
      *
+     * @param string[] $primaryKey The primary key array.
+     * 
      * @return self Returns the current instance for method chaining.
-     */ 
+     */
     public function setPrimaryKey($primaryKey)
     {
         $this->primaryKey = $primaryKey;
 
+        return $this;
+    }
+    
+    /**
+     * Set the sorting behavior for a header column.
+     *
+     * This method sets the sorting order for a given column header in the list. The sort type can be ascending or descending.
+     *
+     * @param string $column The column name to set the sorting for.
+     * @param string $sortType The type of sorting ('ASC' for ascending, 'DESC' for descending).
+     * 
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setSortHeader($column, $sortType)
+    {
+        if(isset($this->header) && is_array($this->header))
+        {
+            foreach($this->header as $index=>$header)
+            {
+                if($this->header[$index]->getValue() == $column)
+                {
+                    $this->header[$index]->setSort($sortType);
+                }
+            }
+        }
         return $this;
     }
 }

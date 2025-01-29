@@ -26,7 +26,7 @@ $picoModule
 
 $data = new PicoUserFormOutputList();
 
-$data->addHeader(new PicoDataHeader("applicationId", $entity->label("applicationId"), "ASC"));
+$data->addHeader(new PicoDataHeader("applicationId", $entity->label("applicationId")));
 $data->addHeader(new PicoDataHeader("name", $entity->label("name")));
 $data->addHeader(new PicoDataHeader("description", $entity->label("description")));
 $data->addHeader(new PicoDataHeader("workspace", $entity->label("workspace")));
@@ -34,6 +34,7 @@ $data->addHeader(new PicoDataHeader("architecture", $entity->label("architecture
 $data->addHeader(new PicoDataHeader("projectDirectory", $entity->label("projectDirectory")));
 $data->addHeader(new PicoDataHeader("baseApplicationDirectory", $entity->label("baseApplicationDirectory")));
 $data->addHeader(new PicoDataHeader("author", $entity->label("author")));
+$data->setSortHeader("applicationId", "asc");
 foreach($pageData->getResult() as $row)
 {
 	$data->addDataItem(
