@@ -477,7 +477,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         $result = $defaultValue;
         if(self::isTypeBoolean($type))
         {
-            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'true' : 'false';
+            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? '1' : '0';
         }
         else if(self::isNativeValue($defaultValue))
         {
