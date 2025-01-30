@@ -1669,8 +1669,8 @@ else
         {
             $type = $this->getFilterType($field);
             
-            $multiple = $field->getReferenceFilter() && $field->getReferenceFilter()->getMultipleSelection();
-            if($multiple)
+            $multipleSelect = self::isTrue($field->getReferenceFilter()->getMultipleSelection());
+            if($multipleSelect)
             {
                 $type .= "[]";
             }
@@ -2536,9 +2536,9 @@ $subqueryMap = '.$referece.';
             }
             else if($field->getFilterElementType() == "select")
             {
-                $multipleSelection = false;
+                $multipleSelect = false;
                 $referenceFilter = $field->getReferenceFilter();
-                $multipleSelection = $this->isMultipleSelection($referenceFilter);
+                $multipleSelect = $this->isMultipleSelection($referenceFilter);
                 
                 $form->appendChild($dom->createTextNode(self::N_TAB2));
                 
@@ -2549,7 +2549,7 @@ $subqueryMap = '.$referece.';
                 $select = $dom->createElement('select');
                 $select->setAttribute('class', 'form-control');
                 
-                if($multipleSelection)
+                if($multipleSelect)
                 {
                     $inputName = $field->getFieldName()."[]";
                     $select->setAttribute('name', $inputName);
@@ -2580,7 +2580,7 @@ $subqueryMap = '.$referece.';
 
                 $value->setAttribute('value', '');
                 $select->appendChild($dom->createTextNode(self::N_TAB6));
-                if(!$multipleSelection)
+                if(!$multipleSelect)
                 {
                     $select->appendChild($value);
                 }
@@ -3143,11 +3143,30 @@ $subqueryMap = '.$referece.';
         }
         else if($field->getElementType() == ElementType::SELECT)
         {
+            $referenceData = $field->getReferenceData();
+
             $input = $dom->createElement('select');
             $classes = array();
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
-            $input->setAttribute('name', $field->getFieldName());
+
+            $multipleSelect = self::isTrue($referenceData->getMultipleSelection());
+
+            if($multipleSelect)
+            {
+                $input->setAttribute('name', $field->getFieldName()."[]");
+                $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
+                $input->setAttributeNode($dom->createAttribute('multiple'));
+                $input->setAttributeNode($dom->createAttribute('data-multi-select'));
+            }
+            else
+            {
+                $input->setAttribute('name', $field->getFieldName());
+            }
+
             $input = $this->addAttributeId($input, $id);  
             $value = $dom->createElement('option');
             $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG;
@@ -3156,8 +3175,11 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $value->setAttribute('value', '');
             $value->appendChild($textLabel);
-            $input->appendChild($value);
-            $referenceData = $field->getReferenceData();
+            if(!$multipleSelect)
+            {
+                $input->appendChild($value);
+            }
+            
             $input = $this->appendOption($dom, $input, $referenceData);
             if($field->getRequired())
             {

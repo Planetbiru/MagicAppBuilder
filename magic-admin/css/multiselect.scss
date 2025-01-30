@@ -80,6 +80,7 @@ select[multiple].form-control {
         .multi-select-header-option {
             background-color: $color-background-light;
             border-radius: 3px;
+            max-width: 120px;
         }
 
         .multi-select-header-max {
