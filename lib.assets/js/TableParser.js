@@ -161,6 +161,10 @@ class TableParser {
                     primaryKeyList.push(columnName);
                 }
                 if (!this.inArray(columnList, columnName)) {
+                    if(isPk)
+                    {
+                        nullable = false;
+                    }
                     let column = {
                         'Field': columnName,
                         'Type': dataType,
