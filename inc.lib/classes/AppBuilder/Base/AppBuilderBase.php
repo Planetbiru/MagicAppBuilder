@@ -1498,9 +1498,9 @@ catch(Exception $e)
         .self::NEW_LINE
         .self::CURLY_BRACKET_CLOSE;
         
-        if(stripos($result, ' multiple=""') !== false && stripos($result, ' multi-select=""')  !== false)
+        if(stripos($result, ' multiple=""') !== false && stripos($result, ' data-multi-select=""')  !== false)
         {
-            $result = str_replace(array(' multiple=""', ' multi-select=""'), array(' multiple', ' multi-select'), $result);
+            $result = str_replace(array(' multiple=""', ' data-multi-select=""'), array(' multiple', ' data-multi-select'), $result);
         }
         
         return $result;
@@ -1658,8 +1658,7 @@ else
      */
     public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable)
     {
-        $map = $this->defineMap($referenceData);
-        
+        $map = $this->defineMap($referenceData); 
         $additionalFilter = $this->getAdditionalFilter($specification);
         $sortableParam = $this->getSortableParams($sortable);
         
@@ -1669,6 +1668,13 @@ else
         foreach($filterFields as $field)
         {
             $type = $this->getFilterType($field);
+            
+            $multiple = $field->getReferenceFilter() && $field->getReferenceFilter()->getMultipleSelection();
+            if($multiple)
+            {
+                $type .= "[]";
+            }
+            
             $arrFilter[] = '"'.PicoStringUtil::camelize($field->getFieldName())
             .'" => PicoSpecification::filter("'.PicoStringUtil::camelize($field->getFieldName()).'", "'.$type.'")';
         }
@@ -2549,8 +2555,11 @@ $subqueryMap = '.$referece.';
                     $select->setAttribute('name', $inputName);
                     
                     $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
+                    $select->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
+                    $select->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
+                    $select->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
                     $select->setAttributeNode($dom->createAttribute('multiple'));
-                    $select->setAttributeNode($dom->createAttribute('multi-select'));
+                    $select->setAttributeNode($dom->createAttribute('data-multi-select'));
                 }
                 else
                 {
@@ -2564,13 +2573,18 @@ $subqueryMap = '.$referece.';
                 
 
                 $value = $dom->createElement('option');
+                
                 $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG;
                 $textLabel = $dom->createTextNode($caption);
                 $value->appendChild($textLabel);
+
                 $value->setAttribute('value', '');
-                $value->appendChild($textLabel);
                 $select->appendChild($dom->createTextNode(self::N_TAB6));
-                $select->appendChild($value);
+                if(!$multipleSelection)
+                {
+                    $select->appendChild($value);
+                }
+
                 $select = $this->appendOption($dom, $select, $referenceFilter, self::VAR."inputGet".self::CALL_GET.$inputGetName.self::BRACKETS."");
 
                 $filterGroup->appendChild($dom->createTextNode(self::N_TAB3));               
