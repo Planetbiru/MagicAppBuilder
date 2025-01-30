@@ -128,7 +128,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $columnType = $column[MagicObject::KEY_TYPE];
 
         $col[] = "`" . $columnName . "`";  // Enclose column name in backticks
-        $col[] = $columnType;  // Add the column type (e.g., INT, VARCHAR)
+        $col[] = strtoupper($columnType);  // Add the column type (e.g., INT, VARCHAR)
 
         // Check if the column is part of primary keys
         if (in_array($columnName, $pkCols)) {

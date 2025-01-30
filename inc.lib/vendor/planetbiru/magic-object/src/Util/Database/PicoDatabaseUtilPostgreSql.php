@@ -167,7 +167,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         
         $type = $this->fixAutoIncrementType($column, $column[MagicObject::KEY_TYPE], $autoIncrementKeys);
         
-        $col[] = $type;
+        $col[] = strtoupper($type);
 
         if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
             $col[] = "NULL";
@@ -272,7 +272,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
 
         $col[] = "\t";  // Add tab indentation for readability.
         $col[] = $columnName;  // Add the column name.
-        $col[] = $columnType;  // Add the column type (SERIAL or BIGSERIAL, or custom type).
+        $col[] = strtoupper($columnType);  // Add the column type (SERIAL or BIGSERIAL, or custom type).
 
         // Add PRIMARY KEY constraint if the column is part of the primary keys.
         if (in_array($columnName, $pkCols)) {
