@@ -182,23 +182,31 @@ class PicoDatabaseDump
     /**
      * Create an ALTER TABLE ADD COLUMN query for the specified entity or entities.
      *
-     * This method generates SQL queries to add new columns to a table. It supports adding columns
-     * either from a single entity or an array of entities. The method calls a helper method based
-     * on whether a single entity or multiple entities are passed.
+     * This method generates SQL queries to add new columns to a table. It supports adding columns 
+     * from either a single entity or an array of entities. Depending on whether a single entity or 
+     * multiple entities are provided, the method delegates query generation to different helper methods.
+     * If the `$forceCreateNewTable` flag is set to true, the method will generate a `CREATE TABLE` query 
+     * instead of an `ALTER TABLE` query, effectively creating a new table with the specified columns.
      *
-     * @param MagicObject|MagicObject[] $entity A single entity or an array of entities representing the columns to be added.
-     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, the default database will be used.
-     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
-     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
+     * @param MagicObject|MagicObject[] $entity A single entity or an array of entities representing the columns to be added. 
+     *                                          Each entity contains the column name, type, and other related information.
+     * @param PicoDatabase|null $database The database connection used to fetch the current table schema. If null, 
+     *                                    the default database will be used.
+     * @param bool $createIfNotExists Flag indicating whether to generate a CREATE TABLE query if the table does not exist. 
+     *                                Default is false.
+     * @param bool $dropIfExists Flag indicating whether to generate a DROP TABLE query if the table already exists, 
+     *                           before the CREATE TABLE query. Default is false.
+     * @param bool $forceCreateNewTable Flag indicating whether to generate a `CREATE TABLE` query instead of `ALTER TABLE`, 
+     *                                  effectively creating a new table. Default is false.
      * 
-     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
+     * @return string[] An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns.
      */
-    public function createAlterTableAdd($entity, $database = null, $createIfNotExists = false, $dropIfExists = false)
+    public function createAlterTableAdd($entity, $database = null, $createIfNotExists = false, $dropIfExists = false, $forceCreateNewTable = false)
     {
         if (is_array($entity)) {
-            return $this->createAlterTableAddFromEntities($entity, $database, $createIfNotExists, $dropIfExists);
+            return $this->createAlterTableAddFromEntities($entity, null, $database, $createIfNotExists, $dropIfExists, $forceCreateNewTable);
         } else {
-            return $this->createAlterTableAddFromEntity($entity);
+            return $this->createAlterTableAddFromEntity($entity, $forceCreateNewTable);
         }
     }
 
@@ -257,19 +265,29 @@ class PicoDatabaseDump
     /**
      * Create a list of ALTER TABLE ADD COLUMN queries from multiple entities.
      *
-     * This method generates SQL queries to add new columns to an existing table based on the provided entities.
-     * It checks the current database schema, compares it with the provided entity information, and generates
-     * the necessary ALTER TABLE queries.
+     * This method generates SQL queries to add new columns to an existing table based on the provided entities. 
+     * It checks the current database schema and compares it with the provided entity information, generating the 
+     * necessary ALTER TABLE queries. If columns already exist in the database, they will be skipped unless the 
+     * `forceCreateNewTable` flag is set to true, in which case a `CREATE TABLE` query will be generated to create 
+     * the table (and columns) from scratch, even if the columns already exist.
      *
-     * @param MagicObject[] $entities An array of entities representing the columns to be added.
-     * @param string|null $tableName The name of the table to alter. If null, the table name is derived from the entities.
-     * @param PicoDatabase|null $database The database connection to fetch the current table schema. If null, it will be inferred from the entities.
-     * @param bool $createIfNotExists Flag to indicate if a CREATE TABLE query should be generated if the table does not exist.
-     * @param bool $dropIfExists Flag to indicate if a DROP TABLE query should be generated if the table already exists, before the CREATE TABLE query.
+     * @param MagicObject[] $entities An array of entity objects representing the columns to be added. Each entity contains 
+     *                                the column name, type, and other related information.
+     * @param string|null $tableName The name of the table to alter. If null, the table name will be derived from the entities.
+     * @param PicoDatabase|null $database The database connection used to fetch the current table schema. If null, it will 
+     *                                    be inferred from the entities.
+     * @param bool $createIfNotExists Flag indicating whether a `CREATE TABLE` query should be generated if the table does not exist. 
+     *                                Default is false.
+     * @param bool $dropIfExists Flag indicating whether a `DROP TABLE` query should be generated if the table already exists, 
+     *                           before the `CREATE TABLE` query. Default is false.
+     * @param bool $forceCreateNewTable Flag indicating whether to generate a `CREATE TABLE` query instead of an `ALTER TABLE` query. 
+     *                                  If true, the table (and its columns) will be created from scratch, even if the columns 
+     *                                  already exist. Default is false.
      * 
-     * @return string[] An array of SQL ALTER TABLE queries to add the columns.
+     * @return string[] An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query is a string 
+     *                  representing a complete SQL statement.
      */
-    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null, $createIfNotExists = false, $dropIfExists = false)
+    public function createAlterTableAddFromEntities($entities, $tableName = null, $database = null, $createIfNotExists = false, $dropIfExists = false, $forceCreateNewTable = false)
     {
         $tableInfo = $this->getMergedTableInfo($entities);
         $columnNameList = $this->getColumnNameList($entities);
@@ -284,7 +302,7 @@ class PicoDatabaseDump
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
             $createdColumns = array();
-            if (is_array($rows) && !empty($rows)) {
+            if (is_array($rows) && !empty($rows) && !$forceCreateNewTable) {
                 foreach ($rows as $row) {
                     $dbColumnNames[] = $row['Field'];
                 }
@@ -331,12 +349,23 @@ class PicoDatabaseDump
     }
 
     /**
-     * Create a list of ALTER TABLE ADD COLUMN queries from a single entity.
+     * Create a list of ALTER TABLE ADD COLUMN queries or a CREATE TABLE query from a single entity.
      *
-     * @param MagicObject $entity Entity
-     * @return string[] List of SQL ALTER TABLE queries
+     * This method generates SQL queries to add new columns to a table based on the provided entity. 
+     * It compares the current database schema with the entity's column definitions. If the columns do not already exist,
+     * it generates the necessary ALTER TABLE queries. However, if the `forceCreateNewTable` flag is set to true,
+     * a CREATE TABLE query will be generated instead of ALTER TABLE, effectively creating the table and columns from scratch 
+     * even if the columns already exist in the database.
+     *
+     * @param MagicObject $entity The entity representing the table and its columns to be added.
+     * @param bool $forceCreateNewTable Flag indicating whether to generate a CREATE TABLE query, even if the table and 
+     *                                  columns already exist. When true, a CREATE TABLE query will be generated to create 
+     *                                  the table and its columns from scratch. Default is false.
+     * 
+     * @return string[] An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query 
+     *                  is a string representing a complete SQL statement.
      */
-    public function createAlterTableAddFromEntity($entity)
+    public function createAlterTableAddFromEntity($entity, $forceCreateNewTable = false)
     {
         $tableInfo = $this->getTableInfo($entity);
         $tableName = $tableInfo->getTableName();
@@ -349,7 +378,7 @@ class PicoDatabaseDump
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
             $createdColumns = array();
-            if (is_array($rows) && !empty($rows)) {
+            if (is_array($rows) && !empty($rows) && !$forceCreateNewTable) {
                 foreach ($rows as $row) {
                     $dbColumnNames[] = $row['Field'];
                 }

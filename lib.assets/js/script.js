@@ -485,13 +485,22 @@ jQuery(function () {
   $(document).on("change", ".entity-container-query .entity-checkbox", function (e) {
     let ents = getEntitySelection();
     let merged = $(".entity-merge")[0].checked;
-    getEntityQuery(ents, merged);
+    let createNew = $(".entity-create-new")[0].checked;
+    getEntityQuery(ents, merged, createNew);
   });
 
   $(document).on("change", ".entity-merge", function (e) {
     let ents = getEntitySelection();
     let merged = $(".entity-merge")[0].checked;
-    getEntityQuery(ents, merged);
+    let createNew = $(".entity-create-new")[0].checked;
+    getEntityQuery(ents, merged, createNew);
+  });
+  
+  $(document).on("change", ".entity-create-new", function (e) {
+    let ents = getEntitySelection();
+    let merged = $(".entity-merge")[0].checked;
+    let createNew = $(".entity-create-new")[0].checked;
+    getEntityQuery(ents, merged, createNew);
   });
 
   $(document).on("change", ".entity-check-controll", function (e) {
@@ -501,7 +510,8 @@ jQuery(function () {
     });
     let ents = getEntitySelection();
     let merged = $(".entity-merge")[0].checked;
-    getEntityQuery(ents, merged);
+    let createNew = $(".entity-create-new")[0].checked;
+    getEntityQuery(ents, merged, createNew);
   });
 
   $(document).on("click", "#create_new_app", function (e) {
@@ -668,7 +678,8 @@ jQuery(function () {
     function (e) {
       e.preventDefault();
       let entity = $(this).attr("data-entity-name");
-      getEntityQuery([entity]);
+      let createNew = $(".entity-create-new")[0].checked;
+      getEntityQuery([entity], false, createNew);
     }
   );
 
@@ -1111,7 +1122,8 @@ jQuery(function () {
                 decreaseAjaxPending();
                 let ents = getEntitySelection();
                 let merged = $(".entity-merge")[0].checked;
-                getEntityQuery(ents, merged);
+                let createNew = $(".entity-create-new")[0].checked;
+                getEntityQuery(ents, merged, createNew);
                 modal.modal('hide');
               },
             });
@@ -3016,19 +3028,22 @@ function getEntitySelection() {
 /**
  * Fetches the query for a specific entity and updates the SQL editor.
  *
- * This function sends an AJAX request to get the query for the specified
+ * This function sends an AJAX request to retrieve the query for the specified
  * entity, and then updates the SQL editor with the received data.
+ * It handles both merging of entities and the option to create a new table
+ * instead of updating an existing structure.
  *
- * @param {string} entity - The entity for which to retrieve the query.
- * @param {boolean} merged - Indicates whether to merge the entities.
+ * @param {string} entity The entity for which to retrieve the query.
+ * @param {boolean} merged Indicates whether to merge the entities.
+ * @param {boolean} createNew Indicates whether to create a new table instead of updating the structure.
  * @returns {void} This function does not return a value.
  */
-function getEntityQuery(entity, merged) {
+function getEntityQuery(entity, merged, createNew) {
   increaseAjaxPending();
   $.ajax({
     type: "POST",
     url: "lib.ajax/entity-query.php",
-    data: { entity: entity, merged: merged ? 1 : 0 },
+    data: { entity: entity, merged: merged ? 1 : 0, createNew: createNew ? 1 : 0},
     dataType: "text",
     success: function (data) {
       decreaseAjaxPending();
@@ -3130,8 +3145,9 @@ function updateEntityQuery(autoload) {
       $(".entity-container-query .entity-list").empty().append(data);
       let ents = getEntitySelection();
       let merged = $(".entity-merge");
+      let createNew = $(".entity-create-new")[0].checked;
       if (merged.length > 0 && autoload) {
-        getEntityQuery(ents, merged[0].checked);
+        getEntityQuery(ents, merged[0].checked, createNew);
       }
     },
   });

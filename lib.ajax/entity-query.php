@@ -39,10 +39,18 @@ try
         {
             $dbType = "MySQL";
         }
-
+        $createNewTable = $inputPost->getCreateNew() == 1;
+        if($createNewTable)
+        {
+            $description = "Queries for table creation";
+        }
+        else
+        {
+            $description = "Queries for table creation and modification";
+        }
         $allQueries[] = $dashedLine;
         $allQueries[] = "-- Application Name : $applicationName";
-        $allQueries[] = "-- Description      : Queries for table creation and modification ";
+        $allQueries[] = "-- Description      : $description";
         $allQueries[] = "-- Generator        : MagicAppBuilder";
         $allQueries[] = "-- Database Type    : ".$dbType;
         if($database->getDatabaseConnection() != null)
@@ -61,6 +69,7 @@ try
             if($inputPost->getEntity() != null && $inputPost->countableEntity())
             {
                 $inputEntity = $inputPost->getEntity();
+                
                 $entities = array();
                 $entityNames = array();
                 foreach($inputEntity as $idx=>$entityName)
@@ -91,8 +100,8 @@ try
                 {
                     $entityQueries = array();
                     $dumper = new PicoDatabaseDump();   
-                    $quertArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database);
-                    foreach($quertArr as $sql)
+                    $queryArr = $dumper->createAlterTableAddFromEntities($entity, $tableName, $database, true, false, $createNewTable);
+                    foreach($queryArr as $sql)
                     {
                         if(!empty($sql))
                         {
@@ -136,9 +145,9 @@ try
                             $entity = new $className(null, $database);
                             $dumper = new PicoDatabaseDump();
                 
-                            $quertArr = $dumper->createAlterTableAdd($entity);
+                            $queryArr = $dumper->createAlterTableAdd($entity);
                             $entityQueries = array();
-                            foreach($quertArr as $sql)
+                            foreach($queryArr as $sql)
                             {
                                 if(!empty($sql))
                                 {
