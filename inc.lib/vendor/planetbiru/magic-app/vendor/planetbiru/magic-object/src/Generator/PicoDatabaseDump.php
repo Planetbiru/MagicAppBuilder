@@ -9,6 +9,7 @@ use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoTableInfo;
 use MagicObject\Database\PicoTableInfoExtended;
 use MagicObject\MagicObject;
+use MagicObject\Util\Database\DatabaseTypeConverter;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
@@ -263,6 +264,27 @@ class PicoDatabaseDump
     }
 
     /**
+     * Get a list of column names from multiple entities.
+     *
+     * This method retrieves the table information for each entity, extracts the columns,
+     * and merges them into a single list.
+     *
+     * @param MagicObject[] $entities Array of entities to process.
+     * @return string[] List of column names from all entities.
+     */
+    public function getColumnNameList($entities)
+    {
+        $res = array();
+        foreach ($entities as $entity) {
+            $tableInfo = $this->getTableInfo($entity);
+            $columns = $tableInfo->getColumns();
+            $res = array_merge($res, array_keys($columns));
+        }
+        $res = array_unique($res);
+        return $res;
+    }
+
+    /**
      * Create a list of ALTER TABLE ADD COLUMN queries from multiple entities.
      *
      * This method generates SQL queries to add new columns to an existing table based on the provided entities. 
@@ -298,6 +320,8 @@ class PicoDatabaseDump
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
 
+        $dataTypeConverter = new DatabaseTypeConverter();
+
         if (!empty($tableInfo->getColumns())) {
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
@@ -310,7 +334,8 @@ class PicoDatabaseDump
                 foreach ($tableInfo->getColumns() as $entityColumn) {
                     if (!in_array($entityColumn['name'], $dbColumnNames)) {
                         $createdColumns[] = $entityColumn['name'];
-                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $entityColumn['type']);
+                        $columnType = $dataTypeConverter->convertType($entityColumn['type'], $database->getDatabaseType());
+                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $columnType);
                         $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
                         $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
                         $query = $this->updateQueryAlterTableAddColumn($query, $lastColumn, $database->getDatabaseType());
@@ -325,27 +350,6 @@ class PicoDatabaseDump
             }
         }
         return $queryAlter;
-    }
-
-    /**
-     * Get a list of column names from multiple entities.
-     *
-     * This method retrieves the table information for each entity, extracts the columns,
-     * and merges them into a single list.
-     *
-     * @param MagicObject[] $entities Array of entities to process.
-     * @return string[] List of column names from all entities.
-     */
-    public function getColumnNameList($entities)
-    {
-        $res = array();
-        foreach ($entities as $entity) {
-            $tableInfo = $this->getTableInfo($entity);
-            $columns = $tableInfo->getColumns();
-            $res = array_merge($res, array_keys($columns));
-        }
-        $res = array_unique($res);
-        return $res;
     }
 
     /**
@@ -374,6 +378,8 @@ class PicoDatabaseDump
         $queryAlter = array();
         $numberOfColumn = count($tableInfo->getColumns());
 
+        $dataTypeConverter = new DatabaseTypeConverter();
+
         if (!empty($tableInfo->getColumns())) {
             $dbColumnNames = array();
             $rows = PicoColumnGenerator::getColumnList($database, $tableInfo->getTableName());
@@ -386,7 +392,8 @@ class PicoDatabaseDump
                 foreach ($tableInfo->getColumns() as $entityColumn) {
                     if (!in_array($entityColumn['name'], $dbColumnNames)) {
                         $createdColumns[] = $entityColumn['name'];
-                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $entityColumn['type']);
+                        $columnType = $dataTypeConverter->convertType($entityColumn['type'], $database->getDatabaseType());
+                        $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $columnType);
                         $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
                         $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
                         $query = $this->updateQueryAlterTableAddColumn($query, $lastColumn, $database->getDatabaseType());

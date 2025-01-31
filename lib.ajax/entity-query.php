@@ -15,6 +15,13 @@ header("Content-type: text/plain");
 
 $dashedLine = "-- --------------------------------------------------------------";
 
+function implodeWithAnd($array) {
+    if (count($array) > 1) {
+        $lastElement = array_pop($array);
+        return implode(', ', $array) . ' and ' . $lastElement;
+    }
+    return $array[0];
+}
 try
 {
     if($database->isConnected())
@@ -111,7 +118,7 @@ try
                     if(!empty($entityQueries))
                     {
                         $entNames = array_unique($entityNames[$tableName]);
-                        $entityName = implode(", ", $entNames);
+                        $entityName = implodeWithAnd($entNames);
                         $entityName = str_replace("\\", ".", $entityName);
                         $allQueries[] = "-- SQL for $entityName begin";
                         $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
