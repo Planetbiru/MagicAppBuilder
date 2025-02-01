@@ -2051,6 +2051,18 @@ class DatabaseExplorer // NOSONAR
         $space = $dom->createTextNode(' ');
         $form->appendChild($space);
 
+        // Create save button
+        $save = $dom->createElement('button');
+        $save->setAttribute('type', 'button');
+        $save->setAttribute('class', 'btn btn-success save');
+        $buttonText = $dom->createTextNode('Save');
+        $save->appendChild($buttonText);
+        $form->appendChild($save);
+
+        // Add space between buttons
+        $space = $dom->createTextNode(' ');
+        $form->appendChild($space);
+
         // Create reset button
         $reset = $dom->createElement('button');
         $reset->setAttribute('type', 'reset');

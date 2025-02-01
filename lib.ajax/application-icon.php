@@ -30,6 +30,7 @@ try
     foreach ($_POST['images'] as $key => $image) {
         $images[] = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
     }
+    $imagePng = "image/png";
 
     // If PNG images are uploaded
     if (!empty($images)) {
@@ -51,17 +52,17 @@ try
                     [
                         "src" => "apple-icon-57x57.png",
                         "sizes" => "57x57",
-                        "type" => "image/png"
+                        "type" => $imagePng
                     ],
                     [
                         "src" => "apple-icon-60x60.png",
                         "sizes" => "60x60",
-                        "type" => "image/png"
+                        "type" => $imagePng
                     ],
                     [
                         "src" => "android-icon-192x192.png",
                         "sizes" => "192x192",
-                        "type" => "image/png"
+                        "type" => $imagePng
                     ]
                 ],
                 "start_url" => "/",
