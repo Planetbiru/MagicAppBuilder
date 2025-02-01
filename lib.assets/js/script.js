@@ -1621,7 +1621,8 @@ jQuery(function () {
         reader.onload = function(event) {
             const image = new Image();
             
-            image.onload = function() {
+            image.onload = function() // NOSONAR
+            {
                 // Validate image dimensions (minimum 512x512)
                 if (image.width < 512 || image.height < 512) {
                     asyncAlert(

@@ -192,6 +192,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.querySelector('[type="button"].save').addEventListener('click', function(event) {
+        event.preventDefault();
+        let query = document.querySelector('textarea[name="query"]').value.trim();
+        if(query.length > 0)
+        {
+            const blob = new Blob([query], { type: "text/plain" });
+
+            // Create a URL for the Blob
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary anchor element
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = 'query.sql'; // Set the filename to include the datetime suffix
+            document.body.appendChild(a);
+            a.click(); // Trigger the download by clicking the anchor
+            document.body.removeChild(a); // Clean up by removing the anchor
+            URL.revokeObjectURL(url); // Release the object URL
+        }
+    });
+
     document.querySelector('[type="submit"][name="___export_database___"]').addEventListener('click', function(event) {
         event.preventDefault();
         showConfirmationDialog('Are you sure you want to export the data from the database?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
