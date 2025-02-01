@@ -1601,7 +1601,18 @@ jQuery(function () {
     inputFile.addEventListener('change', function () {
         const selectedFile = inputFile.files[0]; // Get the selected file
         if (!selectedFile) {
-            alert("Please select a PNG file first.");
+            asyncAlert(
+              'Please select a PNG file first.',  // Message to display in the modal
+              'Notification',  
+              [
+                {
+                  'caption': 'Close',  
+                  'fn': () => {
+                  },  
+                  'class': 'btn-primary'  
+                }
+              ]
+            );
             return;
         }
         
@@ -1613,7 +1624,18 @@ jQuery(function () {
             image.onload = function() {
                 // Validate image dimensions (minimum 512x512)
                 if (image.width < 512 || image.height < 512) {
-                    alert("The image must be at least 512x512 pixels.");
+                    asyncAlert(
+                      'The image must be at least 512x512 pixels.',  // Message to display in the modal
+                      'Notification',  
+                      [
+                        {
+                          'caption': 'Close',  
+                          'fn': () => {
+                          },  
+                          'class': 'btn-primary'  
+                        }
+                      ]
+                    );
                     return;
                 }
 
@@ -1683,7 +1705,14 @@ jQuery(function () {
  *                                    This image is used to create the different icon sizes.
  */
 function generateFaviconICO(applicationId, image) {
-  const sizes = [16, 32, 48];  // Favicon sizes for ICO (can include more if necessary)
+  const sizes = [
+    16, 
+    32, 
+    48, 
+    64, 
+    128,
+    256
+  ];  // Favicon sizes for ICO (can include more if necessary)
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   const iconImages = [];
@@ -2625,6 +2654,8 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
   // Append the icon name (e.g., "favicon-16x16.png") to the FormData object
   formData.append('icon_name', iconName);
 
+  increaseAjaxPending();
+
   // Send the FormData to the server using the Fetch API
   fetch('lib.ajax/application-icons.php', {
       method: 'POST',  // Specify that this is a POST request
@@ -2634,12 +2665,17 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
   .then(data => {
       // Check if the response indicates success
       if (data.success) {
+          decreaseAjaxPending();
           console.log('Icon uploaded successfully:', data.filePath);  // Log success
       } else {
+          decreaseAjaxPending();
           console.error('Error uploading icon:', data.error);  // Log error
       }
   })
-  .catch(error => console.error('Error:', error));  // Log any errors during the fetch request
+  .catch(error => {
+    decreaseAjaxPending();
+    console.error('Error:', error);
+  });  // Log any errors during the fetch request
 }
 
 /**
@@ -2659,6 +2695,8 @@ function sendIconToServer(applicationId, iconImages, iconName) {
       formData.append('images[' + index + ']', imageData);  // Add each PNG image as a separate form data entry
   });
 
+  increaseAjaxPending();
+
   // Send the data to the server using a POST request
   fetch('lib.ajax/application-icon.php', {
       method: 'POST',
@@ -2667,14 +2705,18 @@ function sendIconToServer(applicationId, iconImages, iconName) {
   .then(response => response.json())
   .then(data => {
       if (data.success) {
+          decreaseAjaxPending();
           console.log('Icon uploaded successfully:', data.filePath);
       } else {
+          decreaseAjaxPending();
           console.error('Error uploading icon:', data.error);
       }
   })
-  .catch(error => console.error('Error:', error));
+  .catch(error => {
+    decreaseAjaxPending();
+    console.error('Error:', error);
+  });
 }
-
 
 /**
  * Converts a string from snake_case to UpperCamelCase.

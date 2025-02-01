@@ -16,7 +16,7 @@ try
 
     // Make sure the directory exists
     if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
 
     // Check if the required fields are present in the POST request
@@ -24,7 +24,7 @@ try
         // Get the base64 image data and icon name from POST data
         $base64Image = $_POST['image'];
         $iconName = $_POST['icon_name'];
-        if(stripos($iconName, ".png") === false && stripos($iconName, ".ico") === false)
+        if(stripos($iconName, ".png") === false)
         {
             $iconName .= ".png";
         }
