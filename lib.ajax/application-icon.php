@@ -75,26 +75,21 @@ try
                 'success' => true,
                 'filePath' => $icoPath
             ]);
-            exit();
         } catch (Exception $e) {
             // Handle errors if there is an issue using ImageMagick
             ResponseUtil::sendJSON([
                 'success' => false,
                 'error' => 'Error creating .ico file: ' . $e->getMessage()
             ]);
-            exit();
         }
-
     } else {
         ResponseUtil::sendJSON([
             'success' => false,
             'error' => 'No images were uploaded.'
         ]);
-        exit();
     }
 }
 catch(Exception $e)
 {
     ResponseUtil::sendJSON(new stdClass);
-    exit();
 }
