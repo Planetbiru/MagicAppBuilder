@@ -55,6 +55,7 @@ try
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-menu">Menu</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-database">Database</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-open">VS Code</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-icons">Icon</a>
             <a href="javascript:;" class="btn btn-sm btn-primary button-application-default">Default</a>
         </div>
     </div>

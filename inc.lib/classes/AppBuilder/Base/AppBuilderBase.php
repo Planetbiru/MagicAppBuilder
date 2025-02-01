@@ -1669,7 +1669,7 @@ else
         {
             $type = $this->getFilterType($field);
             
-            $multipleSelect = self::isTrue($field->getReferenceFilter()->getMultipleSelection());
+            $multipleSelect = $field->getReferenceFilter() && $field->getReferenceFilter()->getMultipleSelection();
             if($multipleSelect)
             {
                 $type .= "[]";

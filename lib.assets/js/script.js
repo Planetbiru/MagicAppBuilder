@@ -1589,6 +1589,81 @@ jQuery(function () {
     doFilterApplication($(this));
   });
 
+  $(document).on("click", '.button-application-icons', function () {
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    
+    // Create dynamic input file element
+    const inputFile = document.createElement('input');
+    inputFile.type = 'file';
+    inputFile.accept = 'image/png';  // Only accept PNG files
+
+    // Handle file selection change
+    inputFile.addEventListener('change', function () {
+        const selectedFile = inputFile.files[0]; // Get the selected file
+        if (!selectedFile) {
+            alert("Please select a PNG file first.");
+            return;
+        }
+        
+        // Read the file using FileReader
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const image = new Image();
+            
+            image.onload = function() {
+                // Validate image dimensions (minimum 512x512)
+                if (image.width < 512 || image.height < 512) {
+                    alert("The image must be at least 512x512 pixels.");
+                    return;
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const iconSizes = [
+                    { size: 16, name: "favicon-16x16.png" },
+                    { size: 32, name: "favicon-32x32.png" },
+                    { size: 48, name: "favicon-48x48.png" },
+                    { size: 57, name: "apple-icon-57x57.png" },
+                    { size: 60, name: "apple-icon-60x60.png" },
+                    { size: 72, name: "apple-icon-72x72.png" },
+                    { size: 76, name: "apple-icon-76x76.png" },
+                    { size: 114, name: "apple-icon-114x114.png" },
+                    { size: 120, name: "apple-icon-120x120.png" },
+                    { size: 144, name: "apple-icon-144x144.png" },
+                    { size: 152, name: "apple-icon-152x152.png" },
+                    { size: 180, name: "apple-icon-180x180.png" },
+                    { size: 192, name: "android-icon-192x192.png" },
+                    { size: 512, name: "android-icon-512x512.png" }
+                ];
+
+                // Generate icons for each size
+                iconSizes.forEach(icon => {
+                    canvas.width = icon.size;
+                    canvas.height = icon.size;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                    const dataUrl = canvas.toDataURL('image/png');
+
+                    // Send each PNG icon to the server
+                    sendIconToServer(applicationId, dataUrl, icon.name);
+                });
+
+                // Additional step: Generate favicon.ico
+                generateFaviconICO(image);
+            };
+          
+            // Load the image data
+            image.src = event.target.result;
+        };
+
+        // Read the image as a data URL
+        reader.readAsDataURL(selectedFile);
+    });
+
+    // Trigger input file dialog
+    inputFile.click();  // Open file selection dialog
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
@@ -1597,6 +1672,112 @@ jQuery(function () {
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
 });
+
+$(document).on("click", '.button-application-icons', function () {
+  let applicationId = $(this).closest('.application-item').attr('data-application-id');
+  
+  // Create dynamic input file element
+  const inputFile = document.createElement('input');
+  inputFile.type = 'file';
+  inputFile.accept = 'image/png';  // Only accept PNG files
+
+  // Handle file selection change
+  inputFile.addEventListener('change', function () {
+      const selectedFile = inputFile.files[0]; // Get the selected file
+      if (!selectedFile) {
+          alert("Please select a PNG file first.");
+          return;
+      }
+      
+      // Read the file using FileReader
+      const reader = new FileReader();
+      reader.onload = function(event) {
+          const image = new Image();
+          
+          image.onload = function() {
+              // Validate image dimensions (minimum 512x512)
+              if (image.width < 512 || image.height < 512) {
+                  alert("The image must be at least 512x512 pixels.");
+                  return;
+              }
+
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const iconSizes = [
+                  { size: 16, name: "favicon-16x16.png" },
+                  { size: 32, name: "favicon-32x32.png" },
+                  { size: 48, name: "favicon-48x48.png" },
+                  { size: 57, name: "apple-icon-57x57.png" },
+                  { size: 60, name: "apple-icon-60x60.png" },
+                  { size: 72, name: "apple-icon-72x72.png" },
+                  { size: 76, name: "apple-icon-76x76.png" },
+                  { size: 114, name: "apple-icon-114x114.png" },
+                  { size: 120, name: "apple-icon-120x120.png" },
+                  { size: 144, name: "apple-icon-144x144.png" },
+                  { size: 152, name: "apple-icon-152x152.png" },
+                  { size: 180, name: "apple-icon-180x180.png" },
+                  { size: 192, name: "android-icon-192x192.png" },
+                  { size: 512, name: "android-icon-512x512.png" }
+              ];
+
+              // Generate icons for each size
+              iconSizes.forEach(icon => {
+                  canvas.width = icon.size;
+                  canvas.height = icon.size;
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                  ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                  const dataUrl = canvas.toDataURL('image/png');
+
+                  // Send each PNG icon to the server
+                  //sendIconPngToServer(applicationId, dataUrl, icon.name);
+              });
+
+              // Additional step: Generate favicon.ico
+              generateFaviconICO(applicationId, image);
+          };
+        
+          // Load the image data
+          image.src = event.target.result;
+      };
+
+      // Read the image as a data URL
+      reader.readAsDataURL(selectedFile);
+  });
+
+  // Trigger input file dialog
+  inputFile.click();  // Open file selection dialog
+});
+
+/**
+ * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
+ * and sending them to the server to create a single ICO file.
+ * 
+ * @param {string} applicationId - The unique identifier for the application. 
+ *                                  This ID will be associated with the uploaded favicon.
+ * @param {HTMLImageElement} image - The image to generate the favicon from. 
+ *                                    This image is used to create the different icon sizes.
+ */
+function generateFaviconICO(applicationId, image) {
+  const sizes = [16, 32, 48];  // Favicon sizes for ICO (can include more if necessary)
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const iconImages = [];
+
+  sizes.forEach(size => {
+      canvas.width = size;
+      canvas.height = size;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
+      
+      // Push the canvas data for each size
+      const dataUrl = canvas.toDataURL('image/png');
+      iconImages.push(dataUrl);
+  });
+
+  // After generating the individual icon sizes, send them to the server to create the .ico file
+  sendIconToServer(applicationId, iconImages, 'favicon.ico');
+}
+
 
 function doFilterWorkspace(elem)
 {
@@ -2493,6 +2674,82 @@ function translateModule() {
     },
   });
 }
+
+
+/**
+ * Sends the generated icon to the server for storage.
+ * 
+ * @param {string} applicationId - The ID of the application associated with the icon.
+ * @param {string} dataUrl - The base64 encoded image data of the icon.
+ * @param {string} iconName - The name of the icon file (e.g., "favicon-16x16.png").
+ * 
+ * This function creates a FormData object, appends the application ID, base64 image data, and icon name to it, 
+ * and sends it to the server using a POST request. The server endpoint is expected to handle the image upload 
+ * and return a success or error response.
+ */
+function sendIconPngToServer(applicationId, dataUrl, iconName) {
+  // Create a new FormData object to send to the server
+  const formData = new FormData();
+  
+  // Append the application ID to the FormData object
+  formData.append('application_id', applicationId);
+  
+  // Append the base64 encoded image data (icon) to the FormData object
+  formData.append('image', dataUrl);  // base64 image data
+  
+  // Append the icon name (e.g., "favicon-16x16.png") to the FormData object
+  formData.append('icon_name', iconName);
+
+  // Send the FormData to the server using the Fetch API
+  fetch('lib.ajax/application-icons.php', {
+      method: 'POST',  // Specify that this is a POST request
+      body: formData    // Attach the FormData object to the body of the request
+  })
+  .then(response => response.json())  // Parse the server's response as JSON
+  .then(data => {
+      // Check if the response indicates success
+      if (data.success) {
+          console.log('Icon uploaded successfully:', data.filePath);  // Log success
+      } else {
+          console.error('Error uploading icon:', data.error);  // Log error
+      }
+  })
+  .catch(error => console.error('Error:', error));  // Log any errors during the fetch request
+}
+
+/**
+ * Sends the generated icon data to the server.
+ * 
+ * @param {string} applicationId - The unique identifier for the application.
+ * @param {Array} iconImages - An array of base64 PNG images for different icon sizes.
+ * @param {string} iconName - The name of the icon file (e.g., 'favicon.ico').
+ */
+function sendIconToServer(applicationId, iconImages, iconName) {
+  const formData = new FormData();
+  formData.append('application_id', applicationId);  // Add the application ID
+  formData.append('icon_name', iconName);  // Add the icon file name
+  
+  // Loop through each icon image and append it to the form data
+  iconImages.forEach((imageData, index) => {
+      formData.append('images[' + index + ']', imageData);  // Add each PNG image as a separate form data entry
+  });
+
+  // Send the data to the server using a POST request
+  fetch('lib.ajax/application-icon.php', {
+      method: 'POST',
+      body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.success) {
+          console.log('Icon uploaded successfully:', data.filePath);
+      } else {
+          console.error('Error uploading icon:', data.error);
+      }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
 
 /**
  * Converts a string from snake_case to UpperCamelCase.

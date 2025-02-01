@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -14,23 +15,27 @@ $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZ
 
 if($applicationId != null)
 {
-    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
-    if(file_exists($appConfigPath))
+    $application = new EntityApplication(null, $databaseBuilder);
+    try
     {
-        $appConfig->loadYamlFile($appConfigPath, false, true, true);
-    }
-}
-$menuPath = $activeApplication->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
-if(!file_exists($menuPath))
-{
-    if(!file_exists(basename($menuPath)))
-    {
-        mkdir(dirname($menuPath), 0755, true);
-    }
-    file_put_contents($menuPath, "");
-}
+        $application->findOneByApplicationId($applicationId);
+        $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
+        if(!file_exists($menuPath))
+        {
+            if(!file_exists(basename($menuPath)))
+            {
+                mkdir(dirname($menuPath), 0755, true);
+            }
+            file_put_contents($menuPath, "");
+        }
 
-$data = json_decode($inputPost->getData(), true);
-$yaml = PicoYamlUtil::dump($data, 0, 2, 0);
-file_put_contents($menuPath, $yaml);
-ResponseUtil::sendJSON(new stdClass);
+        $data = json_decode($inputPost->getData(), true);
+        $yaml = PicoYamlUtil::dump($data, 0, 2, 0);
+        file_put_contents($menuPath, $yaml);
+        ResponseUtil::sendJSON(new stdClass);
+    }
+    catch(Exception $e)
+    {
+        ResponseUtil::sendJSON(new stdClass);
+    }
+}
