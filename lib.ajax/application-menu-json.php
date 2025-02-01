@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\Entity\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
@@ -17,23 +18,27 @@ if(!isset($applicationId) || empty($applicationId))
 
 if($applicationId != null)
 {
-    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$activeApplication->getApplicationId()."/default.yml";
-    
-    if(file_exists($appConfigPath))
+    $application = new EntityApplication(null, $databaseBuilder);
+    try
     {
-        $appConfig->loadYamlFile($appConfigPath, false, true, true);
-    }
-}
-$menuPath = $activeApplication->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
-if(!file_exists($menuPath))
-{
-    if(!file_exists(dirname($menuPath)))
-    {
-        mkdir(dirname($menuPath), 0755, true);
-    }
-    file_put_contents($menuPath, "");
-}
+        $application->findOneByApplicationId($applicationId);
 
-$menus = new SecretObject();
-$menus->loadYamlFile($menuPath, false, true, true);
-ResponseUtil::sendJSON($menus, false, true);
+        $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
+        if(!file_exists($menuPath))
+        {
+            if(!file_exists(dirname($menuPath)))
+            {
+                mkdir(dirname($menuPath), 0755, true);
+            }
+            file_put_contents($menuPath, "");
+        }
+
+        $menus = new SecretObject();
+        $menus->loadYamlFile($menuPath, false, true, true);
+        ResponseUtil::sendJSON($menus, false, true);
+    }
+    catch(Exception $e)
+    {
+        ResponseUtil::sendJSON(new stdClass, false, true);
+    }
+}

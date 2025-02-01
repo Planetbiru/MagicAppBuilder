@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\Entity\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoFieldWaitingFor;
 use MagicApp\AppDto\MocroServices\PicoInputField;
@@ -12,14 +12,18 @@ use MagicObject\Response\PicoResponse;
 
 require_once __DIR__ . "/database.php";
 
-$entity = new EntityAdmin(null, $database);
-$entity->findOneByUsername("administrator");
+$entity = new EntityApplication(null, $database);
+$entity->findOneByApplicationId("tukang");
 $data = new PicoUserFormOutputDetail();
 
-$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("adminId", $entity->label("adminId")), "string", new PicoInputField($entity->get("adminId"), $entity->get("adminId"))));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("applicationId", $entity->label("applicationId")), "string", new PicoInputField($entity->get("applicationId"), $entity->get("applicationId"))));
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("name", $entity->label("name")), "string", new PicoInputField($entity->get("name"), $entity->get("name"))));
-$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("adminLevelId", $entity->label("adminLevelId")), "string", new PicoInputField($entity->get("adminLevelId"), $entity->get("adminLevel") != null ? $entity->get("adminLevel")->get("name") : "")));
-
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("description", $entity->label("description")), "string", new PicoInputField($entity->get("description"), $entity->get("description"))));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("workspace", $entity->label("workspace")), "string", new PicoInputField($entity->get("workspaceId"), $entity->hasValue("workspace") ? $entity->get("workspace")->get("name") : null)));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("architecture", $entity->label("architecture")), "string", new PicoInputField($entity->get("architecture"), $entity->get("architecture"))));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("projectDirectory", $entity->label("projectDirectory")), "string", new PicoInputField($entity->get("projectDirectory"), $entity->get("projectDirectory"))));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("baseApplicationDirectory", $entity->label("baseApplicationDirectory")), "string", new PicoInputField($entity->get("baseApplicationDirectory"), $entity->get("baseApplicationDirectory"))));
+$data->addOutput(new PicoOutputFieldDetail(new PicoInputField("author", $entity->label("author")), "string", new PicoInputField($entity->get("author"), $entity->get("author"))));
 
 $data->setWaitingfor(new PicoFieldWaitingFor(1, "new", "new"));
 
@@ -34,10 +38,10 @@ $body = PicoResponseBody::getInstance()
   	->setModule($picoModule)
     ->setData($data)
     ->setEntity($entity, true)
-    ->switchCaseTo("camelCase")
     ->setResponseCode("000")
     ->setResponseText("Success")
 	->switchCaseTo("snake_case")
+    ->prettify(true)
     ;
 	
 PicoResponse::sendResponse($body);

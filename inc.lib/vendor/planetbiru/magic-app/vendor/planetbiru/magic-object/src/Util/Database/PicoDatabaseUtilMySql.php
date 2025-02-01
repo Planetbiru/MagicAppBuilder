@@ -128,7 +128,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $columnType = $column[MagicObject::KEY_TYPE];
 
         $col[] = "`" . $columnName . "`";  // Enclose column name in backticks
-        $col[] = $columnType;  // Add the column type (e.g., INT, VARCHAR)
+        $col[] = strtoupper($columnType);  // Add the column type (e.g., INT, VARCHAR)
 
         // Check if the column is part of primary keys
         if (in_array($columnName, $pkCols)) {
@@ -176,7 +176,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $result = $defaultValue;
         if(stripos($type, 'tinyint(1)') !== false || self::isTypeBoolean($type))
         {
-            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'true' : 'false';
+            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'TRUE' : 'FALSE';
         }
         else if(self::isNativeValue($defaultValue))
         {

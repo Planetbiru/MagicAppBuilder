@@ -2518,14 +2518,14 @@ else {
     <title>Database Explorer</title>
     <link rel="icon" type="image/png" href="../favicon.png" />
     <link rel="shortcut icon" type="image/png" href="../favicon.png" />
-    <link rel="stylesheet" href="../lib.assets/css/entity-editor.css">
-    <link rel="stylesheet" href="../lib.assets/css/database-explorer.css">
-    <script src="../lib.assets/js/TableParser.js"></script>
-    <script src="../lib.assets/js/SQLConverter.js"></script>
-    <script src="../lib.assets/js/EntityEditor.js"></script>
-    <script src="../lib.assets/js/EntityRenderer.js"></script>
-    <script src="../lib.assets/js/ResizablePanel.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
+    <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
+    <script src="../lib.assets/js/TableParser.min.js"></script>
+    <script src="../lib.assets/js/SQLConverter.min.js"></script>
+    <script src="../lib.assets/js/EntityEditor.min.js"></script>
+    <script src="../lib.assets/js/EntityRenderer.min.js"></script>
+    <script src="../lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -2641,6 +2641,7 @@ else {
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
                         </div>
+
                         <!-- Entity Editor Form -->
                         <div class="editor-form" style="display:none;">
                             <div class="entity-container">

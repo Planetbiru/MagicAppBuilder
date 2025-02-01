@@ -297,7 +297,7 @@ class PicoDatabaseUtil
         return addslashes($value);
     }
 
-   /**
+    /**
      * Trim a WHERE clause by removing unnecessary characters.
      *
      * This method cleans up a raw WHERE clause by trimming whitespace

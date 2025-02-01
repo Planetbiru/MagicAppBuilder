@@ -54,6 +54,8 @@ $files = new PicoUploadFile();
 $file1 = $files->get('myupload');
 // or alternatively
 // $file1 = $files->myupload;
+// or
+// $file1 = $files->getMyupload();
 
 $targetDir = __DIR__;
 

@@ -41,7 +41,6 @@ $data->setFilter(
     )
 );
 
-
 echo PicoResponseBody::getInstance()
     ->setData($data)
     ->setEntity($entity)

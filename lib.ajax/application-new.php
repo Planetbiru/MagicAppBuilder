@@ -27,8 +27,6 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 $bundeledMagicAppVersion = "2.15.18";
 
-
-
 if (ComposerUtil::checkInternetConnection()) {
     // Online
     try

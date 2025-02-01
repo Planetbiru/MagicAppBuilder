@@ -131,7 +131,7 @@ class MultiSelect {
                 for (const option of group.options) {
                     underOptgroupHTML += `
                         <div class="multi-select-option-container">
-                            <div class="multi-select-option${this._getSelectedClass(option.value)}" data-value="${option.value}">
+                            <div class="multi-select-option${this._getSelectedClass(option.value, group.selected)}" data-value="${option.value}">
                                 <span class="multi-select-option-radio"></span>
                                 <span class="multi-select-option-text">${this._getText(option)}</span>
                             </div>
@@ -144,13 +144,26 @@ class MultiSelect {
                 // Options outside the optgroup
                 nonSelectAllOptionsHTML += `
                     <div class="multi-select-option-container">
-                        <div class="multi-select-option${this._getSelectedClass(group.value)}" data-value="${group.value}">
+                        <div class="multi-select-option${this._getSelectedClass(group.value, group.selected)}" data-value="${group.value}">
                             <span class="multi-select-option-radio"></span>
                             <span class="multi-select-option-text">${this._getText(group)}</span>
                         </div>
                     </div>
                 `;
             }
+        }
+        let selectedValues = [];
+        if(this.selectedValues.length == 0)
+        {
+            for (const group of this.data) {
+                if (group.selected) {
+                    selectedValues.push(group.value)
+                }
+            }
+        }
+        else
+        {
+            selectedValues = this.selectedValues;
         }
 
         // If 'Select All' is enabled, add HTML for Select All
@@ -162,10 +175,12 @@ class MultiSelect {
         }
 
         // Combine all HTML into one template
+
+        let hidenInput = selectedValues.map(value => `<input type="hidden" name="${this.name}[]" value="${value}">`).join('\r\n');
         let template = `
             <div class="multi-select ${this.name}"${this.selectElement.id ? ' id="' + this.selectElement.id + '"' : ''} style="${this._getDimension()}">
                 <div class="multi-select-hidden-input-area" style="display:none;">
-                    ${this.selectedValues.map(value => `<input type="hidden" name="${this.name}[]" value="${value}">`).join('\r\n')}
+                    ${hidenInput}
                 </div>
                 <div class="multi-select-header" style="${this._getDimension()}">
                     <span class="multi-select-header-max">${this.options.max ? this.selectedValues.length + '/' + this.options.max : ''}</span>
@@ -205,11 +220,12 @@ class MultiSelect {
      * 
      * @private
      * @param {string} value - The value of the option.
+     * @param {Boolean} selected - The value of the option.
      * @returns {string} The class to be applied to the option.
      */
-    _getSelectedClass(value)
+    _getSelectedClass(value, selected)
     {
-        return `${this.selectedValues.includes(value) ? ' multi-select-selected' : ''}`;
+        return `${this.selectedValues.includes(value) || selected ? ' multi-select-selected' : ''}`;
     }
 
     /**

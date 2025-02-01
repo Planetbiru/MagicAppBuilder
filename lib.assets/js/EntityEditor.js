@@ -583,13 +583,18 @@ class EntityEditor {
         document.addEventListener('change', function (event) {
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
+                const tr = event.target.closest('tr');
                 if(isChecked)
-                {
-                    const tr = event.target.closest('tr');
+                {  
                     tr.querySelector('.column-type').value = _this.primaryKeyDataType;
                     _this.updateColumnLengthInput(tr.querySelector('.column-type'));
                     tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
                     tr.querySelector('.column-nullable').checked = false;
+                    tr.querySelector('.column-nullable').disabled = true;
+                }
+                else
+                {
+                    tr.querySelector('.column-nullable').disabled = false;
                 }
             }
         });
@@ -777,6 +782,16 @@ class EntityEditor {
         let columnLength = column.length == null ? '' : column.length.replace(/\D/g,'');
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        let nullable = '';
+        if(column.primaryKey)
+        {
+            nullable = 'disabled';
+        }
+        else if(column.nullable)
+        {
+            nullable = 'checked';
+        }
+        
         row.innerHTML = `
             <td class="column-action">
                 <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
@@ -792,7 +807,7 @@ class EntityEditor {
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
-            <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
+            <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''}></td>
         `;

@@ -28,16 +28,16 @@ class PicoOutputDataItem extends PicoEntityData
     /**
      * Primary key values for the data item.
      *
-     * @var PrimaryKeyValue[]
+     * @var PicoPrimaryKeyValue[]
      */
     protected $primaryKeyValue;
 
     /**
      * The current status of the data item, typically used to indicate 
      * whether the item is waiting for a specific action, such as approval, 
-     * update, or another process. This status is represented by a `FieldWaitingFor` object.
+     * update, or another process. This status is represented by a `PicoFieldWaitingFor` object.
      *
-     * @var FieldWaitingFor|null
+     * @var PicoFieldWaitingFor|null
      */
     protected $waitingFor;
 
@@ -120,7 +120,7 @@ class PicoOutputDataItem extends PicoEntityData
             $this->primaryKeyValue = [];
             foreach ($primaryKey as $pk) {
                 if ($entity->get($pk) !== null) {
-                    $this->primaryKeyValue[] = $entity->get($pk);
+                    $this->primaryKeyValue[] = new PicoPrimaryKeyValue($pk, $entity->get($pk));
                 }
             }
         }

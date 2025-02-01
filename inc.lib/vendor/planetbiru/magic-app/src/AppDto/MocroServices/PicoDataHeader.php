@@ -82,4 +82,32 @@ class PicoDataHeader extends PicoObjectToString
 
         return $this;
     }
+
+    /**
+     * Get the field value.
+     *
+     * This method retrieves the field value, which can be a string or other data type depending on the field's nature.
+     *
+     * @return mixed The value of the field.
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Set the field value.
+     *
+     * This method sets the value of the field, which can be a string or other data type.
+     *
+     * @param mixed $value The value to be set for the field.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
 }

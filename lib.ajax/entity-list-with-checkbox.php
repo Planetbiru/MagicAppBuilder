@@ -48,6 +48,7 @@ try {
 
     $rootDiv->appendChild($createCheckbox('entity-check-controll', 'Select all', $chk));
     $rootDiv->appendChild($createCheckbox('entity-merge', 'Merge queries by table', true));
+    $rootDiv->appendChild($createCheckbox('entity-create-new', 'Create new', false));
 
     $rootDiv->appendChild($dom->createElement('h4', 'Data'));
 

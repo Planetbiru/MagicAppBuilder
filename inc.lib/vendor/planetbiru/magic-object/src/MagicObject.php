@@ -1264,6 +1264,20 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
+     * Check if a property has a value set.
+     *
+     * This method checks if the specified property is set (exists and has a value). It returns true if the property exists and has a value, and false otherwise.
+     *
+     * @param string $propertyName The name of the property to check.
+     * @return bool True if the property is set, false otherwise.
+     */
+    public function hasValue($propertyName)
+    {
+        $var = PicoStringUtil::camelize($propertyName);
+        return isset($this->{$var});
+    }
+
+    /**
      * Get the value of a property or a default value if the property is not set.
      *
      * This method retrieves the value of the specified property. If the property is not set, the provided default value is returned.

@@ -2,6 +2,8 @@
 
 namespace MagicObject\Util\Database;
 
+use MagicObject\Database\PicoDatabaseType;
+
 /**
  * Class DatabaseTypeConverter
  *
@@ -60,17 +62,21 @@ class DatabaseTypeConverter
         "int" => "integer",         // MySQL int to PostgreSQL integer
         "bigint" => "bigint",       // MySQL bigint to PostgreSQL bigint
         "float" => "real",          // MySQL float to PostgreSQL real
-        "double" => self::TYPE_DOUBLE_PRECISION, // MySQL double to PostgreSQL double precision
+        "double" => "double precision", // MySQL double to PostgreSQL double precision
+        "decimal" => "numeric",     // MySQL decimal to PostgreSQL numeric
         "varchar" => self::TYPE_CHARACTER_VARYING, // MySQL varchar to PostgreSQL character varying
         "char" => "character",      // MySQL char to PostgreSQL character
         "text" => "text",           // MySQL text to PostgreSQL text
+        "longtext" => "text",       // MySQL longtext to PostgreSQL text
+        "tinytext" => "text",       // MySQL tinytext to PostgreSQL text
         "datetime" => "timestamp",  // MySQL datetime to PostgreSQL timestamp
         "timestamp" => "timestamp with time zone", // MySQL timestamp to PostgreSQL timestamp with time zone
         "date" => "date",           // MySQL date to PostgreSQL date
         "time" => "time",           // MySQL time to PostgreSQL time
+        "year" => "smallint",       // MySQL year to PostgreSQL smallint
         "json" => "jsonb",          // MySQL json to PostgreSQL jsonb
         "uuid" => "uuid"            // MySQL uuid to PostgreSQL uuid
-    ];
+    ];    
 
     /**
      * Map of MySQL types to SQLite types.
@@ -85,16 +91,20 @@ class DatabaseTypeConverter
         "bigint" => "INTEGER",      // MySQL bigint to SQLite INTEGER
         "float" => "REAL",          // MySQL float to SQLite REAL
         "double" => "REAL",         // MySQL double to SQLite REAL
-        "varchar" => "TEXT",        // MySQL varchar to SQLite TEXT
+        "decimal" => "REAL",        // MySQL decimal to SQLite REAL (SQLite does not have a specific decimal type)
+        "varchar" => "NVARCHAR",    // MySQL varchar to SQLite TEXT
         "char" => "TEXT",           // MySQL char to SQLite TEXT
+        "longtext" => "TEXT",       // MySQL longtext to SQLite TEXT
         "text" => "TEXT",           // MySQL text to SQLite TEXT
-        "datetime" => "TEXT",       // MySQL datetime to SQLite TEXT
-        "timestamp" => "TEXT",      // MySQL timestamp to SQLite TEXT
-        "date" => "TEXT",           // MySQL date to SQLite TEXT
-        "time" => "TEXT",           // MySQL time to SQLite TEXT
+        "tinytext" => "TEXT",       // MySQL tinytext to SQLite TEXT
+        "datetime" => "DATETIME",   // MySQL datetime to SQLite TEXT (SQLite stores datetime as text), but we need DATETIME
+        "timestamp" => "TIMESTAMP", // MySQL timestamp to SQLite TEXT, but we need TIMESTAMP
+        "date" => "DATE",           // MySQL date to SQLite TEXT, but we need DATE
+        "time" => "TIME",           // MySQL time to SQLite TEXT, but we need TIME
+        "year" => "INTEGER",        // MySQL year to SQLite INTEGER (SQLite stores years as INTEGER)
         "json" => "TEXT",           // MySQL json to SQLite TEXT
         "uuid" => "TEXT"            // MySQL uuid to SQLite TEXT
-    ];
+    ];    
 
     /**
      * Map of PostgreSQL types to MySQL types.
@@ -135,9 +145,10 @@ class DatabaseTypeConverter
         self::TYPE_CHARACTER_VARYING => "TEXT", // PostgreSQL character varying to SQLite TEXT
         "character" => "TEXT",      // PostgreSQL character to SQLite TEXT
         "text" => "TEXT",           // PostgreSQL text to SQLite TEXT
-        "timestamp" => "TEXT",      // PostgreSQL timestamp to SQLite TEXT
-        "date" => "TEXT",           // PostgreSQL date to SQLite TEXT
-        "time" => "TEXT",           // PostgreSQL time to SQLite TEXT
+        "timestamp" => "TIMESTAMP", // PostgreSQL timestamp to SQLite TEXT
+        "datetime" => "DATETIME",   // PostgreSQL date to SQLite TEXT
+        "date" => "DATE",           // PostgreSQL date to SQLite TEXT
+        "time" => "TIME",           // PostgreSQL time to SQLite TEXT
         "jsonb" => "TEXT",          // PostgreSQL jsonb to SQLite TEXT
         "uuid" => "TEXT"            // PostgreSQL uuid to SQLite TEXT
     ];
@@ -311,5 +322,34 @@ class DatabaseTypeConverter
         }
 
         return "`$columnName` $columnType";
+    }
+
+    /**
+     * Converts a column type from MySQL to the target database type (PostgreSQL or SQLite).
+     *
+     * This method takes a column type (e.g., "varchar", "int") and converts it
+     * to the appropriate data type for the specified target database (PostgreSQL or SQLite).
+     * It uses predefined mappings for MySQL to PostgreSQL and MySQL to SQLite conversions.
+     *
+     * @param string $columnType The column type to be converted (e.g., "varchar", "int").
+     * @param string $databaseType The target database type. This can be one of the following:
+     *                             - PicoDatabaseType::DATABASE_TYPE_POSTGRESQL
+     *                             - PicoDatabaseType::DATABASE_TYPE_SQLITE
+     *
+     * @return string The corresponding column type for the target database, in uppercase.
+     *                If no match is found in the predefined mappings, the original column type is returned.
+     */
+    public function convertType($columnType, $databaseType)
+    {
+        $columnType = strtolower($columnType);
+        if($databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL && isset($this->mysqlToPostgresql[$columnType]))
+        {
+            return strtoupper($this->mysqlToPostgresql[$columnType]);
+        }
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE && isset($this->mysqlToSQLite[$columnType]))
+        {
+            return strtoupper($this->mysqlToSQLite[$columnType]);
+        }
+        return strtoupper($columnType);
     }
 }

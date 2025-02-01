@@ -54,7 +54,7 @@ $data->addFilter(
         "select", 
         "string", 
         "url", 
-        "workspace.php?user_action=show-option&field=adminId", 
+        "?user_action=show-option&field=adminId", 
         null, 
         new PicoInputField("admin", "Administrator")
     )
@@ -94,4 +94,5 @@ echo PicoResponseBody::getInstance()
     ->switchCaseTo("camelCase")
     ->setResponseCode("000")
     ->setResponseText("Success")
+    ->prettify(true)
     ;
