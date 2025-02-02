@@ -1709,10 +1709,7 @@ function generateFaviconICO(applicationId, image) {
   const sizes = [
     16, 
     32, 
-    48, 
-    64, 
-    128,
-    256
+    48
   ];  // Favicon sizes for ICO (can include more if necessary)
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
