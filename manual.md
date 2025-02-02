@@ -701,7 +701,7 @@ Go to the Apps tab, and MagicAppBuilder will display the application cards. Clic
 
 The `favicon.ico` file contains 3 images with sizes of 16x16, 32x32, and 48x48 pixels.
 
-The application also generates a `manifest.json` file containing the following information:
+MagicAppBuilder also generates a `manifest.json` file containing the following information:
 
 ```json
 {
