@@ -668,3 +668,53 @@ You can create localization by translating both modules and entities into other 
 3. **Translate Entities One by One**:
 
    - You will need to translate each entity individually.
+
+## Step 13: Add Favicon to the Application
+
+Go to the Apps tab, and MagicAppBuilder will display the application cards. Click the Icon button on an application. Upload a square image in PNG format. The minimum image size is 512x125 pixels. The application will automatically generate several icon files in the application directory with the following names:
+
+- favicon-16x16.png
+- favicon-32x32.png
+- favicon-48x48.png
+- apple-icon-57x57.png
+- apple-icon-60x60.png
+- apple-icon-72x72.png
+- apple-icon-76x76.png
+- apple-icon-114x114.png
+- apple-icon-120x120.png
+- apple-icon-144x144.png
+- apple-icon-152x152.png
+- apple-icon-180x180.png
+- android-icon-192x192.png
+- android-icon-512x512.png
+- favicon.ico
+
+The `favicon.ico` file contains 3 images with sizes of 16x16, 32x32, and 48x48 pixels.
+
+The application also generates a `manifest.json` file containing the following information:
+
+```json
+{
+    "name": "Application Name",
+    "short_name": "AppName",
+    "icons": [
+        {
+            "src": "apple-icon-57x57.png",
+            "sizes": "57x57",
+            "type": "image\/png"
+        },
+        {
+            "src": "apple-icon-60x60.png",
+            "sizes": "60x60",
+            "type": "image\/png"
+        },
+        {
+            "src": "android-icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image\/png"
+        }
+    ],
+    "start_url": "\/",
+    "display": "standalone"
+}
+```
