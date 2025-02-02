@@ -1,6 +1,9 @@
 <?php
 
 use AppBuilder\Entity\EntityAdminWorkspace;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
+use MagicObject\Database\PicoSpecification;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 $selected = "false";
@@ -10,7 +13,16 @@ try
 {
     $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
     $currentWorkspaceId = isset($entityAdmin) && $entityAdmin->issetWorkspaceId() ? $entityAdmin->getWorkspaceId() : null;
-    $pageData = $workspaceFinder->findDescByAdminIdAndActive($adminId, true);
+
+
+    $specs = PicoSpecification::getInstance()
+        ->add(['adminId', $adminId])
+        ->add(['active', true])
+        ->add(['workspace.active', true])
+        ;
+    $sorts = new PicoSortable('workspace.sortOrder', PicoSort::ORDER_TYPE_ASC, 'workspace.timeCreate', PicoSort::ORDER_TYPE_DESC);
+
+    $pageData = $workspaceFinder->findAll($specs, null, $sorts);
     if($pageData->getTotalResult() > 0)
     {
         foreach($pageData->getResult() as $row)
