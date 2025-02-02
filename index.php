@@ -18,8 +18,8 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <meta name="workspace-id" content="<?php echo $workspaceId;?>">
   <meta name="application-id" content="<?php echo $applicationId;?>">
   <title>MagicAppBuilder</title>
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="shortcut icon" type="image/png" href="favicon.png" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/css.css">

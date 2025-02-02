@@ -2528,8 +2528,8 @@ else {
     <meta name="database-schema" content="<?php echo $schemaName;?>">
     <meta name="application-id" content="<?php echo $applicationId;?>">
     <title>Database Explorer</title>
-    <link rel="icon" type="image/png" href="../favicon.png" />
-    <link rel="shortcut icon" type="image/png" href="../favicon.png" />
+    <link rel="icon" type="image/x-icon" href="../favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/js/TableParser.min.js"></script>
