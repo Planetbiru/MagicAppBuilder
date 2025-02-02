@@ -42,3 +42,7 @@ if($applicationId != null)
         ResponseUtil::sendJSON(new stdClass, false, true);
     }
 }
+else
+{
+    ResponseUtil::sendJSON(new stdClass, false, true);
+}

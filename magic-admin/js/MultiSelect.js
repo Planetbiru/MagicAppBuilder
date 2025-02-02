@@ -112,7 +112,8 @@ class MultiSelect {
      * @private
      * @returns {HTMLElement} The generated HTML element representing the multi-select dropdown.
      */
-    _template() {
+    _template() // NOSONAR
+    {
         let optionsHTML = ''; // HTML for optgroup
         let nonSelectAllOptionsHTML = '';  // HTML for non-optgroup options
         let selectAllHTML = ''; // HTML for Select All

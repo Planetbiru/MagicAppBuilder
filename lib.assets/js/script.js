@@ -1918,13 +1918,16 @@ function loadAllResource() {
   loadApplicationList();
   loadPathList();
   loadLanguageList();
+  
   loadMenu();
   loadTable();
   updateEntityQuery(false);
+  
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
   initTooltip();
+  
 }
 
 /**
@@ -1934,15 +1937,7 @@ function loadAllResource() {
  * It also updates entity queries, diagrams, files, and initializes tooltips for the default workspace.
  */
 function onSetDefaultWorkspace() {
-  loadWorkspaceList();
-  loadApplicationList();
-  loadMenu();
-  loadTable();
-  updateEntityQuery(false);
-  updateEntityRelationshipDiagram();
-  updateEntityFile();
-  updateModuleFile();
-  initTooltip();
+  loadAllResource();
 }
 
 /**
@@ -3367,9 +3362,9 @@ function updateEntityQuery(autoload) {
       $(".entity-container-query .entity-list").empty().append(data);
       let ents = getEntitySelection();
       let merged = $(".entity-merge");
-      let createNew = $(".entity-create-new")[0].checked;
-      if (merged.length > 0 && autoload) {
-        getEntityQuery(ents, merged[0].checked, createNew);
+      let createNew = $(".entity-create-new");
+      if (merged.length > 0 && createNew.length > 0 && autoload) {
+        getEntityQuery(ents, merged[0].checked, createNew[0].checked);
       }
     },
   });
@@ -4080,6 +4075,10 @@ function loadMenu() {
           );
         }
       }
+    },
+    error: function(er)
+    {
+      decreaseAjaxPending();
     }
   });
 }
