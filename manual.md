@@ -98,13 +98,17 @@ After these steps, the SQLite driver will be enabled for PHP on your Windows ser
 
 To begin setting up MagicAppBuilder on your server, follow these steps:
 
-1. **Visit the MagicAppBuilder GitHub Repository**Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder](https://github.com/Planetbiru/MagicAppBuilder).
+1. **Visit the MagicAppBuilder GitHub Repository**
+   Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder](https://github.com/Planetbiru/MagicAppBuilder).
 2. **Download the Latest Release**Once on the GitHub page, navigate to the **Releases** section. Here, you’ll find the most recent stable version of MagicAppBuilder. Click on the release to download the ZIP file containing the latest version.
-3. **Extract the Files to Your Server’s Document Root**After downloading the release, extract the ZIP file into the **Document Root** directory of your web server. The Document Root is typically a directory like `/var/www/html` on Linux-based systems or `C:\xampp\htdocs` if you’re using XAMPP on Windows.
+3. **Extract the Files to Your Server’s Document Root**
+   After downloading the release, extract the ZIP file into the **Document Root** directory of your web server. The Document Root is typically a directory like `/var/www/html` on Linux-based systems or `C:\xampp\htdocs` if you’re using XAMPP on Windows.
 
    Make sure you extract the files into a directory named **MagicAppBuilder**. This will ensure that the application is easily accessible via the correct URL path.
-4. **Verify Web Server Operation**Ensure that your web server (e.g., Apache or Nginx) is running correctly. You can do this by checking if the web server's status page or other websites hosted on the same server are functioning as expected.
-5. **Access MagicAppBuilder from Your Browser**Open a browser of your choice. We recommend using the latest version of **Mozilla Firefox** for optimal performance and compatibility.
+4. **Verify Web Server Operation**
+   Ensure that your web server (e.g., Apache or Nginx) is running correctly. You can do this by checking if the web server's status page or other websites hosted on the same server are functioning as expected.
+5. **Access MagicAppBuilder from Your Browser**
+   Open a browser of your choice. We recommend using the latest version of **Mozilla Firefox** for optimal performance and compatibility.
 
    Enter the following URL into the address bar:
 

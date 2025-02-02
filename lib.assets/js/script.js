@@ -5424,7 +5424,7 @@ function getReferenceResource() {
                   <thead>
                       <tr>
                           <td width="40%">Column Name</td>
-                          <td width="8%">Comp</td>
+                          <td width="12%">Comp</td>
                           <td>Value</td>
                           <td width="42">Rem</td>
                           <td colspan="2">Move</td>
@@ -5464,7 +5464,7 @@ function getReferenceResource() {
               <table data-name="sortable" class="table table-reference">
                   <thead>
                       <tr>
-                          <td width="65%">Column</td>
+                          <td width="60%">Column</td>
                           <td>Value</td>
                           <td width="42">Rem</td>
                           <td colspan="2">Move</td>
