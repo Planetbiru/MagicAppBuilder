@@ -4,12 +4,13 @@
 
 Imagine a large application consisting of dozens of CRUD (Create, Read, Update, Delete) modules. Each module has the following mechanism:
 
-1. create new data
-2. change existing data
-3. delete existing data
-4. requires approval to create new data, change data and delete data
-5. have a rule that the user who approves the creation, change and deletion of data must be different from the user who creates, changes and deletes data
-6. Data can be exported to Microsoft Excel and CSV formats.
+1. Creation of new data
+2. Modification of existing data
+3. Deletion of existing data
+4. Approval required for creating, modifying, or deleting data
+5. A rule that the user who approves the creation, modification, or deletion of data must be different from the user who creates, modifies, or deletes the data
+6. Data export functionality to Microsoft Excel and CSV formats
+7. Support for multiple languages
 
 This project must be created in a very fast time, even less than 3 months.
 
