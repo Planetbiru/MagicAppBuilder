@@ -114,6 +114,7 @@ if($databaseConfigured)
                 $password = 'administrator';
                 $hash = hash('sha1', $password);
                 $hash = hash('sha1', $hash);
+                $ipAddress = $_SERVER['REMOTE_ADDR'];
 
                 $userLevel = new EntityAdminLevel(null, $databaseBuilder);
                 $userLevel->setAdminLevelId("superuser");
@@ -121,8 +122,19 @@ if($databaseConfigured)
                 $userLevel->setSortOrder(1);
                 $userLevel->setTimeCreate($now);
                 $userLevel->setTimeEdit($now);
-                $userLevel->setIpCreate($_SERVER['REMOTE_ADDR']);
-                $userLevel->setIpEdit($_SERVER['REMOTE_ADDR']);
+                $userLevel->setIpCreate($ipAddress);
+                $userLevel->setIpEdit($ipAddress);
+                $userLevel->setActive(true);
+                $userLevel->insert();
+
+                $userLevel = new EntityAdminLevel(null, $databaseBuilder);
+                $userLevel->setAdminLevelId("user");
+                $userLevel->setName("User");
+                $userLevel->setSortOrder(2);
+                $userLevel->setTimeCreate($now);
+                $userLevel->setTimeEdit($now);
+                $userLevel->setIpCreate($ipAddress);
+                $userLevel->setIpEdit($ipAddress);
                 $userLevel->setActive(true);
                 $userLevel->insert();
                         
@@ -135,8 +147,8 @@ if($databaseConfigured)
                 $admin->setLanguageId("en");
                 $admin->setTimeCreate($now);
                 $admin->setTimeEdit($now);
-                $admin->setIpCreate($_SERVER['REMOTE_ADDR']);
-                $admin->setIpEdit($_SERVER['REMOTE_ADDR']);
+                $admin->setIpCreate($ipAddress);
+                $admin->setIpEdit($ipAddress);
                 $admin->setActive(true);
                 $admin->insert();
                             
