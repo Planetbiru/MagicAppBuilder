@@ -562,7 +562,9 @@ class ScriptGenerator //NOSONAR
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
             $fileGenerated++;
         }
-        $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, $updateEntity);
+        
+        // Do not update referenced entities automatically
+        $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, false);
         $this->updateMenu($appConf, $request);
         return $fileGenerated;
     }
