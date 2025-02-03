@@ -562,7 +562,9 @@ class ScriptGenerator //NOSONAR
             $appBuilder->generateTrashEntity($database, $appConf, $entityMain, $entityInfo, $entityTrash, $referenceData);
             $fileGenerated++;
         }
-        $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities);
+        
+        // Do not update referenced entities automatically
+        $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, false);
         $this->updateMenu($appConf, $request);
         return $fileGenerated;
     }
@@ -883,19 +885,22 @@ class ScriptGenerator //NOSONAR
     }
 
     /**
-     * Generate entity files if they do not exist.
+     * Generates entity files if they do not already exist or need to be updated.
      *
-     * This method checks for the existence of entity class files corresponding to the provided 
-     * reference entities. If an entity file is missing, it generates the file using the 
-     * specified database schema and configuration settings.
+     * This method checks for the existence of entity class files for the provided reference entities.
+     * If the entity class file does not exist or needs to be updated (based on the `updateEntity` flag),
+     * it generates the file using the database schema and the provided configuration settings.
+     * The generated file includes relevant metadata, fields, and configurations as required by the application.
      *
-     * @param PicoDatabase $database Database connection object for schema queries.
-     * @param SecretObject $appConf Application configuration object containing paths and namespaces.
-     * @param EntityInfo $entityInfo Metadata about the entity being processed.
-     * @param MagicObject[] $referenceEntities Array of reference entities to validate and generate.
-     * @return int The number of entity files that were generated.
+     * @param PicoDatabase $database Database connection object used for schema queries to retrieve table information.
+     * @param SecretObject $appConf Application configuration object containing paths, namespaces, and settings for entity file generation.
+     * @param EntityInfo $entityInfo Metadata and field information for the entity being processed (e.g., non-updatable fields).
+     * @param MagicObject[] $referenceEntities Array of reference entity objects to validate and generate their corresponding entity files.
+     * @param bool $updateEntity Flag indicating whether to regenerate or update existing entity files.
+     *
+     * @return int The total number of entity files that were generated or updated.
      */
-    private function generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities)
+    private function generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, $updateEntity = false)
     {
         $fileGenerated = 0;
         $checked = array();
@@ -910,7 +915,7 @@ class ScriptGenerator //NOSONAR
                 $fileName = $baseNamespace."/".$entityName;
                 $path = $baseDir."/".$fileName.".php";
                 $path = str_replace("\\", "/", $path);
-                if(!file_exists($path))
+                if($updateEntity || !file_exists($path))
                 {
                     $gen = new PicoEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
                     $nonupdatables = AppField::getNonupdatableColumns($entityInfo);

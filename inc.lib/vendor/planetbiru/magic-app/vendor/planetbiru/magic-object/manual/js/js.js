@@ -1,19 +1,19 @@
 function doStuff() {
-    for (i = 1; i <= 6; i++) {
-        var headers = document.getElementsByTagName('h' + i);
-        for (j = 0; j < headers.length; j++) {
+    for (let i = 1; i <= 6; i++) {
+        let headers = document.getElementsByTagName('h' + i);
+        for (let j = 0; j < headers.length; j++) {
             headers[j].className = 'h';
             headers[j].setAttribute('data-id', i*100+j)
         }
     }
-    var headers = document.getElementsByClassName('h');
-    var h1 = document.getElementsByTagName('h1')[0];
+    let headers = document.getElementsByClassName('h');
+    let h1 = document.getElementsByTagName('h1')[0];
     h1.parentNode.insertBefore(document.createElement('ul'), h1.nextSibling);
     h1.nextSibling.id = 'nav';
     let ul = document.querySelector('#nav ul');
-    for (i = 0; i < headers.length; i++) {
-        let id = headers[i].getAttribute('data-id');
-        ul.innerHTML += ('<li class="' + headers[i].tagName.toLowerCase() + '"><a href="javascript:goto('+id+')">' + headers[i].innerHTML + '</a></li>');
+    for (let header of headers) {
+        let id = header.getAttribute('data-id');
+        ul.innerHTML += ('<li class="' + header.tagName.toLowerCase() + '"><a href="javascript:goto('+id+')">' + header.innerHTML + '</a></li>');
     }
 }
 

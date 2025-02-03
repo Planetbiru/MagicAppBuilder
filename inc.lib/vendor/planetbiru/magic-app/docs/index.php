@@ -548,6 +548,14 @@ class PhpDocumentCreator // NOSONAR
             
             // Constants
             $constants = $reflection->getConstants(); // NOSONAR
+            $parentClass = $reflection->getParentClass(); // Get the parent class
+
+            // Filter constants to only display those owned by the current class
+            if ($parentClass) {
+                $parentConstants = $parentClass->getConstants();
+                $constants = array_diff_key($constants, $parentConstants); // Remove constants inherited from the parent class
+            }
+
             $output .= $this->displayConstant($constants);
 
             // Property docblocks with access level
@@ -556,6 +564,24 @@ class PhpDocumentCreator // NOSONAR
 
             // Method docblocks with access level
             $methods = $reflection->getMethods();
+            $parentClass = $reflection->getParentClass(); // Get the parent class
+
+            // Filter methods to only display those owned by the current class
+            if ($parentClass) {
+                $parentMethods = $parentClass->getMethods();
+                
+                // Compare methods in the current class with those in the parent class
+                $methods = array_filter($methods, function($method) use ($parentMethods) {
+                    // Only add methods that are not in the parent class
+                    foreach ($parentMethods as $parentMethod) {
+                        if ($method->getName() === $parentMethod->getName()) {
+                            return false; // If the method is already in the parent class, don't display it
+                        }
+                    }
+                    return true; // If the method is only in the current class, display it
+                });
+            }
+
             $output .= $this->displayMethods($methods);
 
             $output .= "</div>\r\n";
