@@ -10,6 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_level")
+ * @package AppBuilder\App\Entity\App
  */
 class AppAdminLevelImpl extends MagicObject
 {

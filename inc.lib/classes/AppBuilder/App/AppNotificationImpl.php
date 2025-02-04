@@ -8,6 +8,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="notification")
+ * @package AppBuilder\App\Entity\App
  */
 class AppNotificationImpl extends MagicObject
 {

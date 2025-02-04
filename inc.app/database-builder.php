@@ -112,12 +112,13 @@ if($databaseConfigured)
 
                 $now = date('Y-m-d H:i:s');
                 $password = 'administrator';
+                $userLevelId = "superuser";
                 $hash = hash('sha1', $password);
                 $hash = hash('sha1', $hash);
-                $ipAddress = $_SERVER['REMOTE_ADDR'];
+                $ipAddress = $_SERVER['REMOTE_ADDR']; 
 
                 $userLevel = new EntityAdminLevel(null, $databaseBuilder);
-                $userLevel->setAdminLevelId("superuser");
+                $userLevel->setAdminLevelId($userLevelId);
                 $userLevel->setName("Super User");
                 $userLevel->setSortOrder(1);
                 $userLevel->setTimeCreate($now);
@@ -143,7 +144,7 @@ if($databaseConfigured)
                 $admin->setName("Administrator");
                 $admin->setPassword($hash);    
                 $admin->setLastResetPassword($now);
-                $admin->setAdminLevelId("superuser");
+                $admin->setAdminLevelId($userLevelId);
                 $admin->setLanguageId("en");
                 $admin->setTimeCreate($now);
                 $admin->setTimeEdit($now);
