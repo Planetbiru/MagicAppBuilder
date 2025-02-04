@@ -1,8 +1,8 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
-use AppBuilder\Entity\EntityApplication;
-use AppBuilder\Entity\EntityWorkspace;
+use AppBuilder\EntityInstaller\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityApplication;
+use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\SecretObject;
 

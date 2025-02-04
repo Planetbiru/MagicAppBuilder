@@ -1,37 +1,55 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityModule class represents an entity in the "module" table.
+ * The EntityApplicationGroupMember class represents an entity in the "application_group_member" table.
  *
- * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "application_group_member" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="module")
+ * @Table(name="application_group_member")
  */
-class EntityModule extends MagicObject
+class EntityApplicationGroupMember extends MagicObject
 {
 	/**
-	 * Module ID
+	 * Application Group Member ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Module ID")
+	 * @Column(name="application_group_member_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Application Group Member ID")
 	 * @var string
 	 */
-	protected $moduleId;
+	protected $applicationGroupMemberId;
+
+	/**
+	 * Application Group ID
+	 * 
+	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Application Group ID")
+	 * @var string
+	 */
+	protected $applicationGroupId;
+
+	/**
+	 * Application Group
+	 * 
+	 * @JoinColumn(name="application_group_id", referenceColumnName="application_group_id")
+	 * @Label(content="Application Group")
+	 * @var EntityApplicationGroup
+	 */
+	protected $applicationGroup;
 
 	/**
 	 * Admin ID
@@ -50,51 +68,6 @@ class EntityModule extends MagicObject
 	 * @var EntityAdmin
 	 */
 	protected $admin;
-
-	/**
-	 * Application ID
-	 * 
-	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Application ID")
-	 * @var string
-	 */
-	protected $applicationId;
-
-	/**
-	 * Application
-	 * 
-	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
-	 * @Label(content="Application")
-	 * @var EntityApplication
-	 */
-	protected $application;
-
-	/**
-	 * File Name
-	 * 
-	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="File Name")
-	 * @var string
-	 */
-	protected $fileName;
-
-	/**
-	 * Directory Name
-	 * 
-	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Directory Name")
-	 * @var string
-	 */
-	protected $directoryName;
-
-	/**
-	 * Reference Value
-	 * 
-	 * @Column(name="reference_value", type="text", nullable=true)
-	 * @Label(content="Reference Value")
-	 * @var string
-	 */
-	protected $referenceValue;
 
 	/**
 	 * Time Create
@@ -149,5 +122,15 @@ class EntityModule extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
+
+	/**
+	 * Active
+	 * 
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Active")
+	 * @var bool
+	 */
+	protected $active;
 
 }

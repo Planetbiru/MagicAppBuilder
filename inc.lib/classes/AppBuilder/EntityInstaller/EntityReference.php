@@ -1,37 +1,37 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityAdminSession class represents an entity in the "admin_session" table.
+ * The EntityReference class represents an entity in the "reference" table.
  *
- * This entity maps to the "admin_session" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "reference" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="admin_session")
+ * @Table(name="reference")
  */
-class EntityAdminSession extends MagicObject
+class EntityReference extends MagicObject
 {
 	/**
-	 * Admin Session ID
+	 * Reference ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="admin_session_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Admin Session ID")
+	 * @Column(name="reference_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Reference ID")
 	 * @var string
 	 */
-	protected $adminSessionId;
+	protected $referenceId;
 
 	/**
 	 * Admin ID
@@ -70,13 +70,31 @@ class EntityAdminSession extends MagicObject
 	protected $application;
 
 	/**
-	 * User Agent
+	 * Column Name
 	 * 
-	 * @Column(name="user_agent", type="text", nullable=true)
-	 * @Label(content="User Agent")
+	 * @Column(name="column_name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Column Name")
 	 * @var string
 	 */
-	protected $userAgent;
+	protected $columnName;
+
+	/**
+	 * Reference Key
+	 * 
+	 * @Column(name="reference_key", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Reference Key")
+	 * @var string
+	 */
+	protected $referenceKey;
+
+	/**
+	 * Reference Value
+	 * 
+	 * @Column(name="reference_value", type="text", nullable=true)
+	 * @Label(content="Reference Value")
+	 * @var string
+	 */
+	protected $referenceValue;
 
 	/**
 	 * Time Create
@@ -95,6 +113,24 @@ class EntityAdminSession extends MagicObject
 	 * @var string
 	 */
 	protected $timeEdit;
+
+	/**
+	 * Admin Create
+	 * 
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Label(content="Admin Create")
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * Admin Edit
+	 * 
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Edit")
+	 * @var string
+	 */
+	protected $adminEdit;
 
 	/**
 	 * IP Create

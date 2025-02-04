@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdmin;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";

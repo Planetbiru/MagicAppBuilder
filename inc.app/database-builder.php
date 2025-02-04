@@ -1,8 +1,8 @@
 <?php
 
 use AppBuilder\AppInstaller;
-use AppBuilder\Entity\EntityAdmin;
-use AppBuilder\Entity\EntityAdminLevel;
+use AppBuilder\EntityInstaller\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdminLevel;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtil;

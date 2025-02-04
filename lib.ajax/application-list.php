@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
 use MagicApp\Field;
 use MagicObject\Database\PicoSort;

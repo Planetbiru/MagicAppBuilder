@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdminWorkspace;
+use AppBuilder\EntityInstaller\EntityAdminWorkspace;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;

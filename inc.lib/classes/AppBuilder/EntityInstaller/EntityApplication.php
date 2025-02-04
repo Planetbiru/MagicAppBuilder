@@ -1,54 +1,37 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityAdminWorkspace class represents an entity in the "admin_workspace" table.
+ * The EntityApplication class represents an entity in the "application" table.
  *
- * This entity maps to the "admin_workspace" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "application" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="admin_workspace")
+ * @Table(name="application")
  */
-class EntityAdminWorkspace extends MagicObject
+class EntityApplication extends MagicObject
 {
 	/**
-	 * Admin Workspace ID
+	 * Application ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="admin_workspace_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Admin Workspace ID")
+	 * @NotNull
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=false)
+	 * @Label(content="Application ID")
 	 * @var string
 	 */
-	protected $adminWorkspaceId;
-
-	/**
-	 * Admin ID
-	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
-	 * @var string
-	 */
-	protected $adminId;
-
-	/**
-	 * Admin
-	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var EntityAdmin
-	 */
-	protected $admin;
+	protected $applicationId;
 
 	/**
 	 * Workspace ID
@@ -69,9 +52,64 @@ class EntityAdminWorkspace extends MagicObject
 	protected $workspace;
 
 	/**
+	 * Architecture
+	 * 
+	 * @Column(name="architecture", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Architecture")
+	 * @var string
+	 */
+	protected $architecture;
+
+	/**
+	 * Name
+	 * 
+	 * @Column(name="name", type="varchar(255)", length=255, nullable=true)
+	 * @Label(content="Name")
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * Description
+	 * 
+	 * @Column(name="description", type="text", nullable=true)
+	 * @Label(content="Description")
+	 * @var string
+	 */
+	protected $description;
+
+	/**
+	 * Project Directory
+	 * 
+	 * @Column(name="project_directory", type="text", nullable=true)
+	 * @Label(content="Project Directory")
+	 * @var string
+	 */
+	protected $projectDirectory;
+
+	/**
+	 * Base Application Directory
+	 * 
+	 * @Column(name="base_application_directory", type="text", nullable=true)
+	 * @Label(content="Base Application Directory")
+	 * @var string
+	 */
+	protected $baseApplicationDirectory;
+
+	/**
+	 * Author
+	 * 
+	 * @Column(name="author", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Author")
+	 * @var string
+	 */
+	protected $author;
+	
+	/**
 	 * Sort Order
 	 * 
-	 * @Column(name="sort_order", type="int", nullable=true)
+	 * @Column(name="sort_order", type="int(11)", length=11, defaultValue="NULL", nullable=true)
+	 * @DefaultColumn(value="NULL")
 	 * @Label(content="Sort Order")
 	 * @var int
 	 */
@@ -134,9 +172,8 @@ class EntityAdminWorkspace extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=false)
-	 * @DefaultColumn(value="TRUE")
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
 	 * @Label(content="Active")
 	 * @var bool
 	 */

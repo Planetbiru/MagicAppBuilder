@@ -2,69 +2,79 @@
 
 namespace AppBuilder;
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdmin;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\SecretObject;
 
+/**
+ * UserProfile class handles user authentication and profile management.
+ */
 class UserProfile
 {
     /**
-     * Undocumented variable
+     * Database instance to interact with user data.
      *
      * @var PicoDatabase
      */
     private $database;
     
     /**
-     * Undocumented variable
+     * Core configuration object for the application.
      *
      * @var SecretObject
      */
     private $coreConfig;
     
     /**
-     * Undocumented variable
+     * Path to the core configuration file.
      *
      * @var string
      */
     private $coreConfigPath;
     
     /**
-     * Undocumented variable
+     * Boolean flag indicating whether the user is logged in.
      *
      * @var boolean
      */
     private $loggedIn;
     
     /**
-     * Undocumented variable
+     * ID of the authenticated admin.
      *
      * @var string
      */
     private $adminId;
     
     /**
-     * Undocumented variable
+     * Username of the authenticated admin.
      *
      * @var string
      */
     private $username;
     
     /**
-     * Undocumented variable
+     * Full name of the authenticated admin.
      *
      * @var string
      */
     private $name;
     
     /**
-     * Undocumented variable
+     * The user level (e.g., admin, user) of the authenticated admin.
      *
      * @var string
      */
     private $userLevel;
     
+    /**
+     * Constructor to initialize the UserProfile instance.
+     *
+     * @param PicoDatabase $database      The database instance for user data.
+     * @param SecretObject $coreConfig    The core configuration object.
+     * @param string       $coreConfigPath The path to the core configuration file.
+     */
     public function __construct($database, $coreConfig, $coreConfigPath)
     {
         $this->database = $database;
@@ -72,13 +82,21 @@ class UserProfile
         $this->coreConfigPath = $coreConfigPath;
     }
     
+    /**
+     * Authenticates a user by checking the username and password.
+     *
+     * @param string $username The username to authenticate.
+     * @param string $password The password to authenticate.
+     *
+     * @return void
+     */
     public function auth($username, $password)
     {
         $entityAdmin = new EntityAdmin(null, $this->database);
         try
         {
             $entityAdmin->findOneByUsername($username);
-            if($entityAdmin->getPassword() == sha1($password))
+            if ($entityAdmin->getPassword() == sha1($password))
             {
                 $this->adminId = $entityAdmin->getUserId();
                 $this->username = $entityAdmin->getUsername();
@@ -86,29 +104,29 @@ class UserProfile
                 $this->userLevel = $entityAdmin->getUserLevel();
             }
         }
-        catch(Exception $e)
+        catch (Exception $e)
         {
             // Do nothing
         }
     }
 
     /**
-     * Get undocumented variable
+     * Gets the logged-in status of the user.
      *
-     * @return  boolean
-     */ 
+     * @return boolean True if logged in, false otherwise.
+     */
     public function getLoggedIn()
     {
         return $this->loggedIn;
     }
 
     /**
-     * Set undocumented variable
+     * Sets the logged-in status of the user.
      *
-     * @param  boolean  $loggedIn  Undocumented variable
+     * @param boolean $loggedIn The logged-in status to set.
      *
-     * @return  self
-     */ 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setLoggedIn($loggedIn)
     {
         $this->loggedIn = $loggedIn;
@@ -117,22 +135,22 @@ class UserProfile
     }
 
     /**
-     * Get undocumented variable
+     * Gets the ID of the authenticated user.
      *
-     * @return  string
-     */ 
+     * @return string The authenticated user's ID.
+     */
     public function getUserId()
     {
         return $this->adminId;
     }
 
     /**
-     * Set undocumented variable
+     * Sets the ID of the authenticated user.
      *
-     * @param  string  $adminId  Undocumented variable
+     * @param string $adminId The admin ID to set.
      *
-     * @return  self
-     */ 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setUserId($adminId)
     {
         $this->adminId = $adminId;
@@ -141,22 +159,22 @@ class UserProfile
     }
 
     /**
-     * Get undocumented variable
+     * Gets the username of the authenticated user.
      *
-     * @return  string
-     */ 
+     * @return string The authenticated user's username.
+     */
     public function getUsername()
     {
         return $this->username;
     }
 
     /**
-     * Set undocumented variable
+     * Sets the username of the authenticated user.
      *
-     * @param  string  $username  Undocumented variable
+     * @param string $username The username to set.
      *
-     * @return  self
-     */ 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setUsername($username)
     {
         $this->username = $username;
@@ -165,22 +183,22 @@ class UserProfile
     }
 
     /**
-     * Get undocumented variable
+     * Gets the name of the authenticated user.
      *
-     * @return  string
-     */ 
+     * @return string The authenticated user's full name.
+     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Set undocumented variable
+     * Sets the name of the authenticated user.
      *
-     * @param  string  $name  Undocumented variable
+     * @param string $name The name to set.
      *
-     * @return  self
-     */ 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setName($name)
     {
         $this->name = $name;
@@ -189,22 +207,22 @@ class UserProfile
     }
 
     /**
-     * Get undocumented variable
+     * Gets the user level of the authenticated user.
      *
-     * @return  string
-     */ 
+     * @return string The user level (e.g., admin, user).
+     */
     public function getUserLevel()
     {
         return $this->userLevel;
     }
 
     /**
-     * Set undocumented variable
+     * Sets the user level of the authenticated user.
      *
-     * @param  string  $userLevel  Undocumented variable
+     * @param string $userLevel The user level to set.
      *
-     * @return  self
-     */ 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setUserLevel($userLevel)
     {
         $this->userLevel = $userLevel;

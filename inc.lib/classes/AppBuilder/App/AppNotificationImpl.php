@@ -138,7 +138,7 @@ class AppNotificationImpl extends MagicObject
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
-	protected $waktuBuat;
+	protected $timeCreate;
 
 	/**
 	 * IP Create
@@ -148,5 +148,23 @@ class AppNotificationImpl extends MagicObject
 	 * @var string
 	 */
 	protected $ipCreate;
+
+	/**
+	 * Time Read
+	 * 
+	 * @Column(name="time_read", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Time Read")
+	 * @var string
+	 */
+	protected $timeRead;
+
+	/**
+	 * IP Read
+	 * 
+	 * @Column(name="ip_read", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @Label(content="IP Read")
+	 * @var string
+	 */
+	protected $ipRead;
 
 }

@@ -1,73 +1,54 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityApplicationGroupMember class represents an entity in the "application_group_member" table.
+ * The EntityAdminLevel class represents an entity in the "admin_level" table.
  *
- * This entity maps to the "application_group_member" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "admin_level" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application_group_member")
+ * @Table(name="admin_level")
  */
-class EntityApplicationGroupMember extends MagicObject
+class EntityAdminLevel extends MagicObject
 {
 	/**
-	 * Application Group Member ID
+	 * Admin Level ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @NotNull
-	 * @Column(name="application_group_member_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Application Group Member ID")
+	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Admin Level ID")
 	 * @var string
 	 */
-	protected $applicationGroupMemberId;
+	protected $adminLevelId;
 
 	/**
-	 * Application Group ID
+	 * Name
 	 * 
-	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Application Group ID")
+	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Name")
 	 * @var string
 	 */
-	protected $applicationGroupId;
+	protected $name;
 
 	/**
-	 * Application Group
+	 * Sort Order
 	 * 
-	 * @JoinColumn(name="application_group_id", referenceColumnName="application_group_id")
-	 * @Label(content="Application Group")
-	 * @var EntityApplicationGroup
+	 * @Column(name="sort_order", type="int", nullable=true)
+	 * @Label(content="Sort Order")
+	 * @var int
 	 */
-	protected $applicationGroup;
-
-	/**
-	 * Admin ID
-	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
-	 * @var string
-	 */
-	protected $adminId;
-
-	/**
-	 * Admin
-	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var EntityAdmin
-	 */
-	protected $admin;
+	protected $sortOrder;
 
 	/**
 	 * Time Create
@@ -126,8 +107,9 @@ class EntityApplicationGroupMember extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
-	 * @DefaultColumn(value="true")
+	 * @NotNull
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=false)
+	 * @DefaultColumn(value="TRUE")
 	 * @Label(content="Active")
 	 * @var bool
 	 */

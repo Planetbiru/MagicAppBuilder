@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Generator\ScriptGenerator;
 use AppBuilder\Util\FileDirUtil;
 use MagicAdmin\Entity\Data\Admin;

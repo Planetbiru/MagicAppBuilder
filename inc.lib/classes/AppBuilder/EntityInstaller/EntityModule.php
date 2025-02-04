@@ -1,37 +1,37 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityAdminProfile class represents an entity in the "admin_profile" table.
+ * The EntityModule class represents an entity in the "module" table.
  *
- * This entity maps to the "admin_profile" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="admin_profile")
+ * @Table(name="module")
  */
-class EntityAdminProfile extends MagicObject
+class EntityModule extends MagicObject
 {
 	/**
-	 * Admin Profile ID
+	 * Module ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="admin_profile_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Admin Profile ID")
+	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Module ID")
 	 * @var string
 	 */
-	protected $adminProfileId;
+	protected $moduleId;
 
 	/**
 	 * Admin ID
@@ -52,31 +52,49 @@ class EntityAdminProfile extends MagicObject
 	protected $admin;
 
 	/**
-	 * Profile Name
+	 * Application ID
 	 * 
-	 * @Column(name="profile_name", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Profile Name")
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Application ID")
 	 * @var string
 	 */
-	protected $profileName;
+	protected $applicationId;
 
 	/**
-	 * Profile Value
+	 * Application
 	 * 
-	 * @Column(name="profile_value", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Profile Value")
-	 * @var string
+	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
+	 * @Label(content="Application")
+	 * @var EntityApplication
 	 */
-	protected $profileValue;
+	protected $application;
 
 	/**
-	 * User Agent
+	 * File Name
 	 * 
-	 * @Column(name="user_agent", type="text", nullable=true)
-	 * @Label(content="User Agent")
+	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="File Name")
 	 * @var string
 	 */
-	protected $userAgent;
+	protected $fileName;
+
+	/**
+	 * Directory Name
+	 * 
+	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Directory Name")
+	 * @var string
+	 */
+	protected $directoryName;
+
+	/**
+	 * Reference Value
+	 * 
+	 * @Column(name="reference_value", type="text", nullable=true)
+	 * @Label(content="Reference Value")
+	 * @var string
+	 */
+	protected $referenceValue;
 
 	/**
 	 * Time Create
@@ -97,6 +115,24 @@ class EntityAdminProfile extends MagicObject
 	protected $timeEdit;
 
 	/**
+	 * Admin Create
+	 * 
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Label(content="Admin Create")
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * Admin Edit
+	 * 
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Edit")
+	 * @var string
+	 */
+	protected $adminEdit;
+
+	/**
 	 * IP Create
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
@@ -113,15 +149,5 @@ class EntityAdminProfile extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
-
-	/**
-	 * Active
-	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
-	 * @DefaultColumn(value="true")
-	 * @Label(content="Active")
-	 * @var bool
-	 */
-	protected $active;
 
 }

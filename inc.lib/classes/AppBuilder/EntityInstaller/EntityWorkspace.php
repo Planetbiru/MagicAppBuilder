@@ -1,64 +1,37 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityApplication class represents an entity in the "application" table.
+ * The EntityWorkspace class represents an entity in the "workspace" table.
  *
- * This entity maps to the "application" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "workspace" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application")
+ * @Table(name="workspace")
  */
-class EntityApplication extends MagicObject
+class EntityWorkspace extends MagicObject
 {
 	/**
-	 * Application ID
+	 * Workspace ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=false)
-	 * @Label(content="Application ID")
-	 * @var string
-	 */
-	protected $applicationId;
-
-	/**
-	 * Workspace ID
-	 * 
-	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Workspace ID")
 	 * @var string
 	 */
 	protected $workspaceId;
-
-	/**
-	 * Workspace
-	 * 
-	 * @JoinColumn(name="workspace_id", referenceColumnName="workspace_id")
-	 * @Label(content="Workspace")
-	 * @var EntityWorkspace
-	 */
-	protected $workspace;
-
-	/**
-	 * Architecture
-	 * 
-	 * @Column(name="architecture", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Architecture")
-	 * @var string
-	 */
-	protected $architecture;
 
 	/**
 	 * Name
@@ -79,22 +52,13 @@ class EntityApplication extends MagicObject
 	protected $description;
 
 	/**
-	 * Project Directory
+	 * Directory
 	 * 
-	 * @Column(name="project_directory", type="text", nullable=true)
-	 * @Label(content="Project Directory")
+	 * @Column(name="directory", type="text", nullable=true)
+	 * @Label(content="Directory")
 	 * @var string
 	 */
-	protected $projectDirectory;
-
-	/**
-	 * Base Application Directory
-	 * 
-	 * @Column(name="base_application_directory", type="text", nullable=true)
-	 * @Label(content="Base Application Directory")
-	 * @var string
-	 */
-	protected $baseApplicationDirectory;
+	protected $directory;
 
 	/**
 	 * Author
@@ -108,8 +72,7 @@ class EntityApplication extends MagicObject
 	/**
 	 * Sort Order
 	 * 
-	 * @Column(name="sort_order", type="int(11)", length=11, defaultValue="NULL", nullable=true)
-	 * @DefaultColumn(value="NULL")
+	 * @Column(name="sort_order", type="int", nullable=true)
 	 * @Label(content="Sort Order")
 	 * @var int
 	 */

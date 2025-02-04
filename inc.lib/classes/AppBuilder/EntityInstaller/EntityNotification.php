@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityMessage class represents an entity in the "message" table.
+ * The EntityNotification class represents an entity in the "notification" table.
  *
- * This entity maps to the "message" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "notification" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -17,30 +17,30 @@ use MagicObject\MagicObject;
  * @package MagicAdmin\Entity\Data
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="message")
+ * @Table(name="notification")
  */
-class EntityMessage extends MagicObject
+class EntityNotification extends MagicObject
 {
 	/**
-	 * Message ID
+	 * Notification ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Message ID")
+	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Notification ID")
 	 * @var string
 	 */
-	protected $messageId;
+	protected $notificationId;
 
 	/**
-	 * Subject
+	 * Title
 	 * 
 	 * @NotNull
-	 * @Column(name="subject", type="text", nullable=true)
-	 * @Label(content="Subject")
+	 * @Column(name="title", type="text", nullable=true)
+	 * @Label(content="Title")
 	 * @var string
 	 */
-	protected $subject;
+	protected $title;
 
 	/**
 	 * Content
@@ -53,23 +53,14 @@ class EntityMessage extends MagicObject
 	protected $content;
 
 	/**
-	 * Sender ID
+	 * Url
 	 * 
 	 * @NotNull
-	 * @Column(name="sender_id", type="varchar(50)", length=50, nullable=true)
-	 * @Label(content="Sender")
+	 * @Column(name="url", type="text", nullable=true)
+	 * @Label(content="Url")
 	 * @var string
 	 */
-	protected $senderId;
-
-	/**
-	 * Sender
-	 * 
-	 * @JoinColumn(name="sender", referenceColumnName="admin_id")
-	 * @Label(content="Sender")
-	 * @var AdminMin
-	 */
-	protected $sender;
+	protected $url;
 
 	/**
 	 * Receiver ID
@@ -84,40 +75,11 @@ class EntityMessage extends MagicObject
 	/**
 	 * Receiver
 	 * 
-	 * @JoinColumn(name="receiver", referenceColumnName="admin_min")
+	 * @JoinColumn(name="receiver", referenceColumnName="admin_id")
 	 * @Label(content="Receiver")
 	 * @var AdminMin
 	 */
 	protected $receiver;
-
-	/**
-	 * Message Folder ID
-	 * 
-	 * @NotNull
-	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Message Folder ID")
-	 * @var string
-	 */
-	protected $messageFolderId;
-
-	/**
-	 * Message Folder
-	 * 
-	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id")
-	 * @Label(content="Message Folder")
-	 * @var MessageFolderMin
-	 */
-	protected $messageFolder;
-
-	/**
-	 * Is Copy
-	 * 
-	 * @NotNull
-	 * @Column(name="is_copy", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Is Copy")
-	 * @var bool
-	 */
-	protected $isCopy;
 
 	/**
 	 * Time Create

@@ -1,7 +1,7 @@
 <?php
 
-use AppBuilder\Entity\EntityAdminWorkspace;
-use AppBuilder\Entity\EntityWorkspace;
+use AppBuilder\EntityInstaller\EntityAdminWorkspace;
+use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
