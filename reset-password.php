@@ -14,12 +14,10 @@ $inputPost = new InputPost();
 
 if($inputPost->getResetPassword())
 {
-
     $path = __DIR__ . "/inc.cfg/reset-password.yml";
 
     if(file_exists($path))
     {
-
         $resetPassword = new MagicObject();
         $resetPassword->loadYamlFile($path, true, true, true);
         if($resetPassword->issetPasswordToReset() && is_array($resetPassword->getPasswordToReset()))
