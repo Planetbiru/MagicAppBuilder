@@ -5261,7 +5261,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
-      if (map[i]["selected"] == 'true') {
+      if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
