@@ -1093,6 +1093,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success button-execute-query">Execute</button>
+          <button type="button" class="btn btn-primary button-open-file">Open File</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

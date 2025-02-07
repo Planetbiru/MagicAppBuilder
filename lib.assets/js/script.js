@@ -1686,6 +1686,33 @@ jQuery(function () {
     // Trigger input file dialog
     inputFile.click();  // Open file selection dialog
   });
+  
+  $(document).on('click', '.button-open-file', function(e1){
+    let el = document.querySelector('#sqlFileInput');
+    if(el)
+    {
+      el.parentNode.removeChild(el);
+    }
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.sql';  
+    fileInput.id = 'sqlFileInput';
+    document.querySelector('body').appendChild(fileInput);
+    fileInput.addEventListener('change', function handleFileSelect(event) {
+      const file = event.target.files[0]; 
+      if (file) 
+      {
+        const reader = new FileReader();
+        reader.onload = function(e2) {
+          const content = e2.target.result; 
+          cmEditorSQLExecute.getDoc().setValue(content);
+          cmEditorSQLExecute.refresh();
+        };
+        reader.readAsText(file);
+      }
+    });
+    fileInput.click();
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -1695,6 +1722,9 @@ jQuery(function () {
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
 });
+
+
+
 
 /**
  * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
