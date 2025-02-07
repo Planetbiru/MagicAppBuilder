@@ -1592,10 +1592,20 @@ jQuery(function () {
   $(document).on("click", '.button-application-icons', function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     
+    let el = document.querySelector('#iconFileInput');
+    if(el)
+    {
+      el.parentNode.removeChild(el);
+    }
+    
     // Create dynamic input file element
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
     inputFile.accept = 'image/png';  // Only accept PNG files
+    inputFile.id = 'iconFileInput';
+    inputFile.style.position = 'absolute';
+    inputFile.style.left = '-1000000px';
+    inputFile.style.top = '-1000000px';
 
     // Handle file selection change
     inputFile.addEventListener('change', function () {
@@ -1613,78 +1623,116 @@ jQuery(function () {
                 }
               ]
             );
-            return;
         }
+        else
+        {
         
-        // Read the file using FileReader
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const image = new Image();
+          // Read the file using FileReader
+          const reader = new FileReader();
+          reader.onload = function(event) {
+              const image = new Image();
+              
+              image.onload = function() // NOSONAR
+              {
+                  // Validate image dimensions (minimum 512x512)
+                  if (image.width < 512 || image.height < 512) {
+                      asyncAlert(
+                        'The image must be at least 512x512 pixels.',  // Message to display in the modal
+                        'Notification',  
+                        [
+                          {
+                            'caption': 'Close',  
+                            'fn': () => {
+                            },  
+                            'class': 'btn-primary'  
+                          }
+                        ]
+                      );
+                      return;
+                  }
+
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const iconSizes = [
+                      { size: 16, name: "favicon-16x16.png" },
+                      { size: 32, name: "favicon-32x32.png" },
+                      { size: 48, name: "favicon-48x48.png" },
+                      { size: 57, name: "apple-icon-57x57.png" },
+                      { size: 60, name: "apple-icon-60x60.png" },
+                      { size: 72, name: "apple-icon-72x72.png" },
+                      { size: 76, name: "apple-icon-76x76.png" },
+                      { size: 114, name: "apple-icon-114x114.png" },
+                      { size: 120, name: "apple-icon-120x120.png" },
+                      { size: 144, name: "apple-icon-144x144.png" },
+                      { size: 152, name: "apple-icon-152x152.png" },
+                      { size: 180, name: "apple-icon-180x180.png" },
+                      { size: 192, name: "android-icon-192x192.png" },
+                      { size: 512, name: "android-icon-512x512.png" }
+                  ];
+
+                  // Generate icons for each size
+                  iconSizes.forEach(icon => {
+                      canvas.width = icon.size;
+                      canvas.height = icon.size;
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                      const dataUrl = canvas.toDataURL('image/png');
+
+                      // Send each PNG icon to the server
+                      sendIconPngToServer(applicationId, dataUrl, icon.name);
+                  });
+
+                  // Additional step: Generate favicon.ico
+                  generateFaviconICO(applicationId, image);
+              };
             
-            image.onload = function() // NOSONAR
-            {
-                // Validate image dimensions (minimum 512x512)
-                if (image.width < 512 || image.height < 512) {
-                    asyncAlert(
-                      'The image must be at least 512x512 pixels.',  // Message to display in the modal
-                      'Notification',  
-                      [
-                        {
-                          'caption': 'Close',  
-                          'fn': () => {
-                          },  
-                          'class': 'btn-primary'  
-                        }
-                      ]
-                    );
-                    return;
-                }
+              // Load the image data
+              image.src = event.target.result;
+          };
 
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const iconSizes = [
-                    { size: 16, name: "favicon-16x16.png" },
-                    { size: 32, name: "favicon-32x32.png" },
-                    { size: 48, name: "favicon-48x48.png" },
-                    { size: 57, name: "apple-icon-57x57.png" },
-                    { size: 60, name: "apple-icon-60x60.png" },
-                    { size: 72, name: "apple-icon-72x72.png" },
-                    { size: 76, name: "apple-icon-76x76.png" },
-                    { size: 114, name: "apple-icon-114x114.png" },
-                    { size: 120, name: "apple-icon-120x120.png" },
-                    { size: 144, name: "apple-icon-144x144.png" },
-                    { size: 152, name: "apple-icon-152x152.png" },
-                    { size: 180, name: "apple-icon-180x180.png" },
-                    { size: 192, name: "android-icon-192x192.png" },
-                    { size: 512, name: "android-icon-512x512.png" }
-                ];
-
-                // Generate icons for each size
-                iconSizes.forEach(icon => {
-                    canvas.width = icon.size;
-                    canvas.height = icon.size;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
-                    const dataUrl = canvas.toDataURL('image/png');
-
-                    // Send each PNG icon to the server
-                    sendIconPngToServer(applicationId, dataUrl, icon.name);
-                });
-
-                // Additional step: Generate favicon.ico
-                generateFaviconICO(applicationId, image);
-            };
-          
-            // Load the image data
-            image.src = event.target.result;
-        };
-
-        // Read the image as a data URL
-        reader.readAsDataURL(selectedFile);
+          // Read the image as a data URL
+          reader.readAsDataURL(selectedFile);
+        }
     });
+    
 
     // Trigger input file dialog
     inputFile.click();  // Open file selection dialog
+  });
+  
+  $(document).on('click', '.button-open-file', function(e1){
+    let el = document.querySelector('#sqlFileInput');
+    if(el)
+    {
+      el.parentNode.removeChild(el);
+    }
+    const inputFile = document.createElement('input');
+    inputFile.type = 'file';
+    inputFile.accept = '.sql';  
+    inputFile.id = 'sqlFileInput';
+    inputFile.style.position = 'absolute';
+    inputFile.style.left = '-1000000px';
+    inputFile.style.top = '-1000000px';
+    document.querySelector('body').appendChild(inputFile);
+    inputFile.addEventListener('change', function handleFileSelect(event) {
+      const file = event.target.files[0]; 
+      if (file) 
+      {
+        const reader = new FileReader();
+        reader.onload = function(e2) {
+          const content = e2.target.result; 
+          inputFile.parentNode.removeChild(inputFile);
+          cmEditorSQLExecute.getDoc().setValue(content);
+          cmEditorSQLExecute.refresh();
+        };
+        reader.readAsText(file);
+      }
+      else
+      {
+        inputFile.parentNode.removeChild(inputFile);
+      }
+    });
+    inputFile.click();
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -1695,6 +1743,9 @@ jQuery(function () {
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
 });
+
+
+
 
 /**
  * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
@@ -2989,7 +3040,7 @@ function downloadPNG() {
  */
 function onChangeMapKey(obj) {
   let val = obj.val();
-  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default')) {
+  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'selected')) {
     if (!obj.hasClass('input-invalid-value')) {
       obj.addClass('input-invalid-value');
       setTimeout(function () {
@@ -3753,7 +3804,7 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
-    moduleAdMenu: $('[name="module_as_menu"]').val(),
+    moduleAsMenu: $('[name="module_as_menu"]').val(),
     moduleMenu: $('[name="module_menu"]').val(),
     target: $('#current_module_location').val(),
     updateEntity: $('[name="update_entity"]')[0].checked,
@@ -5178,7 +5229,7 @@ function setMapData(data)  //NOSONAR
         if (objLength > 4) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "default") {
+        if (i != "value" && i != "label" && i != "selected") {
           keys.push(i);
           mapKey[j] = i;
         }
@@ -5210,7 +5261,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
-      if (map[i]["default"]) {
+      if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
@@ -5247,11 +5298,11 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
-      let selected = tr.find(".rd-selected")[0].checked;
+      let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
-        default: selected,
+        selected: selected,
       };
       if (keys.length > 0) {
         let idx = 0;

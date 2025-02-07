@@ -1093,6 +1093,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success button-execute-query">Execute</button>
+          <button type="button" class="btn btn-primary button-open-file">Open File</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -1118,9 +1119,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
     </div>
   </div>
 
-  <!-- Overlay background (optional, will cover other elements when modal appears) -->
   <div class="alertOverlay" id="alertOverlay"></div>
-  <!-- Modal Structure -->
   <div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle"
       aria-hidden="true">
       <div class="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1135,7 +1134,6 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
                   <p id="alertMessage">This is the alert message.</p>
               </div>
               <div class="modal-footer" id="modalFooter">
-                  <!-- Buttons will be dynamically added here -->
               </div>
           </div>
       </div>
