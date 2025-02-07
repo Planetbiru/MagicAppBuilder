@@ -3040,7 +3040,7 @@ function downloadPNG() {
  */
 function onChangeMapKey(obj) {
   let val = obj.val();
-  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default')) {
+  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'selected')) {
     if (!obj.hasClass('input-invalid-value')) {
       obj.addClass('input-invalid-value');
       setTimeout(function () {
@@ -5229,7 +5229,7 @@ function setMapData(data)  //NOSONAR
         if (objLength > 4) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "default") {
+        if (i != "value" && i != "label" && i != "selected") {
           keys.push(i);
           mapKey[j] = i;
         }
@@ -5261,7 +5261,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
-      if (map[i]["default"]) {
+      if (map[i]["selected"] == 'true') {
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
@@ -5298,11 +5298,11 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
-      let selected = tr.find(".rd-selected")[0].checked;
+      let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
-        default: selected,
+        selected: selected,
       };
       if (keys.length > 0) {
         let idx = 0;
