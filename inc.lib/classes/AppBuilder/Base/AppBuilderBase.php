@@ -832,7 +832,8 @@ class AppBuilderBase //NOSONAR
                     $arr2 = array();
                     foreach($val1 as $key2=>$val2)
                     {
-                        $arr2[] = '"'.trim($key2).'" => "'.str_replace("\"", "\\\"", $val2).'"';
+                        $val3 = $this->fixJsonValue($val2);
+                        $arr2[] = '"'.trim($key2).'" => '.$val3;
                     }
                     $arr1[] = '"'.trim($val1['value']).'" => array('.implode(', ', $arr2).')';
                 }
@@ -841,6 +842,15 @@ class AppBuilderBase //NOSONAR
             }
         }
         return implode("\r\n", $map);
+    }
+    
+    private function fixJsonValue($val2)
+    {
+        if($val2 != 'true' && $val2 != 'false' && $val2 != 'null')
+        {
+            return '"'.str_replace("\"", "\\\"", $val2).'"';
+        }
+        return $val2;
     }
     
     /**
