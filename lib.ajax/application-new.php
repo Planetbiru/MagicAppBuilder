@@ -1,7 +1,7 @@
 <?php
 
 use AppBuilder\AppArchitecture;
-use AppBuilder\Entity\EntityAdminWorkspace;
+use AppBuilder\EntityInstaller\EntityAdminWorkspace;
 use AppBuilder\Util\Composer\ComposerUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicAdmin\Entity\Data\GeneralCache;

@@ -2,7 +2,7 @@
 
 namespace AppBuilder;
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdmin;
 use Exception;
 use MagicAdmin\Entity\Data\Message;
 use MagicAdmin\Entity\Data\Notification;

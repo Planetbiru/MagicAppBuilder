@@ -1,11 +1,11 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
 /**
- * The EntityMessageFolder class represents an entity in the "message_folder" table.
+ * The EntityMessageFolderMin class represents an entity in the "message_folder" table.
  *
  * This entity maps to the "message_folder" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
@@ -16,10 +16,10 @@ use MagicObject\MagicObject;
  * 
  * @package MagicAdmin\Entity\Data
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
  * @Table(name="message_folder")
  */
-class EntityMessageFolder extends MagicObject
+class EntityMessageFolderMin extends MagicObject
 {
 	/**
 	 * Message Folder ID

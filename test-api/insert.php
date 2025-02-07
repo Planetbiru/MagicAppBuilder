@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdmin;
 use MagicApp\AppDto\MocroServices\PicoInputField;
 use MagicApp\AppDto\MocroServices\PicoInputFieldOption;
 use MagicApp\AppDto\MocroServices\PicoInputFieldUpdate;

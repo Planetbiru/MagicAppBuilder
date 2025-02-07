@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 
@@ -14,7 +14,7 @@ use MagicObject\MagicObject;
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
@@ -90,7 +90,7 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Birth Day
 	 * 
-	 * @Column(name="birth_day", type="text", nullable=true)
+	 * @Column(name="birth_day", type="date", nullable=true)
 	 * @Label(content="Birth Day")
 	 * @var string
 	 */

@@ -19,7 +19,7 @@ require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package AppBuilder\Entity
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="module")

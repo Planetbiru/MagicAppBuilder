@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;

@@ -14,15 +14,12 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
-use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Notification;
-use MagicAdmin\Entity\Data\AdminMin;
-
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -39,122 +36,10 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-$dataFilter = null;
+$dataFilter = PicoSpecification::getInstance();
+$dataFilter->addAnd(PicoPredicate::getInstance()->equals(Field::of()->receiverId, $currentAction->getUserId()));
 
-if($inputPost->getUserAction() == UserAction::CREATE)
-{
-	$notification = new Notification(null, $database);
-	$notification->setTitle($inputPost->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$notification->setContent($inputPost->getContent(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$notification->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$notification->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$notification->setIsOpen($inputPost->getIsOpen(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$notification->setTimeOpen($inputPost->getTimeOpen(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$notification->setIsDelete($inputPost->getIsDelete(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$notification->setAdminCreate($currentAction->getUserId());
-	$notification->setTimeCreate($currentAction->getTime());
-	$notification->setIpCreate($currentAction->getIp());
-	$notification->setAdminEdit($currentAction->getUserId());
-	$notification->setTimeEdit($currentAction->getTime());
-	$notification->setIpEdit($currentAction->getIp());
-	try
-	{
-		$notification->insert();
-		$newId = $notification->getNotificationId();
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->notification_id, $newId);
-	}
-	catch(Exception $e)
-	{
-		$currentModule->redirectToItself();
-	}
-}
-else if($inputPost->getUserAction() == UserAction::UPDATE)
-{
-	$specification = PicoSpecification::getInstanceOf(Field::of()->notificationId, $inputPost->getNotificationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-	$specification->addAnd($dataFilter);
-	$notification = new Notification(null, $database);
-	$updater = $notification->where($specification)
-		->setTitle($inputPost->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setContent($inputPost->getContent(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setIsOpen($inputPost->getIsOpen(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-		->setTimeOpen($inputPost->getTimeOpen(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setIsDelete($inputPost->getIsDelete(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
-	;
-	$updater->setAdminEdit($currentAction->getUserId());
-	$updater->setTimeEdit($currentAction->getTime());
-	$updater->setIpEdit($currentAction->getIp());
-	try
-	{
-		$updater->update();
-		$newId = $inputPost->getNotificationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->notification_id, $newId);
-	}
-	catch(Exception $e)
-	{
-		$currentModule->redirectToItself();
-	}
-}
-else if($inputPost->getUserAction() == UserAction::ACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			$notification = new Notification(null, $database);
-			try
-			{
-				$notification->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notificationId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, true))
-					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(true)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			$notification = new Notification(null, $database);
-			try
-			{
-				$notification->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notificationId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(false)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DELETE)
+if($inputPost->getUserAction() == UserAction::DELETE)
 {
 	if($inputPost->countableCheckedRowId())
 	{
@@ -205,23 +90,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="url" id="url"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getReceiver();?></td>
-						<td>
-							<select class="form-control" name="receiver_id" id="receiver_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name)
-								; ?>
-							</select>
 						</td>
 					</tr>
 					<tr>
@@ -294,23 +162,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
 						<td>
 							<input class="form-control" type="text" name="url" id="url" value="<?php echo $notification->getUrl();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getReceiver();?></td>
-						<td>
-							<select class="form-control" name="receiver_id" id="receiver_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $notification->getReceiverId())
-								; ?>
-							</select>
 						</td>
 					</tr>
 					<tr>
@@ -485,7 +336,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"receiverId" => PicoSpecification::filter("receiverId", "fulltext")
+	
 );
 $sortOrderMap = array(
 	"title" => "title",
@@ -532,37 +383,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-list">
 	<div class="jambi-wrapper">
-		<div class="filter-section">
-			<form action="" method="get" class="filter-form">
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getReceiver();?></span>
-					<span class="filter-control">
-							<select class="form-control" name="receiver_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $inputGet->getReceiverId())
-								; ?>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
-				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
-				</span>
-				<?php } ?>
-			</form>
-		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
 			<?php } /*ajaxSupport*/ ?>
 			<?php try{

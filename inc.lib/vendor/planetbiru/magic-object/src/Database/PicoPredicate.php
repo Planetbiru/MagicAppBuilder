@@ -106,12 +106,12 @@ class PicoPredicate // NOSONAR
      * @param array $values The values to include.
      * @return self Returns the current instance for method chaining.
      */
-    public function in($field, array $values)
+    public function in($field, $values)
     {
         if (!empty($values)) {
             $this->field = $field;
             $this->value = $values;
-            $this->comparation = PicoDataComparation::in((array) $values);
+            $this->comparation = PicoDataComparation::in($values);
         }
         return $this;
     }
@@ -123,12 +123,12 @@ class PicoPredicate // NOSONAR
      * @param array $values The values to exclude.
      * @return self Returns the current instance for method chaining.
      */
-    public function notIn($field, array $values)
+    public function notIn($field, $values)
     {
         if (!empty($values)) {
             $this->field = $field;
             $this->value = $values;
-            $this->comparation = PicoDataComparation::notIn((array) $values);
+            $this->comparation = PicoDataComparation::notIn($values);
         }
         return $this;
     }

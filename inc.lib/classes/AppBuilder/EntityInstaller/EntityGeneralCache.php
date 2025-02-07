@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Entity;
+namespace AppBuilder\EntityInstaller;
 
 use MagicObject\MagicObject;
 

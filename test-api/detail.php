@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoFieldWaitingFor;
 use MagicApp\AppDto\MocroServices\PicoInputField;

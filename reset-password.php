@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityAdmin;
+use AppBuilder\EntityInstaller\EntityAdmin;
 use MagicApp\Field;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;

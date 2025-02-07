@@ -35,15 +35,16 @@ class AppInstaller {
         $entities = [];
         $entityNames = [];
 
-        $files = glob(__DIR__."/Entity/*.php");
+        $files = glob(__DIR__."/EntityInstaller/*.php");
         
         // Process each entity file
         foreach($files as $idx=>$fileName)
         {
             $entityName = basename($fileName, ".php");
-            $className = "\\AppBuilder\Entity\\".$entityName;
+            $className = "\\AppBuilder\EntityInstaller\\".$entityName;
             $entityName = trim($entityName);
             
+            // Check if file exists
             if(file_exists($fileName))
             {
                 // Check for errors in the entity file

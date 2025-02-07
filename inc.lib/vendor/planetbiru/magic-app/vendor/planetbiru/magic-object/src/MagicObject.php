@@ -891,7 +891,7 @@ class MagicObject extends stdClass // NOSONAR
         } 
         catch (PDOException $e) {
             // Log and rethrow the exception if a database error occurs
-            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+            throw new PDOException($e->getMessage(), intval($e->getCode()), $e);
         }
     }
 

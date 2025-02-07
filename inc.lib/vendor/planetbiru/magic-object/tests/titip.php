@@ -221,7 +221,7 @@
         catch (PDOException $e) 
         {
             // Handle database errors with logging
-            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+            throw new PDOException($e->getMessage(), intval($e->getCode()), $e);
         }
         return null;
     }

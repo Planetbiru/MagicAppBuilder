@@ -847,7 +847,7 @@ class PicoParsedown // NOSONAR
      * @param array|null $block The current block being processed.
      * @return array|null The updated block or null if not applicable.
      */
-    protected function blockSetextHeader($line, array $block = null)
+    protected function blockSetextHeader($line, $block = null)
     {
         if (!isset($block) || isset($block['type']) || isset($block['interrupted'])) {
             return null;

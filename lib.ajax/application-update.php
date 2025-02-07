@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
