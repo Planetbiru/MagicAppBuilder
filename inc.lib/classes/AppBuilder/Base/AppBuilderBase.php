@@ -1304,7 +1304,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             && $field->getReferenceData()->getMap() != null
             )
             {
-                $globals[] = 'global $'.PicoStringUtil::camelize('map_for_'.$field->getFieldName()).';';
+                $globals[] = '$'.PicoStringUtil::camelize('map_for_'.$field->getFieldName());
             }
 
             if($field->getElementType() == 'text')
@@ -1338,7 +1338,11 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
 '."\t".'$sheetName = "Sheet 1";
 ';
         }
-
+        $uses = "";
+        if(!empty($globals))
+        {
+            $uses = " use (".implode(", ", $globals).") ";
+        }
 
 return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 {'.$exporter.'
@@ -1348,8 +1352,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 '."\t\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
 '."\t\t".implode(",\n\t\t", $headers).'
 '."\t".'), 
-'."\t".'function($index, $row, $appLanguage){
-'."\t\t".implode(self::N_TAB2, $globals).'
+'."\t".'function($index, $row, $appLanguage)'.$uses.'{
 '."\t\t".'return array(
 '."\t\t\t".'sprintf("%d", $index + 1),
 '."\t\t\t".implode(",\n\t\t\t", $data).'
