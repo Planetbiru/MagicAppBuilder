@@ -754,7 +754,7 @@ class AppBuilderBase //NOSONAR
     {
         if($approvalRequired)
         {
-            return $this->createGuiDetailWithApproval($mainEntity, $appFields, $referenceData, $approvalRequired, $approvalEntity);
+            return $this->createGuiDetailWithApproval($mainEntity, $appFields, $referenceData, $approvalEntity);
         }
         else
         {
@@ -844,6 +844,17 @@ class AppBuilderBase //NOSONAR
         return implode("\r\n", $map);
     }
     
+    /**
+     * Fixes the JSON value by ensuring that strings are properly quoted and escaped.
+     *
+     * This method checks if the provided value is a boolean or null representation
+     * in string form ('true', 'false', or 'null'). If the value is not one of those,
+     * it wraps the value in double quotes and escapes any existing double quotes inside
+     * the string. If the value is 'true', 'false', or 'null', it returns the value as is.
+     *
+     * @param string $val2 The value to fix for JSON compatibility.
+     * @return string The properly formatted JSON value.
+     */
     private function fixJsonValue($val2)
     {
         if($val2 != 'true' && $val2 != 'false' && $val2 != 'null')
@@ -886,11 +897,10 @@ class AppBuilderBase //NOSONAR
      * @param MagicObject $mainEntity The main entity object containing metadata.
      * @param AppField[] $appFields Array of AppField objects representing the form fields.
      * @param MagicObject[] $referenceData Array of reference data for related entities.
-     * @param boolean $approvalRequired Indicates if approval is required for the detail view.
      * @param MagicObject|null $approvalEntity Optional entity for handling approval logic.
      * @return string Generated HTML and PHP code for the DETAIL view with approval.
      */
-    public function createGuiDetailWithApproval($mainEntity, $appFields, $referenceData, $approvalRequired = false, $approvalEntity = null)
+    public function createGuiDetailWithApproval($mainEntity, $appFields, $referenceData, $approvalEntity = null)
     {
         $map = $this->addIndent($this->defineMap($referenceData), 3);
         $entityName = $mainEntity->getEntityName();
@@ -1286,17 +1296,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         foreach($exportFields as $field)
         {
             $caption = PicoStringUtil::upperCamelize($field->getFieldName());
-            if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-            )
-            {
-                $caption = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-            }
+            $caption = $this->fixFieldName($caption, $field);
 
             if($field->getElementType() == 'select' 
             && $field->getReferenceData() != null 
@@ -1480,7 +1480,7 @@ catch(Exception $e)
         $getData[] = $this->constructEntityLabel($entityName);
 
         // before script
-        $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable);
+        $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable);
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
             $getData[] = $this->createExportScript($entityMain, $exportFields);
@@ -1602,10 +1602,9 @@ else
     /**
      * Get additional filters based on the provided specifications.
      *
-     * @param array $specification The array of specifications for filtering data.
      * @return string The additional filter script as a string.
      */
-    private function getAdditionalFilter($specification)
+    private function getAdditionalFilter()
     {
         $additionalFilter = '';
         
@@ -1662,14 +1661,13 @@ else
      * @param AppField[] $listFields An array of fields to be displayed in the list.
      * @param AppField[] $filterFields An array of filter fields.
      * @param MagicObject[] $referenceData An array of reference data objects.
-     * @param array $specification Specifications for filtering.
      * @param array $sortable Sortable field specifications.
      * @return string The generated script for the list section.
      */
-    public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $specification, $sortable)
+    public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable)
     {
         $map = $this->defineMap($referenceData); 
-        $additionalFilter = $this->getAdditionalFilter($specification);
+        $additionalFilter = $this->getAdditionalFilter();
         $sortableParam = $this->getSortableParams($sortable);
         
         $arrFilter = array();
@@ -2468,6 +2466,34 @@ $subqueryMap = '.$referece.';
 
         return $form;
     }
+
+    /**
+     * Fixes the field name by converting it to upper camel case if certain conditions are met.
+     *
+     * This method checks if the provided field is a 'select' type with reference data of type 'entity'.
+     * It also ensures that the entity, its object name, and property name are not null. If the field name
+     * ends with "_id", it removes the "_id" suffix and converts the remaining portion of the field name to 
+     * upper camel case. If the conditions are not met, it returns the original upper field name.
+     *
+     * @param string $upperFieldName The original upper camel case field name.
+     * @param object $field The field object containing the relevant data for processing.
+     * @return string The modified field name in upper camel case if conditions are met, otherwise the original field name.
+     */
+    protected function fixFieldName($upperFieldName, $field)
+    {
+        if($field->getElementType() == 'select' 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getEntity() != null
+            && $field->getReferenceData()->getEntity()->getObjectName() != null
+            && $field->getReferenceData()->getEntity()->getPropertyName() != null
+            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
+            )
+        {
+            return PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
+        }
+        return $upperFieldName;
+    }
     
     /**
      * Appends filter elements to the given form.
@@ -2484,17 +2510,7 @@ $subqueryMap = '.$referece.';
         foreach($filterFields as $field)
         {
             $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-            if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-            )
-            {
-                $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-            }
+            $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
             $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $label = $dom->createTextNode($labelStr);
@@ -2736,7 +2752,6 @@ $subqueryMap = '.$referece.';
      * Create a detailed comparison table for two entities.
      *
      * @param DOMDocument $dom             The DOM document to append the table to.
-     * @param MagicObject $mainEntity      The main entity for comparison.
      * @param string $objectName           The name of the main object.
      * @param AppField[] $fields           The fields to include in the comparison.
      * @param string $primaryKeyName       The name of the primary key field.
@@ -2797,17 +2812,7 @@ $subqueryMap = '.$referece.';
         $td2 = $dom->createElement('td');
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-        if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-        )
-        {
-            $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-        }
+        $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
@@ -2844,17 +2849,7 @@ $subqueryMap = '.$referece.';
         $td2 = $dom->createElement('td');
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-        if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-        )
-        {
-            $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-        }
+        $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
@@ -2889,17 +2884,7 @@ $subqueryMap = '.$referece.';
         $td2 = $dom->createElement('td');
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-        if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-        )
-        {
-            $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-        }
+        $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
@@ -3019,17 +3004,8 @@ $subqueryMap = '.$referece.';
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $upperFieldNameOri = $upperFieldName;
-        if($field->getElementType() == 'select' 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
-            && $field->getReferenceData()->getEntity() != null
-            && $field->getReferenceData()->getEntity()->getObjectName() != null
-            && $field->getReferenceData()->getEntity()->getPropertyName() != null
-            && PicoStringUtil::endsWith($field->getFieldName(), "_id")
-        )
-        {
-            $upperFieldName = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
-        }
+        $upperFieldName = $this->fixFieldName($upperFieldName, $field);
+
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
         
