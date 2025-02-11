@@ -11,7 +11,7 @@ namespace MagicObject\Request;
  * 
  * @author Kamshory
  * @package MagicObject\Database
- * @link https://github.com/Planetbiru/Request
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoFilterConstant
 {

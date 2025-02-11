@@ -1013,7 +1013,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function setGeneratedValue($prop, $strategy, $firstCall)
     {
-        if(strcasecmp($strategy, "GenerationType.UUID") == 0)
+        if(stripos($strategy, "UUID") !== false)
         {
             if($firstCall && ($this->object->get($prop) == null || $this->object->get($prop) == "") && !$this->generatedValue)
             {
@@ -1022,7 +1022,7 @@ class PicoDatabasePersistence // NOSONAR
                 $this->generatedValue = true;
             }
         }
-        else if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
+        else if(stripos($strategy, "IDENTITY") !== false)
         {
             if($firstCall)
             {
@@ -1181,7 +1181,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function isRequireGenerateValue($strategy, $propertyName)
     {
-        return strcasecmp($strategy, "GenerationType.UUID") == 0 
+        return stripos($strategy, "UUID") !== false 
                 && ($this->object->get($propertyName) == null || $this->object->get($propertyName) == "") 
                 && !$this->generatedValue;
     }
@@ -1287,7 +1287,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function fixComparison($column)
     {
-        if(stripos($column, ' ') !== false)
+        if(strpos($column, ' ') !== false)
         {
             $arr = explode(' ', $column);
             foreach($arr as $idx=>$val)

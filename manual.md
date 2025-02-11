@@ -647,7 +647,17 @@ This section allows you to configure additional features for the module. The ava
    - You can see the **"ALTER TABLE"** queries in the **Query** tab.
    - In the **Query** tab, you can also apply these queries directly to the database by executing them.
 
-## Step 12: Creating Localization
+## Step 12: Update Database Structure
+
+After creating your module and entities, you may need to update the database structure depending on the features you are using in the module. If you are using features such as activate, deactivate, or sort order, but you don't yet have columns for them, or you are using approval and trash features, MagicAppBuilder will add several columns to the created entities. As a result, you will need to update the database structure.
+
+Open the Query tab, check **Merge queries by table** and **Select all**. By default, **Merge queries by table** is already checked.
+
+MagicAppBuilder will generate a database query to update the database structure. If MagicAppBuilder does not display a query, it means the database structure is already in line with the entities you created. If MagicAppBuilder displays a query, execute the query by selecting the query to execute, then click the **Execute Query** button located below the editor. MagicAppBuilder will display a dialog and copy the query you selected. Proceed by clicking the **Execute** button at the bottom of the dialog. MagicAppBuilder will update the contents of the editor according to the latest conditions.
+
+If you need a query to create the database structure from scratch for a new, empty database, check **Create new**. MagicAppBuilder will generate a database query to create all the tables instead of a query to update the structure.
+
+## Step 13: Creating Localization
 
 You can create localization by translating both modules and entities into other languages as per the user’s needs.
 
@@ -679,7 +689,7 @@ You can create localization by translating both modules and entities into other 
 
    - You will need to translate each entity individually.
 
-## Step 13: Add Favicon to the Application
+## Step 14: Add Favicon to the Application
 
 Go to the Apps tab, and MagicAppBuilder will display the application cards. Click the Icon button on an application. Upload a square image in PNG format. The minimum image size is 512x125 pixels. The application will automatically generate several icon files in the application directory with the following names:
 
