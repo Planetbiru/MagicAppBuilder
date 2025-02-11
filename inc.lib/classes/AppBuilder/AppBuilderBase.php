@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Base;
+namespace AppBuilder;
 
 use DOMText;
 use DOMElement;

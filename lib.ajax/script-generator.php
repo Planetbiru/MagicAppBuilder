@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Generator\ScriptGenerator;
+use AppBuilder\ScriptGenerator;
 use AppBuilder\Util\Composer\ComposerUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
