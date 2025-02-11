@@ -101,7 +101,7 @@ class AppFormOption
         $attrs = array();
         if (isset($this->attributes) && is_array($this->attributes)) {
             foreach ($this->attributes as $attr => $val) {
-                $attrs[] = 'data-' . str_replace('_', '-', PicoStringUtil::snakeize($attr)) . '="' . htmlspecialchars($val) . '"';
+                $attrs[] = 'data-' . str_replace('_', '-', PicoStringUtil::snakeize($attr)) . '="' . $this->encode($val) . '"';
             }
             return ' ' . implode(' ', $attrs);
         }
@@ -186,6 +186,20 @@ class AppFormOption
         $this->pad = $pad;
         return $this;
     }
+    
+    /**
+     * Ensures any pre-encoded HTML entities are re-encoded.
+     *
+     * This function can be used to ensure that a string is safely encoded for output in HTML,
+     * potentially after some prior decoding or modification of HTML entities.
+     *
+     * @param string $string The string to encode.
+     * @return string The encoded string with HTML entities.
+     */
+    private function encode($string)
+    {
+        return htmlspecialchars(htmlspecialchars_decode($string));
+    }
 
     /**
      * Get the HTML representation of the option as a string.
@@ -202,9 +216,9 @@ class AppFormOption
         if (isset($this->format) && isset($this->params)) {
             $values = $this->getValues();
             $label = vsprintf($this->format, $values);
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . $label . '</option>';
+            return $this->pad . '<option value="' . $this->encode($this->value) . '"' . $attrs . $selected . '>' . $label . '</option>';
         } else {
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . htmlspecialchars($this->label) . '</option>';
+            return $this->pad . '<option value="' . $this->encode($this->value) . '"' . $attrs . $selected . '>' . $this->encode($this->label) . '</option>';
         }
     }
 

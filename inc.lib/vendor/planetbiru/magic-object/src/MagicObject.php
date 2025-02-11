@@ -865,7 +865,11 @@ class MagicObject extends stdClass // NOSONAR
 
             // Bind the parameters to the prepared statement
             foreach ($callerParamValues as $index => $paramValue) {
-                if (isset($callerParams[$index]) && !($paramValue instanceof PicoPageable) && !($paramValue instanceof PicoSortable) && !($paramValue instanceof PicoDatabaseQueryTemplate)) {
+                if (isset($callerParams[$index]) 
+                    && !($paramValue instanceof PicoPageable) // Skip PicoPageable
+                    && !($paramValue instanceof PicoSortable) // Skip PicoSortable
+                    && !($paramValue instanceof PicoDatabaseQueryTemplate) // PicoDatabaseQueryTemplate
+                ) {
                     // Bind the parameter name and type to the statement
                     $paramName = $callerParams[$index]->getName();
                     if (!is_array($paramValue)) {
