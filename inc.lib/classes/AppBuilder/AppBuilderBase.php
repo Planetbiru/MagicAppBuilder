@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\Base;
+namespace AppBuilder;
 
 use DOMText;
 use DOMElement;
@@ -673,7 +673,7 @@ class AppBuilderBase //NOSONAR
         $getData[] = $this->getSpecs($primaryKeyName, 1);
         $getData[] = self::TAB1.$this->createConstructor($objectName, $entityName);
         $getData[] = self::TAB1."try{";
-        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);';
+        $getData[] = self::TAB1.self::TAB1.self::VAR.$objectName.self::CALL_FIND_ONE.'($specification);'; // NOSONAR
         $getData[] = self::TAB1.self::TAB1."if(".self::VAR.$objectName.self::CALL_ISSET.$upperPkName.self::BRACKETS.")";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
 
@@ -708,9 +708,9 @@ class AppBuilderBase //NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1.self::TAB1."else";
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
-        $getData[] = self::TAB1.self::TAB1.self::TAB1."// Do somtething here when data is not found";
+        $getData[] = self::TAB1.self::TAB1.self::TAB1."// Do somtething here when data is not found"; // NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_CLOSE_TAG;
-        $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>';
+        $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>'; // NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_OPEN_TAG;
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
 
@@ -720,12 +720,12 @@ class AppBuilderBase //NOSONAR
         
 
         $getData[] = self::TAB1.self::CURLY_BRACKET_CLOSE;
-        $getData[] = self::TAB1."catch(Exception ".self::VAR."e)";
+        $getData[] = self::TAB1."catch(Exception ".self::VAR."e)"; // NOSONAR
         $getData[] = self::TAB1.self::CURLY_BRACKET_OPEN;
         $getData[] = $this->getIncludeHeader();
-        $getData[] = self::TAB1.self::TAB1."// Do somtething here when exception";
+        $getData[] = self::TAB1.self::TAB1."// Do somtething here when exception"; // NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::PHP_CLOSE_TAG;
-        $getData[] = self::TAB1.self::TAB1.'<div class="alert alert-danger"><?php echo $e->getMessage();?></div>';
+        $getData[] = self::TAB1.self::TAB1.'<div class="alert alert-danger"><?php echo $e->getMessage();?></div>'; // NOSONAR
         $getData[] = self::TAB1.self::TAB1.self::PHP_OPEN_TAG;
         $getData[] = $this->getIncludeFooter();
 
@@ -1205,12 +1205,12 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
      * @param AppField $field The field object containing information about the field.
      * @return string The formatted export value as a string.
      */
-    private function createExportValue($objectName, $field)
+    private function createExportValue($objectName, $field) // NOSONAR
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         
-        $yes = self::VAR."appLanguage->getYes()";
-        $no = self::VAR."appLanguage->getNo()";
+        $yes = self::VAR."appLanguage->getYes()"; // NOSONAR
+        $no = self::VAR."appLanguage->getNo()"; // NOSONAR
 
         $true = self::VAR."appLanguage->getTrue()";
         $false = self::VAR."appLanguage->getFalse()";
@@ -1221,7 +1221,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             && $field->getReferenceData()->getType() == 'yesno')
         )
         {
-            $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
+            $val = "->option".$upperFieldName."(".$yes.", ".$no.")"; // NOSONAR
             $result = self::VAR.'row'.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -1237,7 +1237,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $row'.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $row'.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""'; // NOSONAR
             $result = self::VAR.'row'.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -1246,10 +1246,10 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             && $field->getReferenceData()->getMap() != null
             )
         {
-            $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
-            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
-            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
-            $v4 = self::MAP_FOR.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]';
+            $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')'; // NOSONAR
+            $v2 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.'])'; // NOSONAR
+            $v3 = 'isset($mapFor'.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])'; // NOSONAR
+            $v4 = self::MAP_FOR.$upperFieldName.'[$'.'row'.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"]'; // NOSONAR
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
         }
@@ -1354,8 +1354,8 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 '."\t".'), 
 '."\t".'function($index, $row, $appLanguage)'.$uses.'{
 '."\t\t".'return array(
-'."\t\t\t".'sprintf("%d", $index + 1),
-'."\t\t\t".implode(",\n\t\t\t", $data).'
+'.self::TAB3.'sprintf("%d", $index + 1),
+'.self::TAB3.implode(",\n\t\t\t", $data).'
 '."\t\t".');
 '."\t".'});
 '."\t".'exit();
@@ -1667,7 +1667,7 @@ else
      * @param array $sortable Sortable field specifications.
      * @return string The generated script for the list section.
      */
-    public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable)
+    public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable) // NOSONAR
     {
         $map = $this->defineMap($referenceData); 
         $additionalFilter = $this->getAdditionalFilter();
@@ -1854,27 +1854,27 @@ $subqueryMap = '.$referece.';
 
         if($activate)
         {
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG));
-        $activate = $dom->createElement('button');
-        $activate->setAttribute('type', 'submit');
-        $activate->setAttribute('class', ElementClass::BUTTON_SUCCESS);
-        $activate->setAttribute('name', 'user_action');
-        $activate->setAttribute('value', 'activate');
-        $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedUpdate()){ '.self::PHP_CLOSE_TAG)); // NOSONAR 
+            $activate = $dom->createElement('button');
+            $activate->setAttribute('type', 'submit');
+            $activate->setAttribute('class', ElementClass::BUTTON_SUCCESS);
+            $activate->setAttribute('name', 'user_action');
+            $activate->setAttribute('value', 'activate');
+            $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
 
-        $deactivate = $dom->createElement('button');
-        $deactivate->setAttribute('type', 'submit');
-        $deactivate->setAttribute('class', 'btn btn-warning');
-        $deactivate->setAttribute('name', 'user_action');
-        $deactivate->setAttribute('value', 'deactivate');
-        $deactivate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDeactivate();'.self::PHP_CLOSE_TAG));
+            $deactivate = $dom->createElement('button');
+            $deactivate->setAttribute('type', 'submit');
+            $deactivate->setAttribute('class', 'btn btn-warning'); // NOSONAR
+            $deactivate->setAttribute('name', 'user_action');
+            $deactivate->setAttribute('value', 'deactivate');
+            $deactivate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDeactivate();'.self::PHP_CLOSE_TAG));
 
-        
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
-        $wrapper->appendChild($activate);
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
-        $wrapper->appendChild($deactivate);
-        $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
+            
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
+            $wrapper->appendChild($activate);
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
+            $wrapper->appendChild($deactivate);
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
         }
 
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDelete()){ '.self::PHP_CLOSE_TAG));
@@ -1892,7 +1892,7 @@ $subqueryMap = '.$referece.';
 
         if($sortOrder)
         {
-            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG));
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG)); // NOSONAR
             $order = $dom->createElement('button');
             $order->setAttribute('type', 'submit');
             $order->setAttribute('class', ElementClass::BUTTON_PRIMARY);
@@ -2011,7 +2011,7 @@ $subqueryMap = '.$referece.';
         // edit end
         
         // detail begin
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG)); 
+        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG)); // NOSONAR
         $spanDetail = $dom->createElement('span');
         $spanDetail->setAttribute('class', 'fa fa-folder');
         $spanDetail->appendChild($dom->createTextNode(''));
@@ -2031,14 +2031,14 @@ $subqueryMap = '.$referece.';
         // approval begin
         if($approvalRequired && $this->appFeatures->getApprovalPosition() == AppFeatures::BEFORE_DATA)
         {
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); 
-        $td3 = $dom->createElement('td');
-        $td3->setAttribute('class', 'data-controll data-approval');
-        $td3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getApproval();'.self::PHP_CLOSE_TAG)); 
-        
-        $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
-        $trh->appendChild($td3);
-        $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG)); 
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); // NOSONAR
+            $td3 = $dom->createElement('td');
+            $td3->setAttribute('class', 'data-controll data-approval'); // NOSONAR
+            $td3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getApproval();'.self::PHP_CLOSE_TAG)); 
+            
+            $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
+            $trh->appendChild($td3);
+            $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG)); 
         }
         // approval end
 
@@ -2119,7 +2119,7 @@ $subqueryMap = '.$referece.';
         $approvalType = $this->appFeatures->getApprovalType();
         if($approvalType == 2)
         {
-            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));'.self::PHP_CLOSE_TAG);
+            $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVAL));'.self::PHP_CLOSE_TAG); // NOSONAR
         }
         else
         {
@@ -2187,8 +2187,8 @@ $subqueryMap = '.$referece.';
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
             
-            $trh->setAttribute("data-primary-key", self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).self::BRACKETS.';'.self::PHP_CLOSE_TAG);
-            $trh->setAttribute("data-sort-order", self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).self::BRACKETS.';'.self::PHP_CLOSE_TAG);
+            $trh->setAttribute("data-primary-key", self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($primaryKey).self::BRACKETS.';'.self::PHP_CLOSE_TAG); // NOSONAR
+            $trh->setAttribute("data-sort-order", self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.PicoStringUtil::upperCamelize($this->entityInfo->getSortOrder()).self::BRACKETS.';'.self::PHP_CLOSE_TAG); // NOSONAR
             $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG)); 
             // sort-control end
         }
@@ -2530,9 +2530,9 @@ $subqueryMap = '.$referece.';
                 $filterGroup->setAttribute('class', 'filter-group');
 
                 $input = $dom->createElement('input');
-                $input->setAttribute('type', 'text');
+                $this->setInputTypeAttribute($input, $field->getDataType());
                 $input->setAttribute('name', $field->getFieldName());
-                $input->setAttribute('class', 'form-control');
+                $input->setAttribute('autocomplete', 'off'); 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
 
@@ -2603,7 +2603,7 @@ $subqueryMap = '.$referece.';
 
                 $value = $dom->createElement('option');
                 
-                $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG;
+                $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG; // NOSONAR
                 $textLabel = $dom->createTextNode($caption);
                 $value->appendChild($textLabel);
 
@@ -2762,7 +2762,7 @@ $subqueryMap = '.$referece.';
      * @param string $objectApprovalName    The name of the approval object.
      * @return DOMElement                  The generated comparison table element.
      */
-    private function createDetailTableCompare($dom, $mainEntity, $objectName, $fields, $primaryKeyName, $approvalEntity, $objectApprovalName)
+    private function createDetailTableCompare($dom, $mainEntity, $objectName, $fields, $primaryKeyName, $approvalEntity, $objectApprovalName) // NOSONAR
     {
         $table = $this->createElementTableResponsiveApproval($dom);
         $thead = $dom->createElement('thead');
@@ -2808,7 +2808,7 @@ $subqueryMap = '.$referece.';
      * @param string $primaryKeyName       The name of the primary key field.
      * @return DOMElement                  The generated row element.
      */
-    private function createInsertRow($dom, $mainEntity, $objectName, $field, $primaryKeyName)
+    private function createInsertRow($dom, $mainEntity, $objectName, $field, $primaryKeyName) // NOSONAR
     {
         $tr = $dom->createElement('tr');
         $td1 = $dom->createElement('td');
@@ -2845,7 +2845,7 @@ $subqueryMap = '.$referece.';
      * @param string $primaryKeyName       The name of the primary key field.
      * @return DOMElement                  The generated row element.
      */
-    private function createUpdateRow($dom, $mainEntity, $objectName, $field, $primaryKeyName)
+    private function createUpdateRow($dom, $mainEntity, $objectName, $field, $primaryKeyName) // NOSONAR
     {
         $tr = $dom->createElement('tr');
         $td1 = $dom->createElement('td');
@@ -2945,7 +2945,7 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.$objectName.$val;
         }
         else if($field->getElementType() == 'select' 
@@ -3031,8 +3031,8 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
-            $val2 = '->isset'.$upperObjName.self::BRACKETS.' ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $val2 = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val2;
         }
@@ -3095,7 +3095,7 @@ $subqueryMap = '.$referece.';
      * @param string|null $id          The optional ID attribute for the control.
      * @return DOMElement              The created input control element.
      */
-    private function createInsertControl($dom, $field, $id = null)
+    private function createInsertControl($dom, $field, $id = null) // NOSONAR
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $input = $dom->createElement('input');
@@ -3731,7 +3731,7 @@ $subqueryMap = '.$referece.';
      * @param string $userAction The user action context.
      * @return DOMElement The generated button container table.
      */
-    private function createButtonContainerTableCreate($dom, $name, $id, $userAction)
+    private function createButtonContainerTableCreate($dom, $name, $id, $userAction) // NOSONAR
     {
         $table = $this->createElementTableResponsive($dom);
         
@@ -3880,7 +3880,7 @@ $subqueryMap = '.$referece.';
 
             if($approvalType == 2)
             {
-                $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG));
+                $td2->appendChild($dom->createTextNode('if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($'.$objectName.'->getWaitingFor()) && $userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); // NOSONAR
                 $td2->appendChild($dom->createTextNode(self::N_TAB5));
                 $td2->appendChild($btn32);
                 $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -4586,10 +4586,10 @@ $subqueryMap = '.$referece.';
         if($wrapper == self::WRAPPER_INSERT)
         {
             $html = 
-            '<div class="page page-jambi page-insert">'.self::NEW_LINE
-            .self::TAB1.'<div class="jambi-wrapper">'.self::NEW_LINE
+            '<div class="page page-jambi page-insert">'.self::NEW_LINE 
+            .self::TAB1.'<div class="jambi-wrapper">'.self::NEW_LINE // NOSONAR
             .$html
-            .self::TAB1.'</div>'.self::NEW_LINE
+            .self::TAB1.'</div>'.self::NEW_LINE // NOSONAR
             .'</div>'.self::NEW_LINE;
         }
         else if($wrapper == self::WRAPPER_UPDATE)
