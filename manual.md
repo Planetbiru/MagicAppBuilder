@@ -189,7 +189,7 @@ By default, MagicAppBuilder uses **SQLite** as its database. However, you can sw
        databaseName: sipro
        databaseSchema: public
        timeZone: Asia/Jakarta
-       databaseFilePath: 'D:\xampp\htdocs\MagicAppBuilder\inc.cfg\database.sqlite'
+       databaseFilePath: 'D:\xampp\htdocs\MagicAppBuilder\inc.database\database.sqlite'
    ```
 3. **Database Connection Details**For **MySQL** or **PostgreSQL**, you will need to provide the following information:
 
