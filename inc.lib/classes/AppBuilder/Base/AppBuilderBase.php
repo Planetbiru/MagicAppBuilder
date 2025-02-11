@@ -2530,9 +2530,9 @@ $subqueryMap = '.$referece.';
                 $filterGroup->setAttribute('class', 'filter-group');
 
                 $input = $dom->createElement('input');
-                $input->setAttribute('type', 'text');
+                $this->setInputTypeAttribute($input, $field->getDataType());
                 $input->setAttribute('name', $field->getFieldName());
-                $input->setAttribute('class', 'form-control');
+                $input->setAttribute('autocomplete', 'off'); 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
 
