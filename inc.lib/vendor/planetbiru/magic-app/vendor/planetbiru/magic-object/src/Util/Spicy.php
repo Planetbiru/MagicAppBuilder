@@ -6,7 +6,7 @@ use MagicObject\Exceptions\YamlException;
 use stdClass;
 
 /**
- * Class PicoYaml
+ * Class Spicy
  * 
  * This class is a modification of the Spyc project.
  * The purpose of this modification is to integrate the class with other projects that use Composer,
@@ -20,7 +20,7 @@ use stdClass;
  * @copyright Copyright 2005-2006 Chris Wanstrath, 2006-2011 Vlad Andersen
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class PicoYaml // NOSONAR 
+class Spicy // NOSONAR 
 {
     const REMPTY = "\0\0\0\0\0";
 
@@ -112,7 +112,7 @@ class PicoYaml // NOSONAR
 
 
     /**
-     * Load a valid YAML string to PicoYaml.
+     * Load a valid YAML string to Spicy.
      * @param string $input
      * @return array
      */
@@ -441,7 +441,7 @@ class PicoYaml // NOSONAR
      */
     private function isTrueWord($value)
     {
-        $words = $this->getTranslations(['true', 'on', 'yes', 'y']);
+        $words = self::getTranslations(['true', 'on', 'yes', 'y']);
         return in_array($value, $words, true);
     }
 
@@ -455,7 +455,7 @@ class PicoYaml // NOSONAR
      */
     private function isFalseWord($value)
     {
-        $words = $this->getTranslations(['false', 'off', 'no', 'n']);
+        $words = self::getTranslations(['false', 'off', 'no', 'n']);
         return in_array($value, $words, true);
     }
 
@@ -469,7 +469,7 @@ class PicoYaml // NOSONAR
      */
     private function isNullWord($value)
     {
-        $words = $this->getTranslations(['null', '~']);
+        $words = self::getTranslations(['null', '~']);
         return in_array($value, $words, true);
     }
 
@@ -517,7 +517,7 @@ class PicoYaml // NOSONAR
      * @return array An array of translated words with all case variations.
      * @access private
      */
-    private static function getTranslations(array $words)
+    private static function getTranslations($words)
     {
         $result = [];
         foreach ($words as $word) {
@@ -579,16 +579,16 @@ class PicoYaml // NOSONAR
             $line = $source[$i];
             $this->indent = strlen($line) - strlen(ltrim($line));
             $tempPath = $this->getParentPathByIndent($this->indent);
-            $line = $this->stripIndent($line, $this->indent);
+            $line = self::stripIndent($line, $this->indent);
 
-            if ($this->isComment($line) || $this->isEmpty($line)) {
+            if (self::isComment($line) || self::isEmpty($line)) {
                 continue;
             }
 
             $this->path = $tempPath;
 
             // Handle literal blocks (| or > style)
-            $literalBlockStyle = $this->startsLiteralBlock($line);
+            $literalBlockStyle = self::startsLiteralBlock($line);
             if ($literalBlockStyle) {
                 $line = rtrim($line, $literalBlockStyle . " \n");
                 $literalBlock = '';
@@ -606,7 +606,7 @@ class PicoYaml // NOSONAR
             }
 
             // Concatenate multiline YAML values.
-            while (++$i < $cnt && $this->greedilyNeedNextLine($line)) { // NOSONAR
+            while (++$i < $cnt && self::greedilyNeedNextLine($line)) { // NOSONAR
                 $line = rtrim($line, " \n\t\r") . ' ' . ltrim($source[$i], " \t");
             }
             $i--; // NOSONAR
@@ -1114,6 +1114,16 @@ class PicoYaml // NOSONAR
         return $this;
     }
 
+    /**
+     * Check if the line starts a literal block.
+     *
+     * This function checks if the line ends with a literal block indicator, either `|` or `>`.
+     * It also excludes lines that contain HTML tags.
+     *
+     * @param string $line The line to check.
+     * 
+     * @return string|false Returns `|` or `>` if it starts a literal block, `false` otherwise.
+     */
     private static function startsLiteralBlock($line) // NOSONAR
     {
         $lastChar = substr(trim($line), -1);
@@ -1130,6 +1140,16 @@ class PicoYaml // NOSONAR
         return $lastChar;
     }
 
+    /**
+     * Check if the next line is needed to complete the current one.
+     *
+     * This function determines whether a following line is required to complete
+     * a structure, for instance when the line starts an array or contains a reference to one.
+     *
+     * @param string $line The line to analyze.
+     * 
+     * @return bool Returns `true` if the next line is needed, `false` otherwise.
+     */
     private static function greedilyNeedNextLine($line) // NOSONAR
     {
         $line = trim($line);
@@ -1148,11 +1168,24 @@ class PicoYaml // NOSONAR
         return false;
     }
 
+    /**
+     * Add a literal line to a literal block.
+     *
+     * This function appends a line to the literal block. It handles indentation
+     * and adjusts the line's content according to the specified literal block style (`|` or `>`).
+     *
+     * @param string $literalBlock The existing literal block content.
+     * @param string $line The line to add.
+     * @param string $literalBlockStyle The style of the literal block (`|` or `>`).
+     * @param int $indent The indentation level to strip from the line (default: `-1`).
+     * 
+     * @return string The updated literal block with the added line.
+     */
     private function addLiteralLine($literalBlock, $line, $literalBlockStyle, $indent = -1) // NOSONAR
     {
-        $line = $this->stripIndent($line, $indent);
+        $line = self::stripIndent($line, $indent);
         if ($literalBlockStyle !== '|') {
-            $line = $this->stripIndent($line);
+            $line = self::stripIndent($line);
         }
         $line = rtrim($line, "\r\n\t ") . "\n";
         if ($literalBlockStyle == '|') {
@@ -1170,6 +1203,17 @@ class PicoYaml // NOSONAR
         return $literalBlock . $line;
     }
 
+    /**
+     * Revert literal placeholders back to the full literal block.
+     *
+     * This function searches for literal placeholders in the provided lines and 
+     * replaces them with the actual content of the literal block.
+     *
+     * @param array $lineArray The array of lines to process.
+     * @param string $literalBlock The literal block content to insert.
+     * 
+     * @return array The updated line array with placeholders replaced.
+     */
     function revertLiteralPlaceHolder($lineArray, $literalBlock) // NOSONAR
     {
         foreach ($lineArray as $k => $_) {
@@ -1182,6 +1226,16 @@ class PicoYaml // NOSONAR
         return $lineArray;
     }
 
+    /**
+     * Strip indentation from a line.
+     *
+     * This function removes leading whitespace from a line based on the provided indentation level.
+     *
+     * @param string $line The line to strip.
+     * @param int $indent The number of spaces to strip (default: `-1`).
+     * 
+     * @return string The line with indentation removed.
+     */
     private static function stripIndent($line, $indent = -1)
     {
         if ($indent == -1) {
@@ -1190,6 +1244,15 @@ class PicoYaml // NOSONAR
         return substr($line, $indent);
     }
 
+    /**
+     * Get the parent path for a given indentation level.
+     *
+     * This function retrieves the path of the parent nodes based on the current indentation level.
+     *
+     * @param int $indent The current indentation level.
+     * 
+     * @return array The parent path for the given indentation level.
+     */
     private function getParentPathByIndent($indent)
     {
         if ($indent == 0) {
@@ -1206,6 +1269,16 @@ class PicoYaml // NOSONAR
         return $linePath;
     }
 
+    /**
+     * Check if the line is a comment.
+     *
+     * This function checks if a line is a comment, either starting with a `#` symbol
+     * or containing a YAML document separator (`---`).
+     *
+     * @param string $line The line to check.
+     * 
+     * @return bool Returns `true` if the line is a comment, `false` otherwise.
+     */
     private static function isComment($line) // NOSONAR
     {
         if (!$line) {
@@ -1220,11 +1293,30 @@ class PicoYaml // NOSONAR
         return false;
     }
 
+    /**
+     * Check if the line is empty.
+     *
+     * This function checks if a line is empty after trimming leading and trailing whitespace.
+     *
+     * @param string $line The line to check.
+     * 
+     * @return bool Returns `true` if the line is empty, `false` otherwise.
+     */
     private static function isEmpty($line)
     {
         return trim($line) === '';
     }
 
+    /**
+     * Check if the line is an array element.
+     *
+     * This function checks if a line starts with a dash (`- `), which is indicative
+     * of an element in a YAML array.
+     *
+     * @param string $line The line to check.
+     * 
+     * @return bool Returns `true` if the line is an array element, `false` otherwise.
+     */
     private function isArrayElement($line) // NOSONAR
     {
         if (!$line || !is_scalar($line)) {
@@ -1240,6 +1332,15 @@ class PicoYaml // NOSONAR
         return true;
     }
 
+    /**
+     * Remove quotes from a value.
+     *
+     * This function removes single or double quotes from the start and end of a string, if present.
+     *
+     * @param string $value The value to unquote.
+     * 
+     * @return string The value without quotes.
+     */
     private static function unquote($value) // NOSONAR
     {
         if (!$value) {
@@ -1257,20 +1358,50 @@ class PicoYaml // NOSONAR
         return $value;
     }
 
+    /**
+     * Check if the line starts a mapped sequence.
+     *
+     * This function checks if a line represents the start of a mapped sequence, 
+     * indicated by a `-` followed by a key and a colon (`:`).
+     *
+     * @param string $line The line to check.
+     * 
+     * @return bool Returns `true` if the line starts a mapped sequence, `false` otherwise.
+     */
     private function startsMappedSequence($line)
     {
         return substr($line, 0, 2) == '- ' && substr($line, -1, 1) == ':';
     }
 
+    /**
+     * Return the mapped sequence from a line.
+     *
+     * This function processes the line to extract the key and create a corresponding
+     * array for a mapped sequence.
+     *
+     * @param string $line The line to process.
+     * 
+     * @return array The array representing the mapped sequence.
+     */
     private function returnMappedSequence($line)
     {
         $array = array();
-        $key = $this->unquote(trim(substr($line, 1, -1)));
+        $key = self::unquote(trim(substr($line, 1, -1)));
         $array[$key] = array();
         $this->delayedPath = array(strpos($line, $key) + $this->indent => $key);
         return array($array);
     }
 
+    /**
+     * Check if a value contains multiple keys.
+     *
+     * This function checks if the value contains more than one key, indicated
+     * by the presence of a colon (`:`) in a non-array or non-object structure.
+     *
+     * @param string $value The value to check.
+     * 
+     * @throws YamlException If there are too many keys in the value.
+     */
     private function checkKeysInValue($value)
     {
         if (strchr('[{"\'', $value[0]) === false && strchr($value, ': ') !== false) {
@@ -1278,31 +1409,82 @@ class PicoYaml // NOSONAR
         }
     }
 
-
+    /**
+     * Return a mapped value from a line.
+     *
+     * This function processes the line and returns a key-value pair for a mapped value.
+     *
+     * @param string $line The line to process.
+     * 
+     * @return array The array with the key-value pair.
+     */
     private function returnMappedValue($line)
     {
         $this->checkKeysInValue($line);
         $array = array();
-        $key         = $this->unquote(trim(substr($line, 0, -1)));
+        $key         = self::unquote(trim(substr($line, 0, -1)));
         $array[$key] = '';
         return $array;
     }
 
+
+    /**
+     * Check if the line represents a mapped value (ends with a colon).
+     *
+     * This function checks whether the line ends with a colon (`:`), indicating that
+     * it is likely a mapped value in the YAML format.
+     *
+     * @param string $line The line of text to check.
+     * 
+     * @return bool Returns `true` if the line ends with a colon, `false` otherwise.
+     */
     private function startsMappedValue($line)
     {
         return substr($line, -1, 1) == ':';
     }
 
+    /**
+     * Check if the line represents a plain array.
+     *
+     * This function checks whether the line starts with an opening bracket (`[`) 
+     * and ends with a closing bracket (`]`), which is characteristic of a plain array 
+     * in YAML.
+     *
+     * @param string $line The line of text to check.
+     * 
+     * @return bool Returns `true` if the line is a plain array, `false` otherwise.
+     */
     private function isPlainArray($line)
     {
         return $line[0] == '[' && substr($line, -1, 1) == ']';
     }
 
+    /**
+     * Return the parsed value of a plain array.
+     *
+     * This function processes the line and converts it to its appropriate data type 
+     * based on the provided method `_toType`.
+     *
+     * @param string $line The line representing the array element to be processed.
+     * 
+     * @return mixed The parsed value after conversion using `_toType`.
+     */
     private function returnPlainArray($line)
     {
         return $this->_toType($line);
     }
 
+    /**
+     * Return a key-value pair from a line.
+     *
+     * This function extracts a key-value pair from a line. It handles cases where 
+     * the key is wrapped in quotes and also checks for special cases like `0` as key.
+     * The value is processed to determine its data type.
+     *
+     * @param string $line The line to parse.
+     * 
+     * @return array Returns an associative array with the key and value.
+     */
     private function returnKeyValuePair($line)
     {
         $array = array();
@@ -1333,7 +1515,17 @@ class PicoYaml // NOSONAR
         return $array;
     }
 
-
+    /**
+     * Return an array element from the line.
+     *
+     * This function processes the line and trims the first character (usually a dash) 
+     * before converting it to its appropriate type. It also checks if the value is 
+     * an array and recursively handles nested elements.
+     *
+     * @param string $line The line to process.
+     * 
+     * @return array Returns an array with the processed value.
+     */
     private function returnArrayElement($line)
     {
         if (strlen($line) <= 1) {
@@ -1349,6 +1541,18 @@ class PicoYaml // NOSONAR
         return $array;
     }
 
+    /**
+     * Check if the line contains a group anchor or alias.
+     *
+     * This function checks if a line contains a reference to a group anchor (denoted 
+     * by `&`) or alias (denoted by `*`). It can match anchors or aliases at the 
+     * beginning or end of the line, as well as inline references such as `<<`.
+     *
+     * @param string $line The line to check for group anchors or aliases.
+     * 
+     * @return string|false Returns the group reference (anchor or alias) if found, 
+     *         or `false` if no group reference is present.
+     */
     private function nodeContainsGroup($line) // NOSONAR
     {
         $symbolsForReference = 'A-z0-9_\-';
@@ -1373,6 +1577,19 @@ class PicoYaml // NOSONAR
         return false;
     }
 
+
+    /**
+     * Add a group anchor or alias to the internal properties.
+     *
+     * This function processes a group identifier (anchor or alias) and stores it in 
+     * the appropriate internal property, depending on whether it's an anchor ('&') 
+     * or an alias ('*').
+     *
+     * @param string $line The current line being processed (unused in this method).
+     * @param string $group The group string which can be an anchor or alias.
+     * 
+     * @return void
+     */
     private function addGroup($line, $group) // NOSONAR
     {
         if ($group[0] == '&') {
@@ -1383,6 +1600,17 @@ class PicoYaml // NOSONAR
         }
     }
 
+    /**
+     * Strip a group identifier from a line of text.
+     *
+     * This function removes the specified group identifier (anchor or alias) from 
+     * the line and trims any extra spaces from the result.
+     *
+     * @param string $line The line of text to process.
+     * @param string $group The group identifier to remove from the line.
+     * 
+     * @return string The line with the group identifier removed and trimmed.
+     */
     private function stripGroup($line, $group)
     {
         $line = trim(str_replace($group, '', $line));
@@ -1390,22 +1618,29 @@ class PicoYaml // NOSONAR
     }
 
     /**
-     * Get quotes. False by default.
+     * Get the flag determining whether quotes are forced in the dump.
      *
-     * @return  bool
-     */ 
+     * By default, the value is `false`. This flag indicates whether strings should 
+     * always be wrapped in quotes during the dumping process.
+     *
+     * @return bool The current setting of the flag for forced quotes.
+     */
     public function getDumpForceQuotes()
     {
         return $this->dumpForceQuotes;
     }
 
     /**
-     * Set quotes. False by default.
+     * Set the flag for forcing quotes in the dump.
      *
-     * @param  bool  $dumpForceQuotes  quotes. False by default.
+     * This function allows you to specify whether strings should always be enclosed 
+     * in quotes during the dumping process.
      *
-     * @return  self
-     */ 
+     * @param bool $dumpForceQuotes The value indicating whether to force quotes 
+     *                               (true for forced quotes, false otherwise).
+     * 
+     * @return self The current instance to allow method chaining.
+     */
     public function setDumpForceQuotes(bool $dumpForceQuotes)
     {
         $this->dumpForceQuotes = $dumpForceQuotes;
@@ -1414,26 +1649,34 @@ class PicoYaml // NOSONAR
     }
 
     /**
-     * Get possible. False by default.
+     * Get the flag determining whether empty hashes are treated as objects.
      *
-     * @return  bool
-     */ 
+     * By default, this value is `false`. This flag specifies whether empty hash 
+     * structures should be interpreted as objects instead of arrays.
+     *
+     * @return bool The current setting of the flag for empty hash as object.
+     */
     public function getEmptyHashAsObject()
     {
         return $this->emptyHashAsObject;
     }
 
     /**
-     * Set possible. False by default.
+     * Set the flag for treating empty hashes as objects.
      *
-     * @param  bool  $emptyHashAsObject  possible. False by default.
+     * This function allows you to specify whether empty hash structures should be 
+     * considered as objects (true) or as empty arrays (false).
      *
-     * @return  self
-     */ 
+     * @param bool $emptyHashAsObject The value to indicate whether empty hashes 
+     *                                should be treated as objects.
+     * 
+     * @return self The current instance to allow method chaining.
+     */
     public function setEmptyHashAsObject(bool $emptyHashAsObject)
     {
         $this->emptyHashAsObject = $emptyHashAsObject;
 
         return $this;
     }
+
 }

@@ -5,6 +5,7 @@ use AppBuilder\Util\Error\ErrorChecker;
 use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/entity-diagram-config.php";
 
 $inputGet = new InputGet();
 try
@@ -31,18 +32,18 @@ try
         
         if($entityMarginX < 1)
         {
-            $entityMarginX = 40;
+            $entityMarginX = $entityDiagramConfig->gapX;
         }
         if($entityMarginY < 1)
         {
-            $entityMarginY = 20;
+            $entityMarginY = $entityDiagramConfig->gapY;
         }
-        if($zoom < 0.25)
+        if($zoom < $entityDiagramConfig->minimumZoom)
         {
             $zoom = 1;
         }
         
-        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, 200, $entityMarginX, $entityMarginY);
+        $entityRelationshipDiagram = new EntityRelationshipDiagram($appConfig, $entityDiagramConfig->diagramWidth, $entityMarginX, $entityMarginY);
         $entityRelationshipDiagram->setMarginX($inputGet->getMarginX());
         $entityRelationshipDiagram->setMarginY($inputGet->getMarginY());
         $entityRelationshipDiagram->setMaximumLevel($inputGet->getMaximumLevel());
