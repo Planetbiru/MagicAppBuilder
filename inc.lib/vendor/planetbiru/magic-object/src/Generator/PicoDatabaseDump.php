@@ -14,6 +14,7 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
 use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
+use MagicObject\Util\Database\PicoDatabaseUtilSqlServer;
 
 /**
  * Database dump class for managing and generating SQL statements
@@ -77,6 +78,11 @@ class PicoDatabaseDump
         else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
         {
             $tool = new PicoDatabaseUtilSqlite();
+            $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
+        }
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLSERVER) 
+        {
+            $tool = new PicoDatabaseUtilSqlServer();
             $result = $tool->dumpStructure($tableInfo, $picoTableName, $createIfNotExists, $dropIfExists, $engine, $charset);
         }
         return $result;

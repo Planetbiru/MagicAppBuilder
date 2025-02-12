@@ -1641,7 +1641,7 @@ class Spicy // NOSONAR
      * 
      * @return self The current instance to allow method chaining.
      */
-    public function setDumpForceQuotes(bool $dumpForceQuotes)
+    public function setDumpForceQuotes($dumpForceQuotes)
     {
         $this->dumpForceQuotes = $dumpForceQuotes;
 
@@ -1672,7 +1672,7 @@ class Spicy // NOSONAR
      * 
      * @return self The current instance to allow method chaining.
      */
-    public function setEmptyHashAsObject(bool $emptyHashAsObject)
+    public function setEmptyHashAsObject($emptyHashAsObject)
     {
         $this->emptyHashAsObject = $emptyHashAsObject;
 

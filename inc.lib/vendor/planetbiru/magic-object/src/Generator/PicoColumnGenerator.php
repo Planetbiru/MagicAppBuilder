@@ -7,6 +7,7 @@ use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
 use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
+use MagicObject\Util\Database\PicoDatabaseUtilSqlServer;
 
 /**
  * Class for generating column information from a database.
@@ -45,6 +46,11 @@ class PicoColumnGenerator
         {
             // Use SQLite-specific utility to get column list
             $columns = (new PicoDatabaseUtilSqlite())->getColumnList($database, $picoTableName);
+        }
+        else if($database->getDatabaseType() === PicoDatabaseType::DATABASE_TYPE_SQLSERVER)
+        {
+            // Use SQLServer-specific utility to get column list
+            $columns = (new PicoDatabaseUtilSqlServer())->getColumnList($database, $picoTableName);
         }
         
          // Return the column list, or an empty array if the database type is not supported
