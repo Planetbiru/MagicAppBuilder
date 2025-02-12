@@ -132,7 +132,7 @@ class Spicy // NOSONAR
      * @param array  $options Optional settings to modify parsing behavior.
      * @return array The parsed YAML converted to a PHP array.
      */
-    public function loadFile($input, $options = [])
+    public function loadFile($input, $options = array())
     {
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
@@ -152,7 +152,7 @@ class Spicy // NOSONAR
      * @param array  $options Optional settings to modify parsing behavior.
      * @return array The parsed YAML converted to a PHP array.
      */
-    public function loadString($input, $options = [])
+    public function loadString($input, $options = array())
     {
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
@@ -519,7 +519,7 @@ class Spicy // NOSONAR
      */
     private static function getTranslations($words)
     {
-        $result = [];
+        $result = array();
         foreach ($words as $word) {
             $result = array_merge($result, [ucfirst($word), strtoupper($word), strtolower($word)]);
         }
@@ -571,8 +571,8 @@ class Spicy // NOSONAR
             return [];
         }
 
-        $this->path = [];
-        $this->result = [];
+        $this->path = array();
+        $this->result = array();
 
         $cnt = count($source);
         for ($i = 0; $i < $cnt; $i++) {
@@ -625,7 +625,7 @@ class Spicy // NOSONAR
                 $this->path[$indent] = $delayedPath;
             }
 
-            $this->delayedPath = [];
+            $this->delayedPath = array();
         }
 
         return $this->result;
@@ -747,7 +747,7 @@ class Spicy // NOSONAR
                 return [];
             }
             $explode = $this->_inlineEscape($innerValue);
-            $array = [];
+            $array = array();
             foreach ($explode as $v) {
                 $subArr = $this->_toType($v);
                 if (empty($subArr)) {

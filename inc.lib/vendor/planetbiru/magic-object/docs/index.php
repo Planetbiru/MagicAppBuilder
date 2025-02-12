@@ -1,6 +1,6 @@
 <?php
 
-use MagicObject\Util\PicoParsedown;
+use MagicObject\Util\Parsedown;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
@@ -23,6 +23,11 @@ class PhpDocumentCreator // NOSONAR
     
     const DUPLICATED_WHITESPACE_EXP = '/\s\s+/';
 
+    /**
+     * Parsedown
+     *
+     * @var Parsedown
+     */
     private $parsedown = null;
 
     /**
@@ -31,7 +36,7 @@ class PhpDocumentCreator // NOSONAR
      */
     public function __construct()
     {
-        $this->parsedown = new PicoParsedown();
+        $this->parsedown = new Parsedown();
     }
 
     /**

@@ -15,7 +15,7 @@ namespace MagicObject\Util;
  *
  */
 
-class PicoParsedown // NOSONAR
+class Parsedown // NOSONAR
 {
     /**
      * The current version of the parser.
@@ -206,7 +206,7 @@ class PicoParsedown // NOSONAR
      * @param array $lines The lines of text to process.
      * @return string The generated HTML markup.
      */
-    protected function lines(array $lines) // NOSONAR
+    protected function lines($lines) // NOSONAR
     {
         $currentBlock = null;
 
@@ -502,7 +502,7 @@ class PicoParsedown // NOSONAR
      * @param array $block The current comment block being processed.
      * @return array|null The updated comment block or null if not applicable.
      */
-    protected function blockCommentContinue($line, array $block)
+    protected function blockCommentContinue($line, $block)
     {
         if (isset($block['closed'])) {
             return null;
@@ -691,7 +691,7 @@ class PicoParsedown // NOSONAR
      * @param array $block The current list block being processed.
      * @return array|null The updated list block or null if not applicable.
      */
-    protected function blockListContinue($line, array $block) // NOSONAR
+    protected function blockListContinue($line, $block) // NOSONAR
     {
         if ($block['indent'] === $line['indent'] && preg_match('/^' . $block['pattern'] . '(?:[ ]+(.*)|$)/', $line['text'], $matches)) {
             if (isset($block['interrupted'])) {
@@ -752,7 +752,7 @@ class PicoParsedown // NOSONAR
      * @param array $block The list block to complete.
      * @return array The completed list block.
      */
-    protected function blockListComplete(array $block)
+    protected function blockListComplete($block)
     {
         if (isset($block['loose'])) {
             foreach ($block['element']['text'] as &$li) {
@@ -797,7 +797,7 @@ class PicoParsedown // NOSONAR
      * @param array $block The current block quote being processed.
      * @return array|null The updated block quote or null if not applicable.
      */
-    protected function blockQuoteContinue($line, array $block)
+    protected function blockQuoteContinue($line, $block)
     {
         if ($line['text'][0] === '>' && preg_match('/^>[ ]?(.*)/', $line['text'], $matches)) // NOSONAR
         {
@@ -919,7 +919,7 @@ class PicoParsedown // NOSONAR
      * @param array $line The line of text to process.
      * @return array|null The constructed reference or null if not applicable.
      */
-    protected function blockMarkupContinue($line, array $block)
+    protected function blockMarkupContinue($line, $block)
     {
         if (isset($block['closed'])) {
             return null;
@@ -991,7 +991,7 @@ class PicoParsedown // NOSONAR
      * @param array|null $block The current block being processed.
      * @return array|null The constructed table block or null if not applicable.
      */
-    protected function blockTable($line, array $block = null) // NOSONAR
+    protected function blockTable($line, $block = null) // NOSONAR
     {
         if (!isset($block) || isset($block['type']) || isset($block['interrupted'])) {
             return null;
@@ -1656,7 +1656,7 @@ class PicoParsedown // NOSONAR
      * @param array $element The element to be rendered as HTML.
      * @return string The generated HTML markup for the element.
      */
-    protected function element(array $element) // NOSONAR
+    protected function element($element) // NOSONAR
     {
         if ($this->safeMode) {
             $element = $this->sanitiseElement($element);
@@ -1716,7 +1716,7 @@ class PicoParsedown // NOSONAR
      * @param array $elements An array of elements to be rendered as HTML.
      * @return string The generated HTML markup for all elements.
      */
-    protected function elements(array $elements)
+    protected function elements($elements)
     {
         $markup = '';
 
@@ -1770,7 +1770,7 @@ class PicoParsedown // NOSONAR
      * @param array $element The element to be sanitized.
      * @return array The sanitized element.
      */
-    protected function sanitiseElement(array $element)
+    protected function sanitiseElement($element)
     {
         static $goodAttribute = '/^[a-zA-Z0-9][a-zA-Z0-9-_]*+$/';
         static $safeUrlNameToAtt  = array(
@@ -1801,7 +1801,7 @@ class PicoParsedown // NOSONAR
      * @param string $attribute The name of the attribute to be checked.
      * @return array The element with the filtered attribute.
      */
-    protected function filterUnsafeUrlInAttribute(array $element, $attribute)
+    protected function filterUnsafeUrlInAttribute($element, $attribute)
     {
         foreach ($this->safeLinksWhitelist as $scheme) {
             if (self::striAtStart($element['attributes'][$attribute], $scheme)) {
