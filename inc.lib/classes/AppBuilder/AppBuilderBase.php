@@ -2454,7 +2454,7 @@ $subqueryMap = '.$referece.';
 
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
-            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'if($userPermission->isAllowedExport()){ '.self::PHP_CLOSE_TAG));
             $form->appendChild($dom->createTextNode(self::NN_TAB2));
             $form->appendChild($exportFilterWrapper);
             $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
