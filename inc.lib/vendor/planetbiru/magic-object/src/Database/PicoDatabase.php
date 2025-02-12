@@ -667,15 +667,16 @@ class PicoDatabase // NOSONAR
             // Construct connection string for a database with database name
             if (stripos($this->databaseCredentials->getDriver(), "sqlsrv") !== false) {
                 return sprintf(
-                    '%s:Server=%s',
+                    '%s:Server=%s;Database=%s',
                     $this->getDbDriver($this->databaseCredentials->getDriver()),
-                    $this->databaseCredentials->getHost()
+                    $this->databaseCredentials->getHost(),
+                    $this->databaseCredentials->getDatabaseName()
                 );
             } 
             else
             {
                 return sprintf(
-                    '%s:host=%s;port=%d;Database=%s',
+                    '%s:host=%s;port=%d;dbname=%s',
                     $this->getDbDriver($this->databaseCredentials->getDriver()),
                     $this->databaseCredentials->getHost(),
                     (int) $this->databaseCredentials->getPort(),
