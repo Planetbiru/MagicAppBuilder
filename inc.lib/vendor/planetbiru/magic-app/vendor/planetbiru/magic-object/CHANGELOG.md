@@ -155,3 +155,21 @@ These methods are designed to work seamlessly with an active database connection
 
 6.  **Updated Documentation**  
     The documentation has been updated to reflect the latest changes in MagicObject. This includes clarifications, examples, and explanations to assist developers in understanding and utilizing the library effectively.
+
+
+# MagicObject Version 3.0
+
+## What's New
+
+1.  **SQL Server Database Support**  
+    This feature expands user options by providing support for SQL Server, offering more flexibility in choosing DBMS.
+    
+2.  **Time Zone Conversion for SQLite and SQL Server Databases**  
+    This feature automatically converts time in databases that do not natively support time zone conversion, such as SQLite and SQL Server.
+    
+3.  **Database Time Zone Change After Object Construction**  
+    Users can now change the database's time zone at any time as needed. This provides greater flexibility when handling data across multiple time zones, especially when the application is used by users from different time zones, all without the need to modify the application configuration.
+
+4.  **Yaml Parser and Dumper**
+    MagicObject version 3.0 no longer depends on external libraries. The Yaml parsing and dumping functions are now fully handled by a class that is part of MagicObject itself, reducing its overall complexity.
+    

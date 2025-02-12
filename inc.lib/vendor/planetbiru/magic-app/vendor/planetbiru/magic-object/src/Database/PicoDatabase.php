@@ -2,6 +2,8 @@
 
 namespace MagicObject\Database;
 
+use DateTime;
+use DateTimeZone;
 use Exception;
 use PDO;
 use PDOException;
@@ -291,7 +293,6 @@ class PicoDatabase // NOSONAR
 
             return $timeZone;
         } catch (Exception $e) {
-            // Handle any exceptions by returning an error message
             return "UTC+00:00";
         }
     }
@@ -410,6 +411,10 @@ class PicoDatabase // NOSONAR
             else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
                 $this->connectMySql($connectionString, $timeZoneOffset, $charset);
             }
+            // Handle SQL Server-specific connection settings
+            else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLSERVER) {
+                $this->connectSqlServer($connectionString);
+            }
             // If the database type is neither MySQL nor PostgreSQL, throw an exception
             else {
                 throw new PDOException("Unsupported database type: " . $this->getDatabaseType());
@@ -457,10 +462,10 @@ class PicoDatabase // NOSONAR
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            [
+            array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_FOUND_ROWS => true
-            ]
+            )
         );
 
         if (!empty($initialQueries)) {
@@ -508,9 +513,9 @@ class PicoDatabase // NOSONAR
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            [
+            array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]
+            )
         );
 
         // Execute the initial queries (timezone, charset, schema) in PostgreSQL
@@ -523,13 +528,53 @@ class PicoDatabase // NOSONAR
     }
     
     /**
+     * Establish a connection to a SQL Server database.
+     *
+     * This method sets up a connection to a SQL Server database and then establishes a PDO connection to the database.
+     *
+     * @param string $connectionString The connection string used to connect to the SQL Server database.
+     *
+     * @return void
+     *
+     * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
+     */
+    private function connectSqlServer($connectionString)
+    {
+        $initialQueries = array();
+
+        // SQL Server connection setup
+        $this->databaseConnection = new PDO(
+            $connectionString,
+            $this->databaseCredentials->getUsername(),
+            $this->databaseCredentials->getPassword(),
+            array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            )
+        );
+
+        // Execute the initial queries (timezone, charset) in SQL Server
+        if (!empty($initialQueries)) {
+            foreach ($initialQueries as $initialQuery) {
+                $this->databaseConnection->exec($initialQuery);
+            }
+        }
+    }
+
+    
+    /**
      * Determine the database type from a string.
      *
-     * This method evaluates the provided string to identify common database types (e.g., SQLite, PostgreSQL, MariaDB, MySQL) 
-     * and returns the corresponding constant from the `PicoDatabaseType` class.
+     * This method evaluates the provided string to identify common database types such as SQLite, PostgreSQL, 
+     * MariaDB, MySQL, and SQL Server. It returns the corresponding constant from the `PicoDatabaseType` class.
+     * If the provided database type is not supported, it throws an `UnsupportedDatabaseException`.
      *
-     * @param string $databaseType The database type string (e.g., 'SQLite', 'PostgreSQL', 'MariaDB', 'MySQL').
-     * @return string The corresponding `PicoDatabaseType` constant.
+     * @param string $databaseType The database type string (e.g., 'SQLite', 'PostgreSQL', 'MariaDB', 'MySQL', 'SQLServer').
+     * @return string The corresponding `PicoDatabaseType` constant, one of:
+     *                - `PicoDatabaseType::DATABASE_TYPE_SQLITE`
+     *                - `PicoDatabaseType::DATABASE_TYPE_PGSQL`
+     *                - `PicoDatabaseType::DATABASE_TYPE_MARIADB`
+     *                - `PicoDatabaseType::DATABASE_TYPE_SQLSERVER`
+     *                - `PicoDatabaseType::DATABASE_TYPE_MYSQL`
      * @throws UnsupportedDatabaseException If the database type is unsupported.
      */
     private static function getDbType($databaseType) // NOSONAR
@@ -550,6 +595,10 @@ class PicoDatabase // NOSONAR
         {
             return PicoDatabaseType::DATABASE_TYPE_MYSQL;
         }
+        else if(stripos($databaseType, 'sqlsrv') !== false)
+        {
+            return PicoDatabaseType::DATABASE_TYPE_SQLSERVER;
+        }
         else
         {
             throw new UnsupportedDatabaseException("Unsupported database type: $databaseType");
@@ -561,21 +610,24 @@ class PicoDatabase // NOSONAR
      *
      * This function takes a string representing the database type and returns 
      * the corresponding database driver constant from the `PicoDatabaseType` class.
-     * It supports SQLite, PostgreSQL, and MySQL/MariaDB types.
+     * It supports SQLite, PostgreSQL, MySQL/MariaDB, and SQL Server types.
      *
-     * @param string $databaseType The type of the database (e.g., 'sqlite', 'postgres', 'pgsql', 'mysql', 'mariadb').
+     * @param string $databaseType The type of the database (e.g., 'sqlite', 'postgres', 'pgsql', 'mysql', 'mariadb', 'sqlsrv').
      * 
      * @return string The corresponding database driver constant, one of:
-     *                - `sqlite`
-     *                - `pgsql`
-     *                - `mysql`
+     *                - `PicoDatabaseType::DATABASE_TYPE_SQLITE`
+     *                - `PicoDatabaseType::DATABASE_TYPE_PGSQL`
+     *                - `PicoDatabaseType::DATABASE_TYPE_MYSQL`
+     *                - `PicoDatabaseType::DATABASE_TYPE_SQLSERVER`
      */
-    private function getDbDriver($databaseType)
+    private function getDbDriver($databaseType) // NOSONAR
     {
         if (stripos($databaseType, 'sqlite') !== false) {
             return PicoDatabaseType::DATABASE_TYPE_SQLITE;
         } else if (stripos($databaseType, 'postgre') !== false || stripos($databaseType, 'pgsql') !== false) {
             return PicoDatabaseType::DATABASE_TYPE_PGSQL;
+        } else if (stripos($databaseType, 'sqlsrv') !== false) {
+            return PicoDatabaseType::DATABASE_TYPE_SQLSERVER;
         } else {
             return PicoDatabaseType::DATABASE_TYPE_MYSQL;
         }
@@ -589,29 +641,68 @@ class PicoDatabase // NOSONAR
      * @return string The constructed connection string.
      * @throws InvalidDatabaseConfiguration If database configuration is invalid.
      */
-    private function constructConnectionString($withDatabase = true)
+    private function constructConnectionString($withDatabase = true) // NOSONAR
     {
         $emptyDriver = !$this->databaseCredentials->issetDriver();
         $emptyHost = !$this->databaseCredentials->issetHost();
         $emptyPort = !$this->databaseCredentials->issetPort();
         $emptyName = !$this->databaseCredentials->issetDatabaseName();
         $emptyValue = "";
+
+        // Append missing components to the emptyValue string
         $emptyValue .= $emptyDriver ? "{driver}" : "";
         $emptyValue .= $emptyHost ? "{host}" : "";
         $emptyValue .= $emptyPort ? "{port}" : "";
-        $invalidParam1 = $emptyDriver || $emptyHost || $emptyPort;
+
+        // Check if there are missing components
+        $invalidParam1 = $emptyDriver || $emptyHost || ($emptyPort && stripos($this->databaseCredentials->getDriver(), "sqlsrv") === false);
 
         if ($withDatabase) {
+            // If database is required and there are invalid parameters or missing database name, throw an exception
             if ($invalidParam1 || $emptyName) {
                 $emptyValue .= $emptyName ? "{database_name}" : "";
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort()) . ';dbname=' . $this->databaseCredentials->getDatabaseName();
+
+            // Construct connection string for a database with database name
+            if (stripos($this->databaseCredentials->getDriver(), "sqlsrv") !== false) {
+                return sprintf(
+                    '%s:Server=%s',
+                    $this->getDbDriver($this->databaseCredentials->getDriver()),
+                    $this->databaseCredentials->getHost()
+                );
+            } 
+            else
+            {
+                return sprintf(
+                    '%s:host=%s;port=%d;Database=%s',
+                    $this->getDbDriver($this->databaseCredentials->getDriver()),
+                    $this->databaseCredentials->getHost(),
+                    (int) $this->databaseCredentials->getPort(),
+                    $this->databaseCredentials->getDatabaseName()
+                );
+            }
         } else {
+            // If database is not required but parameters are missing, throw an exception
             if ($invalidParam1) {
                 throw new InvalidDatabaseConfiguration("Invalid database configuration. $emptyValue. Please check your database configuration!");
             }
-            return $this->getDbDriver($this->databaseCredentials->getDriver()) . ':host=' . $this->databaseCredentials->getHost() . ';port=' . ((int) $this->databaseCredentials->getPort());
+
+            // Construct connection string without database name
+            if (stripos($this->databaseCredentials->getDriver(), "sqlsrv") !== false) {
+                return sprintf(
+                    '%s:Server=%s',
+                    $this->getDbDriver($this->databaseCredentials->getDriver()),
+                    $this->databaseCredentials->getHost()
+                );
+            } else {
+                return sprintf(
+                    '%s:host=%s;port=%d',
+                    $this->getDbDriver($this->databaseCredentials->getDriver()),
+                    $this->databaseCredentials->getHost(),
+                    (int) $this->databaseCredentials->getPort()
+                );
+            }
         }
     }
 
@@ -645,11 +736,58 @@ class PicoDatabase // NOSONAR
         }
         else if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL)
         {
-            $sql = "SET time_zone='$timeZoneOffset';";
+            $sql = "SET time_zone='$timeZoneOffset'";
             $this->execute($sql);
         }
         
         return $this;
+    }
+    
+    /**
+     * Set the time zone offset for the database session.
+     *
+     * This method sets the time zone offset for the current database session. This is useful for ensuring that 
+     * any time-related operations (such as querying and storing timestamps) are adjusted to the correct time zone.
+     * The method generates the appropriate SQL command based on the type of the database (e.g., PostgreSQL, MySQL, etc.)
+     * and executes it to apply the time zone setting.
+     *
+     * @param string $timeZoneOffset The time zone offset to set for the session. It can either be a valid UTC offset (e.g., '+00:00')
+     *                               or a named time zone (e.g., 'Europe/London').
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setTimeZone($timezone)
+    {
+        return $this->setTimeZoneOffset(self::getTimeZoneOffsetFromString($timezone));
+    }
+    
+    /**
+     * Converts a timezone name (e.g., 'Asia/Jakarta') to its corresponding UTC offset (e.g., '+07:00' or '-03:00').
+     *
+     * This function will return the timezone offset without affecting the current PHP runtime timezone.
+     *
+     * @param string $timezone The name of the timezone, e.g., 'Asia/Jakarta'.
+     * @return string The UTC offset corresponding to the provided timezone, e.g., '+07:00' or '-03:00'.
+     */
+    public static function getTimeZoneOffsetFromString($timezone)
+    {
+        // Create a DateTimeZone object for the provided timezone
+        $zone = new DateTimeZone($timezone);
+        
+        // Get the current time in the given timezone
+        $now = new DateTime("now", $zone);
+        
+        // Get the offset in seconds from UTC
+        $offsetInSeconds = $zone->getOffset($now);
+
+        // Calculate hours and minutes from the offset in seconds
+        $hours = floor($offsetInSeconds / 3600);
+        $minutes = abs(floor(($offsetInSeconds % 3600) / 60));
+
+        // Format the offset to be positive or negative
+        $sign = $hours < 0 ? '-' : '+';
+
+        // Return the offset as a string in the format (+hh:mm or -hh:mm)
+        return $sign . str_pad(abs($hours), 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT);
     }
 
     /**

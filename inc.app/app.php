@@ -55,6 +55,7 @@ languages:
         name: Indonesia
         code: id
 ", true, true, true);
+    echo $builderConfig;
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
     file_put_contents($builderConfigPath, $yaml);

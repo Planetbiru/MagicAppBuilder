@@ -19,6 +19,7 @@ use MagicObject\Util\ClassUtil\ExtendedReflectionClass;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\ClassUtil\PicoEmptyParameter;
 use MagicObject\Util\Database\PicoDatabaseUtil;
+use MagicObject\Util\Database\PicoTimeZoneChanger;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -57,6 +58,7 @@ class PicoDatabasePersistence // NOSONAR
     const KEY_GENERATOR = "generator";
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_VALUE = "value";
+    const KEY_TYPE = "type";
     const KEY_ENABLE = "enable";
     const KEY_ENTITY_OBJECT = "entityObject";
     
@@ -211,6 +213,40 @@ class PicoDatabasePersistence // NOSONAR
      * @var array
      */
     private $joinCache = array();
+    
+    /**
+     * The timezone offset for the current session, in the format '+hh:mm' or '-hh:mm'.
+     * This offset represents the time difference between the current session's timezone and UTC.
+     *
+     * @var string
+     */
+    private $timeZoneOffset;
+
+    /**
+     * The system's timezone offset, representing the offset used by the system's configuration, 
+     * in the format '+hh:mm' or '-hh:mm'.
+     * This offset is typically used when interacting with the system's time settings.
+     *
+     * @var string
+     */
+    private $timeZoneOffsetSystem;
+
+    /**
+     * The timezone identifier for the current session, e.g., 'Asia/Jakarta'.
+     * This timezone is used for time-related operations within the session.
+     *
+     * @var string
+     */
+    private $timeZone;
+
+    /**
+     * The system's timezone identifier, representing the timezone used by the system, 
+     * e.g., 'Europe/London'.
+     * This timezone is typically used for system-level time settings.
+     *
+     * @var string
+     */
+    private $timeZoneSystem;
 
     /**
      * Class constructor to initialize database connection and entity object.
@@ -223,6 +259,21 @@ class PicoDatabasePersistence // NOSONAR
         $this->database = $database;
         $this->className = get_class($object);
         $this->object = $object;
+        $timeZoneSystem = null;
+        $currentTimeZone = date_default_timezone_get();
+        if(isset($database))
+        {
+            $databaseConfig = $this->database->getDatabaseCredentials();
+            $timeZoneSystem = $databaseConfig->getTimeZoneSystem();
+        }
+        if(!isset($timeZoneSystem))
+        {
+            $timeZoneSystem = $currentTimeZone;
+        }
+        $this->timeZone = $currentTimeZone;
+        $this->timeZoneSystem = $timeZoneSystem;
+        $this->timeZoneOffset = PicoDatabase::getTimeZoneOffsetFromString($currentTimeZone);
+        $this->timeZoneOffsetSystem = PicoDatabase::getTimeZoneOffsetFromString($timeZoneSystem);
     }
     
     /**
@@ -3164,6 +3215,8 @@ class PicoDatabasePersistence // NOSONAR
         {
             $columnName = $column[self::KEY_NAME];
             $value = $data[$columnName];
+            $value = $this->fixTimeZone($value, $column, $this->timeZoneSystem, $this->timeZone);
+            
             if(isset($typeMap[$columnName]))
             {
                 $result[$prop] = $this->fixData($value, $typeMap[$columnName]);
@@ -3296,19 +3349,22 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Fixes the input value based on its type.
+     * Fixes the input value based on its type and applies timezone adjustments if necessary.
      *
-     * If the input value is an instance of DateTime, it formats the date according
-     * to the specified column format. Otherwise, it returns the original value.
+     * If the input value is an instance of DateTime, it adjusts the timezone and formats the date 
+     * according to the specified column format. If the input value is not a DateTime, it simply 
+     * adjusts the timezone without formatting the value. If a date format is specified in the column, 
+     * it will format the DateTime accordingly.
      *
-     * @param mixed $value The input value to fix.
-     * @param array $column The column information containing potential date format.
-     * @return mixed The formatted date string or the original value.
+     * @param mixed $value The input value to fix, which can be a DateTime object, string, or other types.
+     * @param array $column The column information containing potential date format and type.
+     * @return mixed The formatted date string if the input is a DateTime, or the original value after timezone adjustment.
      */
     private function fixInput($value, $column)
     {
         if($value instanceof DateTime)
         {
+            $value = $this->fixTimeZone($value, $column, $this->timeZone, $this->timeZoneSystem);
             if(isset($column[self::DATE_TIME_FORMAT]))
             {
                 return (string) $value->format($column[self::DATE_TIME_FORMAT]);
@@ -3317,6 +3373,35 @@ class PicoDatabasePersistence // NOSONAR
             {
                 return (string) $value->format(self::SQL_DATETIME_FORMAT);
             }
+        }
+        else
+        {
+            $value = $this->fixTimeZone($value, $column, $this->timeZone, $this->timeZoneSystem);
+            return $value;
+        }
+    }
+
+    /**
+     * Adjusts the input value from the source timezone to the target timezone if necessary.
+     *
+     * This method checks if the column type is related to a timestamp and the database is SQLite.
+     * If so, it adjusts the input value (which can be a DateTime object, string, or Unix timestamp)
+     * from the source timezone to the target timezone. Otherwise, it returns the original value.
+     *
+     * @param mixed $value The value to be adjusted. Can be a DateTime, string, or Unix timestamp.
+     * @param array $column The column information containing potential date format and type.
+     * @param string|DateTimeZone $timeZoneFrom The source timezone (either a string or DateTimeZone object).
+     * @param string|DateTimeZone $timeZoneTo The target timezone (either a string or DateTimeZone object).
+     * @return mixed The adjusted value, either a formatted DateTime or the original value if no adjustment is necessary.
+     */
+    private function fixTimeZone($value, $column, $timeZoneFrom, $timeZoneTo)
+    {
+        if(isset($column[self::KEY_PROPERTY_TYPE]) 
+        && stripos($column[self::KEY_PROPERTY_TYPE], "timestamp") !== false 
+        && $timeZoneFrom != $timeZoneTo
+        && $this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            return PicoTimeZoneChanger::changeTimeZone($value, $timeZoneFrom, $timeZoneTo);
         }
         return $value;
     }
@@ -3371,7 +3456,7 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Selects records from the database based on the defined criteria.
+     * Selects record from the database based on the defined criteria.
      *
      * This method builds a query to retrieve records from the database using the
      * current table information, filters, specifications, and pagination settings.
@@ -3851,4 +3936,121 @@ class PicoDatabasePersistence // NOSONAR
     {
         return isset($input) && !empty($input);
     }
+
+    /**
+     * Get the timezone offset for the current session, represented in the format '+hh:mm' or '-hh:mm'.
+     *
+     * @return  string
+     */ 
+    public function getTimeZoneOffset()
+    {
+        return $this->timeZoneOffset;
+    }
+
+    /**
+     * Set the timezone offset for the current session, represented in the format '+hh:mm' or '-hh:mm'.
+     *
+     * @param  string  $timeZoneOffset  The timezone offset for the current session, represented in the format '+hh:mm' or '-hh:mm'.
+     *
+     * @return  self
+     */ 
+    public function setTimeZoneOffset($timeZoneOffset)
+    {
+        $this->timeZoneOffset = $timeZoneOffset;
+
+        return $this;
+    }
+
+    /**
+     * Get the system's timezone offset in the format '+hh:mm' or '-hh:mm'.
+     *
+     * This method returns the system's timezone offset, which is stored as a string in the format 
+     * of hours and minutes (e.g., '+07:00', '-03:00').
+     *
+     * @return string The system's timezone offset.
+     */
+    public function getTimeZoneOffsetSystem()
+    {
+        return $this->timeZoneOffsetSystem;
+    }
+
+    /**
+     * Set the system's timezone offset in the format '+hh:mm' or '-hh:mm'.
+     *
+     * This method sets the system's timezone offset, which should be provided as a string 
+     * in the format of hours and minutes (e.g., '+07:00', '-03:00').
+     *
+     * @param string $timeZoneOffsetSystem The timezone offset to set for the system.
+     *                                    Must be in the format '+hh:mm' or '-hh:mm'.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setTimeZoneOffsetSystem($timeZoneOffsetSystem)
+    {
+        $this->timeZoneOffsetSystem = $timeZoneOffsetSystem;
+
+        return $this;
+    }
+
+
+    /**
+     * Get the timezone used for time-related operations within the session.
+     *
+     * This method returns the timezone identifier (e.g., 'Asia/Jakarta') that is set for the current session 
+     * and is used for all time-related operations.
+     *
+     * @return string The timezone identifier for the current session (e.g., 'Asia/Jakarta').
+     */
+    public function getTimeZone()
+    {
+        return $this->timeZone;
+    }
+
+    /**
+     * Set the timezone used for time-related operations within the session.
+     *
+     * This method sets the timezone identifier (e.g., 'Asia/Jakarta') to be used for all time-related operations 
+     * in the current session.
+     *
+     * @param string $timeZone The timezone identifier to be used for time-related operations (e.g., 'Asia/Jakarta').
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setTimeZone($timeZone)
+    {
+        $this->timeZone = $timeZone;
+
+        return $this;
+    }
+
+    /**
+     * Get the timezone typically used for system-level time settings.
+     *
+     * This method returns the system's timezone identifier (e.g., 'Europe/London') which is generally used for 
+     * system-level time settings and configurations.
+     *
+     * @return string The system's timezone identifier (e.g., 'Europe/London').
+     */
+    public function getTimeZoneSystem()
+    {
+        return $this->timeZoneSystem;
+    }
+
+    /**
+     * Set the timezone typically used for system-level time settings.
+     *
+     * This method sets the system's timezone identifier (e.g., 'Europe/London') that is typically used for system 
+     * configurations and time settings.
+     *
+     * @param string $timeZoneSystem The timezone identifier to be used for system-level time settings (e.g., 'Europe/London').
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setTimeZoneSystem($timeZoneSystem)
+    {
+        $this->timeZoneSystem = $timeZoneSystem;
+
+        return $this;
+    }
+
 }

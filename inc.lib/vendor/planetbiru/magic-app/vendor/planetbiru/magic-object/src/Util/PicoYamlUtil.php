@@ -4,7 +4,6 @@ namespace MagicObject\Util;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\InvalidTypeException;
     
 /**
@@ -90,12 +89,25 @@ class PicoYamlUtil
      * @return string A YAML string representing the original PHP value.
      * @throws InvalidTypeException If the input is an unsupported type.
      */
-    public static function dump($input, $inline, $indent, $flags)
+    public static function dump($input, $inline, $indent, $flags) // NOSONAR
     {
         if($inline == null || $inline < 0)
         {
             $inline = self::arrayDepth($input);
         }
-        return Yaml::dump($input, $inline, $indent, $flags);
+        $yaml = new PicoYaml();
+        return $yaml->dump($input, $indent);
+    }
+
+    public static function parseFile($file)
+    {
+        $yaml = new PicoYaml();
+        return $yaml->loadFile($file);
+    }
+
+    public static function parse($rawData)
+    {
+        $yaml = new PicoYaml();
+        return $yaml->loadString($rawData);
     }
 }

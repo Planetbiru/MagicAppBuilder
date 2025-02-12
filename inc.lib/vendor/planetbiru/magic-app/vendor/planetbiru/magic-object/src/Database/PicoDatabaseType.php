@@ -14,6 +14,7 @@ namespace MagicObject\Database;
  * - MariaDB
  * - PostgreSQL
  * - SQLite
+ * - SQL Server
  *
  * @package MagicObject\Database
  * @author Kamshory
@@ -55,4 +56,11 @@ class PicoDatabaseType
      * @var string
      */
     const DATABASE_TYPE_SQLITE = "sqlite";
+    
+    /**
+     * Constant for SQL Server database type.
+     *
+     * @var string
+     */
+    const DATABASE_TYPE_SQLSERVER = "sqlsrv";
 }
