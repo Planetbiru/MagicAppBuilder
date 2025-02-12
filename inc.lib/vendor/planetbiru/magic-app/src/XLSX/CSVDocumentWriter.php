@@ -140,13 +140,13 @@ class CSVDocumentWriter extends DocumentWriter
         $idx = 0;
         if ($this->noFetchData($pageData)) {
             while ($row = $pageData->fetch()) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $data = call_user_func($writerFunction, $idx, $row);             
                 $this->writeRow($data);
                 $idx++;
             }
         } else {
             foreach ($pageData->getResult() as $row) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $data = call_user_func($writerFunction, $idx, $row);             
                 $this->writeRow($data);
                 $idx++;
             }
@@ -172,20 +172,20 @@ class CSVDocumentWriter extends DocumentWriter
      * @param mixed[] $fields Array of values to write
      * @param string $delimiter Field delimiter
      * @param string $enclosure Field enclosures
-     * @param string $escape_char Escape enclosure characters in fields
-     * @param string $record_separator Record separator
+     * @param string $escapeChar Escape enclosure characters in fields
+     * @param string $recordSeparator Record separator
      * @return self The current instance, allowing method chaining
      */
-    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escape_char = "\\", $record_separator = "\r\n")
+    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escapeChar = "\\", $recordSeparator = "\r\n")
     {
         $result = [];
         foreach ($fields as $field) {
-            $result[] = $enclosure . str_replace($enclosure, $escape_char . $enclosure, $field) . $enclosure;
+            $result[] = $enclosure . str_replace($enclosure, $escapeChar . $enclosure, $field) . $enclosure;
         }
         if ($handle == null) {
-            echo implode($delimiter, $result) . $record_separator;
+            echo implode($delimiter, $result) . $recordSeparator;
         } else {
-            fwrite($handle, implode($delimiter, $result) . $record_separator);
+            fwrite($handle, implode($delimiter, $result) . $recordSeparator);
         }
         return $this;
     }
