@@ -58,12 +58,12 @@ try {
             $path = $baseDir."/".$entityName.".php";
 
             $liData[$tableName][] = [
-                'name'=>sprintf($format3, $dir, $entityName), 
-                'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName),
-                'filetime'=>$filetime,
-                'entityName'=>$entityName,
-                'className'=>$className,
-                'path'=>$path
+                'name'        => sprintf($format3, $dir, $entityName), 
+                'html'        => sprintf($format1, $dir, $entityName, $filetime, $entityName),
+                'filetime'    => $filetime,
+                'entityName'  => $entityName,
+                'className'   => $className,
+                'path'        => $path
             ];
         } else {
             if (!isset($liData[$idx])) {
