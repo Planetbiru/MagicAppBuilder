@@ -14,7 +14,6 @@ use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 use ReflectionClass;
 use stdClass;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * SecretObject class
@@ -699,7 +698,7 @@ class SecretObject extends stdClass // NOSONAR
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parse($rawData);
+        $data = PicoYamlUtil::parse($rawData);
         if(isset($data) && !empty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
@@ -734,7 +733,7 @@ class SecretObject extends stdClass // NOSONAR
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parseFile($path);
+        $data = PicoYamlUtil::parseFile($path);
         if(isset($data) && !empty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);

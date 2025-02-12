@@ -6,16 +6,7 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit98d566506d9bd29ba23d2ee9efda62ae
 {
-    public static $files = array (
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'S' => 
-        array (
-            'Symfony\\Polyfill\\Ctype\\' => 23,
-            'Symfony\\Component\\Yaml\\' => 23,
-        ),
         'M' => 
         array (
             'MagicObject\\' => 12,
@@ -24,14 +15,6 @@ class ComposerStaticInit98d566506d9bd29ba23d2ee9efda62ae
     );
 
     public static $prefixDirsPsr4 = array (
-        'Symfony\\Polyfill\\Ctype\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
-        ),
-        'Symfony\\Component\\Yaml\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/yaml',
-        ),
         'MagicObject\\' => 
         array (
             0 => __DIR__ . '/..' . '/planetbiru/magic-object/src',

@@ -38,7 +38,6 @@ use PDO;
 use ReflectionClass;
 use ReflectionMethod;
 use stdClass;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class for creating a magic object.
@@ -322,7 +321,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parse($rawData);
+        $data = PicoYamlUtil::parse($rawData);
         if($this->_isNotNullAndNotEmpty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
@@ -370,7 +369,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parseFile($path);
+        $data = PicoYamlUtil::parseFile($path);
         if($this->_isNotNullAndNotEmpty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);

@@ -2454,7 +2454,7 @@ $subqueryMap = '.$referece.';
 
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
-            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'if($userPermission->isAllowedDetail()){ '.self::PHP_CLOSE_TAG));
+            $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'if($userPermission->isAllowedExport()){ '.self::PHP_CLOSE_TAG));
             $form->appendChild($dom->createTextNode(self::NN_TAB2));
             $form->appendChild($exportFilterWrapper);
             $form->appendChild($dom->createTextNode(self::N_TAB2.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
@@ -2532,14 +2532,10 @@ $subqueryMap = '.$referece.';
                 $input = $dom->createElement('input');
                 $this->setInputTypeAttribute($input, $field->getDataType());
                 $input->setAttribute('name', $field->getFieldName());
-                $input->setAttribute('autocomplete', 'off'); 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-
-                
                 $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
-                $input->setAttribute('autocomplete', 'off');
-                
+                $input->setAttribute('autocomplete', 'off'); 
                 $filterGroup->appendChild($dom->createTextNode(self::N_TAB3));
                 
                 $filterGroup->appendChild($labelWrapper);
@@ -3102,7 +3098,7 @@ $subqueryMap = '.$referece.';
         if($field->getElementType() == ElementType::TEXT)
         {
             $input = $dom->createElement('input');
-            $input->setAttribute('autocomplete', 'off');
+            
             $this->setInputTypeAttribute($input, $field->getDataType()); 
             $input->setAttribute('name', $field->getFieldName());
 
@@ -3680,8 +3676,7 @@ $subqueryMap = '.$referece.';
     private function setInputTypeAttribute($input, $dataType)
     {
         $classes = array();
-        $classes[] = 'form-control';
-        $input->setAttribute('class', implode(' ', $classes));
+        $classes[] = 'form-control';    
         if($dataType == 'int' || $dataType == 'integer')
         {
             $input->setAttribute('type', 'number');
@@ -3697,6 +3692,7 @@ $subqueryMap = '.$referece.';
             $dataType = $this->mapInputType($dataType);
             $input->setAttribute('type', $dataType);
         }
+        $input->setAttribute('class', implode(' ', $classes));
         return $input;
     }
 

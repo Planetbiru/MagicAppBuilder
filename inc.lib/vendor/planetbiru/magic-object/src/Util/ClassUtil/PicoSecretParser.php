@@ -4,8 +4,8 @@ namespace MagicObject\Util\ClassUtil;
 
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
+use MagicObject\Util\PicoYamlUtil;
 use stdClass;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class PicoSecretParser
@@ -226,7 +226,7 @@ class PicoSecretParser
     {
         if($yamlString != null)
         {
-            $data = Yaml::parse($yamlString);
+            $data = PicoYamlUtil::parse($yamlString);
             if (is_array($data) || is_object($data)) {
                 return self::parseObject($data);
             }

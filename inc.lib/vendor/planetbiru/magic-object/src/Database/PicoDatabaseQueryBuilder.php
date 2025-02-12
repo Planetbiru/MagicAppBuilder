@@ -127,6 +127,16 @@ class PicoDatabaseQueryBuilder // NOSONAR
     {
         return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) == 0;
     }
+	
+	/**
+     * Check if the database type is SQL Server.
+     *
+     * @return bool True if the database type is SQLite, false otherwise.
+     */
+    public function isSqlServer()
+    {
+        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLSERVER) == 0;
+    }
 
     /**
      * Initialize a new SQL query by resetting the buffer, limit, and offset.
@@ -577,6 +587,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql()) {
 			return "LOCK TABLES $tables";
 		}
+		elseif ($this->isSqlServer()) {
+			return "BEGIN TRANSACTION";
+		}
 		return null;
 	}
 
@@ -590,6 +603,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql()) {
 			return "UNLOCK TABLES";
 		}
+		elseif ($this->isSqlServer()) {
+			return "COMMIT TRANSACTION";
+		}
 		return null;
 	}
 
@@ -598,13 +614,12 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 *
 	 * @return string|null The START TRANSACTION statement or null if not supported.
 	 */
-	public function startTransaction()
+	public function startTransaction() 
 	{
 		if ($this->isMySql() || $this->isPgSql()) {
 			return "START TRANSACTION";
 		}
-		else if($this->isSqlite())
-		{
+		elseif ($this->isSqlite() || $this->isSqlServer()) {
 			return "BEGIN TRANSACTION";
 		}
 		return null;
@@ -620,6 +635,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "COMMIT";
 		}
+		elseif ($this->isSqlServer()) {
+			return "COMMIT TRANSACTION"; // Finalizing transaction in SQL Server
+		}
 		return null;
 	}
 
@@ -633,6 +651,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "ROLLBACK";
 		}
+		elseif ($this->isSqlServer()) {
+			return "ROLLBACK TRANSACTION"; // Reverting transaction in SQL Server
+		}
 		return null;
 	}
 	
@@ -641,12 +662,13 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 *
 	 * This method escapes special characters in a SQL query string to prevent SQL 
 	 * injection and ensure proper execution across different database systems. 
-	 * It handles various database types (SQLite, MySQL/MariaDB, and PostgreSQL) 
+	 * It handles various database types (SQLite, MySQL/MariaDB, PostgreSQL, and SQL Server) 
 	 * by applying database-specific escaping techniques:
 	 * - For MySQL/MariaDB, it uses `addslashes` for special characters and escapes 
 	 *   newline characters.
 	 * - For PostgreSQL and SQLite, it uses a custom quote replacement function and escapes 
 	 *   newline characters.
+	 * - For SQL Server, it doubles the single quote characters (`'`) to escape them.
 	 *
 	 * @param string $query The SQL query string to escape. This should be a valid 
 	 *                      SQL statement that may contain special characters 
@@ -662,11 +684,13 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			return str_replace(array("\r", "\n"), array("\\r", "\\n"), addslashes($query));
 		}
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) !== false 
-			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) {
+			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false
+			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLSERVER) !== false) {
 			return str_replace(array("\r", "\n"), array("\\r", "\\n"), $this->replaceQuote($query));
 		}
 		return $query;
 	}
+
 	
 	/**
 	 * Escape a value for SQL queries.
@@ -763,7 +787,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function executeFunction($name, $params)
 	{
-		if ($this->isMySql() || $this->isPgSql()) {
+		if ($this->isMySql() || $this->isPgSql() || $this->isSqlServer()) {
 			return "SELECT $name($params)";
 		}
 		return null;
@@ -776,13 +800,16 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * @param string $params The parameters for the procedure.
 	 * @return string|null The SQL statement to execute the procedure or null if not supported.
 	 */
-	public function executeProcedure($name, $params)
+	public function executeProcedure($name, $params) // NOSONAR
 	{
 		if ($this->isMySql()) {
 			return "CALL $name($params)";
 		}
-		if ($this->isPgSql()) {
+		elseif ($this->isPgSql()) {
 			return "SELECT $name($params)";
+		}
+		elseif ($this->isSqlServer()) {
+			return "EXEC $name $params"; // SQL Server uses EXEC to call stored procedures
 		}
 		return null;
 	}
@@ -804,6 +831,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		{
 			$this->buffer .= "last_insert_rowid()";
 		}
+		else if ($this->isSqlServer()) {
+			$this->buffer .= "SCOPE_IDENTITY()"; // SQL Server uses SCOPE_IDENTITY() to get the last inserted ID
+		}
 		return $this;
 	}
 
@@ -816,6 +846,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	{
 		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_DATE";
+		}
+		else if ($this->isSqlServer()) {
+			return "GETDATE()"; // SQL Server uses GETDATE() for current date
 		}
 		return null;
 	}
@@ -830,6 +863,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_TIME";
 		}
+		else if ($this->isSqlServer()) {
+			return "CONVERT(TIME, GETDATE())"; // SQL Server uses CONVERT for current time
+		}
 		return null;
 	}
 
@@ -842,6 +878,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	{
 		if ($this->isMySql() || $this->isPgSql() || $this->isSqlite()) {
 			return "CURRENT_TIMESTAMP";
+		}
+		else if ($this->isSqlServer()) {
+			return "GETDATE()"; // SQL Server uses GETDATE() for current timestamp as well
 		}
 		return null;
 	}
@@ -857,6 +896,9 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if($this->isSqlite())
 		{
 			return "CURRENT_TIMESTAMP";
+		}
+		if ($this->isSqlServer()) {
+			return $precision > 0 ? "SYSDATETIMEOFFSET($precision)" : "SYSDATETIMEOFFSET"; // SQL Server's equivalent to NOW() with precision
 		}
 		if ($precision > 6) {
 			$precision = 6;
@@ -948,6 +990,11 @@ class PicoDatabaseQueryBuilder // NOSONAR
 				// MariaDB and MySQL
 				$queryString .= "\r\nLIMIT $offset, $limit";
 			}
+			else if($this->isSqlServer())
+			{
+				// SQL Server
+				$queryString .= "\r\nOFFSET $offset ROWS FETCH NEXT $limit ROWS ONLY";
+			}
 		}
 		
 		return $queryString;
@@ -974,8 +1021,12 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if ($this->limitOffset) {
 			if ($this->isMySql()) {
 				$sql .= "LIMIT " . $this->offset . ", " . $this->limit;
-			} elseif ($this->isPgSql() || $this->isSqlite()) {
+			} else if ($this->isPgSql() || $this->isSqlite()) {
 				$sql .= "LIMIT " . $this->limit . " OFFSET " . $this->offset;
+			}
+			else if ($this->isSqlServer()) {
+				// SQL Server uses OFFSET-FETCH for pagination
+				$sql .= " OFFSET " . $this->offset . " ROWS FETCH NEXT " . $this->limit . " ROWS ONLY";
 			}
 		}
 		return $sql;
