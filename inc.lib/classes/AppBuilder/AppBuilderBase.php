@@ -1293,6 +1293,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         $headers = array();
         $data = array();
         $globals = array();
+        $globals[] = '$appLanguage';
         foreach($exportFields as $field)
         {
             $caption = PicoStringUtil::upperCamelize($field->getFieldName());
@@ -1325,7 +1326,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         if($this->appFeatures->isExportToExcel())
         {
             $exporter = '
-'."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
+'."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
 '."\t".'$sheetName = "Sheet 1";
 ';
@@ -1333,7 +1334,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         else
         {
             $exporter = '
-'."\t".'$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+'."\t".'$exporter = DocumentWriter::getCSVDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
 '."\t".'$sheetName = "Sheet 1";
 ';
@@ -1352,7 +1353,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 '."\t\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
 '."\t\t".implode(",\n\t\t", $headers).'
 '."\t".'), 
-'."\t".'function($index, $row, $appLanguage)'.$uses.'{
+'."\t".'function($index, $row)'.$uses.'{
 '."\t\t".'return array(
 '.self::TAB3.'sprintf("%d", $index + 1),
 '.self::TAB3.implode(",\n\t\t\t", $data).'
