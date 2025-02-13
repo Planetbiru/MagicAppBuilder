@@ -377,10 +377,9 @@ class ScriptGenerator //NOSONAR
         
         $entity = $request->getEntity();      
         $entityMain = $entity->getMainEntity();
-        
         $entityApproval = $this->getEntityApproval($entity);
         $entityTrash = $this->getEntityTrash($entity); 
-        
+    
         $appFeatures = new AppFeatures($request->getFeatures());
 
         $entityMainName = $entityMain->getEntityName();
@@ -469,10 +468,8 @@ class ScriptGenerator //NOSONAR
         $declaration[] = '';
         
         $declarationSection = implode("\r\n", $declaration);
-        
+  
         $appBuilder = null;
-
-        
         $sortable = $request->getSortable();
 
         $ajaxSupport = $request->getFeatures()->getAjaxSupport() == 'true' || $request->getFeatures()->getAjaxSupport() == 1;
@@ -539,7 +536,6 @@ class ScriptGenerator //NOSONAR
         $this->prepareApplication($builderConfig, $appConf, $baseDir, $composerOnline);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
-        error_log($path);
         
         $this->prepareDirContainer($path);     
         $this->createFinalScript($path, $merged);
