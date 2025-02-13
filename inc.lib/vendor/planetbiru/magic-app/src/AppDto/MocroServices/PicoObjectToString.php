@@ -46,7 +46,7 @@ class PicoObjectToString
      * It can be set to 'json' for JSON serialization (default) or 'xml' for XML serialization.
      * Depending on the value of this property, the object will be converted to the corresponding format.
      */
-    protected $__formatOutput = 'json'; //NOSONAR
+    protected $__outputFormat = 'json'; //NOSONAR
 
     /**
      * @var string The root element name for XML serialization.
@@ -55,19 +55,19 @@ class PicoObjectToString
      * By default, it is set to 'data', but it can be customized to any valid XML element name.
      * This property is only used when the output format is set to 'xml'.
      */
-    protected $__root = 'data';
+    protected $__root = 'data'; //NOSONAR
 
     /**
      * Sets the output format to JSON.
      *
      * This method allows the user to specify that the output should be in JSON format.
-     * It updates the `$__formatOutput` property to 'json' and returns the current instance for method chaining.
+     * It updates the `$__outputFormat` property to 'json' and returns the current instance for method chaining.
      *
      * @return self Returns the current instance for method chaining.
      */
     public function toJsonFormat()
     {
-        $this->__formatOutput = 'json';
+        $this->__outputFormat = 'json';
         return $this;
     }
 
@@ -75,13 +75,13 @@ class PicoObjectToString
      * Sets the output format to XML.
      *
      * This method allows the user to specify that the output should be in XML format.
-     * It updates the `$__formatOutput` property to 'xml' and returns the current instance for method chaining.
+     * It updates the `$__outputFormat` property to 'xml' and returns the current instance for method chaining.
      *
      * @return self Returns the current instance for method chaining.
      */
     public function toXmlFormat()
     {
-        $this->__formatOutput = 'xml';
+        $this->__outputFormat = 'xml';
         return $this;
     }
 
@@ -111,16 +111,16 @@ class PicoObjectToString
      * Sets the output format to the specified format ('json' or 'xml').
      *
      * This method allows the user to specify the desired output format by passing either 'json' or 'xml'.
-     * It updates the `$__formatOutput` property with the given format.
+     * It updates the `$__outputFormat` property with the given format.
      * If an unsupported format is provided, it will still set the property, but the user should ensure
      * that the format is valid before calling this method.
      *
      * @param string $format The output format. Expected values are 'json' or 'xml'.
      * @return self Returns the current instance for method chaining.
      */
-    public function formatOutput($format)
+    public function outputFormat($format)
     {
-        $this->__formatOutput = $format;
+        $this->__outputFormat = $format;
         return $this;
     }
 
@@ -196,10 +196,11 @@ class PicoObjectToString
     private function shouldBeSkipped($key, $value)
     {
         return $key === '__caseFormat' 
-        || $key === '__prettify' 
-        || $key === '__formatOutput' 
-        || $key === '__root' 
-        || $value === null;
+            || $key === '__prettify' 
+            || $key === '__outputFormat' 
+            || $key === '__root' 
+            || $value === null
+            ;
     }
 
     /**
@@ -356,7 +357,7 @@ class PicoObjectToString
      * @param SimpleXMLElement &$xml The XML element to append data to.
      * @return void
      */
-    private function arrayToXml($data, &$xml)
+    private function arrayToXml($data, &$xml) // NOSONAR
     {
         if(isset($data) && (is_array($data) || is_object($data)))
         {
@@ -392,35 +393,32 @@ class PicoObjectToString
     }
 
     /**
-     * Overrides the __toString method to serialize the object into a JSON string.
+     * Overrides the __toString method to serialize the object into a JSON or XML string.
      * 
-     * This method calls the `toArray()` method to convert the object into an array, 
-     * and then converts that array into a pretty-printed JSON string.
-     * If the object contains nested objects, their `toArray()` method is called recursively 
-     * to ensure they are properly serialized into the JSON string.
-     *
-     * @return string A JSON string representation of the object.
+     * This method calls the `toArray()` method to convert the object into an array.
+     * The output format is determined by the `__outputFormat` property.
+     * If the format contains 'xml', the object is converted to an XML string using `toXml()`.
+     * Otherwise, it is converted to a JSON string, with optional pretty-print formatting if `__prettify` is enabled.
+     * 
+     * @return string A string representation of the object in either JSON or XML format.
      */
     public function __toString()
     {
-        // Call the toArray() method to convert the object into an array
+        // Convert the object into an array using the toArray() method
         $data = $this->toArray();
 
-        if(stripos($this->__formatOutput, 'xml') !== false)
-        {
+        // Check the output format
+        if (stripos($this->__outputFormat, 'xml') !== false) {
+            // Convert to XML format if 'xml' is found in the output format
             return $this->toXml($data);
-        }
-        else
-        {
-            // Convert the object array into a JSON string with pretty print formatting
-            if($this->__prettify)
-            {
+        } else {
+            // Convert to JSON format with optional pretty-printing
+            if ($this->__prettify) {
                 return json_encode($data, JSON_PRETTY_PRINT);
-            }
-            else
-            {
+            } else {
                 return json_encode($data);
             }
         }
     }
+
 }

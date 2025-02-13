@@ -8,6 +8,7 @@ use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputList;
+use MagicObject\SecretObject;
 
 require_once __DIR__ . "/database.php";
 
@@ -56,12 +57,14 @@ foreach($pageData->getResult() as $row)
 	);
 }
 
+$setting = new SecretObject();
+$setting->setPrettify(true);
+
 echo PicoResponseBody::getInstance()
 	->setModule($picoModule)
     ->setData($data)
     ->setEntity($entity)
+	->setting($setting)
     ->setResponseCode("000")
     ->setResponseText("Success")
-	->switchCaseTo("camelCase")
-	->prettify(true)
     ;
