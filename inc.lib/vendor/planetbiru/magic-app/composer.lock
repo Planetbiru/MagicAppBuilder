@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f814a3beb188ebdb273d31eaec8f4490",
+    "content-hash": "e562aac317f4a04578a1a61d1452dab4",
     "packages": [
         {
             "name": "planetbiru/magic-object",
@@ -52,7 +52,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.4"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

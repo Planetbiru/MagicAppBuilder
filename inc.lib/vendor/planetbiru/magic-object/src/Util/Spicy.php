@@ -640,11 +640,43 @@ class Spicy // NOSONAR
      */
     private function loadFromString($input)
     {
+        $input = $this->fixRaw($input);
         $lines = explode("\n", $input);
         foreach ($lines as $k => $_) {
             $lines[$k] = rtrim($_, "\r");
         }
         return $lines;
+    }
+
+    /**
+     * Fixes raw YAML input by ensuring proper formatting for list items (`- key:`) to avoid
+     * indentation issues or malformed structures in the YAML.
+     *
+     * The method scans each line and, if it detects a list item (`- key:`), it re-adjusts the line's
+     * indentation to ensure it aligns correctly with the rest of the document.
+     *
+     * @param string $text The raw YAML input string.
+     * @return string The formatted YAML string with adjusted indentation for list items.
+     * @access private
+     */
+    private function fixRaw($text)
+    {
+        $lines = explode("\n", $text);
+        $formattedText = ""; 
+        foreach ($lines as $line) {
+            // Check if the line is a list item (e.g., "- key:")
+            if (preg_match('/^- [^\s]+:/', ltrim($line))) {
+                $pad = stripos($line, '- ');
+                $formattedText .= substr($line, 0, $pad + 1) . "\n"
+                            . substr($line, 0, $pad) 
+                            . substr($line, $pad - 1, 1)
+                            . ' ' 
+                            . substr($line, $pad + 2) . "\n";
+            } else {
+                $formattedText .= $line . "\n";
+            }
+        }
+        return $formattedText;
     }
 
     /**
