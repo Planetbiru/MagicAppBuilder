@@ -5,6 +5,7 @@ namespace MagicApp\AppDto\MocroServices;
 use MagicApp\AppUserPermission;
 use MagicApp\PicoModule;
 use MagicObject\MagicObject;
+use MagicObject\SecretObject;
 
 /**
  * Class PicoResponseBody
@@ -298,34 +299,59 @@ class PicoResponseBody extends PicoObjectToString
     }
 
     /**
-     * Get module
+     * Get the module.
      *
-     * @return  ModuleInfo
-     */ 
+     * @return  ModuleInfo|null  Returns the module information or null if not set.
+     */
     public function getModule()
     {
         return $this->module;
     }
 
     /**
-     * Set module
+     * Set the module.
      *
-     * @param ModuleInfo|PicoModule  $module Module
-     * @param string $section Module section
+     * @param  ModuleInfo|PicoModule  $module   The module instance or module info.
+     * @param  string|null            $section  The module section (optional).
      *
-     * @return  self
-     */ 
+     * @return self  Returns the current instance for method chaining.
+     */
     public function setModule($module, $section = null)
     {
-        if(isset($module) && $module instanceof PicoModule)
-        {
+        if (isset($module) && $module instanceof PicoModule) {
             $this->module = new PicoModuleInfo($module->getModuleName(), $module->getModuleTitle(), $section);
-        }
-        else
-        {
+        } else {
             $this->module = $module;
         }
 
+        return $this;
+    }
+
+    /**
+     * Configure the current instance with the provided settings.
+     *
+     * This method applies configuration based on the provided SecretObject. 
+     * It adjusts the naming strategy and applies a prettify option.
+     *
+     * @param SecretObject $setting An object containing the configuration settings:
+     *   - `getPrettify()`: Returns an integer (1 for true, 0 for false) to determine if prettifying should be applied.
+     *   - `getNamingStrategy()`: Returns a string representing the naming strategy to be used.
+     * 
+     * @return self Returns the current instance after applying the settings.
+     */
+    public function setting($setting)
+    {
+        $prettify = $setting->getPrettify() == 1;
+        $namingStrategy = $setting->getNamingStrategy();
+        $formatOutput = $setting->getFormatOutput();
+        $xmlRoot = $setting->getXmlRoot();
+        $this->switchCaseTo($namingStrategy);
+        $this->prettify($prettify);
+        $this->formatOutput($formatOutput);
+        if(isset($xmlRoot) && !empty(trim($xmlRoot)))
+        {
+            $this->xmlRoot($xmlRoot);
+        }
         return $this;
     }
     

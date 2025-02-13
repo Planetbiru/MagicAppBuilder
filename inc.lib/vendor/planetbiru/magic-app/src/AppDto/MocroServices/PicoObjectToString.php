@@ -2,7 +2,10 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
+use DOMDocument;
+use Exception;
 use MagicObject\Util\PicoStringUtil;
+use SimpleXMLElement;
 use stdClass;
 
 /**
@@ -37,6 +40,52 @@ class PicoObjectToString
     protected $__prettify = false; //NOSONAR
 
     /**
+     * @var string Format of the output, either 'json' or 'xml'.
+     *
+     * This property determines the format of the serialized output.
+     * It can be set to 'json' for JSON serialization (default) or 'xml' for XML serialization.
+     * Depending on the value of this property, the object will be converted to the corresponding format.
+     */
+    protected $__formatOutput = 'json'; //NOSONAR
+
+    /**
+     * @var string The root element name for XML serialization.
+     *
+     * This property defines the name of the root element when the object is serialized to XML format.
+     * By default, it is set to 'data', but it can be customized to any valid XML element name.
+     * This property is only used when the output format is set to 'xml'.
+     */
+    protected $__root = 'data';
+
+    /**
+     * Sets the output format to JSON.
+     *
+     * This method allows the user to specify that the output should be in JSON format.
+     * It updates the `$__formatOutput` property to 'json' and returns the current instance for method chaining.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function toJsonFormat()
+    {
+        $this->__formatOutput = 'json';
+        return $this;
+    }
+
+    /**
+     * Sets the output format to XML.
+     *
+     * This method allows the user to specify that the output should be in XML format.
+     * It updates the `$__formatOutput` property to 'xml' and returns the current instance for method chaining.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function toXmlFormat()
+    {
+        $this->__formatOutput = 'xml';
+        return $this;
+    }
+
+    /**
      * Sets the case format to camelCase.
      * This method allows switching the format for property names to camelCase.
      * @return self Returns the current instance for method chaining.
@@ -55,6 +104,39 @@ class PicoObjectToString
     public function toSnakeCase()
     {
         $this->__caseFormat = 'snakeCase';
+        return $this;
+    }
+
+    /**
+     * Sets the output format to the specified format ('json' or 'xml').
+     *
+     * This method allows the user to specify the desired output format by passing either 'json' or 'xml'.
+     * It updates the `$__formatOutput` property with the given format.
+     * If an unsupported format is provided, it will still set the property, but the user should ensure
+     * that the format is valid before calling this method.
+     *
+     * @param string $format The output format. Expected values are 'json' or 'xml'.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function formatOutput($format)
+    {
+        $this->__formatOutput = $format;
+        return $this;
+    }
+
+    /**
+     * Sets the root element name for XML serialization.
+     *
+     * This method allows the user to specify a custom root element name for XML output.
+     * The `$__root` property is updated with the given value, which will be used as the root element
+     * when the object is serialized to XML format.
+     *
+     * @param string $root The custom root element name for the XML output.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function xmlRoot($root)
+    {
+        $this->__root = $root;
         return $this;
     }
 
@@ -106,7 +188,6 @@ class PicoObjectToString
     
     /**
      * Helper method to determine if a property should be skipped in the conversion.
-     * This method skips the `__caseFormat` and `__prettify` property and any property with a null value.
      *
      * @param string $key The property name.
      * @param mixed $value The property value.
@@ -114,7 +195,11 @@ class PicoObjectToString
      */
     private function shouldBeSkipped($key, $value)
     {
-        return $key === '__caseFormat' || $key === '__prettify' || $value === null;
+        return $key === '__caseFormat' 
+        || $key === '__prettify' 
+        || $key === '__formatOutput' 
+        || $key === '__root' 
+        || $value === null;
     }
 
     /**
@@ -232,14 +317,78 @@ class PicoObjectToString
      */
     private function applyCaseFormat($key)
     {
-        if ($this->__caseFormat === 'snakeCase' || $this->__caseFormat === 'snake_case') {
+        if (stripos($this->__caseFormat, 'snake') !== false) {
             return $this->toSnakeCaseString($key);
         }
-        else if($this->__caseFormat === 'camelCase') {
+        else if(stripos($this->__caseFormat, 'camel') !== false) {
             return $this->toCamelCaseString($key);
         }
-
         return $key; // Default, if no case format set
+    }
+
+    /**
+     * Converts an array or JSON data to an XML string.
+     *
+     * @param mixed $data The data to be converted to XML. It can be an associative array or an object.
+     * @return string The XML representation of the data as a string.
+     */
+    public function toXml($data)
+    {
+        $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?><{$this->__root}/>");
+        $this->arrayToXml($data, $xml);
+        $xmlString = $xml->asXML();
+
+        if ($this->__prettify) {
+            $dom = new DOMDocument('1.0', 'UTF-8');
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            $dom->loadXML($xmlString);
+            return $dom->saveXML();
+        } else {
+            return $xmlString;
+        }
+    }
+
+    /**
+     * Recursively converts an array to XML format.
+     *
+     * @param mixed $data The data to be converted. It can be a nested array.
+     * @param SimpleXMLElement &$xml The XML element to append data to.
+     * @return void
+     */
+    private function arrayToXml($data, &$xml)
+    {
+        if(isset($data) && (is_array($data) || is_object($data)))
+        {
+            foreach ($data as $key => $value) {
+                $key = is_numeric($key) ? "item{$key}" : $key;
+
+                if (is_array($value)) {
+                    if ($this->isSequentialArray($value)) {
+                        foreach ($value as $item) {
+                            $child = $xml->addChild($key);
+                            $this->arrayToXml($item, $child);
+                        }
+                    } else {
+                        $child = $xml->addChild($key);
+                        $this->arrayToXml($value, $child);
+                    }
+                } else {
+                    $xml->addChild($key, htmlspecialchars($value));
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if an array is a sequential (indexed) array.
+     *
+     * @param array $array The array to be checked.
+     * @return bool Returns true if the array is sequential, otherwise false.
+     */
+    private function isSequentialArray(array $array)
+    {
+        return array_keys($array) === range(0, count($array) - 1);
     }
 
     /**
@@ -257,14 +406,21 @@ class PicoObjectToString
         // Call the toArray() method to convert the object into an array
         $data = $this->toArray();
 
-        // Convert the object array into a JSON string with pretty print formatting
-        if($this->__prettify)
+        if(stripos($this->__formatOutput, 'xml') !== false)
         {
-            return json_encode($data, JSON_PRETTY_PRINT);
+            return $this->toXml($data);
         }
         else
         {
-            return json_encode($data);
+            // Convert the object array into a JSON string with pretty print formatting
+            if($this->__prettify)
+            {
+                return json_encode($data, JSON_PRETTY_PRINT);
+            }
+            else
+            {
+                return json_encode($data);
+            }
         }
     }
 }
