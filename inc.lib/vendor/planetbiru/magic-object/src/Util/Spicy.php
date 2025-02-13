@@ -494,7 +494,6 @@ class Spicy // NOSONAR
      * Reference: http://yaml.org/type/bool.html
      * 
      * @param mixed &$value The value to coerce.
-     * @access private
      */
     private function coerceValue(&$value)
     {
@@ -515,7 +514,6 @@ class Spicy // NOSONAR
      * 
      * @param array $words The words to translate.
      * @return array An array of translated words with all case variations.
-     * @access private
      */
     private static function getTranslations($words)
     {
@@ -532,7 +530,6 @@ class Spicy // NOSONAR
      * @param string $input The file path.
      * @return array The parsed YAML data.
      * @throws YamlException If the file is not found.
-     * @access private
      */
     private function _loadFile($input)
     {
@@ -550,7 +547,6 @@ class Spicy // NOSONAR
      * 
      * @param string $input The YAML string.
      * @return array The parsed YAML data.
-     * @access private
      */
     private function _loadString($input)
     {
@@ -563,7 +559,6 @@ class Spicy // NOSONAR
      * 
      * @param array $source The source lines.
      * @return array The parsed result as an associative array.
-     * @access private
      */
     private function loadWithSource($source) // NOSONAR
     {
@@ -636,7 +631,6 @@ class Spicy // NOSONAR
      * 
      * @param string $input The YAML string.
      * @return array An array of lines from the YAML input.
-     * @access private
      */
     private function loadFromString($input)
     {
@@ -657,14 +651,12 @@ class Spicy // NOSONAR
      *
      * @param string $text The raw YAML input string.
      * @return string The formatted YAML string with adjusted indentation for list items.
-     * @access private
      */
     private function fixRaw($text)
     {
         $lines = explode("\n", $text);
         $formattedText = ""; 
         foreach ($lines as $line) {
-            // Check if the line is a list item (e.g., "- key:")
             if (preg_match('/^- [^\s]+:/', ltrim($line))) {
                 $pad = stripos($line, '- ');
                 $formattedText .= substr($line, 0, $pad + 1) . "\n"
@@ -687,7 +679,6 @@ class Spicy // NOSONAR
      * 
      * @param string $line A single line from the YAML input.
      * @return array The parsed representation of the line.
-     * @access private
      */
     private function _parseLine($line) // NOSONAR
     {
@@ -732,7 +723,6 @@ class Spicy // NOSONAR
      * 
      * @param string $value The YAML value to convert.
      * @return mixed The converted value as a native PHP type.
-     * @access private
      */
     private function _toType($value) // NOSONAR
     {
@@ -836,7 +826,6 @@ class Spicy // NOSONAR
      * 
      * @param string $inline The inline YAML string.
      * @return array Parsed components as an array.
-     * @access private
      */
     private function _inlineEscape($inline) // NOSONAR
     {
