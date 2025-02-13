@@ -35,10 +35,11 @@ use MagicObject\SecretObject;
  *
  * @param string $jsonData A JSON-encoded string representing the menu structure, including main items and submenus.
  * @param string $currentHref The href of the current page, used to determine which submenu (if any) should be expanded.
+ * @param AppLanguage $appLanguage Application language
  * 
  * @return string The generated HTML for the sidebar, including the main menu and any expanded submenus.
  */
-function generateSidebar($jsonData, $currentHref) // NOSONAR
+function generateSidebar($jsonData, $currentHref, $appLanguage) // NOSONAR
 {
     // Decode JSON data
     $data = json_decode($jsonData, true);
@@ -49,6 +50,8 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
     // Loop through each main menu item
     foreach ($data['menu'] as $item) {
         $sidebarHTML .= '<li class="nav-item">';
+
+        $item['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $item['title'])));
         
         // Link for the main menu item, add collapse toggle if there are submenus
         $sidebarHTML .= '<a class="nav-link" href="' . $item['href'] . '"';
@@ -82,6 +85,7 @@ function generateSidebar($jsonData, $currentHref) // NOSONAR
             
             // Loop through each submenu item
             foreach ($item['submenu'] as $subItem) {
+                $subItem['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $subItem['title'])));
                 $sidebarHTML .= '<li class="nav-item">';
                 $sidebarHTML .= '<a class="nav-link" href="' . $subItem['href'] . '"';
                 
@@ -124,7 +128,7 @@ $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="./"><?php echo $appLanguage->getDashboard();?></a></h4>
         <?php
-        echo generateSidebar($jsonData, basename($_SERVER['PHP_SELF']));
+        echo generateSidebar($jsonData, basename($_SERVER['PHP_SELF']), $appLanguage);
         ?>
     </div>
 
