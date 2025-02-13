@@ -328,30 +328,39 @@ class PicoResponseBody extends PicoObjectToString
     }
 
     /**
-     * Configure the current instance with the provided settings.
+     * Configures the current instance with the provided settings.
      *
-     * This method applies configuration based on the provided SecretObject. 
-     * It adjusts the naming strategy and applies a prettify option.
+     * This method applies configuration options from a `SecretObject` instance, including:
+     * - Enabling or disabling pretty-print formatting.
+     * - Setting a naming strategy for property names.
+     * - Defining the output format (JSON or XML).
+     * - Specifying the root element name for XML output.
      *
-     * @param SecretObject $setting An object containing the configuration settings:
-     *   - `getPrettify()`: Returns an integer (1 for true, 0 for false) to determine if prettifying should be applied.
-     *   - `getNamingStrategy()`: Returns a string representing the naming strategy to be used.
+     * @param SecretObject $setting An object containing the following configuration methods:
+     *   - `getPrettify()`: Returns an integer (1 for true, 0 for false) to determine if pretty-printing should be applied.
+     *   - `getNamingStrategy()`: Returns a string representing the naming strategy to be used (e.g., camelCase, snake_case).
+     *   - `getOutputFormat()`: Returns a string specifying the output format (`json` or `xml`).
+     *   - `getXmlRoot()`: Returns a string defining the root element name for XML output.
      * 
-     * @return self Returns the current instance after applying the settings.
+     * @return self Returns the current instance after applying the configuration settings.
      */
     public function setting($setting)
     {
         $prettify = $setting->getPrettify() == 1;
         $namingStrategy = $setting->getNamingStrategy();
-        $formatOutput = $setting->getFormatOutput();
+        $outputFormat = $setting->getOutputFormat();
         $xmlRoot = $setting->getXmlRoot();
+
+        // Apply the configuration settings
         $this->switchCaseTo($namingStrategy);
         $this->prettify($prettify);
-        $this->formatOutput($formatOutput);
-        if(isset($xmlRoot) && !empty(trim($xmlRoot)))
-        {
+        $this->outputFormat($outputFormat);
+
+        // Set the XML root element name if provided
+        if (isset($xmlRoot) && !empty(trim($xmlRoot))) {
             $this->xmlRoot($xmlRoot);
         }
+
         return $this;
     }
     
