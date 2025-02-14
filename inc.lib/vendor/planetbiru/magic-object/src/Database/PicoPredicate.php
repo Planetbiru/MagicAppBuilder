@@ -410,6 +410,6 @@ class PicoPredicate // NOSONAR
             'value' => $this->value,
             'comparation' => [$this->comparation ? $this->comparation->getComparison() : null],
             'filterLogic' => $this->filterLogic
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 }

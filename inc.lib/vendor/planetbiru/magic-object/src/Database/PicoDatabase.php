@@ -1289,7 +1289,7 @@ class PicoDatabase // NOSONAR
         $val->databaseType = $this->databaseType;
         $val->autocommit = $this->autocommit;
         $val->connected = $this->connected;
-        return json_encode($val);
+        return json_encode($val, JSON_PRETTY_PRINT);
     }
 
 

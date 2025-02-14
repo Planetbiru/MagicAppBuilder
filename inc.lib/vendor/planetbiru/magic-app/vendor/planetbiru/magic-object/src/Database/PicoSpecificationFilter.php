@@ -63,7 +63,7 @@ class PicoSpecificationFilter
         return json_encode(array(
             'columnName' => $this->columnName,
             'dataType' => $this->dataType,
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 
     /**

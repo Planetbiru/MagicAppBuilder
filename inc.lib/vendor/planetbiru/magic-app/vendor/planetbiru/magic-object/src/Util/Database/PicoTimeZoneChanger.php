@@ -4,6 +4,7 @@ namespace MagicObject\Util\Database;
 
 use DateTime;
 use DateTimeZone;
+use InvalidArgumentException;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 
@@ -61,15 +62,19 @@ class PicoTimeZoneChanger
             // Return the timestamp after conversion back to the target timezone
             return $datetimeObj->getTimestamp(); // Return as Unix timestamp
         } else {
-            throw new \InvalidArgumentException('The $datetime parameter must be a string, DateTime object, or Unix timestamp (integer)');
+            throw new InvalidArgumentException('The $datetime parameter must be a string, DateTime object, or Unix timestamp (integer)');
         }
     }
 
     
     /**
-     * Adjusts the given time according to the timezone settings from the database configuration.
-     * The time is adjusted only if the database driver is either "sqlsrv" or "sqlite" and the source 
+     * Adjusts the given time according to the timezone settings from the database configuration
+     * before saving to the database.
+     * The time is adjusted only if the database driver is either "sqlsrv" or "sqlite", and the source 
      * and target timezones are different.
+     *
+     * This method is useful for ensuring that the time is correctly adjusted before being saved 
+     * to the database, based on the application's time zone and the database's time zone settings.
      *
      * @param string|DateTime|int $datetime The time to be adjusted. Can be a string, DateTime object, or Unix timestamp (integer).
      * @param PicoDatabase $database The database object containing the database configuration with timezones.
@@ -83,10 +88,10 @@ class PicoTimeZoneChanger
         // Get the database driver (e.g., sqlsrv, mysql, sqlite, etc.)
         $driver = $databaseConfig->getDriver();
         
-        // Get the source timezone (from database settings)
+        // Get the source timezone (from application settings)
         $timeZoneFrom = $databaseConfig->getTimeZone();
         
-        // Get the target timezone (from system settings)
+        // Get the target timezone (from database settings)
         $timeZoneTo = $databaseConfig->getTimeZoneSystem();
 
         // Check if the driver is SQL Server (sqlsrv) or SQLite (sqlite) and if the timezones are different
@@ -103,9 +108,13 @@ class PicoTimeZoneChanger
 
     /**
      * Reverses the time zone conversion after reading data from the database.
-     * This function is useful for converting the time from the target timezone back to the original source timezone.
-     * The time is adjusted only if the database driver is either "sqlsrv" or "sqlite" and the source 
+     * This function is useful for converting the time from the target timezone back to the original source timezone 
+     * after the data has been fetched from the database.
+     * The time is adjusted only if the database driver is either "sqlsrv" or "sqlite", and the source 
      * and target timezones are different.
+     *
+     * This method ensures that the time is returned to the correct timezone as per the application's settings,
+     * after being retrieved from the database.
      *
      * @param string|DateTime|int $datetime The time to be adjusted. Can be a string, DateTime object, or Unix timestamp (integer).
      * @param PicoDatabase $database The database object containing the database configuration with timezones.
@@ -120,21 +129,22 @@ class PicoTimeZoneChanger
         $driver = $databaseConfig->getDriver();
         
         // Get the source timezone (from database settings)
-        $timeZoneFrom = $databaseConfig->getTimeZone();
+        $timeZoneFrom = $databaseConfig->getTimeZoneSystem();
         
-        // Get the target timezone (from system settings)
-        $timeZoneTo = $databaseConfig->getTimeZoneSystem();
+        // Get the target timezone (from application settings)
+        $timeZoneTo = $databaseConfig->getTimeZone();
 
         // Check if the driver is SQL Server (sqlsrv) or SQLite (sqlite) and if the timezones are different
         if ((stripos($driver, PicoDatabaseType::DATABASE_TYPE_SQLSERVER) !== false || stripos($driver, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) 
             && isset($timeZoneTo) && !empty($timeZoneTo) 
             && $timeZoneTo != $timeZoneFrom) {
             // If the conditions are met, reverse the timezone conversion of the datetime value
-            return self::changeTimeZone($datetime, $timeZoneTo, $timeZoneFrom);
+            return self::changeTimeZone($datetime, $timeZoneFrom, $timeZoneTo);
         } else {
             // If no conversion is needed, return the original datetime value
             return $datetime;
         }
     }
+
 
 }
