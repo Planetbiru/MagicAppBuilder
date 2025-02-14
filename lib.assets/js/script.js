@@ -6,7 +6,7 @@ let lastErrorLine = -1;
 let ajaxPending = 0;
 
 jQuery(function () {
-  $('body').load('lib.ajax/body.html', function () {
+  $('body').load('lib.ajax/body.min.html', function () {
     initAll();
     initEditor();
   });
