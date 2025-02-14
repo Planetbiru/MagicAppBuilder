@@ -18,12 +18,11 @@ let focused = {};
  * This function resets the content of the `cmEditorModule` editor by setting 
  * its value to an empty string and refreshing it to ensure updates are visible.
  */
-function clearModuleFile()
-{
+function clearModuleFile() {
   cmEditorModule.getDoc().setValue('');
-    setTimeout(function () {
-      cmEditorModule.refresh();
-    }, 1);
+  setTimeout(function () {
+    cmEditorModule.refresh();
+  }, 1);
 }
 
 /**
@@ -32,12 +31,11 @@ function clearModuleFile()
  * This function resets the content of the `cmEditorFile` editor by setting 
  * its value to an empty string and refreshing it.
  */
-function clearEntityFile()
-{
+function clearEntityFile() {
   cmEditorFile.getDoc().setValue('');
-    setTimeout(function () {
-      cmEditorFile.refresh();
-    }, 1);
+  setTimeout(function () {
+    cmEditorFile.refresh();
+  }, 1);
 }
 
 /**
@@ -45,12 +43,11 @@ function clearEntityFile()
  * 
  * @param {string} content - The new content to be set in the editor.
  */
-function setEntityFile(content)
-{
+function setEntityFile(content) {
   cmEditorFile.getDoc().setValue(content);
-    setTimeout(function () {
-      cmEditorFile.refresh();
-    }, 1);
+  setTimeout(function () {
+    cmEditorFile.refresh();
+  }, 1);
 }
 
 /**
@@ -59,12 +56,11 @@ function setEntityFile(content)
  * This function resets the content of the `cmEditorSQL` editor by setting 
  * its value to an empty string and refreshing it.
  */
-function clearEditorSQL()
-{
+function clearEditorSQL() {
   cmEditorSQL.getDoc().setValue('');
-    setTimeout(function () {
-      cmEditorSQL.refresh();
-    }, 1);
+  setTimeout(function () {
+    cmEditorSQL.refresh();
+  }, 1);
 }
 
 /**
@@ -73,56 +69,51 @@ function clearEditorSQL()
  * This function resets the content of the `cmEditorSQLExecute` editor by setting 
  * its value to an empty string and refreshing it.
  */
-function clearEditorSQLExecute()
-{
+function clearEditorSQLExecute() {
   cmEditorSQLExecute.getDoc().setValue('');
-    setTimeout(function () {
-      cmEditorSQLExecute.refresh();
-    }, 1);
+  setTimeout(function () {
+    cmEditorSQLExecute.refresh();
+  }, 1);
 }
 
 /**
  * Clears the content of the first translation editor.
  */
-function clearTtransEd1()
-{
+function clearTtransEd1() {
   transEd1.getDoc().setValue('');
-    setTimeout(function () {
-      transEd1.refresh();
-    }, 1);
+  setTimeout(function () {
+    transEd1.refresh();
+  }, 1);
 }
 
 /**
  * Clears the content of the second translation editor.
  */
-function clearTtransEd2()
-{
+function clearTtransEd2() {
   transEd2.getDoc().setValue('');
-    setTimeout(function () {
-      transEd2.refresh();
-    }, 1);
+  setTimeout(function () {
+    transEd2.refresh();
+  }, 1);
 }
 
 /**
  * Clears the content of the third translation editor.
  */
-function clearTtransEd3()
-{
+function clearTtransEd3() {
   transEd3.getDoc().setValue('');
-    setTimeout(function () {
-      transEd3.refresh();
-    }, 1);
+  setTimeout(function () {
+    transEd3.refresh();
+  }, 1);
 }
 
 /**
  * Clears the content of the fourth translation editor.
  */
-function clearTtransEd4()
-{
+function clearTtransEd4() {
   transEd4.getDoc().setValue('');
-    setTimeout(function () {
-      transEd4.refresh();
-    }, 1);
+  setTimeout(function () {
+    transEd4.refresh();
+  }, 1);
 }
 
 /**
@@ -168,7 +159,7 @@ function isHidden(el) {
     el.visibility == 'hidden';
 }
 
-jQuery(function () {
+let initEditor = function () {
 
   $('#modal-query-executor').on('shown.bs.modal', function () {
     cmEditorSQLExecute.refresh();
@@ -402,7 +393,7 @@ jQuery(function () {
     }, 1);
   }
 
-});
+};
 
 /**
  * Highlights the current line in the first translation editor.

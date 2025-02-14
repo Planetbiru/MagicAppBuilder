@@ -1042,3 +1042,13 @@ input[type=number][name="database_port"] {
 	width: 200px;
 	display: inline-block;
 }
+
+[data-admin-level-id="superuser"] .level-user
+{
+	display: none;
+}
+
+[data-admin-level-id="user"] .level-superuser
+{
+	display: none;
+}

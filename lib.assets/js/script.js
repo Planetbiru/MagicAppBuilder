@@ -5,6 +5,13 @@ let currentEntity2Translated = "";
 let lastErrorLine = -1;
 let ajaxPending = 0;
 
+jQuery(function () {
+  $('body').load('lib.ajax/body.html', function () {
+    initAll();
+    initEditor();
+  });
+});
+
 /**
  * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
  */
@@ -197,7 +204,9 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
   return target.replace(new RegExp(search, "g"), replacement);
 };
 
-jQuery(function () {
+
+
+let initAll = function () {
 
   $(document).on('change', '.multiple-selection', function (e) {
     let val = $(this).val();
@@ -1742,7 +1751,7 @@ jQuery(function () {
   loadAllResource();
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
-});
+};
 
 
 
