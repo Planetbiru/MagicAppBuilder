@@ -11,14 +11,16 @@ use MagicApp\AppDto\MocroServices\PicoUserFormOutputDetail;
 use MagicApp\AppEntityLanguage;
 use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\Response\PicoResponse;
+use MagicObject\SecretObject;
 
 require_once __DIR__ . "/database.php";
 
 $entity = new EntityApplication(null, $database);
-$entity->findOneByApplicationId("tukang");
+$entity->findOneByApplicationId("sipro-gitlab");
 $data = new PicoUserFormOutputDetail();
 
-$entityLanguage = new AppEntityLanguage($entity);
+$appConfig = new SecretObject();
+$entityLanguage = new AppEntityLanguage($entity, $appConfig, 'en');
 
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("applicationId", $entityLanguage->get("applicationId")), "string", new PicoInputField($entity->get("applicationId"), $entity->get("applicationId"))));
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("name", $entityLanguage->get("name")), "string", new PicoInputField($entity->get("name"), $entity->get("name"))));
