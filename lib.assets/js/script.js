@@ -1240,7 +1240,6 @@ let initAll = function () {
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
-        loadAllResource();
         updateBtn[0].disabled = false;
       }
     });
@@ -1278,7 +1277,6 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         $('#modal-application-menu .modal-body').empty().append(data);
-        loadAllResource();
         updateBtn[0].disabled = false;
         initMenu();
       }
