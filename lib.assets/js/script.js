@@ -229,7 +229,8 @@ let initAll = function () {
                   $('#button_save_module_file').attr('disabled', 'disabled');
                   $('#button_delete_module_file').attr('disabled', 'disabled');
                   cmEditorModule.getDoc().setValue('');
-                  setTimeout(function () {
+                  setTimeout(function () // NOSONAR
+                  {
                     cmEditorModule.refresh();
                   }, 1);
                 }
