@@ -22,7 +22,6 @@ if($applicationId != null)
     try
     {
         $application->findOneByApplicationId($applicationId);
-
         $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         if(!file_exists($menuPath))
         {

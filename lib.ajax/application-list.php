@@ -41,11 +41,11 @@ try
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
     <div 
-    class="card application-item" 
-    data-selected="<?php echo $selected;?>"
-    data-application-id="<?php echo $app->getId();?>" 
-    data-application-name="<?php echo htmlspecialchars($app->getName());?>"
-    data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
+        class="card application-item" 
+        data-selected="<?php echo $selected;?>"
+        data-application-id="<?php echo $app->getId();?>" 
+        data-application-name="<?php echo htmlspecialchars($app->getName());?>"
+        data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
     >
         <div class="card-body">
             <h5 class="card-title"><?php echo htmlspecialchars($app->getName()); ?></h5>
