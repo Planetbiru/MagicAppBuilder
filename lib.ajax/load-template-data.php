@@ -60,9 +60,9 @@ else
             {
                 if($applicationId == $app['id'])
                 {
-                    $fixApp = new SecretObject([
+                    $fixApp = new SecretObject(array(
                         'name'=>$app['name']
-                    ]);
+                    ));
                     $appConfig->setApplication($fixApp);
                 }
             }
@@ -74,7 +74,7 @@ else
         }
         else
         {
-            $entityInfo = new SecretObject([
+            $entityInfo = new SecretObject(array(
                 'name' => 'name',
                 'sortOrder' => 'sort_order',
                 'adminCreate' => 'admin_create',
@@ -84,97 +84,97 @@ else
                 'ipCreate' => 'ip_create',
                 'ipEdit' => 'ip_edit',
                 'active' => 'active'
-            ]);
+            ));
             
         }
         if(isset($entityInfo))
         {
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->name,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->sortOrder,
                 "type" => "INT",
                 "length" => "11",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->adminCreate,
                 "type" => "VARCHAR",
                 "length" => "40",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->adminEdit,
                 "type" => "VARCHAR",
                 "length" => "40",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->timeCreate,
                 "type" => "TIMESTAMP",
                 "length" => "",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->timeEdit,
                 "type" => "TIMESTAMP",
                 "length" => "",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->ipCreate,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->ipEdit,
                 "type" => "VARCHAR",
                 "length" => "50",
                 "nullable" => true,
                 "default" => null,
                 "values" => ""
-            ];
+            );
 
-            $columns[] = [
+            $columns[] = array(
                 "name" => $entityInfo->active,
                 "type" => "TINYINT",
                 "length" => "1",
                 "nullable" => false,
                 "default" => 1,
                 "values" => ""
-            ];
+            );
 
         }
 
-        $json = [
+        $json = array(
             "columns" => $columns
-        ];
+        );
     }
     else
     {

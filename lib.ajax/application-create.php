@@ -123,7 +123,7 @@ $application->setMagicApp(array(
 
 $newApp->setApplication($application);
 
-$entityInfo = [
+$entityInfo = array(
     'name' => 'name',
     'active' => 'active',
     'draft' => 'draft',
@@ -141,13 +141,13 @@ $entityInfo = [
     'approval_id' => 'approval_id',
     'approval_note' => 'approval_note',
     'approval_status' => 'approval_status'
-];
+);
 
-$entityApvInfo = [
+$entityApvInfo = array(
     'approval_status' => 'approval_status'
-];
+);
 
-$databaseConfig = [
+$databaseConfig = array(
     'driver' => PicoDatabaseType::DATABASE_TYPE_SQLITE,
     'database_file_path' => $databaseFilePath,
     'host' => '',
@@ -157,25 +157,25 @@ $databaseConfig = [
     'database_name' => '',
     'database_schema' => '',
     'time_zone' => 'Asia/Jakarta'
-];
+);
 
 $newApp->setEntityInfo($entityInfo);
 $newApp->setEntityApvInfo($entityApvInfo);
 
-$newApp->setCurrentAction([
+$newApp->setCurrentAction(array(
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
-]);
+));
 
-$paginationConfig = new SecretObject([
+$paginationConfig = new SecretObject(array(
     'page_size' => 20,
     'page_range' => 3,
     'prev' => '<i class="fa-solid fa-angle-left"></i>',
     'next' => '<i class="fa-solid fa-angle-right"></i>',
     'first' => '<i class="fa-solid fa-angles-left"></i>',
     'last' => '<i class="fa-solid fa-angles-right"></i>'
-]);
+));
 
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);

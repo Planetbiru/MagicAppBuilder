@@ -63,7 +63,6 @@ try
             $appConfig->getApplication()->setBaseApplicationDirectory($baseApplicationDirectory);
             $appConfig->getApplication()->setBaseEntityDirectory($baseEntityDirectory);
             $appConfig->getApplication()->setBaseLanguageDirectory($baseLanguageDirectory);
-
         }
 	}
 

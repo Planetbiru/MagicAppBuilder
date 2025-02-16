@@ -27,8 +27,6 @@ try
         unlink($path);
         $response->success = true;
     }
-
-
 }
 catch(Exception $e)
 {

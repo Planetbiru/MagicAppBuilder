@@ -62,7 +62,7 @@ try {
     // Process the rows (PostgreSQL/MySQL)
 	if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
 	{
-		while ($tableRow = $rs->fetch()) {
+		while ($tableRow = $rs->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $tableRow['name'];
             $columnsQuery = "PRAGMA table_info($tableName);";
             $columnsRs = $database->executeQuery($columnsQuery);
@@ -82,7 +82,7 @@ try {
 		ksort($tables);
 	}
     else{
-		$rows = $rs->fetchAll();
+		$rows = $rs->fetchAll(PDO::FETCH_ASSOC);
 
 		foreach ($rows as $data) {
 			$tableName = $data['table_name'];

@@ -112,7 +112,7 @@ else if($inputPost->getAction() == "default")
         }
         else
         {
-            ResponseUtil::sendJSON([]);
+            ResponseUtil::sendJSON(array());
         }
     }
     catch(Exception $e)
