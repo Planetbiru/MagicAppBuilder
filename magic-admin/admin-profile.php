@@ -29,7 +29,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-profile", $appLanguage->getAdminProfile());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 

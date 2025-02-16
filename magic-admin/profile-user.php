@@ -159,7 +159,7 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 					<tr>
 						<td><?php echo $appEntityLanguage->getUsername();?></td>
 						<td>
-							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off" readonly/>
 						</td>
 					</tr>
 					<tr>

@@ -145,6 +145,6 @@ class PicoLimit
         return json_encode(array(
             'limit' => $this->limit,
             'offset' => $this->offset
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 }

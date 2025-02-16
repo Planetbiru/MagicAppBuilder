@@ -1,13 +1,14 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
-use AppBuilder\Generator\ScriptGenerator;
+use AppBuilder\ScriptGenerator;
 use AppBuilder\Util\FileDirUtil;
 use MagicAdmin\Entity\Data\Admin;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -79,10 +80,10 @@ $application->setBaseApplicationDirectory($applicationDirectory);
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
-$application->setBaseEntityDirectory($baseApplicationDirectory."/inc.lib/classes");
-$application->setBaseLanguageDirectory($baseApplicationDirectory."/inc.lang");
+$application->setBaseEntityDirectory($baseApplicationDirectory . "/inc.lib/classes");
+$application->setBaseLanguageDirectory($baseApplicationDirectory . "/inc.lang");
 
-$databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
+$databaseFilePath = $baseApplicationDirectory . "/inc.database/database.sqlite";
 $databaseDirectory = dirname($databaseFilePath);
 if(!file_exists($databaseDirectory))
 {
@@ -147,7 +148,7 @@ $entityApvInfo = [
 ];
 
 $databaseConfig = [
-    'driver' => 'sqlite',
+    'driver' => PicoDatabaseType::DATABASE_TYPE_SQLITE,
     'database_file_path' => $databaseFilePath,
     'host' => '',
     'port' => 0,

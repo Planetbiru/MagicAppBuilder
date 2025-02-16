@@ -181,8 +181,8 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     public function __toString()
     {
         return json_encode(array(
-            'where' => $this->specification->__toString(), 
+            'where' => (string) $this->specification, 
             'set' => $this->map
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 }

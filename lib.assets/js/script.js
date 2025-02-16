@@ -198,6 +198,104 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
 };
 
 jQuery(function () {
+  $('body').load('lib.ajax/body.min.html', function () {
+    initAll();
+    initEditor();
+  });
+});
+
+let initAll = function () {
+  $(document).on('click', '#button_delete_module_file', function (e) {
+    e.preventDefault();
+    asyncAlert(
+      `Do you want to delete file ${currentModule}.php?`,  // Message to display in the modal
+      'Confirmation',  
+      [
+        {
+          'caption': 'Yes',  
+          'fn': () => {
+            
+            increaseAjaxPending();
+            $.ajax({
+              type: "POST",
+              url: "lib.ajax/module-delete.php",
+              dataType: "json",
+              data: { module: currentModule},
+              success: function (data) {
+                decreaseAjaxPending();
+                updateModuleFile();
+                if(data.success)
+                {
+                  $('#button_save_module_file').attr('disabled', 'disabled');
+                  $('#button_delete_module_file').attr('disabled', 'disabled');
+                  cmEditorModule.getDoc().setValue('');
+                  setTimeout(function () // NOSONAR
+                  {
+                    cmEditorModule.refresh();
+                  }, 1);
+                }
+              }, 
+              error: function(e){
+                decreaseAjaxPending();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+  });
+
+  $(document).on('click', '#button_delete_entity_file', function (e) {
+    e.preventDefault();
+    asyncAlert(
+      `Do you want to delete file ${currentEntity}.php?`,  // Message to display in the modal
+      'Confirmation',  
+      [
+        {
+          'caption': 'Yes',  
+          'fn': () => {
+            
+            increaseAjaxPending();
+            $.ajax({
+              type: "POST",
+              url: "lib.ajax/entity-delete.php",
+              dataType: "json",
+              data: { entity: currentEntity},
+              success: function (data) {
+                decreaseAjaxPending();
+                updateEntityFile();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+                removeHilightLineError();
+                if(data.success)
+                {
+                  setEntityFile('');
+                  $('#button_save_entity_file').attr('disabled', 'disabled');
+                  $('#button_save_entity_file_as').attr('disabled', 'disabled');
+                  $('#button_delete_entity_file').attr('disabled', 'disabled');
+                }
+              }, 
+              error: function(e){
+                decreaseAjaxPending();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+  });
 
   $(document).on('change', '.multiple-selection', function (e) {
     let val = $(this).val();
@@ -1231,7 +1329,6 @@ jQuery(function () {
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
-        loadAllResource();
         updateBtn[0].disabled = false;
       }
     });
@@ -1269,7 +1366,6 @@ jQuery(function () {
       success: function (data) {
         decreaseAjaxPending();
         $('#modal-application-menu .modal-body').empty().append(data);
-        loadAllResource();
         updateBtn[0].disabled = false;
         initMenu();
       }
@@ -1742,7 +1838,7 @@ jQuery(function () {
   loadAllResource();
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
-});
+};
 
 
 
@@ -3349,6 +3445,7 @@ function getEntityFile(entity, clbk) {
         cmEditorFile.refresh();
       }, 1);
       $("#button_save_entity_file").removeAttr("disabled");
+      $("#button_delete_entity_file").removeAttr("disabled");
       currentEntity = entity[0];
       if (clbk) {
         clbk();
@@ -3383,6 +3480,7 @@ function getModuleFile(module, clbk) {
         cmEditorModule.refresh();
       }, 1);
       $("#button_save_module_file").removeAttr("disabled");
+      $("#button_delete_module_file").removeAttr("disabled");
       currentModule = module;
       if (clbk) {
         clbk();

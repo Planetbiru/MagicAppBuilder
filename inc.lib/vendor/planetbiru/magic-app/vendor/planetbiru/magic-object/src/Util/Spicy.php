@@ -132,7 +132,7 @@ class Spicy // NOSONAR
      * @param array  $options Optional settings to modify parsing behavior.
      * @return array The parsed YAML converted to a PHP array.
      */
-    public function loadFile($input, $options = [])
+    public function loadFile($input, $options = array())
     {
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
@@ -152,7 +152,7 @@ class Spicy // NOSONAR
      * @param array  $options Optional settings to modify parsing behavior.
      * @return array The parsed YAML converted to a PHP array.
      */
-    public function loadString($input, $options = [])
+    public function loadString($input, $options = array())
     {
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
@@ -494,7 +494,6 @@ class Spicy // NOSONAR
      * Reference: http://yaml.org/type/bool.html
      * 
      * @param mixed &$value The value to coerce.
-     * @access private
      */
     private function coerceValue(&$value)
     {
@@ -515,11 +514,10 @@ class Spicy // NOSONAR
      * 
      * @param array $words The words to translate.
      * @return array An array of translated words with all case variations.
-     * @access private
      */
     private static function getTranslations($words)
     {
-        $result = [];
+        $result = array();
         foreach ($words as $word) {
             $result = array_merge($result, [ucfirst($word), strtoupper($word), strtolower($word)]);
         }
@@ -532,7 +530,6 @@ class Spicy // NOSONAR
      * @param string $input The file path.
      * @return array The parsed YAML data.
      * @throws YamlException If the file is not found.
-     * @access private
      */
     private function _loadFile($input)
     {
@@ -550,7 +547,6 @@ class Spicy // NOSONAR
      * 
      * @param string $input The YAML string.
      * @return array The parsed YAML data.
-     * @access private
      */
     private function _loadString($input)
     {
@@ -563,7 +559,6 @@ class Spicy // NOSONAR
      * 
      * @param array $source The source lines.
      * @return array The parsed result as an associative array.
-     * @access private
      */
     private function loadWithSource($source) // NOSONAR
     {
@@ -571,8 +566,8 @@ class Spicy // NOSONAR
             return [];
         }
 
-        $this->path = [];
-        $this->result = [];
+        $this->path = array();
+        $this->result = array();
 
         $cnt = count($source);
         for ($i = 0; $i < $cnt; $i++) {
@@ -625,7 +620,7 @@ class Spicy // NOSONAR
                 $this->path[$indent] = $delayedPath;
             }
 
-            $this->delayedPath = [];
+            $this->delayedPath = array();
         }
 
         return $this->result;
@@ -636,15 +631,44 @@ class Spicy // NOSONAR
      * 
      * @param string $input The YAML string.
      * @return array An array of lines from the YAML input.
-     * @access private
      */
     private function loadFromString($input)
     {
+        $input = $this->fixRaw($input);
         $lines = explode("\n", $input);
         foreach ($lines as $k => $_) {
             $lines[$k] = rtrim($_, "\r");
         }
         return $lines;
+    }
+
+    /**
+     * Fixes raw YAML input by ensuring proper formatting for list items (`- key:`) to avoid
+     * indentation issues or malformed structures in the YAML.
+     *
+     * The method scans each line and, if it detects a list item (`- key:`), it re-adjusts the line's
+     * indentation to ensure it aligns correctly with the rest of the document.
+     *
+     * @param string $text The raw YAML input string.
+     * @return string The formatted YAML string with adjusted indentation for list items.
+     */
+    private function fixRaw($text)
+    {
+        $lines = explode("\n", $text);
+        $formattedText = ""; 
+        foreach ($lines as $line) {
+            if (preg_match('/^- [^\s]+:/', ltrim($line))) {
+                $pad = stripos($line, '- ');
+                $formattedText .= substr($line, 0, $pad + 1) . "\n"
+                            . substr($line, 0, $pad) 
+                            . substr($line, $pad - 1, 1)
+                            . ' ' 
+                            . substr($line, $pad + 2) . "\n";
+            } else {
+                $formattedText .= $line . "\n";
+            }
+        }
+        return $formattedText;
     }
 
     /**
@@ -655,7 +679,6 @@ class Spicy // NOSONAR
      * 
      * @param string $line A single line from the YAML input.
      * @return array The parsed representation of the line.
-     * @access private
      */
     private function _parseLine($line) // NOSONAR
     {
@@ -700,7 +723,6 @@ class Spicy // NOSONAR
      * 
      * @param string $value The YAML value to convert.
      * @return mixed The converted value as a native PHP type.
-     * @access private
      */
     private function _toType($value) // NOSONAR
     {
@@ -747,7 +769,7 @@ class Spicy // NOSONAR
                 return [];
             }
             $explode = $this->_inlineEscape($innerValue);
-            $array = [];
+            $array = array();
             foreach ($explode as $v) {
                 $subArr = $this->_toType($v);
                 if (empty($subArr)) {
@@ -804,7 +826,6 @@ class Spicy // NOSONAR
      * 
      * @param string $inline The inline YAML string.
      * @return array Parsed components as an array.
-     * @access private
      */
     private function _inlineEscape($inline) // NOSONAR
     {

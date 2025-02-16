@@ -380,7 +380,7 @@ class PicoSession
      */
     public function __toString()
     {
-        return json_encode($_SESSION);
+        return json_encode($_SESSION, JSON_PRETTY_PRINT);
     }
 
 }

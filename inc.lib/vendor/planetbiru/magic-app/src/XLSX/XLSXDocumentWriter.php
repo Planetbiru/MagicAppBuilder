@@ -139,13 +139,13 @@ class XLSXDocumentWriter extends DocumentWriter
         $idx = 0;
         if ($this->noFetchData($pageData)) {
             while ($row = $pageData->fetch()) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);
+                $data = call_user_func($writerFunction, $idx, $row);
                 $writer->writeSheetRow($sheetName, $data);
                 $idx++;
             }
         } else {
             foreach ($pageData->getResult() as $row) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);
+                $data = call_user_func($writerFunction, $idx, $row);
                 $writer->writeSheetRow($sheetName, $data);
                 $idx++;
             }

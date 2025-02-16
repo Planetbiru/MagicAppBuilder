@@ -893,16 +893,20 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function now($precision = 0)
 	{
-		if($this->isSqlite())
-		{
+		if ($this->isSqlite()) {
 			return "CURRENT_TIMESTAMP";
 		}
+
 		if ($this->isSqlServer()) {
+			// SQL Server's equivalent to NOW() with precision, max precision is 7
+			$precision = min($precision, 7); // Limit precision to 7 for SQL Server
 			return $precision > 0 ? "SYSDATETIMEOFFSET($precision)" : "SYSDATETIMEOFFSET"; // SQL Server's equivalent to NOW() with precision
 		}
+
 		if ($precision > 6) {
 			$precision = 6;
 		}
+
 		return $precision > 0 ? "NOW($precision)" : "NOW()";
 	}
 
@@ -999,23 +1003,30 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		
 		return $queryString;
 	}
-
+	
 	/**
-	 * Get the current SQL query as a string.
+	 * Converts the current object to a string representation.
 	 *
-	 * @return string The constructed SQL query.
+	 * This method casts the current object to a string. It relies on the magic method __toString()
+	 * to provide a meaningful string representation of the object.
+	 *
+	 * @return string The string representation of the object.
 	 */
-	public function __toString()
+	public function toString()
 	{
-		return $this->toString();
+		return (string) $this;
 	}
 
 	/**
-	 * Get the constructed SQL query as a string.
+	 * Magic method that converts the object to a string representation.
 	 *
-	 * @return string The SQL query string with any applied limits or offsets.
+	 * This method generates a SQL query string based on the object's buffer and
+	 * the limit/offset properties. The exact SQL syntax depends on the database
+	 * type being used (MySQL, PostgreSQL, SQLite, or SQL Server).
+	 *
+	 * @return string The generated SQL query string with pagination (if applicable).
 	 */
-	public function toString()
+	public function __toString()
 	{
 		$sql = $this->buffer;
 		if ($this->limitOffset) {

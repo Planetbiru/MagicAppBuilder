@@ -30,7 +30,7 @@ class PicoUserFormOutputApproval extends PicoEntityData
      *
      * @var FieldWaitingFor
      */
-    protected $waitingfor;
+    protected $waitingFor;
     
     /**
      * Add an allowed action to the output approval.
@@ -53,9 +53,9 @@ class PicoUserFormOutputApproval extends PicoEntityData
      *
      * @return  FieldWaitingFor
      */ 
-    public function getWaitingfor()
+    public function getWaitingFor()
     {
-        return $this->waitingfor;
+        return $this->waitingFor;
     }
 
     /**
@@ -65,9 +65,9 @@ class PicoUserFormOutputApproval extends PicoEntityData
      *
      * @return self Returns the current instance for method chaining.
      */ 
-    public function setWaitingfor($waitingfor)
+    public function setWaitingFor($waitingFor)
     {
-        $this->waitingfor = $waitingfor;
+        $this->waitingFor = $waitingFor;
 
         return $this;
     }

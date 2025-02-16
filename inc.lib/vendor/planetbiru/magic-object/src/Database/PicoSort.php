@@ -160,6 +160,6 @@ class PicoSort
         $stdClass = new stdClass;
         $stdClass->sortBy = $this->sortBy;
         $stdClass->sortType = $this->sortType;
-        return json_encode($stdClass);
+        return json_encode($stdClass, JSON_PRETTY_PRINT);
     }
 }

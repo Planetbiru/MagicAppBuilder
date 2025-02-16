@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1acb834e26238a167ec3ca5f6a953d4",
+    "content-hash": "7eb70963d0d0f7a4b8342ee2c38f650f",
     "packages": [
         {
             "name": "planetbiru/magic-object",
-            "version": "3.1.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "71096ed42c3aab785099edb228a5c577102e2204"
+                "reference": "52f4409558c55374fb6e961da34118f84e8848e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/71096ed42c3aab785099edb228a5c577102e2204",
-                "reference": "71096ed42c3aab785099edb228a5c577102e2204",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/52f4409558c55374fb6e961da34118f84e8848e1",
+                "reference": "52f4409558c55374fb6e961da34118f84e8848e1",
                 "shasum": ""
             },
             "require": {
@@ -41,9 +41,9 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/3.1.0"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/3.3.0"
             },
-            "time": "2025-02-12T10:10:57+00:00"
+            "time": "2025-02-14T04:15:52+00:00"
         }
     ],
     "packages-dev": [],
@@ -52,7 +52,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.4"
+    },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }

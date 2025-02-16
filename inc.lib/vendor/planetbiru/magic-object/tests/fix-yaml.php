@@ -1,3 +1,22 @@
+<?php
+function formatText($text) {
+    $lines = explode("\n", $text);
+    $formattedText = "";
+
+    foreach ($lines as $line) {
+        if (preg_match('/^- [^\s]+:/', ltrim($line))) { // Cek apakah baris diawali dengan '- ' dan diikuti kata tanpa spasi lalu ':'
+            $pad = stripos($line, '- ');
+            $formattedText .= substr($line, 0, $pad+1)."\n".substr($line, 0, $pad).substr($line, $pad-2, 2).substr($line, $pad+2)."\n";
+            // Potong dan tambahkan indentasi
+        } else {
+            $formattedText .= $line . "\n";
+        }
+    }
+
+    return $formattedText;
+}
+
+$yamlText = <<<EOT
 menu:
   - title: "Home"
     icon: "fas fa-home"
@@ -16,14 +35,14 @@ menu:
       - title: "Workspace"
         icon: "fas fa-building"
         href: "workspace.php"
-      - title: "Administrator"
+      - title: "Admin"
         icon: "fas fa-user"
         href: "admin.php"
   - title: "Role"
     icon: "fas fa-folder"
     href: "#submenu2"
     submenu:
-      - title: "Administrator Workspace"
+      - title: "Admin Workspace"
         icon: "fas fa-user-check"
         href: "admin-workspace.php"
       - title: "Application Group Member"
@@ -62,3 +81,7 @@ menu:
     href: "../magic-database/"
     submenu: []
     target: "_blank"
+EOT;
+
+$formattedText = formatText($yamlText);
+echo "<pre>$formattedText</pre>";

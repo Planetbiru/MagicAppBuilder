@@ -345,7 +345,7 @@ class PicoPageData // NOSONAR
             "FIND_OPTION_NO_FETCH_DATA" => $this->findOption & MagicObject::FIND_OPTION_NO_FETCH_DATA,
         );
 
-        return json_encode($obj);
+        return json_encode($obj, JSON_PRETTY_PRINT);
     }
 
     /**

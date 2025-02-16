@@ -132,6 +132,6 @@ class PicoJoinMap
             'entity'         => $this->entity,
             'joinTable'      => $this->joinTable,
             'joinTableAlias' => $this->joinTableAlias,
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 }
