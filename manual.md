@@ -2,6 +2,88 @@
 
 MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
+## User Interface
+
+The application consists of several tabs:
+
+### **1. Administration**
+
+A separate web interface for managing users, user access, workspaces, applications, and other administrative settings.
+
+### **2. Workspace**
+
+This tab allows users to create and view workspaces. Users can also set the active workspace.
+
+### **3. Application**
+
+This tab enables users to create and view applications. Users can also set the active application.
+
+### **4. Select Table**
+
+In this tab, users can select a table and define:
+
+-   Module name
+-   Entity name
+-   Menu name
+-   Configuration options for module creation
+-   Whether to load a previously saved configuration for the module
+
+### **5. Generate Module**
+
+This tab is used to configure modules by selecting:
+
+-   Columns to be included in the module
+-   UI elements for **Create, Update, Show Detail, Show List, and Export**
+-   Relationships between columns and other entities or database tables
+-   Data filters and sorting options
+-   Features such as:
+    -   **Activate/Deactivate**
+    -   **Manual sort order**
+    -   **Export to CSV**
+    -   **Export to Excel**
+    -   **Approval workflow**
+    -   **Trash (soft delete)**
+    -   **AJAX-based list rendering**
+
+### **6. Edit Module**
+
+This tab allows users to manually edit the module's code. Users can also delete the module files.
+
+### **7. Edit Entity**
+
+This tab enables users to manually edit entity code. Users can also delete entity files.
+
+### **8. ERD (Entity Relationship Diagram)**
+
+In this tab, users can generate an ERD diagram for one or more selected entities. Users can also specify the depth level of entity relationships to be displayed.
+
+### **9. Query**
+
+This tab displays database queries for one or more selected entities. The primary function is to generate:
+
+-   **CREATE TABLE** and **ALTER TABLE** queries after entities are created
+-   Queries for database generation based on the application's defined entities
+
+Supported database management systems (**DBMS**):
+
+-   **MySQL**
+-   **MariaDB**
+-   **PostgreSQL**
+-   **SQLite**
+
+### **10. Translate Module**
+
+This tab allows users to create localization files for modules, enabling **multi-language support** in applications.
+
+### **11. Translate Entity**
+
+This tab allows users to create localization files for entities, enabling **multi-language support** in applications.
+
+### **12. Logout**
+
+A link to log out of the administrator session.
+
+
 Steps 1 and 2 are preparation. You only need to do them once.
 
 ## Step 1: Install the Server
