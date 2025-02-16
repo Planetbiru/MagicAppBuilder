@@ -83,12 +83,11 @@ This tab allows users to create localization files for entities, enabling **mult
 
 A link to log out of the administrator session.
 
+This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
 Steps 1 and 2 are preparation. You only need to do them once.
 
 ## Step 1: Install the Server
-
-This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
 Before you can begin using MagicAppBuilder, you must install a server. The server should include the following components:
 
