@@ -97,8 +97,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$admin->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setAdminCreate($currentAction->getUserId());
@@ -139,6 +139,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -348,23 +349,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
 						<td>
 							<select class="form-control" name="workspace_id" id="workspace_id">
@@ -384,7 +368,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="language_id" id="language_id"/>
+							<select class="form-control" name="language_id" id="language_id">
+							<?php
+                            $languages = $appConfig->getLanguages();
+                            foreach($languages as $language)
+                            {
+                                if($language->getCode() != null && $language->getName() != null)
+                                {
+                                    ?>
+									<option value="<?php echo $language->getCode();?>"><?php echo $language->getName();?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
@@ -535,7 +532,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
 						<td>
-							<input class="form-control" type="text" name="language_id" id="language_id" value="<?php echo $admin->getLanguageId();?>" autocomplete="off"/>
+							<select class="form-control" name="language_id" id="language_id">
+							<?php
+                            $languages = $appConfig->getLanguages();
+                            foreach($languages as $language)
+                            {
+                                if($language->getCode() != null && $language->getName() != null)
+                                {
+                                    ?>
+									<option value="<?php echo $language->getCode();?>"<?php echo $language->getCode() == $admin->getLanguageId() ? ' selected' : '';?>><?php echo $language->getName();?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
