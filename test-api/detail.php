@@ -2,6 +2,7 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
+use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoFieldWaitingFor;
 use MagicApp\AppDto\MocroServices\PicoInputField;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
@@ -16,8 +17,9 @@ use MagicObject\SecretObject;
 require_once __DIR__ . "/database.php";
 
 $entity = new EntityApplication(null, $database);
-$entity->findOneByApplicationId("sipro-gitlab");
-$data = new PicoUserFormOutputDetail();
+$entity->findOneByApplicationId("sipro");
+$picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
+$data = new PicoUserFormOutputDetail($entity, $picoEntityInfo);
 
 $appConfig = new SecretObject();
 $entityLanguage = new AppEntityLanguage($entity, $appConfig, 'en');
@@ -31,9 +33,7 @@ $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("projectDirectory"
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("baseApplicationDirectory", $entityLanguage->get("baseApplicationDirectory")), "string", new PicoInputField($entity->get("baseApplicationDirectory"), $entity->get("baseApplicationDirectory"))));
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("author", $entityLanguage->get("author")), "string", new PicoInputField($entity->get("author"), $entity->get("author"))));
 
-$data->setWaitingfor(new PicoFieldWaitingFor(1, "new", "new"));
-
-$picoModule = new PicoModuleInfo("any", "Any", "detail");
+$picoModule = new PicoModuleInfo("application", "Application", "detail");
 
 $picoModule
     ->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
