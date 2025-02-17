@@ -23,6 +23,8 @@ if(!file_exists($builderConfigPath))
         mkdir(dirname($defaultDatabasePath), 0755, true);
     }
     $builderConfig->loadYamlString("
+application:
+    entityBaseNamespace: 'MagicAdmin\Entity'
 dataLimit: 20
 database:
     driver: sqlite
@@ -55,7 +57,6 @@ languages:
         name: Indonesia
         code: id
 ", true, true, true);
-    echo $builderConfig;
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
     file_put_contents($builderConfigPath, $yaml);
