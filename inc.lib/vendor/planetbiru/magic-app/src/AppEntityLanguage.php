@@ -84,19 +84,20 @@ class AppEntityLanguage extends PicoEntityLanguage
     public function loadEntityLanguage($entity, $appConfig, $currentLanguage)
     {
         $langs = new MagicObject();
-        $baseNamespace = $appConfig->getEntityBaseNamespace();
+        $app = $appConfig->getApplication();
+        if(!isset($app))
+        {
+            $app = new SecretObject();
+        }
+        $baseNamespace = $app->getEntityBaseNamespace();
         if(isset($baseNamespace))
         {
-            $this->baseClassName = $this->baseClassName(get_class($entity), $baseNamespace);
-            $this->fullClassName = $this->baseClassName(get_class($entity), $baseNamespace, 1);
+            $fullClassName = get_class($entity);
+            $this->baseClassName = $this->baseClassName($fullClassName, $baseNamespace);
+            $this->fullClassName = $this->baseClassName($fullClassName, $baseNamespace, 1);
+            
             $this->appConfig = $appConfig;
             $this->currentLanguage = $currentLanguage;
-
-            $app = $appConfig->getApplication();
-            if(!isset($app))
-            {
-                $app = new SecretObject();
-            }
 
             $this->baseLanguageDirectory = $app->getBaseLanguageDirectory();
             

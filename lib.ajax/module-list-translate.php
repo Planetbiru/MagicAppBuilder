@@ -10,6 +10,7 @@ if ($appConfig->getApplication() == null) {
 
 try {
     $baseModuleDirectory = $appConfig->getApplication()->getBaseModuleDirectory();
+    $baseDirectory = $activeApplication->getBaseApplicationDirectory();
 
     // Create a new DOMDocument object to build the HTML structure
     $doc = new DOMDocument();
@@ -43,7 +44,7 @@ try {
                 $target = "/" . $target;
             }
 
-            $baseDirectory = $activeApplication->getBaseApplicationDirectory();
+            
             $dir = $baseDirectory . "$target";
             $pattern = $baseDirectory . "$target/*.php";
             $list = glob($pattern);

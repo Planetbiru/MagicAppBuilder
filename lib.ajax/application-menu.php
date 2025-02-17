@@ -50,11 +50,11 @@ foreach ($menus as $menu) {
     $menuItem->setAttribute('class', 'sortable-menu-item');
 
     // Add icons for move up, move down, and edit
-    $icons = [
-        ['class' => 'icon-move-up', 'onclick' => 'moveUp(this)'],
-        ['class' => 'icon-move-down', 'onclick' => 'moveDown(this)'],
-        ['class' => 'icon-edit', 'onclick' => 'editMenu(this)'],
-    ];
+    $icons = array(
+        array('class' => 'icon-move-up', 'onclick' => 'moveUp(this)'),
+        array('class' => 'icon-move-down', 'onclick' => 'moveDown(this)'),
+        array('class' => 'icon-edit', 'onclick' => 'editMenu(this)'),
+        );
 
     // Append each icon to the menu item
     foreach ($icons as $icon) {

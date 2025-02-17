@@ -20,7 +20,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
  */
 function fixValue($original)
 {
-    $labels = [
+    $labels = array(
         'Message Data Not Found' => 'Data Not Found',
         'Yes' => 'Yes',
         'No' => 'No',
@@ -37,7 +37,7 @@ function fixValue($original)
         'Numero' => 'Numero',
         'Warning Delete Confirmation' => 'Delete Confirmation',
         'Label Option Select One' => 'Option Select One'
-    ];
+    );
     return str_replace(
         array_keys($labels), 
         array_values($labels), 
