@@ -192,7 +192,7 @@
 <tbody>
 <tr>
 <td></td>
-<td><input class="btn btn-success" type="button" name="load_column" id="load_column" value="Load Column"></td>
+<td><button class="btn btn-success" type="button" name="load_column" id="load_column">Load Column</button></td>
 </tr>
 </tbody>
 </table>
@@ -247,7 +247,7 @@ Data Order
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
 Module Features
 </button>
-<input class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Module"> &nbsp;
+<button class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Module">Generate Module</button> &nbsp;
 
 <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
 <div class="modal-dialog modal-md modal-dialog-centered">
@@ -501,13 +501,13 @@ Module Features
 </div>
 <div class="column-body">
 <div class="diagram-option">
-Max Level <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
-Max Column <input class="form-control" type="number" step="1" name="maximum_column" value="8" min="4">
-Margin X <input class="form-control" type="number" name="margin_x" value="0" min="0">
-Margin Y <input class="form-control" type="number" name="margin_y" value="0" min="0">
-H Space <input class="form-control" type="number" name="entity_margin_x" value="40" min="0">
-V Space <input class="form-control" type="number" name="entity_margin_y" value="20" min="0">
-Zoom <input class="form-control" type="number" step="0.05" name="zoom" value="1" min="0.5">
+<span>Max Level</span> <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
+<span>Max Column</span> <input class="form-control" type="number" step="1" name="maximum_column" value="8" min="4">
+<span>Margin X</span> <input class="form-control" type="number" name="margin_x" value="0" min="0">
+<span>Margin Y</span> <input class="form-control" type="number" name="margin_y" value="0" min="0">
+<span>H Space</span> <input class="form-control" type="number" name="entity_margin_x" value="40" min="0">
+<span>V Space</span> <input class="form-control" type="number" name="entity_margin_y" value="20" min="0">
+<span>Zoom</span> <input class="form-control" type="number" step="0.05" name="zoom" value="1" min="0.5">
 <button type="button" class="btn btn-primary reload-diagram">Reload</button>
 <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()">SVG</button>
 <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()">PNG</button>
@@ -561,10 +561,10 @@ Zoom <input class="form-control" type="number" step="0.05" name="zoom" value="1"
 </div>
 <div class="col col-10">
 <div class="column-title"> 
-Target Language
+<span>Target Language</span>
 <select class="form-control target-language" data-translate-for="entity">
 </select>
-Filter
+<span>Filter</span>
 <select class="form-control filter-translate" data-translate-for="entity">
 <option value="untranslated">Untranslated</option>
 <option value="all">All</option>
@@ -601,10 +601,10 @@ Filter
 </div>
 <div class="col col-10">
 <div class="column-title"> 
-Target Language
+<span>Target Language</span>
 <select class="form-control target-language" data-translate-for="module">
 </select>
-Filter
+<span>Filter</span>
 <select class="form-control filter-translate" data-translate-for="module">
 <option value="untranslated">Untranslated</option>
 <option value="all">All</option>
@@ -933,7 +933,7 @@ Filter
 <div class="application-setting"></div>
 </div>
 <div class="modal-footer">
-<input class="btn btn-success button-save-application-config" type="button" name="button-save-application-config" value="Save">
+<button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config">Save</button>
 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 </div>
 </div>
@@ -974,7 +974,7 @@ Filter
 </form>
 </div>
 <div class="modal-footer">
-<input class="btn btn-success button-save-workspace" type="button" name="button-save-workspace" value="Save">
+<button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace">Save</button>
 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 </div>
 </div>
