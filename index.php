@@ -7,8 +7,7 @@ require_once __DIR__ . "/inc.app/navs.php";
 $workspaceId = isset($activeWorkspace) ? $activeWorkspace->getWorkspaceId() : "";
 $applicationId = isset($activeApplication) ? $activeApplication->getApplicationId() : "";
 
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -29,7 +28,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
 
