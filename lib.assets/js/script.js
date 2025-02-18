@@ -5599,7 +5599,7 @@ function getReferenceResource() {
                   </tbody>
                   <tfoot>
                       <tr>
-                          <td colspan="5">
+                          <td colspan="6">
                               <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
                           </td>
                       </tr>
@@ -5635,6 +5635,21 @@ function getReferenceResource() {
                           <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
                       </tr>
                   </tfoot>
+              </table>
+            </div>
+            <h4>Grouping</h4>
+            <div class="table-reference-container">
+              <table data-name="grouping" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Value</td>
+                          <td><input class="form-control rd-group-value" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Label</td>
+                          <td><input class="form-control rd-group-label" type="text"></td>
+                      </tr>
+                  </tbody>
               </table>
             </div>
             <h4>Additional Output</h4>
