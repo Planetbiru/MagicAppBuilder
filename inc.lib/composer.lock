@@ -61,16 +61,16 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "3.4.3",
+            "version": "3.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "f5e0f67a38e056b675850d2f71376e34e9b199d9"
+                "reference": "31581d424af84bc37355be8799b2fcc606f65bb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/f5e0f67a38e056b675850d2f71376e34e9b199d9",
-                "reference": "f5e0f67a38e056b675850d2f71376e34e9b199d9",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/31581d424af84bc37355be8799b2fcc606f65bb0",
+                "reference": "31581d424af84bc37355be8799b2fcc606f65bb0",
                 "shasum": ""
             },
             "require": {
@@ -95,9 +95,9 @@
             "description": "MagicApp",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/3.4.3"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/3.4.4"
             },
-            "time": "2025-02-18T03:20:42+00:00"
+            "time": "2025-02-18T14:11:06+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -147,5 +147,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.6.0"
 }

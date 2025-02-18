@@ -27,7 +27,7 @@ class CSVDocumentWriter extends DocumentWriter
      * @param string[] $headerFormat Data format for headers
      * @param callable $writerFunction Function to write formatted data
      * @param boolean $useTemporary Flag to use temporary file
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction, $useTemporary = true)
     {
@@ -97,7 +97,7 @@ class CSVDocumentWriter extends DocumentWriter
      * Write header format to the CSV
      *
      * @param string[] $keys Data keys
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeHeader($keys)
     {
@@ -114,7 +114,7 @@ class CSVDocumentWriter extends DocumentWriter
      *
      * @param string[] $keys Data keys
      * @param MagicObject $row Data row
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeData($keys, $row)
     {
@@ -157,7 +157,7 @@ class CSVDocumentWriter extends DocumentWriter
      * Write a line of data to the CSV
      *
      * @param array $data Array of values to write
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeRow($data)
     {
@@ -174,7 +174,7 @@ class CSVDocumentWriter extends DocumentWriter
      * @param string $enclosure Field enclosures
      * @param string $escapeChar Escape enclosure characters in fields
      * @param string $recordSeparator Record separator
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escapeChar = "\\", $recordSeparator = "\r\n")
     {

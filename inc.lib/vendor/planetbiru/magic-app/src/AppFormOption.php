@@ -116,7 +116,7 @@ class AppFormOption
      *
      * @param string $format The format string
      * @param string[] $params The parameters for the format
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function textNodeFormat($format, $params)
     {
@@ -179,7 +179,7 @@ class AppFormOption
      * typically useful for nested option elements.
      *
      * @param string $pad The padding string (default is a tab character)
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function setPad($pad = "\t")
     {
@@ -253,7 +253,7 @@ class AppFormOption
      * This method allows setting a new text value for the option.
      *
      * @param string $label The text node to set
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setTextNode($label)
     {

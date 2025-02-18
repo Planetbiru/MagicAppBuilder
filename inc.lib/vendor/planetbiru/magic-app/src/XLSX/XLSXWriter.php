@@ -108,7 +108,7 @@ class XLSXWriter //NOSONAR
 	 * Set the title of the document.
 	 *
 	 * @param string $title The title to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setTitle($title = '')
 	{
@@ -120,7 +120,7 @@ class XLSXWriter //NOSONAR
 	 * Set the subject of the document.
 	 *
 	 * @param string $subject The subject to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setSubject($subject = '')
 	{
@@ -132,7 +132,7 @@ class XLSXWriter //NOSONAR
 	 * Set the author of the document.
 	 *
 	 * @param string $author The author to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setAuthor($author = '')
 	{
@@ -144,7 +144,7 @@ class XLSXWriter //NOSONAR
 	 * Set the company name associated with the document.
 	 *
 	 * @param string $company The company name to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setCompany($company = '')
 	{
@@ -156,7 +156,7 @@ class XLSXWriter //NOSONAR
 	 * Set the keywords associated with the document.
 	 *
 	 * @param string $keywords The keywords to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setKeywords($keywords = '')
 	{
@@ -168,7 +168,7 @@ class XLSXWriter //NOSONAR
 	 * Set the description of the document.
 	 *
 	 * @param string $description The description to set.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setDescription($description = '')
 	{
@@ -180,7 +180,7 @@ class XLSXWriter //NOSONAR
 	 * Set the directory for temporary files.
 	 *
 	 * @param string $tempdir The temporary directory to use.
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setTempDir($tempdir = '')
 	{
@@ -192,7 +192,7 @@ class XLSXWriter //NOSONAR
 	 * Enable or disable right-to-left text direction.
 	 *
 	 * @param bool $isRightToLeft Whether to set right-to-left text direction (default: false).
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function setRightToLeft($isRightToLeft = false)
 	{
@@ -243,7 +243,7 @@ class XLSXWriter //NOSONAR
 	/**
 	 * Writes the contents of the current sheets to stdout.
 	 *
-	 * @return self The current instance, allowing method chaining.
+	 * @return self Returns the current instance for method chaining.
 	 */
 	public function writeToStdOut()
 	{
