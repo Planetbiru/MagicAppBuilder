@@ -898,4 +898,16 @@ input[type=number][name=database_port] {
 
 [data-admin-level-id=user] .level-superuser {
   display: none;
+}
+
+[data-group-source=group-entity] .source-map {
+  display: none;
+}
+
+[data-group-source=group-map] .source-entity {
+  display: none;
+}
+
+.table.table-reference td .btn {
+  margin-top: 0px;
 }/*# sourceMappingURL=css.css.map */

@@ -205,6 +205,10 @@ jQuery(function () {
 });
 
 let initAll = function () {
+  $(document).on('click', '.group-reference', function(e2){
+    let value = $(this).val();
+    $(this).closest('table').attr('data-group-source', value);
+  });
   $(document).on('click', '#button_delete_module_file', function (e) {
     e.preventDefault();
     asyncAlert(
@@ -5639,7 +5643,7 @@ function getReferenceResource() {
             </div>
             <h4>Grouping</h4>
             <div class="table-reference-container">
-              <table data-name="grouping" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+              <table data-name="grouping" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0" data-group-source="group-entity">
                   <tbody>
                       <tr>
                           <td>Value</td>
@@ -5649,33 +5653,50 @@ function getReferenceResource() {
                           <td>Label</td>
                           <td><input class="form-control rd-group-label" type="text"></td>
                       </tr>
+                      <tr>
+                          <td>Source</td>
+                          <td>
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-entity" checked="checked"> Entity</label>
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-map"> Map</label>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Reference</td>
+                          <td>
+                            <div class="source-entity">
+                              <input class="form-control rd-group-entity" type="text">
+                            </div>
+                            <div class="source-map">
+                              <table data-name="map" class="table table-reference" data-offset="2" data-empty-on-remove="true">
+                                <thead>
+                                    <tr>
+                                        <td>Value</td>
+                                        <td>Label</td>
+                                        <td width="42">Rem</td>
+                                        <td colspan="2">Move</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input class="form-control rd-map-value" type="text" value=""></td>
+                                        <td><input class="form-control rd-map-label" type="text" value=""></td>
+                                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="8">
+                                            <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            </div>
+                          </td>
+                      </tr>
                   </tbody>
-              </table>
-            </div>
-            <h4>Additional Output</h4>
-            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
-            <div class="table-reference-container">
-              <table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
-                  <thead>
-                      <tr>
-                          <td>Column</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="4"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
-                      </tr>
-                  </tfoot>
               </table>
             </div>
             <h4>Selection</h4>
@@ -5691,6 +5712,32 @@ function getReferenceResource() {
                           </td>
                       </tr>
                   </tbody>
+              </table>
+            </div>
+            <h4>Additional Output</h4>
+            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
+            <div class="table-reference-container">
+              <table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
+                <thead>
+                    <tr>
+                        <td>Column</td>
+                        <td width="42">Rem</td>
+                        <td colspan="2">Move</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input class="form-control rd-column-name" type="text" value=""></td>
+                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                        <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                        <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
+                    </tr>
+                </tfoot>
               </table>
             </div>
         </div>

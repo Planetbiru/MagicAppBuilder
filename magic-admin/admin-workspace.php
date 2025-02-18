@@ -23,9 +23,7 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Admin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
-use MagicAdmin\Entity\Data\AdminMin;
 use MagicAdmin\Entity\Data\WorkspaceMin;
-
 
 require_once __DIR__ . "/inc.app/auth.php";
 
