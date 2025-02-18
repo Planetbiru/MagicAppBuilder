@@ -141,7 +141,7 @@ button {
   padding: 3px 0;
 }
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
-  width: 200px;
+  width: 170px;
 }
 
 .btn {
@@ -228,7 +228,10 @@ button {
   padding: 4px 0;
 }
 .modal-table tbody > tr:nth-child(1) > td:nth-child(1) {
-  width: 200px;
+  width: 170px;
+}
+.modal-table .table.table-reference tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: auto;
 }
 
 table.table.table-reference td {

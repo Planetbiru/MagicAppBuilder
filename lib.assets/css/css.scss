@@ -188,12 +188,13 @@ button {
 			&:nth-child(1) {
 				>td {
 					&:nth-child(1) {
-						width: 200px;
+						width: 170px;
 					}
 				}
 			}
 		}
 	}
+	
 }
 
 .btn {
@@ -290,7 +291,23 @@ button {
 			&:nth-child(1) {
 				>td {
 					&:nth-child(1) {
-						width: 200px;
+						width: 170px;
+					}
+				}
+			}
+		}
+	}
+
+	.table.table-reference
+	{
+		tbody
+		{
+			>tr {
+				&:nth-child(1) {
+					>td {
+						&:nth-child(1) {
+							width: auto;
+						}
 					}
 				}
 			}
