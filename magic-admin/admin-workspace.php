@@ -21,6 +21,7 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
+use MagicAdmin\Entity\Data\Admin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
 use MagicAdmin\Entity\Data\AdminMin;
 use MagicAdmin\Entity\Data\WorkspaceMin;
@@ -607,7 +608,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="admin_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new Admin(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -615,6 +616,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->adminId, Field::of()->name, $inputGet->getAdminId())
+								->setGroup(Field::of()->adminLevelId, Field::of()->name, ['superuser'=>'Super Admin'])
 								; ?>
 							</select>
 					</span>
