@@ -2,7 +2,6 @@
 
 require_once __DIR__ . "/inc.app/sqlite-detector.php";
 require_once __DIR__ . "/inc.app/auth-with-form.php";
-require_once __DIR__ . "/inc.app/navs.php";
 
 $workspaceId = isset($activeWorkspace) ? $activeWorkspace->getWorkspaceId() : "";
 $applicationId = isset($activeApplication) ? $activeApplication->getApplicationId() : "";
