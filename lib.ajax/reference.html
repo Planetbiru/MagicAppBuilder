@@ -1,0 +1,297 @@
+<form action="">
+    <div class="reference-selector">
+      <label for="reference_type_entity"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_entity" value="entity" checked> Entity</label>
+      <label for="reference_type_map"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_map" value="map"> Map</label>
+      <label for="reference_type_yesno"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_yesno" value="yesno"> Yes/No</label>
+      <label for="reference_type_truefalse"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_truefalse" value="truefalse"> True/False</label>
+      <label for="reference_type_onezero"><input type="radio" class="reference_type" name="reference_type"
+              id="reference_type_onezero" value="onezero"> 1/0</label>
+    </div>
+    <div class="reference-container">
+        <div class="reference-section entity-section">
+            <h4>Entity</h4>
+            <div class="table-reference-container">
+              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Entity Name</td>
+                          <td><input class="form-control rd-entity-name" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Table Name</td>
+                          <td><input class="form-control rd-table-name" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Primary Key</td>
+                          <td><input class="form-control rd-primary-key" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Value Column</td>
+                          <td><input class="form-control rd-value-column" type="text"></td>
+                      </tr>
+                      <tr class="display-reference">
+                          <td>Reference Object Name</td>
+                          <td><input class="form-control rd-reference-object-name" type="text"></td>
+                      </tr>
+                      <tr class="display-reference">
+                          <td>Reference Property Name</td>
+                          <td><input class="form-control rd-reference-property-name" type="text"></td>
+                      </tr>
+                      <tr class="entity-generator">
+                          <td></td>
+                          <td>
+                            <button type="button" class="btn btn-primary add_subfix">Add Entity Subfix</button>
+                            <button type="button" class="btn btn-success generate_entity">Generate Entity</button>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+            <h4>Option Node</h4>
+            <div class="table-reference-container">
+              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Format and Pamareters</td>
+                          <td><input class="form-control rd-option-text-node-format" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Indent</td>
+                          <td><input class="form-control rd-option-indent" type="number" step="1" min="0"></td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+            <h4>Specfification</h4>
+            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
+            <div class="table-reference-container">
+              <table data-name="specification" class="table table-reference" data-empty-on-remove="true">
+                  <thead>
+                      <tr>
+                          <td width="40%">Column Name</td>
+                          <td width="12%">Comp</td>
+                          <td>Value</td>
+                          <td width="42">Rem</td>
+                          <td colspan="2">Move</td>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td><input class="form-control rd-column-name" type="text" value=""></td>
+                          <td>
+                            <select class="form-control rd-comparison">
+                              <option value="equals">=</option>
+                              <option value="notEquals">!=</option>
+                              <option value="greaterThan">&gt;</option>
+                              <option value="greaterThanOrEquals">&gt;=</option>
+                              <option value="lessThan">&lt;</option>
+                              <option value="lessThanOrEquals">&lt;=</option>
+                            </select>
+                          </td>
+                          <td><input class="form-control rd-value" type="text" value=""></td>
+                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                      </tr>
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <td colspan="6">
+                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
+                          </td>
+                      </tr>
+                  </tfoot>
+              </table>
+            </div>
+            <h4>Sortable</h4>
+            <p>Use at least one column to sort.</p>
+            <div class="table-reference-container">
+              <table data-name="sortable" class="table table-reference">
+                  <thead>
+                      <tr>
+                          <td width="60%">Column</td>
+                          <td>Value</td>
+                          <td width="42">Rem</td>
+                          <td colspan="2">Move</td>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td><input class="form-control rd-column-name" type="text" value=""></td>
+                          <td><select class="form-control rd-order-type">
+                                  <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
+                                  <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
+                              </select></td>
+                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                      </tr>
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
+                      </tr>
+                  </tfoot>
+              </table>
+            </div>
+            <h4>Grouping</h4>
+            <div class="table-reference-container">
+              <table data-name="grouping" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0" data-group-source="group-entity">
+                  <tbody>
+                      <tr>
+                          <td>Value</td>
+                          <td><input class="form-control rd-group-value" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Label</td>
+                          <td><input class="form-control rd-group-label" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Source</td>
+                          <td>
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-entity" checked="checked"> Entity</label>
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-map"> Map</label>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Reference</td>
+                          <td>
+                            <div class="source-entity">
+                              <input class="form-control rd-group-entity" type="text">
+                            </div>
+                            <div class="source-map">
+                              <table data-name="map" class="table table-reference" data-offset="2" data-empty-on-remove="true">
+                                <thead>
+                                    <tr>
+                                        <td>Value</td>
+                                        <td>Label</td>
+                                        <td width="42">Rem</td>
+                                        <td colspan="2">Move</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input class="form-control rd-map-value" type="text" value=""></td>
+                                        <td><input class="form-control rd-map-label" type="text" value=""></td>
+                                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="8">
+                                            <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            </div>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+            <h4>Selection</h4>
+            <p>How user can select the options</p>
+            <div class="table-reference-container">
+              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Selection</td>
+                          <td><select class="form-control multiple-selection">
+                            <option value="0">Single</option>
+                            <option value="1">Multiple</option>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+            <h4>Additional Output</h4>
+            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
+            <div class="table-reference-container">
+              <table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
+                <thead>
+                    <tr>
+                        <td>Column</td>
+                        <td width="42">Rem</td>
+                        <td colspan="2">Move</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input class="form-control rd-column-name" type="text" value=""></td>
+                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                        <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                        <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
+                    </tr>
+                </tfoot>
+              </table>
+            </div>
+        </div>
+        <div class="reference-section map-section">
+            <h4>Map</h4>
+            <div class="table-reference-container">
+              <table data-name="map" class="table table-reference" data-offset="2">
+                  <thead>
+                      <tr>
+                          <td>Value</td>
+                          <td>Label</td>
+                          <td><input class="form-control map-key" type="text" value=""
+                                  placeholder="Additional attribute name"></td>
+                          <td>Def</td>
+                          <td width="42">Rem</td>
+                          <td colspan="2">Move</td>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td><input class="form-control rd-value" type="text" value=""></td>
+                          <td><input class="form-control rd-label" type="text" value=""></td>
+                          <td><input class="form-control map-value" type="text" value=""
+                                  placeholder="Additional attribute value"></td>
+                          <td><input type="checkbox" class="rd-selected"></td>
+                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                      </tr>
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <td colspan="7">
+                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
+                              <button type="button" class="btn btn-primary btn-add-column">Add Column</button>
+                              <button type="button" class="btn btn-primary btn-remove-last-column">Remove Last
+                                  Column</button>
+                          </td>
+                      </tr>
+                  </tfoot>
+              </table>
+            </div>
+            <h4>Selection</h4>
+            <p>How user can select the options</p>
+            <div class="table-reference-container">
+              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Selection</td>
+                          <td><select class="form-control multiple-selection">
+                            <option value="0">Single</option>
+                            <option value="1">Multiple</option>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+        </div>
+    </div>
+</form>

@@ -913,4 +913,8 @@ input[type=number][name=database_port] {
 
 .table.table-reference td .btn {
   margin-top: 0px;
+}
+
+.fade {
+  transition: opacity 0.05s linear;
 }/*# sourceMappingURL=css.css.map */
