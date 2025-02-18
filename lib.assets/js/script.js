@@ -205,6 +205,11 @@ jQuery(function () {
 });
 
 let initAll = function () {
+  $(document).on('click', function(e){
+    e.preventDefault();
+    let value = $(this).val();
+    $(this).closest('table').attr('data-source', value);
+  })
   $(document).on('click', '#button_delete_module_file', function (e) {
     e.preventDefault();
     asyncAlert(
@@ -5327,7 +5332,7 @@ function setMapData(data)  //NOSONAR
         if (objLength > 4) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "selected") {
+        if (i != "value" && i != "label" && i != "group" && i != "selected") {
           keys.push(i);
           mapKey[j] = i;
         }
@@ -5359,6 +5364,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
+      tr.find(".rd-group").val(row.group);
       if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
@@ -5396,10 +5402,12 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
+      let group = tr.find(".rd-group").val().trim();
       let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
+        group: group,
         selected: selected,
       };
       if (keys.length > 0) {
@@ -5599,7 +5607,7 @@ function getReferenceResource() {
                   </tbody>
                   <tfoot>
                       <tr>
-                          <td colspan="5">
+                          <td colspan="6">
                               <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
                           </td>
                       </tr>
@@ -5637,6 +5645,81 @@ function getReferenceResource() {
                   </tfoot>
               </table>
             </div>
+            <h4>Grouping</h4>
+            <div class="table-reference-container">
+              <table data-name="grouping" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Value</td>
+                          <td><input class="form-control rd-group-value" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Label</td>
+                          <td><input class="form-control rd-group-value" type="text"></td>
+                      </tr>
+                      <tr>
+                          <td>Source</td>
+                          <td>
+                          <!--
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-entity"> Entity</label>
+                            <label><input type="radio" class="group-reference" name="group_reference" value="group-map"> Map</label>
+                          -->
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Reference</td>
+                          <td>
+                            <div class="source-entity">
+                              <input class="form-control rd-group-entity" type="text">
+                            </div>
+                            <div class="source-map">
+                              <table data-name="map" class="table table-reference" data-offset="2">
+                                <thead>
+                                    <tr>
+                                        <td>Value</td>
+                                        <td>Label</td>
+                                        <td width="42">Rem</td>
+                                        <td colspan="2">Move</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input class="form-control rd-value" type="text" value=""></td>
+                                        <td><input class="form-control rd-label" type="text" value=""></td>
+                                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                                        <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="8">
+                                            <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            </div>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+            <h4>Selection</h4>
+            <p>How user can select the options</p>
+            <div class="table-reference-container">
+              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                      <tr>
+                          <td>Selection</td>
+                          <td><select class="form-control multiple-selection">
+                            <option value="0">Single</option>
+                            <option value="1">Multiple</option>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
             <h4>Additional Output</h4>
             <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
             <div class="table-reference-container">
@@ -5663,21 +5746,6 @@ function getReferenceResource() {
                   </tfoot>
               </table>
             </div>
-            <h4>Selection</h4>
-            <p>How user can select the options</p>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Selection</td>
-                          <td><select class="form-control multiple-selection">
-                            <option value="0">Single</option>
-                            <option value="1">Multiple</option>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
         </div>
         <div class="reference-section map-section">
             <h4>Map</h4>
@@ -5687,6 +5755,7 @@ function getReferenceResource() {
                       <tr>
                           <td>Value</td>
                           <td>Label</td>
+                          <td>Group</td>
                           <td><input class="form-control map-key" type="text" value=""
                                   placeholder="Additional attribute name"></td>
                           <td>Def</td>
@@ -5698,6 +5767,7 @@ function getReferenceResource() {
                       <tr>
                           <td><input class="form-control rd-value" type="text" value=""></td>
                           <td><input class="form-control rd-label" type="text" value=""></td>
+                          <td><input class="form-control rd-group" type="text" value=""></td>
                           <td><input class="form-control map-value" type="text" value=""
                                   placeholder="Additional attribute value"></td>
                           <td><input type="checkbox" class="rd-selected"></td>
@@ -5708,7 +5778,7 @@ function getReferenceResource() {
                   </tbody>
                   <tfoot>
                       <tr>
-                          <td colspan="7">
+                          <td colspan="8">
                               <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
                               <button type="button" class="btn btn-primary btn-add-column">Add Column</button>
                               <button type="button" class="btn btn-primary btn-remove-last-column">Remove Last

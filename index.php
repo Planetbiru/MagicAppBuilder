@@ -29,7 +29,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
 
