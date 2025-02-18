@@ -14,7 +14,6 @@ if(!$database->isConnected())
 }
 
 try {
-
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
     $databaseType = $database->getDatabaseType();
 
@@ -42,7 +41,8 @@ try {
                     AND t.table_schema = ?
                 ORDER BY 
                     t.table_name ASC, 
-                    kcu.ordinal_position ASC";
+                    kcu.ordinal_position ASC
+                ";
         $rs = $database->executeQuery($sql, [$schemaName]);
     } 
     else if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
@@ -81,7 +81,7 @@ try {
         }
 		ksort($tables);
 	}
-    else{
+    else {
 		$rows = $rs->fetchAll(PDO::FETCH_ASSOC);
 
 		foreach ($rows as $data) {
@@ -96,7 +96,7 @@ try {
 			}
 
 			// Check if the column is a primary key
-			if (isset($data['column_key']) && $data['column_key'] == 'PRI') {
+			if (isset($data['column_key']) && $data['column_key'] == 'PRI' && !in_array($data['column_name'], $tables[$tableName]['primary_key'])) {
 				$tables[$tableName]['primary_key'][] = $data['column_name'];
 			}
 		}
@@ -110,4 +110,3 @@ try {
     error_log("Error: " . $e->getMessage());
     ResponseUtil::sendJSON(["error" => "An error occurred while processing your request."]);
 }
-
