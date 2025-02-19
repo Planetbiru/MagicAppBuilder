@@ -67,7 +67,7 @@ try
                 <i class="fas fa-icons"></i> Icon
             </a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-default">
-                <i class="fas fa-check"></i> Default
+                <i class="fas fa-check"></i> Active
             </a>
         </div>
     </div>

@@ -47,7 +47,7 @@ try
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-scan">Scan</a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-open">VS Code</a>
-            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-default">Default</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-default">Active</a>
         </div>
     </div>
 </div>
