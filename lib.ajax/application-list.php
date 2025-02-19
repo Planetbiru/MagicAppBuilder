@@ -51,12 +51,24 @@ try
             <h5 class="card-title"><?php echo htmlspecialchars($app->getName()); ?></h5>
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $app->getId(); ?></h6>
             <p class="card-text"><?php echo $app->getDescription(); ?></p>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-setting">Setting</a>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-menu">Menu</a>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-database">Database</a>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-open">VS Code</a>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-icons">Icon</a>
-            <a href="javascript:;" class="btn btn-sm btn-primary button-application-default">Default</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-setting">
+                <i class="fas fa-cog"></i> Setting
+            </a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-menu">
+                <i class="fas fa-bars"></i> Menu
+            </a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-database">
+                <i class="fas fa-database"></i> Database
+            </a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-open">
+                <i class="fas fa-code"></i> VS Code
+            </a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-icons">
+                <i class="fas fa-icons"></i> Icon
+            </a>
+            <a href="javascript:;" class="btn btn-sm btn-primary button-application-default">
+                <i class="fas fa-check"></i> Default
+            </a>
         </div>
     </div>
 </div>
