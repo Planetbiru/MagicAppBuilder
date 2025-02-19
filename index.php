@@ -23,12 +23,12 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
-  <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js" async></script>
-  <script type="text/javascript" src="lib.assets/js/Editor.min.js" async></script>
-  <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js" async></script>
-  <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js" async></script>
-  <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js" async></script>
-  <script type="text/javascript" src="lib.assets/js/Sortable.min.js" async></script>
+  <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
+  <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
 
 <body data-admin-level-id="<?php echo isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : ""; ?>">
