@@ -917,4 +917,11 @@ input[type=number][name=database_port] {
 
 .fade {
   transition: opacity 0.05s linear;
+}
+
+.btn-group-tn > .btn, .btn-tn {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
 }/*# sourceMappingURL=css.css.map */

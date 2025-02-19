@@ -1086,3 +1086,10 @@ input[type=number][name="database_port"] {
 .fade {
 	transition: opacity .05s linear;
 }
+
+.btn-group-tn > .btn, .btn-tn {
+	padding: .20rem .4rem;
+	font-size: .75rem;
+	line-height: 1.5;
+	border-radius: .2rem;
+  }
