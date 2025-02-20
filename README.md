@@ -30,7 +30,7 @@ MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for
 
 - **Web Server:** Apache Server
 - **PHP Runtime Version:** 5.6 or above
-- **Database:** MariaDB or MySQL
+- **Database:** SQLite and MariaDB or MySQL
 
 ## Dependency
 
