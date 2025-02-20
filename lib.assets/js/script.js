@@ -5324,22 +5324,25 @@ function getSortableData() {
  */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
-  selector.attr('data-group-source', data.entity.group.source);
-  selector.find(".rd-group-value").val(data.entity.group.value);
-  selector.find(".rd-group-label").val(data.entity.group.label);
-  selector.find(".group-reference").filter('[value="'+data.entity.group.source+'"]')[0].checked = true;
-  selector.find(".rd-group-entity").val(data.entity.group.entity);
-  let table = selector.find('table.table-reference');
-  let group = data.entity.group;
-  if (group?.map?.length > 0) {
-    for (let i in group.map) {
-      if (i > 0) {
-        addRow(table);
+  if(typeof data.entity != "undefined" && typeof data.entity.group != "undefined")
+  {
+    selector.attr('data-group-source', data.entity.group.source);
+    selector.find(".rd-group-value").val(data.entity.group.value);
+    selector.find(".rd-group-label").val(data.entity.group.label);
+    selector.find(".group-reference").filter('[value="'+data.entity.group.source+'"]')[0].checked = true;
+    selector.find(".rd-group-entity").val(data.entity.group.entity);
+    let table = selector.find('table.table-reference');
+    let group = data.entity.group;
+    if (group?.map?.length > 0) {
+      for (let i in group.map) {
+        if (i > 0) {
+          addRow(table);
+        }
+        let tr = table.find("tr:last-child");
+        let row = group.map[i];
+        tr.find(".rd-map-value").val(row.value);
+        tr.find(".rd-map-label").val(row.label);
       }
-      let tr = table.find("tr:last-child");
-      let row = group.map[i];
-      tr.find(".rd-map-value").val(row.value);
-      tr.find(".rd-map-label").val(row.label);
     }
   }
 }
