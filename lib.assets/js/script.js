@@ -5135,6 +5135,7 @@ function setEntityData(data) {
 
   setSpecificationData(data);
   setSortableData(data);
+  setGroupData(data);
   setAdditionalOutputData(data);
 }
 
@@ -5156,6 +5157,7 @@ function getEntityData() {
     indent: $(selector).find(".rd-option-indent").val(),
     specification: getSpecificationData(),
     sortable: getSortableData(),
+    group: getGroupData(),
     additionalOutput: getAdditionalOutputData(),
   };
   return entity;
@@ -5305,6 +5307,67 @@ function getSortableData() {
     });
   return result;
 }
+
+function setGroupData(data) {
+  let selector = $('[data-name="grouping"]');
+  selector.attr('data-group-source', data.entity.group.source);
+  selector.find(".rd-group-value").val(data.entity.group.value);
+  selector.find(".rd-group-label").val(data.entity.group.label);
+  selector.find(".group-reference").filter('[value="'+data.entity.group.source+'"]')[0].checked = true;
+  selector.find(".rd-group-entity").val(data.entity.group.entity);
+  let table = selector.find('table.table-reference');
+  let group = data.entity.group;
+  if (
+    typeof group != "undefined" &&
+    typeof group.map != "undefined" &&
+    group.map.length > 0
+  ) {
+    for (let i in group.map) {
+      if (i > 0) {
+        addRow(table);
+      }
+      let tr = table.find("tr:last-child");
+      let row = group.map[i];
+      tr.find(".rd-map-value").val(row.value);
+      tr.find(".rd-map-label").val(row.label);
+    }
+  }
+}
+
+function getGroupData() {
+  let result = {};
+  let map = [];
+
+  let selector = $('[data-name="grouping"]');
+
+  let value = selector.find(".rd-group-value").val();
+  let label = selector.find(".rd-group-label").val();
+  let source = selector.find(".group-reference:checked").val();
+  let entity = selector.find(".rd-group-entity").val();
+
+  result.value = value;
+  result.label = label;
+  result.source = source;
+  result.entity = entity;
+
+  $(selector)
+    .find(".table-reference tbody tr")
+    .each(function () {
+      let tr = $(this);
+      let value = tr.find(".rd-map-value").val().trim();
+      let label = tr.find(".rd-map-label").val().trim();
+      if (value.length > 0) { 
+        map.push({
+          value: value,
+          label: label,
+        });
+      }
+    });
+
+  result.map = map;
+  return result;
+}
+
 
 /**
  * Sets additional output data into the form based on the provided data object.
