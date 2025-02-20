@@ -198,6 +198,9 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
   return target.replace(new RegExp(search, "g"), replacement);
 };
 
+/**
+ * Load main resource
+ */
 jQuery(function () {
   $('body').load('lib.ajax/body.min.html', function () {
     initAll();
@@ -205,6 +208,7 @@ jQuery(function () {
   });
 });
 
+// Add event listener
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
@@ -570,7 +574,11 @@ let initAll = function () {
         .closest("tr")
         .find(":input")
         .each(function (e3) {
-          $(this).val("");
+          if ($(this).is(":checkbox, :radio")) {
+            $(this).prop("checked", false);
+          } else {
+            $(this).val("");
+          }
         });
     }
   });
@@ -5350,7 +5358,7 @@ function setMapData(data)  //NOSONAR
         if (objLength > 4) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "selected") {
+        if (i != "value" && i != "label" && i != "group" && i != "selected") {
           keys.push(i);
           mapKey[j] = i;
         }
@@ -5382,6 +5390,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
+      tr.find(".rd-group").val(row.group);
       if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
@@ -5419,10 +5428,12 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
+      let group = tr.find(".rd-group").val().trim();
       let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
+        group: group,
         selected: selected,
       };
       if (keys.length > 0) {
