@@ -5331,11 +5331,7 @@ function setGroupData(data) {
   selector.find(".rd-group-entity").val(data.entity.group.entity);
   let table = selector.find('table.table-reference');
   let group = data.entity.group;
-  if (
-    typeof group != "undefined" &&
-    typeof group.map != "undefined" &&
-    group.map.length > 0
-  ) {
+  if (group?.map?.length > 0) {
     for (let i in group.map) {
       if (i > 0) {
         addRow(table);
