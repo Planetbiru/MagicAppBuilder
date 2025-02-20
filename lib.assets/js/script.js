@@ -5027,8 +5027,9 @@ function addColumn(table) {
 function removeLastColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let offset = parseInt(table.attr("data-offset"));
-  let pos = ncol - offset - 2;
-  if (ncol > offset + 3) {
+  let mincol = parseInt(table.attr("data-number-of-column"));
+  let pos = ncol - offset - mincol;
+  if (pos >= mincol) {
     table
       .find("thead")
       .find("tr")
