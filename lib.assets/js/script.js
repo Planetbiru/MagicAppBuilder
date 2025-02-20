@@ -570,16 +570,34 @@ let initAll = function () {
       nrow == 1 &&
       $(this).closest("table").attr("data-empty-on-remove") == "true"
     ) {
-      $(this)
-        .closest("tr")
-        .find(":input")
-        .each(function (e3) {
-          if ($(this).is(":checkbox, :radio")) {
-            $(this).prop("checked", false);
-          } else {
-            $(this).val("");
+      asyncAlert(
+        'Do you want to clear this row?',
+        'Confirmation',
+        [
+          {
+            'caption': 'Yes',
+            'fn': () => {
+              $(this)
+                .closest("tr")
+                .find(":input")
+                .each(function (e3) {
+                  if ($(this).is(":checkbox, :radio")) {
+                    $(this).prop("checked", false);
+                  } else {
+                    $(this).val("");
+                  }
+                });
+            },
+            'class': 'btn-primary'
+          },
+          {
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
           }
-        });
+        ]
+      );
+      
     }
   });
 
