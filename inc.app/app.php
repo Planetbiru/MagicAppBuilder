@@ -25,6 +25,7 @@ if(!file_exists($builderConfigPath))
     $builderConfig->loadYamlString("
 application:
     entityBaseNamespace: 'MagicAdmin\Entity'
+    name: 'MagicAppBuilder'
 dataLimit: 20
 database:
     driver: sqlite

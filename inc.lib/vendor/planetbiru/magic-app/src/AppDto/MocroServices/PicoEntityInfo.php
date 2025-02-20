@@ -40,20 +40,35 @@ class PicoEntityInfo extends PicoObjectToString
 
     /**
      * PicoEntityInfo constructor.
-     * Initializes the properties with the given values.
+     * Initializes the properties with the given values from the $info array.
+     * 
+     * This constructor checks for the existence of specific keys in the provided 
+     * associative array ($info) and assigns their values to the corresponding 
+     * properties of the class if they exist.
      *
-     * @param string $active The status of the entity, either active or inactive.
-     * @param string $draft The draft status of the entity.
-     * @param string $waitingFor The waitingFor value.
-     * @param string $approvalId The approval ID for the entity.
+     * @param array $info An associative array containing the entity information.
+     *                    Expected keys: 'active', 'draft', 'waitingFor', 'approvalId'.
      */
-    public function __construct($active = null, $draft = null, $waitingFor = null, $approvalId = null)
+    public function __construct($info)
     {
-        $this->active = $active;
-        $this->draft = $draft;
-        $this->waitingFor = $waitingFor;
-        $this->approvalId = $approvalId;
+        if(isset($info['active']))
+        {
+            $this->active = $info['active'];
+        }
+        if(isset($info['draft']))
+        {
+            $this->draft = $info['draft'];
+        }
+        if(isset($info['waitingFor']))
+        {
+            $this->waitingFor = $info['waitingFor'];
+        }
+        if(isset($info['approvalId']))
+        {
+            $this->approvalId = $info['approvalId'];
+        }
     }
+
 
     /**
      * Get the active status of the entity.

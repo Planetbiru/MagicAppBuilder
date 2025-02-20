@@ -2,6 +2,8 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
+use MagicObject\MagicObject;
+
 /**
  * Class PicoUserFormOutputDetail
  *
@@ -25,12 +27,68 @@ class PicoUserFormOutputDetail extends PicoEntityData
     protected $fields;
     
     /**
-     * A list of allowed actions that can be performed on the form fields.
-     * Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
+     * Flag indicating whether the data item is active or inactive. 
+     * If `null`, the flag is considered inactive, and the front-end application 
+     * should not use it for decision-making.
      *
-     * @var FieldWaitingFor
+     * @var bool|null
+     */
+    protected $active;
+    
+    /**
+     * The current status of the data item, typically used to indicate 
+     * whether the item is waiting for a specific action, such as approval, 
+     * update, or another process. This status is represented by a `PicoFieldWaitingFor` object.
+     *
+     * @var PicoFieldWaitingFor|null
      */
     protected $waitingFor;
+
+    /**
+     * Flag indicating whether the data item is in draft status. 
+     * If `null`, the draft flag is not used by the front-end application.
+     *
+     * @var bool|null
+     */
+    protected $draft;
+
+    /**
+     * The approval ID associated with the data item, if any.
+     *
+     * @var string|null
+     */
+    protected $approvalId;
+    
+    /**
+     * Constructor for the PicoOutputDataItem class.
+     * Initializes the properties with provided values. If a value is not provided for a property,
+     * it will remain uninitialized (null).
+     *
+     * @param MagicObject|null $entity Original data entity.
+     * @param PicoEntityInfo|null $entityInfo Object containing flags that indicate whether the item is a draft, final version, or has other status.
+     */
+    public function __construct($entity = null, $entityInfo = null)
+    {
+        // Set active status if provided in entity info
+        if ($entityInfo->getActive() !== null) {
+            $this->active = $entity->get($entityInfo->getActive());
+        }
+
+        // Set draft status if provided in entity info
+        if ($entityInfo->getDraft() !== null) {
+            $this->draft = $entity->get($entityInfo->getDraft());
+        }
+
+        // Set waitingFor status if provided in entity info
+        if ($entityInfo->getWaitingFor() !== null) {
+            $this->waitingFor = $entity->get($entityInfo->getWaitingFor());
+        }
+
+        // Set approval ID if provided in entity info
+        if ($entityInfo->getApprovalId() !== null) {
+            $this->approvalId = $entity->get($entityInfo->getApprovalId());
+        }
+    }
     
     /**
      * Add an allowed action to the output detail.
@@ -45,29 +103,5 @@ class PicoUserFormOutputDetail extends PicoEntityData
             $this->fields = [];
         }
         $this->fields[] = $output;
-    }
-
-    /**
-     * Get examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
-     *
-     * @return  FieldWaitingFor
-     */ 
-    public function getWaitingfor()
-    {
-        return $this->waitingFor;
-    }
-
-    /**
-     * Set examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
-     *
-     * @param FieldWaitingFor  $waitingFor  Examples include `update`, `activate`, `deactivate`, `delete`, `approve`, `reject`.
-     *
-     * @return self Returns the current instance for method chaining.
-     */ 
-    public function setWaitingfor($waitingFor)
-    {
-        $this->waitingFor = $waitingFor;
-
-        return $this;
     }
 }

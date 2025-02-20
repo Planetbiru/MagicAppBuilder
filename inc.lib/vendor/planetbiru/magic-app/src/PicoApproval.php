@@ -129,7 +129,7 @@ class PicoApproval
      * @param string $currentIp The current IP address of the user performing the action.
      * @param SetterGetter|null $approvalCallback Optional callback for approval, which can trigger actions before and after the approval process.
      * 
-     * @return self The current instance, allowing method chaining The current instance of the class, allowing for method chaining.
+     * @return self Returns the current instance for method chaining. The current instance of the class, allowing for method chaining.
      */
     public function approve($columnToBeCopied, $entityApv, $entityTrash, $currentUser, $currentTime, $currentIp, $approvalCallback = null)
     {
@@ -253,7 +253,7 @@ class PicoApproval
      *        `getAfterDelete` methods on the callback can be used to define actions 
      *        that should be taken before and after the deletion respectively.
      *
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      *         Returns the current instance to allow for method chaining.
      */
     public function approveDelete($entityTrash, $currentUser, $currentTime, $currentIp, $approvalCallback = null)
@@ -312,7 +312,7 @@ class PicoApproval
      *        `getAfterReject` methods on the callback can be used to define actions 
      *        that should be taken before and after the rejection respectively.
      *
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      *         Returns the current instance to allow for method chaining.
      */
     public function reject($entityApv, $currentUser = null, $currentTime = null, $currentIp = null, $approvalCallback = null)
@@ -384,7 +384,7 @@ class PicoApproval
      *        An array of column names that should be copied from the approval entity to the main entity 
      *        during the approval process.
      *
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      *        Returns the current instance of the class for method chaining.
      */
     private function approveUpdate($entityApv, $columnToBeCopied)
