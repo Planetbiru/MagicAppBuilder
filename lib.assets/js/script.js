@@ -5308,6 +5308,20 @@ function getSortableData() {
   return result;
 }
 
+/**
+ * Sets group data into the element with the attribute `data-name="grouping"`.
+ *
+ * @param {Object} data - The data object containing group information.
+ * @param {Object} data.entity - The entity object that includes group details.
+ * @param {Object} data.entity.group - The group object containing values, labels, source, and entity.
+ * @param {string} data.entity.group.value - The main value of the group.
+ * @param {string} data.entity.group.label - The label of the group.
+ * @param {string} data.entity.group.source - The source of the group.
+ * @param {string} data.entity.group.entity - The entity associated with the group.
+ * @param {Array} [data.entity.group.map] - An optional array of mapping objects in the reference table.
+ * @param {string} data.entity.group.map[].value - The value of each mapping.
+ * @param {string} data.entity.group.map[].label - The label of each mapping.
+ */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
   selector.attr('data-group-source', data.entity.group.source);
@@ -5334,6 +5348,18 @@ function setGroupData(data) {
   }
 }
 
+/**
+ * Retrieves group data from the element with the attribute `data-name="grouping"`.
+ *
+ * @returns {Object} result - The object containing group data.
+ * @returns {string} result.value - The main value of the group.
+ * @returns {string} result.label - The label of the group.
+ * @returns {string} result.source - The source of the group.
+ * @returns {string} result.entity - The entity associated with the group.
+ * @returns {Array} result.map - An array of mapping objects in the reference table.
+ * @returns {string} result.map[].value - The value of each mapping.
+ * @returns {string} result.map[].label - The label of each mapping.
+ */
 function getGroupData() {
   let result = {};
   let map = [];
