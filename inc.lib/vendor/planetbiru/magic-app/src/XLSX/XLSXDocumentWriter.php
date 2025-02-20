@@ -24,7 +24,7 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param array $headerFormat Data format for the header
      * @param callable $writerFunction Function to format data
      * @param bool $useTemporary Whether to use a temporary file
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction, $useTemporary = true)
     {

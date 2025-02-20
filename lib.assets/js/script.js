@@ -4,6 +4,7 @@ let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
 let ajaxPending = 0;
+let referenceResource = '';
 
 /**
  * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
@@ -197,6 +198,9 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
   return target.replace(new RegExp(search, "g"), replacement);
 };
 
+/**
+ * Load main resource
+ */
 jQuery(function () {
   $('body').load('lib.ajax/body.min.html', function () {
     initAll();
@@ -204,7 +208,13 @@ jQuery(function () {
   });
 });
 
+// Add event listener
 let initAll = function () {
+  $(document).on('click', '.group-reference', function(e2){
+    let value = $(this).val();
+    $(this).closest('table').attr('data-group-source', value);
+  });
+  
   $(document).on('click', '#button_delete_module_file', function (e) {
     e.preventDefault();
     asyncAlert(
@@ -560,12 +570,34 @@ let initAll = function () {
       nrow == 1 &&
       $(this).closest("table").attr("data-empty-on-remove") == "true"
     ) {
-      $(this)
-        .closest("tr")
-        .find(":input")
-        .each(function (e3) {
-          $(this).val("");
-        });
+      asyncAlert(
+        'Do you want to clear this row?',
+        'Confirmation',
+        [
+          {
+            'caption': 'Yes',
+            'fn': () => {
+              $(this)
+                .closest("tr")
+                .find(":input")
+                .each(function (e3) {
+                  if ($(this).is(":checkbox, :radio")) {
+                    $(this).prop("checked", false);
+                  } else {
+                    $(this).val("");
+                  }
+                });
+            },
+            'class': 'btn-primary'
+          },
+          {
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
+          }
+        ]
+      );
+      
     }
   });
 
@@ -1838,8 +1870,25 @@ let initAll = function () {
   loadAllResource();
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
+  loadReferenceResource();
 };
 
+function loadReferenceResource()
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/reference.min.html',
+    success: function(data){
+      referenceResource = data;
+      decreaseAjaxPending();
+    },
+    error: function(e)
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
 
 
 
@@ -4996,8 +5045,9 @@ function addColumn(table) {
 function removeLastColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let offset = parseInt(table.attr("data-offset"));
-  let pos = ncol - offset - 2;
-  if (ncol > offset + 3) {
+  let mincol = parseInt(table.attr("data-number-of-column"));
+  let pos = ncol - offset - mincol;
+  if (pos >= mincol) {
     table
       .find("thead")
       .find("tr")
@@ -5085,6 +5135,7 @@ function setEntityData(data) {
 
   setSpecificationData(data);
   setSortableData(data);
+  setGroupData(data);
   setAdditionalOutputData(data);
 }
 
@@ -5106,6 +5157,7 @@ function getEntityData() {
     indent: $(selector).find(".rd-option-indent").val(),
     specification: getSpecificationData(),
     sortable: getSortableData(),
+    group: getGroupData(),
     additionalOutput: getAdditionalOutputData(),
   };
   return entity;
@@ -5257,6 +5309,92 @@ function getSortableData() {
 }
 
 /**
+ * Sets group data into the element with the attribute `data-name="grouping"`.
+ *
+ * @param {Object} data - The data object containing group information.
+ * @param {Object} data.entity - The entity object that includes group details.
+ * @param {Object} data.entity.group - The group object containing values, labels, source, and entity.
+ * @param {string} data.entity.group.value - The main value of the group.
+ * @param {string} data.entity.group.label - The label of the group.
+ * @param {string} data.entity.group.source - The source of the group.
+ * @param {string} data.entity.group.entity - The entity associated with the group.
+ * @param {Array} [data.entity.group.map] - An optional array of mapping objects in the reference table.
+ * @param {string} data.entity.group.map[].value - The value of each mapping.
+ * @param {string} data.entity.group.map[].label - The label of each mapping.
+ */
+function setGroupData(data) {
+  let selector = $('[data-name="grouping"]');
+  if (data?.entity?.group) 
+  {
+    selector.attr('data-group-source', data.entity.group.source);
+    selector.find(".rd-group-value").val(data.entity.group.value);
+    selector.find(".rd-group-label").val(data.entity.group.label);
+    selector.find(".group-reference").filter('[value="'+data.entity.group.source+'"]')[0].checked = true;
+    selector.find(".rd-group-entity").val(data.entity.group.entity);
+    let table = selector.find('table.table-reference');
+    let group = data.entity.group;
+    if (group?.map?.length > 0) {
+      for (let i in group.map) {
+        if (i > 0) {
+          addRow(table);
+        }
+        let tr = table.find("tr:last-child");
+        let row = group.map[i];
+        tr.find(".rd-map-value").val(row.value);
+        tr.find(".rd-map-label").val(row.label);
+      }
+    }
+  }
+}
+
+/**
+ * Retrieves group data from the element with the attribute `data-name="grouping"`.
+ *
+ * @returns {Object} result - The object containing group data.
+ * @returns {string} result.value - The main value of the group.
+ * @returns {string} result.label - The label of the group.
+ * @returns {string} result.source - The source of the group.
+ * @returns {string} result.entity - The entity associated with the group.
+ * @returns {Array} result.map - An array of mapping objects in the reference table.
+ * @returns {string} result.map[].value - The value of each mapping.
+ * @returns {string} result.map[].label - The label of each mapping.
+ */
+function getGroupData() {
+  let result = {};
+  let map = [];
+
+  let selector = $('[data-name="grouping"]');
+
+  let value = selector.find(".rd-group-value").val();
+  let label = selector.find(".rd-group-label").val();
+  let source = selector.find(".group-reference:checked").val();
+  let entity = selector.find(".rd-group-entity").val();
+
+  result.value = value;
+  result.label = label;
+  result.source = source;
+  result.entity = entity;
+
+  $(selector)
+    .find(".table-reference tbody tr")
+    .each(function () {
+      let tr = $(this);
+      let value = tr.find(".rd-map-value").val().trim();
+      let label = tr.find(".rd-map-label").val().trim();
+      if (value.length > 0) { 
+        map.push({
+          value: value,
+          label: label,
+        });
+      }
+    });
+
+  result.map = map;
+  return result;
+}
+
+
+/**
  * Sets additional output data into the form based on the provided data object.
  *
  * @param {Object} data - The object containing additional output data to populate the form.
@@ -5327,7 +5465,7 @@ function setMapData(data)  //NOSONAR
         if (objLength > 4) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "selected") {
+        if (i != "value" && i != "label" && i != "group" && i != "selected") {
           keys.push(i);
           mapKey[j] = i;
         }
@@ -5359,6 +5497,7 @@ function setMapData(data)  //NOSONAR
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
+      tr.find(".rd-group").val(row.group);
       if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
@@ -5396,10 +5535,12 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
+      let group = tr.find(".rd-group").val().trim();
       let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
+        group: group,
         selected: selected,
       };
       if (keys.length > 0) {
@@ -5496,245 +5637,5 @@ function setLanguage(languages) {
  * @returns {string} The HTML string for the reference configuration form.
  */
 function getReferenceResource() {
-  return `
-<form action="">
-    <div class="reference-selector">
-      <label for="reference_type_entity"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_entity" value="entity" checked> Entity</label>
-      <label for="reference_type_map"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_map" value="map"> Map</label>
-      <label for="reference_type_yesno"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_yesno" value="yesno"> Yes/No</label>
-      <label for="reference_type_truefalse"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_truefalse" value="truefalse"> True/False</label>
-      <label for="reference_type_onezero"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_onezero" value="onezero"> 1/0</label>
-    </div>
-    <div class="reference-container">
-        <div class="reference-section entity-section">
-            <h4>Entity</h4>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Entity Name</td>
-                          <td><input class="form-control rd-entity-name" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Table Name</td>
-                          <td><input class="form-control rd-table-name" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Primary Key</td>
-                          <td><input class="form-control rd-primary-key" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Value Column</td>
-                          <td><input class="form-control rd-value-column" type="text"></td>
-                      </tr>
-                      <tr class="display-reference">
-                          <td>Reference Object Name</td>
-                          <td><input class="form-control rd-reference-object-name" type="text"></td>
-                      </tr>
-                      <tr class="display-reference">
-                          <td>Reference Property Name</td>
-                          <td><input class="form-control rd-reference-property-name" type="text"></td>
-                      </tr>
-                      <tr class="entity-generator">
-                          <td></td>
-                          <td>
-                            <button type="button" class="btn btn-primary add_subfix">Add Entity Subfix</button>
-                            <button type="button" class="btn btn-success generate_entity">Generate Entity</button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-            <h4>Option Node</h4>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Format and Pamareters</td>
-                          <td><input class="form-control rd-option-text-node-format" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Indent</td>
-                          <td><input class="form-control rd-option-indent" type="number" step="1" min="0"></td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-            <h4>Specfification</h4>
-            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
-            <div class="table-reference-container">
-              <table data-name="specification" class="table table-reference" data-empty-on-remove="true">
-                  <thead>
-                      <tr>
-                          <td width="40%">Column Name</td>
-                          <td width="12%">Comp</td>
-                          <td>Value</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td>
-                            <select class="form-control rd-comparison">
-                              <option value="equals">=</option>
-                              <option value="notEquals">!=</option>
-                              <option value="greaterThan">&gt;</option>
-                              <option value="greaterThanOrEquals">&gt;=</option>
-                              <option value="lessThan">&lt;</option>
-                              <option value="lessThanOrEquals">&lt;=</option>
-                            </select>
-                          </td>
-                          <td><input class="form-control rd-value" type="text" value=""></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="5">
-                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
-                          </td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Sortable</h4>
-            <p>Use at least one column to sort.</p>
-            <div class="table-reference-container">
-              <table data-name="sortable" class="table table-reference">
-                  <thead>
-                      <tr>
-                          <td width="60%">Column</td>
-                          <td>Value</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td><select class="form-control rd-order-type">
-                                  <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
-                                  <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
-                              </select></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Additional Output</h4>
-            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
-            <div class="table-reference-container">
-              <table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
-                  <thead>
-                      <tr>
-                          <td>Column</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="4"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Selection</h4>
-            <p>How user can select the options</p>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Selection</td>
-                          <td><select class="form-control multiple-selection">
-                            <option value="0">Single</option>
-                            <option value="1">Multiple</option>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-        </div>
-        <div class="reference-section map-section">
-            <h4>Map</h4>
-            <div class="table-reference-container">
-              <table data-name="map" class="table table-reference" data-offset="2">
-                  <thead>
-                      <tr>
-                          <td>Value</td>
-                          <td>Label</td>
-                          <td><input class="form-control map-key" type="text" value=""
-                                  placeholder="Additional attribute name"></td>
-                          <td>Def</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-value" type="text" value=""></td>
-                          <td><input class="form-control rd-label" type="text" value=""></td>
-                          <td><input class="form-control map-value" type="text" value=""
-                                  placeholder="Additional attribute value"></td>
-                          <td><input type="checkbox" class="rd-selected"></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="7">
-                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
-                              <button type="button" class="btn btn-primary btn-add-column">Add Column</button>
-                              <button type="button" class="btn btn-primary btn-remove-last-column">Remove Last
-                                  Column</button>
-                          </td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Selection</h4>
-            <p>How user can select the options</p>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Selection</td>
-                          <td><select class="form-control multiple-selection">
-                            <option value="0">Single</option>
-                            <option value="1">Multiple</option>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-        </div>
-    </div>
-</form>
-`;
+  return referenceResource;
 }

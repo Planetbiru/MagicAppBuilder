@@ -3,7 +3,6 @@
 namespace MagicApp\AppDto\MocroServices;
 
 use DOMDocument;
-use Exception;
 use MagicObject\Util\PicoStringUtil;
 use SimpleXMLElement;
 use stdClass;

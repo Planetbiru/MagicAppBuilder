@@ -61,6 +61,52 @@ class PicoInputFieldOption extends PicoObjectToString
     {
         return new self(null, null);
     }
+    
+    /**
+     * Converts an array of input field options into an array of PicoInputFieldOption objects.
+     * 
+     * This static method accepts an array of input field option data, and for each item in the array,
+     * it creates a new `PicoInputFieldOption` object using the 'value', 'label', and 'selected' keys 
+     * (if available) from the input array. It returns an array of `PicoInputFieldOption` objects.
+     *
+     * @param array $map An array of input field options. Each item in the array is expected to 
+     *                   contain at least the 'value' and 'label' keys, with an optional 'selected' key.
+     * @return PicoInputFieldOption[] An array of `PicoInputFieldOption` objects created from the input array.
+     */
+    public static function fromArray($map)
+    {
+        $result = array();
+        if(isset($map) && is_array($map))
+        {
+            foreach($map as $item)
+            {
+                $result[] = new PicoInputFieldOption($item['value'], $item['label'], isset($item['selected']) && $item['selected']);
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Retrieves the label associated with a given value from a map.
+     *
+     * This static method accepts a map (associative array) and a value, and returns the corresponding 
+     * label from the map. The map is expected to contain sub-arrays where each sub-array has a 'label' key 
+     * for the label value. If the value does not exist in the map or if the label is not found, an empty string 
+     * will be returned.
+     *
+     * @param array $map An associative array where each key corresponds to a value, and the value is an array containing at least the 'label' key.
+     * @param string $value The value whose associated label needs to be retrieved from the map.
+     * @return string The label associated with the given value, or an empty string if the value or label is not found.
+     */
+    public static function getLabelFromValue($map, $value)
+    {
+        $result = '';
+        if(isset($map) && is_array($map) && isset($map[$value]) && is_array($map[$value]) && isset($map[$value]['label']))
+        {
+            $result = $map[$value]['label']; 
+        }
+        return $result;
+    }
 
     /**
      * PicoInputFieldOption constructor.

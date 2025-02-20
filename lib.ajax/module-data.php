@@ -16,7 +16,14 @@ try
     {
         $target = "/".$target;
     }
-    $path = $activeWorkspace->getDirectory()."/applications/".$activeApplication->getApplicationId()."/module$target/".basename($inputGet->getModuleFile(), ".php") . ".json";
+    $path = sprintf(
+        "%s/applications/%s/module%s/%s.json",
+        $activeWorkspace->getDirectory(),
+        $activeApplication->getApplicationId(),
+        $target,
+        basename($inputGet->getModuleFile(), ".php")
+    );
+    
     if(isset($moduleFile) && !empty($moduleFile) && file_exists($path))
     {
         ResponseUtil::sendJSON(file_get_contents($path));

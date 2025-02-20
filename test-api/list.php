@@ -16,7 +16,7 @@ $entity = new EntityApplication(null, $database);
 
 $pageData = $entity->findAll();
 
-$picoEntityInfo = new PicoEntityInfo("active");
+$picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
 $picoModule = new PicoModuleInfo("application", "Application", "list");
 $primaryKeys = array_keys($entity->tableInfo()->getPrimaryKeys());
 
