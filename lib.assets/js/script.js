@@ -5324,7 +5324,7 @@ function getSortableData() {
  */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
-  if(typeof data.entity != "undefined" && typeof data.entity.group != "undefined")
+  if (data?.entity?.group) 
   {
     selector.attr('data-group-source', data.entity.group.source);
     selector.find(".rd-group-value").val(data.entity.group.value);
