@@ -2580,10 +2580,10 @@ $subqueryMap = '.$referece.';
                     $inputName = $field->getFieldName()."[]";
                     $select->setAttribute('name', $inputName);
                     
-                    $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
+                    $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG); // NOSONAR
                     $select->setAttributeNode($dom->createAttribute('multiple'));
                     $select->setAttributeNode($dom->createAttribute('data-multi-select'));
                 }
@@ -3202,7 +3202,7 @@ $subqueryMap = '.$referece.';
      * @param string|null $id          The optional ID attribute for the control.
      * @return DOMElement              The created input control element.
      */
-    private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null)
+    private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null) // NOSONAR
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $fieldName = $field->getFieldName();
@@ -3248,11 +3248,28 @@ $subqueryMap = '.$referece.';
         }
         else if($field->getElementType() == ElementType::SELECT)
         {
+            $referenceData = $field->getReferenceData();
             $input = $dom->createElement('select');
             $classes = array();
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
-            $input->setAttribute('name', $fieldName);
+
+            $multipleSelect = self::isTrue($referenceData->getMultipleSelection());
+
+            if($multipleSelect)
+            {
+                $input->setAttribute('name', $field->getFieldName()."[]");
+                $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
+                $input->setAttributeNode($dom->createAttribute('multiple'));
+                $input->setAttributeNode($dom->createAttribute('data-multi-select'));
+            }
+            else
+            {
+                $input->setAttribute('name', $field->getFieldName());
+            }
 
             $input = $this->addAttributeId($input, $id);
 
@@ -3508,43 +3525,70 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Undocumented function
+     * Retrieves the option group based on reference data.
      *
-     * @param MagicObject $referenceData
-     * @return void
+     * @param MagicObject $referenceData The reference object used to obtain the group.
+     * @return string The formatted option group configuration.
      */
     private function getOptionGroup($referenceData)
     {
         $result = "";
-        $group = $referenceData->getGroup();
-        error_log($referenceData);
-        if(isset($group) && !empty($group))
-        {
+        $group = $referenceData->getEntity()->getGroup();
+        if (isset($group) && !empty($group)) {
             $value = $group->getValue();
             $label = $group->getLabel();
             $source = $group->getSource();
             $entity = $group->getEntity();
             $map = $group->getMap();
-            if($source == "map" && $map != null && !empty($map))
-            {
-                $arguments = sprintf('$%s, $%s, %s', $value, $label, var_export($map, true));
-                $result = self::NEW_LINE_N.self::TAB3.self::TAB3."->setGroup($arguments)";
+            if ($source == "map" && $map != null && !empty($map)) {
+                $arguments = sprintf('%s, %s, %s', $this->getStringOf($value), $this->getStringOf($label), $this->varExport($map));
+                $result = self::NEW_LINE_N . self::TAB3 . self::TAB3 . "->setGroup($arguments)";
+            } elseif ($this->isNotEmpty($value) && $this->isNotEmpty($label) && $this->isNotEmpty($entity)) {
+                $arguments = sprintf('%s, %s, %s', $this->getStringOf($value), $this->getStringOf($label), $this->getStringOf($entity));
+                $result = self::NEW_LINE_N . self::TAB3 . self::TAB3 . "->setGroup($arguments)";
             }
-            else if($this->isNotEmpty($value) && $this->isNotEmpty($label) && $this->isNotEmpty($entity))
-            {
-                $arguments = sprintf('$%s, $%s, $%s', $value, $label, $entity);
-                $result = self::NEW_LINE_N.self::TAB3.self::TAB3."->setGroup($arguments)";
-            }
-            
         }
         return $result;
     }
 
     /**
-     * Undocumented function
+     * Converts a map object to a single-line PHP array representation.
      *
-     * @param mixed $value
-     * @return boolean
+     * @param MagicObject $map The map object containing value-label pairs.
+     * @return string A single-line string representation of the exported array.
+     */
+    private function varExport($map)
+    {
+        $exported = var_export($this->valueLabelToAssociatedArray($map->valueArray()), true);
+        $oneLiner = preg_replace('/\s+/', ' ', trim($exported)); // Remove excessive whitespace and newlines
+        $oneLiner = preg_replace('/,\s*\)/', ')', $oneLiner); // Remove trailing commas before closing parentheses
+        $oneLiner = preg_replace('/,\s*\]/', ']', $oneLiner); // Remove trailing commas before closing brackets
+        if (PicoStringUtil::startsWith($oneLiner, 'array ( ')) {
+            $oneLiner = 'array(' . substr($oneLiner, 8);
+        }
+        return $oneLiner;
+    }
+
+    /**
+     * Converts an array of value-label pairs into an associative array.
+     *
+     * @param array $array The input array containing value-label pairs.
+     * @return array The converted associative array.
+     */
+    private function valueLabelToAssociatedArray($array)
+    {
+        $result = array();
+        foreach ($array as $v) {
+            $result[$v["value"]] = $v["label"];
+        }
+        return $result;
+    }
+
+    /**
+     * Checks whether a value is not empty.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value is not null and not empty, otherwise false.
      */
     private function isNotEmpty($value)
     {
