@@ -888,11 +888,11 @@ let initAll = function () {
     );
   });
 
-  $(document).on('change', '.map-key', function (e) {
+  $(document).on('change', '.rd-map-key', function (e) {
     onChangeMapKey($(this));
   });
 
-  $(document).on('keyup', '.map-key', function (e) {
+  $(document).on('keyup', '.rd-map-key', function (e) {
     onChangeMapKey($(this));
   });
 
@@ -3185,7 +3185,7 @@ function downloadPNG() {
  */
 function onChangeMapKey(obj) {
   let val = obj.val();
-  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'selected')) {
+  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'goup' || val.toLowerCase() == 'selected')) {
     if (!obj.hasClass('input-invalid-value')) {
       obj.addClass('input-invalid-value');
       setTimeout(function () {
@@ -5015,8 +5015,8 @@ function addRow(table) {
 function addColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let pos = ncol - parseInt(table.attr("data-offset")) - 2;
-  let inputHeader = '<td><input class="form-control map-key" type="text" value="" placeholder="Additional attribute name"></td>';
-  let inputBody = '<td><input class="form-control map-value" type="text" value="" placeholder="Additional attribute value"></td>';
+  let inputHeader = '<td><input class="form-control rd-map-key" type="text" value="" placeholder="Additional attribute name"></td>';
+  let inputBody = '<td><input class="form-control rd-map-value" type="text" value="" placeholder="Additional attribute value"></td>';
   table
     .find("thead")
     .find("tr")
@@ -5046,8 +5046,8 @@ function removeLastColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let offset = parseInt(table.attr("data-offset"));
   let mincol = parseInt(table.attr("data-number-of-column"));
-  let pos = ncol - offset - mincol;
-  if (pos >= mincol) {
+  let pos = ncol - offset - 2;
+  if (pos > mincol) {
     table
       .find("thead")
       .find("tr")
@@ -5066,6 +5066,22 @@ function removeLastColumn(table) {
       .find("tr")
       .find("td")
       .attr("colspan", table.find("thead").find("tr").find("td").length);
+  }
+  else
+  {
+    table
+      .find("thead")
+      .find("tr")
+      .find("td:nth(" + pos + ")")
+      .find(':input').val('');
+    table
+      .find("tbody")
+      .find("tr")
+      .each(function (e3) {
+        $(this)
+          .find("td:nth(" + pos + ")")
+          .find(':input').val('');
+      });
   }
 }
 
@@ -5447,52 +5463,34 @@ function getAdditionalOutputData() {
  *
  * @param {Object} data - The object containing map data to populate the form.
  */
-function setMapData(data)  //NOSONAR
+function setMapData(data) // NOSONAR
 {
   let selector = '[data-name="map"]';
   let table = $(selector);
   let keys = [];
   data.map = data.map ? data.map : [];
   let map = data.map;
-  let mapKey = [];  //NOSONAR
   if (map.length > 0) {
     let map0 = map[0];
     let objLength = 0;
-    let j = 0;
     for (let i in map0) {
       if (map0.hasOwnProperty(i)) {
         objLength++;
-        if (objLength > 4) {
+        if (objLength > 5) {
           addColumn(table);
         }
         if (i != "value" && i != "label" && i != "group" && i != "selected") {
           keys.push(i);
-          mapKey[j] = i;
         }
       }
     }
     for (let i in keys) {
-      let j = parseInt(i) + 1;
-      table
-        .find("thead")
-        .find("tr")
-        .find(".map-key:nth-child(" + j + ")")
-        .val(keys[i]);
+      table.find("thead tr .rd-map-key")[i].value = keys[i];
     }
-    if ($(selector).find("thead").find("tr").find(".map-key").length > 0) {
-      $(selector)
-        .find("thead")
-        .find("tr")
-        .find(".map-key")
-        .each(function (e) {
-          keys.push($(this).val().trim());
-        });
-    }
-
     for (let i in map) {
       if (i > 0) {
         addRow(table);
-      }
+      }  
       let tr = table.find("tr:last-child");
       let row = map[i];
       tr.find(".rd-value").val(row.value);
@@ -5502,9 +5500,7 @@ function setMapData(data)  //NOSONAR
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
-        let j = parseInt(k) + 1;
-        let refValue = map[i][keys[k]];
-        tr.find(".map-value:nth-child(" + j + ")").val(refValue);
+        tr.find(".rd-map-value")[k].value = map[i][keys[k]];
       }
     }
   }
@@ -5519,11 +5515,11 @@ function getMapData() {
   let result = [];
   let selector = '[data-name="map"]';
   let keys = [];
-  if ($(selector).find("thead").find("tr").find(".map-key").length > 0) {
+  if ($(selector).find("thead").find("tr").find(".rd-map-key").length > 0) {
     $(selector)
       .find("thead")
       .find("tr")
-      .find(".map-key")
+      .find(".rd-map-key")
       .each(function (e) {
         keys.push($(this).val().trim());
       });
@@ -5545,7 +5541,7 @@ function getMapData() {
       };
       if (keys.length > 0) {
         let idx = 0;
-        tr.find(".map-value").each(function (e) {
+        tr.find(".rd-map-value").each(function (e) {
           let attrVal = $(this).val();
           if (keys[idx].length > 0) {
             opt[keys[idx]] = attrVal;
