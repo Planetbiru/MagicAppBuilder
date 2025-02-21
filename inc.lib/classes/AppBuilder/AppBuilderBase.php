@@ -168,6 +168,13 @@ class AppBuilderBase //NOSONAR
     protected $updateEntity = false;
 
     /**
+     * Cache to store option values that belong to a group.
+     *
+     * @var string[]
+     */
+    private $inGroup;
+
+    /**
      * Constructor
      *
      * Initializes the object with application and entity configurations.
@@ -2580,10 +2587,10 @@ $subqueryMap = '.$referece.';
                     $inputName = $field->getFieldName()."[]";
                     $select->setAttribute('name', $inputName);
                     
-                    $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
-                    $select->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
+                    $select->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG); // NOSONAR
+                    $select->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG); // NOSONAR
                     $select->setAttributeNode($dom->createAttribute('multiple'));
                     $select->setAttributeNode($dom->createAttribute('data-multi-select'));
                 }
@@ -3202,7 +3209,7 @@ $subqueryMap = '.$referece.';
      * @param string|null $id          The optional ID attribute for the control.
      * @return DOMElement              The created input control element.
      */
-    private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null)
+    private function createUpdateControl($dom, $objectName, $field, $primaryKeyName, $id = null) // NOSONAR
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $fieldName = $field->getFieldName();
@@ -3248,11 +3255,28 @@ $subqueryMap = '.$referece.';
         }
         else if($field->getElementType() == ElementType::SELECT)
         {
+            $referenceData = $field->getReferenceData();
             $input = $dom->createElement('select');
             $classes = array();
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
-            $input->setAttribute('name', $fieldName);
+
+            $multipleSelect = self::isTrue($referenceData->getMultipleSelection());
+
+            if($multipleSelect)
+            {
+                $input->setAttribute('name', $field->getFieldName()."[]");
+                $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-label-select-all', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelectAll();'.self::PHP_CLOSE_TAG);
+                $input->setAttributeNode($dom->createAttribute('multiple'));
+                $input->setAttributeNode($dom->createAttribute('data-multi-select'));
+            }
+            else
+            {
+                $input->setAttribute('name', $field->getFieldName());
+            }
 
             $input = $this->addAttributeId($input, $id);
 
@@ -3354,29 +3378,156 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'entity')
             {    
                 $entity = $referenceData->getEntity();         
-                $specification = $entity->getSpecification();
-                $sortable = $entity->getSortable();
-                $additionalOutput = $entity->getAdditionalOutput();
+                
 
                 if(isset($entity) && $entity->getEntityName() != null && $entity->getPrimaryKey() != null && $entity->getValue())
                 {
-                    $input = $this->appendOptionEntity($dom, $input, $entity, $specification, $sortable, $selected, $additionalOutput);
+                    $input = $this->appendOptionEntity($dom, $input, $referenceData, $selected);
                 }
             }
         }
         return $input;
     }
-    
+
     /**
-     * Append a list of options to a select element from a map.
+     * Retrieves a unique list of option groups from the provided map.
      *
-     * @param DOMDocument $dom         The DOM document to which the options will be added.
-     * @param DOMElement $input        The select element to append options to.
-     * @param MagicObject $map         The map containing the options.
-     * @param string|null $selected     The optional selected value.
-     * @return DOMElement              The select element with appended options.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @return string[] A unique array of option group names.
      */
-    private function appendOptionList($dom, $input, $map, $selected = null)
+    private function getOptionGroupList($map)
+    {
+        $groups = array();
+        foreach($map as $opt)
+        {
+            $group = $opt->getGroup();
+            if($this->isNotEmpty($group))
+            {
+                $groups[] = $group;
+            }
+        }
+        return array_unique($groups);
+    }
+
+    /**
+     * Retrieves grouped options and creates corresponding DOM elements.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string[] $groups The list of option groups.
+     * @param string|null $selected The optional selected value.
+     * @return array An array of grouped DOMElement option elements.
+     */
+    private function getInGroupOption($dom, $input, $map, $groups, $selected)
+    {
+        $optionsInGroup = array();
+        foreach($groups as $group)
+        {
+            foreach($map as $opt)
+            {
+                $value = $opt->getValue();
+                if($group == $opt->getGroup())
+                {
+                    $this->inGroup[] = $value;
+                    $caption = $this->buildCaption($opt->getLabel());
+                    $option = $dom->createElement('option');
+                    $option->setAttribute('value', $value);
+                    $textLabel = $dom->createTextNode($caption);
+                    $option->appendChild($textLabel);
+                    $option = $this->addSelectAttribute($option, $opt);
+                    if($selected != null)
+                    {
+                        $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
+                        $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
+                    }
+                    else if($this->isTrue($opt->getSelected()))
+                    {
+                        $option->setAttribute('selected', 'selected');
+                    }
+                    if(!isset($optionsInGroup[$group]))
+                    {
+                        $optionsInGroup[$group] = array();
+                    }
+                    $optionsInGroup[$group][] = $option;
+                    
+                }
+            }
+        }
+        return $optionsInGroup;
+    }
+
+    /**
+     * Builds and appends grouped options to a select element.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string[] $groups The list of option groups.
+     * @param string|null $selected The optional selected value.
+     * @return void
+     */
+    private function builOptionWithGroup($dom, $input, $map, $groups, $selected = null)
+    {
+        $this->inGroup = array();
+        $optionsInGroup = $this->getInGroupOption($dom, $input, $map, $groups, $selected);
+        $optionsNotInGroup = array();
+        
+        foreach($map as $opt)
+        {
+            $value = $opt->getValue();
+            if(!in_array($value, $this->inGroup))
+            {
+                $caption = $this->buildCaption($opt->getLabel());
+                $option = $dom->createElement('option');
+                $option->setAttribute('value', $value);
+                $textLabel = $dom->createTextNode($caption);
+                $option->appendChild($textLabel);
+                $option = $this->addSelectAttribute($option, $opt);
+                if($selected != null)
+                {
+                    $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
+                    $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
+                }
+                else if($this->isTrue($opt->getSelected()))
+                {
+                    $option->setAttribute('selected', 'selected');
+                }
+                $optionsNotInGroup[] = $option;
+            }
+        }
+        foreach($optionsInGroup as $group=>$options)
+        {
+            $optGroup = $dom->createElement('optgroup');
+            $optGroup->setAttribute("label", $group);
+            foreach($options as $option)
+            {
+                $optGroup->appendChild($dom->createTextNode(self::N_TAB7));
+                $optGroup->appendChild($option);
+            }
+            $optGroup->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($optGroup);
+            
+        }
+
+        foreach($optionsNotInGroup as $option)
+        {
+            $input->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($option);
+        }
+    }
+
+    /**
+     * Builds and appends options to a select element without groups.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string|null $selected The optional selected value.
+     * @return void
+     */
+    private function builOptionWithoutGroup($dom, $input, $map, $selected = null)
     {
         foreach($map as $opt)
         {
@@ -3392,27 +3543,56 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
                 $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
             }
-            else if($opt->isSelected())
+            else if($this->isTrue($opt->getSelected()))
             {
                 $option->setAttribute('selected', 'selected');
             }
             $input->appendChild($dom->createTextNode(self::N_TAB6));
             $input->appendChild($option);
         }
+    }
+    
+    /**
+     * Append a list of options to a select element from a map.
+     *
+     * @param DOMDocument $dom         The DOM document to which the options will be added.
+     * @param DOMElement $input        The select element to append options to.
+     * @param MagicObject $map         The map containing the options.
+     * @param string|null $selected     The optional selected value.
+     * @return DOMElement              The select element with appended options.
+     */
+    private function appendOptionList($dom, $input, $map, $selected = null)
+    {
+        $hasGroup = false;
+        $groups = $this->getOptionGroupList($map);
+        if(!empty($groups))
+        {
+            $hasGroup = true;
+        }
+        if($hasGroup)
+        {
+            $this->builOptionWithGroup($dom, $input, $map, $groups, $selected);
+        }
+        else
+        {
+            $this->builOptionWithoutGroup($dom, $input, $map, $selected);
+        }
         $input->appendChild($dom->createTextNode(self::N_TAB5));
         return $input;
     }
 
     /**
-     * Add custom attributes to a select option element.
+     * Appends a list of options to a select element based on the provided map.
      *
-     * @param DOMElement $input        The option element to which attributes will be added.
-     * @param MagicObject $opt         The option data containing additional attributes.
-     * @return DOMElement              The option element with custom attributes.
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string|null $selected The optional selected value.
+     * @return DOMElement The select element with appended options.
      */
     private function addSelectAttribute($input, $opt)
     {
-        $reserved = array('value', 'label', 'default');
+        $reserved = array('value', 'label', 'group', 'selected');
         $arr = $opt->valueArray();
         foreach($arr as $key=>$value)
         {
@@ -3457,17 +3637,18 @@ $subqueryMap = '.$referece.';
      *
      * @param DOMDocument $dom         The DOM document to which the options will be added.
      * @param DOMElement $input        The select element to append options to.
-     * @param MagicObject $entity      The entity providing options.
-     * @param array $specification     The specification for the entity.
-     * @param array $sortable          The sorting criteria for the entity options.
+     * @param MagicObject $referenceData
      * @param string|null $selected     The optional selected value.
-     * @param MagicObject|null $additionalOutput Optional additional output for the options.
      * @return DOMElement              The select element with appended options.
      */
-    private function appendOptionEntity($dom, $input, $entity, $specification, $sortable, $selected = null, $additionalOutput = null)
+    private function appendOptionEntity($dom, $input, $referenceData, $selected = null)
     {
+        $entity = $referenceData->getEntity();
         if($entity != null)
         {
+            $specification = $entity->getSpecification();
+            $sortable = $entity->getSortable();
+            $additionalOutput = $entity->getAdditionalOutput();
             $paramAdditionalOutput = "";
             if($additionalOutput != null && !empty($additionalOutput))
             {
@@ -3491,6 +3672,7 @@ $subqueryMap = '.$referece.';
             $val = AppBuilderBase::getStringOf(PicoStringUtil::camelize($entity->getValue()));
             $textNodeFormat = $entity->getTextNodeFormat();
             $indent = $entity->getIndent();
+            $group = $this->getOptionGroup($referenceData);
             $format = $this->getEntityOptionFormat($textNodeFormat);
             $indentStr = $this->getIndentString($indent);
             
@@ -3500,11 +3682,90 @@ $subqueryMap = '.$referece.';
             .self::NEW_LINE_N.self::TAB3.self::TAB3
             .$specStr.', '.self::NEW_LINE_N.self::TAB3.self::TAB3
             .$sortStr.', '.self::NEW_LINE_N.self::TAB3.self::TAB3
-            .$pk.', '.$val.$paramSelected.$paramAdditionalOutput.')'.$format.$indentStr.
+            .$pk.', '.$val.$paramSelected.$paramAdditionalOutput.')'.$group.$format.$indentStr.
             self::NEW_LINE_N.self::TAB3.self::TAB3.'; '.self::PHP_CLOSE_TAG.self::NEW_LINE_N.self::TAB3.self::TAB2);
             $input->appendChild($option);
         }
         return $input;
+    }
+
+    /**
+     * Retrieves the option group based on reference data.
+     *
+     * @param MagicObject $referenceData The reference object used to obtain the group.
+     * @return string The formatted option group configuration.
+     */
+    private function getOptionGroup($referenceData)
+    {
+        $result = "";
+        $group = $referenceData->getEntity()->getGroup();
+        if (isset($group) && !empty($group)) {
+            $value = $group->getValue();
+            $label = $group->getLabel();
+            $source = $group->getSource();
+            $entity = $group->getEntity();
+            $map = $group->getMap();
+            if ($source == "map" && $map != null && !empty($map)) {
+                $arguments = sprintf('%s, %s, %s', $this->getStringOf($value), $this->getStringOf($label), $this->varExport($map));
+                $result = self::NEW_LINE_N . self::TAB3 . self::TAB3 . "->setGroup($arguments)";
+            } elseif ($this->isNotEmpty($value) && $this->isNotEmpty($label) && $this->isNotEmpty($entity)) {
+                $arguments = sprintf('%s, %s, %s', $this->getStringOf($value), $this->getStringOf($label), $this->getStringOf($entity));
+                $result = self::NEW_LINE_N . self::TAB3 . self::TAB3 . "->setGroup($arguments)";
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Converts a map object to a single-line PHP array representation.
+     *
+     * @param MagicObject $map The map object containing value-label pairs.
+     * @return string A single-line string representation of the exported array.
+     */
+    private function varExport($map)
+    {
+        $exported = var_export($this->valueLabelToAssociatedArray($map->valueArray()), true);
+        $oneLiner = preg_replace('/\s+/', ' ', trim($exported)); // Remove excessive whitespace and newlines
+        $oneLiner = preg_replace('/,\s*\)/', ')', $oneLiner); // Remove trailing commas before closing parentheses
+        $oneLiner = preg_replace('/,\s*\]/', ']', $oneLiner); // Remove trailing commas before closing brackets
+        if (PicoStringUtil::startsWith($oneLiner, 'array ( ')) {
+            $oneLiner = 'array(' . substr($oneLiner, 8);
+        }
+        return $oneLiner;
+    }
+
+    /**
+     * Converts an array of value-label pairs into an associative array.
+     *
+     * @param array $array The input array containing value-label pairs.
+     * @return array The converted associative array.
+     */
+    private function valueLabelToAssociatedArray($array)
+    {
+        $result = array();
+        foreach ($array as $v) {
+            if(isset($v["value"]))
+            {
+                if(!isset($v["label"]))
+                {
+                    $v["label"] = $v["value"];
+                }
+                $result[$v["value"]] = $v["label"];
+            }
+            
+        }
+        return $result;
+    }
+
+    /**
+     * Checks whether a value is not empty.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value is not null and not empty, otherwise false.
+     */
+    private function isNotEmpty($value)
+    {
+        return $value != null && !empty($value);
     }
 
     /**
@@ -4402,7 +4663,7 @@ $subqueryMap = '.$referece.';
         }
         if($this->appFeatures->isActivateDeactivate())
         {
-            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //active",
+            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''); //active",
         }
         if($this->appFeatures->isApprovalRequired())
         {
@@ -4439,7 +4700,7 @@ $subqueryMap = '.$referece.';
             "timeEdit"     => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_edit",
             "timeAskEdit"  => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_ask_edit",
             "sortOrder"    => array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //sort_order",
-            "active"       => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //active",
+            "active"       => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''), //active",
             "draft"        => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //draft",
             "waitingFor"   => array('Type'=>DataType::INT_4,      'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //waiting_for",
             "approvalId"   => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>'')  //approval_id",

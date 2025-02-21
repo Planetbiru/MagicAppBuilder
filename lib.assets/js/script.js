@@ -538,6 +538,10 @@ let initAll = function () {
     let table = $(this).closest("table");
     removeLastColumn(table);
   });
+  $(document).on("click", ".btn-clear-group", function(e){
+    let table = $(this).closest("table");
+    clearGroup(table);
+  });
 
   $(document).on("click", ".btn-add-row", function (e) {
     let table = $(this).closest("table");
@@ -5034,7 +5038,7 @@ function addColumn(table) {
     .find("tfoot")
     .find("tr")
     .find("td")
-    .attr("colspan", table.find("thead").find("tr").find("td").length);
+    .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
 }
 
 /**
@@ -5065,7 +5069,7 @@ function removeLastColumn(table) {
       .find("tfoot")
       .find("tr")
       .find("td")
-      .attr("colspan", table.find("thead").find("tr").find("td").length);
+      .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
   }
   else
   {
@@ -5083,6 +5087,35 @@ function removeLastColumn(table) {
           .find(':input').val('');
       });
   }
+}
+
+/**
+ * Clears the input values of all elements with the class "rd-group" in the given table.
+ * A confirmation prompt is shown to the user before clearing the values.
+ * 
+ * @param {jQuery} table - The jQuery object representing the table containing the groups.
+ * @returns {void}
+ */
+function clearGroup(table)
+{
+  asyncAlert(
+    'Do you want to clear the groups?',
+    'Confirmation',
+    [
+      {
+        'caption': 'Yes',
+        'fn': () => {
+          table.find(".rd-group").val("");
+        },
+        'class': 'btn-primary'
+      },
+      {
+        'caption': 'No',
+        'fn': () => { },
+        'class': 'btn-secondary'
+      }
+    ]
+  );
 }
 
 /**

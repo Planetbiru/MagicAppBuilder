@@ -24,14 +24,21 @@ $inputGet = new InputGet();
 if (isset($_POST) && !empty($_POST)) {
     // Initialize InputPost with raw data processing enabled
     $request = new InputPost(true);
-
-    // Build the JSON file path
-    $path = $activeWorkspace->getDirectory()."/applications/" . $activeApplication->getApplicationId() . "/module/" . basename($request->getModuleFile(), ".php") . ".json";
+    
+    // Build target path if it's not empty
     $target = trim($request->getTarget(), "/\\");
     if (!empty($target)) {
         $target = "/" . $target;
     }
-    $path = $activeWorkspace->getDirectory()."/applications/" . $activeApplication->getApplicationId() . "/module$target/" . basename($request->getModuleFile(), ".php") . ".json";
+
+    // Update path using sprintf for target inclusion
+    $path = sprintf(
+        "%s/applications/%s/module%s/%s.json",
+        $activeWorkspace->getDirectory(),
+        $activeApplication->getApplicationId(),
+        $target,
+        basename($request->getModuleFile(), ".php")
+    );
     
     // Ensure the directory exists
     if (!file_exists(dirname($path))) {
