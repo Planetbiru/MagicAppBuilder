@@ -168,6 +168,13 @@ class AppBuilderBase //NOSONAR
     protected $updateEntity = false;
 
     /**
+     * Cache to store option values that belong to a group.
+     *
+     * @var string[]
+     */
+    private $inGroup;
+
+    /**
      * Constructor
      *
      * Initializes the object with application and entity configurations.
@@ -3381,17 +3388,146 @@ $subqueryMap = '.$referece.';
         }
         return $input;
     }
-    
+
     /**
-     * Append a list of options to a select element from a map.
+     * Retrieves a unique list of option groups from the provided map.
      *
-     * @param DOMDocument $dom         The DOM document to which the options will be added.
-     * @param DOMElement $input        The select element to append options to.
-     * @param MagicObject $map         The map containing the options.
-     * @param string|null $selected     The optional selected value.
-     * @return DOMElement              The select element with appended options.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @return string[] A unique array of option group names.
      */
-    private function appendOptionList($dom, $input, $map, $selected = null)
+    private function getOptionGroupList($map)
+    {
+        $groups = array();
+        foreach($map as $opt)
+        {
+            $group = $opt->getGroup();
+            if($this->isNotEmpty($group))
+            {
+                $groups[] = $group;
+            }
+        }
+        return array_unique($groups);
+    }
+
+    /**
+     * Retrieves grouped options and creates corresponding DOM elements.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string[] $groups The list of option groups.
+     * @param string|null $selected The optional selected value.
+     * @return array An array of grouped DOMElement option elements.
+     */
+    private function getInGroupOption($dom, $input, $map, $groups, $selected)
+    {
+        $optionsInGroup = array();
+        foreach($groups as $group)
+        {
+            foreach($map as $opt)
+            {
+                $value = $opt->getValue();
+                if($group == $opt->getGroup())
+                {
+                    $this->inGroup[] = $value;
+                    $caption = $this->buildCaption($opt->getLabel());
+                    $option = $dom->createElement('option');
+                    $option->setAttribute('value', $value);
+                    $textLabel = $dom->createTextNode($caption);
+                    $option->appendChild($textLabel);
+                    $option = $this->addSelectAttribute($option, $opt);
+                    if($selected != null)
+                    {
+                        $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
+                        $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
+                    }
+                    else if($this->isTrue($opt->getSelected()))
+                    {
+                        $option->setAttribute('selected', 'selected');
+                    }
+                    if(!isset($optionsInGroup[$group]))
+                    {
+                        $optionsInGroup[$group] = array();
+                    }
+                    $optionsInGroup[$group][] = $option;
+                    
+                }
+            }
+        }
+        return $optionsInGroup;
+    }
+
+    /**
+     * Builds and appends grouped options to a select element.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string[] $groups The list of option groups.
+     * @param string|null $selected The optional selected value.
+     * @return void
+     */
+    private function builOptionWithGroup($dom, $input, $map, $groups, $selected = null)
+    {
+        $this->inGroup = array();
+        $optionsInGroup = $this->getInGroupOption($dom, $input, $map, $groups, $selected);
+        $optionsNotInGroup = array();
+        
+        foreach($map as $opt)
+        {
+            $value = $opt->getValue();
+            if(!in_array($value, $this->inGroup))
+            {
+                $caption = $this->buildCaption($opt->getLabel());
+                $option = $dom->createElement('option');
+                $option->setAttribute('value', $value);
+                $textLabel = $dom->createTextNode($caption);
+                $option->appendChild($textLabel);
+                $option = $this->addSelectAttribute($option, $opt);
+                if($selected != null)
+                {
+                    $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
+                    $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
+                }
+                else if($this->isTrue($opt->getSelected()))
+                {
+                    $option->setAttribute('selected', 'selected');
+                }
+                $optionsNotInGroup[] = $option;
+            }
+        }
+        foreach($optionsInGroup as $group=>$options)
+        {
+            $optGroup = $dom->createElement('optgroup');
+            $optGroup->setAttribute("label", $group);
+            foreach($options as $option)
+            {
+                $optGroup->appendChild($dom->createTextNode(self::N_TAB7));
+                $optGroup->appendChild($option);
+            }
+            $optGroup->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($optGroup);
+            
+        }
+
+        foreach($optionsNotInGroup as $option)
+        {
+            $input->appendChild($dom->createTextNode(self::N_TAB6));
+            $input->appendChild($option);
+        }
+    }
+
+    /**
+     * Builds and appends options to a select element without groups.
+     *
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string|null $selected The optional selected value.
+     * @return void
+     */
+    private function builOptionWithoutGroup($dom, $input, $map, $selected = null)
     {
         foreach($map as $opt)
         {
@@ -3407,27 +3543,56 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
                 $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
             }
-            else if($opt->isSelected())
+            else if($this->isTrue($opt->getSelected()))
             {
                 $option->setAttribute('selected', 'selected');
             }
             $input->appendChild($dom->createTextNode(self::N_TAB6));
             $input->appendChild($option);
         }
+    }
+    
+    /**
+     * Append a list of options to a select element from a map.
+     *
+     * @param DOMDocument $dom         The DOM document to which the options will be added.
+     * @param DOMElement $input        The select element to append options to.
+     * @param MagicObject $map         The map containing the options.
+     * @param string|null $selected     The optional selected value.
+     * @return DOMElement              The select element with appended options.
+     */
+    private function appendOptionList($dom, $input, $map, $selected = null)
+    {
+        $hasGroup = false;
+        $groups = $this->getOptionGroupList($map);
+        if(!empty($groups))
+        {
+            $hasGroup = true;
+        }
+        if($hasGroup)
+        {
+            $this->builOptionWithGroup($dom, $input, $map, $groups, $selected);
+        }
+        else
+        {
+            $this->builOptionWithoutGroup($dom, $input, $map, $selected);
+        }
         $input->appendChild($dom->createTextNode(self::N_TAB5));
         return $input;
     }
 
     /**
-     * Add custom attributes to a select option element.
+     * Appends a list of options to a select element based on the provided map.
      *
-     * @param DOMElement $input        The option element to which attributes will be added.
-     * @param MagicObject $opt         The option data containing additional attributes.
-     * @return DOMElement              The option element with custom attributes.
+     * @param DOMDocument $dom The DOM document to which the options will be added.
+     * @param DOMElement $input The select element to append options to.
+     * @param MagicObject[] $map The collection of objects containing options.
+     * @param string|null $selected The optional selected value.
+     * @return DOMElement The select element with appended options.
      */
     private function addSelectAttribute($input, $opt)
     {
-        $reserved = array('value', 'label', 'default');
+        $reserved = array('value', 'label', 'group', 'selected');
         $arr = $opt->valueArray();
         foreach($arr as $key=>$value)
         {
