@@ -4402,7 +4402,7 @@ $subqueryMap = '.$referece.';
         }
         if($this->appFeatures->isActivateDeactivate())
         {
-            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //active",
+            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''); //active",
         }
         if($this->appFeatures->isApprovalRequired())
         {
@@ -4439,7 +4439,7 @@ $subqueryMap = '.$referece.';
             "timeEdit"     => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_edit",
             "timeAskEdit"  => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_ask_edit",
             "sortOrder"    => array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //sort_order",
-            "active"       => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //active",
+            "active"       => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''), //active",
             "draft"        => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //draft",
             "waitingFor"   => array('Type'=>DataType::INT_4,      'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //waiting_for",
             "approvalId"   => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>'')  //approval_id",
