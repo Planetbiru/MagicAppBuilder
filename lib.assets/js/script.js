@@ -5089,9 +5089,33 @@ function removeLastColumn(table) {
   }
 }
 
+/**
+ * Clears the input values of all elements with the class "rd-group" in the given table.
+ * A confirmation prompt is shown to the user before clearing the values.
+ * 
+ * @param {jQuery} table - The jQuery object representing the table containing the groups.
+ * @returns {void}
+ */
 function clearGroup(table)
 {
-  table.find(".rd-group").val("");
+  asyncAlert(
+    'Do you want to clear the groups?',
+    'Confirmation',
+    [
+      {
+        'caption': 'Yes',
+        'fn': () => {
+          table.find(".rd-group").val("");
+        },
+        'class': 'btn-primary'
+      },
+      {
+        'caption': 'No',
+        'fn': () => { },
+        'class': 'btn-secondary'
+      }
+    ]
+  );
 }
 
 /**
