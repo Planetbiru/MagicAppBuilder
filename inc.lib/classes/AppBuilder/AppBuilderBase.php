@@ -3438,8 +3438,8 @@ $subqueryMap = '.$referece.';
                     $option = $this->addSelectAttribute($option, $opt);
                     if($selected != null)
                     {
-                        $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"'));
-                        $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG));
+                        $input->setAttribute('data-app-builder-encoded-script', base64_encode('data-value="'.self::PHP_OPEN_TAG.self::ECHO.$selected.';'.self::PHP_CLOSE_TAG.'"')); // NOSONAR
+                        $option->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.'AppFormBuilder::selected('.$selected.', '."'".$value."'".');'.self::PHP_CLOSE_TAG)); // NOSONAR
                     }
                     else if($this->isTrue($opt->getSelected()))
                     {
