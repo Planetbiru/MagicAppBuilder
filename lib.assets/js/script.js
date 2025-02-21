@@ -538,6 +538,10 @@ let initAll = function () {
     let table = $(this).closest("table");
     removeLastColumn(table);
   });
+  $(document).on("click", ".btn-clear-group", function(e){
+    let table = $(this).closest("table");
+    clearGroup(table);
+  });
 
   $(document).on("click", ".btn-add-row", function (e) {
     let table = $(this).closest("table");
@@ -5034,7 +5038,7 @@ function addColumn(table) {
     .find("tfoot")
     .find("tr")
     .find("td")
-    .attr("colspan", table.find("thead").find("tr").find("td").length);
+    .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
 }
 
 /**
@@ -5065,7 +5069,7 @@ function removeLastColumn(table) {
       .find("tfoot")
       .find("tr")
       .find("td")
-      .attr("colspan", table.find("thead").find("tr").find("td").length);
+      .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
   }
   else
   {
@@ -5083,6 +5087,11 @@ function removeLastColumn(table) {
           .find(':input').val('');
       });
   }
+}
+
+function clearGroup(table)
+{
+  table.find(".rd-group").val("");
 }
 
 /**
