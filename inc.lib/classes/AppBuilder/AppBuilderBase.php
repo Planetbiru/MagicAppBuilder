@@ -3354,13 +3354,11 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'entity')
             {    
                 $entity = $referenceData->getEntity();         
-                $specification = $entity->getSpecification();
-                $sortable = $entity->getSortable();
-                $additionalOutput = $entity->getAdditionalOutput();
+                
 
                 if(isset($entity) && $entity->getEntityName() != null && $entity->getPrimaryKey() != null && $entity->getValue())
                 {
-                    $input = $this->appendOptionEntity($dom, $input, $entity, $specification, $sortable, $selected, $additionalOutput);
+                    $input = $this->appendOptionEntity($dom, $input, $referenceData, $selected);
                 }
             }
         }
@@ -3457,17 +3455,18 @@ $subqueryMap = '.$referece.';
      *
      * @param DOMDocument $dom         The DOM document to which the options will be added.
      * @param DOMElement $input        The select element to append options to.
-     * @param MagicObject $entity      The entity providing options.
-     * @param array $specification     The specification for the entity.
-     * @param array $sortable          The sorting criteria for the entity options.
+     * @param MagicObject $referenceData
      * @param string|null $selected     The optional selected value.
-     * @param MagicObject|null $additionalOutput Optional additional output for the options.
      * @return DOMElement              The select element with appended options.
      */
-    private function appendOptionEntity($dom, $input, $entity, $specification, $sortable, $selected = null, $additionalOutput = null)
+    private function appendOptionEntity($dom, $input, $referenceData, $selected = null)
     {
+        $entity = $referenceData->getEntity();
         if($entity != null)
         {
+            $specification = $entity->getSpecification();
+            $sortable = $entity->getSortable();
+            $additionalOutput = $entity->getAdditionalOutput();
             $paramAdditionalOutput = "";
             if($additionalOutput != null && !empty($additionalOutput))
             {
@@ -3491,6 +3490,7 @@ $subqueryMap = '.$referece.';
             $val = AppBuilderBase::getStringOf(PicoStringUtil::camelize($entity->getValue()));
             $textNodeFormat = $entity->getTextNodeFormat();
             $indent = $entity->getIndent();
+            $group = $this->getOptionGroup($referenceData);
             $format = $this->getEntityOptionFormat($textNodeFormat);
             $indentStr = $this->getIndentString($indent);
             
@@ -3500,11 +3500,55 @@ $subqueryMap = '.$referece.';
             .self::NEW_LINE_N.self::TAB3.self::TAB3
             .$specStr.', '.self::NEW_LINE_N.self::TAB3.self::TAB3
             .$sortStr.', '.self::NEW_LINE_N.self::TAB3.self::TAB3
-            .$pk.', '.$val.$paramSelected.$paramAdditionalOutput.')'.$format.$indentStr.
+            .$pk.', '.$val.$paramSelected.$paramAdditionalOutput.')'.$group.$format.$indentStr.
             self::NEW_LINE_N.self::TAB3.self::TAB3.'; '.self::PHP_CLOSE_TAG.self::NEW_LINE_N.self::TAB3.self::TAB2);
             $input->appendChild($option);
         }
         return $input;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param MagicObject $referenceData
+     * @return void
+     */
+    private function getOptionGroup($referenceData)
+    {
+        $result = "";
+        $group = $referenceData->getGroup();
+        error_log($referenceData);
+        if(isset($group) && !empty($group))
+        {
+            $value = $group->getValue();
+            $label = $group->getLabel();
+            $source = $group->getSource();
+            $entity = $group->getEntity();
+            $map = $group->getMap();
+            if($source == "map" && $map != null && !empty($map))
+            {
+                $arguments = sprintf('$%s, $%s, %s', $value, $label, var_export($map, true));
+                $result = self::NEW_LINE_N.self::TAB3.self::TAB3."->setGroup($arguments)";
+            }
+            else if($this->isNotEmpty($value) && $this->isNotEmpty($label) && $this->isNotEmpty($entity))
+            {
+                $arguments = sprintf('$%s, $%s, $%s', $value, $label, $entity);
+                $result = self::NEW_LINE_N.self::TAB3.self::TAB3."->setGroup($arguments)";
+            }
+            
+        }
+        return $result;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param mixed $value
+     * @return boolean
+     */
+    private function isNotEmpty($value)
+    {
+        return $value != null && !empty($value);
     }
 
     /**
