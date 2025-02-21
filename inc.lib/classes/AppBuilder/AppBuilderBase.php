@@ -3579,7 +3579,15 @@ $subqueryMap = '.$referece.';
     {
         $result = array();
         foreach ($array as $v) {
-            $result[$v["value"]] = $v["label"];
+            if(isset($v["value"]))
+            {
+                if(!isset($v["label"]))
+                {
+                    $v["label"] = $v["value"];
+                }
+                $result[$v["value"]] = $v["label"];
+            }
+            
         }
         return $result;
     }
