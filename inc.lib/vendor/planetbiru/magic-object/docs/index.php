@@ -1158,9 +1158,7 @@ if (is_dir($srcDir)) {
 </div>
 <script src="highlight.min.js"></script>
 <script>
-    // Menyorot kode setelah halaman dimuat
     hljs.highlightAll();
-
 </script>
 </body>
 </html>

@@ -1676,14 +1676,14 @@ class PicoDatabasePersistence // NOSONAR
                 // get from map
                 $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $maps[$field], $entityTable == $masterTable);
                 $columnFinal = $this->formatColumn($column, $functionFormat);
-                $arr[] = $spec->getFilterLogic() . " " . $columnFinal . " " . $spec->getComparation()->getComparison() . " " . $this->contructComparisonValue($spec, $sqlQuery);
+                $arr[] = $this->constructSpecificationQuery($sqlQuery, $spec, $columnFinal);
             }
             else if(in_array($field, $columnNames))
             {
                 // get colum name
                 $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $field, $entityTable == $masterTable);
                 $columnFinal = $this->formatColumn($column, $functionFormat);
-                $arr[] = $spec->getFilterLogic() . " " . $columnFinal . " " . $spec->getComparation()->getComparison() . " " . $this->contructComparisonValue($spec, $sqlQuery);
+                $arr[] = $this->constructSpecificationQuery($sqlQuery, $spec, $columnFinal);
             }
         }
         else if($spec instanceof PicoSpecification)
@@ -1692,6 +1692,35 @@ class PicoDatabasePersistence // NOSONAR
             $arr[] = $spec->getParentFilterLogic() . " (" . $this->createWhereFromSpecification($sqlQuery, $spec, $info) . ")";
         }
         return $arr;
+    }
+
+    /**
+     * Constructs an SQL query fragment based on the given specification.
+     *
+     * @param PicoDatabaseQueryBuilder $sqlQuery Query builder instance.
+     * @param PicoSpecification $spec Specification containing comparison logic and values.
+     * @param string $columnFinal The database column to be compared.
+     * @return string The constructed SQL query fragment.
+     */
+    private function constructSpecificationQuery($sqlQuery, $spec, $columnFinal)
+    {
+        if($spec->getComparation()->getComparison() == PicoDataComparation::BETWEEN && is_array($spec->getValue()) && count($spec->getValue()) > 1)
+        {
+            $values = $spec->getValue();
+            $min = $values[0];
+            $max = end($values);
+            $str = $spec->getFilterLogic() . " ( " 
+            . $columnFinal . " >= " . $sqlQuery->escapeValue($min)
+            . " AND "
+            . $columnFinal . " <= " . $sqlQuery->escapeValue($max)
+            . " )"
+            ;
+        }
+        else
+        {
+            $str = $spec->getFilterLogic() . " " . $columnFinal . " " . $spec->getComparation()->getComparison() . " " . $this->contructComparisonValue($spec, $sqlQuery);
+        }
+        return $str;
     }
     
     /**
