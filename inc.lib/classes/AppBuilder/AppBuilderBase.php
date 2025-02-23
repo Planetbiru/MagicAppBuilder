@@ -3142,8 +3142,8 @@ $subqueryMap = '.$referece.';
             $classes = array();
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
-
-            $multipleSelect = self::isTrue($referenceData->getMultipleSelection());
+            
+            $multipleSelect = isset($referenceData) ? self::isTrue($referenceData->getMultipleSelection()) : false;
 
             if($multipleSelect)
             {
@@ -3261,7 +3261,7 @@ $subqueryMap = '.$referece.';
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
 
-            $multipleSelect = self::isTrue($referenceData->getMultipleSelection());
+            $multipleSelect = isset($referenceData) ? self::isTrue($referenceData->getMultipleSelection()) : false;
 
             if($multipleSelect)
             {
