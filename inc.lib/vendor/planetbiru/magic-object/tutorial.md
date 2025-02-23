@@ -7403,6 +7403,8 @@ Methods:
 - greaterThan(string $fieldName, string|integer|float $value)
 - lessThanOrEquals(string $fieldName, string|integer|float $value)
 - greaterThanOrEquals(string $fieldName, string|integer|float $value)
+- between(string $fieldName, string|integer|float $min, string|integer|float $max)
+- inRange(string $fieldName, mixed[] $value)
 
 Static Methods:
 - getInstance()

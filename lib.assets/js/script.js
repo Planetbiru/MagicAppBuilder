@@ -4614,37 +4614,34 @@ function generateSelectFilter(field, args)  //NOSONAR
     ],
   };
 
-  virtualDOM = $(
-    '<select class="form-control input-data-filter" name="filter_type_' +
-    field +
-    '" id="filter_type_' +
-    field +
-    '">\r\n' +
-    '<option value="FILTER_DEFAULT">DEFAULT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_BOOL">BOOL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_INT">NUMBER_INT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_UINT">NUMBER_UINT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_OCTAL">NUMBER_OCTAL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_HEXADECIMAL">NUMBER_HEXADECIMAL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_FLOAT">NUMBER_FLOAT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING">STRING</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING_INLINE">STRING_INLINE</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NO_DOUBLE_SPACE">NO_DOUBLE_SPACE</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRIPPED">STRIPPED</option>\r\n' +
-    '<option value="FILTER_SANITIZE_SPECIAL_CHARS">SPECIAL_CHARS</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHA">ALPHA</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHANUMERIC">ALPHANUMERIC</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHANUMERICPUNC">ALPHANUMERICPUNC</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING_BASE64">STRING_BASE64</option>\r\n' +
-    '<option value="FILTER_SANITIZE_EMAIL">EMAIL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_URL">URL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_IP">IP</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ENCODED">ENCODED</option>\r\n' +
-    '<option value="FILTER_SANITIZE_COLOR">COLOR</option>\r\n' +
-    '<option value="FILTER_SANITIZE_MAGIC_QUOTES">MAGIC_QUOTES</option>\r\n' +
-    '<option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>\r\n' +
-    "</select>\r\n"
-  );
+  virtualDOM = $(`
+    <select class="form-control input-data-filter" name="filter_type_${field}" id="filter_type_${field}">
+        <option value="FILTER_DEFAULT">DEFAULT</option>
+        <option value="FILTER_SANITIZE_BOOL">BOOL</option>
+        <option value="FILTER_SANITIZE_NUMBER_INT">NUMBER_INT</option>
+        <option value="FILTER_SANITIZE_NUMBER_UINT">NUMBER_UINT</option>
+        <option value="FILTER_SANITIZE_NUMBER_OCTAL">NUMBER_OCTAL</option>
+        <option value="FILTER_SANITIZE_NUMBER_HEXADECIMAL">NUMBER_HEXADECIMAL</option>
+        <option value="FILTER_SANITIZE_NUMBER_FLOAT">NUMBER_FLOAT</option>
+        <option value="FILTER_SANITIZE_STRING">STRING</option>
+        <option value="FILTER_SANITIZE_STRING_INLINE">STRING_INLINE</option>
+        <option value="FILTER_SANITIZE_NO_DOUBLE_SPACE">NO_DOUBLE_SPACE</option>
+        <option value="FILTER_SANITIZE_STRIPPED">STRIPPED</option>
+        <option value="FILTER_SANITIZE_SPECIAL_CHARS">SPECIAL_CHARS</option>
+        <option value="FILTER_SANITIZE_ALPHA">ALPHA</option>
+        <option value="FILTER_SANITIZE_ALPHANUMERIC">ALPHANUMERIC</option>
+        <option value="FILTER_SANITIZE_ALPHANUMERICPUNC">ALPHANUMERICPUNC</option>
+        <option value="FILTER_SANITIZE_STRING_BASE64">STRING_BASE64</option>
+        <option value="FILTER_SANITIZE_EMAIL">EMAIL</option>
+        <option value="FILTER_SANITIZE_URL">URL</option>
+        <option value="FILTER_SANITIZE_IP">IP</option>
+        <option value="FILTER_SANITIZE_ENCODED">ENCODED</option>
+        <option value="FILTER_SANITIZE_COLOR">COLOR</option>
+        <option value="FILTER_SANITIZE_MAGIC_QUOTES">MAGIC_QUOTES</option>
+        <option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>
+    </select>
+  `);
+
 
   let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";
@@ -4749,27 +4746,25 @@ function generateSelectType(field, args) {
     ],
   };
 
-  virtualDOM = $(
-    '<select class="form-control input-field-data-type" name="data_type_' +
-    field +
-    '" id="data_type_' +
-    field +
-    '">\r\n' +
-    '<option value="text" title="&lt;input type=&quot;text&quot;&gt;">text</option>\r\n' +
-    '<option value="email" title="&lt;input type=&quot;email&quot;&gt;">email</option>\r\n' +
-    '<option value="url" title="&lt;input type=&quot;url&quot;&gt;">url</option>\r\n' +
-    '<option value="tel" title="&lt;input type=&quot;tel&quot;&gt;">tel</option>\r\n' +
-    '<option value="password" title="&lt;input type=&quot;password&quot;&gt;">password</option>\r\n' +
-    '<option value="int" title="&lt;input type=&quot;number&quot;&gt;">int</option>\r\n' +
-    '<option value="float" title="&lt;input type=&quot;number&quot; step=&quot;any&quot;&gt;">float</option>\r\n' +
-    '<option value="date" title="&lt;input type=&quot;text&date;&gt;">date</option>\r\n' +
-    '<option value="time" title="&lt;input type=&quot;time&quot;&gt;">time</option>\r\n' +
-    '<option value="datetime-local" title="&lt;input type=&quot;datetime-local&quot;&gt;">datetime</option>\r\n' +
-    '<option value="week" title="&lt;input type=&quot;month&quot;&gt;">month</option>\r\n' +
-    '<option value="week" title="&lt;input type=&quot;week&quot;&gt;">week</option>\r\n' +
-    '<option value="color" title="&lt;input type=&quot;color&quot;&gt;">color</option>\r\n' +
-    "</select>\r\n"
-  );
+  virtualDOM = $(`
+    <select class="form-control input-field-data-type" name="data_type_${field}" id="data_type_${field}">
+        <option value="text" title="&lt;input type=&#39;text&#39;&gt;">text</option>
+        <option value="email" title="&lt;input type=&#39;email&#39;&gt;">email</option>
+        <option value="url" title="&lt;input type=&#39;url&#39;&gt;">url</option>
+        <option value="tel" title="&lt;input type=&#39;tel&#39;&gt;">tel</option>
+        <option value="password" title="&lt;input type=&#39;password&#39;&gt;">password</option>
+        <option value="int" title="&lt;input type=&#39;number&#39;&gt;">int</option>
+        <option value="float" title="&lt;input type=&#39;number&#39; step=&#39;any&#39;&gt;">float</option>
+        <option value="date" title="&lt;input type=&#39;date&#39;&gt;">date</option>
+        <option value="time" title="&lt;input type=&#39;time&#39;&gt;">time</option>
+        <option value="datetime-local" title="&lt;input type=&#39;datetime-local&#39;&gt;">datetime</option>
+        <option value="month" title="&lt;input type=&#39;month&#39;&gt;">month</option>
+        <option value="week" title="&lt;input type=&#39;week&#39;&gt;">week</option>
+        <option value="color" title="&lt;input type=&#39;color&#39;&gt;">color</option>
+    </select>
+  `);
+
+
 
   let i;
   let j;
@@ -4862,82 +4857,112 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
   let listRow = "";
   let exportRow = "";
   if ($.inArray(field, skippedOnInsertEdit) != -1) {
-    insertRow =
-      '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
-      field +
-      '" value="0" disabled="disabled"></td>\r\n';
-    editRow =
-      '  <td align="center"><input type="checkbox" class="include_edit" name="include_edit_' +
-      field +
-      '" value="0" disabled="disabled"></td>\r\n';
-    listRow =
-      '  <td align="center"><input type="checkbox" class="include_list" name="include_list_' +
-      field +
-      '" value="1"></td>\r\n';
+    insertRow = `
+      <td align="center">
+        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="0" disabled="disabled">
+      </td>
+    `;
+
+    editRow = `
+      <td align="center">
+        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="0" disabled="disabled">
+      </td>
+    `;
+
+    listRow = `
+      <td align="center">
+        <input type="checkbox" class="include_list" name="include_list_${field}" value="1">
+      </td>
+    `;
+
   } else {
-    insertRow =
-      '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
-    editRow =
-      '  <td align="center"><input type="checkbox" class="include_edit" name="include_edit_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
-    listRow =
-      '  <td align="center"><input type="checkbox" class="include_list" name="include_list_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
+    insertRow = `
+      <td align="center">
+        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="1" checked="checked">
+      </td>
+    `;
+
+    editRow = `
+      <td align="center">
+        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="1" checked="checked">
+      </td>
+    `;
+
+    listRow = `
+      <td align="center">
+        <input type="checkbox" class="include_list" name="include_list_${field}" value="1" checked="checked">
+      </td>
+    `;
+
   }
 
-  exportRow =
-    '  <td align="center"><input type="checkbox" class="include_export" name="include_export_' +
-    field +
-    '" value="1" checked="checked"></td>\r\n';
+  exportRow = `
+    <td align="center">
+      <input type="checkbox" class="include_export" name="include_export_${field}" value="1" checked="checked">
+    </td>
+  `;
 
-  let rowHTML =
-    '<tr data-field-name="' +
-    field +
-    '" ' +
-    cls +
-    ">\r\n" +
-    '  <td class="data-sort data-sort-body data-sort-handler"></td>\r\n' +
-    '  <td class="field-name">' +
-    field +
-    '<input type="hidden" name="field" value="' +
-    field +
-    '"></td>\r\n' +
-    '  <td><input type="hidden" class="input-field-name" name="caption_' +
-    field +
-    '" value="' + field.replaceAll("_", " ").capitalize().prettify().trim() + '" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
-    insertRow + editRow +
-    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' + field + '" value="1" checked="checked"></td>\r\n' +
-    listRow +
-    exportRow +
-    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' + field + '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' + field + '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="text" checked="checked"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="textarea"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="checkbox"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="select"></td>\r\n' +
-    '  <td align="center"><input type="hidden" class="reference-data" name="reference_data_' +
-    field +
-    '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button></td>\r\n' +
-    '  <td align="center"><input type="checkbox" name="list_filter_' +
-    field +
-    '" value="text" class="input-field-filter"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" name="list_filter_' +
-    field +
-    '" value="select" class="input-field-filter"></td>\r\n' +
-    '  <td align="center"><input type="hidden" class="reference-filter" name="reference_filter_' +
-    field +
-    '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference_button_filter">Source</button></td>\r\n' +
-    "  <td>\r\n" +
-    generateSelectType(field, args) +
-    "  </td>\r\n" +
-    "  <td>\r\n" +
-    generateSelectFilter(field, args) +
-    "  </td>\r\n" +
-    "</tr>\r\n";
+  let rowHTML = `
+    <tr data-field-name="${field}" ${cls}>
+      <td class="data-sort data-sort-body data-sort-handler"></td>
+      <td class="field-name">
+        ${field}
+        <input type="hidden" name="field" value="${field}">
+      </td>
+      <td>
+        <input type="hidden" class="input-field-name" name="caption_${field}" 
+          value="${field.replaceAll("_", " ").capitalize().prettify().trim()}" 
+          autocomplete="off" spellcheck="false">
+        ${field.replaceAll("_", " ").capitalize().prettify().trim()}
+      </td>
+      ${insertRow} ${editRow}
+      <td align="center">
+        <input type="checkbox" class="include_detail" name="include_detail_${field}" value="1" checked="checked">
+      </td>
+      ${listRow}
+      ${exportRow}
+      <td align="center">
+        <input type="checkbox" class="include_key" name="include_key_${field}" value="1">
+      </td>
+      <td align="center">
+        <input type="checkbox" class="include_required" name="include_required_${field}" value="1">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="text" checked="checked">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="textarea">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="checkbox">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="select">
+      </td>
+      <td align="center">
+        <input type="hidden" class="reference-data" name="reference_data_${field}" value="{}">
+        <button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button>
+      </td>
+      <td align="center">
+        <input type="checkbox" name="list_filter_${field}" value="text" class="input-field-filter">
+      </td>
+      <td align="center">
+        <input type="checkbox" name="list_filter_${field}" value="select" class="input-field-filter">
+      </td>
+      <td align="center">
+        <input type="hidden" class="reference-filter" name="reference_filter_${field}" value="{}">
+        <button type="button" class="btn btn-sm btn-primary reference-button reference_button_filter">Source</button>
+      </td>
+      <td>
+        ${generateSelectType(field, args)}
+      </td>
+      <td>
+        ${generateSelectFilter(field, args)}
+      </td>
+    </tr>
+  `;
+
+
   return rowHTML;
 }
 
