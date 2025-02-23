@@ -654,13 +654,25 @@ Used to order the data in the select element:
 - **Column Name**: The property name in the entity.
 - **Value**: The sort order (ASC or DESC).
 
-#### Additional Output:
 
-Used to display multiple columns in the option label in the select element.
+#### Grouping:
+
+Used to group options in the dropdown.
+
+1.  If the dropdown source is **Entity**, grouping can be done using another entity referenced by the source entity.
+    
+    -   **Value**: The property from the referenced entity that is referred to by the source entity of the dropdown.
+    -   **Label**: The property from the referenced entity that will be used as the label for the option group in the dropdown. The label is only used if the group source is an **Entity**.
+    -   **Reference**: The data source for the option group in the dropdown. If the dropdown source is an **Entity**, then **Reference** is the property from the source entity that acts as the source for the option group. If the dropdown source is a **Map**, then **Reference** is a pair of **Value** and **Label**. All dropdown options that have the same **Value** will be grouped under the label **Label**.
+2.  If the dropdown source is **Map**, grouping can be done using the **Group** column, which can be filled directly in the map.
 
 #### Selection:
 
 Indicates whether the select element will allow single or multiple selections.
+
+#### Additional Output:
+
+Used to display multiple columns in the option label in the select element.
 
 #### 2. **Map**:
 
