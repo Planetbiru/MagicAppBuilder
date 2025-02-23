@@ -680,6 +680,7 @@ If the user selects **Map**, MagicAppBuilder will show a form with the following
 
 - **Value**: The value of the option.
 - **Label**: The label for the option.
+- **Group**: The label for the option group.
 
 The user can enter multiple options for the map.
 
