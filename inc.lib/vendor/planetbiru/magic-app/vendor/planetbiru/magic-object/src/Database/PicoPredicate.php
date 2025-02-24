@@ -117,6 +117,41 @@ class PicoPredicate // NOSONAR
     }
 
     /**
+     * Sets an IN RANGE condition.
+     *
+     * @param string $field The name of the field to compare.
+     * @param array $values An array containing the lower and upper boundaries of the range.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function inRange($field, $values)
+    {
+        if (!empty($values)) {
+            $this->field = $field;
+            $this->value = $values;
+            $this->comparation = PicoDataComparation::inRange($values);
+        }
+        return $this;
+    }
+
+    /**
+     * Sets a BETWEEN condition.
+     *
+     * @param string $field The name of the field to compare.
+     * @param mixed $min The lower boundary of the range.
+     * @param mixed $max The upper boundary of the range.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function between($field, $min, $max)
+    {
+        if (!empty($min) && !empty($max)) {
+            $this->field = $field;
+            $this->value = array($min, $max);
+            $this->comparation = PicoDataComparation::between($min, $max);
+        }
+        return $this;
+    }
+
+    /**
      * Set a NOT IN condition.
      *
      * @param string $field The name of the field.
