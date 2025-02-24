@@ -23,7 +23,7 @@ class PicoDataComparation // NOSONAR
     const EQUALS                 = "=";
     const NOT_EQUALS             = "!=";
     const IN                     = "in";
-    const BETWEEN                = "beetween";
+    const BETWEEN                = "between";
     const NOT_IN                 = "not in";
     const IS                     = "is";
     const IS_NOT                 = "is not";

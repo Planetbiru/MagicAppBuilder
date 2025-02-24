@@ -1,7 +1,8 @@
 <?php
 
 use MagicObject\Database\PicoDatabase;
-use MagicObject\Generator\PicoDatabaseDump;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
@@ -622,7 +623,7 @@ class Artist extends MagicObject
 }
 
 $databaseCredential = new SecretObject();
-$databaseCredential->loadYamlFile(dirname(dirname(__DIR__))."/test.yml", false, true, true);
+$databaseCredential->loadYamlFile(dirname(dirname(__DIR__))."/test.yml.txt", false, true, true);
 $database = new PicoDatabase($databaseCredential->getDatabase(), function(){}, function($sql){
 	// echo $sql;
 });
@@ -728,10 +729,16 @@ try
 		
 	
 	//echo $r;
+	$database->setCallbackDebugQuery(function($sql)
+	{
+		echo $sql;
+	});
 	
 
+	$specs = PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->between('name', "Album 2", 'Album 4'));
 	
-	$result = $album->findAll(null, null, null, true, $subqueryMap);
+	$result = $album->findAll($specs, null, null, true, $subqueryMap);
 	
 	foreach($result->getResult() as $row)
 	{

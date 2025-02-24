@@ -173,5 +173,52 @@ class PicoArrayUtil
 
         return $normalizedArray;
     }
+    
+    /**
+     * Recursively converts string "true"/"false"/"null" to actual boolean/null values
+     * and converts numeric string keys to integer keys.
+     *
+     * This function will iterate over each element of the given array and perform the following:
+     * 1. Converts string `"true"` to boolean `true`, string `"false"` to boolean `false`, 
+     *    and string `"null"` to the `null` value.
+     * 2. Converts string keys representing numbers (e.g., "0", "1", "2") into actual integers (e.g., 0, 1, 2).
+     * 3. Recursively processes nested arrays if present.
+     *
+     * @param array &$array The input array which will be modified in-place. The function updates
+     *                      the original array by converting string values and keys as described.
+     *
+     * @return void This function modifies the array by reference and does not return any value.
+     */
+    public static function normalizeArray(&$array) {
+        foreach ($array as $key => &$value) {
+            // Convert string keys that represent numbers into actual integers
+            if (is_string($key) && is_numeric($key)) {
+                $key = (int)$key;
+            }
+
+            if (is_array($value)) {
+                // Recursively process nested arrays
+                self::normalizeArray($value);
+            } else {
+                // Replace string "true" with boolean true, "false" with boolean false, and "null" with null
+                if ($value === "true") {
+                    $value = true;
+                } elseif ($value === "false") {
+                    $value = false;
+                } elseif ($value === "null") {
+                    $value = null;
+                }
+            }
+
+            // Reassign the converted key back
+            $array[$key] = $value;
+
+            // Remove the original string key if it was a numeric string
+            if (is_numeric($key) && !is_int($key)) {
+                unset($array[$key]);
+            }
+        }
+    }
+
 
 }
