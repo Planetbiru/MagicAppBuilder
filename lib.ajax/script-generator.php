@@ -23,7 +23,7 @@ header("Content-type: application/json");
 $inputGet = new InputGet();
 if (isset($_POST) && !empty($_POST)) {
     // Initialize InputPost with raw data processing enabled
-    $request = new InputPost(true, true);
+    $request = new InputPost(true, false);
     
     // Build target path if it's not empty
     $target = trim($request->getTarget(), "/\\");

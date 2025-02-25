@@ -1866,6 +1866,43 @@ let initAll = function () {
     });
     inputFile.click();
   });
+  
+  $(document).on('change', '.input-element-type', function(e1){
+    if($(this)[0].checked)
+    {
+      let tr = $(this).closest('tr');
+      if($(this).val() == 'text' || $(this).val() == 'select')
+      {
+        tr.find('.input-multiple-data')[0].disabled = false;
+      }
+      else
+      {
+        tr.find('.input-multiple-data')[0].disabled = true;
+        tr.find('.input-multiple-data')[0].checked = false;
+      }
+    }
+  });
+  
+  $(document).on('change', '.input-field-filter', function(e1){
+    let tr = $(this).closest('tr');
+    if($(this)[0].checked)
+    {
+      if($(this).val() == 'text' || $(this).val() == 'select')
+      {
+        tr.find('.input-multiple-filter')[0].disabled = false;
+      }
+      else
+      {
+        tr.find('.input-multiple-filter')[0].disabled = true;
+        tr.find('.input-multiple-filter')[0].checked = false;
+      }
+    }
+    else
+    {
+      tr.find('.input-multiple-filter')[0].disabled = true;
+      tr.find('.input-multiple-filter')[0].checked = false;
+    }
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -3869,6 +3906,9 @@ function generateScript(selector) {
       let referenceFilter = parseJsonData(
         $(this).find("input.reference-filter").val()
       );
+      
+      let multipleData = $(this).find("input.input-multiple-data")[0].checked;
+      let multipleFilter = $(this).find("input.input-multiple-filter")[0].checked;
 
       let field = {
         fieldName: fieldName,
@@ -3886,6 +3926,8 @@ function generateScript(selector) {
         inputFilter: inputFilter,
         referenceData: referenceData,
         referenceFilter: referenceFilter,
+        multipleData: multipleData,
+        multipleFilter: multipleFilter
       };
       fields.push(field);
     });
@@ -4337,6 +4379,17 @@ function loadColumn(tableName, selector) {
 }
 
 /**
+ * Checks if a value is true (either boolean true or string 'true').
+ *
+ * @param {any} value - The value to check.
+ * @returns {boolean} - Returns true if value is boolean true or string 'true', otherwise false.
+ */
+function isTrue(value)
+{
+  return value === true || value == 'true';
+}
+
+/**
  * Restores the form data from a given object.
  *
  * This function takes a data object containing configuration settings
@@ -4369,13 +4422,13 @@ function restoreForm(data)  //NOSONAR
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
 
-          tr.find('.include_insert')[0].checked = data.fields[i].includeInsert === true || data.fields[i].includeInsert == 'true';
-          tr.find('.include_edit')[0].checked = data.fields[i].includeEdit === true || data.fields[i].includeEdit == 'true';
-          tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
-          tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
-          tr.find('.include_export')[0].checked = data.fields[i].includeExport === true || data.fields[i].includeExport == 'true';
-          tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
-          tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
+          tr.find('.include_insert')[0].checked = this.isTrue(data.fields[i].includeInsert);
+          tr.find('.include_edit')[0].checked = this.isTrue(data.fields[i].includeEdit);
+          tr.find('.include_detail')[0].checked = this.isTrue(data.fields[i].includeDetail);
+          tr.find('.include_list')[0].checked = this.isTrue(data.fields[i].includeList);
+          tr.find('.include_export')[0].checked = this.isTrue(data.fields[i].includeExport);
+          tr.find('.include_key')[0].checked = this.isTrue(data.fields[i].isKey);
+          tr.find('.include_required')[0].checked = this.isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
 
           if (data.fields[i].elementType == 'select') {
@@ -4391,13 +4444,40 @@ function restoreForm(data)  //NOSONAR
           if (data.fields[i].filterElementType == 'text') {
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
           }
-
-          tr.find('.input-field-data-type').val(data.fields[i].dataType)
-          tr.find('.input-data-filter').val(data.fields[i].inputFilter)
+          
+          if(data.fields[i].elementType == 'text' || data.fields[i].elementType == 'select')
+          {
+            tr.find('.input-multiple-data')[0].disabled = false;
+            if(this.isTrue(data.fields[i].multipleData))
+            {
+              tr.find('.input-multiple-data')[0].checked = 1;
+            }
+          }
+          else
+          {
+            tr.find('.input-multiple-data')[0].disabled = true;
+          }
+          
+          if(data.fields[i].filterElementType == 'text' || data.fields[i].filterElementType == 'select')
+          {
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            if(this.isTrue(data.fields[i].multipleFilter))
+            {
+              tr.find('.input-multiple-filter')[0].checked = 1;
+            }
+          }
+          else
+          {
+            tr.find('.input-multiple-filter')[0].disabled = true;
+          }
+          
+          tr.find('.input-field-data-type').val(data.fields[i].dataType);
+          tr.find('.input-data-filter').val(data.fields[i].inputFilter);
         }
       }
     }
   }
+
 
   let cnt;
   let selector;
@@ -4944,6 +5024,9 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
         <button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button>
       </td>
       <td align="center">
+        <input type="checkbox" class="input-multiple-data" name="multiple_data_${field}" value="1">
+      </td>
+      <td align="center">
         <input type="checkbox" name="list_filter_${field}" value="text" class="input-field-filter">
       </td>
       <td align="center">
@@ -4952,6 +5035,9 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       <td align="center">
         <input type="hidden" class="reference-filter" name="reference_filter_${field}" value="{}">
         <button type="button" class="btn btn-sm btn-primary reference-button reference_button_filter">Source</button>
+      </td>
+      <td align="center">
+        <input type="checkbox" class="input-multiple-filter" name="multiple_filter_${field}" value="1" disabled="disabled">
       </td>
       <td>
         ${generateSelectType(field, args)}
@@ -4980,7 +5066,6 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
  *   - yesno: Placeholder for yes/no data (currently null).
  *   - truefalse: Placeholder for true/false data (currently null).
  *   - onezero: Placeholder for one/zero data (currently null).
- *   - multipleSelection: The value from the multiple selection dropdown.
  */
 function serializeForm() {
   let type = null;
@@ -4989,7 +5074,6 @@ function serializeForm() {
       type = $(this).val();
     }
   });
-  let multipleSelection = $(".multiple-selection").val();
   let entity = getEntityData();
   let map = getMapData();
   let yesno = null;
@@ -5001,8 +5085,7 @@ function serializeForm() {
     map: map,
     yesno: yesno,
     truefalse: truefalse,
-    onezero: onezero,
-    multipleSelection: multipleSelection
+    onezero: onezero
   };
   return all;
 }
@@ -5201,11 +5284,6 @@ function setEntityData(data) {
   $(selector).find(".rd-reference-property-name").val(entity.propertyName);
   $(selector).find(".rd-option-text-node-format").val(entity.textNodeFormat);
   $(selector).find(".rd-option-indent").val(entity.indent);
-  let multiple = data.multipleSelection || '0';
-  if (multiple != '1') {
-    multiple = '0';
-  }
-  $('.multiple-selection').val(multiple);
 
   setSpecificationData(data);
   setSortableData(data);
@@ -5686,7 +5764,6 @@ function setLanguage(languages) {
  * - Entity details (name, table name, primary key, etc.)
  * - Map details (value, label, additional attributes)
  * - Specification, sortable, and additional output configurations.
- * - Selection method (single or multiple) for both entity and map sections.
  *
  * @returns {string} The HTML string for the reference configuration form.
  */
