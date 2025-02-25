@@ -1871,7 +1871,7 @@ let initAll = function () {
     if($(this)[0].checked)
     {
       let tr = $(this).closest('tr');
-      if($(this).val() == 'text' || $(this).val() == 'select')
+      if(isSupportMultiple($(this).val()))
       {
         tr.find('.input-multiple-data')[0].disabled = false;
       }
@@ -1887,7 +1887,7 @@ let initAll = function () {
     let tr = $(this).closest('tr');
     if($(this)[0].checked)
     {
-      if($(this).val() == 'text' || $(this).val() == 'select')
+      if(isSupportMultiple($(this).val()))
       {
         tr.find('.input-multiple-filter')[0].disabled = false;
       }
@@ -4390,6 +4390,17 @@ function isTrue(value)
 }
 
 /**
+ * Checks if a given value supports multiple selection.
+ *
+ * @param {string} value - The value to check.
+ * @returns {boolean} - Returns true if the value is 'text' or 'select', otherwise false.
+ */
+function isSupportMultiple(value)
+{
+  return value == 'text' || value == 'select';
+}
+
+/**
  * Restores the form data from a given object.
  *
  * This function takes a data object containing configuration settings
@@ -4422,13 +4433,13 @@ function restoreForm(data)  //NOSONAR
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
 
-          tr.find('.include_insert')[0].checked = this.isTrue(data.fields[i].includeInsert);
-          tr.find('.include_edit')[0].checked = this.isTrue(data.fields[i].includeEdit);
-          tr.find('.include_detail')[0].checked = this.isTrue(data.fields[i].includeDetail);
-          tr.find('.include_list')[0].checked = this.isTrue(data.fields[i].includeList);
-          tr.find('.include_export')[0].checked = this.isTrue(data.fields[i].includeExport);
-          tr.find('.include_key')[0].checked = this.isTrue(data.fields[i].isKey);
-          tr.find('.include_required')[0].checked = this.isTrue(data.fields[i].isInputRequired);
+          tr.find('.include_insert')[0].checked = isTrue(data.fields[i].includeInsert);
+          tr.find('.include_edit')[0].checked = isTrue(data.fields[i].includeEdit);
+          tr.find('.include_detail')[0].checked = isTrue(data.fields[i].includeDetail);
+          tr.find('.include_list')[0].checked = isTrue(data.fields[i].includeList);
+          tr.find('.include_export')[0].checked = isTrue(data.fields[i].includeExport);
+          tr.find('.include_key')[0].checked = isTrue(data.fields[i].isKey);
+          tr.find('.include_required')[0].checked = isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
 
           if (data.fields[i].elementType == 'select') {
@@ -4445,10 +4456,10 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
           }
           
-          if(data.fields[i].elementType == 'text' || data.fields[i].elementType == 'select')
+          if(isSupportMultiple(data.fields[i].elementType))
           {
             tr.find('.input-multiple-data')[0].disabled = false;
-            if(this.isTrue(data.fields[i].multipleData))
+            if(isTrue(data.fields[i].multipleData))
             {
               tr.find('.input-multiple-data')[0].checked = 1;
             }
@@ -4458,10 +4469,10 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-multiple-data')[0].disabled = true;
           }
           
-          if(data.fields[i].filterElementType == 'text' || data.fields[i].filterElementType == 'select')
+          if(isSupportMultiple(data.fields[i].filterElementType))
           {
             tr.find('.input-multiple-filter')[0].disabled = false;
-            if(this.isTrue(data.fields[i].multipleFilter))
+            if(isTrue(data.fields[i].multipleFilter))
             {
               tr.find('.input-multiple-filter')[0].checked = 1;
             }
@@ -4560,36 +4571,35 @@ function restoreForm(data)  //NOSONAR
   if (typeof data.features != 'undefined') {
 
     if ($('#modal-module-features [name="subquery"]').length) {
-      $('#modal-module-features [name="subquery"]')[0].checked = data.features.subquery === true || data.features.subquery == 'true';
+      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
     }
 
     if ($('#modal-module-features [name="activate_deactivate"]').length) {
-      $('#modal-module-features [name="activate_deactivate"]')[0].checked = data.features.activateDeactivate === true || data.features.activateDeactivate == 'true';
+      $('#modal-module-features [name="activate_deactivate"]')[0].checked = isTrue(data.features.activateDeactivate);
     }
 
     if ($('#modal-module-features [name="manualsortorder"]').length) {
-      $('#modal-module-features [name="manualsortorder"]')[0].checked = data.features.sortOrder === true || data.features.sortOrder == 'true';
+      $('#modal-module-features [name="manualsortorder"]')[0].checked = isTrue(data.features.sortOrder);
     }
 
     if ($('#modal-module-features [name="export_to_excel"]').length) {
-      $('#modal-module-features [name="export_to_excel"]')[0].checked = data.features.exportToExcel === true || data.features.exportToExcel == 'true';
+      $('#modal-module-features [name="export_to_excel"]')[0].checked = isTrue(data.features.exportToExcel);
     }
 
     if ($('#modal-module-features [name="export_to_csv"]').length) {
-      $('#modal-module-features [name="export_to_csv"]')[0].checked = data.features.exportToCsv === true || data.features.exportToCsv == 'true';
+      $('#modal-module-features [name="export_to_csv"]')[0].checked = isTrue(data.features.exportToCsv);
     }
 
-
     if ($('#modal-module-features [name="with_approval"]').length) {
-      $('#modal-module-features [name="with_approval"]')[0].checked = data.features.approvalRequired === true || data.features.approvalRequired == 'true';
+      $('#modal-module-features [name="with_approval"]')[0].checked = isTrue(data.features.approvalRequired);
     }
 
     if ($('#modal-module-features [name="with_approval_note"]').length) {
-      $('#modal-module-features [name="with_approval_note"]')[0].checked = data.features.approvalNote === true || data.features.approvalNote == 'true';
+      $('#modal-module-features [name="with_approval_note"]')[0].checked = isTrue(data.features.approvalNote);
     }
 
     if ($('#modal-module-features [name="with_trash"]').length) {
-      $('#modal-module-features [name="with_trash"]')[0].checked = data.features.trashRequired === true || data.features.trashRequired == 'true';
+      $('#modal-module-features [name="with_trash"]')[0].checked = isTrue(data.features.trashRequired);
     }
 
     if ($('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]').length) {
@@ -4601,9 +4611,10 @@ function restoreForm(data)  //NOSONAR
     }
 
     if ($('#modal-module-features [name="ajax_support"]').length) {
-      $('#modal-module-features [name="ajax_support"]')[0].checked = data.features.ajaxSupport === true || data.features.ajaxSupport == 'true';
+      $('#modal-module-features [name="ajax_support"]')[0].checked = isTrue(data.features.ajaxSupport);
     }
   }
+
 }
 
 /**
@@ -5632,7 +5643,7 @@ function setMapData(data) // NOSONAR
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
       tr.find(".rd-group").val(row.group);
-      if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
+      if (isTrue(map[i]["selected"])) {
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
