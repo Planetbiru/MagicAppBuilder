@@ -583,6 +583,8 @@ In this section, the following options are available:
 - **TA**: Indicates that the input is a textarea.
 - **CB**: Indicates that the input is a checkbox.
 - **SE**: Indicates that the input is a select field (dropdown).
+- **MU**: Indicates that the input has multiple value.
+
 
 ### Search Section:
 
@@ -590,6 +592,7 @@ In the **Search** section, the following options are available:
 
 - **TE**: Indicates that the input is a text field (e.g., text, number, date, datetime-local, time, tel, email, url, etc.).
 - **SE**: Indicates that the input is a select field (dropdown).
+- **MU**: Indicates that the input has multiple value.
 
 ### Data Type:
 
@@ -666,9 +669,6 @@ Used to group options in the dropdown.
     -   **Reference**: The data source for the option group in the dropdown. If the dropdown source is an **Entity**, then **Reference** is the property from the source entity that acts as the source for the option group. If the dropdown source is a **Map**, then **Reference** is a pair of **Value** and **Label**. All dropdown options that have the same **Value** will be grouped under the label **Label**.
 2.  If the dropdown source is **Map**, grouping can be done using the **Group** column, which can be filled directly in the map.
 
-#### Selection:
-
-Indicates whether the select element will allow single or multiple selections.
 
 #### Additional Output:
 
@@ -683,10 +683,6 @@ If the user selects **Map**, MagicAppBuilder will show a form with the following
 - **Group**: The label for the option group.
 
 The user can enter multiple options for the map.
-
-#### Selection:
-
-Indicates whether the select element will allow single or multiple selections.
 
 #### 3. **Yes/No**, **True/False**, **1/0**:
 
