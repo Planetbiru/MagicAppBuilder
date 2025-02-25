@@ -644,12 +644,15 @@ class ScriptGenerator //NOSONAR
 
         foreach($menus as $menu)
         {
-            $submenus = $menu->getSubmenus();
-            if(is_array($submenus))
+            if(isset($menu) && is_object($menu))
             {
-                foreach($submenus as $submenu)
+                $submenus = $menu->getSubmenus();
+                if(is_array($submenus))
                 {
-                    $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
+                    foreach($submenus as $submenu)
+                    {
+                        $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
+                    }
                 }
             }
         }
@@ -692,7 +695,7 @@ class ScriptGenerator //NOSONAR
             $menuArray = $menus->valueArray();
             foreach($menuArray as $index=>$menu)
             {
-                if(trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
+                if(isset($menu['label']) && trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
                 {
                     if(!isset($menuArray[$index]['submenus']))
                     {
