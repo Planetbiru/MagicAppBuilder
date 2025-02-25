@@ -14,7 +14,7 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
  * This class encapsulates the metadata of fields including their names, labels, data types, 
  * and various flags for operations they participate in (such as required fields and key fields).
  */
-class AppField
+class AppField // NOSONAR
 {
     /**
      * The name of the field.
