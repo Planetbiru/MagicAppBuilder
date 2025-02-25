@@ -1,6 +1,6 @@
 <?php
 
-use MagicObject\Util\PicoParsedown;
+use MagicObject\Util\Parsedown;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
@@ -20,7 +20,7 @@ function processBlock($block)
     $lastCommand = null;
     $buffer = "";
     
-    $parsedown = new PicoParsedown();
+    $parsedown = new Parsedown();
 
     // Enable the safe mode of Parsedown.
 	$parsedown->setSafeMode(true);

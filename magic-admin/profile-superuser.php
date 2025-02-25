@@ -64,7 +64,7 @@ function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
 	}
 }
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getProfile());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -165,7 +165,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getUsername();?></td>
 						<td>
-							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off" readonly />
 						</td>
 					</tr>
 					<tr>

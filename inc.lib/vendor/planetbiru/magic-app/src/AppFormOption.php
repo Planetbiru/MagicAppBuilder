@@ -101,7 +101,7 @@ class AppFormOption
         $attrs = array();
         if (isset($this->attributes) && is_array($this->attributes)) {
             foreach ($this->attributes as $attr => $val) {
-                $attrs[] = 'data-' . str_replace('_', '-', PicoStringUtil::snakeize($attr)) . '="' . htmlspecialchars($val) . '"';
+                $attrs[] = 'data-' . str_replace('_', '-', PicoStringUtil::snakeize($attr)) . '="' . $this->encode($val) . '"';
             }
             return ' ' . implode(' ', $attrs);
         }
@@ -116,7 +116,7 @@ class AppFormOption
      *
      * @param string $format The format string
      * @param string[] $params The parameters for the format
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function textNodeFormat($format, $params)
     {
@@ -138,7 +138,7 @@ class AppFormOption
         $values = array();
         if (isset($this->params) && is_array($this->params)) {
             foreach ($this->params as $param) {
-                $values[] = $this->getValue($param);
+                $values[] = $this->getValueOf($param);
             }
         }
         return $values;
@@ -153,7 +153,7 @@ class AppFormOption
      * @param string $param The parameter name
      * @return string|null The value associated with the parameter, or null if not found
      */
-    public function getValue($param)
+    private function getValueOf($param)
     {
         if ($this->data == null) {
             return null;
@@ -179,12 +179,26 @@ class AppFormOption
      * typically useful for nested option elements.
      *
      * @param string $pad The padding string (default is a tab character)
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function setPad($pad = "\t")
     {
         $this->pad = $pad;
         return $this;
+    }
+    
+    /**
+     * Ensures any pre-encoded HTML entities are re-encoded.
+     *
+     * This function can be used to ensure that a string is safely encoded for output in HTML,
+     * potentially after some prior decoding or modification of HTML entities.
+     *
+     * @param string $string The string to encode.
+     * @return string The encoded string with HTML entities.
+     */
+    private function encode($string)
+    {
+        return htmlspecialchars(htmlspecialchars_decode($string));
     }
 
     /**
@@ -202,9 +216,9 @@ class AppFormOption
         if (isset($this->format) && isset($this->params)) {
             $values = $this->getValues();
             $label = vsprintf($this->format, $values);
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . $label . '</option>';
+            return $this->pad . '<option value="' . $this->encode($this->value) . '"' . $attrs . $selected . '>' . $label . '</option>';
         } else {
-            return $this->pad . '<option value="' . htmlspecialchars($this->value) . '"' . $attrs . $selected . '>' . htmlspecialchars($this->label) . '</option>';
+            return $this->pad . '<option value="' . $this->encode($this->value) . '"' . $attrs . $selected . '>' . $this->encode($this->label) . '</option>';
         }
     }
 
@@ -230,7 +244,7 @@ class AppFormOption
      */ 
     public function getTextNode()
     {
-        return $this->label;
+        return $this->getLabel();
     }
 
     /**
@@ -239,7 +253,7 @@ class AppFormOption
      * This method allows setting a new text value for the option.
      *
      * @param string $label The text node to set
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setTextNode($label)
     {
@@ -287,6 +301,46 @@ class AppFormOption
     {
         $this->attributes = $attributes;
         return $this;
+    }
+
+    /**
+     * Get the label of the option.
+     *
+     * @return string The label text.
+     */ 
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * Get the value associated with the option.
+     *
+     * @return string The option's value.
+     */ 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Check if the option is selected.
+     *
+     * @return bool True if the option is selected, false otherwise.
+     */ 
+    public function getSelected()
+    {
+        return $this->selected;
+    }
+
+    /**
+     * Get the format for the text node, allowing dynamic content.
+     *
+     * @return string The format string.
+     */ 
+    public function getFormat()
+    {
+        return $this->format;
     }
 
 }

@@ -64,7 +64,7 @@ function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
 	}
 }
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getProfile());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -81,6 +81,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
@@ -159,7 +160,7 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 					<tr>
 						<td><?php echo $appEntityLanguage->getUsername();?></td>
 						<td>
-							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="username" id="username" value="<?php echo $admin->getUsername();?>" autocomplete="off" readonly/>
 						</td>
 					</tr>
 					<tr>
@@ -196,6 +197,27 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 							<input class="form-control" type="tel" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
 						</td>
 					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
+						<td>
+							<select class="form-control" name="language_id" id="language_id" data-value="<?php echo $admin->getLanguage();?>">
+							<?php
+                            $languages = $appConfig->getLanguages();
+                            foreach($languages as $language)
+                            {
+                                if($language->getCode() != null && $language->getName() != null)
+                                {
+                                    ?>
+									<option value="<?php echo $language->getCode();?>"<?php echo $language->getCode() == $admin->getLanguageId() ? ' selected' : '';?>><?php echo $language->getName();?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+							</select>
+						</td>
+					</tr>
+
+					
 				</tbody>
 			</table>
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">

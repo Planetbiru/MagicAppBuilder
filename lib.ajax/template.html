@@ -1,0 +1,1105 @@
+
+<div class="all">
+  <div class="tabs">
+    <ul class="nav nav-tabs" id="maintab" role="tablist">
+        <li class="nav-item level-superuser" role="presentation">
+            <a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">{{lang['administration']}}</a>
+        </li>
+        <li class="nav-item level-user" role="presentation">
+            <a href="magic-admin/profile.php" class="nav-link" type="button" role="tab" aria-controls="config">{{lang['profile']}}</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="define-workspace-tab" data-toggle="tab" data-target="#define-workspace" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['workspace']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#define-application" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['apps']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="define-module-tab" data-toggle="tab" data-target="#define-module" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['select_table']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="define-column-tab" data-toggle="tab" data-target="#define-column" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['generate_module']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="module-file-tab" data-toggle="tab" data-target="#module-file" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['edit_module']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="entity-file-tab" data-toggle="tab" data-target="#entity-file" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['edit_entity']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="entity-relationship-tab" data-toggle="tab" data-target="#entity-relationship" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['erd']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="entity-query-tab" data-toggle="tab" data-target="#entity-query" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['query']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="translate-entity-tab" data-toggle="tab" data-target="#translate-entity" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['translate_entity']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="translate-application-tab" data-toggle="tab" data-target="#translate-application" type="button" role="tab" aria-controls="config" aria-selected="true">{{lang['translate_module']}}</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" type="button" role="tab" aria-controls="config" onclick="window.location='logout.php'">{{lang['logout']}}</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+
+    <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+        <div class="main-menu">
+          <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace">{{lang['create_new']}}</button>
+          <button type="button" class="btn btn-primary refresh-workspace-list">{{lang['refresh']}}</button>
+          <input type="text" class="form-control" id="search-workspace" placeholder="{{lang['type_to_search_']}}">
+        </div>
+        
+        <div class="container-fluid workspace-container">
+        <div class="row workspace-card">
+        </div>
+        </div>
+      </div>
+
+      <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
+
+        <div class="main-menu">
+          <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">{{lang['create_new']}}</button>
+          <button type="button" class="btn btn-primary refresh-application-list">{{lang['refresh']}}</button>
+          <input type="text" class="form-control" id="search-application" placeholder="{{lang['type_to_search_']}}">
+        </div>
+
+        <div class="container-fluid application-container">
+          <div class="row application-card">
+          
+          </div>
+        </div>  
+      </div>
+
+      <div id="define-module" class="tab-pane fade show active" role="tabpanel" aria-labelledby="define-module-tab">
+
+        <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+          <div class="card">
+            <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
+              <div class="card-body">
+                <h4>{{lang['entity']}}</h4>
+                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    <tr>
+                      <td>{{lang['table']}}</td>
+                      <td><select class="form-control" name="source_table"></select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td>
+                        <button class="btn btn-primary" type="button" name="load_table" id="load_table">{{lang['reload_table']}}</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['master_entity_name']}}</td>
+                      <td><input class="form-control" type="text" name="entity_master_name" id="entity_master_name"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['master_primary_key']}}</td>
+                      <td><input class="form-control" type="text" name="primary_key_master" id="primary_key_master"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['approval_table_name']}}</td>
+                      <td><input class="form-control" type="text" name="table_approval_name" id="table_approval_name"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['approval_primary_key']}}</td>
+                      <td><input class="form-control" type="text" name="primary_key_approval" id="primary_key_approval"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['approval_entity_name']}}</td>
+                      <td><input class="form-control" type="text" name="entity_approval_name" id="entity_approval_name"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['trash_table_name']}}</td>
+                      <td><input class="form-control" type="text" name="table_trash_name" id="table_trash_name"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['trash_primary_key']}}</td>
+                      <td><input class="form-control" type="text" name="primary_key_trash" id="primary_key_trash"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['trash_entity_name']}}</td>
+                      <td><input class="form-control" type="text" name="entity_trash_name" id="entity_trash_name"></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h4>{{lang['module_option']}}</h4>
+                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    <tr>
+                      <td>{{lang['target']}}</td>
+                      <td>
+                        <select class="form-control" name="current_module_location" id="current_module_location">
+                        </select>  
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td>
+                        <button class="btn btn-primary" type="button" name="update_current_location" id="update_current_location">{{lang['update_current_location']}}</button>
+                        <button class="btn btn-primary" type="button" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path">{{lang['manage']}}</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['update_entity']}}</td>
+                      <td><label for=""><input type="checkbox" name="update_entity">{{lang['yes']}}</label></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h4>{{lang['module']}}</h4>
+                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    <tr>
+                      <td>{{lang['file_name']}}</td>
+                      <td><input class="form-control" type="text" name="module_file" id="module_file"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['module_code']}}</td>
+                      <td><input class="form-control" type="text" name="module_code" id="module_code"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['module_name']}}</td>
+                      <td><input class="form-control" type="text" name="module_name" id="module_name"></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['load_saved_module']}}</td>
+                      <td><label for=""><input type="checkbox" name="module_load_previous" value="1" checked="">{{lang['yes']}}</label></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['add_to_module_list']}}</td>
+                      <td><label for=""><input type="checkbox" name="module_add_to_list" value="1">{{lang['yes']}}</label></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['special_access']}}</td>
+                      <td><label for=""><input type="checkbox" name="module_special_access" value="1">{{lang['yes']}}</label></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['add_menu']}}</td>
+                      <td><label for=""><input type="checkbox" name="module_as_menu" value="1" checkdate="">{{lang['yes']}}</label></td>
+                    </tr>
+                    <tr>
+                      <td>{{lang['append_to']}}</td>
+                      <td><select class="form-control" name="module_menu"></select></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    <tr>
+                      <td></td>
+                      <td><button class="btn btn-success" type="button" name="load_column" id="load_column">{{lang['load_column']}}</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
+        <div class="define-wrapper">
+          <form name="formgenerator" id="formgenerator" method="post" action="">
+            <table width="100%" border="1" cellspacing="0" cellpadding="0" class="main-table">
+              <thead>
+                <tr>
+                  <td rowspan="2" class="data-sort data-sort-header"></td>
+                  <td rowspan="2" align="center">{{lang['field']}}</td>
+                  <td rowspan="2" align="center">{{lang['caption']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert">{{lang['i']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update">{{lang['u']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail">{{lang['d']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List">{{lang['l']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export">{{lang['e']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">{{lang['k']}}</td>
+                  <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">{{lang['r']}}</td>
+                  <td colspan="5" align="center">{{lang['element_type']}}</td>
+                  <td colspan="3" align="center" width="60">{{lang['search']}}</td>
+                  <td rowspan="2" align="center" width="100">{{lang['data_type']}}</td>
+                  <td rowspan="2" align="center" width="180">{{lang['filter_type']}}</td>
+                </tr>
+                <tr>
+                  <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">{{lang['te']}}</td>
+                  <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea">{{lang['ta']}}</td>
+                  <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox">{{lang['cb']}}</td>
+                  <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">{{lang['se']}}</td>
+                  <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">{{lang['source']}}</td>
+                  <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Text">{{lang['te']}}</td>
+                  <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Select">{{lang['se']}}</td>
+                  <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">{{lang['source']}}</td>
+                </tr>
+              </thead>
+
+              <tbody class="data-table-manual-sort">
+              </tbody>
+            </table>
+            <div class="button-area">
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">{{lang['data_filter']}}</button>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-order-data">{{lang['data_order']}}</button>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">{{lang['module_features']}}</button>
+              <button class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Module">{{lang['generate_module']}}</button> &nbsp;
+
+              <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">{{lang['data_filter']}}</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="table-reference-container">
+                      <table class="table table-reference table-data-filter" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
+                        <thead>
+                          <tr>
+                            <td width="35%">{{lang['column']}}</td>
+                            <td width="12%">{{lang['comp']}}</td>
+                            <td>{{lang['value']}}</td>
+                            <td width="42">{{lang['rem']}}</td>
+                            <td colspan="2">{{lang['move']}}</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><input class="form-control data-filter-column-name" type="text" value=""></td>
+                            <td>
+                              <select class="form-control data-filter-column-comparison">
+                                <option value="equals">=</option>
+                                <option value="notEquals">!=</option>
+                                <option value="greaterThan">&gt;</option>
+                                <option value="greaterThanOrEquals">&gt;=</option>
+                                <option value="lessThan">&lt;</option>
+                                <option value="lessThanOrEquals">&lt;=</option>
+                              </select>
+                            </td>
+                            <td><input class="form-control data-filter-column-value" type="text" value=""></td>
+                            <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                            <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                            <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">{{lang['add_row']}}</button></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="modal-order-data" tabindex="-1" aria-labelledby="modal_order_label" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">{{lang['data_order']}}</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="table-reference-container">
+                      <table class="table table-reference table-data-order" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
+                        <thead>
+                          <tr>
+                            <td width="55%">{{lang['column']}}</td>
+                            <td>{{lang['value']}}</td>
+                            <td width="42">{{lang['rem']}}</td>
+                            <td colspan="2">{{lang['move']}}</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><input class="form-control data-order-column-name" type="text" value=""></td>
+                            <td><select class="form-control data-order-order-type">
+                                <option value="PicoSort::ORDER_TYPE_ASC">{{lang['asc']}}</option>
+                                <option value="PicoSort::ORDER_TYPE_DESC">{{lang['desc']}}</option>
+                              </select></td>
+                            <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+                            <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+                            <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">{{lang['add_row']}}</button></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="modal-module-features" tabindex="-1" aria-labelledby="modal_features_label" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">{{lang['module_features']}}</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                          <tr>
+                            <td>{{lang['activate_decativate']}}</td>
+                            <td><label><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1">{{lang['activate_decativate']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['manual_sort_order']}}</td>
+                            <td><label><input type="checkbox" name="manualsortorder" id="manualsortorder" value="1">{{lang['manual_sort_order']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['export_to_excel']}}</td>
+                            <td><label><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1">{{lang['export_to_excel']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['export_to_csv']}}</td>
+                            <td><label><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1">{{lang['export_to_csv']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['use_temporary_file']}}</td>
+                            <td><label><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled="">{{lang['use_temporary_file']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['approval']}}</td>
+                            <td><label><input type="checkbox" name="with_approval" id="with_approval" value="1">{{lang['approval']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['approval_note']}}</td>
+                            <td><label><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1">{{lang['approval_note']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['approval_type']}}</td>
+                            <td><label><input type="radio" name="approval_type" id="approval_type" value="1">{{lang['separated']}}</label> &nbsp; <label><input type="radio" name="approval_type" id="approval_type" value="2" checked="">{{lang['combined']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['approval_position']}}</td>
+                            <td><label><input type="radio" name="approval_position" id="approval_position" value="before-data">{{lang['before_data']}}</label> &nbsp; <label><input type="radio" name="approval_position" id="approval_position" value="after-data" checked="">{{lang['after_data']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['approval_by_another_user']}}</td>
+                            <td><label><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1">{{lang['approval_by_another_user']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['trash']}}</td>
+                            <td><label><input type="checkbox" name="with_trash" id="with_trash" value="1">{{lang['trash']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['ajax_support']}}</td>
+                            <td><label><input type="checkbox" name="ajax_support" id="ajax_support" value="1">{{lang['ajax_support']}}</label> &nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td>{{lang['subquery']}}</td>
+                            <td><label><input type="checkbox" name="subquery" id="subquery" value="1">{{lang['subquery']}}</label> &nbsp;</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="module-file" class="tab-pane fade" role="tabpanel" aria-labelledby="module-file-tab">
+        <div class="module-container">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['modules']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="module-list module-list-file"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title">
+                <h4>{{lang['content']}}</h4>
+              </div>
+              <div class="column-body">
+                <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
+                <div class="button-area">
+                  <button class="btn btn-success" id="button_save_module_file" type="button" disabled="">{{lang['save_module']}}</button>
+                  <button class="btn btn-danger" id="button_delete_module_file" type="button" disabled="">{{lang['delete_module']}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="entity-file" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-file-tab">
+        <div class="entity-container-file">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['entities']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="entity-list"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title">
+                <h4>{{lang['content']}}</h4>
+              </div>
+              <div class="column-body">
+                <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
+                <div class="button-area">
+                  <button class="btn btn-success" id="button_save_entity_file" type="button" disabled="">{{lang['save_entity']}}</button>
+                  <button class="btn btn-success" id="button_save_entity_file_as" type="button">{{lang['save_entity_as']}}</button>
+                  <button class="btn btn-danger" id="button_delete_entity_file" type="button" disabled="">{{lang['delete_entity']}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="entity-relationship" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-relationship-tab">
+        <div class="entity-container-relationship">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['entities']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="entity-list"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title">
+                <h4>{{lang['entity_relationship_diagram']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="diagram-option">
+                  <span>{{lang['max_level']}}</span> <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
+                  <span>{{lang['max_column']}}</span> <input class="form-control" type="number" step="1" name="maximum_column" value="8" min="4">
+                  <span>{{lang['margin_x']}}</span> <input class="form-control" type="number" name="margin_x" value="0" min="0">
+                  <span>{{lang['margin_y']}}</span> <input class="form-control" type="number" name="margin_y" value="0" min="0">
+                  <span>{{lang['h_space']}}</span> <input class="form-control" type="number" name="entity_margin_x" value="40" min="0">
+                  <span>{{lang['v_space']}}</span> <input class="form-control" type="number" name="entity_margin_y" value="20" min="0">
+                  <span>{{lang['zoom']}}</span> <input class="form-control" type="number" step="0.05" name="zoom" value="1" min="0.5">
+                  <button type="button" class="btn btn-primary reload-diagram">{{lang['reload']}}</button>
+                  <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()">{{lang['svg']}}</button>
+                  <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()">{{lang['png']}}</button>
+                </div>
+                <div class="erd-image"></div>
+                <map name="erd-map"></map>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="entity-query" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-query-tab">
+        <div class="entity-container-query">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['entities']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="entity-list"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title">
+                <h4>{{lang['query']}}</h4>
+              </div>
+              <div class="column-body">
+                <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
+                <div class="button-area">
+                  <button class="btn btn-success" id="button_save_entity_query" type="button" disabled="">{{lang['save_query']}}</button>
+                  <button class="btn btn-primary" id="button_execute_entity_query" type="button">{{lang['execute_query']}}</button>
+                  <button class="btn btn-primary" id="button_explore_database" type="button">{{lang['explore_database']}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="translate-entity" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-entity-tab">
+        <div class="container-translate-entity">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['entities']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="entity-list"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title"> 
+                <span>{{lang['target_language']}}</span>
+                <select class="form-control target-language" data-translate-for="entity">
+                </select>
+                <span>{{lang['filter']}}</span>
+                <select class="form-control filter-translate" data-translate-for="entity">
+                  <option value="untranslated">{{lang['untranslated']}}</option>
+                  <option value="all">{{lang['all']}}</option>
+                </select>
+                <button class="btn btn-primary default-language" type="button">{{lang['default_language']}}</button>
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-update-language">{{lang['manage']}}</button>
+              </div>
+              <div class="column-body">
+                <div class="row">
+                  <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                  <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                </div>
+                <div class="button-area">
+                  <input type="hidden" class="entity-property-name" value="">
+                  <input type="hidden" class="entity-name" value="">
+                  <button class="btn btn-success" id="button-save-entity-translation" type="button">{{lang['save_translation']}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="translate-application" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-application-tab">
+      <div class="container-translate-module">
+          <div class="row">
+            <div class="col col-2">
+              <div class="column-title">
+                <h4>{{lang['modules']}}</h4>
+              </div>
+              <div class="column-body">
+                <div class="module-list module-list-translate"></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="column-title"> 
+                <span>{{lang['target_language']}}</span>
+                <select class="form-control target-language" data-translate-for="module">
+                </select>
+                <span>{{lang['filter']}}</span>
+                <select class="form-control filter-translate" data-translate-for="module">
+                  <option value="untranslated">{{lang['untranslated']}}</option>
+                  <option value="all">{{lang['all']}}</option>
+                </select>
+                <button class="btn btn-primary default-language" type="button">{{lang['default_language']}}</button>
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-update-language">{{lang['manage']}}</button>
+              </div>
+              <div class="column-body">
+                <div class="row">
+                  <div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                  <div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                </div>
+                <div class="button-area">
+                  <input type="hidden" class="module-property-name" value="">
+                  <button class="btn btn-success" id="button-save-module-translation" type="button">{{lang['save_translation']}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-create-application" tabindex="-1" aria-labelledby="application_modal_label" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['create_new_application']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td>{{lang['application_name']}}</td>
+              <td><input class="form-control" type="text" name="application_name"></td>
+            </tr>
+            <tr>
+              <td>{{lang['application_id']}}</td>
+              <td><input class="form-control" type="text" name="application_id"></td>
+            </tr>
+            <tr>
+              <td>{{lang['architecture']}}</td>
+              <td>
+                  <select class="form-control" name="application_architecture">
+                      <option value="monolith">{{lang['monolith_application']}}</option>
+                      <option value="microservices">{{lang['microservices_aplication']}}</option>
+                  </select>
+              </td>
+            </tr>
+            <tr>
+              <td>{{lang['description']}}</td>
+              <td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
+            </tr>
+            <tr>
+              <td>{{lang['magicapp_version']}}</td>
+              <td>
+                  <select class="form-control" name="magic_app_version">
+                      
+                  </select>
+              </td>
+            </tr>
+            <tr>
+              <td>{{lang['installation_method']}}</td>
+              <td><input class="form-control" type="text" name="dependencies-installation" readonly="">
+                  <input type="hidden" name="composer_online" value="1">
+              </td>
+            </tr>
+            <tr>
+              <td>{{lang['workspace']}}</td>
+              <td><select class="form-control" name="application_workspace_id"></select></td>
+            </tr>
+            <tr>
+              <td>{{lang['application_directory']}}</td>
+              <td><input class="form-control" type="text" name="application_directory"></td>
+            </tr>                
+            <tr>
+              <td>{{lang['base_namespace']}}</td>
+              <td><input class="form-control" type="text" name="application_namespace"></td>
+            </tr>
+            <tr>
+              <td>{{lang['author']}}</td>
+              <td><input class="form-control" type="text" name="application_author"></td>
+            </tr>           
+            <tr>
+              <td>{{lang['path']}}</td>
+              <td class="paths">
+                <table class="path-manager">
+                  <thead>
+                    <tr>
+                      <td>{{lang['name']}}</td>
+                      <td>{{lang['path']}}</td>
+                      <td width="20"></td>
+                      <td width="35"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input class="form-control" type="text" name="name[0]" value="root"></td>
+                      <td><input class="form-control" type="text" name="path[0]" value="/"></td>
+                      <td><input type="checkbox" name="checked[0]" checked=""></td>
+                      <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="4">
+                      <button type="button" class="btn btn-primary add-path">{{lang['add']}}</button>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" id="create_new_app">{{lang['create']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['create_data_reference']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" id="load_from_cache">{{lang['load']}}</button>
+      <button type="button" class="btn btn-primary" id="save_to_cache">{{lang['save']}}</button>
+      <button type="button" class="btn btn-success" id="apply_reference">{{lang['ok']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['cancel']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['add_language']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">            
+          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td>{{lang['language']}}</td>
+              <td><input class="form-control" type="text" name="language_name"></td>
+            </tr>
+            <tr>
+              <td>{{lang['code']}}</td>
+              <td><input class="form-control" type="text" name="language_code"></td>
+            </tr>
+          </tbody>
+        </table>      
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success add-new-language">{{lang['add']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-update-path" tabindex="-1" aria-labelledby="application_path" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['module_location_manager']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td>{{lang['path']}}</td>
+              <td class="paths">
+                <table class="path-manager">
+                  <thead>
+                    <tr>
+                      <td>{{lang['name']}}</td>
+                      <td>{{lang['path']}}</td>
+                      <td width="20"></td>
+                      <td width="35"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input class="form-control location-name" type="text" name="name[0]" value=""></td>
+                      <td><input class="form-control location-path" type="text" name="path[0]" value=""></td>
+                      <td><input type="checkbox" name="checked[0]" checked=""></td>
+                      <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="4">
+                      <button type="button" class="btn btn-primary add-path">{{lang['add']}}</button>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" id="update_module_path">{{lang['update']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_language" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['application_language_manager']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td>{{lang['language']}}</td>
+              <td class="languages">
+                <table class="language-manager">
+                  <thead>
+                    <tr>
+                      <td>{{lang['name']}}</td>
+                      <td>{{lang['code']}}</td>
+                      <td width="20"></td>
+                      <td width="35"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input class="form-control language-name" type="text" name="language_name[0]" value=""></td>
+                      <td><input class="form-control language-code" type="text" name="language_code[0]" value=""></td>
+                      <td><input type="checkbox" name="checked[0]" checked=""></td>
+                      <td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="4">
+                      <button type="button" class="btn btn-primary add-language">{{lang['add']}}</button>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" id="update-application-language">{{lang['update']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-entity-detail" tabindex="-1" aria-labelledby="application_entity" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['entity_detail']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="entity-detail"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['application_setting']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="application-setting"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config">{{lang['save']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-workspace" tabindex="-1" aria-labelledby="application_workspace" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['workspace']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+          <tr>
+              <td>{{lang['name']}}</td>
+              <td><input class="form-control" type="text" name="workspace_name" value="" autocomplete="off"></td>
+            </tr>
+            <tr>
+              <td>{{lang['description']}}</td>
+              <td><textarea class="form-control" name="workspace_description"></textarea></td>
+            </tr>
+            <tr>
+              <td>{{lang['directory']}}</td>
+              <td><input class="form-control" type="text" name="workspace_directory" value="" autocomplete="off"></td>
+            </tr>
+            <tr>
+              <td>{{lang['php_path']}}</td>
+              <td><input class="form-control" type="text" name="php_path" value="" autocomplete="off"></td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace">{{lang['save']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-menu" tabindex="-1" aria-labelledby="application_menu" aria-hidden="true">
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['application_menu']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary button-add-menu">{{lang['add']}}</button>
+      <button type="button" class="btn btn-success button-save-menu">{{lang['save']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-menu-add" tabindex="-1" aria-labelledby="application_menu_add" aria-hidden="true">
+<div class="modal-dialog modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['add_menu']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success button-apply-new-menu">{{lang['ok']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal-dialog modal-fullscreen">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['database_explorer']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="database-explorer">
+        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-query-executor" tabindex="-1" aria-labelledby="application_query_executor" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['query_executor']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="query-container">
+        <textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success button-execute-query">{{lang['execute']}}</button>
+      <button type="button" class="btn btn-primary button-open-file">{{lang['open_file']}}</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{lang['alert']}}</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">{{lang['close']}}</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="alertOverlay" id="alertOverlay"></div>
+<div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="alertTitle">{{lang['confirmation']}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <p id="alertMessage">{{lang['this_is_the_alert_message_']}}</p>
+          </div>
+          <div class="modal-footer" id="modalFooter">
+          </div>
+      </div>
+  </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
+</div>
+<div class="status-bar-container position-fixed bottom-0 right-0 p-3">
+<div class="status-bar">
+    <div class="ajax-pending"></div>
+</div>
+</div>

@@ -2,7 +2,6 @@
 
 namespace AppBuilder;
 
-use AppBuilder\Base\AppBuilderBase;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
@@ -418,9 +417,9 @@ class AppBuilderApproval extends AppBuilderBase
      */
     public function createApprovalSection($mainEntity, $editFields, $approvalRequired, $approvalEntity, $trashRequired, $trashEntity)
     {
-        $currentUser = $this->getCurrentAction()->getUserFunction();
-        $currentTime = $this->getCurrentAction()->getTimeFunction();
-        $currentIp = $this->getCurrentAction()->getIpFunction();
+        $currentUser = $this->fixVariableInput($this->getCurrentAction()->getUserFunction());
+        $currentTime = $this->fixVariableInput($this->getCurrentAction()->getTimeFunction());
+        $currentIp = $this->fixVariableInput($this->getCurrentAction()->getIpFunction());
 
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
@@ -575,9 +574,9 @@ class AppBuilderApproval extends AppBuilderBase
      */
     public function createRejectionSection($mainEntity, $approvalRequired, $approvalEntity)
     {
-        $currentUser = $this->getCurrentAction()->getUserFunction();
-        $currentTime = $this->getCurrentAction()->getTimeFunction();
-        $currentIp = $this->getCurrentAction()->getIpFunction();
+        $currentUser = $this->fixVariableInput($this->getCurrentAction()->getUserFunction());
+        $currentTime = $this->fixVariableInput($this->getCurrentAction()->getTimeFunction());
+        $currentIp = $this->fixVariableInput($this->getCurrentAction()->getIpFunction());
 
         $entityName = $mainEntity->getEntityName();
         $entityApprovalName = $approvalEntity->getEntityName();

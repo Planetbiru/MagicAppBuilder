@@ -33,15 +33,6 @@ class PicoOutputDataItem extends PicoEntityData
     protected $primaryKeyValue;
 
     /**
-     * The current status of the data item, typically used to indicate 
-     * whether the item is waiting for a specific action, such as approval, 
-     * update, or another process. This status is represented by a `PicoFieldWaitingFor` object.
-     *
-     * @var PicoFieldWaitingFor|null
-     */
-    protected $waitingFor;
-
-    /**
      * Flag indicating whether the data item is active or inactive. 
      * If `null`, the flag is considered inactive, and the front-end application 
      * should not use it for decision-making.
@@ -49,6 +40,15 @@ class PicoOutputDataItem extends PicoEntityData
      * @var bool|null
      */
     protected $active;
+    
+    /**
+     * The current status of the data item, typically used to indicate 
+     * whether the item is waiting for a specific action, such as approval, 
+     * update, or another process. This status is represented by a `PicoFieldWaitingFor` object.
+     *
+     * @var PicoFieldWaitingFor|null
+     */
+    protected $waitingFor;
 
     /**
      * Flag indicating whether the data item is in draft status. 

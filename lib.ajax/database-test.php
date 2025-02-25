@@ -27,7 +27,7 @@ if($inputPost->issetTestConnection())
     $databaseSchema = $inputPost->getDatabaseDatabaseSchema();
     $databaseTimeZone = $inputPost->getDatabaseTimeZone();
 
-    $databaseConfig = new SecretObject([
+    $databaseConfig = new SecretObject(array(
         'driver'=>$databaseDriver,
         'databaseFilePath'=>$databaseDatabaseFilePath,
         'host'=>$databaseHost,
@@ -37,7 +37,7 @@ if($inputPost->issetTestConnection())
         'databaseName'=>$databaseName,
         'databaseSchema'=>$databaseSchema,
         'timeZone'=>$databaseTimeZone
-    ]);
+    ));
     $database = new PicoDatabase($databaseConfig);
     try
     {

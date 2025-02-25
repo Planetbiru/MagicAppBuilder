@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\Image\PicoIcon;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
@@ -45,29 +45,29 @@ try
             // Convert and save as .ico file
             $icons->saveIconFile($icoPath);
 
-            $appManifest = [
+            $appManifest = array(
                 "name" => $application->getName(),
                 "short_name" => str_replace(array("-", " ", "_"), "", $application->getName()),
-                "icons" => [
-                    [
+                "icons" => array(
+                    array(
                         "src" => "apple-icon-57x57.png",
                         "sizes" => "57x57",
                         "type" => $imagePng
-                    ],
-                    [
+                    ),
+                    array(
                         "src" => "apple-icon-60x60.png",
                         "sizes" => "60x60",
                         "type" => $imagePng
-                    ],
-                    [
+                    ),
+                    array(
                         "src" => "android-icon-192x192.png",
                         "sizes" => "192x192",
                         "type" => $imagePng
-                    ]
-                ],
+                    )
+                    ),
                 "start_url" => "/",
                 "display" => "standalone"
-            ];
+                );
             $manifestPath = $uploadDir . "/manifest.json";
             file_put_contents($manifestPath, json_encode($appManifest, JSON_PRETTY_PRINT));
 
@@ -78,16 +78,16 @@ try
             ]);
         } catch (Exception $e) {
             // Handle errors if there is an issue using ImageMagick
-            ResponseUtil::sendJSON([
+            ResponseUtil::sendJSON(array(
                 'success' => false,
                 'error' => 'Error creating .ico file: ' . $e->getMessage()
-            ]);
+            ));
         }
     } else {
-        ResponseUtil::sendJSON([
+        ResponseUtil::sendJSON(array(
             'success' => false,
             'error' => 'No images were uploaded.'
-        ]);
+        ));
     }
 }
 catch(Exception $e)

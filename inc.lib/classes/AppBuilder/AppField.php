@@ -127,6 +127,27 @@ class AppField
      * @var array
      */
     private $additionalOutput;
+    
+    /**
+     * Indicates whether multiple data can be handled.
+     *
+     * This variable is used to specify if the system should allow multiple data entries
+     * or not. It is typically used in scenarios where more than one item can be processed
+     * simultaneously.
+     *
+     * @var bool
+     */
+    private $multipleData = false;
+
+    /**
+     * Indicates whether multiple filters are allowed.
+     *
+     * This variable determines if the system allows applying more than one filter at a time
+     * to the data. If set to true, multiple filters can be applied concurrently.
+     *
+     * @var bool
+     */
+    private $multipleFilter = false;
 
     /**
      * Constructor that initializes the AppField object based on the provided MagicObject.
@@ -151,6 +172,8 @@ class AppField
         $this->referenceData = PicoObjectParser::parseJsonRecursive($value->getReferenceData());
         $this->referenceFilter = PicoObjectParser::parseJsonRecursive($value->getReferenceFilter());
         $this->additionalOutput = $value->getAdditionalOutput();
+        $this->multipleData = $this->isTrue($value->getMultipleData());
+        $this->multipleFilter = $this->isTrue($value->getMultipleFilter());
     }
 
     /**
@@ -357,4 +380,65 @@ class AppField
         $this->includeExport = $includeExport;
         return $this;
     }
+
+    /**
+     * Get the status of multiple data.
+     *
+     * This method returns the current setting for handling multiple data entries.
+     * It indicates whether multiple data entries are allowed (true) or not (false).
+     *
+     * @return bool  The status of multiple data handling (true if allowed, false if not).
+     */ 
+    public function isMultipleData()
+    {
+        return $this->multipleData;
+    }
+
+    /**
+     * Set the status of multiple data.
+     *
+     * This method sets whether multiple data entries should be allowed or not.
+     * It is used to enable or disable the simultaneous processing of multiple data entries.
+     *
+     * @param bool $multipleData  The status to set (true to allow multiple data, false to disallow).
+     *
+     * @return self  The current instance for method chaining.
+     */ 
+    public function setMultipleData(bool $multipleData)
+    {
+        $this->multipleData = $multipleData;
+
+        return $this;
+    }
+
+    /**
+     * Get the status of multiple filters.
+     *
+     * This method returns the current setting for applying multiple filters concurrently.
+     * If set to true, multiple filters can be applied simultaneously to the data.
+     *
+     * @return bool  The status of multiple filter handling (true if allowed, false if not).
+     */ 
+    public function isMultipleFilter()
+    {
+        return $this->multipleFilter;
+    }
+
+    /**
+     * Set the status of multiple filters.
+     *
+     * This method sets whether multiple filters can be applied to the data concurrently.
+     * It is used to enable or disable the simultaneous application of filters.
+     *
+     * @param bool $multipleFilter  The status to set (true to allow multiple filters, false to disallow).
+     *
+     * @return self  The current instance for method chaining.
+     */ 
+    public function setMultipleFilter(bool $multipleFilter)
+    {
+        $this->multipleFilter = $multipleFilter;
+
+        return $this;
+    }
+
 }

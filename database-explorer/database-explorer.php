@@ -1849,7 +1849,8 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isInteger($type)
     {
-        return stripos($type, 'tinyint') === 0 
+        return stripos($type, 'bool') === 0 
+        || stripos($type, 'tinyint') === 0 
         || stripos($type, 'smallint') === 0 
         || stripos($type, 'mediumint') === 0 
         || stripos($type, 'bigint') === 0 

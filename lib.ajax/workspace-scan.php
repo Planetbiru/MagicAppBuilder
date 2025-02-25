@@ -1,7 +1,7 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
-use AppBuilder\Entity\EntityWorkspace;
+use AppBuilder\EntityInstaller\EntityApplication;
+use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Exceptions\NoRecordFoundException;

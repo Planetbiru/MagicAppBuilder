@@ -106,12 +106,47 @@ class PicoPredicate // NOSONAR
      * @param array $values The values to include.
      * @return self Returns the current instance for method chaining.
      */
-    public function in($field, array $values)
+    public function in($field, $values)
     {
         if (!empty($values)) {
             $this->field = $field;
             $this->value = $values;
-            $this->comparation = PicoDataComparation::in((array) $values);
+            $this->comparation = PicoDataComparation::in($values);
+        }
+        return $this;
+    }
+
+    /**
+     * Sets an IN RANGE condition.
+     *
+     * @param string $field The name of the field to compare.
+     * @param array $values An array containing the lower and upper boundaries of the range.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function inRange($field, $values)
+    {
+        if (!empty($values)) {
+            $this->field = $field;
+            $this->value = $values;
+            $this->comparation = PicoDataComparation::inRange($values);
+        }
+        return $this;
+    }
+
+    /**
+     * Sets a BETWEEN condition.
+     *
+     * @param string $field The name of the field to compare.
+     * @param mixed $min The lower boundary of the range.
+     * @param mixed $max The upper boundary of the range.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function between($field, $min, $max)
+    {
+        if (!empty($min) && !empty($max)) {
+            $this->field = $field;
+            $this->value = array($min, $max);
+            $this->comparation = PicoDataComparation::between($min, $max);
         }
         return $this;
     }
@@ -123,12 +158,12 @@ class PicoPredicate // NOSONAR
      * @param array $values The values to exclude.
      * @return self Returns the current instance for method chaining.
      */
-    public function notIn($field, array $values)
+    public function notIn($field, $values)
     {
         if (!empty($values)) {
             $this->field = $field;
             $this->value = $values;
-            $this->comparation = PicoDataComparation::notIn((array) $values);
+            $this->comparation = PicoDataComparation::notIn($values);
         }
         return $this;
     }
@@ -410,6 +445,6 @@ class PicoPredicate // NOSONAR
             'value' => $this->value,
             'comparation' => [$this->comparation ? $this->comparation->getComparison() : null],
             'filterLogic' => $this->filterLogic
-        ));
+        ), JSON_PRETTY_PRINT);
     }
 }

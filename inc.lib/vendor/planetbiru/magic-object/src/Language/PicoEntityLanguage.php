@@ -368,7 +368,7 @@ class PicoEntityLanguage
     public function __toString()
     {
         if (isset($this->_lableLanguage) && isset($this->_currentLanguage) && isset($this->_lableLanguage[$this->_currentLanguage])) {
-            return json_encode($this->_lableLanguage[$this->_currentLanguage]);
+            return json_encode($this->_lableLanguage[$this->_currentLanguage], JSON_PRETTY_PRINT);
         } else {
             return "{}";
         }

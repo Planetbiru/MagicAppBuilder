@@ -1,184 +1,130 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
+use MagicApp\AppDto\MocroServices\PicoAllowedAction;
+use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoInputField;
 use MagicApp\AppDto\MocroServices\PicoInputFieldOption;
-use MagicApp\AppDto\MocroServices\PicoResponseBody;
+use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoInputFieldUpdate;
-use MagicApp\AppDto\MocroServices\PicoUserFormInputUpdate;
-use MagicObject\MagicObject;
+use MagicApp\AppDto\MocroServices\PicoResponseBody;
+use MagicApp\AppDto\MocroServices\PicoUserFormOutputDetail;
+use MagicApp\AppEntityLanguage;
+use MagicObject\Response\PicoResponse;
+use MagicObject\SecretObject;
 
-require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
+require_once __DIR__ . "/database.php";
 
-/**
- * The EntityModule class represents an entity in the "module" table.
- *
- * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
- * You can establish relationships with other entities using the JoinColumn annotation. 
- * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
- * 
- * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
- * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
- * 
- * @package AppBuilder\Entity
- * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="module")
- */
-class EntityModule extends MagicObject
-{
-	/**
-	 * Module ID
-	 * 
-	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @NotNull
-	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Module ID")
-	 * @var string
-	 */
-	protected $moduleId;
+$entity = new EntityApplication(null, $database);
+$entity->findOneByApplicationId("sipro");
+$picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
+$data = new PicoUserFormOutputDetail($entity, $picoEntityInfo);
 
-	/**
-	 * Admin ID
-	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
-	 * @var string
-	 */
-	protected $adminId;
+$appConfig = new SecretObject();
+$entityLanguage = new AppEntityLanguage($entity, $appConfig, 'en');
 
-	/**
-	 * Admin
-	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var EntityAdmin
-	 */
-	protected $admin;
-
-	/**
-	 * Application ID
-	 * 
-	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Application ID")
-	 * @var string
-	 */
-	protected $applicationId;
-
-	/**
-	 * Application
-	 * 
-	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
-	 * @Label(content="Application")
-	 * @var EntityApplication
-	 */
-	protected $application;
-
-	/**
-	 * File Name
-	 * 
-	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="File Name")
-	 * @var string
-	 */
-	protected $fileName;
-
-	/**
-	 * Directory Name
-	 * 
-	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Directory Name")
-	 * @var string
-	 */
-	protected $directoryName;
-
-	/**
-	 * Reference Value
-	 * 
-	 * @Column(name="reference_value", type="text", nullable=true)
-	 * @Label(content="Reference Value")
-	 * @var string
-	 */
-	protected $referenceValue;
-
-	/**
-	 * Time Create
-	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
-	 * @Label(content="Time Create")
-	 * @var string
-	 */
-	protected $timeCreate;
-
-	/**
-	 * Time Edit
-	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
-	 * @Label(content="Time Edit")
-	 * @var string
-	 */
-	protected $timeEdit;
-
-	/**
-	 * Admin Create
-	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-	 * @Label(content="Admin Create")
-	 * @var string
-	 */
-	protected $adminCreate;
-
-	/**
-	 * Admin Edit
-	 * 
-	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Edit")
-	 * @var string
-	 */
-	protected $adminEdit;
-
-	/**
-	 * IP Create
-	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
-	 * @Label(content="IP Create")
-	 * @var string
-	 */
-	protected $ipCreate;
-
-	/**
-	 * IP Edit
-	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="IP Edit")
-	 * @var string
-	 */
-	protected $ipEdit;
-
-}
-
-$data = new PicoUserFormInputUpdate();
-
-$data->addInput(new PicoInputFieldUpdate(
-    new PicoInputField("gender", "Gender"), // Field
-    "select.multiple",                 // Input type
-    "string[]",                         // Data type
-    "map",                              // Option source
-    [PicoInputFieldOption::getInstance()->setValue("M")->setLabel("Man")->setSelected(true), new PicoInputFieldOption("W", "Woman")], // Option value
-    null,                               // Pattern
-    new PicoInputField("val", "Label") // Current value
-)
+$map1 = array(
+	"monolith" => array("value" => "monolith", "label" => "Monolith", "selected" => false),
+	"microservices" => array("value" => "microservices", "label" => "Microservices", "selected" => false)
 );
 
-$data->addInput(new PicoInputFieldUpdate(new PicoInputField("gender", "Gender"), "text", "string"));
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("applicationId", $entityLanguage->get("applicationId")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("applicationId"), $entity->get("applicationId"))
+));
 
-$appModule = new EntityModule();
-$appModule->setModuleId("123");
-echo PicoResponseBody::getInstance()
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("name", $entityLanguage->get("name")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("name"), $entity->get("name"))
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("description", $entityLanguage->get("description")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("description"), $entity->get("description"))
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("workspace", 
+	$entityLanguage->get("workspace")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("workspaceId"), $entity->hasValue("workspace") ? $entity->get("workspace")->get("name") : null)
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("architecture", $entityLanguage->get("architecture")), 
+	"select", 
+	"string", 
+	"map", 
+	PicoInputFieldOption::fromArray($map1), 
+	null, 
+	new PicoInputField($entity->get("architecture"), 
+	PicoInputFieldOption::getLabelFromValue($map1, $entity->get("architecture")))
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("projectDirectory", $entityLanguage->get("projectDirectory")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("projectDirectory"), $entity->get("projectDirectory"))
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("baseApplicationDirectory", $entityLanguage->get("baseApplicationDirectory")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("baseApplicationDirectory"), $entity->get("baseApplicationDirectory"))
+));
+
+$data->addOutput(new PicoInputFieldUpdate(
+	new PicoInputField("author", $entityLanguage->get("author")), 
+	"text", 
+	"string", 
+	null, 
+	null, 
+	null, 
+	new PicoInputField($entity->get("author"), $entity->get("author"))
+));
+
+$picoModule = new PicoModuleInfo("application", "Application", "detail");
+
+$picoModule
+    ->addAllowedAction(new PicoAllowedAction("delete", "Delete"))
+    ->addAllowedAction(new PicoAllowedAction("approve", "Approve"))
+;
+
+$body = PicoResponseBody::getInstance()
+  	->setModule($picoModule)
     ->setData($data)
-    ->setEntity($appModule)
-    ->switchCaseTo("camelCase")
+    ->setEntity($entity, true)
     ->setResponseCode("000")
     ->setResponseText("Success")
-	->prettify(true)
+	->switchCaseTo("snake_case")
+    ->prettify(true)
     ;
+	
+PicoResponse::sendResponse($body);

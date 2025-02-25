@@ -57,23 +57,23 @@ try {
             $className = "\\".$baseEntity."\\".$entityName;
             $path = $baseDir."/".$entityName.".php";
 
-            $liData[$tableName][] = [
-                'name'=>sprintf($format3, $dir, $entityName), 
-                'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName),
-                'filetime'=>$filetime,
-                'entityName'=>$entityName,
-                'className'=>$className,
-                'path'=>$path
-            ];
+            $liData[$tableName][] = array(
+                'name'        => sprintf($format3, $dir, $entityName), 
+                'html'        => sprintf($format1, $dir, $entityName, $filetime, $entityName),
+                'filetime'    => $filetime,
+                'entityName'  => $entityName,
+                'className'   => $className,
+                'path'        => $path
+            );
         } else {
             if (!isset($liData[$idx])) {
                 $liData[$idx] = array();
             }
-            $liData[$idx][] = [
-                'name'=>sprintf($format3, $dir, $entityName), 
-                'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName),
-                'filetime'=>$filetime
-            ];
+            $liData[$idx][] = array(
+                'name'        => sprintf($format3, $dir, $entityName), 
+                'html'        => sprintf($format2, $dir, $entityName, $filetime, $entityName),
+                'filetime'    => $filetime
+            );
         }
     }
 
@@ -136,23 +136,23 @@ try {
             $className = "\\".$baseEntity."\\".$entityName;
             $path = $baseDir."/".$entityName.".php";
 
-            $liApp[$tableName][] = [
-                'name'=>sprintf($format3, $dir, $entityName), 
-                'html'=>sprintf($format1, $dir, $entityName, $filetime, $entityName),
-                'filetime'=>$filetime,
-                'entityName'=>$entityName,
-                'className'=>$className,
+            $liApp[$tableName][] = array(
+                'name'        => sprintf($format3, $dir, $entityName), 
+                'html'        => sprintf($format1, $dir, $entityName, $filetime, $entityName),
+                'filetime'    => $filetime,
+                'entityName'  => $entityName,
+                'className'   => $className,
                 'path'=>$path
-            ];
+            );
         } else {
             if (!isset($liApp[$idx])) {
                 $liApp[$idx] = array();
             }
-            $liApp[$idx][] = [
-                'name'=>sprintf($format3, $dir, $entityName), 
-                'html'=>sprintf($format2, $dir, $entityName, $filetime, $entityName),
-                'filetime'=>$filetime
-            ];
+            $liApp[$idx][] = array(
+                'name'        => sprintf($format3, $dir, $entityName), 
+                'html'        => sprintf($format2, $dir, $entityName, $filetime, $entityName),
+                'filetime'    => $filetime
+            );
         }
     }
 

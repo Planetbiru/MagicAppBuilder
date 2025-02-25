@@ -138,6 +138,6 @@ class PicoUploadFile
         foreach ($this->values as $key => $value) {
             $arr[$key] = json_decode($value); // Assuming PicoUploadFileContainer has a valid __toString() method
         }
-        return json_encode($arr);
+        return json_encode($arr, JSON_PRETTY_PRINT);
     }
 }

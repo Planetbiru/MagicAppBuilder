@@ -1,6 +1,89 @@
 # MagicAppBuilder Usage Guide
 
-MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
+MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. 
+
+## User Interface
+
+The application consists of several tabs:
+
+### **1. Administration**
+
+A separate web interface for managing users, user access, workspaces, applications, and other administrative settings.
+
+### **2. Workspace**
+
+This tab allows users to create and view workspaces. Users can also set the active workspace.
+
+### **3. Application**
+
+This tab enables users to create and view applications. Users can also set the active application.
+
+### **4. Select Table**
+
+In this tab, users can select a table and define:
+
+-   Module name
+-   Entity name
+-   Menu name
+-   Configuration options for module creation
+-   Whether to load a previously saved configuration for the module
+
+### **5. Generate Module**
+
+This tab is used to configure modules by selecting:
+
+-   Columns to be included in the module
+-   UI elements for **Create, Update, Show Detail, Show List, and Export**
+-   Relationships between columns and other entities or database tables
+-   Data filters and sorting options
+-   Features such as:
+    -   **Activate/Deactivate**
+    -   **Manual sort order**
+    -   **Export to CSV**
+    -   **Export to Excel**
+    -   **Approval workflow**
+    -   **Trash (soft delete)**
+    -   **AJAX-based list rendering**
+
+### **6. Edit Module**
+
+This tab allows users to manually edit the module's code. Users can also delete the module files.
+
+### **7. Edit Entity**
+
+This tab enables users to manually edit entity code. Users can also delete entity files.
+
+### **8. ERD (Entity Relationship Diagram)**
+
+In this tab, users can generate an ERD diagram for one or more selected entities. Users can also specify the depth level of entity relationships to be displayed.
+
+### **9. Query**
+
+This tab displays database queries for one or more selected entities. The primary function is to generate:
+
+-   **CREATE TABLE** and **ALTER TABLE** queries after entities are created
+-   Queries for database generation based on the application's defined entities
+
+Supported database management systems (**DBMS**):
+
+-   **MySQL**
+-   **MariaDB**
+-   **PostgreSQL**
+-   **SQLite**
+
+### **10. Translate Module**
+
+This tab allows users to create localization files for modules, enabling **multi-language support** in applications.
+
+### **11. Translate Entity**
+
+This tab allows users to create localization files for entities, enabling **multi-language support** in applications.
+
+### **12. Logout**
+
+A link to log out of the administrator session.
+
+This guide will take you through each step, from installation to generating modules, and ensure you have a smooth experience with the platform.
 
 Steps 1 and 2 are preparation. You only need to do them once.
 
@@ -189,7 +272,7 @@ By default, MagicAppBuilder uses **SQLite** as its database. However, you can sw
        databaseName: sipro
        databaseSchema: public
        timeZone: Asia/Jakarta
-       databaseFilePath: 'D:\xampp\htdocs\MagicAppBuilder\inc.cfg\database.sqlite'
+       databaseFilePath: 'D:\xampp\htdocs\MagicAppBuilder\inc.database\database.sqlite'
    ```
 3. **Database Connection Details**For **MySQL** or **PostgreSQL**, you will need to provide the following information:
 
@@ -571,13 +654,25 @@ Used to order the data in the select element:
 - **Column Name**: The property name in the entity.
 - **Value**: The sort order (ASC or DESC).
 
-#### Additional Output:
 
-Used to display multiple columns in the option label in the select element.
+#### Grouping:
+
+Used to group options in the dropdown.
+
+1.  If the dropdown source is **Entity**, grouping can be done using another entity referenced by the source entity.
+    
+    -   **Value**: The property from the referenced entity that is referred to by the source entity of the dropdown.
+    -   **Label**: The property from the referenced entity that will be used as the label for the option group in the dropdown. The label is only used if the group source is an **Entity**.
+    -   **Reference**: The data source for the option group in the dropdown. If the dropdown source is an **Entity**, then **Reference** is the property from the source entity that acts as the source for the option group. If the dropdown source is a **Map**, then **Reference** is a pair of **Value** and **Label**. All dropdown options that have the same **Value** will be grouped under the label **Label**.
+2.  If the dropdown source is **Map**, grouping can be done using the **Group** column, which can be filled directly in the map.
 
 #### Selection:
 
 Indicates whether the select element will allow single or multiple selections.
+
+#### Additional Output:
+
+Used to display multiple columns in the option label in the select element.
 
 #### 2. **Map**:
 
@@ -585,6 +680,7 @@ If the user selects **Map**, MagicAppBuilder will show a form with the following
 
 - **Value**: The value of the option.
 - **Label**: The label for the option.
+- **Group**: The label for the option group.
 
 The user can enter multiple options for the map.
 
@@ -647,7 +743,17 @@ This section allows you to configure additional features for the module. The ava
    - You can see the **"ALTER TABLE"** queries in the **Query** tab.
    - In the **Query** tab, you can also apply these queries directly to the database by executing them.
 
-## Step 12: Creating Localization
+## Step 12: Update Database Structure
+
+After creating your module and entities, you may need to update the database structure depending on the features you are using in the module. If you are using features such as activate, deactivate, or sort order, but you don't yet have columns for them, or you are using approval and trash features, MagicAppBuilder will add several columns to the created entities. As a result, you will need to update the database structure.
+
+Open the Query tab, check **Merge queries by table** and **Select all**. By default, **Merge queries by table** is already checked.
+
+MagicAppBuilder will generate a database query to update the database structure. If MagicAppBuilder does not display a query, it means the database structure is already in line with the entities you created. If MagicAppBuilder displays a query, execute the query by selecting the query to execute, then click the **Execute Query** button located below the editor. MagicAppBuilder will display a dialog and copy the query you selected. Proceed by clicking the **Execute** button at the bottom of the dialog. MagicAppBuilder will update the contents of the editor according to the latest conditions.
+
+If you need a query to create the database structure from scratch for a new, empty database, check **Create new**. MagicAppBuilder will generate a database query to create all the tables instead of a query to update the structure.
+
+## Step 13: Creating Localization
 
 You can create localization by translating both modules and entities into other languages as per the user’s needs.
 
@@ -679,7 +785,7 @@ You can create localization by translating both modules and entities into other 
 
    - You will need to translate each entity individually.
 
-## Step 13: Add Favicon to the Application
+## Step 14: Add Favicon to the Application
 
 Go to the Apps tab, and MagicAppBuilder will display the application cards. Click the Icon button on an application. Upload a square image in PNG format. The minimum image size is 512x125 pixels. The application will automatically generate several icon files in the application directory with the following names:
 

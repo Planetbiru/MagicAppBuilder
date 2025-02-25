@@ -2,7 +2,6 @@
 
 namespace MagicApp\XLSX;
 
-use MagicApp\AppLanguage;
 use MagicObject\Database\PicoPageData;
 use MagicObject\MagicObject;
 
@@ -24,20 +23,11 @@ class DocumentWriter
     protected $headerFormat = array();
 
     /**
-     * Application language
-     *
-     * @var AppLanguage
-     */
-    protected $appLanguage;
-
-    /**
      * Constructor
      *
-     * @param AppLanguage $appLanguage Application language instance
      */
-    public function __construct($appLanguage)
+    public function __construct()
     {
-        $this->appLanguage = $appLanguage;
     }
 
     /**
@@ -52,47 +42,22 @@ class DocumentWriter
     }
 
     /**
-     * Get the application language
-     *
-     * @return AppLanguage The current application language
-     */ 
-    public function getAppLanguage()
-    {
-        return $this->appLanguage;
-    }
-
-    /**
-     * Set the application language
-     *
-     * @param AppLanguage $appLanguage Application language
-     * @return DocumentWriter
-     */ 
-    public function setAppLanguage($appLanguage)
-    {
-        $this->appLanguage = $appLanguage;
-
-        return $this;
-    }
-
-    /**
      * Create an instance of XLSXDocumentWriter
      *
-     * @param AppLanguage $appLanguage Application language
      * @return XLSXDocumentWriter An instance of XLSXDocumentWriter
      */
-    public static function getXLSXDocumentWriter($appLanguage)
+    public static function getXLSXDocumentWriter()
     {
-        return new XLSXDocumentWriter($appLanguage);
+        return new XLSXDocumentWriter();
     }
 
     /**
      * Create an instance of CSVDocumentWriter
      *
-     * @param AppLanguage $appLanguage Application language
      * @return CSVDocumentWriter An instance of CSVDocumentWriter
      */
-    public static function getCSVDocumentWriter($appLanguage)
+    public static function getCSVDocumentWriter()
     {
-        return new CSVDocumentWriter($appLanguage);
+        return new CSVDocumentWriter();
     }
 }

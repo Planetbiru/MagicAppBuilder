@@ -160,7 +160,7 @@ class PicoTableInfo // NOSONAR
         $stdClass->notNullColumns = $this->notNullColumns;
         $stdClass->noCache = $this->noCache;
         $stdClass->package = $this->package;
-        return json_encode($stdClass);
+        return json_encode($stdClass, JSON_PRETTY_PRINT);
     }
 
     /**

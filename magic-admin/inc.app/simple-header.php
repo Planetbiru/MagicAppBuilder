@@ -26,5 +26,5 @@
   <div class="container container-custom mt-5">
     <div class="row">
       <div class="col-12">
-        <h3>Admin Profile</h3>
+        <h3><?php echo $appLanguage->getAdministratorProfile();?></h3>
         

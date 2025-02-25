@@ -10,6 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="module")
+ * @package AppBuilder\App\Entity\App
  */
 class AppModuleImpl extends MagicObject
 {

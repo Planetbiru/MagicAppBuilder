@@ -4,6 +4,7 @@ let currentModule = "";
 let currentEntity2Translated = "";
 let lastErrorLine = -1;
 let ajaxPending = 0;
+let referenceResource = '';
 
 /**
  * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
@@ -197,7 +198,114 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
   return target.replace(new RegExp(search, "g"), replacement);
 };
 
+/**
+ * Load main resource
+ */
 jQuery(function () {
+  $('body').load('lib.ajax/body.min.html', function () {
+    initAll();
+    initEditor();
+  });
+});
+
+// Add event listener
+let initAll = function () {
+  $(document).on('click', '.group-reference', function(e2){
+    let value = $(this).val();
+    $(this).closest('table').attr('data-group-source', value);
+  });
+  
+  $(document).on('click', '#button_delete_module_file', function (e) {
+    e.preventDefault();
+    asyncAlert(
+      `Do you want to delete file ${currentModule}.php?`,  // Message to display in the modal
+      'Confirmation',  
+      [
+        {
+          'caption': 'Yes',  
+          'fn': () => {
+            
+            increaseAjaxPending();
+            $.ajax({
+              type: "POST",
+              url: "lib.ajax/module-delete.php",
+              dataType: "json",
+              data: { module: currentModule},
+              success: function (data) {
+                decreaseAjaxPending();
+                updateModuleFile();
+                if(data.success)
+                {
+                  $('#button_save_module_file').attr('disabled', 'disabled');
+                  $('#button_delete_module_file').attr('disabled', 'disabled');
+                  cmEditorModule.getDoc().setValue('');
+                  setTimeout(function () // NOSONAR
+                  {
+                    cmEditorModule.refresh();
+                  }, 1);
+                }
+              }, 
+              error: function(e){
+                decreaseAjaxPending();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+  });
+
+  $(document).on('click', '#button_delete_entity_file', function (e) {
+    e.preventDefault();
+    asyncAlert(
+      `Do you want to delete file ${currentEntity}.php?`,  // Message to display in the modal
+      'Confirmation',  
+      [
+        {
+          'caption': 'Yes',  
+          'fn': () => {
+            
+            increaseAjaxPending();
+            $.ajax({
+              type: "POST",
+              url: "lib.ajax/entity-delete.php",
+              dataType: "json",
+              data: { entity: currentEntity},
+              success: function (data) {
+                decreaseAjaxPending();
+                updateEntityFile();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+                removeHilightLineError();
+                if(data.success)
+                {
+                  setEntityFile('');
+                  $('#button_save_entity_file').attr('disabled', 'disabled');
+                  $('#button_save_entity_file_as').attr('disabled', 'disabled');
+                  $('#button_delete_entity_file').attr('disabled', 'disabled');
+                }
+              }, 
+              error: function(e){
+                decreaseAjaxPending();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+  });
 
   $(document).on('change', '.multiple-selection', function (e) {
     let val = $(this).val();
@@ -430,6 +538,10 @@ jQuery(function () {
     let table = $(this).closest("table");
     removeLastColumn(table);
   });
+  $(document).on("click", ".btn-clear-group", function(e){
+    let table = $(this).closest("table");
+    clearGroup(table);
+  });
 
   $(document).on("click", ".btn-add-row", function (e) {
     let table = $(this).closest("table");
@@ -462,12 +574,34 @@ jQuery(function () {
       nrow == 1 &&
       $(this).closest("table").attr("data-empty-on-remove") == "true"
     ) {
-      $(this)
-        .closest("tr")
-        .find(":input")
-        .each(function (e3) {
-          $(this).val("");
-        });
+      asyncAlert(
+        'Do you want to clear this row?',
+        'Confirmation',
+        [
+          {
+            'caption': 'Yes',
+            'fn': () => {
+              $(this)
+                .closest("tr")
+                .find(":input")
+                .each(function (e3) {
+                  if ($(this).is(":checkbox, :radio")) {
+                    $(this).prop("checked", false);
+                  } else {
+                    $(this).val("");
+                  }
+                });
+            },
+            'class': 'btn-primary'
+          },
+          {
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
+          }
+        ]
+      );
+      
     }
   });
 
@@ -758,11 +892,11 @@ jQuery(function () {
     );
   });
 
-  $(document).on('change', '.map-key', function (e) {
+  $(document).on('change', '.rd-map-key', function (e) {
     onChangeMapKey($(this));
   });
 
-  $(document).on('keyup', '.map-key', function (e) {
+  $(document).on('keyup', '.rd-map-key', function (e) {
     onChangeMapKey($(this));
   });
 
@@ -1231,7 +1365,6 @@ jQuery(function () {
           // prevent autofill password
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
-        loadAllResource();
         updateBtn[0].disabled = false;
       }
     });
@@ -1269,7 +1402,6 @@ jQuery(function () {
       success: function (data) {
         decreaseAjaxPending();
         $('#modal-application-menu .modal-body').empty().append(data);
-        loadAllResource();
         updateBtn[0].disabled = false;
         initMenu();
       }
@@ -1592,10 +1724,20 @@ jQuery(function () {
   $(document).on("click", '.button-application-icons', function () {
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     
+    let el = document.querySelector('#iconFileInput');
+    if(el)
+    {
+      el.parentNode.removeChild(el);
+    }
+    
     // Create dynamic input file element
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
     inputFile.accept = 'image/png';  // Only accept PNG files
+    inputFile.id = 'iconFileInput';
+    inputFile.style.position = 'absolute';
+    inputFile.style.left = '-1000000px';
+    inputFile.style.top = '-1000000px';
 
     // Handle file selection change
     inputFile.addEventListener('change', function () {
@@ -1613,78 +1755,153 @@ jQuery(function () {
                 }
               ]
             );
-            return;
         }
+        else
+        {
         
-        // Read the file using FileReader
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const image = new Image();
+          // Read the file using FileReader
+          const reader = new FileReader();
+          reader.onload = function(event) {
+              const image = new Image();
+              
+              image.onload = function() // NOSONAR
+              {
+                  // Validate image dimensions (minimum 512x512)
+                  if (image.width < 512 || image.height < 512) {
+                      asyncAlert(
+                        'The image must be at least 512x512 pixels.',  // Message to display in the modal
+                        'Notification',  
+                        [
+                          {
+                            'caption': 'Close',  
+                            'fn': () => {
+                            },  
+                            'class': 'btn-primary'  
+                          }
+                        ]
+                      );
+                      return;
+                  }
+
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const iconSizes = [
+                      { size: 16, name: "favicon-16x16.png" },
+                      { size: 32, name: "favicon-32x32.png" },
+                      { size: 48, name: "favicon-48x48.png" },
+                      { size: 57, name: "apple-icon-57x57.png" },
+                      { size: 60, name: "apple-icon-60x60.png" },
+                      { size: 72, name: "apple-icon-72x72.png" },
+                      { size: 76, name: "apple-icon-76x76.png" },
+                      { size: 114, name: "apple-icon-114x114.png" },
+                      { size: 120, name: "apple-icon-120x120.png" },
+                      { size: 144, name: "apple-icon-144x144.png" },
+                      { size: 152, name: "apple-icon-152x152.png" },
+                      { size: 180, name: "apple-icon-180x180.png" },
+                      { size: 192, name: "android-icon-192x192.png" },
+                      { size: 512, name: "android-icon-512x512.png" }
+                  ];
+
+                  // Generate icons for each size
+                  iconSizes.forEach(icon => {
+                      canvas.width = icon.size;
+                      canvas.height = icon.size;
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                      const dataUrl = canvas.toDataURL('image/png');
+
+                      // Send each PNG icon to the server
+                      sendIconPngToServer(applicationId, dataUrl, icon.name);
+                  });
+
+                  // Additional step: Generate favicon.ico
+                  generateFaviconICO(applicationId, image);
+              };
             
-            image.onload = function() // NOSONAR
-            {
-                // Validate image dimensions (minimum 512x512)
-                if (image.width < 512 || image.height < 512) {
-                    asyncAlert(
-                      'The image must be at least 512x512 pixels.',  // Message to display in the modal
-                      'Notification',  
-                      [
-                        {
-                          'caption': 'Close',  
-                          'fn': () => {
-                          },  
-                          'class': 'btn-primary'  
-                        }
-                      ]
-                    );
-                    return;
-                }
+              // Load the image data
+              image.src = event.target.result;
+          };
 
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const iconSizes = [
-                    { size: 16, name: "favicon-16x16.png" },
-                    { size: 32, name: "favicon-32x32.png" },
-                    { size: 48, name: "favicon-48x48.png" },
-                    { size: 57, name: "apple-icon-57x57.png" },
-                    { size: 60, name: "apple-icon-60x60.png" },
-                    { size: 72, name: "apple-icon-72x72.png" },
-                    { size: 76, name: "apple-icon-76x76.png" },
-                    { size: 114, name: "apple-icon-114x114.png" },
-                    { size: 120, name: "apple-icon-120x120.png" },
-                    { size: 144, name: "apple-icon-144x144.png" },
-                    { size: 152, name: "apple-icon-152x152.png" },
-                    { size: 180, name: "apple-icon-180x180.png" },
-                    { size: 192, name: "android-icon-192x192.png" },
-                    { size: 512, name: "android-icon-512x512.png" }
-                ];
-
-                // Generate icons for each size
-                iconSizes.forEach(icon => {
-                    canvas.width = icon.size;
-                    canvas.height = icon.size;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
-                    const dataUrl = canvas.toDataURL('image/png');
-
-                    // Send each PNG icon to the server
-                    sendIconPngToServer(applicationId, dataUrl, icon.name);
-                });
-
-                // Additional step: Generate favicon.ico
-                generateFaviconICO(applicationId, image);
-            };
-          
-            // Load the image data
-            image.src = event.target.result;
-        };
-
-        // Read the image as a data URL
-        reader.readAsDataURL(selectedFile);
+          // Read the image as a data URL
+          reader.readAsDataURL(selectedFile);
+        }
     });
+    
 
     // Trigger input file dialog
     inputFile.click();  // Open file selection dialog
+  });
+  
+  $(document).on('click', '.button-open-file', function(e1){
+    let el = document.querySelector('#sqlFileInput');
+    if(el)
+    {
+      el.parentNode.removeChild(el);
+    }
+    const inputFile = document.createElement('input');
+    inputFile.type = 'file';
+    inputFile.accept = '.sql';  
+    inputFile.id = 'sqlFileInput';
+    inputFile.style.position = 'absolute';
+    inputFile.style.left = '-1000000px';
+    inputFile.style.top = '-1000000px';
+    document.querySelector('body').appendChild(inputFile);
+    inputFile.addEventListener('change', function handleFileSelect(event) {
+      const file = event.target.files[0]; 
+      if (file) 
+      {
+        const reader = new FileReader();
+        reader.onload = function(e2) {
+          const content = e2.target.result; 
+          inputFile.parentNode.removeChild(inputFile);
+          cmEditorSQLExecute.getDoc().setValue(content);
+          cmEditorSQLExecute.refresh();
+        };
+        reader.readAsText(file);
+      }
+      else
+      {
+        inputFile.parentNode.removeChild(inputFile);
+      }
+    });
+    inputFile.click();
+  });
+  
+  $(document).on('change', '.input-element-type', function(e1){
+    if($(this)[0].checked)
+    {
+      let tr = $(this).closest('tr');
+      if($(this).val() == 'text' || $(this).val() == 'select')
+      {
+        tr.find('.input-multiple-data')[0].disabled = false;
+      }
+      else
+      {
+        tr.find('.input-multiple-data')[0].disabled = true;
+        tr.find('.input-multiple-data')[0].checked = false;
+      }
+    }
+  });
+  
+  $(document).on('change', '.input-field-filter', function(e1){
+    let tr = $(this).closest('tr');
+    if($(this)[0].checked)
+    {
+      if($(this).val() == 'text' || $(this).val() == 'select')
+      {
+        tr.find('.input-multiple-filter')[0].disabled = false;
+      }
+      else
+      {
+        tr.find('.input-multiple-filter')[0].disabled = true;
+        tr.find('.input-multiple-filter')[0].checked = false;
+      }
+    }
+    else
+    {
+      tr.find('.input-multiple-filter')[0].disabled = true;
+      tr.find('.input-multiple-filter')[0].checked = false;
+    }
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -1694,7 +1911,27 @@ jQuery(function () {
   loadAllResource();
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
-});
+  loadReferenceResource();
+};
+
+function loadReferenceResource()
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/reference.min.html',
+    success: function(data){
+      referenceResource = data;
+      decreaseAjaxPending();
+    },
+    error: function(e)
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+
 
 /**
  * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
@@ -2989,7 +3226,7 @@ function downloadPNG() {
  */
 function onChangeMapKey(obj) {
   let val = obj.val();
-  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'default')) {
+  if ((val.toLowerCase() == 'label' || val.toLowerCase() == 'value' || val.toLowerCase() == 'goup' || val.toLowerCase() == 'selected')) {
     if (!obj.hasClass('input-invalid-value')) {
       obj.addClass('input-invalid-value');
       setTimeout(function () {
@@ -3298,6 +3535,7 @@ function getEntityFile(entity, clbk) {
         cmEditorFile.refresh();
       }, 1);
       $("#button_save_entity_file").removeAttr("disabled");
+      $("#button_delete_entity_file").removeAttr("disabled");
       currentEntity = entity[0];
       if (clbk) {
         clbk();
@@ -3332,6 +3570,7 @@ function getModuleFile(module, clbk) {
         cmEditorModule.refresh();
       }, 1);
       $("#button_save_module_file").removeAttr("disabled");
+      $("#button_delete_module_file").removeAttr("disabled");
       currentModule = module;
       if (clbk) {
         clbk();
@@ -3667,6 +3906,9 @@ function generateScript(selector) {
       let referenceFilter = parseJsonData(
         $(this).find("input.reference-filter").val()
       );
+      
+      let multipleData = $(this).find("input.input-multiple-data")[0].checked;
+      let multipleFilter = $(this).find("input.input-multiple-filter")[0].checked;
 
       let field = {
         fieldName: fieldName,
@@ -3684,6 +3926,8 @@ function generateScript(selector) {
         inputFilter: inputFilter,
         referenceData: referenceData,
         referenceFilter: referenceFilter,
+        multipleData: multipleData,
+        multipleFilter: multipleFilter
       };
       fields.push(field);
     });
@@ -3753,7 +3997,7 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
-    moduleAdMenu: $('[name="module_as_menu"]').val(),
+    moduleAsMenu: $('[name="module_as_menu"]').val(),
     moduleMenu: $('[name="module_menu"]').val(),
     target: $('#current_module_location').val(),
     updateEntity: $('[name="update_entity"]')[0].checked,
@@ -4135,6 +4379,17 @@ function loadColumn(tableName, selector) {
 }
 
 /**
+ * Checks if a value is true (either boolean true or string 'true').
+ *
+ * @param {any} value - The value to check.
+ * @returns {boolean} - Returns true if value is boolean true or string 'true', otherwise false.
+ */
+function isTrue(value)
+{
+  return value === true || value == 'true';
+}
+
+/**
  * Restores the form data from a given object.
  *
  * This function takes a data object containing configuration settings
@@ -4167,13 +4422,13 @@ function restoreForm(data)  //NOSONAR
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
 
-          tr.find('.include_insert')[0].checked = data.fields[i].includeInsert === true || data.fields[i].includeInsert == 'true';
-          tr.find('.include_edit')[0].checked = data.fields[i].includeEdit === true || data.fields[i].includeEdit == 'true';
-          tr.find('.include_detail')[0].checked = data.fields[i].includeDetail === true || data.fields[i].includeDetail == 'true';
-          tr.find('.include_list')[0].checked = data.fields[i].includeList === true || data.fields[i].includeList == 'true';
-          tr.find('.include_export')[0].checked = data.fields[i].includeExport === true || data.fields[i].includeExport == 'true';
-          tr.find('.include_key')[0].checked = data.fields[i].isKey === true || data.fields[i].isKey == 'true';
-          tr.find('.include_required')[0].checked = data.fields[i].isInputRequired === true || data.fields[i].isInputRequired == 'true';
+          tr.find('.include_insert')[0].checked = this.isTrue(data.fields[i].includeInsert);
+          tr.find('.include_edit')[0].checked = this.isTrue(data.fields[i].includeEdit);
+          tr.find('.include_detail')[0].checked = this.isTrue(data.fields[i].includeDetail);
+          tr.find('.include_list')[0].checked = this.isTrue(data.fields[i].includeList);
+          tr.find('.include_export')[0].checked = this.isTrue(data.fields[i].includeExport);
+          tr.find('.include_key')[0].checked = this.isTrue(data.fields[i].isKey);
+          tr.find('.include_required')[0].checked = this.isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
 
           if (data.fields[i].elementType == 'select') {
@@ -4189,13 +4444,40 @@ function restoreForm(data)  //NOSONAR
           if (data.fields[i].filterElementType == 'text') {
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
           }
-
-          tr.find('.input-field-data-type').val(data.fields[i].dataType)
-          tr.find('.input-data-filter').val(data.fields[i].inputFilter)
+          
+          if(data.fields[i].elementType == 'text' || data.fields[i].elementType == 'select')
+          {
+            tr.find('.input-multiple-data')[0].disabled = false;
+            if(this.isTrue(data.fields[i].multipleData))
+            {
+              tr.find('.input-multiple-data')[0].checked = 1;
+            }
+          }
+          else
+          {
+            tr.find('.input-multiple-data')[0].disabled = true;
+          }
+          
+          if(data.fields[i].filterElementType == 'text' || data.fields[i].filterElementType == 'select')
+          {
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            if(this.isTrue(data.fields[i].multipleFilter))
+            {
+              tr.find('.input-multiple-filter')[0].checked = 1;
+            }
+          }
+          else
+          {
+            tr.find('.input-multiple-filter')[0].disabled = true;
+          }
+          
+          tr.find('.input-field-data-type').val(data.fields[i].dataType);
+          tr.find('.input-data-filter').val(data.fields[i].inputFilter);
         }
       }
     }
   }
+
 
   let cnt;
   let selector;
@@ -4412,37 +4694,34 @@ function generateSelectFilter(field, args)  //NOSONAR
     ],
   };
 
-  virtualDOM = $(
-    '<select class="form-control input-data-filter" name="filter_type_' +
-    field +
-    '" id="filter_type_' +
-    field +
-    '">\r\n' +
-    '<option value="FILTER_DEFAULT">DEFAULT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_BOOL">BOOL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_INT">NUMBER_INT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_UINT">NUMBER_UINT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_OCTAL">NUMBER_OCTAL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_HEXADECIMAL">NUMBER_HEXADECIMAL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NUMBER_FLOAT">NUMBER_FLOAT</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING">STRING</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING_INLINE">STRING_INLINE</option>\r\n' +
-    '<option value="FILTER_SANITIZE_NO_DOUBLE_SPACE">NO_DOUBLE_SPACE</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRIPPED">STRIPPED</option>\r\n' +
-    '<option value="FILTER_SANITIZE_SPECIAL_CHARS">SPECIAL_CHARS</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHA">ALPHA</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHANUMERIC">ALPHANUMERIC</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ALPHANUMERICPUNC">ALPHANUMERICPUNC</option>\r\n' +
-    '<option value="FILTER_SANITIZE_STRING_BASE64">STRING_BASE64</option>\r\n' +
-    '<option value="FILTER_SANITIZE_EMAIL">EMAIL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_URL">URL</option>\r\n' +
-    '<option value="FILTER_SANITIZE_IP">IP</option>\r\n' +
-    '<option value="FILTER_SANITIZE_ENCODED">ENCODED</option>\r\n' +
-    '<option value="FILTER_SANITIZE_COLOR">COLOR</option>\r\n' +
-    '<option value="FILTER_SANITIZE_MAGIC_QUOTES">MAGIC_QUOTES</option>\r\n' +
-    '<option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>\r\n' +
-    "</select>\r\n"
-  );
+  virtualDOM = $(`
+    <select class="form-control input-data-filter" name="filter_type_${field}" id="filter_type_${field}">
+        <option value="FILTER_DEFAULT">DEFAULT</option>
+        <option value="FILTER_SANITIZE_BOOL">BOOL</option>
+        <option value="FILTER_SANITIZE_NUMBER_INT">NUMBER_INT</option>
+        <option value="FILTER_SANITIZE_NUMBER_UINT">NUMBER_UINT</option>
+        <option value="FILTER_SANITIZE_NUMBER_OCTAL">NUMBER_OCTAL</option>
+        <option value="FILTER_SANITIZE_NUMBER_HEXADECIMAL">NUMBER_HEXADECIMAL</option>
+        <option value="FILTER_SANITIZE_NUMBER_FLOAT">NUMBER_FLOAT</option>
+        <option value="FILTER_SANITIZE_STRING">STRING</option>
+        <option value="FILTER_SANITIZE_STRING_INLINE">STRING_INLINE</option>
+        <option value="FILTER_SANITIZE_NO_DOUBLE_SPACE">NO_DOUBLE_SPACE</option>
+        <option value="FILTER_SANITIZE_STRIPPED">STRIPPED</option>
+        <option value="FILTER_SANITIZE_SPECIAL_CHARS">SPECIAL_CHARS</option>
+        <option value="FILTER_SANITIZE_ALPHA">ALPHA</option>
+        <option value="FILTER_SANITIZE_ALPHANUMERIC">ALPHANUMERIC</option>
+        <option value="FILTER_SANITIZE_ALPHANUMERICPUNC">ALPHANUMERICPUNC</option>
+        <option value="FILTER_SANITIZE_STRING_BASE64">STRING_BASE64</option>
+        <option value="FILTER_SANITIZE_EMAIL">EMAIL</option>
+        <option value="FILTER_SANITIZE_URL">URL</option>
+        <option value="FILTER_SANITIZE_IP">IP</option>
+        <option value="FILTER_SANITIZE_ENCODED">ENCODED</option>
+        <option value="FILTER_SANITIZE_COLOR">COLOR</option>
+        <option value="FILTER_SANITIZE_MAGIC_QUOTES">MAGIC_QUOTES</option>
+        <option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>
+    </select>
+  `);
+
 
   let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";
@@ -4547,27 +4826,25 @@ function generateSelectType(field, args) {
     ],
   };
 
-  virtualDOM = $(
-    '<select class="form-control input-field-data-type" name="data_type_' +
-    field +
-    '" id="data_type_' +
-    field +
-    '">\r\n' +
-    '<option value="text" title="&lt;input type=&quot;text&quot;&gt;">text</option>\r\n' +
-    '<option value="email" title="&lt;input type=&quot;email&quot;&gt;">email</option>\r\n' +
-    '<option value="url" title="&lt;input type=&quot;url&quot;&gt;">url</option>\r\n' +
-    '<option value="tel" title="&lt;input type=&quot;tel&quot;&gt;">tel</option>\r\n' +
-    '<option value="password" title="&lt;input type=&quot;password&quot;&gt;">password</option>\r\n' +
-    '<option value="int" title="&lt;input type=&quot;number&quot;&gt;">int</option>\r\n' +
-    '<option value="float" title="&lt;input type=&quot;number&quot; step=&quot;any&quot;&gt;">float</option>\r\n' +
-    '<option value="date" title="&lt;input type=&quot;text&date;&gt;">date</option>\r\n' +
-    '<option value="time" title="&lt;input type=&quot;time&quot;&gt;">time</option>\r\n' +
-    '<option value="datetime-local" title="&lt;input type=&quot;datetime-local&quot;&gt;">datetime</option>\r\n' +
-    '<option value="week" title="&lt;input type=&quot;month&quot;&gt;">month</option>\r\n' +
-    '<option value="week" title="&lt;input type=&quot;week&quot;&gt;">week</option>\r\n' +
-    '<option value="color" title="&lt;input type=&quot;color&quot;&gt;">color</option>\r\n' +
-    "</select>\r\n"
-  );
+  virtualDOM = $(`
+    <select class="form-control input-field-data-type" name="data_type_${field}" id="data_type_${field}">
+        <option value="text" title="&lt;input type=&#39;text&#39;&gt;">text</option>
+        <option value="email" title="&lt;input type=&#39;email&#39;&gt;">email</option>
+        <option value="url" title="&lt;input type=&#39;url&#39;&gt;">url</option>
+        <option value="tel" title="&lt;input type=&#39;tel&#39;&gt;">tel</option>
+        <option value="password" title="&lt;input type=&#39;password&#39;&gt;">password</option>
+        <option value="int" title="&lt;input type=&#39;number&#39;&gt;">int</option>
+        <option value="float" title="&lt;input type=&#39;number&#39; step=&#39;any&#39;&gt;">float</option>
+        <option value="date" title="&lt;input type=&#39;date&#39;&gt;">date</option>
+        <option value="time" title="&lt;input type=&#39;time&#39;&gt;">time</option>
+        <option value="datetime-local" title="&lt;input type=&#39;datetime-local&#39;&gt;">datetime</option>
+        <option value="month" title="&lt;input type=&#39;month&#39;&gt;">month</option>
+        <option value="week" title="&lt;input type=&#39;week&#39;&gt;">week</option>
+        <option value="color" title="&lt;input type=&#39;color&#39;&gt;">color</option>
+    </select>
+  `);
+
+
 
   let i;
   let j;
@@ -4660,82 +4937,118 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
   let listRow = "";
   let exportRow = "";
   if ($.inArray(field, skippedOnInsertEdit) != -1) {
-    insertRow =
-      '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
-      field +
-      '" value="0" disabled="disabled"></td>\r\n';
-    editRow =
-      '  <td align="center"><input type="checkbox" class="include_edit" name="include_edit_' +
-      field +
-      '" value="0" disabled="disabled"></td>\r\n';
-    listRow =
-      '  <td align="center"><input type="checkbox" class="include_list" name="include_list_' +
-      field +
-      '" value="1"></td>\r\n';
+    insertRow = `
+      <td align="center">
+        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="0" disabled="disabled">
+      </td>
+    `;
+
+    editRow = `
+      <td align="center">
+        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="0" disabled="disabled">
+      </td>
+    `;
+
+    listRow = `
+      <td align="center">
+        <input type="checkbox" class="include_list" name="include_list_${field}" value="1">
+      </td>
+    `;
+
   } else {
-    insertRow =
-      '  <td align="center"><input type="checkbox" class="include_insert" name="include_insert_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
-    editRow =
-      '  <td align="center"><input type="checkbox" class="include_edit" name="include_edit_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
-    listRow =
-      '  <td align="center"><input type="checkbox" class="include_list" name="include_list_' +
-      field +
-      '" value="1" checked="checked"></td>\r\n';
+    insertRow = `
+      <td align="center">
+        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="1" checked="checked">
+      </td>
+    `;
+
+    editRow = `
+      <td align="center">
+        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="1" checked="checked">
+      </td>
+    `;
+
+    listRow = `
+      <td align="center">
+        <input type="checkbox" class="include_list" name="include_list_${field}" value="1" checked="checked">
+      </td>
+    `;
+
   }
 
-  exportRow =
-    '  <td align="center"><input type="checkbox" class="include_export" name="include_export_' +
-    field +
-    '" value="1" checked="checked"></td>\r\n';
+  exportRow = `
+    <td align="center">
+      <input type="checkbox" class="include_export" name="include_export_${field}" value="1" checked="checked">
+    </td>
+  `;
 
-  let rowHTML =
-    '<tr data-field-name="' +
-    field +
-    '" ' +
-    cls +
-    ">\r\n" +
-    '  <td class="data-sort data-sort-body data-sort-handler"></td>\r\n' +
-    '  <td class="field-name">' +
-    field +
-    '<input type="hidden" name="field" value="' +
-    field +
-    '"></td>\r\n' +
-    '  <td><input type="hidden" class="input-field-name" name="caption_' +
-    field +
-    '" value="' + field.replaceAll("_", " ").capitalize().prettify().trim() + '" autocomplete="off" spellcheck="false">' + field.replaceAll("_", " ").capitalize().prettify().trim() + '</td>\r\n' +
-    insertRow + editRow +
-    '  <td align="center"><input type="checkbox" class="include_detail" name="include_detail_' + field + '" value="1" checked="checked"></td>\r\n' +
-    listRow +
-    exportRow +
-    '  <td align="center"><input type="checkbox" class="include_key" name="include_key_' + field + '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" class="include_required" name="include_required_' + field + '" value="1"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="text" checked="checked"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="textarea"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="checkbox"></td>\r\n' +
-    '  <td align="center"><input type="radio" class="input-element-type" name="element_type_' + field + '" value="select"></td>\r\n' +
-    '  <td align="center"><input type="hidden" class="reference-data" name="reference_data_' +
-    field +
-    '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button></td>\r\n' +
-    '  <td align="center"><input type="checkbox" name="list_filter_' +
-    field +
-    '" value="text" class="input-field-filter"></td>\r\n' +
-    '  <td align="center"><input type="checkbox" name="list_filter_' +
-    field +
-    '" value="select" class="input-field-filter"></td>\r\n' +
-    '  <td align="center"><input type="hidden" class="reference-filter" name="reference_filter_' +
-    field +
-    '" value="{}"><button type="button" class="btn btn-sm btn-primary reference-button reference_button_filter">Source</button></td>\r\n' +
-    "  <td>\r\n" +
-    generateSelectType(field, args) +
-    "  </td>\r\n" +
-    "  <td>\r\n" +
-    generateSelectFilter(field, args) +
-    "  </td>\r\n" +
-    "</tr>\r\n";
+  let rowHTML = `
+    <tr data-field-name="${field}" ${cls}>
+      <td class="data-sort data-sort-body data-sort-handler"></td>
+      <td class="field-name">
+        ${field}
+        <input type="hidden" name="field" value="${field}">
+      </td>
+      <td>
+        <input type="hidden" class="input-field-name" name="caption_${field}" 
+          value="${field.replaceAll("_", " ").capitalize().prettify().trim()}" 
+          autocomplete="off" spellcheck="false">
+        ${field.replaceAll("_", " ").capitalize().prettify().trim()}
+      </td>
+      ${insertRow} ${editRow}
+      <td align="center">
+        <input type="checkbox" class="include_detail" name="include_detail_${field}" value="1" checked="checked">
+      </td>
+      ${listRow}
+      ${exportRow}
+      <td align="center">
+        <input type="checkbox" class="include_key" name="include_key_${field}" value="1">
+      </td>
+      <td align="center">
+        <input type="checkbox" class="include_required" name="include_required_${field}" value="1">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="text" checked="checked">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="textarea">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="checkbox">
+      </td>
+      <td align="center">
+        <input type="radio" class="input-element-type" name="element_type_${field}" value="select">
+      </td>
+      <td align="center">
+        <input type="hidden" class="reference-data" name="reference_data_${field}" value="{}">
+        <button type="button" class="btn btn-sm btn-primary reference-button reference_button_data">Source</button>
+      </td>
+      <td align="center">
+        <input type="checkbox" class="input-multiple-data" name="multiple_data_${field}" value="1">
+      </td>
+      <td align="center">
+        <input type="checkbox" name="list_filter_${field}" value="text" class="input-field-filter">
+      </td>
+      <td align="center">
+        <input type="checkbox" name="list_filter_${field}" value="select" class="input-field-filter">
+      </td>
+      <td align="center">
+        <input type="hidden" class="reference-filter" name="reference_filter_${field}" value="{}">
+        <button type="button" class="btn btn-sm btn-primary reference-button reference_button_filter">Source</button>
+      </td>
+      <td align="center">
+        <input type="checkbox" class="input-multiple-filter" name="multiple_filter_${field}" value="1" disabled="disabled">
+      </td>
+      <td>
+        ${generateSelectType(field, args)}
+      </td>
+      <td>
+        ${generateSelectFilter(field, args)}
+      </td>
+    </tr>
+  `;
+
+
   return rowHTML;
 }
 
@@ -4753,7 +5066,6 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
  *   - yesno: Placeholder for yes/no data (currently null).
  *   - truefalse: Placeholder for true/false data (currently null).
  *   - onezero: Placeholder for one/zero data (currently null).
- *   - multipleSelection: The value from the multiple selection dropdown.
  */
 function serializeForm() {
   let type = null;
@@ -4762,7 +5074,6 @@ function serializeForm() {
       type = $(this).val();
     }
   });
-  let multipleSelection = $(".multiple-selection").val();
   let entity = getEntityData();
   let map = getMapData();
   let yesno = null;
@@ -4774,8 +5085,7 @@ function serializeForm() {
     map: map,
     yesno: yesno,
     truefalse: truefalse,
-    onezero: onezero,
-    multipleSelection: multipleSelection
+    onezero: onezero
   };
   return all;
 }
@@ -4817,8 +5127,8 @@ function addRow(table) {
 function addColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let pos = ncol - parseInt(table.attr("data-offset")) - 2;
-  let inputHeader = '<td><input class="form-control map-key" type="text" value="" placeholder="Additional attribute name"></td>';
-  let inputBody = '<td><input class="form-control map-value" type="text" value="" placeholder="Additional attribute value"></td>';
+  let inputHeader = '<td><input class="form-control rd-map-key" type="text" value="" placeholder="Additional attribute name"></td>';
+  let inputBody = '<td><input class="form-control rd-map-value" type="text" value="" placeholder="Additional attribute value"></td>';
   table
     .find("thead")
     .find("tr")
@@ -4836,7 +5146,7 @@ function addColumn(table) {
     .find("tfoot")
     .find("tr")
     .find("td")
-    .attr("colspan", table.find("thead").find("tr").find("td").length);
+    .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
 }
 
 /**
@@ -4847,8 +5157,9 @@ function addColumn(table) {
 function removeLastColumn(table) {
   let ncol = table.find("thead").find("tr").find("td").length;
   let offset = parseInt(table.attr("data-offset"));
+  let mincol = parseInt(table.attr("data-number-of-column"));
   let pos = ncol - offset - 2;
-  if (ncol > offset + 3) {
+  if (pos > mincol) {
     table
       .find("thead")
       .find("tr")
@@ -4866,8 +5177,53 @@ function removeLastColumn(table) {
       .find("tfoot")
       .find("tr")
       .find("td")
-      .attr("colspan", table.find("thead").find("tr").find("td").length);
+      .attr("colspan", table.find("thead").find("tr").find("td").length + 1);
   }
+  else
+  {
+    table
+      .find("thead")
+      .find("tr")
+      .find("td:nth(" + pos + ")")
+      .find(':input').val('');
+    table
+      .find("tbody")
+      .find("tr")
+      .each(function (e3) {
+        $(this)
+          .find("td:nth(" + pos + ")")
+          .find(':input').val('');
+      });
+  }
+}
+
+/**
+ * Clears the input values of all elements with the class "rd-group" in the given table.
+ * A confirmation prompt is shown to the user before clearing the values.
+ * 
+ * @param {jQuery} table - The jQuery object representing the table containing the groups.
+ * @returns {void}
+ */
+function clearGroup(table)
+{
+  asyncAlert(
+    'Do you want to clear the groups?',
+    'Confirmation',
+    [
+      {
+        'caption': 'Yes',
+        'fn': () => {
+          table.find(".rd-group").val("");
+        },
+        'class': 'btn-primary'
+      },
+      {
+        'caption': 'No',
+        'fn': () => { },
+        'class': 'btn-secondary'
+      }
+    ]
+  );
 }
 
 /**
@@ -4928,14 +5284,10 @@ function setEntityData(data) {
   $(selector).find(".rd-reference-property-name").val(entity.propertyName);
   $(selector).find(".rd-option-text-node-format").val(entity.textNodeFormat);
   $(selector).find(".rd-option-indent").val(entity.indent);
-  let multiple = data.multipleSelection || '0';
-  if (multiple != '1') {
-    multiple = '0';
-  }
-  $('.multiple-selection').val(multiple);
 
   setSpecificationData(data);
   setSortableData(data);
+  setGroupData(data);
   setAdditionalOutputData(data);
 }
 
@@ -4957,6 +5309,7 @@ function getEntityData() {
     indent: $(selector).find(".rd-option-indent").val(),
     specification: getSpecificationData(),
     sortable: getSortableData(),
+    group: getGroupData(),
     additionalOutput: getAdditionalOutputData(),
   };
   return entity;
@@ -5108,6 +5461,92 @@ function getSortableData() {
 }
 
 /**
+ * Sets group data into the element with the attribute `data-name="grouping"`.
+ *
+ * @param {Object} data - The data object containing group information.
+ * @param {Object} data.entity - The entity object that includes group details.
+ * @param {Object} data.entity.group - The group object containing values, labels, source, and entity.
+ * @param {string} data.entity.group.value - The main value of the group.
+ * @param {string} data.entity.group.label - The label of the group.
+ * @param {string} data.entity.group.source - The source of the group.
+ * @param {string} data.entity.group.entity - The entity associated with the group.
+ * @param {Array} [data.entity.group.map] - An optional array of mapping objects in the reference table.
+ * @param {string} data.entity.group.map[].value - The value of each mapping.
+ * @param {string} data.entity.group.map[].label - The label of each mapping.
+ */
+function setGroupData(data) {
+  let selector = $('[data-name="grouping"]');
+  if (data?.entity?.group) 
+  {
+    selector.attr('data-group-source', data.entity.group.source);
+    selector.find(".rd-group-value").val(data.entity.group.value);
+    selector.find(".rd-group-label").val(data.entity.group.label);
+    selector.find(".group-reference").filter('[value="'+data.entity.group.source+'"]')[0].checked = true;
+    selector.find(".rd-group-entity").val(data.entity.group.entity);
+    let table = selector.find('table.table-reference');
+    let group = data.entity.group;
+    if (group?.map?.length > 0) {
+      for (let i in group.map) {
+        if (i > 0) {
+          addRow(table);
+        }
+        let tr = table.find("tr:last-child");
+        let row = group.map[i];
+        tr.find(".rd-map-value").val(row.value);
+        tr.find(".rd-map-label").val(row.label);
+      }
+    }
+  }
+}
+
+/**
+ * Retrieves group data from the element with the attribute `data-name="grouping"`.
+ *
+ * @returns {Object} result - The object containing group data.
+ * @returns {string} result.value - The main value of the group.
+ * @returns {string} result.label - The label of the group.
+ * @returns {string} result.source - The source of the group.
+ * @returns {string} result.entity - The entity associated with the group.
+ * @returns {Array} result.map - An array of mapping objects in the reference table.
+ * @returns {string} result.map[].value - The value of each mapping.
+ * @returns {string} result.map[].label - The label of each mapping.
+ */
+function getGroupData() {
+  let result = {};
+  let map = [];
+
+  let selector = $('[data-name="grouping"]');
+
+  let value = selector.find(".rd-group-value").val();
+  let label = selector.find(".rd-group-label").val();
+  let source = selector.find(".group-reference:checked").val();
+  let entity = selector.find(".rd-group-entity").val();
+
+  result.value = value;
+  result.label = label;
+  result.source = source;
+  result.entity = entity;
+
+  $(selector)
+    .find(".table-reference tbody tr")
+    .each(function () {
+      let tr = $(this);
+      let value = tr.find(".rd-map-value").val().trim();
+      let label = tr.find(".rd-map-label").val().trim();
+      if (value.length > 0) { 
+        map.push({
+          value: value,
+          label: label,
+        });
+      }
+    });
+
+  result.map = map;
+  return result;
+}
+
+
+/**
  * Sets additional output data into the form based on the provided data object.
  *
  * @param {Object} data - The object containing additional output data to populate the form.
@@ -5160,63 +5599,44 @@ function getAdditionalOutputData() {
  *
  * @param {Object} data - The object containing map data to populate the form.
  */
-function setMapData(data)  //NOSONAR
+function setMapData(data) // NOSONAR
 {
   let selector = '[data-name="map"]';
   let table = $(selector);
   let keys = [];
   data.map = data.map ? data.map : [];
   let map = data.map;
-  let mapKey = [];  //NOSONAR
   if (map.length > 0) {
     let map0 = map[0];
     let objLength = 0;
-    let j = 0;
     for (let i in map0) {
       if (map0.hasOwnProperty(i)) {
         objLength++;
-        if (objLength > 4) {
+        if (objLength > 5) {
           addColumn(table);
         }
-        if (i != "value" && i != "label" && i != "default") {
+        if (i != "value" && i != "label" && i != "group" && i != "selected") {
           keys.push(i);
-          mapKey[j] = i;
         }
       }
     }
     for (let i in keys) {
-      let j = parseInt(i) + 1;
-      table
-        .find("thead")
-        .find("tr")
-        .find(".map-key:nth-child(" + j + ")")
-        .val(keys[i]);
+      table.find("thead tr .rd-map-key")[i].value = keys[i];
     }
-    if ($(selector).find("thead").find("tr").find(".map-key").length > 0) {
-      $(selector)
-        .find("thead")
-        .find("tr")
-        .find(".map-key")
-        .each(function (e) {
-          keys.push($(this).val().trim());
-        });
-    }
-
     for (let i in map) {
       if (i > 0) {
         addRow(table);
-      }
+      }  
       let tr = table.find("tr:last-child");
       let row = map[i];
       tr.find(".rd-value").val(row.value);
       tr.find(".rd-label").val(row.label);
-      if (map[i]["default"]) {
+      tr.find(".rd-group").val(row.group);
+      if (map[i]["selected"] == 'true' || map[i]["selected"] === true) {
         tr.find(".rd-selected")[0].checked = true;
       }
       for (let k in keys) {
-        let j = parseInt(k) + 1;
-        let refValue = map[i][keys[k]];
-        tr.find(".map-value:nth-child(" + j + ")").val(refValue);
+        tr.find(".rd-map-value")[k].value = map[i][keys[k]];
       }
     }
   }
@@ -5231,11 +5651,11 @@ function getMapData() {
   let result = [];
   let selector = '[data-name="map"]';
   let keys = [];
-  if ($(selector).find("thead").find("tr").find(".map-key").length > 0) {
+  if ($(selector).find("thead").find("tr").find(".rd-map-key").length > 0) {
     $(selector)
       .find("thead")
       .find("tr")
-      .find(".map-key")
+      .find(".rd-map-key")
       .each(function (e) {
         keys.push($(this).val().trim());
       });
@@ -5247,15 +5667,17 @@ function getMapData() {
       let tr = $(this);
       let value = tr.find(".rd-value").val().trim();
       let label = tr.find(".rd-label").val().trim();
-      let selected = tr.find(".rd-selected")[0].checked;
+      let group = tr.find(".rd-group").val().trim();
+      let selected = tr.find(".rd-selected")[0].checked ? 'true':'false';
       let opt = {
         value: value,
         label: label,
-        default: selected,
+        group: group,
+        selected: selected,
       };
       if (keys.length > 0) {
         let idx = 0;
-        tr.find(".map-value").each(function (e) {
+        tr.find(".rd-map-value").each(function (e) {
           let attrVal = $(this).val();
           if (keys[idx].length > 0) {
             opt[keys[idx]] = attrVal;
@@ -5342,250 +5764,9 @@ function setLanguage(languages) {
  * - Entity details (name, table name, primary key, etc.)
  * - Map details (value, label, additional attributes)
  * - Specification, sortable, and additional output configurations.
- * - Selection method (single or multiple) for both entity and map sections.
  *
  * @returns {string} The HTML string for the reference configuration form.
  */
 function getReferenceResource() {
-  return `
-<form action="">
-    <div class="reference-selector">
-      <label for="reference_type_entity"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_entity" value="entity" checked> Entity</label>
-      <label for="reference_type_map"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_map" value="map"> Map</label>
-      <label for="reference_type_yesno"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_yesno" value="yesno"> Yes/No</label>
-      <label for="reference_type_truefalse"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_truefalse" value="truefalse"> True/False</label>
-      <label for="reference_type_onezero"><input type="radio" class="reference_type" name="reference_type"
-              id="reference_type_onezero" value="onezero"> 1/0</label>
-    </div>
-    <div class="reference-container">
-        <div class="reference-section entity-section">
-            <h4>Entity</h4>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Entity Name</td>
-                          <td><input class="form-control rd-entity-name" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Table Name</td>
-                          <td><input class="form-control rd-table-name" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Primary Key</td>
-                          <td><input class="form-control rd-primary-key" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Value Column</td>
-                          <td><input class="form-control rd-value-column" type="text"></td>
-                      </tr>
-                      <tr class="display-reference">
-                          <td>Reference Object Name</td>
-                          <td><input class="form-control rd-reference-object-name" type="text"></td>
-                      </tr>
-                      <tr class="display-reference">
-                          <td>Reference Property Name</td>
-                          <td><input class="form-control rd-reference-property-name" type="text"></td>
-                      </tr>
-                      <tr class="entity-generator">
-                          <td></td>
-                          <td>
-                            <button type="button" class="btn btn-primary add_subfix">Add Entity Subfix</button>
-                            <button type="button" class="btn btn-success generate_entity">Generate Entity</button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-            <h4>Option Node</h4>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Format and Pamareters</td>
-                          <td><input class="form-control rd-option-text-node-format" type="text"></td>
-                      </tr>
-                      <tr>
-                          <td>Indent</td>
-                          <td><input class="form-control rd-option-indent" type="number" step="1" min="0"></td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-            <h4>Specfification</h4>
-            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
-            <div class="table-reference-container">
-              <table data-name="specification" class="table table-reference" data-empty-on-remove="true">
-                  <thead>
-                      <tr>
-                          <td width="40%">Column Name</td>
-                          <td width="12%">Comp</td>
-                          <td>Value</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td>
-                            <select class="form-control rd-comparison">
-                              <option value="equals">=</option>
-                              <option value="notEquals">!=</option>
-                              <option value="greaterThan">&gt;</option>
-                              <option value="greaterThanOrEquals">&gt;=</option>
-                              <option value="lessThan">&lt;</option>
-                              <option value="lessThanOrEquals">&lt;=</option>
-                            </select>
-                          </td>
-                          <td><input class="form-control rd-value" type="text" value=""></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="5">
-                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
-                          </td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Sortable</h4>
-            <p>Use at least one column to sort.</p>
-            <div class="table-reference-container">
-              <table data-name="sortable" class="table table-reference">
-                  <thead>
-                      <tr>
-                          <td width="60%">Column</td>
-                          <td>Value</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td><select class="form-control rd-order-type">
-                                  <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
-                                  <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
-                              </select></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="5"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Additional Output</h4>
-            <p>Just leave it blank if it doesn't exist. Click Remove button to remove value.</p>
-            <div class="table-reference-container">
-              <table data-name="additional-output" class="table table-reference" data-empty-on-remove="true">
-                  <thead>
-                      <tr>
-                          <td>Column</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-column-name" type="text" value=""></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="4"><button type="button" class="btn btn-primary btn-add-row">Add Row</button></td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Selection</h4>
-            <p>How user can select the options</p>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Selection</td>
-                          <td><select class="form-control multiple-selection">
-                            <option value="0">Single</option>
-                            <option value="1">Multiple</option>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-        </div>
-        <div class="reference-section map-section">
-            <h4>Map</h4>
-            <div class="table-reference-container">
-              <table data-name="map" class="table table-reference" data-offset="2">
-                  <thead>
-                      <tr>
-                          <td>Value</td>
-                          <td>Label</td>
-                          <td><input class="form-control map-key" type="text" value=""
-                                  placeholder="Additional attribute name"></td>
-                          <td>Def</td>
-                          <td width="42">Rem</td>
-                          <td colspan="2">Move</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td><input class="form-control rd-value" type="text" value=""></td>
-                          <td><input class="form-control rd-label" type="text" value=""></td>
-                          <td><input class="form-control map-value" type="text" value=""
-                                  placeholder="Additional attribute value"></td>
-                          <td><input type="checkbox" class="rd-selected"></td>
-                          <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                          <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                          <td colspan="7">
-                              <button type="button" class="btn btn-primary btn-add-row">Add Row</button>
-                              <button type="button" class="btn btn-primary btn-add-column">Add Column</button>
-                              <button type="button" class="btn btn-primary btn-remove-last-column">Remove Last
-                                  Column</button>
-                          </td>
-                      </tr>
-                  </tfoot>
-              </table>
-            </div>
-            <h4>Selection</h4>
-            <p>How user can select the options</p>
-            <div class="table-reference-container">
-              <table data-name="entity" class="modal-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                      <tr>
-                          <td>Selection</td>
-                          <td><select class="form-control multiple-selection">
-                            <option value="0">Single</option>
-                            <option value="1">Multiple</option>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
-        </div>
-    </div>
-</form>
-`;
+  return referenceResource;
 }

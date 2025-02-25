@@ -8,7 +8,6 @@ use MagicObject\Database\PicoDatabaseType;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
-
 $inputPost = new InputPost();
 
 try {
@@ -34,7 +33,7 @@ try {
             ->select("column_name, column_type, data_type, column_key")
             ->from("INFORMATION_SCHEMA.COLUMNS")
             ->where(
-                "TABLE_SCHEMA = ? AND TABLE_NAME = ? and column_name not in(?)",
+                "TABLE_SCHEMA = ? AND TABLE_NAME = ? AND column_name NOT IN (?)",
                 $databaseName,
                 $tableName,
                 $excludeColumns
@@ -63,7 +62,7 @@ try {
             c.table_catalog = ?
             AND c.table_schema = ? 
             AND c.table_name = ?
-            AND c.column_name not in(?)",
+            AND c.column_name NOT IN (?)",
             $databaseName,
             $databaseSchema,
             $tableName,

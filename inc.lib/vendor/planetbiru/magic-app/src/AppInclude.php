@@ -166,7 +166,7 @@ class AppInclude
      * Allows setting a new application configuration object.
      *
      * @param SecretObject $appConfig The application configuration to set.
-     * @return self The current instance, allowing method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setAppConfig($appConfig)
     {
@@ -193,7 +193,7 @@ class AppInclude
      * Allows setting a new module as the current one.
      *
      * @param PicoModule $currentModule The module to set as current.
-     * @return self The current instance, allowing method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setCurrentModule($currentModule)
     {

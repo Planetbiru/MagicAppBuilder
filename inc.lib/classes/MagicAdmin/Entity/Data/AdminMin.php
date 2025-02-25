@@ -81,7 +81,7 @@ class AdminMin extends MagicObject
 	/**
 	 * Birth Day
 	 * 
-	 * @Column(name="birth_day", type="text", nullable=true)
+	 * @Column(name="birth_day", type="date", nullable=true)
 	 * @Label(content="Birth Day")
 	 * @var string
 	 */

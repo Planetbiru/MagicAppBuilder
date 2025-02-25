@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -28,7 +28,6 @@ if($applicationId != null)
             }
             file_put_contents($menuPath, "");
         }
-
         $data = json_decode($inputPost->getData(), true);
         $yaml = PicoYamlUtil::dump($data, 0, 2, 0);
         file_put_contents($menuPath, $yaml);

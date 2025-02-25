@@ -84,28 +84,34 @@ class AppEntityLanguage extends PicoEntityLanguage
     public function loadEntityLanguage($entity, $appConfig, $currentLanguage)
     {
         $langs = new MagicObject();
-        $this->baseClassName = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace());
-        $this->fullClassName = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace(), 1);
-        $this->appConfig = $appConfig;
-        $this->currentLanguage = $currentLanguage;
-
         $app = $appConfig->getApplication();
         if(!isset($app))
         {
             $app = new SecretObject();
         }
+        $baseNamespace = $app->getEntityBaseNamespace();
+        if(isset($baseNamespace))
+        {
+            $fullClassName = get_class($entity);
+            $this->baseClassName = $this->baseClassName($fullClassName, $baseNamespace);
+            $this->fullClassName = $this->baseClassName($fullClassName, $baseNamespace, 1);
+            
+            $this->appConfig = $appConfig;
+            $this->currentLanguage = $currentLanguage;
 
-        $this->baseLanguageDirectory = $app->getBaseLanguageDirectory();
-        
-        // Construct the language file path
-        $languageFilePath = $this->baseLanguageDirectory . "/" . $currentLanguage . "/Entity/" . $this->fullClassName . ".ini";
-        $languageFilePath = str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $languageFilePath);
-        
-        // Load the language file if it exists
-        if (file_exists($languageFilePath)) {
-            $langs->loadIniFile($languageFilePath);
+            $this->baseLanguageDirectory = $app->getBaseLanguageDirectory();
+            
+            // Construct the language file path
+            $languageFilePath = $this->baseLanguageDirectory . "/" . $currentLanguage . "/Entity/" . $this->fullClassName . ".ini";
+            $languageFilePath = str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $languageFilePath);
+            
+            // Load the language file if it exists
+            if (file_exists($languageFilePath)) {
+                $langs->loadIniFile($languageFilePath);
+            }
+            return $langs;
         }
-        return $langs;
+        return new MagicObject();
     }
     
     /**

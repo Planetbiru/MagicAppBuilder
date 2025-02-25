@@ -228,7 +228,10 @@ button {
   padding: 4px 0;
 }
 .modal-table tbody > tr:nth-child(1) > td:nth-child(1) {
-  width: 200px;
+  width: 170px;
+}
+.modal-table .table.table-reference tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: auto;
 }
 
 table.table.table-reference td {
@@ -887,7 +890,44 @@ input[type=number][name=database_port] {
   transition: width ease-in-out 0.1s;
 }
 
-#search-application.form-control, #search-workspace.form-control {
+#search-application.form-control,
+#search-workspace.form-control {
   width: 200px;
   display: inline-block;
+}
+
+[data-admin-level-id=superuser] .level-user {
+  display: none;
+}
+
+[data-admin-level-id=user] .level-superuser {
+  display: none;
+}
+
+[data-group-source=entity] .source-map {
+  display: none;
+}
+
+[data-group-source=map] .source-entity {
+  display: none;
+}
+
+.table.table-reference td .btn {
+  margin-top: 0px;
+}
+
+.fade {
+  transition: opacity 0.05s linear;
+}
+
+.btn-group-tn > .btn,
+.btn-tn {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+p {
+  margin-bottom: 0.75rem;
 }/*# sourceMappingURL=css.css.map */

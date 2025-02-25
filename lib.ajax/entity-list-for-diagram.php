@@ -53,8 +53,6 @@ try {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
-            
-            
 
             // Create the checkbox input
             $input = $dom->createElement('input');

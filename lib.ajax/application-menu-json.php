@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
@@ -22,7 +22,6 @@ if($applicationId != null)
     try
     {
         $application->findOneByApplicationId($applicationId);
-
         $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         if(!file_exists($menuPath))
         {

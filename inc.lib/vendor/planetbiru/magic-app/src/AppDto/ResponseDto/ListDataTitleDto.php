@@ -72,7 +72,7 @@ class ListDataTitleDto extends ToString
      * Set the field associated with the column title.
      *
      * @param string|null $field The field associated with the column title.
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setField($field)
     {
@@ -94,7 +94,7 @@ class ListDataTitleDto extends ToString
      * Set the display value of the column title.
      *
      * @param string|null $label The display value of the column title.
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setLabel($label)
     {
@@ -116,7 +116,7 @@ class ListDataTitleDto extends ToString
      * Set the sortable status of the column.
      *
      * @param bool $sortable Indicates if the column is sortable.
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setSortable($sortable)
     {
@@ -138,7 +138,7 @@ class ListDataTitleDto extends ToString
      * Set the current sort direction.
      *
      * @param string|null $currentSort The current sort direction (ASC/DESC).
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function setCurrentSort($currentSort)
     {

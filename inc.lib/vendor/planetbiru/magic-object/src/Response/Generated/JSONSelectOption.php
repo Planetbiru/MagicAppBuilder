@@ -12,7 +12,7 @@ use MagicObject\Database\PicoDatabaseQueryBuilder;
  * 
  * @author Kamshory
  * @package MagicObject\Response\Generated
- * @link https://github.com/Planetbiru/Request
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class JSONSelectOption
 {

@@ -38,7 +38,6 @@ use PDO;
 use ReflectionClass;
 use ReflectionMethod;
 use stdClass;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class for creating a magic object.
@@ -322,7 +321,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function loadYamlString($rawData, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parse($rawData);
+        $data = PicoYamlUtil::parse($rawData);
         if($this->_isNotNullAndNotEmpty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
@@ -370,7 +369,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     public function loadYamlFile($path, $systemEnv = false, $asObject = false, $recursive = false)
     {
-        $data = Yaml::parseFile($path);
+        $data = PicoYamlUtil::parseFile($path);
         if($this->_isNotNullAndNotEmpty($data))
         {
             $data = PicoEnvironmentVariable::replaceValueAll($data, $data, true);
@@ -865,7 +864,11 @@ class MagicObject extends stdClass // NOSONAR
 
             // Bind the parameters to the prepared statement
             foreach ($callerParamValues as $index => $paramValue) {
-                if (isset($callerParams[$index]) && !($paramValue instanceof PicoPageable) && !($paramValue instanceof PicoSortable) && !($paramValue instanceof PicoDatabaseQueryTemplate)) {
+                if (isset($callerParams[$index]) 
+                    && !($paramValue instanceof PicoPageable) // Skip PicoPageable
+                    && !($paramValue instanceof PicoSortable) // Skip PicoSortable
+                    && !($paramValue instanceof PicoDatabaseQueryTemplate) // PicoDatabaseQueryTemplate
+                ) {
                     // Bind the parameter name and type to the statement
                     $paramName = $callerParams[$index]->getName();
                     if (!is_array($paramValue)) {
@@ -891,7 +894,7 @@ class MagicObject extends stdClass // NOSONAR
         } 
         catch (PDOException $e) {
             // Log and rethrow the exception if a database error occurs
-            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+            throw new PDOException($e->getMessage(), intval($e->getCode()), $e);
         }
     }
 

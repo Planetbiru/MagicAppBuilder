@@ -257,6 +257,6 @@ class PicoPageable
         $stdClass->page = $page;
         $stdClass->offsetLimit = $offsetLimit;
 
-        return json_encode($stdClass);
+        return json_encode($stdClass, JSON_PRETTY_PRINT);
     }
 }

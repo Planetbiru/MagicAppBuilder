@@ -4,8 +4,6 @@ namespace MagicObject\Util;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\InvalidTypeException;
     
 /**
  * Class PicoYamlUtil
@@ -88,14 +86,50 @@ class PicoYamlUtil
      * @param int $flags A bit field of DUMP_* constants to customize the dumped YAML string.
      * 
      * @return string A YAML string representing the original PHP value.
-     * @throws InvalidTypeException If the input is an unsupported type.
      */
-    public static function dump($input, $inline, $indent, $flags)
+    public static function dump($input, $inline, $indent, $flags) // NOSONAR
     {
         if($inline == null || $inline < 0)
         {
             $inline = self::arrayDepth($input);
         }
-        return Yaml::dump($input, $inline, $indent, $flags);
+        $yaml = new Spicy();
+        return $yaml->dump($input, $indent, 0, true);
     }
+
+    /**
+     * Parse a YAML file and return the parsed data.
+     *
+     * This function loads a YAML file and returns the parsed content as an array or object
+     * depending on the configuration of the YAML parser.
+     *
+     * @param string $file The path to the YAML file that needs to be parsed.
+     * 
+     * @return mixed The parsed YAML data, typically as an array or object.
+     * 
+     * @throws Exception If the file cannot be loaded or parsed.
+     */
+    public static function parseFile($file)
+    {
+        $yaml = new Spicy();
+        return $yaml->loadFile($file);
+    }
+
+    /**
+     * Parse raw YAML data and return the parsed content.
+     *
+     * This function loads a raw YAML string and returns the parsed content as an array or object.
+     *
+     * @param string $rawData The raw YAML string to be parsed.
+     * 
+     * @return mixed The parsed YAML data, typically as an array or object.
+     * 
+     * @throws Exception If the YAML string cannot be parsed.
+     */
+    public static function parse($rawData)
+    {
+        $yaml = new Spicy();
+        return $yaml->loadString($rawData);
+    }
+
 }

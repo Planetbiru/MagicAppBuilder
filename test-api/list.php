@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoOutputDataItem;
 use MagicApp\AppDto\MocroServices\PicoDataHeader;
@@ -8,6 +8,7 @@ use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputList;
+use MagicObject\SecretObject;
 
 require_once __DIR__ . "/database.php";
 
@@ -15,7 +16,7 @@ $entity = new EntityApplication(null, $database);
 
 $pageData = $entity->findAll();
 
-$picoEntityInfo = new PicoEntityInfo("active");
+$picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
 $picoModule = new PicoModuleInfo("application", "Application", "list");
 $primaryKeys = array_keys($entity->tableInfo()->getPrimaryKeys());
 
@@ -56,12 +57,14 @@ foreach($pageData->getResult() as $row)
 	);
 }
 
+$setting = new SecretObject();
+$setting->setPrettify(true);
+
 echo PicoResponseBody::getInstance()
 	->setModule($picoModule)
     ->setData($data)
     ->setEntity($entity)
+	->setting($setting)
     ->setResponseCode("000")
     ->setResponseText("Success")
-	->switchCaseTo("camelCase")
-	->prettify(true)
     ;

@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
@@ -38,23 +38,23 @@ try
         // Save the image to the server
         if (file_put_contents($filePath, $imageData)) {
             // Respond with success
-            ResponseUtil::sendJSON([
+            ResponseUtil::sendJSON(array(
                 'success' => true,
                 'filePath' => $filePath
-            ]);
+            ));
         } else {
             // Respond with error
-            ResponseUtil::sendJSON([
+            ResponseUtil::sendJSON(array(
                 'success' => false,
                 'error' => 'Failed to save the icon'
-            ]);
+            ));
         }
     } else {
         // Invalid request, missing data
-        ResponseUtil::sendJSON([
+        ResponseUtil::sendJSON(array(
             'success' => false,
             'error' => 'Missing image or icon name'
-        ]);
+        ));
     }
 }
 catch(Exception $e)

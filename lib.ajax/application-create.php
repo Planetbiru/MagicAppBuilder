@@ -1,13 +1,14 @@
 <?php
 
-use AppBuilder\Entity\EntityApplication;
-use AppBuilder\Generator\ScriptGenerator;
+use AppBuilder\EntityInstaller\EntityApplication;
+use AppBuilder\ScriptGenerator;
 use AppBuilder\Util\FileDirUtil;
 use MagicAdmin\Entity\Data\Admin;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
+use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -79,10 +80,10 @@ $application->setBaseApplicationDirectory($applicationDirectory);
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
-$application->setBaseEntityDirectory($baseApplicationDirectory."/inc.lib/classes");
-$application->setBaseLanguageDirectory($baseApplicationDirectory."/inc.lang");
+$application->setBaseEntityDirectory($baseApplicationDirectory . "/inc.lib/classes");
+$application->setBaseLanguageDirectory($baseApplicationDirectory . "/inc.lang");
 
-$databaseFilePath = $baseApplicationDirectory."/inc.database/database.sqlite";
+$databaseFilePath = $baseApplicationDirectory . "/inc.database/database.sqlite";
 $databaseDirectory = dirname($databaseFilePath);
 if(!file_exists($databaseDirectory))
 {
@@ -122,7 +123,7 @@ $application->setMagicApp(array(
 
 $newApp->setApplication($application);
 
-$entityInfo = [
+$entityInfo = array(
     'name' => 'name',
     'active' => 'active',
     'draft' => 'draft',
@@ -140,14 +141,14 @@ $entityInfo = [
     'approval_id' => 'approval_id',
     'approval_note' => 'approval_note',
     'approval_status' => 'approval_status'
-];
+);
 
-$entityApvInfo = [
+$entityApvInfo = array(
     'approval_status' => 'approval_status'
-];
+);
 
-$databaseConfig = [
-    'driver' => 'sqlite',
+$databaseConfig = array(
+    'driver' => PicoDatabaseType::DATABASE_TYPE_SQLITE,
     'database_file_path' => $databaseFilePath,
     'host' => '',
     'port' => 0,
@@ -156,25 +157,25 @@ $databaseConfig = [
     'database_name' => '',
     'database_schema' => '',
     'time_zone' => 'Asia/Jakarta'
-];
+);
 
 $newApp->setEntityInfo($entityInfo);
 $newApp->setEntityApvInfo($entityApvInfo);
 
-$newApp->setCurrentAction([
+$newApp->setCurrentAction(array(
     'user_function' => '$currentAction->getUserId()',
     'time_function' => '$currentAction->getTime()',
     'ip_function' => '$currentAction->getIp()'
-]);
+));
 
-$paginationConfig = new SecretObject([
+$paginationConfig = new SecretObject(array(
     'page_size' => 20,
     'page_range' => 3,
     'prev' => '<i class="fa-solid fa-angle-left"></i>',
     'next' => '<i class="fa-solid fa-angle-right"></i>',
     'first' => '<i class="fa-solid fa-angles-left"></i>',
     'last' => '<i class="fa-solid fa-angles-right"></i>'
-]);
+));
 
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);

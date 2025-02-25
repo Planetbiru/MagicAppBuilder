@@ -10,6 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
+ * @package AppBuilder\App\Entity\App
  */
 class AppAdminImpl extends MagicObject
 {
@@ -34,6 +35,26 @@ class AppAdminImpl extends MagicObject
 	 * @var string
 	 */
 	protected $name;
+
+	/**
+	 * Username
+	 * 
+	 * @NotNull
+	 * @Column(name="username", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Username")
+	 * @var string
+	 */
+	protected $username;
+
+	/**
+	 * Password
+	 * 
+	 * @NotNull
+	 * @Column(name="name", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Password")
+	 * @var string
+	 */
+	protected $password;
 	
 	/**
 	 * Admin Level ID
@@ -54,16 +75,6 @@ class AppAdminImpl extends MagicObject
 	 * @var AppAdminLevelImpl
 	 */
 	protected $adminLevel;
-
-	/**
-	 * Default Data
-	 * 
-	 * @NotNull
-	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value="0", nullable=true)
-	 * @Label(content="Default Data")
-	 * @var boolean
-	 */
-	protected $defaultData;
 
 	/**
 	 * Blocked

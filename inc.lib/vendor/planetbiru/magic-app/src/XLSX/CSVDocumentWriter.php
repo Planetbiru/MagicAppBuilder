@@ -27,7 +27,7 @@ class CSVDocumentWriter extends DocumentWriter
      * @param string[] $headerFormat Data format for headers
      * @param callable $writerFunction Function to write formatted data
      * @param boolean $useTemporary Flag to use temporary file
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function write($pageData, $fileName, $sheetName, $headerFormat, $writerFunction, $useTemporary = true)
     {
@@ -97,7 +97,7 @@ class CSVDocumentWriter extends DocumentWriter
      * Write header format to the CSV
      *
      * @param string[] $keys Data keys
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeHeader($keys)
     {
@@ -114,7 +114,7 @@ class CSVDocumentWriter extends DocumentWriter
      *
      * @param string[] $keys Data keys
      * @param MagicObject $row Data row
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeData($keys, $row)
     {
@@ -140,13 +140,13 @@ class CSVDocumentWriter extends DocumentWriter
         $idx = 0;
         if ($this->noFetchData($pageData)) {
             while ($row = $pageData->fetch()) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $data = call_user_func($writerFunction, $idx, $row);             
                 $this->writeRow($data);
                 $idx++;
             }
         } else {
             foreach ($pageData->getResult() as $row) {
-                $data = call_user_func($writerFunction, $idx, $row, $this->appLanguage);             
+                $data = call_user_func($writerFunction, $idx, $row);             
                 $this->writeRow($data);
                 $idx++;
             }
@@ -157,7 +157,7 @@ class CSVDocumentWriter extends DocumentWriter
      * Write a line of data to the CSV
      *
      * @param array $data Array of values to write
-     * @return self The current instance, allowing method chaining
+     * @return self Returns the current instance for method chaining.
      */
     private function writeRow($data)
     {
@@ -172,20 +172,20 @@ class CSVDocumentWriter extends DocumentWriter
      * @param mixed[] $fields Array of values to write
      * @param string $delimiter Field delimiter
      * @param string $enclosure Field enclosures
-     * @param string $escape_char Escape enclosure characters in fields
-     * @param string $record_separator Record separator
-     * @return self The current instance, allowing method chaining
+     * @param string $escapeChar Escape enclosure characters in fields
+     * @param string $recordSeparator Record separator
+     * @return self Returns the current instance for method chaining.
      */
-    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escape_char = "\\", $record_separator = "\r\n")
+    private function fputcsv($handle, $fields, $delimiter = ",", $enclosure = '"', $escapeChar = "\\", $recordSeparator = "\r\n")
     {
         $result = [];
         foreach ($fields as $field) {
-            $result[] = $enclosure . str_replace($enclosure, $escape_char . $enclosure, $field) . $enclosure;
+            $result[] = $enclosure . str_replace($enclosure, $escapeChar . $enclosure, $field) . $enclosure;
         }
         if ($handle == null) {
-            echo implode($delimiter, $result) . $record_separator;
+            echo implode($delimiter, $result) . $recordSeparator;
         } else {
-            fwrite($handle, implode($delimiter, $result) . $record_separator);
+            fwrite($handle, implode($delimiter, $result) . $recordSeparator);
         }
         return $this;
     }
