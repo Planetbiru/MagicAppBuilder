@@ -1688,8 +1688,8 @@ else
         {
             $type = $this->getFilterType($field);
             
-            $multipleSelect = $field->getReferenceFilter() && $field->getReferenceFilter()->getMultipleSelection();
-            if($multipleSelect)
+            $multipleFilter = $field->isMultipleFilter();
+            if($multipleFilter)
             {
                 $type .= "[]";
             }
@@ -2522,6 +2522,7 @@ $subqueryMap = '.$referece.';
         {
             $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
             $upperFieldName = $this->fixFieldName($upperFieldName, $field);
+            $multipleFilter = $field->isMultipleFilter();
 
             $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $label = $dom->createTextNode($labelStr);
@@ -2569,9 +2570,8 @@ $subqueryMap = '.$referece.';
             }
             else if($field->getFilterElementType() == "select")
             {
-                $multipleSelect = false;
                 $referenceFilter = $field->getReferenceFilter();
-                $multipleSelect = $this->isMultipleSelection($referenceFilter);
+
                 
                 $form->appendChild($dom->createTextNode(self::N_TAB2));
                 
@@ -2582,7 +2582,7 @@ $subqueryMap = '.$referece.';
                 $select = $dom->createElement('select');
                 $select->setAttribute('class', 'form-control');
                 
-                if($multipleSelect)
+                if($multipleFilter)
                 {
                     $inputName = $field->getFieldName()."[]";
                     $select->setAttribute('name', $inputName);
@@ -2613,7 +2613,7 @@ $subqueryMap = '.$referece.';
 
                 $value->setAttribute('value', '');
                 $select->appendChild($dom->createTextNode(self::N_TAB6));
-                if(!$multipleSelect)
+                if(!$multipleFilter)
                 {
                     $select->appendChild($value);
                 }
@@ -2639,22 +2639,6 @@ $subqueryMap = '.$referece.';
             }  
         }
         return $form;
-    }
-    
-    /**
-     * Checks if the reference filter allows multiple selections.
-     *
-     * @param MagicObject $referenceFilter The reference filter object to check.
-     * 
-     * @return boolean True if multiple selection is allowed, otherwise false.
-     */
-    public function isMultipleSelection($referenceFilter)
-    {
-        if(isset($referenceFilter))
-        {
-            return $this->isTrue($referenceFilter->getMultipleSelection());
-        }
-        return false;
     }
     
     /**
@@ -3103,18 +3087,30 @@ $subqueryMap = '.$referece.';
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $input = $dom->createElement('input');
+        $multipleData = $field->isMultipleData();
         if($field->getElementType() == ElementType::TEXT)
         {
             $input = $dom->createElement('input');
             
             $this->setInputTypeAttribute($input, $field->getDataType()); 
-            $input->setAttribute('name', $field->getFieldName());
 
+            if($multipleData)
+            {
+                $input->setAttribute('name', $field->getFieldName()."[]");
+            }
+            else
+            {
+                $input->setAttribute('name', $field->getFieldName());
+            }
             $input = $this->addAttributeId($input, $id); 
             $input->setAttribute('autocomplete', 'off'); 
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
+            }
+            if($multipleData)
+            {
+                $input->setAttribute('data-multi-input', 'true');
             }
         }
         else if($field->getElementType() == ElementType::TEXTAREA)
@@ -3143,9 +3139,7 @@ $subqueryMap = '.$referece.';
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
             
-            $multipleSelect = isset($referenceData) ? self::isTrue($referenceData->getMultipleSelection()) : false;
-
-            if($multipleSelect)
+            if($multipleData)
             {
                 $input->setAttribute('name', $field->getFieldName()."[]");
                 $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
@@ -3168,7 +3162,7 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $value->setAttribute('value', '');
             $value->appendChild($textLabel);
-            if(!$multipleSelect)
+            if(!$multipleData)
             {
                 $input->appendChild($value);
             }
@@ -3213,6 +3207,7 @@ $subqueryMap = '.$referece.';
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $fieldName = $field->getFieldName();
+        $multipleData = $field->isMultipleData();
         if($fieldName == $primaryKeyName)
         {
             $fieldName = "app_builder_new_pk_".$fieldName;
@@ -3222,7 +3217,15 @@ $subqueryMap = '.$referece.';
         {
             $input = $dom->createElement('input');
             $this->setInputTypeAttribute($input, $field->getDataType()); 
-            $input->setAttribute('name', $fieldName);
+
+            if($multipleData)
+            {
+                $input->setAttribute('name', $field->getFieldName()."[]");
+            }
+            else
+            {
+                $input->setAttribute('name', $field->getFieldName());
+            }
 
             $input = $this->addAttributeId($input, $id);  
             
@@ -3231,6 +3234,10 @@ $subqueryMap = '.$referece.';
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
+            }
+            if($multipleData)
+            {
+                $input->setAttribute('data-multi-input', 'true');
             }
         }
         else if($field->getElementType() == ElementType::TEXTAREA)
@@ -3255,15 +3262,12 @@ $subqueryMap = '.$referece.';
         }
         else if($field->getElementType() == ElementType::SELECT)
         {
-            $referenceData = $field->getReferenceData();
             $input = $dom->createElement('select');
             $classes = array();
             $classes[] = 'form-control';
             $input->setAttribute('class', implode(' ', $classes));
 
-            $multipleSelect = isset($referenceData) ? self::isTrue($referenceData->getMultipleSelection()) : false;
-
-            if($multipleSelect)
+            if($multipleData)
             {
                 $input->setAttribute('name', $field->getFieldName()."[]");
                 $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
