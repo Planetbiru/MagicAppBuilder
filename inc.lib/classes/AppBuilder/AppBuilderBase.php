@@ -8,7 +8,7 @@ use DOMDocument;
 use AppBuilder\AppField;
 use AppBuilder\EntityInfo;
 use AppBuilder\AppFeatures;
-use AppBuilder\ElementType;
+use AppBuilder\InputType;
 use AppBuilder\ElementClass;
 use MagicObject\MagicObject;
 use AppBuilder\EntityApvInfo;
@@ -68,6 +68,7 @@ class AppBuilderBase //NOSONAR
     const WRAPPER_DETAIL = "detail";
     const WRAPPER_LIST = "list";
 
+    const APP_ENTITY_LANGUAGE = 'appEntityLanguage';
     const APP_CONFIG = "appConfig";
     const CURLY_BRACKET_OPEN = "{";
     const CURLY_BRACKET_CLOSE = "}";
@@ -1222,18 +1223,18 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
         $true = self::VAR."appLanguage->getTrue()";
         $false = self::VAR."appLanguage->getFalse()";
 
-        if(($field->getElementType() == 'checkbox') ||
-            ($field->getElementType() == 'select' 
+        if(($field->getElementType() == InputType::CHECKBOX) ||
+            ($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'yesno')
+            && $field->getReferenceData()->getType() == ReferenceType::YESNO)
         )
         {
             $val = "->option".$upperFieldName."(".$yes.", ".$no.")"; // NOSONAR
             $result = self::VAR.'row'.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getType() == ReferenceType::ENTITY
             && $field->getReferenceData()->getEntity() != null
             && $field->getReferenceData()->getEntity()->getObjectName() != null
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
@@ -1247,9 +1248,9 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $row'.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""'; // NOSONAR
             $result = self::VAR.'row'.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getType() == ReferenceType::MAP
             && $field->getReferenceData()->getMap() != null
             )
         {
@@ -1260,17 +1261,17 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
         && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'truefalse'
+            && $field->getReferenceData()->getType() == ReferenceType::TRUE_FALSE
             )
         {
             $val = "->option".$upperFieldName."(".$true.", ".$false.")";
             $result = self::VAR.'row'.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
         && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'onezero'
+            && $field->getReferenceData()->getType() == ReferenceType::ONE_ZERO
             )
         {
             $val = "->option".$upperFieldName."(\"1\", \"0\")";
@@ -1306,22 +1307,22 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $caption = PicoStringUtil::upperCamelize($field->getFieldName());
             $caption = $this->fixFieldName($caption, $field);
 
-            if($field->getElementType() == 'select' 
+            if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getType() == ReferenceType::MAP
             && $field->getReferenceData()->getMap() != null
             )
             {
                 $globals[] = '$'.PicoStringUtil::camelize('map_for_'.$field->getFieldName());
             }
 
-            if($field->getElementType() == 'text')
+            if($field->getElementType() == InputType::TEXT)
             {
-                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
+                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
             }
             else
             {
-                $line1 = self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
+                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
             }
 
             $headers[] = $line1;
@@ -2067,9 +2068,9 @@ $subqueryMap = '.$referece.';
             $a->setAttribute('href', '#');
 
             $caption = PicoStringUtil::upperCamelize($field->getFieldName());
-            if($field->getElementType() == 'select' 
+            if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getType() == ReferenceType::ENTITY
             && $field->getReferenceData()->getEntity() != null
             && $field->getReferenceData()->getEntity()->getObjectName() != null
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
@@ -2079,7 +2080,7 @@ $subqueryMap = '.$referece.';
                 $caption = PicoStringUtil::upperCamelize(substr($field->getFieldName(), 0, strlen($field->getFieldName()) - 3));
             }
 
-            $a->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$caption.self::BRACKETS.";".self::PHP_CLOSE_TAG)); 
+            $a->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS.";".self::PHP_CLOSE_TAG)); 
             $td->appendChild($a);
             $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
             $trh->appendChild($td);
@@ -2491,9 +2492,9 @@ $subqueryMap = '.$referece.';
      */
     protected function fixFieldName($upperFieldName, $field)
     {
-        if($field->getElementType() == 'select' 
+        if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getType() == ReferenceType::ENTITY
             && $field->getReferenceData()->getEntity() != null
             && $field->getReferenceData()->getEntity()->getObjectName() != null
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
@@ -2523,14 +2524,14 @@ $subqueryMap = '.$referece.';
             $upperFieldName = $this->fixFieldName($upperFieldName, $field);
             $multipleFilter = $field->getMultipleFilter();
 
-            $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+            $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $label = $dom->createTextNode($labelStr);
             
             $labelWrapper = $dom->createElement('span');
             $labelWrapper->setAttribute('class', 'filter-label');
             $labelWrapper->appendChild($label);
                 
-            if($field->getFilterElementType() == "text")
+            if($field->getFilterElementType() == InputType::TEXT)
             {
                 $form->appendChild($dom->createTextNode(self::N_TAB2));
                 
@@ -2580,7 +2581,7 @@ $subqueryMap = '.$referece.';
                 
                 
             }
-            else if($field->getFilterElementType() == "select")
+            else if($field->getFilterElementType() == InputType::SELECT)
             {
                 $referenceFilter = $field->getReferenceFilter();
 
@@ -2766,7 +2767,6 @@ $subqueryMap = '.$referece.';
         $thead = $dom->createElement('thead');
         $tbody = $dom->createElement('tbody');
 
-
         $trh = $dom->createElement('tr');
         $td1 = $dom->createElement('td');
         $td2 = $dom->createElement('td');
@@ -2781,7 +2781,6 @@ $subqueryMap = '.$referece.';
         $trh->appendChild($td3);
 
         $thead->appendChild($trh);
-
 
         foreach($fields as $field)
         {
@@ -2815,7 +2814,7 @@ $subqueryMap = '.$referece.';
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2852,7 +2851,7 @@ $subqueryMap = '.$referece.';
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2887,7 +2886,7 @@ $subqueryMap = '.$referece.';
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
         $td1->appendChild($label);
@@ -2895,7 +2894,6 @@ $subqueryMap = '.$referece.';
         $value = $this->createDetailValue($dom, $objectName, $field);
 
         $td2->appendChild($value);
-        
 
         $tr->appendChild($td1);
         $tr->appendChild($td2);
@@ -2921,18 +2919,18 @@ $subqueryMap = '.$referece.';
         $true = self::VAR."appLanguage->getTrue()";
         $false = self::VAR."appLanguage->getFalse()";
 
-        if(($field->getElementType() == 'checkbox') ||
-            ($field->getElementType() == 'select' 
+        if(($field->getElementType() == InputType::CHECKBOX) ||
+            ($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'yesno')
+            && $field->getReferenceData()->getType() == ReferenceType::YESNO)
         )
         {
             $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
             $result = self::VAR.$objectName.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getType() == ReferenceType::ENTITY
             && $field->getReferenceData()->getEntity() != null
             && $field->getReferenceData()->getEntity()->getObjectName() != null
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
@@ -2946,9 +2944,9 @@ $subqueryMap = '.$referece.';
             $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
             $result = self::VAR.$objectName.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getType() == ReferenceType::MAP
             && $field->getReferenceData()->getMap() != null
             )
         {
@@ -2959,17 +2957,17 @@ $subqueryMap = '.$referece.';
             $val = "$v1 && $v2 && $v3 ? $v4 : \"\"";
             $result = $val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
         && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'truefalse'
+            && $field->getReferenceData()->getType() == ReferenceType::TRUE_FALSE
             )
         {
             $val = "->option".$upperFieldName."(".$true.", ".$false.")";
             $result = self::VAR.$objectName.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
         && $field->getReferenceData() != null
-            && $field->getReferenceData()->getType() == 'onezero'
+            && $field->getReferenceData()->getType() == ReferenceType::ONE_ZERO
             )
         {
             $val = "->option".$upperFieldName."(\"1\", \"0\")";
@@ -3007,18 +3005,18 @@ $subqueryMap = '.$referece.';
         $upperFieldNameOri = $upperFieldName;
         $upperFieldName = $this->fixFieldName($upperFieldName, $field);
 
-        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+        $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
         
-        if($field->getElementType() == 'checkbox')
+        if($field->getElementType() == InputType::CHECKBOX)
         {
             $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'entity'
+            && $field->getReferenceData()->getType() == ReferenceType::ENTITY
             && $field->getReferenceData()->getEntity() != null
             && $field->getReferenceData()->getEntity()->getObjectName() != null
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
@@ -3034,9 +3032,9 @@ $subqueryMap = '.$referece.';
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val2;
         }
-        else if($field->getElementType() == 'select' 
+        else if($field->getElementType() == InputType::SELECT 
             && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == 'map'
+            && $field->getReferenceData()->getType() == ReferenceType::MAP
             && $field->getReferenceData()->getMap() != null
             )
         {
@@ -3098,7 +3096,7 @@ $subqueryMap = '.$referece.';
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $input = $dom->createElement('input');
         $multipleData = $field->getMultipleData();
-        if($field->getElementType() == ElementType::TEXT)
+        if($field->getElementType() == InputType::TEXT)
         {
             $input = $dom->createElement('input');
             
@@ -3123,7 +3121,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('data-multi-input', 'true');
             }
         }
-        else if($field->getElementType() == ElementType::TEXTAREA)
+        else if($field->getElementType() == InputType::TEXTAREA)
         {
             $input = $dom->createElement('textarea');
             $classes = array();
@@ -3140,7 +3138,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('required', 'required');
             }
         }
-        else if($field->getElementType() == ElementType::SELECT)
+        else if($field->getElementType() == InputType::SELECT)
         {
             $referenceData = $field->getReferenceData();
 
@@ -3183,7 +3181,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('required', 'required');
             }
         }
-        else if($field->getElementType() == ElementType::CHECKBOX)
+        else if($field->getElementType() == InputType::CHECKBOX)
         {
             $input = $dom->createElement('label');
             $inputStrl = $dom->createElement('input');
@@ -3195,7 +3193,7 @@ $subqueryMap = '.$referece.';
             $inputStrl = $this->addAttributeId($inputStrl, $id);
             $inputStrl->setAttribute('value', '1');
             $input->appendChild($inputStrl);
-            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $textLabel = $dom->createTextNode(' '.$caption);
             $input->appendChild($textLabel);
         }
@@ -3223,7 +3221,7 @@ $subqueryMap = '.$referece.';
             $fieldName = "app_builder_new_pk_".$fieldName;
         }
         $input = $dom->createElement('input');
-        if($field->getElementType() == ElementType::TEXT)
+        if($field->getElementType() == InputType::TEXT)
         {
             $input = $dom->createElement('input');
             $this->setInputTypeAttribute($input, $field->getDataType()); 
@@ -3250,7 +3248,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('data-multi-input', 'true');
             }
         }
-        else if($field->getElementType() == ElementType::TEXTAREA)
+        else if($field->getElementType() == InputType::TEXTAREA)
         {
             $input = $dom->createElement('textarea');
             $classes = array();
@@ -3270,7 +3268,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('required', 'required');
             }
         }
-        else if($field->getElementType() == ElementType::SELECT)
+        else if($field->getElementType() == InputType::SELECT)
         {
             $input = $dom->createElement('select');
             $classes = array();
@@ -3309,7 +3307,7 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('required', 'required');
             }
         }
-        else if($field->getElementType() == ElementType::CHECKBOX)
+        else if($field->getElementType() == InputType::CHECKBOX)
         {
             $input = $dom->createElement('label');
             $inputStrl = $dom->createElement('input');
@@ -3324,7 +3322,7 @@ $subqueryMap = '.$referece.';
             $inputStrl->setAttribute('value', '1');
             $inputStrl->setAttribute("data-app-builder-encoded-script", base64_encode(self::PHP_OPEN_TAG.self::ECHO.self::VAR.$objectName.'->createChecked'.$upperFieldName.self::BRACKETS.';'.self::PHP_CLOSE_TAG));
             $input->appendChild($inputStrl);
-            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appEntityLanguage".self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
+            $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $textLabel = $dom->createTextNode(' '.$caption);
             $input->appendChild($textLabel);
         }

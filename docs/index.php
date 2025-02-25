@@ -1,6 +1,6 @@
 <?php
 
-use MagicObject\Util\PicoParsedown;
+use MagicObject\Util\Parsedown;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
@@ -27,11 +27,11 @@ class PhpDocumentCreator // NOSONAR
 
     /**
      * Constructor for the class.
-     * Initializes the PicoParsedown object to be used within the class.
+     * Initializes the Parsedown object to be used within the class.
      */
     public function __construct()
     {
-        $this->parsedown = new PicoParsedown();
+        $this->parsedown = new Parsedown();
     }
 
     /**
