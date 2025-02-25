@@ -170,6 +170,7 @@ These methods are designed to work seamlessly with an active database connection
 3.  **Database Time Zone Change After Object Construction**  
     Users can now change the database's time zone at any time as needed. This provides greater flexibility when handling data across multiple time zones, especially when the application is used by users from different time zones, all without the need to modify the application configuration.
 
-4.  **Yaml Parser and Dumper**
+4.  **Yaml Parser and Dumper**  
     MagicObject version 3.0 no longer depends on external libraries. The Yaml parsing and dumping functions are now fully handled by a class that is part of MagicObject itself, reducing its overall complexity.
-    
+5.  **Added `BETWEEN` Filter for Predicate Queries**  
+    MagicObject now supports `BETWEEN` filters for predicate-based queries, allowing users to perform range-based filtering efficiently. This improves query performance and simplifies conditions when working with numerical or date ranges.
