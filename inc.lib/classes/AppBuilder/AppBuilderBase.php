@@ -1688,7 +1688,7 @@ else
         {
             $type = $this->getFilterType($field);
             
-            $multipleFilter = $field->isMultipleFilter();
+            $multipleFilter = $field->getMultipleFilter();
             if($multipleFilter)
             {
                 $type .= "[]";
@@ -1795,7 +1795,6 @@ $subqueryMap = '.$referece.';
         }
         return $dataType;
     }
-    
     
     /**
      * Create the data list form with a table and buttons.
@@ -2515,14 +2514,14 @@ $subqueryMap = '.$referece.';
      * 
      * @return DOMElement The updated form element with appended filters.
      */
-    public function appendFilter($dom, $form, $filterFields)
+    public function appendFilter($dom, $form, $filterFields) // NOSONAR
     {
         
         foreach($filterFields as $field)
         {
             $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
             $upperFieldName = $this->fixFieldName($upperFieldName, $field);
-            $multipleFilter = $field->isMultipleFilter();
+            $multipleFilter = $field->getMultipleFilter();
 
             $labelStr = self::PHP_OPEN_TAG.self::ECHO.self::VAR.'appEntityLanguage'.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
             $label = $dom->createTextNode($labelStr);
@@ -2540,11 +2539,24 @@ $subqueryMap = '.$referece.';
 
                 $input = $dom->createElement('input');
                 $this->setInputTypeAttribute($input, $field->getDataType());
-                $input->setAttribute('name', $field->getFieldName());
+
+                if($multipleFilter)
+                {
+                    $input->setAttribute('name', $field->getFieldName().'[]');
+                }
+                else
+                {
+                    $input->setAttribute('name', $field->getFieldName());
+                }
+                
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
                 $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
                 $input->setAttribute('autocomplete', 'off'); 
+                if($multipleFilter)
+                {
+                    $input->setAttribute('data-multi-input', 'true');
+                }
                 $filterGroup->appendChild($dom->createTextNode(self::N_TAB3));
                 
                 $filterGroup->appendChild($labelWrapper);
@@ -3087,7 +3099,7 @@ $subqueryMap = '.$referece.';
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $input = $dom->createElement('input');
-        $multipleData = $field->isMultipleData();
+        $multipleData = $field->getMultipleData();
         if($field->getElementType() == ElementType::TEXT)
         {
             $input = $dom->createElement('input');
@@ -3207,7 +3219,7 @@ $subqueryMap = '.$referece.';
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $fieldName = $field->getFieldName();
-        $multipleData = $field->isMultipleData();
+        $multipleData = $field->getMultipleData();
         if($fieldName == $primaryKeyName)
         {
             $fieldName = "app_builder_new_pk_".$fieldName;
