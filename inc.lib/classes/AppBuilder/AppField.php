@@ -14,7 +14,7 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
  * This class encapsulates the metadata of fields including their names, labels, data types, 
  * and various flags for operations they participate in (such as required fields and key fields).
  */
-class AppField
+class AppField // NOSONAR
 {
     /**
      * The name of the field.
@@ -389,7 +389,7 @@ class AppField
      *
      * @return bool  The status of multiple data handling (true if allowed, false if not).
      */ 
-    public function isMultipleData()
+    public function getMultipleData()
     {
         return $this->multipleData;
     }
@@ -419,7 +419,7 @@ class AppField
      *
      * @return bool  The status of multiple filter handling (true if allowed, false if not).
      */ 
-    public function isMultipleFilter()
+    public function getMultipleFilter()
     {
         return $this->multipleFilter;
     }
