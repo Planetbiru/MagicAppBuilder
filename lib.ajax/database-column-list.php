@@ -100,19 +100,19 @@ try {
     $primaryKeys = array();
     $skipped = array();
     
-    $skipped[] = $appConfig->entityInfo->get('draft');
-    $skipped[] = $appConfig->entityInfo->get('waitingFor');
-    $skipped[] = $appConfig->entityInfo->get('approvalNote');
-    $skipped[] = $appConfig->entityInfo->get('approvalId');
-    $skipped[] = $appConfig->entityInfo->get('adminCreate');
-    $skipped[] = $appConfig->entityInfo->get('adminEdit');
-    $skipped[] = $appConfig->entityInfo->get('adminAskEdit');
-    $skipped[] = $appConfig->entityInfo->get('timeCreate');
-    $skipped[] = $appConfig->entityInfo->get('timeEdit');
-    $skipped[] = $appConfig->entityInfo->get('timeAskEdit');
-    $skipped[] = $appConfig->entityInfo->get('ipCreate');
-    $skipped[] = $appConfig->entityInfo->get('ipEdit');
-    $skipped[] = $appConfig->entityInfo->get('ipAskEdit');
+    $skipped[] = $appConfig->entityInfo->getDraft();
+    $skipped[] = $appConfig->entityInfo->getWaitingFor();
+    $skipped[] = $appConfig->entityInfo->getApprovalNote();
+    $skipped[] = $appConfig->entityInfo->getApprovalId();
+    $skipped[] = $appConfig->entityInfo->getAdminCreate();
+    $skipped[] = $appConfig->entityInfo->getAdminEdit();
+    $skipped[] = $appConfig->entityInfo->getAdminAskEdit();
+    $skipped[] = $appConfig->entityInfo->getTimeCreate();
+    $skipped[] = $appConfig->entityInfo->getTimeEdit();
+    $skipped[] = $appConfig->entityInfo->getTimeAskEdit();
+    $skipped[] = $appConfig->entityInfo->getIpCreate();
+    $skipped[] = $appConfig->entityInfo->getIpEdit();
+    $skipped[] = $appConfig->entityInfo->getIpAskEdit();
     
     foreach ($rows as $i => $data) {
         $cols[] = $data['column_name'];
@@ -125,7 +125,6 @@ try {
         if (strtoupper($data['column_key']) == 'PRI') {
             $primaryKeys[] = $data['column_name'];
         }
-        
     }
 
     $json = array(

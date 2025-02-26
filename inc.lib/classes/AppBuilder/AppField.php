@@ -389,7 +389,7 @@ class AppField // NOSONAR
      *
      * @return bool  The status of multiple data handling (true if allowed, false if not).
      */ 
-    public function isMultipleData()
+    public function getMultipleData()
     {
         return $this->multipleData;
     }
@@ -419,7 +419,7 @@ class AppField // NOSONAR
      *
      * @return bool  The status of multiple filter handling (true if allowed, false if not).
      */ 
-    public function isMultipleFilter()
+    public function getMultipleFilter()
     {
         return $this->multipleFilter;
     }
