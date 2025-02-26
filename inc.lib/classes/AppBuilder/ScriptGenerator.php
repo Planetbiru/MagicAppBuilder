@@ -86,7 +86,7 @@ class ScriptGenerator //NOSONAR
         if($includeMap)
         {
             return ($value->getReferenceData() != null 
-            && $value->getElementType() == 'select' 
+            && $value->getElementType() == InputType::SELECT 
             && $value->getReferenceData()->getType() == 'entity' 
             && $value->getReferenceData()->getEntity() != null 
             && $value->getReferenceData()->getEntity()->getEntityName() != null)
@@ -98,7 +98,7 @@ class ScriptGenerator //NOSONAR
         else
         {
             return $value->getReferenceData() != null 
-            && $value->getElementType() == 'select' 
+            && $value->getElementType() == InputType::SELECT
             && $value->getReferenceData()->getType() == 'entity' 
             && $value->getReferenceData()->getEntity() != null 
             && $value->getReferenceData()->getEntity()->getEntityName() != null;
