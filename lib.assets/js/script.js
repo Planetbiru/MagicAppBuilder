@@ -3885,13 +3885,13 @@ function generateScript(selector) {
     .each(function (e) {
       let fieldName = $(this).attr("data-field-name");
       let fieldLabel = $(this).find("input.input-field-name").val();
-      let includeInsert = $(this).find("input.include_insert")[0].checked;
-      let includeEdit = $(this).find("input.include_edit")[0].checked;
-      let includeDetail = $(this).find("input.include_detail")[0].checked;
-      let includeList = $(this).find("input.include_list")[0].checked;
-      let includeExport = $(this).find("input.include_export")[0].checked;
-      let isKey = $(this).find("input.include_key")[0].checked;
-      let isInputRequired = $(this).find("input.include_required")[0].checked;
+      let includeInsert = $(this).find("input.include-insert")[0].checked;
+      let includeEdit = $(this).find("input.include-edit")[0].checked;
+      let includeDetail = $(this).find("input.include-detail")[0].checked;
+      let includeList = $(this).find("input.include-list")[0].checked;
+      let includeExport = $(this).find("input.include-export")[0].checked;
+      let isKey = $(this).find("input.include-key")[0].checked;
+      let isInputRequired = $(this).find("input.include-required")[0].checked;
       let elementType = $(this).find("input.input-element-type:checked").val();
       let filterElementType =
         $(this).find("input.input-field-filter:checked").length > 0
@@ -4433,13 +4433,13 @@ function restoreForm(data)  //NOSONAR
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
 
-          tr.find('.include_insert')[0].checked = isTrue(data.fields[i].includeInsert);
-          tr.find('.include_edit')[0].checked = isTrue(data.fields[i].includeEdit);
-          tr.find('.include_detail')[0].checked = isTrue(data.fields[i].includeDetail);
-          tr.find('.include_list')[0].checked = isTrue(data.fields[i].includeList);
-          tr.find('.include_export')[0].checked = isTrue(data.fields[i].includeExport);
-          tr.find('.include_key')[0].checked = isTrue(data.fields[i].isKey);
-          tr.find('.include_required')[0].checked = isTrue(data.fields[i].isInputRequired);
+          tr.find('.include-insert')[0].checked = isTrue(data.fields[i].includeInsert);
+          tr.find('.include-edit')[0].checked = isTrue(data.fields[i].includeEdit);
+          tr.find('.include-detail')[0].checked = isTrue(data.fields[i].includeDetail);
+          tr.find('.include-list')[0].checked = isTrue(data.fields[i].includeList);
+          tr.find('.include-export')[0].checked = isTrue(data.fields[i].includeExport);
+          tr.find('.include-key')[0].checked = isTrue(data.fields[i].isKey);
+          tr.find('.include-required')[0].checked = isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
 
           if (data.fields[i].elementType == 'select') {
@@ -4950,38 +4950,38 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
   if ($.inArray(field, skippedOnInsertEdit) != -1) {
     insertRow = `
       <td align="center">
-        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="0" disabled="disabled">
+        <input type="checkbox" class="include-insert" name="include_insert_${field}" value="0" disabled="disabled">
       </td>
     `;
 
     editRow = `
       <td align="center">
-        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="0" disabled="disabled">
+        <input type="checkbox" class="include-edit" name="include_edit_${field}" value="0" disabled="disabled">
       </td>
     `;
 
     listRow = `
       <td align="center">
-        <input type="checkbox" class="include_list" name="include_list_${field}" value="1">
+        <input type="checkbox" class="include-list" name="include_list_${field}" value="1">
       </td>
     `;
 
   } else {
     insertRow = `
       <td align="center">
-        <input type="checkbox" class="include_insert" name="include_insert_${field}" value="1" checked="checked">
+        <input type="checkbox" class="include-insert" name="include_insert_${field}" value="1" checked="checked">
       </td>
     `;
 
     editRow = `
       <td align="center">
-        <input type="checkbox" class="include_edit" name="include_edit_${field}" value="1" checked="checked">
+        <input type="checkbox" class="include-edit" name="include_edit_${field}" value="1" checked="checked">
       </td>
     `;
 
     listRow = `
       <td align="center">
-        <input type="checkbox" class="include_list" name="include_list_${field}" value="1" checked="checked">
+        <input type="checkbox" class="include-list" name="include_list_${field}" value="1" checked="checked">
       </td>
     `;
 
@@ -4989,7 +4989,7 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
 
   exportRow = `
     <td align="center">
-      <input type="checkbox" class="include_export" name="include_export_${field}" value="1" checked="checked">
+      <input type="checkbox" class="include-export" name="include_export_${field}" value="1" checked="checked">
     </td>
   `;
 
@@ -5008,15 +5008,15 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
       ${insertRow} ${editRow}
       <td align="center">
-        <input type="checkbox" class="include_detail" name="include_detail_${field}" value="1" checked="checked">
+        <input type="checkbox" class="include-detail" name="include_detail_${field}" value="1" checked="checked">
       </td>
       ${listRow}
       ${exportRow}
       <td align="center">
-        <input type="checkbox" class="include_key" name="include_key_${field}" value="1">
+        <input type="checkbox" class="include-key" name="include_key_${field}" value="1">
       </td>
       <td align="center">
-        <input type="checkbox" class="include_required" name="include_required_${field}" value="1">
+        <input type="checkbox" class="include-required" name="include_required_${field}" value="1">
       </td>
       <td align="center">
         <input type="radio" class="input-element-type" name="element_type_${field}" value="text" checked="checked">
