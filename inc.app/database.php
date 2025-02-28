@@ -15,4 +15,6 @@ try
 catch(Exception $e)
 {
     // do nothing
+    error_log($e->getMessage());
+    exit();
 }

@@ -4167,13 +4167,15 @@ function generateAllCode(dataToPost) {
     dataType: "json",
     data: dataToPost,
     success: function (data) {
+      if (data.success) {
+        showToast(data.title, data.message);
+      }
       decreaseAjaxPending();
       updateEntityFile();
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
       if (data.success) {
         onModuleCreated();
-        showToast(data.title, data.message);
         setTimeout(function () { closeAlertUI() }, 2000);
       }
     },
@@ -4855,8 +4857,6 @@ function generateSelectType(field, args) {
     </select>
   `);
 
-
-
   let i;
   let j;
   let k;
@@ -5058,7 +5058,6 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
     </tr>
   `;
-
 
   return rowHTML;
 }
