@@ -179,14 +179,14 @@ After these steps, the SQLite driver will be enabled for PHP on your Windows ser
 
 ## Step 2: Download and Install MagicAppBuilder on Your Server
 
-To begin setting up MagicAppBuilder on your server, follow these steps:
+To set up MagicAppBuilder on your server, follow these steps:
 
 1. **Visit the MagicAppBuilder GitHub Repository**
    
-   Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder/releases](https://github.com/Planetbiru/MagicAppBuilder/releases).
+   Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder](https://github.com/Planetbiru/MagicAppBuilder).
 2. **Download the Latest Release**
    
-   Once on the GitHub page, navigate to the **Releases** section. Here, you’ll find the most recent stable version of MagicAppBuilder. Click on the release to download the ZIP file containing the latest version.
+   Navigate to the release page at: [https://github.com/Planetbiru/MagicAppBuilder/releases](https://github.com/Planetbiru/MagicAppBuilder/releases).
 3. **Extract the Files to Your Server’s Document Root**
    
    After downloading the release, extract the ZIP file into the **Document Root** directory of your web server. The Document Root is typically a directory like `/var/www/html` on Linux-based systems or `C:\xampp\htdocs` if you’re using XAMPP on Windows.
