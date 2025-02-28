@@ -575,7 +575,7 @@ The **Generate Module** tab contains a table with multiple columns. These column
 - **K**: Check to mark the column as the Primary Key.
 - **R**: Check to mark the column as Required (Mandatory).
 
-### Element Type Section:
+### Input Section:
 
 In this section, the following options are available:
 
@@ -586,9 +586,9 @@ In this section, the following options are available:
 - **MU**: Indicates that the input has multiple value.
 
 
-### Search Section:
+### Filter Section:
 
-In the **Search** section, the following options are available:
+In the **Filter** section, the following options are available:
 
 - **TE**: Indicates that the input is a text field (e.g., text, number, date, datetime-local, time, tel, email, url, etc.).
 - **SE**: Indicates that the input is a select field (dropdown).
@@ -602,9 +602,9 @@ The data type of the text input field.
 
 The filter to be applied by the application when receiving input from the user.
 
-### Explanation of the SE Column in Element Type and Search
+### Explanation of the SE Column in Input and Filter
 
-The **SE** column in both the **Element Type** and **Search** sections is used to link a column from an entity or table with data from another source. This data can come from another database or a user-defined value. This is typically used to connect a column with data from another table.
+The **SE** column in both the **Input** and **Filter** sections is used to link a column from an entity or table with data from another source. This data can come from another database or a user-defined value. This is typically used to connect a column with data from another table.
 
 #### Example:
 
@@ -620,7 +620,7 @@ The **SE** column in both the **Element Type** and **Search** sections is used t
 
 When displaying song data, the application will show the artist’s name instead of the artist's code. To do this, the application will perform a **join** between the `song` and `artist` tables.
 
-#### Source for SE in Element Type and Search:
+#### Source for SE in Input and Filter:
 
 When the user selects **SE**, a **Source** button will appear that the user must configure.
 
