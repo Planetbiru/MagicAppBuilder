@@ -23,6 +23,14 @@ function decreaseAjaxPending() {
 }
 
 /**
+ * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
+ * The width is calculated as `ajaxPending * 16` pixels.
+ */
+function updatePendingBar() {
+  $('.ajax-pending').css('width', (ajaxPending * 16) + 'px');
+}
+
+/**
  * Reset the workspace search input field to an empty value and trigger the workspace filtering logic.
  *
  * This function clears the value of the workspace search input field (`#search-workspace`)
@@ -46,14 +54,6 @@ function resetApplicationSearch()
 {
   $('#search-application').val('');
   doFilterApplication($('#search-application'));
-}
-
-/**
- * Updates the width of the `.ajax-pending` element to visually represent the current `ajaxPending` count.
- * The width is calculated as `ajaxPending * 16` pixels.
- */
-function updatePendingBar() {
-  $('.ajax-pending').css('width', (ajaxPending * 16) + 'px');
 }
 
 // A comma-separated string of SQL keywords.

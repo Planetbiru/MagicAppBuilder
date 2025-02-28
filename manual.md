@@ -183,7 +183,7 @@ To begin setting up MagicAppBuilder on your server, follow these steps:
 
 1. **Visit the MagicAppBuilder GitHub Repository**
    
-   Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder](https://github.com/Planetbiru/MagicAppBuilder).
+   Go to the official MagicAppBuilder repository at: [https://github.com/Planetbiru/MagicAppBuilder/releases](https://github.com/Planetbiru/MagicAppBuilder/releases).
 2. **Download the Latest Release**
    
    Once on the GitHub page, navigate to the **Releases** section. Here, you’ll find the most recent stable version of MagicAppBuilder. Click on the release to download the ZIP file containing the latest version.
