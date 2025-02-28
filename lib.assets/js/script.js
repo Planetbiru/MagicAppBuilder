@@ -4855,8 +4855,6 @@ function generateSelectType(field, args) {
     </select>
   `);
 
-
-
   let i;
   let j;
   let k;
@@ -5058,8 +5056,7 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
     </tr>
   `;
-
-
+  
   return rowHTML;
 }
 
