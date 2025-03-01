@@ -215,6 +215,10 @@ class AppBuilder extends AppBuilderBase
 
         $objectName = lcfirst($entityName);
         
+        $upperAdminDelete = PicoStringUtil::upperCamelize($this->entityInfo->getAdminDelete());
+        $upperTimeDelete = PicoStringUtil::upperCamelize($this->entityInfo->getTimeDelete());
+        $upperIpDelete = PicoStringUtil::upperCamelize($this->entityInfo->getIpDelete());
+
         $objectNameBk = $objectName;
         $lines = array();
         $camelPkName = PicoStringUtil::camelize($primaryKeyName);
@@ -241,7 +245,13 @@ class AppBuilder extends AppBuilderBase
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectNameBk."->isset".$upperPkName."())";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_OPEN;       
+            
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectTrashName, $entityTrashName, $objectNameBk);
+
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_SET.$upperAdminDelete."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_SET.$upperTimeDelete."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_SET.$upperIpDelete."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
+
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectTrashName.parent::CALL_INSERT_END;
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectNameBk."->delete();";
             $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::CURLY_BRACKET_CLOSE;

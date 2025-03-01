@@ -55,6 +55,13 @@ class EntityInfo extends SecretObject
     protected $adminAskEdit;
 
     /**
+     * Admin user who delete the entity.
+     *
+     * @var string
+     */
+    protected $adminDelete;
+
+    /**
      * IP address of the user who created the entity.
      *
      * @var string
@@ -76,6 +83,13 @@ class EntityInfo extends SecretObject
     protected $ipAskEdit;
 
     /**
+     * IP address of the user who delete the entity.
+     *
+     * @var string
+     */
+    protected $ipDelete;
+
+    /**
      * Timestamp of when the entity was created.
      *
      * @var string
@@ -95,6 +109,13 @@ class EntityInfo extends SecretObject
      * @var string
      */
     protected $timeAskEdit;
+
+    /**
+     * Timestamp of when the entity was deleted.
+     *
+     * @var string
+     */
+    protected $timeDelete;
 
     /**
      * Key indicating who the entity is waiting for approval from.
