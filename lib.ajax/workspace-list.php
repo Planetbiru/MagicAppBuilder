@@ -45,9 +45,9 @@ try
             <h5 class="card-title"><?php echo $workspace->getName(); ?></h5>
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getDirectory(); ?></h6>
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
-            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-scan">Scan</a>
-            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-open">VS Code</a>
-            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-default">Active</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-scan"><i class="fa-solid fa-folder-tree"></i> Scan</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-open"><i class="fas fa-code"></i> VS Code</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-default"><i class="fas fa-check"></i>  Active</a>
         </div>
     </div>
 </div>
