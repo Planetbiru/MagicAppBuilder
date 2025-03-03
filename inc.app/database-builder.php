@@ -45,9 +45,16 @@ if($databaseConfigured)
             {
                 try
                 {
+                    // Connect to database server without specify database
                     $databaseBuilder->connect(false);
+                    
+                    // Create database
                     $databaseBuilder->query("CREATE DATABASE ".$databaseConfigBuilder->getDatabaseName());
+                    
+                    // Disconnect from database server
                     $databaseBuilder->disconnect();
+                    
+                    // Connect to database server with specify database
                     $databaseBuilder->connect();
                 }
                 catch(Exception $e)
