@@ -79,7 +79,7 @@ $data->addFilter(
 );
 
 $data->addElement([
-    'type' => 'button',
+    'tag' => 'button',
     'textNode'=>'Search',
     'attribute' => [
         'type' => 'button',
