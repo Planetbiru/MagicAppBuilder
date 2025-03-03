@@ -37,13 +37,13 @@ Method:
 
 Parameters:
 
-- PicoSpecification|PicoPredicate|array
+- PicoSpecification|PicoPredicate|array|string
 
 2. addOr
 
 Parameters:
 
-- PicoSpecification|PicoPredicate|array
+- PicoSpecification|PicoPredicate|array|string
 
 We can form specifications in an unlimited number of stages. Note that users need to simplify the logic before implementing it into the specification.
 
@@ -705,3 +705,91 @@ catch(Exception $e)
 	error_log($e);
 }
 ```
+
+**String-Based Specification**
+
+Since version **3.6**, **MagicObject** has supported specifications in the form of strings, which are used as part of the `WHERE` clause. The introduction of string-based specifications aims to address limitations that cannot be handled using predicates alone. This feature provides users with greater flexibility, allowing them to write `WHERE` clauses directly, tailored to the syntax and capabilities of their specific DBMS.
+
+Example:
+
+```php
+
+$album = new EntityAlbum(null, $database);
+
+// Debug query callback to log the executed SQL
+$database->setCallbackDebugQuery(function($sql){
+    error_log($sql);
+});
+
+// Creating a specification object
+$specs = new PicoSpecification();
+
+// Adding conditions using an array
+$specs->name = ['Album 1', 'Album 2'];
+
+/*
+$specs->numberOfSong = 11;
+$specs->active = true;
+$specs->asDraft = false;
+*/
+
+// Adding conditions using string specifications
+$specs->addAnd("number_of_song = 11");
+$specs->addAnd("active = true");
+$specs->addAnd("as_draft = false");
+
+try {
+    // Executing the query based on the specifications
+    $res = $album->findAll($specs);
+
+    // Displaying the results
+    foreach ($res->getResult() as $row) {
+        echo $row . "\r\n\r\n";
+    }
+} catch (Exception $e) {
+    error_log($e);
+}
+
+```
+
+Important Notes:
+
+-    Clause additions must use the functions `add`, `addAnd`, or `addOr`.
+-    Column names must exactly match those in the database without any mapping.
+-    Values must be manually escaped to prevent SQL injection.
+
+**Escaping Values in SQL WHERE Clause**
+
+When constructing SQL queries, it is crucial to properly escape values to prevent SQL injection and ensure data integrity. You can use the `bindSqlParams` function from the `PicoDatabaseQueryBuilder` class to safely replace placeholders (`?`) with actual values.
+
+Example usage:
+
+```php
+$specs->addAnd((string) (new PicoDatabaseQueryBuilder($database))->bindSqlParams('lyric LIKE ?', "%O'ben%"));
+```
+
+If you are using MySQL or MariaDB, you can use PHP's built-in `addslashes` function:
+
+```php
+$specs->addAnd('lyric LIKE ?', addslashes("%O'ben%"));
+```
+
+For other databases, you can use PHP's built-in `str_replace` function:
+
+```php
+$specs->addAnd('lyric LIKE ?', str_replace("'", "''", "%O'ben%"));
+```
+
+-   **Creating a `PicoDatabaseQueryBuilder` instance**
+    
+    -   A new instance of `PicoDatabaseQueryBuilder` is created with the `$database` connection.
+-   **Calling `bindSqlParams`**
+    
+    -   The function replaces the `?` placeholder in `'lyric LIKE ?'` with the provided value `"%O'ben%"`.
+    -   This ensures proper escaping of special characters like the single quote (`'`) in `"O'ben"`.
+-   **Ensuring Type Safety**
+    
+    -   The `(string)` cast ensures the output is properly converted to a string before being used in the SQL query.
+-   **Using `addAnd` to Append Conditions**
+    
+    -   The escaped SQL condition is safely added to the filter specifications.

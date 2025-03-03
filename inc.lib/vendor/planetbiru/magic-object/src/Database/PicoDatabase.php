@@ -577,7 +577,7 @@ class PicoDatabase // NOSONAR
      *                - `PicoDatabaseType::DATABASE_TYPE_MYSQL`
      * @throws UnsupportedDatabaseException If the database type is unsupported.
      */
-    private static function getDbType($databaseType) // NOSONAR
+    public static function getDbType($databaseType) // NOSONAR
     {
         if(stripos($databaseType, 'sqlite') !== false)
         {

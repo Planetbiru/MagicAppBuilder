@@ -32,13 +32,11 @@ Several bugs and issues from previous versions have been addressed in **MagicObj
 -   **Performance Optimizations**: Internally, **MagicObject Version 2** has been optimized to improve overall performance. Key database interaction operations have been streamlined, leading to faster query execution times and better resource utilization.
     
 -   **Backward Compatibility**: **MagicObject Version 2** maintains **backward compatibility** with **Version 1**, ensuring that existing users can upgrade smoothly without having to make significant changes to their codebase. This allows for an easy transition to the new version while still maintaining compatibility with legacy systems.
-    
+
 
 ## Migration Notes
 
 If you are upgrading from **MagicObject Version 1** to **Version 2**, please review the migration notes carefully. The documentation includes detailed guidelines and best practices for handling any potential breaking changes, as well as adjustments that may be necessary to ensure a smooth transition. By following these guidelines, you can ensure that your upgrade process is as seamless as possible, minimizing disruptions to your development workflow.
-
-
 
 # MagicObject Version 2.1
 
@@ -174,3 +172,82 @@ These methods are designed to work seamlessly with an active database connection
     MagicObject version 3.0 no longer depends on external libraries. The Yaml parsing and dumping functions are now fully handled by a class that is part of MagicObject itself, reducing its overall complexity.
 5.  **Added `BETWEEN` Filter for Predicate Queries**  
     MagicObject now supports `BETWEEN` filters for predicate-based queries, allowing users to perform range-based filtering efficiently. This improves query performance and simplifies conditions when working with numerical or date ranges.
+
+
+# MagicObject Version 3.6
+
+## What's New
+
+**MagicObject 3.6** introduces new enhancements and improvements to provide greater flexibility in query building.
+
+### Key Features & Updates:
+
+- **String-Based Specifications in `WHERE` Clauses**
+- **String-Based Sortable in `ORDER BY` Clauses**
+- **Update Constructor for `PicoDatabaseQueryBuilder` class**
+- **New `bindSqlParams` Function for Secure Parameter Binding**
+
+### String-Based Specifications in `WHERE` Clauses
+
+You can now use raw SQL strings as part of the WHERE clause, allowing for more complex conditions that predicates alone cannot handle. This gives users full control over query construction, adapting to different DBMS requirements.
+
+**Example Usage:**
+
+```php
+$specs->addAnd((string) (new PicoDatabaseQueryBuilder($database))->bindSqlParams('artist_name LIKE ?', "%O'ben%"));
+```
+
+### String-Based Sorting in `ORDER BY` Clauses
+
+MagicObject now supports string-based sorting, allowing users to define custom `ORDER BY` clauses dynamically. This feature enhances flexibility when ordering query results.
+
+**Example Usage:**
+
+```php
+$sortable = new PicoSortable();
+$sortable->add("artist_name DESC, album_year ASC");
+```
+
+or
+
+```php
+$sortable = new PicoSortable();
+$sortable->add(["artist_name", "DESC"], true);
+$sortable->add(["album_year", "ASC"], true);
+```
+
+### Updated Constructor for `PicoDatabaseQueryBuilder`
+
+When construct an object of `PicoDatabaseQueryBuilder` class, user can send a `PDO` object as parameter. `PicoDatabaseQueryBuilder` will retrieve database type information from it. So, user not require to construct a `PicoDatabase` to get the datatabase type from it.
+
+**Before (Previous Approach):**
+
+```php
+$databaseCredentials = new SecretObject();
+$databaseCredentials->loadYamlFile("db.yml");
+$database = new PicoDatabase($databaseCredentials);
+$database->connect();
+$queryBuilder = new PicoDatabaseQueryBuilder($database);
+```
+
+**Now (New Approach in v3.6):**
+
+```php
+$queryBuilder = new PicoDatabaseQueryBuilder($pdo);
+```
+
+### **New `bindSqlParams` Function in `PicoDatabaseQueryBuilder`**
+
+A new function, `bindSqlParams`, has been introduced to safely bind SQL parameters, helping to escape values properly and prevent SQL injection.
+
+### **Key Improvements**
+
+-   **Increased flexibility** for defining custom SQL conditions.
+-   **Support for complex `WHERE` clauses** with direct SQL strings.
+-   **More control over query sorting** through string-based `ORDER BY` clauses.
+-   **Improved compatibility** with different database systems.
+-   **Enhanced sorting capabilities** with dynamic and flexible `ORDER BY` handling.
+
+Several functions in the class with **private access level** have undergone changes, including function names, parameter names, and parameter order, to improve maintainability. These changes do not affect compatibility with previous versions, as the functions are only accessed within the class itself.
+
+Upgrade to **MagicObject 3.6** now and enjoy a more powerful and flexible query-building experience!

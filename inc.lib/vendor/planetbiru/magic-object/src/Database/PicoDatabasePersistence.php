@@ -1673,14 +1673,14 @@ class PicoDatabasePersistence // NOSONAR
             // flat
             if(isset($maps[$field]))
             {
-                // get from map
+                // Get from map.
                 $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $maps[$field], $entityTable == $masterTable);
                 $columnFinal = $this->formatColumn($column, $functionFormat);
                 $arr[] = $this->constructSpecificationQuery($sqlQuery, $spec, $columnFinal);
             }
             else if(in_array($field, $columnNames))
             {
-                // get colum name
+                // Get colum name.
                 $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $field, $entityTable == $masterTable);
                 $columnFinal = $this->formatColumn($column, $functionFormat);
                 $arr[] = $this->constructSpecificationQuery($sqlQuery, $spec, $columnFinal);
@@ -1688,49 +1688,69 @@ class PicoDatabasePersistence // NOSONAR
         }
         else if($spec instanceof PicoSpecification)
         {
-            // nested
+            // Neested
             $arr[] = $spec->getParentFilterLogic() . " (" . $this->createWhereFromSpecification($sqlQuery, $spec, $info) . ")";
+        }
+        else if(is_string($spec))
+        {
+            // Raw SQL query.
+            $arr[] = $this->constructSpecificationQuery($sqlQuery, $spec, null);
         }
         return $arr;
     }
 
     /**
-     * Constructs an SQL query fragment based on the given specification.
+     * Constructs an SQL query fragment based on the given predicate.
+     * 
+     * This method generates an SQL condition using a `PicoPredicate` instance or a raw SQL string.
+     * If the predicate specifies a "BETWEEN" comparison with an array of values, it constructs 
+     * a range-based condition. Otherwise, it applies a standard comparison operation.
      *
-     * @param PicoDatabaseQueryBuilder $sqlQuery Query builder instance.
-     * @param PicoSpecification $spec Specification containing comparison logic and values.
+     * @param PicoDatabaseQueryBuilder $sqlQuery The query builder instance used for SQL operations.
+     * @param PicoPredicate|string $spec The predicate defining the condition, or a raw SQL string.
      * @param string $columnFinal The database column to be compared.
-     * @return string The constructed SQL query fragment.
+     * @return string The constructed SQL query fragment. Returns an empty string if no valid predicate is provided.
      */
     private function constructSpecificationQuery($sqlQuery, $spec, $columnFinal)
     {
-        if($spec->getComparation()->getComparison() == PicoDataComparation::BETWEEN && is_array($spec->getValue()) && count($spec->getValue()) > 1)
+        if(!isset($spec))
         {
-            $values = $spec->getValue();
-            $min = $values[0];
-            $max = end($values);
-            $str = $spec->getFilterLogic() . " ( " 
-            . $columnFinal . " >= " . $sqlQuery->escapeValue($min)
-            . " AND "
-            . $columnFinal . " <= " . $sqlQuery->escapeValue($max)
-            . " )"
-            ;
+            return "";
         }
-        else
+        if($spec instanceof PicoPredicate)
         {
-            $str = $spec->getFilterLogic() . " " . $columnFinal . " " . $spec->getComparation()->getComparison() . " " . $this->contructComparisonValue($spec, $sqlQuery);
+            if($spec->getComparation()->getComparison() == PicoDataComparation::BETWEEN && is_array($spec->getValue()) && count($spec->getValue()) > 1)
+            {
+                $values = $spec->getValue();
+                $min = $values[0];
+                $max = end($values);
+                $str = $spec->getFilterLogic() . " ( " 
+                . $columnFinal . " >= " . $sqlQuery->escapeValue($min)
+                . " AND "
+                . $columnFinal . " <= " . $sqlQuery->escapeValue($max)
+                . " )"
+                ;
+            }
+            else
+            {
+                $str = $spec->getFilterLogic() . " " . $columnFinal . " " . $spec->getComparation()->getComparison() . " " . $this->contructComparisonValue($sqlQuery, $spec);
+            }
+            return $str;
         }
-        return $str;
+        else if(is_string($spec))
+        {
+            return $spec;
+        }
     }
     
     /**
      * Construct comparison value for predicates
      *
-     * @param PicoPredicate $predicate Predicate with comparison values
      * @param PicoDatabaseQueryBuilder $sqlQuery Query builder instance
+     * @param PicoPredicate $predicate Predicate with comparison values
      * @return string Formatted comparison value for SQL query
      */
-    private function contructComparisonValue($predicate, $sqlQuery)
+    private function contructComparisonValue($sqlQuery, $predicate)
     {
         if(is_array($predicate->getValue()))
         {
@@ -1812,12 +1832,13 @@ class PicoDatabasePersistence // NOSONAR
         $ret = null;
         if($info == null)
         {
-            $ret = $this->createWithoutMapping($order, $info);
+            $ret = $this->createSortWithoutMapping($order, $info);     
         }
         else
         {
-            $ret = $this->createWithMapping($order, $info);
+            $ret = $this->createSortWithMapping($order, $info);
         }
+        
         return $ret;
     }
     
@@ -1828,22 +1849,29 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoTableInfo|null $info Table information
      * @return string|null The constructed ORDER BY clause or null
      */
-    private function createWithoutMapping($order, $info)
+    private function createSortWithoutMapping($order, $info)
     {
         $ret = null;
         $sorts = array();
-        foreach($order->getSortable() as $sortable)
+        foreach($order->getSortable() as $sort)
         {
-            $columnName = $sortable->getSortBy();
-            $sortType = $sortable->getSortType();             
-            $sortBy = $columnName;
-            $entityField = new PicoEntityField($sortBy, $info);
-            if($entityField->getEntity() != null)
+            if($sort instanceof PicoSort)
             {
-                $tableName = $this->getTableOf($entityField->getEntity(), $info);
-                $sortBy = $tableName.".".$sortBy;
+                $columnName = $sort->getSortBy();
+                $sortType = $sort->getSortType();             
+                $sortBy = $columnName;
+                $entityField = new PicoEntityField($sortBy, $info);
+                if($entityField->getEntity() != null)
+                {
+                    $tableName = $this->getTableOf($entityField->getEntity(), $info);
+                    $sortBy = $tableName.".".$sortBy;
+                }
+                $sorts[] = $sortBy . " " . $sortType;     
+            }    
+            else if(is_string($sort))
+            {
+                $sorts[] = $sort;
             }
-            $sorts[] = $sortBy . " " . $sortType;           
         }
         if(!empty($sorts))
         {
@@ -1859,53 +1887,60 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoTableInfo $info Table information
      * @return string The constructed ORDER BY clause
      */
-    private function createWithMapping($order, $info)
+    private function createSortWithMapping($order, $info) // NOSONAR
     {
         $masterColumnMaps = $this->getColumnMap($info);
         $masterTable = $info->getTableName();
         
         $arr = array();
     
-        foreach($order->getSortable() as $sortOrder)
-        {           
-            $entityField = new PicoEntityField($sortOrder->getSortBy(), $info);
-            $field = $entityField->getField();
-            $entityName = $entityField->getEntity();
-            $parentName = $entityField->getParentField();
-            
-            if($entityName != null)
-            {
-                $entityTable = $this->getTableOf($entityName, $info);
-                if($entityTable != null)
+        foreach($order->getSortable() as $sort)
+        {
+            if($sort instanceof PicoSort)
+            {           
+                $entityField = new PicoEntityField($sort->getSortBy(), $info);
+                $field = $entityField->getField();
+                $entityName = $entityField->getEntity();
+                $parentName = $entityField->getParentField();
+                
+                if($entityName != null)
                 {
-                    $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
-                    $maps = $joinColumnmaps;
+                    $entityTable = $this->getTableOf($entityName, $info);
+                    if($entityTable != null)
+                    {
+                        $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
+                        $maps = $joinColumnmaps;
+                    }
+                    else
+                    {
+                        $maps = $masterColumnMaps;
+                    }
+                    $columnNames = array_values($maps);
                 }
                 else
                 {
+                    $entityTable = null;
                     $maps = $masterColumnMaps;
+                    $columnNames = array_values($maps);
                 }
-                $columnNames = array_values($maps);
-            }
-            else
-            {
-                $entityTable = null;
-                $maps = $masterColumnMaps;
-                $columnNames = array_values($maps);
-            }
-            
-            if(isset($maps[$field]))
-            {
-                // get from map
-                $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $maps[$field], $masterTable == $entityTable);
                 
-                $arr[] = $column . " " . $sortOrder->getSortType();
+                if(isset($maps[$field]))
+                {
+                    // get from map
+                    $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $maps[$field], $masterTable == $entityTable);
+                    
+                    $arr[] = $column . " " . $sort->getSortType();
+                }
+                else if(in_array($field, $columnNames))
+                {
+                    // get colum name
+                    $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $field, $masterTable == $entityTable);
+                    $arr[] = $column . " " . $sort->getSortType();
+                }
             }
-            else if(in_array($field, $columnNames))
+            else if(is_string($sort))
             {
-                // get colum name
-                $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $field, $masterTable == $entityTable);
-                $arr[] = $column . " " . $sortOrder->getSortType();
+                $arr[] = $sort;
             }
         }
         return $this->joinStringArray($arr, self::MAX_LINE_LENGTH, self::COMMA, self::COMMA_RETURN);
@@ -2113,6 +2148,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function setSortable($sqlQuery, $pageable, $sortable, $info)
     {
+        
         if($sortable != null)
         {
             if($sortable instanceof PicoSortable)

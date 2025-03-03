@@ -68,10 +68,19 @@ catch(Exception $e)
 
 Constructor:
 
+```php
+public function __construct(
+    PicoPage|PicoLimit|array|null $page = null,
+    PicoSortable|array|null $sortable = null
+)
+{
+}
+```
+
 Parameters:
 
-- PicoPage|PicoLimit|array $page
-- PicoSortable|array $sortable
+- PicoPage|PicoLimit|array|null $page
+- PicoSortable|array|null $sortable
 
 Method:
 
@@ -87,6 +96,15 @@ Method:
 **PicoPage**
 
 Constructor:
+
+```php
+public function __construct(
+    int $pageNumber = 1,
+    int $pageSize = 1
+)
+{
+}
+```
 
 Parameters:
 
@@ -119,6 +137,12 @@ Metods:
 **PicoSortable**
 
 Constructor:
+
+```php
+public function __construct()
+{
+}
+```
 
 Parameters:
 
@@ -171,9 +195,49 @@ Static methods:
 - getInstance
 - fixSortType
 
+#### Using String-Based Sorting
 
-Example:
+Since version **3.6**, **MagicObject** supports **string-based sorting**, allowing users to define custom `ORDER BY` clauses dynamically. This feature provides greater flexibility when ordering query results.
 
+
+Users can define sorting criteria in the following ways:
+
+**Sortable with String**
+
+```php
+$sortable = new PicoSortable();
+$sortable->add("LOWER(TRIM(title)) ASC");
+```
+
+or
+
+**Sortable with Array**
+
+```php
+$sortable = new PicoSortable();
+$sortable->add(["LOWER(TRIM(title))", "ASC"], true);
+```
+
+#### Understanding the Second Parameter
+
+The second parameter (`true` in this case) **indicates that the first element of the array in the first parameter is a raw SQL expression**. The default value is `false`. When set to `true`, **MagicObject will not modify or escape the value**, allowing full control over custom sorting logic.
+
+#### Security Considerations
+
+When using **string-based sorting**, always consider security risks. Manually escape the parameters you include using the `PicoDatabaseQueryBuilder::bindSqlParams()` function, as shown in the example below:
+
+```php
+$inputGet = new InputGet();
+$sortType = $inputGet->getOrderBy(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+$queryBuilder = new PicoDatabaseQueryBuilder($database);
+$sortBy = $queryBuilder->bindSqlParams('SIN(angle * ?)', $factor);
+$sortable->add([$sortBy, $sortType], true);
+```
+
+This ensures that the sorting parameters are properly sanitized and protected against SQL injection.
+
+#### Pageable with Sortable and without Sortable
 
 **Pageable without Sortable**
 

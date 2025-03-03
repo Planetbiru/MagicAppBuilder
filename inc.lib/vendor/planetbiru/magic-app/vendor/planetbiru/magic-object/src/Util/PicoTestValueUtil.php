@@ -61,7 +61,7 @@ class PicoTestValueUtil
      */
     public function doReturnAttributeSelected()
     {
-        return $this->doReturn(' selected=selected');
+        return $this->doReturn(' selected="selected"');
     }
 
     /**
@@ -81,7 +81,7 @@ class PicoTestValueUtil
      */
     public function doReturnAttributeChecked()
     {
-        return $this->doReturn(' checked=checked');
+        return $this->doReturn(' checked="checked"');
     }
 
     /**

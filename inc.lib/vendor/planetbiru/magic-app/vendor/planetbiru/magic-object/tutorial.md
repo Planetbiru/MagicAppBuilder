@@ -7368,13 +7368,13 @@ Method:
 
 Parameters:
 
-- PicoSpecification|PicoPredicate|array
+- PicoSpecification|PicoPredicate|array|string
 
 2. addOr
 
 Parameters:
 
-- PicoSpecification|PicoPredicate|array
+- PicoSpecification|PicoPredicate|array|string
 
 We can form specifications in an unlimited number of stages. Note that users need to simplify the logic before implementing it into the specification.
 
@@ -8036,6 +8036,95 @@ catch(Exception $e)
 	error_log($e);
 }
 ```
+
+**String-Based Specification**
+
+Since version **3.6**, **MagicObject** has supported specifications in the form of strings, which are used as part of the `WHERE` clause. The introduction of string-based specifications aims to address limitations that cannot be handled using predicates alone. This feature provides users with greater flexibility, allowing them to write `WHERE` clauses directly, tailored to the syntax and capabilities of their specific DBMS.
+
+Example:
+
+```php
+
+$album = new EntityAlbum(null, $database);
+
+// Debug query callback to log the executed SQL
+$database->setCallbackDebugQuery(function($sql){
+    error_log($sql);
+});
+
+// Creating a specification object
+$specs = new PicoSpecification();
+
+// Adding conditions using an array
+$specs->name = ['Album 1', 'Album 2'];
+
+/*
+$specs->numberOfSong = 11;
+$specs->active = true;
+$specs->asDraft = false;
+*/
+
+// Adding conditions using string specifications
+$specs->addAnd("number_of_song = 11");
+$specs->addAnd("active = true");
+$specs->addAnd("as_draft = false");
+
+try {
+    // Executing the query based on the specifications
+    $res = $album->findAll($specs);
+
+    // Displaying the results
+    foreach ($res->getResult() as $row) {
+        echo $row . "\r\n\r\n";
+    }
+} catch (Exception $e) {
+    error_log($e);
+}
+
+```
+
+Important Notes:
+
+-    Clause additions must use the functions `add`, `addAnd`, or `addOr`.
+-    Column names must exactly match those in the database without any mapping.
+-    Values must be manually escaped to prevent SQL injection.
+
+**Escaping Values in SQL WHERE Clause**
+
+When constructing SQL queries, it is crucial to properly escape values to prevent SQL injection and ensure data integrity. You can use the `bindSqlParams` function from the `PicoDatabaseQueryBuilder` class to safely replace placeholders (`?`) with actual values.
+
+Example usage:
+
+```php
+$specs->addAnd((string) (new PicoDatabaseQueryBuilder($database))->bindSqlParams('lyric LIKE ?', "%O'ben%"));
+```
+
+If you are using MySQL or MariaDB, you can use PHP's built-in `addslashes` function:
+
+```php
+$specs->addAnd('lyric LIKE ?', addslashes("%O'ben%"));
+```
+
+For other databases, you can use PHP's built-in `str_replace` function:
+
+```php
+$specs->addAnd('lyric LIKE ?', str_replace("'", "''", "%O'ben%"));
+```
+
+-   **Creating a `PicoDatabaseQueryBuilder` instance**
+    
+    -   A new instance of `PicoDatabaseQueryBuilder` is created with the `$database` connection.
+-   **Calling `bindSqlParams`**
+    
+    -   The function replaces the `?` placeholder in `'lyric LIKE ?'` with the provided value `"%O'ben%"`.
+    -   This ensures proper escaping of special characters like the single quote (`'`) in `"O'ben"`.
+-   **Ensuring Type Safety**
+    
+    -   The `(string)` cast ensures the output is properly converted to a string before being used in the SQL query.
+-   **Using `addAnd` to Append Conditions**
+    
+    -   The escaped SQL condition is safely added to the filter specifications.
+
 ### Pageable and Sortable
 
 In MagicObject, pageable is used to divide data rows into several pages. This is required by the application to display a lot of data per page. While sortable is used to sort data before the data is divided per page.
@@ -8106,10 +8195,19 @@ catch(Exception $e)
 
 Constructor:
 
+```php
+public function __construct(
+    PicoPage|PicoLimit|array|null $page = null,
+    PicoSortable|array|null $sortable = null
+)
+{
+}
+```
+
 Parameters:
 
-- PicoPage|PicoLimit|array $page
-- PicoSortable|array $sortable
+- PicoPage|PicoLimit|array|null $page
+- PicoSortable|array|null $sortable
 
 Method:
 
@@ -8125,6 +8223,15 @@ Method:
 **PicoPage**
 
 Constructor:
+
+```php
+public function __construct(
+    int $pageNumber = 1,
+    int $pageSize = 1
+)
+{
+}
+```
 
 Parameters:
 
@@ -8157,6 +8264,12 @@ Metods:
 **PicoSortable**
 
 Constructor:
+
+```php
+public function __construct()
+{
+}
+```
 
 Parameters:
 
@@ -8209,9 +8322,49 @@ Static methods:
 - getInstance
 - fixSortType
 
+#### Using String-Based Sorting
 
-Example:
+Since version **3.6**, **MagicObject** supports **string-based sorting**, allowing users to define custom `ORDER BY` clauses dynamically. This feature provides greater flexibility when ordering query results.
 
+
+Users can define sorting criteria in the following ways:
+
+**Sortable with String**
+
+```php
+$sortable = new PicoSortable();
+$sortable->add("LOWER(TRIM(title)) ASC");
+```
+
+or
+
+**Sortable with Array**
+
+```php
+$sortable = new PicoSortable();
+$sortable->add(["LOWER(TRIM(title))", "ASC"], true);
+```
+
+#### Understanding the Second Parameter
+
+The second parameter (`true` in this case) **indicates that the first element of the array in the first parameter is a raw SQL expression**. The default value is `false`. When set to `true`, **MagicObject will not modify or escape the value**, allowing full control over custom sorting logic.
+
+#### Security Considerations
+
+When using **string-based sorting**, always consider security risks. Manually escape the parameters you include using the `PicoDatabaseQueryBuilder::bindSqlParams()` function, as shown in the example below:
+
+```php
+$inputGet = new InputGet();
+$sortType = $inputGet->getOrderBy(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+$queryBuilder = new PicoDatabaseQueryBuilder($database);
+$sortBy = $queryBuilder->bindSqlParams('SIN(angle * ?)', $factor);
+$sortable->add([$sortBy, $sortType], true);
+```
+
+This ensures that the sorting parameters are properly sanitized and protected against SQL injection.
+
+#### Pageable with Sortable and without Sortable
 
 **Pageable without Sortable**
 

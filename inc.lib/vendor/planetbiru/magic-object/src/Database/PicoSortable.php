@@ -21,7 +21,7 @@ class PicoSortable
     /**
      * Array of sortable criteria.
      *
-     * @var PicoSort[]
+     * @var (PicoSort|string)[]
      */
     private $sortable = array();
 
@@ -86,28 +86,40 @@ class PicoSortable
     /**
      * Add a sortable criterion.
      *
-     * @param PicoSort|array $sort The sorting criterion to add.
+     * @param PicoSort|array|string $sort The sorting criterion to add.
+     * @param bool $isRawSql Indicates whether the array-based sorting is raw SQL.
      * @return self Returns the current instance for method chaining.
      */
-    public function add($sort)
+    public function add($sort, bool $isRawSql = false)
     {
-        return $this->addSortable($sort);
+        return $this->addSortable($sort, $isRawSql);
     }
 
     /**
      * Add a sortable criterion.
      *
-     * @param PicoSort|array $sort The sorting criterion to add.
+     * @param PicoSort|array|string $sort The sorting criterion to add.
+     * @param bool $isRawSql Indicates whether the array-based sorting is raw SQL.
      * @return self Returns the current instance for method chaining.
      */
-    public function addSortable($sort)
+    public function addSortable($sort, $isRawSql = false)
     {
-        if ($sort != null) {
+        if (isset($sort)) {
             if ($sort instanceof PicoSort) {
                 $this->sortable[count($this->sortable)] = $sort;
             } else if (is_array($sort)) {
-                $sortable = $this->createSortable($sort[0], $sort[1]);
-                $this->sortable[count($this->sortable)] = $sortable;
+                if($isRawSql)
+                {
+                    $sortable = $this->createSortable($sort[0], $sort[1]);
+                    $this->sortable[count($this->sortable)] = $sortable;
+                }
+                else
+                {
+                    $this->sortable[count($this->sortable)] = $sort . " " . $sort[1];
+                }
+                
+            } else if (is_string($sort)) {
+                $this->sortable[count($this->sortable)] = $sort;
             }
         }
         return $this;
@@ -138,9 +150,9 @@ class PicoSortable
         }
         $ret = null;
         if ($tableInfo == null) {
-            $ret = $this->createWithoutMapping();
+            $ret = $this->createOrderByWithoutMapping();
         } else {
-            $ret = $this->createWithMapping($tableInfo);
+            $ret = $this->createOrderByWithMapping($tableInfo);
         }
         return $ret;
     }
@@ -150,17 +162,24 @@ class PicoSortable
      *
      * @return string The ORDER BY clause.
      */
-    private function createWithoutMapping()
+    private function createOrderByWithoutMapping()
     {
         $ret = "";
         if (empty($this->sortable)) {
             return "";
         }
         $sorts = array();
-        foreach ($this->sortable as $sortable) {
-            $columnName = $sortable->getSortBy();
-            $sortType = $sortable->getSortType();
-            $sorts[] = $columnName . " " . $sortType;
+        foreach ($this->sortable as $sort) {
+            if($sort instanceof PicoSort)
+            {
+                $columnName = $sort->getSortBy();
+                $sortType = $sort->getSortType();
+                $sorts[] = $columnName . " " . $sortType;
+            }
+            else if(is_string($sort))
+            {
+                $sorts[] = $sort;
+            }
         }
         if (!empty($sorts)) {
             $ret = implode(", ", $sorts);
@@ -174,7 +193,7 @@ class PicoSortable
      * @param PicoTableInfo $tableInfo Information about the table for mapping.
      * @return string The ORDER BY clause.
      */
-    private function createWithMapping($tableInfo)
+    private function createOrderByWithMapping($tableInfo)
     {
         $ret = null;
         $columns = $tableInfo->getColumns();
@@ -185,14 +204,21 @@ class PicoSortable
             $columnNames[] = $column[MagicObject::KEY_NAME];
         }
         $sorts = array();
-        foreach ($this->sortable as $sortable) {
-            $propertyName = $sortable->getSortBy();
-            $sortType = $sortable->getSortType();
-            if (isset($columnList[$propertyName])) {
-                $sortBy = $columnList[$propertyName]['name'];
-                $sorts[] = $sortBy . " " . $sortType;
-            } else if (in_array($propertyName, $columnNames)) {
-                $sorts[] = $propertyName . " " . $sortType;
+        foreach ($this->sortable as $sort) {
+            if($sort instanceof PicoSort)
+            {
+                $propertyName = $sort->getSortBy();
+                $sortType = $sort->getSortType();
+                if (isset($columnList[$propertyName])) {
+                    $sortBy = $columnList[$propertyName]['name'];
+                    $sorts[] = $sortBy . " " . $sortType;
+                } else if (in_array($propertyName, $columnNames)) {
+                    $sorts[] = $propertyName . " " . $sortType;
+                }
+            }
+            else if(is_string($sort))
+            {
+                $sorts[] = $sort;
             }
         }
         if (!empty($sorts)) {
@@ -232,16 +258,14 @@ class PicoSortable
     }
 
     /**
-     * Convert the object to a JSON string representation for debugging.
+     * Generates the `ORDER BY` clause without mapping.
+     * This method is useful for debugging purposes.
      *
-     * This method is intended for debugging purposes only and provides 
-     * a JSON representation of the object's state.
-     *
-     * @return string The JSON representation of the object.
+     * @return string The generated `ORDER BY` clause.
      */
     public function __toString()
     {
-        return $this->createWithoutMapping();
+        return $this->createOrderByWithoutMapping();
     }
 
     /**

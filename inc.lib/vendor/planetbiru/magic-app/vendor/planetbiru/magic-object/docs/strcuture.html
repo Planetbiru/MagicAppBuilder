@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Styling untuk layout */
+        body {
+            display: flex;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #222222;
+        }
+
+        /* Sidebar */
+        #table-of-contents {
+            width: 240px;
+            height: 100vh;
+            background: #f8f9fa;
+            padding: 15px;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        /* Konten */
+        .content {
+            margin-left: 270px;
+            padding: 16px;
+            flex-grow: 1;
+        }
+
+        /* Styling daftar isi */
+        #table-of-contents ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        #table-of-contents li {
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        #table-of-contents a {
+            padding-left: 20px;
+            text-decoration: none;
+            color: #222222;
+        }
+
+        #table-of-contents a:hover {
+            text-decoration: underline;
+        }
+
+        /* Collapsible effect */
+        .collapsible > ul {
+            display: none;
+            margin-left: 15px;
+        }
+
+        .collapsible.open > ul {
+            display: block;
+        }
+
+        .toggle-btn {
+            font-weight: bold;
+            cursor: pointer;
+            color: #222222;
+        }
+
+        .toggle-btn::before {
+            content: "▶ ";
+            margin-left: -20px;
+            position: absolute;
+            width: 20px;
+            font-size: 12px;
+        }
+
+        .collapsible.open > .toggle-btn::before {
+            content: "▼ ";
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        h1 {
+            border-bottom: 1px solid #cccccc;
+        }
+        h2 {
+            border-bottom: 1px solid #cccccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="table-of-contents"></div>
+
+    <div class="content">
+        <h1>Part 1</h1>
+        <h2>Sub 1.1</h2>
+        <h3>Sub 1.1.1</h3>
+        <h3>Sub 1.1.2</h3>
+        <h2>Sub 1.2</h2>
+        <h2>Sub 1.3</h2>
+        <h3>Sub 1.3.1</h3>
+        <h3>Sub 1.3.2</h3>
+        <h1>Part 2</h1>
+        <h2>Sub 2.1</h2>
+        <h2>Sub 2.2</h2>
+        <h2>Sub 2.3</h2>
+        <h1>Part 3</h1>
+        <h1>Part 4</h1>
+    </div>
+
+    <script>
+        function generateTOC() {
+            const content = document.querySelector(".content");
+            const toc = document.getElementById("table-of-contents");
+            const headers = content.querySelectorAll("h1, h2, h3, h4, h5, h6");
+            const tocTree = { children: [] };
+            const stack = [{ level: 0, node: tocTree }];
+            const idMap = {};
+
+            headers.forEach(header => {
+                const level = parseInt(header.tagName.substring(1));
+                let baseId = header.textContent.replace(/\s+/g, "-").toLowerCase();
+
+                let id = baseId;
+                let counter = 1;
+                while (idMap[id]) {
+                    id = `${baseId}-${counter}`;
+                    counter++;
+                }
+                idMap[id] = true;
+
+                header.id = id;
+
+                const newItem = { element: header, id, title: header.textContent, children: [] };
+
+                while (stack[stack.length - 1].level >= level) {
+                    stack.pop();
+                }
+
+                stack[stack.length - 1].node.children.push(newItem);
+                stack.push({ level, node: newItem });
+            });
+
+            function buildList(items) {
+                if (items.length === 0) return "";
+                let ul = document.createElement("ul");
+                items.forEach(item => {
+                    let li = document.createElement("li");
+                    li.innerHTML = `<a href="#${item.id}" class="toggle-btn">${item.title}</a>`;
+
+                    if (item.children.length > 0) {
+                        li.classList.add("collapsible");
+                        li.querySelector(".toggle-btn").addEventListener("click", (event) => {
+                            li.classList.toggle("open");
+                            event.preventDefault();
+                        });
+
+                        li.appendChild(buildList(item.children));
+                    }
+
+                    ul.appendChild(li);
+                });
+                return ul;
+            }
+
+            toc.appendChild(buildList(tocTree.children));
+        }
+
+        document.addEventListener("DOMContentLoaded", generateTOC);
+    </script>
+
+</body>
+</html>

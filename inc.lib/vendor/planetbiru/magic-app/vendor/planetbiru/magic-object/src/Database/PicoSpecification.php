@@ -17,8 +17,8 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
  */
 class PicoSpecification // NOSONAR
 {
-    const LOGIC_AND = "and";
-    const LOGIC_OR  = "or";
+    const LOGIC_AND = "AND";
+    const LOGIC_OR  = "OR";
 
     /**
      * Parent filter logic (AND/OR) for nested specifications.
@@ -30,7 +30,7 @@ class PicoSpecification // NOSONAR
     /**
      * Array of PicoPredicate objects representing individual conditions.
      *
-     * @var PicoPredicate[]
+     * @var (PicoPredicate|string)[]
      */
     private $specifications = array();
 
@@ -93,7 +93,14 @@ class PicoSpecification // NOSONAR
     /**
      * Adds a specification with default AND logic.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * This method allows adding a filtering condition using logical AND.
+     * The condition can be a `PicoPredicate`, `PicoSpecification`, an array representing a predicate, or a raw SQL condition as a string.
+     *
+     * @param PicoSpecification|PicoPredicate|array|string $predicate The filter condition to be added.
+     *   - `PicoPredicate`: Represents a structured condition.
+     *   - `PicoSpecification`: A collection of conditions.
+     *   - `array`: Must contain at least two elements where the first is a column name and the second is a value.
+     *   - `string`: A raw SQL fragment.
      * @return self Returns the current instance for method chaining.
      */
     public function add($predicate)
@@ -102,9 +109,16 @@ class PicoSpecification // NOSONAR
     }
 
     /**
-     * Adds an AND specification.
+     * Adds an AND condition to the specifications.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * This method allows adding a filtering condition using logical AND.
+     * The condition can be a `PicoPredicate`, `PicoSpecification`, an array representing a predicate, or a raw SQL condition as a string.
+     *
+     * @param PicoSpecification|PicoPredicate|array|string $predicate The filter condition to be added.
+     *   - `PicoPredicate`: Represents a structured condition.
+     *   - `PicoSpecification`: A collection of conditions.
+     *   - `array`: Must contain at least two elements where the first is a column name and the second is a value.
+     *   - `string`: A raw SQL fragment.
      * @return self Returns the current instance for method chaining.
      */
     public function addAnd($predicate)
@@ -117,15 +131,23 @@ class PicoSpecification // NOSONAR
                 $this->addSubfilter($predicate, self::LOGIC_AND);
             } elseif (is_array($predicate) && count($predicate) > 1 && is_string($predicate[0])) {
                 $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_AND);
+            } elseif (is_string($predicate)) {
+                $this->addFilter($predicate, self::LOGIC_AND);
             }
         }
         return $this;
     }
 
     /**
-     * Adds an OR specification.
+     * Adds an OR condition to the specifications.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
+     * Similar to `addAnd()`, but applies logical OR instead of AND.
+     *
+     * @param PicoSpecification|PicoPredicate|array|string $predicate The filter condition to be added.
+     *   - `PicoPredicate`: Represents a structured condition.
+     *   - `PicoSpecification`: A collection of conditions.
+     *   - `array`: Must contain at least two elements where the first is a column name and the second is a value.
+     *   - `string`: A raw SQL fragment.
      * @return self Returns the current instance for method chaining.
      */
     public function addOr($predicate)
@@ -138,19 +160,31 @@ class PicoSpecification // NOSONAR
                 $this->addSubfilter($predicate, self::LOGIC_OR);
             } elseif (is_array($predicate) && count($predicate) > 1 && is_string($predicate[0])) {
                 $this->addFilter(new PicoPredicate($predicate[0], $predicate[1]), self::LOGIC_OR);
+            } elseif (is_string($predicate)) {
+                $this->addFilter($predicate, self::LOGIC_OR);
             }
         }
         return $this;
     }
 
     /**
-     * Adds a filter specification.
+     * Adds a filtering condition to the specifications.
      *
-     * @param PicoSpecification|PicoPredicate|array $predicate The filter to be added.
-     * @param string $logic The logical operator (AND/OR) to use with this filter.
+     * This method processes the given predicate and applies the specified logical operator (AND/OR).
+     * If the predicate is an instance of `PicoPredicate`, it will be modified to include the logical operator.
+     * If a `PicoSpecification` is provided, its specifications will be extracted and added recursively.
+     * If the predicate is an array, it will be processed accordingly.
+     * If a raw SQL string is provided, it will be added with the logical operator.
+     *
+     * @param PicoSpecification|PicoPredicate|array|string $predicate The filter condition to be added.
+     *   - `PicoPredicate`: Represents a structured condition.
+     *   - `PicoSpecification`: A collection of conditions.
+     *   - `array`: Must contain at least two elements where the first is a column name and the second is a value.
+     *   - `string`: A raw SQL fragment.
+     * @param string $logic The logical operator (`AND` or `OR`) to be applied.
      * @return self Returns the current instance for method chaining.
      */
-    private function addFilter($predicate, $logic)
+    private function addFilter($predicate, $logic) // NOSONAR
     {
         if(isset($predicate))
         {
@@ -169,6 +203,8 @@ class PicoSpecification // NOSONAR
                 }
             } elseif (is_array($predicate)) {
                 $this->addFilterByArray($predicate, $logic);
+            } elseif (is_string($predicate)) {
+                $this->specifications[count($this->specifications)] = $logic. " " . $predicate;
             }
         }
         return $this;
@@ -439,18 +475,19 @@ class PicoSpecification // NOSONAR
     }
 
     /**
-     * Convert the object to a JSON string representation for debugging.
+     * Creates a part of the `WHERE` clause from specifications for debugging purposes only.
+     * Removes leading logical operators (`AND`, `OR`) if present.
      *
-     * This method is intended for debugging purposes only and provides 
-     * a JSON representation of the object's state.
-     *
-     * @return string The JSON representation of the object.
+     * @return string The generated `WHERE` clause.
      */
     public function __toString()
     {
-        $specification = implode(" ", $this->getWhere($this->specifications));
+        $specification = trim(implode(" ", $this->getWhere($this->specifications)));
         if (stripos($specification, "and ") === 0) {
             $specification = substr($specification, 4);
+        }
+        if (stripos($specification, "or ") === 0) {
+            $specification = substr($specification, 3);
         }
         return $specification;
     }
