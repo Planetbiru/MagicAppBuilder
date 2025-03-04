@@ -36,21 +36,28 @@ body {
   width: 100%;
   overflow: hidden;
 }
-.entity-editor .left-panel,
-.entity-editor .right-panel {
+.entity-editor .left-panel {
+  display: flex;
+  flex-grow: 1;
+  position: relative;
   overflow: auto;
   padding: 10px;
   border: 1px solid #ccc;
+  width: calc(70% - 5px);
+  background-color: #fbfbfb;
+}
+.entity-editor .left-panel .object-container {
+  width: 184px;
+  height: 100%;
 }
 .entity-editor .resize-bar {
   width: 10px;
   cursor: ew-resize;
 }
-.entity-editor .left-panel {
-  width: calc(70% - 5px);
-  background-color: #fbfbfb;
-}
 .entity-editor .right-panel {
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
   width: calc(30% - 5px);
   background-color: #fbfbfb;
 }

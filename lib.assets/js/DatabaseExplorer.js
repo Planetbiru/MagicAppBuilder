@@ -119,7 +119,7 @@ function openStructure(file)
 // Instantiate the class
 const converter = new SQLConverter();
 let editor;
-let renderer;
+let entityRenderer;
 let resizablePanels;
 
 // Initialize event listeners
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
     const toggles = document.querySelectorAll('.collapsible .button-toggle');
-    renderer = new EntityRenderer(".erd-svg");
+    entityRenderer = new EntityRenderer(".erd-svg");
 
     // Attach event listeners to each toggle button
     toggles.forEach(function(toggle) {

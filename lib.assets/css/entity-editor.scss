@@ -32,7 +32,6 @@ body {
     padding: 0;
     font-family: $font-family;
     font-size: $font-size;
-
     height: 100%;
     width: 100%;
     position: relative;
@@ -52,11 +51,19 @@ body {
     }
 
     // Left and right panels
-    .left-panel,
-    .right-panel {
+    .left-panel{
+        display: flex;
+        flex-grow: 1;
+        position: relative;
         overflow: auto;
         padding: 10px;
         border: $panel-border;
+        width: calc(70% - 5px);
+        background-color: $primary-bg-color;
+        .object-container {
+            width: 184px;
+            height: 100%;
+        }
     }
 
     .resize-bar {
@@ -64,13 +71,11 @@ body {
         cursor: ew-resize;
     }
 
-    // Panel size
-    .left-panel {
-        width: calc(70% - 5px);
-        background-color: $primary-bg-color;
-    }
 
     .right-panel {
+        overflow: auto;
+        padding: 10px;
+        border: $panel-border;
         width: calc(30% - 5px);
         background-color: $primary-bg-color;
 
@@ -117,7 +122,6 @@ body {
     .editor-form {
         padding: 10px 0 0 0;
         
-
         h3 {
             margin: 0;
         }

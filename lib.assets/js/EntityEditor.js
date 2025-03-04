@@ -474,6 +474,31 @@ class Entity {
     }
 }
 
+function Diagram(name, sortOrder, originalEntities)
+{
+    this.entitieNames = [];
+    this.name = name;
+    this.sortOrder = sortOrder;
+    this.originalEntities = originalEntities;
+    this.active = false;
+    this.createERD = function(updatedWidth, drawRelationship)
+    {
+        this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
+    }
+    this.getData = function()
+    {
+        let entities = [];
+        for(let entity of this.originalEntities)
+        {
+            if(this.entitieNames.includes(entity.name))
+            {
+                entities.push(entity);
+            }
+        }
+        return entities;
+    }
+}
+
 /**
  * Class to manage the creation, editing, and deletion of database entities (tables),
  * as well as generating SQL statements for the entities.
@@ -505,6 +530,7 @@ class EntityEditor {
 
         this.selector = selector;
         this.entities = [];
+        this.diagram = [];
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
@@ -713,7 +739,7 @@ class EntityEditor {
     initIconEvent()
     {
         let _this = this;
-        renderer.svg.addEventListener('click', function(e) {
+        entityRenderer.svg.addEventListener('click', function(e) {
             if (e.target.closest('.erd-svg .move-down-icon')) {
                 _this.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
             }
@@ -1220,16 +1246,17 @@ class EntityEditor {
         let svg = container.querySelector(".erd-svg");
 
         // Calculate the updated width of the SVG container
-        let updatedWidth = svg.parentNode.parentNode.offsetWidth;
+        let updatedWidth = svg.closest('.left-panel').offsetWidth;
 
         // If the width is 0 (meaning it's not set), fallback to the left panel width
         if (updatedWidth == 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
         
+        updatedWidth = updatedWidth - 200;
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
-        renderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
+        entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
     
     refreshEntities()

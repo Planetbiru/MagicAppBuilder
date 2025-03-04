@@ -2627,9 +2627,14 @@ else {
                 <div class="entity-editor">
                     <div class="container">
                         <div class="left-panel">
+                            <div class="object-container">
+
+                            </div>
                             <div class="entities-container">
                                 <!-- Entities will be rendered here -->
-                                <svg class="erd-svg" width="600" height="800"></svg>
+                                <div class="diagram" id="diagram-0">
+                                    <svg class="erd-svg" width="600" height="800"></svg>
+                                </div>
                             </div>
                         </div>
                         <div class="resize-bar"></div>
@@ -2647,8 +2652,8 @@ else {
                             <button class="btn" onclick="editor.downloadEntities()">Download Entity</button>
                             <button class="btn" onclick="editor.importSQL()">Upload SQL</button>
                             <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
-                            <button class="btn" onclick="renderer.downloadSVG()">Download SVG</button>
-                            <button class="btn" onclick="renderer.downloadPNG()">Download PNG</button>
+                            <button class="btn" onclick="entityRenderer.downloadSVG()">Download SVG</button>
+                            <button class="btn" onclick="entityRenderer.downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
