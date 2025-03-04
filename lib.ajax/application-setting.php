@@ -174,7 +174,7 @@ $nameInIndonesian = array(
                                     <tfoot>
                                         <tr>
                                         <td colspan="4">
-                                        <button type="button" class="btn btn-primary add-path">Add</button>
+                                        <button type="button" class="btn btn-primary add-path"><i class="fa-regular fa-plus"></i> Add</button>
                                         </td>
                                         </tr>
                                     </tfoot>
@@ -253,8 +253,8 @@ $nameInIndonesian = array(
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button class="btn btn-primary" type="button" id="test-database-connection">Test Connection</button>
-                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;">Create Database</button>
+                                    <button class="btn btn-primary" type="button" id="test-database-connection"><i class="fa-regular fa-plus"></i> Test Connection</button>
+                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;"><i class="fas fa-database"></i> Create Database</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -336,8 +336,8 @@ $nameInIndonesian = array(
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button class="btn btn-primary use-indonesian" type="button">Use Indonesian</button>
-                                    <button class="btn btn-primary use-original" type="button">Use Original</button>
+                                    <button class="btn btn-primary use-indonesian" type="button"><i class="fas fa-check"></i> Use Indonesian</button>
+                                    <button class="btn btn-primary use-original" type="button"><i class="fas fa-check"></i> Use Original</button>
                                 </td>
                             </tr>
                         </tbody>

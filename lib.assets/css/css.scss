@@ -181,6 +181,9 @@ button {
 
 	td {
 		padding: 3px 0;
+		.btn {
+			margin-bottom: 0.5rem;
+		}
 	}
 
 	tbody {
@@ -194,7 +197,6 @@ button {
 			}
 		}
 	}
-
 }
 
 .btn {
