@@ -600,7 +600,7 @@ class EntityEditor {
             }
             this.exportToSQL();
         });
-        document.querySelector(this.selector+" .table-list").addEventListener('change', (event) => {
+        document.querySelector(this.selector+" .table-list-for-export").addEventListener('change', (event) => {
             if (event.target.classList.contains('selected-entity')) {
                 this.exportToSQL();
             }
@@ -1209,23 +1209,44 @@ class EntityEditor {
         }
 
         // Get the list element where the entities will be rendered
-        const tabelList = document.querySelector(this.selector+" .table-list");
+        const tabelListForExport = document.querySelector(this.selector+" .table-list-for-export");
+        const tabelListMain = document.querySelector(this.selector+" .table-list");
         let drawRelationship = document.querySelector(this.selector+" .draw-relationship").checked;
 
 
         // Clear any existing content in the table list
-        tabelList.innerHTML = '';
+        tabelListMain.innerHTML = '';
+        tabelListForExport.innerHTML = '';
 
         // Iterate over the entities and create a checkbox for each entity
         this.entities.forEach((entity, index) => {
             // Create a new list item for each entity
-            let entityCb = document.createElement('li');
-            entityCb.innerHTML = `
+            let entityCbForExport = document.createElement('li');
+            let entityCbMain = document.createElement('li');
+            entityCbForExport.innerHTML = `
             <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
             `;
+
+            entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
+            /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
             
             // Append the created list item to the table list
-            tabelList.appendChild(entityCb);
+
+            
+
+            entityCbMain.setAttribute('data-index', index);
+            entityCbMain.setAttribute('title', entity.name);
+            tabelListMain.appendChild(entityCbMain);
+
+            entityCbMain.querySelector('a.edit-table').addEventListener('click', function(e){
+                editor.editEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+            });
+            entityCbMain.querySelector('a.delete-table').addEventListener('click', function(e){
+                editor.deleteEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+            });
+
+
+            tabelListForExport.appendChild(entityCbForExport);
         });
         
         let count = this.entities.length;
@@ -1242,18 +1263,15 @@ class EntityEditor {
             }
         });
 
-        // Get the SVG element for the ERD (Entity-Relationship Diagram)
-        let svg = container.querySelector(".erd-svg");
-
         // Calculate the updated width of the SVG container
-        let updatedWidth = svg.closest('.left-panel').offsetWidth;
+        let updatedWidth = container.closest('.left-panel').offsetWidth;
 
         // If the width is 0 (meaning it's not set), fallback to the left panel width
         if (updatedWidth == 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
         
-        updatedWidth = updatedWidth - 200;
+        updatedWidth = updatedWidth - 20;
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
         entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);

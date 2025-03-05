@@ -120,6 +120,7 @@ function openStructure(file)
 const converter = new SQLConverter();
 let editor;
 let entityRenderer;
+let diagramRenderer = {};
 let resizablePanels;
 
 // Initialize event listeners
@@ -255,10 +256,217 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get the updated width of the SVG container
         editor.renderEntities();
     });
+
+    document.querySelector('.add-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let ul = e.target.closest('ul');
+        let diagramName = "New Diagram";
+        addDiagram(ul, diagramName, false);
+    });
+
+    document.querySelector('[data-id="all-entities"]').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.parentNode;
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        li.classList.add('active');
+        let selector = 'all-entities';
+        diagramContainer.querySelector('#'+selector).classList.add('active');
+        document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li, index) => {
+            let input = li.querySelector('input[type="checkbox"]');
+            input.checked = false;
+            input.disabled = true;
+        });
+    });
+
+    document.addEventListener('change', function(e){
+        if(e.target.closest('.table-list input[type="checkbox"]'))
+        {
+            let entities = [];
+            e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
+                if(input.checked)
+                {
+                    entities.push(input.getAttribute('data-name'));
+                }
+            });
+            document.querySelector('.diagram-container .diagram.active').setAttribute('data-entities', entities.join(','));
+        }
+        updateDiagram();
+    });
+
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
 });
+
+function addDiagram(ul, diagramName, finish)
+{
+    finish = finish || false;
+    let template = `
+    <input type="text" value="${diagramName}">
+    <a href="#tab1" class="tab-link select-diagram">${diagramName}</a> 
+    <a 
+        href="javascript:" class="update-diagram"><span class="icon-ok"></span></a><a 
+        href="javascript:" class="edit-diagram"><span class="icon-edit"></span></a><a 
+        href="javascript:" class="delete-diagram"><span class="icon-delete"></span></a>
+    `;
+    let randomId = (new Date()).getTime();
+    let id = 'diagram-'+randomId;
+
+    let newTab = document.createElement("li");
+    newTab.innerHTML = template;
+    newTab.setAttribute('data-edit-mode', finish ? 'false':'true');
+    newTab.querySelector('a.tab-link').setAttribute('href', '#'+diagramName);
+    newTab.setAttribute('data-id', id);
+    newTab.classList.add('diagram-tab');
+    
+    let lastChild = ul.lastElementChild;
+    ul.insertBefore(newTab, lastChild);
+    newTab.querySelector('input').select();
+
+    newTab.querySelector('input').addEventListener('keypress', function(e){
+        if(e.key == 'Enter') 
+        {
+            let value = e.target.value;
+            let label = newTab.querySelector('.tab-link');
+            label.innerText = value;
+            newTab.setAttribute('data-edit-mode', 'false');
+            updateDiagram();
+        }
+    });
+
+    ul.querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+        tab.classList.remove('active');
+    });
+    newTab.classList.add('active');
+
+    let diagramContainer = document.querySelector('.diagram-container');
+
+    diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+        tab.classList.remove('active');
+    });
+
+    let diagram = document.createElement('div');
+    diagram.setAttribute('id', id);
+    diagram.classList.add('diagram');
+    diagram.classList.add('diagram-entity');
+    diagram.classList.add('tab-content');
+    diagram.classList.add('active');
+    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute('width', 4);
+    svg.setAttribute('height', 4);
+    svg.classList.add('erd-svg');
+    diagram.appendChild(svg);
+    diagramContainer.appendChild(diagram);
+    diagramRenderer[id] = new EntityRenderer(`.diagram-container #${id} .erd-svg`);
+    
+    ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+        li.setAttribute('data-index', index);
+    });
+    selectDiagram(newTab);
+    updateDiagram();
+    
+    newTab.querySelector('.select-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.closest('li');
+
+        selectDiagram(li);
+    });
+
+    newTab.querySelector('.update-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.closest('li');
+        let input = li.querySelector('input');
+        let value = input.value;
+        let label = li.querySelector('.tab-link');
+        label.innerText = value;
+        li.setAttribute('data-edit-mode', 'false');
+        updateDiagram();
+    });
+
+    newTab.querySelector('.edit-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.closest('li');
+        let label = li.querySelector('.tab-link');
+        let value = label.innerText;
+        let input = li.querySelector('input');
+        input.value = value;
+        li.setAttribute('data-edit-mode', 'true');
+        input.select();
+        updateDiagram();
+    });
+
+    newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.closest('li');
+        let selector = '#'+li.getAttribute('data-id');
+        let ul = li.closest('ul');
+        li.parentNode.removeChild(li);
+        let diagram = diagramContainer.querySelector(selector);
+        diagram.parentNode.removeChild(diagram);
+        ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+            li.setAttribute('data-index', index);
+        });
+        updateDiagram();
+    });
+}
+
+function selectDiagram(li)
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+        tab.classList.remove('active');
+    });
+    li.closest('ul').querySelector('li.all-entities').classList.remove('active');
+
+    diagramContainer.querySelectorAll('div.diagram').forEach((tab, index) => {
+        tab.classList.remove('active');
+    });
+    li.classList.add('active');
+    let selector = li.getAttribute('data-id');
+
+    let diagram = diagramContainer.querySelector('#'+selector);
+    diagram.classList.add('active');
+
+    let dataEntity = diagram.getAttribute('data-entities') || '';
+    let entities = dataEntity.split(',');
+
+    document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2, index) => {
+        let input = li2.querySelector('input[type="checkbox"]');
+        let value = input.getAttribute('data-name');
+        input.checked = entities.includes(value);
+        input.disabled = false;
+    });
+    updateDiagram();
+}
+
+function updateDiagram()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
+        let id = diagram.getAttribute('id');
+        let updatedWidth = diagram.closest('.left-panel').offsetWidth;
+        let dataEntities = diagram.getAttribute('data-entities') || '';
+        let entities = dataEntities.split(',');
+        let data = [];
+        editor.entities.forEach((entity) => {
+            if(entities.includes(entity.name))
+            {
+                data.push(entity);
+            }
+        });
+        if(data.length > 0)
+        {
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 40, true);
+        }
+    });
+}
 
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.

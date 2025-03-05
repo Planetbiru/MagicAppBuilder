@@ -35,19 +35,21 @@ body {
     height: 100%;
     width: 100%;
     position: relative;
-    // Container for entities
-    .entities-container {
-        margin: 0;
-        height: calc(100vh - 410px);
-        min-height: 200px;
-        overflow: auto;
-    }
+    
 
     // Main container
     .container {
         display: flex;
         width: 100%;
         overflow: hidden;
+        height: calc(100vh - 410px);
+    }
+
+    .panel-title{
+        height: 40px;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
     }
     
     // Left and right panels
@@ -55,14 +57,76 @@ body {
         display: flex;
         flex-grow: 1;
         position: relative;
-        overflow: auto;
+        overflow: hidden;
         padding: 10px;
         border: $panel-border;
         width: calc(70% - 5px);
         background-color: $primary-bg-color;
+
         .object-container {
-            width: 184px;
+            width: 224px;
             height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-right: 10px;
+            position: relative;
+            
+            .table-list{
+                list-style-type: none;
+                padding: 0;
+                overflow: auto;
+                padding-bottom: 1rem;
+
+                margin: 5px 0 0px 0;
+                height: calc(100vh - 450px);
+        
+                li {
+                    padding: 0 1rem 0 0;
+                    margin: 0;
+                    white-space: nowrap;
+        
+                    a {
+                        font-size: 0.6rem;
+                    }
+        
+                    line-height: 1.5;
+                }
+
+                
+            }
+            
+        }
+
+
+        // Container for entities
+        .entities-container {
+            margin: 0;
+            min-height: 200px;
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+            height: 100%;
+            box-sizing: border-box;
+
+            .diagram-list{
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .diagram-container{
+                position: relative;
+                height: 100%;
+                overflow: hidden;
+            }
+            .diagram{
+                margin: 5px 0 0px 0;
+                height: calc(100vh - 450px);
+                overflow: auto;
+                display: none;
+            }
+            .diagram.active{
+                display: block;
+            }
         }
     }
 
@@ -334,7 +398,7 @@ body {
         }
     }
 
-    .table-list {
+    .table-list-for-export {
         list-style-type: none;
         padding: 0;
         margin: 0;
@@ -353,6 +417,7 @@ body {
             line-height: 1.5;
         }
     }
+    
 }
 
 .icon-delete::before{
@@ -361,11 +426,20 @@ body {
 .icon-edit::before{
     content: "✏️";
 }
+.icon-ok::before {
+    content: "✅";
+}
 .icon-move-up::before{
     content: "⬆️";
 }
 .icon-move-down::before{
     content: "⬇️";
+}
+.icon-move-left::before {
+    content: "⬅️";
+}
+.icon-move-right::before {
+    content: "➡️";
 }
 
 label{
