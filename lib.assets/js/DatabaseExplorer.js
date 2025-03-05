@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('active');
         let selector = 'all-entities';
         diagramContainer.querySelector('#'+selector).classList.add('active');
-        document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li, index) => {
+        document.querySelector('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach((li, index) => {
             let input = li.querySelector('input[type="checkbox"]');
             input.checked = false;
             input.disabled = true;
@@ -439,7 +439,10 @@ function selectDiagram(li)
     document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2, index) => {
         let input = li2.querySelector('input[type="checkbox"]');
         let value = input.getAttribute('data-name');
-        input.checked = entities.includes(value);
+        if(entities.length > 0 && value != '')
+        {
+            input.checked = entities.includes(value);
+        }
         input.disabled = false;
     });
     updateDiagram();

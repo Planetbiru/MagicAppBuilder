@@ -589,24 +589,28 @@ class EntityEditor {
      */
     addDomListeners() {
         let _this = this;
-        document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
+        document.querySelector(".check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
-            let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
+            let allEntities = event.target.closest('.right-panel').querySelectorAll(".selected-entity");
+            
             if(allEntities)
             {
                 allEntities.forEach((entity, index) => {
                     entity.checked = checked;
                 })
             }
+            
             this.exportToSQL();
         });
-        document.querySelector(this.selector+" .table-list-for-export").addEventListener('change', (event) => {
+        
+        document.querySelector(this.selector+" .right-panel .table-list-for-export").addEventListener('change', (event) => {
             if (event.target.classList.contains('selected-entity')) {
                 this.exportToSQL();
             }
         });
         
         document.addEventListener('change', function (event) {
+            
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
                 const tr = event.target.closest('tr');
@@ -623,6 +627,7 @@ class EntityEditor {
                     tr.querySelector('.column-nullable').disabled = false;
                 }
             }
+            
         });
 
         document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
@@ -1199,9 +1204,10 @@ class EntityEditor {
         const selectedEntity = [];
 
         // Get all selected entity checkboxes (those that are checked)
-        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");
 
         // If there are selected checkboxes, add their data-name to the selectedEntity array
+        
         if (selectedEntities) {
             selectedEntities.forEach(checkbox => {
                 selectedEntity.push(checkbox.getAttribute('data-name'));
@@ -1254,14 +1260,16 @@ class EntityEditor {
         document.querySelector(this.selector + " .entity-count").textContent = countStr;
 
         // Ensure that previously selected entities are checked
+        
         selectedEntity.forEach(value => {
             // Find the checkbox corresponding to the selected entity name
-            let cb = document.querySelector(`input[data-name="${value}"]`);
+            let cb = document.querySelector(`.right-panel input[data-name="${value}"]`);
             if (cb) {
                 // Check the checkbox if found
                 cb.checked = true;
             }
         });
+        
 
         // Calculate the updated width of the SVG container
         let updatedWidth = container.closest('.left-panel').offsetWidth;
@@ -1439,7 +1447,7 @@ class EntityEditor {
      */
     exportToSQL() {
         let sql = [];       
-        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");  
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
