@@ -223,7 +223,7 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
                                     </ul>
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">
-                                            <li class="all-entities"><a href="javascript:" class="tab-link elected-entity" data-id="all-entities" data-name="">All Entities</a></li>
+                                            <li class="all-entities active"><a href="javascript:" class="tab-link elected-entity" data-id="all-entities" data-name="">All Entities</a></li>
                                             <li><a href="javascript:" class="tab-link add-diagram">+</a></li>
                                         </ul>
                                     </div>
@@ -252,8 +252,8 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
                             <button class="btn" onclick="editor.downloadEntities()">Download Entity</button>
                             <button class="btn" onclick="editor.importSQL()">Upload SQL</button>
                             <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
-                            <button class="btn" onclick="entityRenderer.downloadSVG()">Download SVG</button>
-                            <button class="btn" onclick="entityRenderer.downloadPNG()">Download PNG</button>
+                            <button class="btn" onclick="downloadSVG()">Download SVG</button>
+                            <button class="btn" onclick="downloadPNG()">Download PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />

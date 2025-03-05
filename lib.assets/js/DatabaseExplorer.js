@@ -375,7 +375,6 @@ function addDiagram(ul, diagramName, finish)
     newTab.querySelector('.select-diagram').addEventListener('click', function(e){
         e.preventDefault();
         let li = e.target.closest('li');
-
         selectDiagram(li);
     });
 
@@ -446,6 +445,45 @@ function selectDiagram(li)
     updateDiagram();
 }
 
+function downloadSVG()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    let diagram = diagramContainer.querySelector('.diagram.active');
+    if(diagram)
+    {
+        let id = diagram.getAttribute('id');
+        if(id == 'all-entities')
+        {
+            entityRenderer.downloadSVG();
+        }
+        else
+        {
+            diagramRenderer[id].downloadSVG();
+        }
+        
+    }
+}
+
+function downloadPNG()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    let diagram = diagramContainer.querySelector('.diagram.active');
+    if(diagram)
+    {
+        let id = diagram.getAttribute('id');
+        if(id == 'all-entities')
+        {
+            entityRenderer.downloadPNG();
+        }
+        else
+        {
+            diagramRenderer[id].downloadPNG();
+        }
+        
+    }
+}
+
+
 function updateDiagram()
 {
     let diagramContainer = document.querySelector('.diagram-container');
@@ -461,10 +499,7 @@ function updateDiagram()
                 data.push(entity);
             }
         });
-        if(data.length > 0)
-        {
-            diagramRenderer[id].createERD({entities: data}, updatedWidth - 40, true);
-        }
+        diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, true);
     });
 }
 

@@ -1271,7 +1271,7 @@ class EntityEditor {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
         
-        updatedWidth = updatedWidth - 20;
+        updatedWidth = updatedWidth - 200;
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
         entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);

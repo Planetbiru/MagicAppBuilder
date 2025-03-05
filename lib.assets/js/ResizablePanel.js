@@ -118,6 +118,7 @@ class ResizablePanels {
         this.element.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.element.removeEventListener('mouseup', () => this.stopResizing());
         editor.refreshEntities();
+        updateDiagram();
         this.enableSelection(this.leftPanel);
         this.enableSelection(this.rightPanel);
     }
