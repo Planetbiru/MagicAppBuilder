@@ -1185,6 +1185,41 @@ class EntityEditor {
         });
 
         return entities;
+    };
+
+    getCheckedEntities = function() {
+        let diagramEntities = {};
+        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        diagrams.forEach((diagram) => {
+            let id = diagram.getAttribute('id');
+            let entities = diagram.getAttribute('data-entities');
+            diagramEntities[id] = entities ? entities.split(',') : [];
+        });
+        return diagramEntities;
+    };
+    
+    setCheckedEntities = function(diagramEntities) {
+        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        diagrams.forEach((diagram) => {
+            let id = diagram.getAttribute('id');
+            let entities = diagramEntities[id];
+            if (entities) {
+                diagram.setAttribute('data-entities', entities.join(','));
+            }
+        });
+    };
+    
+    restoreCheckedEntities = function()
+    {
+        let diagram = document.querySelector('.diagram-entity.tab-content.active');
+        if(diagram)
+        {
+            let entities = diagram.getAttribute('data-entities');
+            let checked = entities ? entities.split(',') : [];
+            document.querySelectorAll('.left-panel .table-list [type="checkbox"]').forEach((input) => {
+                input.checked = checked.includes(input.getAttribute('data-name'));
+            });
+        }
     }
     
     /**
@@ -1216,7 +1251,7 @@ class EntityEditor {
 
         // Get the list element where the entities will be rendered
         const tabelListForExport = document.querySelector(this.selector+" .table-list-for-export");
-        const tabelListMain = document.querySelector(this.selector+" .table-list");
+        const tabelListMain = document.querySelector(this.selector+" .left-panel .table-list");
         let drawRelationship = document.querySelector(this.selector+" .draw-relationship").checked;
 
 
@@ -1288,9 +1323,8 @@ class EntityEditor {
     refreshEntities()
     {
         let _this = this;
-        setTimeout(function(){
-            _this.renderEntities();
-        }, 1);
+        _this.renderEntities();
+
     }
 
     /**

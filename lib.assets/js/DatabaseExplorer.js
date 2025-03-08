@@ -97,7 +97,11 @@ function init() {
     });
 
     document.querySelector('.draw-relationship').addEventListener('change', function(e){
-        editor.renderEntities();
+        let checkedEntities = editor.getCheckedEntities();
+        editor.refreshEntities();
+        updateDiagram();
+        editor.setCheckedEntities(checkedEntities);
+        editor.restoreCheckedEntities();
     });
     
 }
@@ -254,7 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container
-        editor.renderEntities();
+        let checkedEntities = editor.getCheckedEntities();
+        editor.refreshEntities();
+        updateDiagram();
+        editor.setCheckedEntities(checkedEntities);
+        editor.restoreCheckedEntities();
     });
 
     document.querySelector('.add-diagram').addEventListener('click', function(e){
@@ -436,6 +444,7 @@ function selectDiagram(li)
     let dataEntity = diagram.getAttribute('data-entities') || '';
     let entities = dataEntity.split(',');
 
+    
     document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2, index) => {
         let input = li2.querySelector('input[type="checkbox"]');
         let value = input.getAttribute('data-name');
@@ -445,6 +454,7 @@ function selectDiagram(li)
         }
         input.disabled = false;
     });
+    
     updateDiagram();
 }
 
@@ -635,7 +645,11 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                 try {
                     const parsedData = JSON.parse(response);  // Try to parse the JSON response
                     editor.entities = editor.createEntitiesFromJSON(parsedData); // Insert the received data into editor.entities
-                    editor.renderEntities(); // Update the view with the fetched entities
+                    let checkedEntities = editor.getCheckedEntities();
+                    editor.refreshEntities();
+                    updateDiagram();
+                    editor.setCheckedEntities(checkedEntities);
+                    editor.restoreCheckedEntities();
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
                 }
