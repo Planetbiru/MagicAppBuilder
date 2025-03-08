@@ -1218,6 +1218,7 @@ class EntityEditor {
             let checked = entities ? entities.split(',') : [];
             document.querySelectorAll('.left-panel .table-list [type="checkbox"]').forEach((input) => {
                 input.checked = checked.includes(input.getAttribute('data-name'));
+                input.disabled = false;
             });
         }
     }
@@ -1323,7 +1324,13 @@ class EntityEditor {
     refreshEntities()
     {
         let _this = this;
-        _this.renderEntities();
+        setTimeout(function(){
+            let checkedEntities = _this.getCheckedEntities();
+            _this.renderEntities();
+            _this.setCheckedEntities(checkedEntities);
+            _this.restoreCheckedEntities();
+        }, true)
+        
 
     }
 
