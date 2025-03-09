@@ -342,17 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-/**
- * Removes a specific target element from the array if it appears only once.
- * 
- * @param {Array} arr - The array to filter.
- * @param {string} target - The element to remove if it is unique.
- * @returns {Array} - A new array with the target removed if it was unique.
- */
-function removeUniqueElements(arr, target) {
-    return arr.filter(item => !(item === target && arr.indexOf(item) === arr.lastIndexOf(item)));
-}
-
 function downloadSVG()
 {
     let diagramContainer = document.querySelector('.diagram-container');
