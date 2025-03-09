@@ -20,11 +20,11 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.css">
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
-    <script src="../lib.assets/js/TableParser.min.js"></script>
-    <script src="../lib.assets/js/SQLConverter.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.min.js"></script>
-    <script src="../lib.assets/js/EntityRenderer.min.js"></script>
-    <script src="../lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="../lib.assets/js/TableParser.js"></script>
+    <script src="../lib.assets/js/SQLConverter.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
+    <script src="../lib.assets/js/EntityRenderer.js"></script>
+    <script src="../lib.assets/js/ResizablePanel.js"></script>
     <script src="../lib.assets/js/DatabaseExplorer.js"></script>
 </head>
 
@@ -124,8 +124,8 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
                                 <!-- Entities will be rendered here -->
                                 <div class="panel-title">
                                     <ul class="tab-mover">
-                                        <li><a href="javascript:"><span class="icon-move-left"></span></a></li>
-                                        <li><a href="javascript:"><span class="icon-move-right"></span></a></li>
+                                        <li><a class="move-left" href="javascript:"><span class="icon-move-left"></span></a></li>
+                                        <li><a class="move-right" href="javascript:"><span class="icon-move-right"></span></a></li>
                                     </ul>
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">

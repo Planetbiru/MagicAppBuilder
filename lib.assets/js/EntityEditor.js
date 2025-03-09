@@ -1585,6 +1585,8 @@ class EntityEditor {
             _this.updateDiagram();
             _this.saveDiagram();
         });
+        let move = -10 - newTab.offsetWidth;
+        updateMarginLeft(move)
     }
 
     /**
@@ -1614,6 +1616,49 @@ class EntityEditor {
         if (svg._clickHandler) {
             svg.removeEventListener('click', svg._clickHandler);
             delete svg._clickHandler; // Hapus referensi setelah dilepas
+        }
+    }
+
+    /**
+     * Clears all diagrams from the diagram list and diagram container.
+     * 
+     * This method removes all diagram tabs and their corresponding content from the DOM,
+     * and sets the "all-entities" tab as active.
+     */
+    clearDiagrams()
+    {
+        document.querySelector('.diagram-list.tabs .all-entities').classList.add('active');
+
+        let diagramTab = document.querySelectorAll('.diagram-tab');
+        if(diagramTab)
+        {
+            diagramTab.forEach((tab) => {
+                tab.parentNode.removeChild(tab);
+            });
+        }
+        //
+        let diagramPages = document.querySelectorAll('.diagram-entity.tab-content');
+        if(diagramPages)
+        {
+            diagramPages.forEach((page) => {
+                page.parentNode.removeChild(page);
+            });
+        }
+        document.querySelector('.diagram-container #all-entities').classList.add('active');
+    }
+
+    /**
+     * Clears all entities from the diagram container.
+     * 
+     * This method removes all SVG elements from the "all-entities" diagram,
+     * effectively clearing the diagram of all entities.
+     */
+    clearEntities()
+    {
+        let svg = document.querySelector('.diagram-container .all-entities');
+        if(svg)
+        {
+            svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
         }
     }
 
@@ -1975,7 +2020,13 @@ class EntityEditor {
             const contents = e.target.result; // Get the content of the file
             try {
                 let raw = JSON.parse(contents);  // Parse the JSON content
-                _this.entities = editor.createEntitiesFromJSON(raw.entities); // Insert the received data into editor.entities
+                let data = editor.createEntitiesFromJSON(raw); // Create entities from the parsed JSON
+                _this.clearEntities(); // Clear the existing entities
+                _this.clearDiagrams(); // Clear the existing diagrams
+                _this.entities = data.entities; // Insert the received data into editor.entities
+                _this.diagrams = data.diagrams || []; // Insert the received data into editor.diagrams
+                _this.prepareDiagram(); // Prepare the diagram by loading saved entities and diagrams
+                _this.updateDiagram(); // Update the diagram with the imported entities
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
@@ -2008,6 +2059,10 @@ class EntityEditor {
                 let translator = new SQLConverter();
                 contents = translator.translate(contents, 'mysql').split('`').join('');
                 let parser = new TableParser(contents);
+
+                _this.clearEntities(); // Clear the existing entities
+                _this.clearDiagrams(); // Clear the existing diagrams
+
                 _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities            
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
@@ -2059,7 +2114,8 @@ class EntityEditor {
             databaseType: databaseType,
             databaseName: databaseName,
             databaseSchema: databaseSchema,
-            entities: this.entities  // Converting the entities array into a JSON string
+            entities: this.entities,  // Converting the entities array into a JSON string
+            diagrams: this.diagrams // Converting the diagrams array into a JSON string
         };
         
         this.exportJSON(data); // Export the sample object to a JSON file
