@@ -1,6 +1,6 @@
-
-
-// Move init() outside of the class
+/**
+ * Initializes the event listeners and sets up the modal dialogs.
+ */
 function init() {
     let modalQueryTranslator = document.getElementById("queryTranslatorModal");
     let modalEntityEditor = document.getElementById("entityEditorModal");
@@ -106,6 +106,12 @@ function init() {
     
 }
 
+/**
+ * Opens the structure of the provided file and reads its content.
+ * The content is then displayed in the element with the class 'original'.
+ * 
+ * @param {File} file - The file to be read.
+ */
 function openStructure(file)
 {
     const reader = new FileReader(); // Create a FileReader instance
@@ -342,6 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+/**
+ * Downloads the currently active diagram as an SVG file.
+ */
 function downloadSVG()
 {
     let diagramContainer = document.querySelector('.diagram-container');
@@ -357,10 +366,12 @@ function downloadSVG()
         {
             diagramRenderer[id].downloadSVG();
         }
-        
     }
 }
 
+/**
+ * Downloads the currently active diagram as a PNG file.
+ */
 function downloadPNG()
 {
     let diagramContainer = document.querySelector('.diagram-container');
@@ -376,10 +387,8 @@ function downloadPNG()
         {
             diagramRenderer[id].downloadPNG();
         }
-        
     }
 }
-
 
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.

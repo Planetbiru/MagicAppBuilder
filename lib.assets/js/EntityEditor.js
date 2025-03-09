@@ -1603,7 +1603,6 @@ class EntityEditor {
         }
     
         svg.addEventListener('click', svg._clickHandler);
-        svg.setAttribute('data-event', 'true');
     }
     
     /**
@@ -1616,7 +1615,6 @@ class EntityEditor {
             svg.removeEventListener('click', svg._clickHandler);
             delete svg._clickHandler; // Hapus referensi setelah dilepas
         }
-        svg.setAttribute('data-event', 'false');
     }
 
     /**
@@ -1681,15 +1679,15 @@ class EntityEditor {
         let array = haystack.split(',');
         let index = array.indexOf(needle);
         
-        // Jika elemen tidak ditemukan atau sudah di batas kiri/kanan, kembalikan string asli
+        // If the element is not found or already at the left/right boundary, return the original string
         if (index === -1 || (operation === -1 && index === 0) || (operation === 1 && index === array.length - 1)) {
             return haystack;
         }
         
-        // Tentukan indeks baru
+        // Determine the new index
         let newIndex = index + operation;
         
-        // Tukar elemen dengan elemen di posisi baru
+        // Swap the element with the element at the new position
         [array[index], array[newIndex]] = [array[newIndex], array[index]];
         
         return array.join(',');
@@ -1772,7 +1770,6 @@ class EntityEditor {
             this.callbackSaveEntity(this.entities);
         }
     }
-
 
     /**
      * Edits the specified entity based on its index in the entities array.
@@ -2216,7 +2213,6 @@ class EntityEditor {
             document.querySelector(selectorLength).value = this.defaultLength[type];
         }
     }
-
 
     /**
      * Displays the preference settings dialog and handles saving the user's preferences.
