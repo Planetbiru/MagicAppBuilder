@@ -35,6 +35,7 @@ body {
     height: 100%;
     width: 100%;
     position: relative;
+    
 
     // Main container
     .container {
@@ -44,15 +45,15 @@ body {
         height: calc(100vh - 410px);
     }
 
-    .panel-title {
+    .panel-title{
         height: 40px;
         overflow: hidden;
         position: relative;
         width: 100%;
     }
-
+    
     // Left and right panels
-    .left-panel {
+    .left-panel{
         display: flex;
         flex-grow: 1;
         position: relative;
@@ -61,11 +62,10 @@ body {
         border: $panel-border;
         width: calc(70% - 5px);
         background-color: $primary-bg-color;
-
-        input[type="checkbox"] {
+        input[type="checkbox"]
+        {
             vertical-align: text-top;
         }
-
         .object-container {
             width: 224px;
             height: 100%;
@@ -73,28 +73,33 @@ body {
             overflow-y: hidden;
             padding-right: 10px;
             position: relative;
-
-            .table-list {
+            
+            .table-list{
                 list-style-type: none;
                 padding: 0;
                 overflow: auto;
                 padding-bottom: 2.2rem;
+
                 margin: 5px 0 0px 0;
                 height: calc(100vh - 450px);
-
+        
                 li {
                     padding: 0 1rem 0 0;
                     margin: 0;
                     white-space: nowrap;
-
+        
                     a {
                         font-size: 0.6rem;
                     }
-
+        
                     line-height: 1.5;
                 }
+
+                
             }
+            
         }
+
 
         // Container for entities
         .entities-container {
@@ -106,27 +111,24 @@ body {
             height: 100%;
             box-sizing: border-box;
 
-            .diagram-list {
+            .diagram-list{
                 list-style: none;
                 padding: 0;
                 margin: 0;
                 transition: margin-left 0.2s ease-in-out;
             }
-
-            .diagram-container {
+            .diagram-container{
                 position: relative;
                 height: 100%;
                 overflow: hidden;
             }
-
-            .diagram {
+            .diagram{
                 margin: 5px 0 0px 0;
                 height: calc(100vh - 450px);
                 overflow: auto;
                 display: none;
             }
-
-            .diagram.active {
+            .diagram.active{
                 display: block;
             }
         }
@@ -136,6 +138,7 @@ body {
         width: 10px;
         cursor: ew-resize;
     }
+
 
     .right-panel {
         overflow: auto;
@@ -163,7 +166,7 @@ body {
     .button-container {
         padding: 10px 0px 0;
     }
-
+    
     // Input and select styling
     input[type="text"],
     select {
@@ -171,24 +174,22 @@ body {
         background-color: #FFFFFF;
         border: 1px solid #999999;
         color: #333333;
-
-        &.entity-name {
+        &.entity-name{
             border: 1px solid #dddddd;
-
-            &:focus-visible {
+            &:focus-visible{
                 outline: none;
             }
         }
     }
 
     // Form editor
-    .editor-container {
+    .editor-container
+    {
         height: 225px;
     }
-
     .editor-form {
         padding: 10px 0 0 0;
-
+        
         h3 {
             margin: 0;
         }
@@ -251,19 +252,20 @@ body {
                     text-align: center;
                 }
 
-                &:nth-child(3) {
+                &:nth-child(3)
+                {
                     width: 12%;
                 }
-
-                &:nth-child(4) {
+                &:nth-child(4)
+                {
                     width: 10%;
                 }
-
-                &:nth-child(5) {
+                &:nth-child(5)
+                {
                     width: 15%;
                 }
-
-                &:nth-child(6) {
+                &:nth-child(6)
+                {
                     width: 12%;
                 }
             }
@@ -333,8 +335,8 @@ body {
                 padding: 2px;
                 margin-right: 6px;
                 margin-top: 2px;
-
-                &:nth-child(1) {
+                &:nth-child(1)
+                {
                     margin-right: 10px;
                 }
             }
@@ -347,12 +349,11 @@ body {
             }
         }
 
-        .entity-body {
-            ul {
+        .entity-body  {
+            ul{
                 list-style-type: none;
                 margin: 0;
                 padding: 0;
-
                 li {
                     padding: 4px 10px 5px 10px;
                     border-bottom: 1px solid #DDDDDD;
@@ -368,10 +369,10 @@ body {
                         border-radius: 2px;
                     }
 
-                    &[data-primary-key="true"] {
+                    &[data-primary-key="true"]
+                    {
                         background-color: #E8F6FF;
                         color: #053D62;
-
                         .data-type {
                             background-color: #C4E9FF;
                         }
@@ -380,8 +381,7 @@ body {
                     &:last-child {
                         border-bottom: none;
                     }
-
-                    &::after {
+                    &::after{
                         content: "";
                         display: block;
                         clear: both;
@@ -419,9 +419,10 @@ body {
             line-height: 1.5;
         }
     }
+
 }
 
-.entity-name {
+.entity-name{
     width: 200px;
 }
 
@@ -469,8 +470,7 @@ body {
     color: #555;
     transition: 0.3s;
 
-    &:hover,
-    &.active {
+    &:hover, &.active {
         color: #007bff;
     }
 }
@@ -491,8 +491,7 @@ body {
 .diagram-list {
     &.tabs {
         li {
-            input[type="text"],
-            a.update-diagram {
+            input[type="text"], a.update-diagram {
                 display: none;
             }
 
@@ -549,34 +548,29 @@ body {
     }
 }
 
-.icon-delete::before {
+
+.icon-delete::before{
     content: "❌";
 }
-
-.icon-edit::before {
+.icon-edit::before{
     content: "✏️";
 }
-
 .icon-ok::before {
     content: "✅";
 }
-
-.icon-move-up::before {
+.icon-move-up::before{
     content: "⬆️";
 }
-
-.icon-move-down::before {
+.icon-move-down::before{
     content: "⬇️";
 }
-
 .icon-move-left::before {
     content: "⬅️";
 }
-
 .icon-move-right::before {
     content: "➡️";
 }
 
-label {
+label{
     white-space: nowrap;
 }

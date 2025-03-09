@@ -399,7 +399,8 @@ body {
   display: block;
 }
 
-.diagram-list.tabs li input[type=text], .diagram-list.tabs li a.update-diagram {
+.diagram-list.tabs li input[type=text],
+.diagram-list.tabs li a.update-diagram {
   display: none;
 }
 .diagram-list.tabs li[data-edit-mode=true] a.tab-link {
