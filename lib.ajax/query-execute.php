@@ -7,6 +7,12 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
+if(!$database->isConnected())
+{
+    ResponseUtil::sendJSON(new stdClass);
+    exit();
+}
+
 $inputPost = new InputPost();
 if($database->isConnected())
 {

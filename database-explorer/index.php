@@ -36,6 +36,7 @@ $databaseConfig = new SecretObject();
 $appConfigPath = $activeWorkspace->getDirectory() . "/applications/$appId/default.yml";
 
 if (file_exists($appConfigPath)) {
+    
     $appConfig->loadYamlFile($appConfigPath, false, true, true);
     $databaseConfig = $appConfig->getDatabase();
 
@@ -63,7 +64,7 @@ if (file_exists($appConfigPath)) {
             $databaseName = "";
         }
     } catch (Exception $e) {
-        echo $e->getMessage();
+        require_once __DIR__ . "/error.php";
         exit();
     }
 } else {
@@ -74,5 +75,4 @@ $accessedFrom = "database-explorer";
 
 require_once __DIR__ . "/backend.php";
 require_once __DIR__ . "/database-explorer.php";
-
 
