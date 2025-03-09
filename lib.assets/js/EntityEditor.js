@@ -431,8 +431,10 @@ class Entity {
      * Creates an instance of the Entity class.
      * 
      * @param {string} name - The name of the entity (table).
+     * @param {number} index - The index of the entity (table).
      */
-    constructor(name) {
+    constructor(name, index) {
+        this.index = index;
         this.name = name;
         this.columns = [];
     }
@@ -583,6 +585,21 @@ class EntityEditor {
             this.callbackLoadTemplate();
         }
         this.template = {columns: []};
+    }
+
+    /**
+     * Searches for an entity by name.
+     * 
+     * @param {string} name - The name of the entity to find.
+     * @returns {Object|null} - Returns the entity if found, otherwise returns null.
+     */
+    getEntityByName(name) {
+        for (let entity of this.entities) {
+            if (name === entity.name) {
+                return entity;
+            }
+        }
+        return null;
     }
 
     /**
@@ -901,10 +918,11 @@ class EntityEditor {
         if (this.currentEntityIndex >= 0) {
             // Update existing entity
             this.entities[this.currentEntityIndex].name = entityName;
+            this.entities[this.currentEntityIndex].index = this.currentEntityIndex;
             this.entities[this.currentEntityIndex].columns = columns;
         } else {
             // Add a new entity
-            const newEntity = new Entity(entityName);
+            const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
             this.entities.push(newEntity);
         }
@@ -920,6 +938,7 @@ class EntityEditor {
 
     updateDiagram()
     {
+        let _this = this;
         let diagramContainer = document.querySelector('.diagram-container');
         diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
             let id = diagram.getAttribute('id');
@@ -927,13 +946,14 @@ class EntityEditor {
             let dataEntities = diagram.getAttribute('data-entities') || '';
             let entities = dataEntities.split(',');
             let data = [];
-            editor.entities.forEach((entity) => {
-                if(entities.includes(entity.name))
+            entities.forEach((entityName) => {
+                let entity = _this.getEntityByName(entityName);
+                if(entity != null)
                 {
                     data.push(entity);
                 }
             });
-            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, true);
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, document.querySelector('#draw-relationship').checked);
         });
     }
     
@@ -1129,7 +1149,7 @@ class EntityEditor {
         // Iterate over each entity in the JSON data
         jsonData.entities.forEach(entityData => {
             // Create a new Entity instance
-            const entity = new Entity(entityData.name);
+            const entity = new Entity(entityData.name, entityData.index);
             
             // Iterate over each column in the entity's columns array
             entityData.columns.forEach(columnData => {
@@ -1195,9 +1215,9 @@ class EntityEditor {
         const entities = [];
 
         // Iterate over each entity in the JSON data
-        tables.forEach(table => {
+        tables.forEach((table, index) => {
             // Create a new Entity instance
-            const entity = new Entity(table.tableName);
+            const entity = new Entity(table.tableName, index);
             
             // Iterate over each column in the entity's columns array
             table.columns.forEach(columnData => {
@@ -1552,6 +1572,49 @@ class EntityEditor {
             _this.updateDiagram();
             _this.saveDiagram();
         });
+
+        svg.addEventListener('click', function(e) {
+            if (e.target.closest('.erd-svg .move-down-icon')) {
+                let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+                let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+                let newEntities = _this.arrayElementOperation(haystack, needle, 1);
+                e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+                _this.updateDiagram();
+                _this.saveDiagram();
+            }
+            if (e.target.closest('.erd-svg .move-up-icon')) {
+                let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+                let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+                let newEntities = _this.arrayElementOperation(haystack, needle, -1);
+                e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+                _this.updateDiagram();
+                _this.saveDiagram();
+            }
+            if (e.target.closest('.erd-svg .edit-icon')) {
+                _this.editEntity(parseInt(e.target.getAttribute('data-index')))
+            }
+            if (e.target.closest('.erd-svg .delete-icon')) {
+                _this.deleteEntity(parseInt(e.target.getAttribute('data-index')))
+            }
+        });
+    }
+
+    arrayElementOperation(haystack, needle, operation) {
+        let array = haystack.split(',');
+        let index = array.indexOf(needle);
+        
+        // Jika elemen tidak ditemukan atau sudah di batas kiri/kanan, kembalikan string asli
+        if (index === -1 || (operation === -1 && index === 0) || (operation === 1 && index === array.length - 1)) {
+            return haystack;
+        }
+        
+        // Tentukan indeks baru
+        let newIndex = index + operation;
+        
+        // Tukar elemen dengan elemen di posisi baru
+        [array[index], array[newIndex]] = [array[newIndex], array[index]];
+        
+        return array.join(',');
     }
 
     /**

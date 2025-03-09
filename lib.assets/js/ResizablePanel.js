@@ -21,6 +21,8 @@ class ResizablePanels {
         this.lastDownX = 0;
         this.localStorageKey = this.selector + 'leftPanelWidth';
         this.init();
+        
+        
     }
 
     /**
@@ -119,7 +121,7 @@ class ResizablePanels {
         this.element.removeEventListener('mouseup', () => this.stopResizing());
 
         editor.refreshEntities();
-        updateDiagram();
+        editor.updateDiagram();
 
 
         this.enableSelection(this.leftPanel);

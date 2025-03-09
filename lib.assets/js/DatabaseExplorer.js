@@ -24,6 +24,8 @@ function init() {
     openModalEntityEditorButton.onclick = function() {
         modalEntityEditor.style.display = "block";
         resizablePanels.loadPanelWidth();
+        editor.updateDiagram();
+
     };
     
     closeModalButton.forEach(function(cancelButton) {
@@ -298,27 +300,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.addEventListener('change', function(e){
-        if(e.target.closest('.table-list input[type="checkbox"]'))
-        {
-            let entities = [];
-            e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
-                if(input.checked)
-                {
-                    entities.push(input.getAttribute('data-name'));
+    // Listen for changes in checkboxes within the table-list
+    document.addEventListener('change', function (e) {
+        if (e.target.closest('.table-list input[type="checkbox"]')) {
+            
+            let diagram = document.querySelector('.diagram-container .diagram.active');
+            let currentSelection = diagram.getAttribute('data-entities').split(',');
+
+            let selectedEntities = new Set(); // Use a Set to store selected entities
+            
+            // Iterate through checkboxes and add checked ones to the set
+            e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach(input => {
+                let entity = input.getAttribute('data-name');
+                if (input.checked) {
+                    selectedEntities.add(entity);
                 }
             });
-            document.querySelector('.diagram-container .diagram.active').setAttribute('data-entities', entities.join(','));
+
+            // Maintain the order based on the initial selection
+            let updatedEntities = currentSelection.filter(entity => selectedEntities.has(entity));
+
+            // Append new entities that were not in the initial selection
+            selectedEntities.forEach(entity => {
+                if (!updatedEntities.includes(entity)) {
+                    updatedEntities.push(entity);
+                }
+            });
+
+            // Update the data-entities attribute with the new order
+            diagram.setAttribute('data-entities', updatedEntities.join(','));
+
             editor.saveDiagram();
         }
         editor.updateDiagram();
     });
+
+    
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
 });
 
+/**
+ * Removes a specific target element from the array if it appears only once.
+ * 
+ * @param {Array} arr - The array to filter.
+ * @param {string} target - The element to remove if it is unique.
+ * @returns {Array} - A new array with the target removed if it was unique.
+ */
+function removeUniqueElements(arr, target) {
+    return arr.filter(item => !(item === target && arr.indexOf(item) === arr.lastIndexOf(item)));
+}
 
 function downloadSVG()
 {
@@ -536,7 +569,7 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                     editor.diagrams = data.diagrams || [];
                     editor.refreshEntities();
                     editor.prepareDiagram();
-                    editor.updateDiagram();
+                    
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
                 }

@@ -83,7 +83,7 @@ class EntityRenderer {
 
         // Loop through each entity (table) and create it
         this.data.entities.forEach((entity, index) => {
-            const tableGroup = this.createTable(entity, index, xPos, yPos);
+            const tableGroup = this.createTable(entity, entity.index, xPos, yPos);
             this.tables[entity.name] = { 
                 table: tableGroup, 
                 xPos: xPos, 
@@ -190,6 +190,8 @@ class EntityRenderer {
         let yOffsetCol = 26;
 
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        group.setAttribute('data-entity', entity.name);
+        group.classList.add('svg-entity');
         group.setAttribute("transform", `translate(${x}, ${y})`);
 
         // Table Rectangle

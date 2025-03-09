@@ -25,7 +25,7 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
