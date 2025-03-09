@@ -1573,17 +1573,24 @@ class EntityEditor {
 
         newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
             e.preventDefault();
-            let li = e.target.closest('li');
-            let selector = '#'+li.getAttribute('data-id');
-            let ul = li.closest('ul');
-            li.parentNode.removeChild(li);
-            let diagram = diagramContainer.querySelector(selector);
-            diagram.parentNode.removeChild(diagram);
-            ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
-                li.setAttribute('data-index', index);
+            let diagramName = e.target.closest('li').querySelector('input[type="text"]').value;
+
+            _this.showConfirmationDialog(`<p>Are you sure you want to delete the diagram &quot;${diagramName}&quot;?</p>`, 'Delete Confirmation', 'Yes', 'No', function(isConfirmed) {
+                if (isConfirmed) {
+                    let li = e.target.closest('li');
+                    let selector = '#'+li.getAttribute('data-id');
+                    let ul = li.closest('ul');
+                    li.parentNode.removeChild(li);
+                    let diagram = diagramContainer.querySelector(selector);
+                    diagram.parentNode.removeChild(diagram);
+                    ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+                        li.setAttribute('data-index', index);
+                    });
+                    _this.updateDiagram();
+                    _this.saveDiagram();
+                } 
             });
-            _this.updateDiagram();
-            _this.saveDiagram();
+            
         });
         let move = -10 - newTab.offsetWidth;
         updateMarginLeft(move)
