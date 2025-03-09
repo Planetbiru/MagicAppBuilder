@@ -21,8 +21,6 @@ class ResizablePanels {
         this.lastDownX = 0;
         this.localStorageKey = this.selector + 'leftPanelWidth';
         this.init();
-        
-        
     }
 
     /**
@@ -36,8 +34,6 @@ class ResizablePanels {
         window.addEventListener('resize', () => this.onWindowResize());
         this.loadPanelWidth();
     }
-
-    
 
     /**
      * Handle the mouse movement during resizing.
@@ -68,8 +64,6 @@ class ResizablePanels {
                 // Save the new width of the left panel in localStorage
                 localStorage.setItem(this.localStorageKey, leftPanelWidth);
             }
-
-            
         }
     }
     
@@ -121,8 +115,6 @@ class ResizablePanels {
         this.element.removeEventListener('mouseup', () => this.stopResizing());
 
         editor.refreshEntities();
-        editor.updateDiagram();
-
 
         this.enableSelection(this.leftPanel);
         this.enableSelection(this.rightPanel);

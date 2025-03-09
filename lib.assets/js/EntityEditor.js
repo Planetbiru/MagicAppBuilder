@@ -954,7 +954,11 @@ class EntityEditor {
                 }
             });
             diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, document.querySelector('#draw-relationship').checked);
+            let svg = diagram.querySelector('svg');
+            _this.removeDiagramEventListener(svg);
+            _this.addDiagramEventListener(svg);
         });
+        
     }
     
     /**
@@ -1459,6 +1463,15 @@ class EntityEditor {
         this.updateDiagram();
     }
 
+    /**
+     * Adds a new diagram tab and its corresponding diagram content.
+     * 
+     * @param {HTMLElement} ul - The parent <ul> element to append the new diagram tab.
+     * @param {string} diagramName - The name of the diagram.
+     * @param {string} id - Unique identifier for the diagram.
+     * @param {Array} entities - List of entities associated with the diagram.
+     * @param {boolean} [finish=false] - Whether the diagram is in edit mode.
+     */
     addDiagram(ul, diagramName, id, entities, finish)
     {
         let _this = this;
@@ -1572,33 +1585,98 @@ class EntityEditor {
             _this.updateDiagram();
             _this.saveDiagram();
         });
-
-        svg.addEventListener('click', function(e) {
-            if (e.target.closest('.erd-svg .move-down-icon')) {
-                let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
-                let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
-                let newEntities = _this.arrayElementOperation(haystack, needle, 1);
-                e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
-                _this.updateDiagram();
-                _this.saveDiagram();
-            }
-            if (e.target.closest('.erd-svg .move-up-icon')) {
-                let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
-                let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
-                let newEntities = _this.arrayElementOperation(haystack, needle, -1);
-                e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
-                _this.updateDiagram();
-                _this.saveDiagram();
-            }
-            if (e.target.closest('.erd-svg .edit-icon')) {
-                _this.editEntity(parseInt(e.target.getAttribute('data-index')))
-            }
-            if (e.target.closest('.erd-svg .delete-icon')) {
-                _this.deleteEntity(parseInt(e.target.getAttribute('data-index')))
-            }
-        });
     }
 
+    /**
+     * Adds a click event listener to an SVG diagram.
+     * 
+     * @param {SVGElement} svg - The SVG element to add the event listener to.
+     */
+    addDiagramEventListener(svg) {
+        let _this = this;
+    
+        // Simpan referensi fungsi dalam elemen
+        if (!svg._clickHandler) {
+            svg._clickHandler = function(e) {
+                _this.editEventListener(e);
+            };
+        }
+    
+        svg.addEventListener('click', svg._clickHandler);
+        svg.setAttribute('data-event', 'true');
+    }
+    
+    /**
+     * Removes a click event listener from an SVG diagram.
+     * 
+     * @param {SVGElement} svg - The SVG element to remove the event listener from.
+     */
+    removeDiagramEventListener(svg) {
+        if (svg._clickHandler) {
+            svg.removeEventListener('click', svg._clickHandler);
+            delete svg._clickHandler; // Hapus referensi setelah dilepas
+        }
+        svg.setAttribute('data-event', 'false');
+    }
+
+    /**
+     * Handles click events inside a diagram SVG element.
+     * 
+     * @param {Event} e - The event object.
+     */
+    editEventListener(e)
+    {
+        let _this = this;
+        if (e.target.closest('.erd-svg .move-down-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.arrayElementOperation(haystack, needle, 1);
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+        if (e.target.closest('.erd-svg .move-up-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.arrayElementOperation(haystack, needle, -1);
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+        if (e.target.closest('.erd-svg .edit-icon')) {
+            let index = parseInt(e.target.getAttribute('data-index'));
+            _this.editEntity(index);
+        }
+        if (e.target.closest('.erd-svg .delete-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.removeUniqueElements(haystack.split(','), needle).join(',');
+            document.querySelector(`.selected-entity[data-name="${needle}"]`).checked = false;
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+    }
+
+    /**
+     * Removes a specific target element from the array if it appears only once.
+     * 
+     * @param {Array} arr - The array to filter.
+     * @param {string} target - The element to remove if it is unique.
+     * @returns {Array} - A new array with the target removed if it was unique.
+     */
+    removeUniqueElements(arr, target) {
+        return arr.filter(item => !(item === target && arr.indexOf(item) === arr.lastIndexOf(item)));
+    }
+
+    /**
+     * Moves an element up or down within an array.
+     * 
+     * @param {string} haystack - Comma-separated string of elements.
+     * @param {string} needle - The element to move.
+     * @param {number} operation - 1 to move down, -1 to move up.
+     * @returns {string} - The updated comma-separated string.
+     */
     arrayElementOperation(haystack, needle, operation) {
         let array = haystack.split(',');
         let index = array.indexOf(needle);

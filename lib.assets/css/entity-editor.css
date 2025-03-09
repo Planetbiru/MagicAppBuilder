@@ -47,6 +47,9 @@ body {
   width: calc(70% - 5px);
   background-color: #fbfbfb;
 }
+.entity-editor .left-panel input[type=checkbox] {
+  vertical-align: text-top;
+}
 .entity-editor .left-panel .object-container {
   width: 224px;
   height: 100%;
@@ -59,7 +62,7 @@ body {
   list-style-type: none;
   padding: 0;
   overflow: auto;
-  padding-bottom: 1rem;
+  padding-bottom: 2.2rem;
   margin: 5px 0 0px 0;
   height: calc(100vh - 450px);
 }
