@@ -1573,18 +1573,27 @@ class EntityEditor {
 
         newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
             e.preventDefault();
-            let li = e.target.closest('li');
-            let selector = '#'+li.getAttribute('data-id');
-            let ul = li.closest('ul');
-            li.parentNode.removeChild(li);
-            let diagram = diagramContainer.querySelector(selector);
-            diagram.parentNode.removeChild(diagram);
-            ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
-                li.setAttribute('data-index', index);
+            let diagramName = e.target.closest('li').querySelector('input[type="text"]').value;
+
+            _this.showConfirmationDialog(`<p>Are you sure you want to delete the diagram &quot;${diagramName}&quot;?</p>`, 'Delete Confirmation', 'Yes', 'No', function(isConfirmed) {
+                if (isConfirmed) {
+                    let li = e.target.closest('li');
+                    let selector = '#'+li.getAttribute('data-id');
+                    let ul = li.closest('ul');
+                    li.parentNode.removeChild(li);
+                    let diagram = diagramContainer.querySelector(selector);
+                    diagram.parentNode.removeChild(diagram);
+                    ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+                        li.setAttribute('data-index', index);
+                    });
+                    _this.updateDiagram();
+                    _this.saveDiagram();
+                } 
             });
-            _this.updateDiagram();
-            _this.saveDiagram();
+            
         });
+        let move = -10 - newTab.offsetWidth;
+        updateMarginLeft(move)
     }
 
     /**
@@ -1603,7 +1612,6 @@ class EntityEditor {
         }
     
         svg.addEventListener('click', svg._clickHandler);
-        svg.setAttribute('data-event', 'true');
     }
     
     /**
@@ -1616,7 +1624,49 @@ class EntityEditor {
             svg.removeEventListener('click', svg._clickHandler);
             delete svg._clickHandler; // Hapus referensi setelah dilepas
         }
-        svg.setAttribute('data-event', 'false');
+    }
+
+    /**
+     * Clears all diagrams from the diagram list and diagram container.
+     * 
+     * This method removes all diagram tabs and their corresponding content from the DOM,
+     * and sets the "all-entities" tab as active.
+     */
+    clearDiagrams()
+    {
+        document.querySelector('.diagram-list.tabs .all-entities').classList.add('active');
+
+        let diagramTab = document.querySelectorAll('.diagram-tab');
+        if(diagramTab)
+        {
+            diagramTab.forEach((tab) => {
+                tab.parentNode.removeChild(tab);
+            });
+        }
+        //
+        let diagramPages = document.querySelectorAll('.diagram-entity.tab-content');
+        if(diagramPages)
+        {
+            diagramPages.forEach((page) => {
+                page.parentNode.removeChild(page);
+            });
+        }
+        document.querySelector('.diagram-container #all-entities').classList.add('active');
+    }
+
+    /**
+     * Clears all entities from the diagram container.
+     * 
+     * This method removes all SVG elements from the "all-entities" diagram,
+     * effectively clearing the diagram of all entities.
+     */
+    clearEntities()
+    {
+        let svg = document.querySelector('.diagram-container .all-entities');
+        if(svg)
+        {
+            svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
+        }
     }
 
     /**
@@ -1681,15 +1731,15 @@ class EntityEditor {
         let array = haystack.split(',');
         let index = array.indexOf(needle);
         
-        // Jika elemen tidak ditemukan atau sudah di batas kiri/kanan, kembalikan string asli
+        // If the element is not found or already at the left/right boundary, return the original string
         if (index === -1 || (operation === -1 && index === 0) || (operation === 1 && index === array.length - 1)) {
             return haystack;
         }
         
-        // Tentukan indeks baru
+        // Determine the new index
         let newIndex = index + operation;
         
-        // Tukar elemen dengan elemen di posisi baru
+        // Swap the element with the element at the new position
         [array[index], array[newIndex]] = [array[newIndex], array[index]];
         
         return array.join(',');
@@ -1772,7 +1822,6 @@ class EntityEditor {
             this.callbackSaveEntity(this.entities);
         }
     }
-
 
     /**
      * Edits the specified entity based on its index in the entities array.
@@ -1978,7 +2027,13 @@ class EntityEditor {
             const contents = e.target.result; // Get the content of the file
             try {
                 let raw = JSON.parse(contents);  // Parse the JSON content
-                _this.entities = editor.createEntitiesFromJSON(raw.entities); // Insert the received data into editor.entities
+                let data = editor.createEntitiesFromJSON(raw); // Create entities from the parsed JSON
+                _this.clearEntities(); // Clear the existing entities
+                _this.clearDiagrams(); // Clear the existing diagrams
+                _this.entities = data.entities; // Insert the received data into editor.entities
+                _this.diagrams = data.diagrams || []; // Insert the received data into editor.diagrams
+                _this.prepareDiagram(); // Prepare the diagram by loading saved entities and diagrams
+                _this.updateDiagram(); // Update the diagram with the imported entities
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
@@ -2011,6 +2066,10 @@ class EntityEditor {
                 let translator = new SQLConverter();
                 contents = translator.translate(contents, 'mysql').split('`').join('');
                 let parser = new TableParser(contents);
+
+                _this.clearEntities(); // Clear the existing entities
+                _this.clearDiagrams(); // Clear the existing diagrams
+
                 _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities            
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
@@ -2062,7 +2121,8 @@ class EntityEditor {
             databaseType: databaseType,
             databaseName: databaseName,
             databaseSchema: databaseSchema,
-            entities: this.entities  // Converting the entities array into a JSON string
+            entities: this.entities,  // Converting the entities array into a JSON string
+            diagrams: this.diagrams // Converting the diagrams array into a JSON string
         };
         
         this.exportJSON(data); // Export the sample object to a JSON file
@@ -2216,7 +2276,6 @@ class EntityEditor {
             document.querySelector(selectorLength).value = this.defaultLength[type];
         }
     }
-
 
     /**
      * Displays the preference settings dialog and handles saving the user's preferences.

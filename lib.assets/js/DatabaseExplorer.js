@@ -1,6 +1,6 @@
-
-
-// Move init() outside of the class
+/**
+ * Initializes the event listeners and sets up the modal dialogs.
+ */
 function init() {
     let modalQueryTranslator = document.getElementById("queryTranslatorModal");
     let modalEntityEditor = document.getElementById("entityEditorModal");
@@ -106,6 +106,12 @@ function init() {
     
 }
 
+/**
+ * Opens the structure of the provided file and reads its content.
+ * The content is then displayed in the element with the class 'original'.
+ * 
+ * @param {File} file - The file to be read.
+ */
 function openStructure(file)
 {
     const reader = new FileReader(); // Create a FileReader instance
@@ -276,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let randomId = (new Date()).getTime();
         let id = 'diagram-'+randomId;
         editor.addDiagram(ul, diagramName, id, [], false);
+
         editor.saveDiagram();
     });
 
@@ -338,10 +345,53 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
+
+    tabsLinkContainer = document.querySelector('.tabs-link-container');
+    
+
+    document.querySelector('.tab-mover li a.move-left').addEventListener('click', function(event) {
+        event.preventDefault();
+        updateMarginLeft(-30);
+    });
+    
+    document.querySelector('.tab-mover li a.move-right').addEventListener('click', function(event) {
+        event.preventDefault();
+        updateMarginLeft(30);
+    });
+    
+    tabsLinkContainer.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        const delta = event.deltaY || event.detail || event.wheelDelta;
+        const step = 30; // Adjust the step size as needed
+    
+        updateMarginLeft(delta > 0 ? -step : step);
+    });
+
+
     init();
 
 });
 
+let tabsLinkContainer;
+let currentMarginLeft = 0;
+
+/**
+ * Updates the margin-left of the tabs to scroll them left or right.
+ * 
+ * @param {number} step - The amount to adjust the margin-left by. Positive values scroll right, negative values scroll left.
+ */
+function updateMarginLeft(step) {
+    currentMarginLeft += step;
+    // Ensure the margin-left does not exceed the container's width
+    let ulElement = tabsLinkContainer.querySelector('ul');
+    let maxScroll = ulElement.scrollWidth - tabsLinkContainer.offsetWidth;
+    currentMarginLeft = Math.max(Math.min(currentMarginLeft, 0), -maxScroll);
+    ulElement.style.marginLeft = `${currentMarginLeft}px`;
+}
+
+/**
+ * Downloads the currently active diagram as an SVG file.
+ */
 function downloadSVG()
 {
     let diagramContainer = document.querySelector('.diagram-container');
@@ -357,10 +407,12 @@ function downloadSVG()
         {
             diagramRenderer[id].downloadSVG();
         }
-        
     }
 }
 
+/**
+ * Downloads the currently active diagram as a PNG file.
+ */
 function downloadPNG()
 {
     let diagramContainer = document.querySelector('.diagram-container');
@@ -376,10 +428,8 @@ function downloadPNG()
         {
             diagramRenderer[id].downloadPNG();
         }
-        
     }
 }
-
 
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.
@@ -558,7 +608,6 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                     editor.diagrams = data.diagrams || [];
                     editor.refreshEntities();
                     editor.prepareDiagram();
-                    
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
                 }
