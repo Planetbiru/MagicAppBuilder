@@ -2,12 +2,19 @@
 
 use AppBuilder\Util\Entity\EntityUtil;
 use AppBuilder\Util\Error\ErrorChecker;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Generator\PicoDatabaseDump;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
+
+if(!$database->isConnected())
+{
+    ResponseUtil::sendJSON(new stdClass);
+    exit();
+}
 
 $inputPost = new InputPost();
 
