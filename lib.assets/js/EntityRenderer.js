@@ -493,22 +493,17 @@ class EntityRenderer {
     }
 
     /**
-     * Exports an SVG element as an SVG file.
-     * 
-     * This function serializes the provided SVG element into a string and triggers a download
-     * of the resulting SVG content as a file.
-     * 
-     * @param {SVGElement} svgElement - The SVG element to export as a file.
-     * @param {string} [fileName="exported-image.svg"] - The name of the exported file (default is "exported-image.svg").
+     * Generates an SVG string with embedded styles.
+     *
+     * @param {SVGElement} svgElement - The SVG element to serialize.
+     * @returns {string} - The serialized SVG string with embedded styles.
      */
-    exportToSVG(svgElement, fileName = "exported-image.svg") {
-        // Serialize the SVG element to a string
+    generateSVGString(svgElement) {
         const width = svgElement.clientWidth;
         const height = svgElement.clientHeight + 2;
         const svgData = new XMLSerializer().serializeToString(svgElement);
 
-        // Embed the font-face in the SVG string (example: using Arial font)
-        const svgWithFont = `
+        return `
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}">
             <defs>
                 <style type="text/css">
@@ -516,90 +511,70 @@ class EntityRenderer {
                         text {
                             font-family: 'Arial', sans-serif;
                         }
+                        .move-up-icon, .move-down-icon, .edit-icon, .delete-icon {
+                            display: none;
+                            visibility: hidden;
+                            opacity: 0;
+                            pointer-events: none;
+                        }
                     ]]>
                 </style>
             </defs>
             ${svgData}
         </svg>`;
+    }
 
-        // Create a Blob from the SVG string
+    /**
+     * Exports an SVG element as an SVG file.
+     *
+     * @param {SVGElement} svgElement - The SVG element to export as a file.
+     * @param {string} [fileName="exported-image.svg"] - The name of the exported file.
+     */
+    exportToSVG(svgElement, fileName = "exported-image.svg") {
+        const svgWithFont = this.generateSVGString(svgElement);
         const blob = new Blob([svgWithFont], { type: "image/svg+xml" });
-
-        // Create a URL for the Blob
         const url = URL.createObjectURL(blob);
-
-        // Create an <a> element to trigger the download
+        
         const link = document.createElement("a");
         link.href = url;
         link.download = fileName;
         link.click();
 
-        // Revoke the URL once the download is triggered
         URL.revokeObjectURL(url);
     }
 
     /**
      * Exports an SVG element as a PNG file.
-     * 
-     * This function renders the provided SVG element onto an HTML canvas and then exports
-     * the canvas content as a PNG file.
-     * 
+     *
      * @param {SVGElement} svgElement - The SVG element to export as a PNG file.
-     * @param {string} [fileName="exported-image.png"] - The name of the exported file (default is "exported-image.png").
+     * @param {string} [fileName="exported-image.png"] - The name of the exported file.
      */
     exportToPNG(svgElement, fileName = "exported-image.png") {
-        // Get the dimensions of the SVG element
         const width = svgElement.clientWidth;
         const height = svgElement.clientHeight;
-
-        // Create a canvas element to render the SVG content
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
-
         const context = canvas.getContext("2d");
 
-        // Convert the SVG to a Data URL
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-
-        // Embed the font-face in the SVG string (example: using Arial font)
-        const svgWithFont = `
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}">
-            <defs>
-                <style type="text/css">
-                    <![CDATA[
-                        text {
-                            font-family: 'Arial', sans-serif;
-                        }
-                    ]]>
-                </style>
-            </defs>
-            ${svgData}
-        </svg>`;
+        const svgWithFont = this.generateSVGString(svgElement);
         const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgWithFont);
-
-        // Create an image element from the Data URL
+        
         const img = new Image();
         img.onload = function () {
-            // Draw the image onto the canvas once it's loaded
             context.drawImage(img, 0, 0);
-
-            // Convert the canvas content to PNG format
             const pngDataUrl = canvas.toDataURL("image/png");
-
-            // Create an <a> element to trigger the PNG download
+            
             const link = document.createElement("a");
             link.href = pngDataUrl;
             link.download = fileName;
             link.click();
         };
 
-        // Handle image loading error
         img.onerror = function (err) {
             console.error('Error loading the SVG image:', err);
         };
 
-        // Load the image from the SVG data URL
         img.src = svgUrl;
     }
 

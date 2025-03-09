@@ -530,7 +530,7 @@ class EntityEditor {
 
         this.selector = selector;
         this.entities = [];
-        this.diagram = [];
+        this.diagrams = [];
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
@@ -564,6 +564,7 @@ class EntityEditor {
 
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
+        this.callbackSaveDiagram = this.setting.callbackSaveDiagram;
         this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
         this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
         this.callbackSaveConfig = this.setting.callbackSaveConfig;
@@ -907,13 +908,49 @@ class EntityEditor {
             columns.forEach(col => newEntity.addColumn(col));
             this.entities.push(newEntity);
         }
-
         this.renderEntities();
+        this.updateDiagram();
         this.cancelEdit();
         this.exportToSQL();
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
+        }
+    }
+
+    updateDiagram()
+    {
+        let diagramContainer = document.querySelector('.diagram-container');
+        diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
+            let id = diagram.getAttribute('id');
+            let updatedWidth = diagram.closest('.left-panel').offsetWidth;
+            let dataEntities = diagram.getAttribute('data-entities') || '';
+            let entities = dataEntities.split(',');
+            let data = [];
+            editor.entities.forEach((entity) => {
+                if(entities.includes(entity.name))
+                {
+                    data.push(entity);
+                }
+            });
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, true);
+        });
+    }
+    
+    /**
+     * Save diagram to server
+     */
+    saveDiagram()
+    {
+        let selection = this.getCheckedEntities();
+        let diagrams = [];
+        Object.entries(selection).forEach(([id, entities]) => {
+            let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
+            diagrams.push({id: id, name: name, entities: entities});
+        });
+        if(typeof this.callbackSaveDiagram == 'function')
+        {
+            this.callbackSaveDiagram(diagrams);
         }
     }
 
@@ -1090,7 +1127,7 @@ class EntityEditor {
         const entities = [];
 
         // Iterate over each entity in the JSON data
-        jsonData.forEach(entityData => {
+        jsonData.entities.forEach(entityData => {
             // Create a new Entity instance
             const entity = new Entity(entityData.name);
             
@@ -1116,7 +1153,7 @@ class EntityEditor {
             entities.push(entity);
         });
 
-        return entities;
+        return {entities:entities, diagrams:jsonData.diagrams};
     }
 
     /**
@@ -1272,9 +1309,7 @@ class EntityEditor {
             entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
             /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
             
-            // Append the created list item to the table list
-
-            
+            // Append the created list item to the table list   
 
             entityCbMain.setAttribute('data-index', index);
             entityCbMain.setAttribute('title', entity.name);
@@ -1321,17 +1356,202 @@ class EntityEditor {
         entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
     
-    refreshEntities()
-    {
+    /**
+     * Refreshes the entities by re-rendering and restoring checked entities.
+     * This method temporarily stores the checked entities, re-renders the entities, 
+     * updates the diagram, and then restores the checked entities.
+     */
+    refreshEntities() {
         let _this = this;
-        setTimeout(function(){
+        setTimeout(function () {
             let checkedEntities = _this.getCheckedEntities();
             _this.renderEntities();
+            _this.updateDiagram();
             _this.setCheckedEntities(checkedEntities);
             _this.restoreCheckedEntities();
-        }, true)
-        
+        }, true);
+    }
 
+    /**
+     * Prepares the diagram by loading saved entities and diagrams from the server.
+     * If diagrams are available, they are added to the UI.
+     */
+    prepareDiagram() {
+        let _this = this;
+        if (this.diagrams.length > 0) {
+            this.diagrams.forEach((diagram) => {
+                let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
+                _this.addDiagram(ul, diagram.name, diagram.id, diagram.entities, true);
+            });
+        }
+    }
+
+    /**
+     * Selects a diagram and updates the UI accordingly.
+     * 
+     * This method highlights the selected diagram tab, deactivates all other tabs, 
+     * and displays the corresponding diagram in the container while hiding others.
+     * Additionally, it updates the entity checkboxes based on the selected diagram's entities.
+     * 
+     * @param {HTMLElement} li - The selected list item (diagram tab) element.
+     */
+    selectDiagram(li) {
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        // Remove active class from all diagram tabs
+        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
+            tab.classList.remove('active');
+        });
+
+        // Remove active class from the "All Entities" tab
+        li.closest('ul').querySelector('li.all-entities').classList.remove('active');
+
+        // Remove active class from all diagram containers
+        diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
+            tab.classList.remove('active');
+        });
+
+        // Activate the selected tab
+        li.classList.add('active');
+
+        // Get the selected diagram ID and activate the corresponding diagram
+        let selector = li.getAttribute('data-id');
+        let diagram = diagramContainer.querySelector('#' + selector);
+        diagram.classList.add('active');
+
+        // Retrieve associated entities for the selected diagram
+        let dataEntity = diagram.getAttribute('data-entities') || '';
+        let entities = dataEntity.split(',');
+
+        // Update entity checkboxes based on selected diagram's entities
+        document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
+            let input = li2.querySelector('input[type="checkbox"]');
+            let value = input.getAttribute('data-name');
+
+            if (entities.length > 0 && value !== '') {
+                input.checked = entities.includes(value);
+            }
+            
+            input.disabled = false;
+        });
+
+        // Update the diagram
+        this.updateDiagram();
+    }
+
+    addDiagram(ul, diagramName, id, entities, finish)
+    {
+        let _this = this;
+        finish = finish || false;
+        let template = `
+        <input type="text" value="${diagramName}">
+        <a href="#tab1" class="tab-link select-diagram">${diagramName}</a> 
+        <a 
+            href="javascript:" class="update-diagram"><span class="icon-ok"></span></a><a 
+            href="javascript:" class="edit-diagram"><span class="icon-edit"></span></a><a 
+            href="javascript:" class="delete-diagram"><span class="icon-delete"></span></a>
+        `;
+
+
+        let newTab = document.createElement("li");
+        newTab.innerHTML = template;
+        newTab.setAttribute('data-edit-mode', finish ? 'false':'true');
+        newTab.querySelector('a.tab-link').setAttribute('href', '#'+diagramName);
+        newTab.setAttribute('data-id', id);
+        newTab.classList.add('diagram-tab');
+        
+        let lastChild = ul.lastElementChild;
+        ul.insertBefore(newTab, lastChild);
+        newTab.querySelector('input').select();
+
+        newTab.querySelector('input').addEventListener('keypress', function(e){
+            if(e.key == 'Enter') 
+            {
+                let value = e.target.value;
+                let label = newTab.querySelector('.tab-link');
+                label.innerText = value;
+                newTab.setAttribute('data-edit-mode', 'false');
+                _this.updateDiagram();
+                _this.saveDiagram();
+            }
+        });
+
+        ul.querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        newTab.classList.add('active');
+
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+
+        let diagram = document.createElement('div');
+        diagram.setAttribute('id', id);
+        diagram.classList.add('diagram');
+        diagram.classList.add('diagram-entity');
+        diagram.classList.add('tab-content');
+        diagram.classList.add('active');
+        diagram.setAttribute('data-entities', entities.join(','));
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute('width', 4);
+        svg.setAttribute('height', 4);
+        svg.classList.add('erd-svg');
+        diagram.appendChild(svg);
+        diagramContainer.appendChild(diagram);
+        diagramRenderer[id] = new EntityRenderer(`.diagram-container #${id} .erd-svg`);
+        
+        ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+            li.setAttribute('data-index', index);
+        });
+        this.selectDiagram(newTab);
+        this.updateDiagram();
+        
+        newTab.querySelector('.select-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            _this.selectDiagram(li);
+        });
+
+        newTab.querySelector('.update-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let input = li.querySelector('input');
+            let value = input.value;
+            let label = li.querySelector('.tab-link');
+            label.innerText = value;
+            li.setAttribute('data-edit-mode', 'false');
+            _this.updateDiagram();
+            _this.saveDiagram();
+        });
+
+        newTab.querySelector('.edit-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let label = li.querySelector('.tab-link');
+            let value = label.innerText;
+            let input = li.querySelector('input');
+            input.value = value;
+            li.setAttribute('data-edit-mode', 'true');
+            input.select();
+            _this.updateDiagram();
+        });
+
+        newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let selector = '#'+li.getAttribute('data-id');
+            let ul = li.closest('ul');
+            li.parentNode.removeChild(li);
+            let diagram = diagramContainer.querySelector(selector);
+            diagram.parentNode.removeChild(diagram);
+            ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+                li.setAttribute('data-index', index);
+            });
+            _this.updateDiagram();
+            _this.saveDiagram();
+        });
     }
 
     /**
@@ -1341,7 +1561,7 @@ class EntityEditor {
      * @param {number} index - The index of the entity to move up.
      */
     moveEntityUp(index) {
-        editor.cancelEdit();
+        this.cancelEdit();
         // Ensure the index is valid and it's not the last element
         if (index < this.entities.length - 1) {
             // Swap the entity at 'index' with the one after it (at 'index + 1')
@@ -1367,7 +1587,7 @@ class EntityEditor {
      * @param {number} index - The index of the entity to move down.
      */
     moveEntityDown(index) {
-        editor.cancelEdit();
+        this.cancelEdit();
         // Ensure the index is valid and it's not the first element
         if (index > 0) {
             // Swap the entity at 'index' with the one before it (at 'index - 1')
