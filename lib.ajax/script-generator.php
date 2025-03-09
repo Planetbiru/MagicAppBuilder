@@ -12,6 +12,11 @@ $timeStart = microtime(true);
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
+if(!$database->isConnected())
+{
+    ResponseUtil::sendJSON(new stdClass);
+    exit();
+}
 
 $entityInfo = $appConfig->getEntityInfo();
 $entityApvInfo = $appConfig->getEntityApvInfo();
@@ -50,7 +55,6 @@ if (isset($_POST) && !empty($_POST)) {
     $fileGenerated = 0;
 
     if ($request->issetFields()) {
-        require_once dirname(__DIR__) . "/inc.app/database.php";
         $scriptGenerator = new ScriptGenerator();
         $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);
     }
