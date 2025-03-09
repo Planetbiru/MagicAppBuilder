@@ -6545,14 +6545,14 @@ $album-&gt;where($specfification)-&gt;delete();
 </ol>
 <p>Parameters:</p>
 <ul>
-<li>PicoSpecification|PicoPredicate|array</li>
+<li>PicoSpecification|PicoPredicate|array|string</li>
 </ul>
 <ol start="2">
 <li>addOr</li>
 </ol>
 <p>Parameters:</p>
 <ul>
-<li>PicoSpecification|PicoPredicate|array</li>
+<li>PicoSpecification|PicoPredicate|array|string</li>
 </ul>
 <p>We can form specifications in an unlimited number of stages. Note that users need to simplify the logic before implementing it into the specification.</p>
 <p><strong>PicoPredicate</strong></p>
@@ -7009,6 +7009,87 @@ catch(Exception $e)
 {
     error_log($e);
 }</code></pre>
+<p><strong>String-Based Specification</strong></p>
+<p>Since version <strong>3.6</strong>, <strong>MagicObject</strong> has supported specifications in the form of strings, which are used as part of the <code>WHERE</code> clause. The introduction of string-based specifications aims to address limitations that cannot be handled using predicates alone. This feature provides users with greater flexibility, allowing them to write <code>WHERE</code> clauses directly, tailored to the syntax and capabilities of their specific DBMS.</p>
+<p>Example:</p>
+<pre><code class="language-php">
+$album = new EntityAlbum(null, $database);
+
+// Debug query callback to log the executed SQL
+$database-&gt;setCallbackDebugQuery(function($sql){
+    error_log($sql);
+});
+
+// Creating a specification object
+$specs = new PicoSpecification();
+
+// Adding conditions using an array
+$specs-&gt;name = ['Album 1', 'Album 2'];
+
+/*
+$specs-&gt;numberOfSong = 11;
+$specs-&gt;active = true;
+$specs-&gt;asDraft = false;
+*/
+
+// Adding conditions using string specifications
+$specs-&gt;addAnd("number_of_song = 11");
+$specs-&gt;addAnd("active = true");
+$specs-&gt;addAnd("as_draft = false");
+
+try {
+    // Executing the query based on the specifications
+    $res = $album-&gt;findAll($specs);
+
+    // Displaying the results
+    foreach ($res-&gt;getResult() as $row) {
+        echo $row . "\r\n\r\n";
+    }
+} catch (Exception $e) {
+    error_log($e);
+}
+</code></pre>
+<p>Important Notes:</p>
+<ul>
+<li>Clause additions must use the functions <code>add</code>, <code>addAnd</code>, or <code>addOr</code>.</li>
+<li>Column names must exactly match those in the database without any mapping.</li>
+<li>Values must be manually escaped to prevent SQL injection.</li>
+</ul>
+<p><strong>Escaping Values in SQL WHERE Clause</strong></p>
+<p>When constructing SQL queries, it is crucial to properly escape values to prevent SQL injection and ensure data integrity. You can use the <code>bindSqlParams</code> function from the <code>PicoDatabaseQueryBuilder</code> class to safely replace placeholders (<code>?</code>) with actual values.</p>
+<p>Example usage:</p>
+<pre><code class="language-php">$specs-&gt;addAnd((string) (new PicoDatabaseQueryBuilder($database))-&gt;bindSqlParams('lyric LIKE ?', "%O'ben%"));</code></pre>
+<p>If you are using MySQL or MariaDB, you can use PHP's built-in <code>addslashes</code> function:</p>
+<pre><code class="language-php">$specs-&gt;addAnd('lyric LIKE ?', addslashes("%O'ben%"));</code></pre>
+<p>For other databases, you can use PHP's built-in <code>str_replace</code> function:</p>
+<pre><code class="language-php">$specs-&gt;addAnd('lyric LIKE ?', str_replace("'", "''", "%O'ben%"));</code></pre>
+<ul>
+<li>
+<p><strong>Creating a <code>PicoDatabaseQueryBuilder</code> instance</strong></p>
+<ul>
+<li>A new instance of <code>PicoDatabaseQueryBuilder</code> is created with the <code>$database</code> connection.</li>
+</ul>
+</li>
+<li>
+<p><strong>Calling <code>bindSqlParams</code></strong></p>
+<ul>
+<li>The function replaces the <code>?</code> placeholder in <code>'lyric LIKE ?'</code> with the provided value <code>"%O'ben%"</code>.</li>
+<li>This ensures proper escaping of special characters like the single quote (<code>'</code>) in <code>"O'ben"</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Ensuring Type Safety</strong></p>
+<ul>
+<li>The <code>(string)</code> cast ensures the output is properly converted to a string before being used in the SQL query.</li>
+</ul>
+</li>
+<li>
+<p><strong>Using <code>addAnd</code> to Append Conditions</strong></p>
+<ul>
+<li>The escaped SQL condition is safely added to the filter specifications.</li>
+</ul>
+</li>
+</ul>
 </article>
 
 <article class="article" id="part18">
@@ -7068,10 +7149,16 @@ catch(Exception $e)
 </code></pre>
 <p><strong>PicoPageable</strong></p>
 <p>Constructor:</p>
+<pre><code class="language-php">public function __construct(
+    PicoPage|PicoLimit|array|null $page = null,
+    PicoSortable|array|null $sortable = null
+)
+{
+}</code></pre>
 <p>Parameters:</p>
 <ul>
-<li>PicoPage|PicoLimit|array $page</li>
-<li>PicoSortable|array $sortable</li>
+<li>PicoPage|PicoLimit|array|null $page</li>
+<li>PicoSortable|array|null $sortable</li>
 </ul>
 <p>Method:</p>
 <ul>
@@ -7086,6 +7173,12 @@ catch(Exception $e)
 </ul>
 <p><strong>PicoPage</strong></p>
 <p>Constructor:</p>
+<pre><code class="language-php">public function __construct(
+    int $pageNumber = 1,
+    int $pageSize = 1
+)
+{
+}</code></pre>
 <p>Parameters:</p>
 <ul>
 <li>integer $pageNumber</li>
@@ -7114,6 +7207,9 @@ catch(Exception $e)
 </ul>
 <p><strong>PicoSortable</strong></p>
 <p>Constructor:</p>
+<pre><code class="language-php">public function __construct()
+{
+}</code></pre>
 <p>Parameters:</p>
 <p>Users can enter an even number of parameters where odd numbered parameters are columns while even numbered parameters are methods.</p>
 <p>Example:</p>
@@ -7156,7 +7252,28 @@ catch(Exception $e)
 <li>getInstance</li>
 <li>fixSortType</li>
 </ul>
-<p>Example:</p>
+<h4>Using String-Based Sorting</h4>
+<p>Since version <strong>3.6</strong>, <strong>MagicObject</strong> supports <strong>string-based sorting</strong>, allowing users to define custom <code>ORDER BY</code> clauses dynamically. This feature provides greater flexibility when ordering query results.</p>
+<p>Users can define sorting criteria in the following ways:</p>
+<p><strong>Sortable with String</strong></p>
+<pre><code class="language-php">$sortable = new PicoSortable();
+$sortable-&gt;add("LOWER(TRIM(title)) ASC");</code></pre>
+<p>or</p>
+<p><strong>Sortable with Array</strong></p>
+<pre><code class="language-php">$sortable = new PicoSortable();
+$sortable-&gt;add(["LOWER(TRIM(title))", "ASC"], true);</code></pre>
+<h4>Understanding the Second Parameter</h4>
+<p>The second parameter (<code>true</code> in this case) <strong>indicates that the first element of the array in the first parameter is a raw SQL expression</strong>. The default value is <code>false</code>. When set to <code>true</code>, <strong>MagicObject will not modify or escape the value</strong>, allowing full control over custom sorting logic.</p>
+<h4>Security Considerations</h4>
+<p>When using <strong>string-based sorting</strong>, always consider security risks. Manually escape the parameters you include using the <code>PicoDatabaseQueryBuilder::bindSqlParams()</code> function, as shown in the example below:</p>
+<pre><code class="language-php">$inputGet = new InputGet();
+$sortType = $inputGet-&gt;getOrderBy(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+$queryBuilder = new PicoDatabaseQueryBuilder($database);
+$sortBy = $queryBuilder-&gt;bindSqlParams('SIN(angle * ?)', $factor);
+$sortable-&gt;add([$sortBy, $sortType], true);</code></pre>
+<p>This ensures that the sorting parameters are properly sanitized and protected against SQL injection.</p>
+<h4>Pageable with Sortable and without Sortable</h4>
 <p><strong>Pageable without Sortable</strong></p>
 <pre><code class="language-php">$pageable = new PicoPageable(new Page(1, 100));
 // page number = 1

@@ -4683,10 +4683,15 @@ $subqueryMap = '.$referece.';
             $cols["ipAskEdit"]       = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
             $cols["timeAskEdit"]     = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
         }
+
+        $cols["adminDelete"]         = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_ask_edit",
+        $cols["ipDelete"]            = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
+        $cols["timeDelete"]          = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
         $result = array();
+
         foreach($cols as $key=>$value)
         {
-            $value['Field'] = $this->entityInfo->get($key);
+            $value['Field'] = $this->entityInfo->get($key) != null ? $this->entityInfo->get($key) : PicoStringUtil::snakeize($key);
             $result[] = $value;
         }
         return $result;

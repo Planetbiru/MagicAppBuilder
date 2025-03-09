@@ -266,7 +266,13 @@ class PicoApproval
             // copy database connection from entity to entityTrash
             $entityTrash->currentDatabase($this->entity->currentDatabase());
             // copy data from entity to entityTrash
-            $entityTrash->loadData($this->entity)->insert();
+            $entityTrash->loadData($this->entity);
+
+            $entityTrash->set($this->entityInfo->getAdminDelete(), $currentUser);
+            $entityTrash->set($this->entityInfo->getTimeDelete(), $currentTime);
+            $entityTrash->set($this->entityInfo->getIpDelete(), $currentIp);
+
+            $entityTrash->insert();
         }
 
         // delete data

@@ -431,8 +431,10 @@ class Entity {
      * Creates an instance of the Entity class.
      * 
      * @param {string} name - The name of the entity (table).
+     * @param {number} index - The index of the entity (table).
      */
-    constructor(name) {
+    constructor(name, index) {
+        this.index = index;
         this.name = name;
         this.columns = [];
     }
@@ -474,6 +476,31 @@ class Entity {
     }
 }
 
+function Diagram(name, sortOrder, originalEntities)
+{
+    this.entitieNames = [];
+    this.name = name;
+    this.sortOrder = sortOrder;
+    this.originalEntities = originalEntities;
+    this.active = false;
+    this.createERD = function(updatedWidth, drawRelationship)
+    {
+        this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
+    }
+    this.getData = function()
+    {
+        let entities = [];
+        for(let entity of this.originalEntities)
+        {
+            if(this.entitieNames.includes(entity.name))
+            {
+                entities.push(entity);
+            }
+        }
+        return entities;
+    }
+}
+
 /**
  * Class to manage the creation, editing, and deletion of database entities (tables),
  * as well as generating SQL statements for the entities.
@@ -505,6 +532,7 @@ class EntityEditor {
 
         this.selector = selector;
         this.entities = [];
+        this.diagrams = [];
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
@@ -538,6 +566,7 @@ class EntityEditor {
 
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
         this.callbackSaveEntity = this.setting.callbackSaveEntity;
+        this.callbackSaveDiagram = this.setting.callbackSaveDiagram;
         this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
         this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
         this.callbackSaveConfig = this.setting.callbackSaveConfig;
@@ -559,28 +588,47 @@ class EntityEditor {
     }
 
     /**
+     * Searches for an entity by name.
+     * 
+     * @param {string} name - The name of the entity to find.
+     * @returns {Object|null} - Returns the entity if found, otherwise returns null.
+     */
+    getEntityByName(name) {
+        for (let entity of this.entities) {
+            if (name === entity.name) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
     addDomListeners() {
         let _this = this;
-        document.querySelector(this.selector+" .check-all-entity").addEventListener('change', (event) => {
+        document.querySelector(".check-all-entity").addEventListener('change', (event) => {
             let checked = event.target.checked;
-            let allEntities = document.querySelectorAll(this.selector+" .selected-entity");
+            let allEntities = event.target.closest('.right-panel').querySelectorAll(".selected-entity");
+            
             if(allEntities)
             {
                 allEntities.forEach((entity, index) => {
                     entity.checked = checked;
                 })
             }
+            
             this.exportToSQL();
         });
-        document.querySelector(this.selector+" .table-list").addEventListener('change', (event) => {
+        
+        document.querySelector(this.selector+" .right-panel .table-list-for-export").addEventListener('change', (event) => {
             if (event.target.classList.contains('selected-entity')) {
                 this.exportToSQL();
             }
         });
         
         document.addEventListener('change', function (event) {
+            
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
                 const tr = event.target.closest('tr');
@@ -597,6 +645,7 @@ class EntityEditor {
                     tr.querySelector('.column-nullable').disabled = false;
                 }
             }
+            
         });
 
         document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
@@ -713,7 +762,7 @@ class EntityEditor {
     initIconEvent()
     {
         let _this = this;
-        renderer.svg.addEventListener('click', function(e) {
+        entityRenderer.svg.addEventListener('click', function(e) {
             if (e.target.closest('.erd-svg .move-down-icon')) {
                 _this.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
             }
@@ -869,20 +918,63 @@ class EntityEditor {
         if (this.currentEntityIndex >= 0) {
             // Update existing entity
             this.entities[this.currentEntityIndex].name = entityName;
+            this.entities[this.currentEntityIndex].index = this.currentEntityIndex;
             this.entities[this.currentEntityIndex].columns = columns;
         } else {
             // Add a new entity
-            const newEntity = new Entity(entityName);
+            const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
             this.entities.push(newEntity);
         }
-
         this.renderEntities();
+        this.updateDiagram();
         this.cancelEdit();
         this.exportToSQL();
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
+        }
+    }
+
+    updateDiagram()
+    {
+        let _this = this;
+        let diagramContainer = document.querySelector('.diagram-container');
+        diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
+            let id = diagram.getAttribute('id');
+            let updatedWidth = diagram.closest('.left-panel').offsetWidth;
+            let dataEntities = diagram.getAttribute('data-entities') || '';
+            let entities = dataEntities.split(',');
+            let data = [];
+            entities.forEach((entityName) => {
+                let entity = _this.getEntityByName(entityName);
+                if(entity != null)
+                {
+                    data.push(entity);
+                }
+            });
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, document.querySelector('#draw-relationship').checked);
+            let svg = diagram.querySelector('svg');
+            _this.removeDiagramEventListener(svg);
+            _this.addDiagramEventListener(svg);
+        });
+        
+    }
+    
+    /**
+     * Save diagram to server
+     */
+    saveDiagram()
+    {
+        let selection = this.getCheckedEntities();
+        let diagrams = [];
+        Object.entries(selection).forEach(([id, entities]) => {
+            let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
+            diagrams.push({id: id, name: name, entities: entities});
+        });
+        if(typeof this.callbackSaveDiagram == 'function')
+        {
+            this.callbackSaveDiagram(diagrams);
         }
     }
 
@@ -1059,9 +1151,9 @@ class EntityEditor {
         const entities = [];
 
         // Iterate over each entity in the JSON data
-        jsonData.forEach(entityData => {
+        jsonData.entities.forEach(entityData => {
             // Create a new Entity instance
-            const entity = new Entity(entityData.name);
+            const entity = new Entity(entityData.name, entityData.index);
             
             // Iterate over each column in the entity's columns array
             entityData.columns.forEach(columnData => {
@@ -1085,7 +1177,7 @@ class EntityEditor {
             entities.push(entity);
         });
 
-        return entities;
+        return {entities:entities, diagrams:jsonData.diagrams};
     }
 
     /**
@@ -1127,9 +1219,9 @@ class EntityEditor {
         const entities = [];
 
         // Iterate over each entity in the JSON data
-        tables.forEach(table => {
+        tables.forEach((table, index) => {
             // Create a new Entity instance
-            const entity = new Entity(table.tableName);
+            const entity = new Entity(table.tableName, index);
             
             // Iterate over each column in the entity's columns array
             table.columns.forEach(columnData => {
@@ -1154,6 +1246,42 @@ class EntityEditor {
         });
 
         return entities;
+    };
+
+    getCheckedEntities = function() {
+        let diagramEntities = {};
+        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        diagrams.forEach((diagram) => {
+            let id = diagram.getAttribute('id');
+            let entities = diagram.getAttribute('data-entities');
+            diagramEntities[id] = entities ? entities.split(',') : [];
+        });
+        return diagramEntities;
+    };
+    
+    setCheckedEntities = function(diagramEntities) {
+        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        diagrams.forEach((diagram) => {
+            let id = diagram.getAttribute('id');
+            let entities = diagramEntities[id];
+            if (entities) {
+                diagram.setAttribute('data-entities', entities.join(','));
+            }
+        });
+    };
+    
+    restoreCheckedEntities = function()
+    {
+        let diagram = document.querySelector('.diagram-entity.tab-content.active');
+        if(diagram)
+        {
+            let entities = diagram.getAttribute('data-entities');
+            let checked = entities ? entities.split(',') : [];
+            document.querySelectorAll('.left-panel .table-list [type="checkbox"]').forEach((input) => {
+                input.checked = checked.includes(input.getAttribute('data-name'));
+                input.disabled = false;
+            });
+        }
     }
     
     /**
@@ -1173,9 +1301,10 @@ class EntityEditor {
         const selectedEntity = [];
 
         // Get all selected entity checkboxes (those that are checked)
-        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");
 
         // If there are selected checkboxes, add their data-name to the selectedEntity array
+        
         if (selectedEntities) {
             selectedEntities.forEach(checkbox => {
                 selectedEntity.push(checkbox.getAttribute('data-name'));
@@ -1183,23 +1312,42 @@ class EntityEditor {
         }
 
         // Get the list element where the entities will be rendered
-        const tabelList = document.querySelector(this.selector+" .table-list");
+        const tabelListForExport = document.querySelector(this.selector+" .table-list-for-export");
+        const tabelListMain = document.querySelector(this.selector+" .left-panel .table-list");
         let drawRelationship = document.querySelector(this.selector+" .draw-relationship").checked;
 
 
         // Clear any existing content in the table list
-        tabelList.innerHTML = '';
+        tabelListMain.innerHTML = '';
+        tabelListForExport.innerHTML = '';
 
         // Iterate over the entities and create a checkbox for each entity
         this.entities.forEach((entity, index) => {
             // Create a new list item for each entity
-            let entityCb = document.createElement('li');
-            entityCb.innerHTML = `
+            let entityCbForExport = document.createElement('li');
+            let entityCbMain = document.createElement('li');
+            entityCbForExport.innerHTML = `
             <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
             `;
+
+            entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
+            /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
             
-            // Append the created list item to the table list
-            tabelList.appendChild(entityCb);
+            // Append the created list item to the table list   
+
+            entityCbMain.setAttribute('data-index', index);
+            entityCbMain.setAttribute('title', entity.name);
+            tabelListMain.appendChild(entityCbMain);
+
+            entityCbMain.querySelector('a.edit-table').addEventListener('click', function(e){
+                editor.editEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+            });
+            entityCbMain.querySelector('a.delete-table').addEventListener('click', function(e){
+                editor.deleteEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+            });
+
+
+            tabelListForExport.appendChild(entityCbForExport);
         });
         
         let count = this.entities.length;
@@ -1207,37 +1355,344 @@ class EntityEditor {
         document.querySelector(this.selector + " .entity-count").textContent = countStr;
 
         // Ensure that previously selected entities are checked
+        
         selectedEntity.forEach(value => {
             // Find the checkbox corresponding to the selected entity name
-            let cb = document.querySelector(`input[data-name="${value}"]`);
+            let cb = document.querySelector(`.right-panel input[data-name="${value}"]`);
             if (cb) {
                 // Check the checkbox if found
                 cb.checked = true;
             }
         });
-
-        // Get the SVG element for the ERD (Entity-Relationship Diagram)
-        let svg = container.querySelector(".erd-svg");
+        
 
         // Calculate the updated width of the SVG container
-        let updatedWidth = svg.parentNode.parentNode.offsetWidth;
+        let updatedWidth = container.closest('.left-panel').offsetWidth;
 
         // If the width is 0 (meaning it's not set), fallback to the left panel width
         if (updatedWidth == 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
         
+        updatedWidth = updatedWidth - 200;
 
         // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
-        renderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
+        entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
     
-    refreshEntities()
+    /**
+     * Refreshes the entities by re-rendering and restoring checked entities.
+     * This method temporarily stores the checked entities, re-renders the entities, 
+     * updates the diagram, and then restores the checked entities.
+     */
+    refreshEntities() {
+        let _this = this;
+        setTimeout(function () {
+            let checkedEntities = _this.getCheckedEntities();
+            _this.renderEntities();
+            _this.updateDiagram();
+            _this.setCheckedEntities(checkedEntities);
+            _this.restoreCheckedEntities();
+        }, true);
+    }
+
+    /**
+     * Prepares the diagram by loading saved entities and diagrams from the server.
+     * If diagrams are available, they are added to the UI.
+     */
+    prepareDiagram() {
+        let _this = this;
+        if (this.diagrams.length > 0) {
+            this.diagrams.forEach((diagram) => {
+                let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
+                _this.addDiagram(ul, diagram.name, diagram.id, diagram.entities, true);
+            });
+        }
+    }
+
+    /**
+     * Selects a diagram and updates the UI accordingly.
+     * 
+     * This method highlights the selected diagram tab, deactivates all other tabs, 
+     * and displays the corresponding diagram in the container while hiding others.
+     * Additionally, it updates the entity checkboxes based on the selected diagram's entities.
+     * 
+     * @param {HTMLElement} li - The selected list item (diagram tab) element.
+     */
+    selectDiagram(li) {
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        // Remove active class from all diagram tabs
+        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
+            tab.classList.remove('active');
+        });
+
+        // Remove active class from the "All Entities" tab
+        li.closest('ul').querySelector('li.all-entities').classList.remove('active');
+
+        // Remove active class from all diagram containers
+        diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
+            tab.classList.remove('active');
+        });
+
+        // Activate the selected tab
+        li.classList.add('active');
+
+        // Get the selected diagram ID and activate the corresponding diagram
+        let selector = li.getAttribute('data-id');
+        let diagram = diagramContainer.querySelector('#' + selector);
+        diagram.classList.add('active');
+
+        // Retrieve associated entities for the selected diagram
+        let dataEntity = diagram.getAttribute('data-entities') || '';
+        let entities = dataEntity.split(',');
+
+        // Update entity checkboxes based on selected diagram's entities
+        document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
+            let input = li2.querySelector('input[type="checkbox"]');
+            let value = input.getAttribute('data-name');
+
+            if (entities.length > 0 && value !== '') {
+                input.checked = entities.includes(value);
+            }
+            
+            input.disabled = false;
+        });
+
+        // Update the diagram
+        this.updateDiagram();
+    }
+
+    /**
+     * Adds a new diagram tab and its corresponding diagram content.
+     * 
+     * @param {HTMLElement} ul - The parent <ul> element to append the new diagram tab.
+     * @param {string} diagramName - The name of the diagram.
+     * @param {string} id - Unique identifier for the diagram.
+     * @param {Array} entities - List of entities associated with the diagram.
+     * @param {boolean} [finish=false] - Whether the diagram is in edit mode.
+     */
+    addDiagram(ul, diagramName, id, entities, finish)
     {
         let _this = this;
-        setTimeout(function(){
-            _this.renderEntities();
-        }, 1);
+        finish = finish || false;
+        let template = `
+        <input type="text" value="${diagramName}">
+        <a href="#tab1" class="tab-link select-diagram">${diagramName}</a> 
+        <a 
+            href="javascript:" class="update-diagram"><span class="icon-ok"></span></a><a 
+            href="javascript:" class="edit-diagram"><span class="icon-edit"></span></a><a 
+            href="javascript:" class="delete-diagram"><span class="icon-delete"></span></a>
+        `;
+
+
+        let newTab = document.createElement("li");
+        newTab.innerHTML = template;
+        newTab.setAttribute('data-edit-mode', finish ? 'false':'true');
+        newTab.querySelector('a.tab-link').setAttribute('href', '#'+diagramName);
+        newTab.setAttribute('data-id', id);
+        newTab.classList.add('diagram-tab');
+        
+        let lastChild = ul.lastElementChild;
+        ul.insertBefore(newTab, lastChild);
+        newTab.querySelector('input').select();
+
+        newTab.querySelector('input').addEventListener('keypress', function(e){
+            if(e.key == 'Enter') 
+            {
+                let value = e.target.value;
+                let label = newTab.querySelector('.tab-link');
+                label.innerText = value;
+                newTab.setAttribute('data-edit-mode', 'false');
+                _this.updateDiagram();
+                _this.saveDiagram();
+            }
+        });
+
+        ul.querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        newTab.classList.add('active');
+
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+
+        let diagram = document.createElement('div');
+        diagram.setAttribute('id', id);
+        diagram.classList.add('diagram');
+        diagram.classList.add('diagram-entity');
+        diagram.classList.add('tab-content');
+        diagram.classList.add('active');
+        diagram.setAttribute('data-entities', entities.join(','));
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute('width', 4);
+        svg.setAttribute('height', 4);
+        svg.classList.add('erd-svg');
+        diagram.appendChild(svg);
+        diagramContainer.appendChild(diagram);
+        diagramRenderer[id] = new EntityRenderer(`.diagram-container #${id} .erd-svg`);
+        
+        ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+            li.setAttribute('data-index', index);
+        });
+        this.selectDiagram(newTab);
+        this.updateDiagram();
+        
+        newTab.querySelector('.select-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            _this.selectDiagram(li);
+        });
+
+        newTab.querySelector('.update-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let input = li.querySelector('input');
+            let value = input.value;
+            let label = li.querySelector('.tab-link');
+            label.innerText = value;
+            li.setAttribute('data-edit-mode', 'false');
+            _this.updateDiagram();
+            _this.saveDiagram();
+        });
+
+        newTab.querySelector('.edit-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let label = li.querySelector('.tab-link');
+            let value = label.innerText;
+            let input = li.querySelector('input');
+            input.value = value;
+            li.setAttribute('data-edit-mode', 'true');
+            input.select();
+            _this.updateDiagram();
+        });
+
+        newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
+            e.preventDefault();
+            let li = e.target.closest('li');
+            let selector = '#'+li.getAttribute('data-id');
+            let ul = li.closest('ul');
+            li.parentNode.removeChild(li);
+            let diagram = diagramContainer.querySelector(selector);
+            diagram.parentNode.removeChild(diagram);
+            ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
+                li.setAttribute('data-index', index);
+            });
+            _this.updateDiagram();
+            _this.saveDiagram();
+        });
+    }
+
+    /**
+     * Adds a click event listener to an SVG diagram.
+     * 
+     * @param {SVGElement} svg - The SVG element to add the event listener to.
+     */
+    addDiagramEventListener(svg) {
+        let _this = this;
+    
+        // Simpan referensi fungsi dalam elemen
+        if (!svg._clickHandler) {
+            svg._clickHandler = function(e) {
+                _this.editEventListener(e);
+            };
+        }
+    
+        svg.addEventListener('click', svg._clickHandler);
+        svg.setAttribute('data-event', 'true');
+    }
+    
+    /**
+     * Removes a click event listener from an SVG diagram.
+     * 
+     * @param {SVGElement} svg - The SVG element to remove the event listener from.
+     */
+    removeDiagramEventListener(svg) {
+        if (svg._clickHandler) {
+            svg.removeEventListener('click', svg._clickHandler);
+            delete svg._clickHandler; // Hapus referensi setelah dilepas
+        }
+        svg.setAttribute('data-event', 'false');
+    }
+
+    /**
+     * Handles click events inside a diagram SVG element.
+     * 
+     * @param {Event} e - The event object.
+     */
+    editEventListener(e)
+    {
+        let _this = this;
+        if (e.target.closest('.erd-svg .move-down-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.arrayElementOperation(haystack, needle, 1);
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+        if (e.target.closest('.erd-svg .move-up-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.arrayElementOperation(haystack, needle, -1);
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+        if (e.target.closest('.erd-svg .edit-icon')) {
+            let index = parseInt(e.target.getAttribute('data-index'));
+            _this.editEntity(index);
+        }
+        if (e.target.closest('.erd-svg .delete-icon')) {
+            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
+            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let newEntities = _this.removeUniqueElements(haystack.split(','), needle).join(',');
+            document.querySelector(`.selected-entity[data-name="${needle}"]`).checked = false;
+            e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
+            _this.updateDiagram();
+            _this.saveDiagram();
+        }
+    }
+
+    /**
+     * Removes a specific target element from the array if it appears only once.
+     * 
+     * @param {Array} arr - The array to filter.
+     * @param {string} target - The element to remove if it is unique.
+     * @returns {Array} - A new array with the target removed if it was unique.
+     */
+    removeUniqueElements(arr, target) {
+        return arr.filter(item => !(item === target && arr.indexOf(item) === arr.lastIndexOf(item)));
+    }
+
+    /**
+     * Moves an element up or down within an array.
+     * 
+     * @param {string} haystack - Comma-separated string of elements.
+     * @param {string} needle - The element to move.
+     * @param {number} operation - 1 to move down, -1 to move up.
+     * @returns {string} - The updated comma-separated string.
+     */
+    arrayElementOperation(haystack, needle, operation) {
+        let array = haystack.split(',');
+        let index = array.indexOf(needle);
+        
+        // Jika elemen tidak ditemukan atau sudah di batas kiri/kanan, kembalikan string asli
+        if (index === -1 || (operation === -1 && index === 0) || (operation === 1 && index === array.length - 1)) {
+            return haystack;
+        }
+        
+        // Tentukan indeks baru
+        let newIndex = index + operation;
+        
+        // Tukar elemen dengan elemen di posisi baru
+        [array[index], array[newIndex]] = [array[newIndex], array[index]];
+        
+        return array.join(',');
     }
 
     /**
@@ -1247,7 +1702,7 @@ class EntityEditor {
      * @param {number} index - The index of the entity to move up.
      */
     moveEntityUp(index) {
-        editor.cancelEdit();
+        this.cancelEdit();
         // Ensure the index is valid and it's not the last element
         if (index < this.entities.length - 1) {
             // Swap the entity at 'index' with the one after it (at 'index + 1')
@@ -1273,7 +1728,7 @@ class EntityEditor {
      * @param {number} index - The index of the entity to move down.
      */
     moveEntityDown(index) {
-        editor.cancelEdit();
+        this.cancelEdit();
         // Ensure the index is valid and it's not the first element
         if (index > 0) {
             // Swap the entity at 'index' with the one before it (at 'index - 1')
@@ -1394,7 +1849,7 @@ class EntityEditor {
      */
     exportToSQL() {
         let sql = [];       
-        const selectedEntities = document.querySelectorAll(this.selector+" .selected-entity:checked");  
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 

@@ -34,14 +34,14 @@ if($applicationId != null)
 
         $menus = new SecretObject();
         $menus->loadYamlFile($menuPath, false, true, true);
-        ResponseUtil::sendJSON($menus, false, true);
+        ResponseUtil::sendJSON($menus, false);
     }
     catch(Exception $e)
     {
-        ResponseUtil::sendJSON(new stdClass, false, true);
+        ResponseUtil::sendJSON(new stdClass, false);
     }
 }
 else
 {
-    ResponseUtil::sendJSON(new stdClass, false, true);
+    ResponseUtil::sendJSON(new stdClass, false);
 }

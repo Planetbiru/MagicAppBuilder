@@ -24,6 +24,8 @@ function init() {
     openModalEntityEditorButton.onclick = function() {
         modalEntityEditor.style.display = "block";
         resizablePanels.loadPanelWidth();
+        editor.updateDiagram();
+
     };
     
     closeModalButton.forEach(function(cancelButton) {
@@ -97,7 +99,9 @@ function init() {
     });
 
     document.querySelector('.draw-relationship').addEventListener('change', function(e){
-        editor.renderEntities();
+        editor.refreshEntities();
+        editor.updateDiagram();
+
     });
     
 }
@@ -119,7 +123,8 @@ function openStructure(file)
 // Instantiate the class
 const converter = new SQLConverter();
 let editor;
-let renderer;
+let entityRenderer;
+let diagramRenderer = {};
 let resizablePanels;
 
 // Initialize event listeners
@@ -127,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
     const toggles = document.querySelectorAll('.collapsible .button-toggle');
-    renderer = new EntityRenderer(".erd-svg");
+    entityRenderer = new EntityRenderer(".erd-svg");
 
     // Attach event listeners to each toggle button
     toggles.forEach(function(toggle) {
@@ -158,6 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
                 let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
                 sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+            },
+            callbackSaveDiagram: function (diagrams){
+                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams); 
             },
             callbackLoadTemplate: function(){
                 let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
@@ -253,12 +265,121 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container
-        editor.renderEntities();
+        editor.refreshEntities();
+        editor.updateDiagram();
     });
+
+    document.querySelector('.add-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let ul = e.target.closest('ul');
+        let diagramName = "New Diagram";
+        let randomId = (new Date()).getTime();
+        let id = 'diagram-'+randomId;
+        editor.addDiagram(ul, diagramName, id, [], false);
+        editor.saveDiagram();
+    });
+
+    document.querySelector('[data-id="all-entities"]').addEventListener('click', function(e){
+        e.preventDefault();
+        let li = e.target.parentNode;
+        let diagramContainer = document.querySelector('.diagram-container');
+
+        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+            tab.classList.remove('active');
+        });
+        li.classList.add('active');
+        let selector = 'all-entities';
+        diagramContainer.querySelector('#'+selector).classList.add('active');
+        document.querySelector('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach((li, index) => {
+            let input = li.querySelector('input[type="checkbox"]');
+            input.checked = false;
+            input.disabled = true;
+        });
+    });
+
+    // Listen for changes in checkboxes within the table-list
+    document.addEventListener('change', function (e) {
+        if (e.target.closest('.table-list input[type="checkbox"]')) {
+            
+            let diagram = document.querySelector('.diagram-container .diagram.active');
+            let currentSelection = diagram.getAttribute('data-entities').split(',');
+
+            let selectedEntities = new Set(); // Use a Set to store selected entities
+            
+            // Iterate through checkboxes and add checked ones to the set
+            e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach(input => {
+                let entity = input.getAttribute('data-name');
+                if (input.checked) {
+                    selectedEntities.add(entity);
+                }
+            });
+
+            // Maintain the order based on the initial selection
+            let updatedEntities = currentSelection.filter(entity => selectedEntities.has(entity));
+
+            // Append new entities that were not in the initial selection
+            selectedEntities.forEach(entity => {
+                if (!updatedEntities.includes(entity)) {
+                    updatedEntities.push(entity);
+                }
+            });
+
+            // Update the data-entities attribute with the new order
+            diagram.setAttribute('data-entities', updatedEntities.join(','));
+
+            editor.saveDiagram();
+        }
+        editor.updateDiagram();
+    });
+
+    
+
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
     init();
 
 });
+
+function downloadSVG()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    let diagram = diagramContainer.querySelector('.diagram.active');
+    if(diagram)
+    {
+        let id = diagram.getAttribute('id');
+        if(id == 'all-entities')
+        {
+            entityRenderer.downloadSVG();
+        }
+        else
+        {
+            diagramRenderer[id].downloadSVG();
+        }
+        
+    }
+}
+
+function downloadPNG()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    let diagram = diagramContainer.querySelector('.diagram.active');
+    if(diagram)
+    {
+        let id = diagram.getAttribute('id');
+        if(id == 'all-entities')
+        {
+            entityRenderer.downloadPNG();
+        }
+        else
+        {
+            diagramRenderer[id].downloadPNG();
+        }
+        
+    }
+}
+
 
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.
@@ -330,12 +451,56 @@ function removeAllEventListeners(element) {
  * @param {Array} entities - The list of entities to be sent to the server.
  */
 function sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities) {
-    const data = {
+    let data = {
         applicationId: applicationId,
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
         entities: JSON.stringify(entities)  // Converting the entities array into a JSON string
+    };
+
+    const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
+    const url = buildUrl('entity', applicationId, databaseType, databaseName, databaseSchema, '');
+
+    xhr.open('POST', url, true); // Open a POST connection to the server
+
+    // Set the header to send data in URL-encoded format
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    // Handle the server response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {  // Check if the request is complete
+            if (xhr.status === 200) {  // Check if the response is successful (status 200)
+                // Response received successfully
+            } else {
+                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+            }
+        }
+    };
+
+    // Prepare data in URL-encoded format
+    const urlEncodedData = new URLSearchParams(data).toString();
+
+    // Send the data in URL-encoded format
+    xhr.send(urlEncodedData);
+}
+
+/**
+ * Sends data to the server using the POST method with URL-encoded format.
+ * 
+ * @param {string} applicationId - The application ID to be sent.
+ * @param {string} databaseType - The type of database being used.
+ * @param {string} databaseName - The name of the database being used.
+ * @param {string} databaseSchema - The schema of the database being used.
+ * @param {Array} diagrams - The list of diagrams to be sent to the server.
+ */
+function sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams) {
+    let data = {
+        applicationId: applicationId,
+        databaseType: databaseType,
+        databaseName: databaseName,
+        databaseSchema: databaseSchema,
+        diagrams: JSON.stringify(diagrams)  // Converting the entities array into a JSON string
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -388,8 +553,12 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                 const response = xhr.responseText;  // Get the response from the server
                 try {
                     const parsedData = JSON.parse(response);  // Try to parse the JSON response
-                    editor.entities = editor.createEntitiesFromJSON(parsedData); // Insert the received data into editor.entities
-                    editor.renderEntities(); // Update the view with the fetched entities
+                    let data = editor.createEntitiesFromJSON(parsedData);
+                    editor.entities = data.entities || [] // Insert the received data into editor.entities
+                    editor.diagrams = data.diagrams || [];
+                    editor.refreshEntities();
+                    editor.prepareDiagram();
+                    
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
                 }
@@ -573,8 +742,6 @@ function fetchConfigFromServer(applicationId, databaseType, databaseName, databa
     // Send the GET request to the server
     xhr.send();
 }
-
-
 
 /**
  * Builds the URL for the GET request by appending query parameters.

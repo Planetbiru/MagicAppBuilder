@@ -21,8 +21,6 @@ require_once __DIR__ . "/database.php";
 $inputGet = new InputGet();
 
 
-
-
 $data = new PicoUserFormFilterList();
 
 
@@ -80,6 +78,15 @@ $data->addFilter(
     )
 );
 
+$data->addElement([
+    'tag' => 'button',
+    'textNode'=>'Search',
+    'attribute' => [
+        'type' => 'button',
+        'id'=>'search',
+        'class' => 'btn btn-primary'
+    ]
+]);
 
 $appModule = new AppModule();
 $appModule->setModuleId("123");
@@ -87,6 +94,7 @@ $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "umk", "
 $userPermission = new AppUserPermission(null, null, null, null, null);
 
 $section = "filter-list";
+header("Content-type: application/json");
 echo PicoResponseBody::getInstance()
     ->setModule($currentModule, $section)
     ->setPermission($userPermission)

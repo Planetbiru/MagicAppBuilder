@@ -25,32 +25,92 @@ body {
   width: 100%;
   position: relative;
 }
-.entity-editor .entities-container {
-  margin: 0;
-  height: calc(100vh - 410px);
-  min-height: 200px;
-  overflow: auto;
-}
 .entity-editor .container {
   display: flex;
   width: 100%;
   overflow: hidden;
+  height: calc(100vh - 410px);
 }
-.entity-editor .left-panel,
-.entity-editor .right-panel {
-  overflow: auto;
+.entity-editor .panel-title {
+  height: 40px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.entity-editor .left-panel {
+  display: flex;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
   padding: 10px;
   border: 1px solid #ccc;
+  width: calc(70% - 5px);
+  background-color: #fbfbfb;
+}
+.entity-editor .left-panel input[type=checkbox] {
+  vertical-align: text-top;
+}
+.entity-editor .left-panel .object-container {
+  width: 224px;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-right: 10px;
+  position: relative;
+}
+.entity-editor .left-panel .object-container .table-list {
+  list-style-type: none;
+  padding: 0;
+  overflow: auto;
+  padding-bottom: 2.2rem;
+  margin: 5px 0 0px 0;
+  height: calc(100vh - 450px);
+}
+.entity-editor .left-panel .object-container .table-list li {
+  padding: 0 1rem 0 0;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+.entity-editor .left-panel .object-container .table-list li a {
+  font-size: 0.6rem;
+}
+.entity-editor .left-panel .entities-container {
+  margin: 0;
+  min-height: 200px;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+}
+.entity-editor .left-panel .entities-container .diagram-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.entity-editor .left-panel .entities-container .diagram-container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+.entity-editor .left-panel .entities-container .diagram {
+  margin: 5px 0 0px 0;
+  height: calc(100vh - 450px);
+  overflow: auto;
+  display: none;
+}
+.entity-editor .left-panel .entities-container .diagram.active {
+  display: block;
 }
 .entity-editor .resize-bar {
   width: 10px;
   cursor: ew-resize;
 }
-.entity-editor .left-panel {
-  width: calc(70% - 5px);
-  background-color: #fbfbfb;
-}
 .entity-editor .right-panel {
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
   width: calc(30% - 5px);
   background-color: #fbfbfb;
 }
@@ -260,7 +320,7 @@ body {
 .entity-editor .entity .entity-footer button {
   margin-bottom: 0;
 }
-.entity-editor .table-list {
+.entity-editor .table-list-for-export {
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -268,12 +328,12 @@ body {
   height: 80px;
   overflow: auto;
 }
-.entity-editor .table-list li {
+.entity-editor .table-list-for-export li {
   padding: 0;
   margin: 0;
   line-height: 1.5;
 }
-.entity-editor .table-list li label {
+.entity-editor .table-list-for-export li label {
   padding: 0;
 }
 
@@ -285,12 +345,24 @@ body {
   content: "✏️";
 }
 
+.icon-ok::before {
+  content: "✅";
+}
+
 .icon-move-up::before {
   content: "⬆️";
 }
 
 .icon-move-down::before {
   content: "⬇️";
+}
+
+.icon-move-left::before {
+  content: "⬅️";
+}
+
+.icon-move-right::before {
+  content: "➡️";
 }
 
 label {

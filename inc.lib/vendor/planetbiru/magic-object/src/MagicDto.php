@@ -797,7 +797,6 @@ class MagicDto extends stdClass // NOSONAR
         return json_decode((string) $this, true);
     }
 
-
     /**
      * Convert the object's properties to XML format.
      *

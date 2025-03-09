@@ -21,6 +21,13 @@ class PicoUserFormFilterList extends PicoObjectToString
      * @var InputFieldFilter[]
      */
     protected $filters;
+
+    /**
+     * Undocumented variable
+     *
+     * @var array
+     */
+    protected $elements;
     
     /**
      * Constructor for initializing the filter list.
@@ -44,9 +51,23 @@ class PicoUserFormFilterList extends PicoObjectToString
      * This method allows for adding an `InputFieldFilter` object to the list of filters.
      *
      * @param InputFieldFilter $filter The filter to be added to the list.
+     * @return self
      */
     public function addFilter($filter)
     {
         $this->filters[] = $filter;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $element
+     * @return self
+     */
+    public function addElement($element)
+    {
+        $this->elements[] = $element;
+        return $this;
     }
 }

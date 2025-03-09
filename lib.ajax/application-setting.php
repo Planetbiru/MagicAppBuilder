@@ -86,12 +86,15 @@ $nameInIndonesian = array(
     "admin_create" => "admin_buat",
     "admin_edit" => "admin_ubah",
     "admin_ask_edit" => "admin_minta_ubah",
+    "admin_delete" => "admin_hapus",
     "time_create" => "waktu_buat",
     "time_edit" => "waktu_ubah",
     "time_ask_edit" => "waktu_minta_ubah",
+    "time_delete" => "waktu_delete",
     "ip_create" => "ip_buat",
     "ip_edit" => "ip_ubah",
     "ip_ask_edit" => "ip_minta_ubah",
+    "ip_delete" => "ip_hapus",
     "approval_id" => "approval_id",
     "approval_note" => "approval_note",
     "approval_status" => "approval_status"
@@ -171,7 +174,7 @@ $nameInIndonesian = array(
                                     <tfoot>
                                         <tr>
                                         <td colspan="4">
-                                        <button type="button" class="btn btn-primary add-path">Add</button>
+                                        <button type="button" class="btn btn-primary add-path"><i class="fa-regular fa-plus"></i> Add</button>
                                         </td>
                                         </tr>
                                     </tfoot>
@@ -250,8 +253,8 @@ $nameInIndonesian = array(
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button class="btn btn-primary" type="button" id="test-database-connection">Test Connection</button>
-                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;">Create Database</button>
+                                    <button class="btn btn-primary" type="button" id="test-database-connection"><i class="fa-solid fa-right-left"></i> Test Connection</button>
+                                    <button class="btn btn-success" type="button" id="create-database" style="display: none;"><i class="fas fa-database"></i> Create Database</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -333,8 +336,8 @@ $nameInIndonesian = array(
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button class="btn btn-primary use-indonesian" type="button">Use Indonesian</button>
-                                    <button class="btn btn-primary use-original" type="button">Use Original</button>
+                                    <button class="btn btn-primary use-indonesian" type="button"><i class="fas fa-check"></i> Use Indonesian</button>
+                                    <button class="btn btn-primary use-original" type="button"><i class="fas fa-check"></i> Use Original</button>
                                 </td>
                             </tr>
                         </tbody>

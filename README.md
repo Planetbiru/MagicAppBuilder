@@ -147,12 +147,15 @@ The following is an example of column mapping into Indonesian.
 | admin_create    | admin_buat       |
 | admin_edit      | admin_ubah       |
 | admin_ask_edit  | admin_minta_ubah |
+| admin_delete    | admin_hapus      |
 | time_create     | waktu_buat       |
 | time_edit       | waktu_ubah       |
 | time_ask_edit   | waktu_minta_ubah |
+| time_delete     | waktu_delete |
 | ip_create       | ip_buat          |
 | ip_edit         | ip_ubah          |
 | ip_ask_edit     | ip_minta_ubah    |
+| ip_delete       | ip_delete        |
 | approval_id     | approval_id      |
 | approval_note   | approval_note    |
 | approval_status | approval_status  |
@@ -161,25 +164,28 @@ Developers for applications that use Indonesian as the native language of the ap
 
 Here is an explanation of the reserved columns above.
 
-| Original Key    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name            | A column that will represent a single row as a whole in an entity.                                                                                                                                                                                                                                                                                                                                                                                                      |
-| sort_order      | Columns for sorting data. For example, reference data such as song genres need to be sorted based on the number of genres produced by a studio. Another example is the type of application user that needs to be sorted based on authority in the application. The user type that has higher authority can be placed at the top so that when the user will set the role of the user, the user is already aware of which user type has the highest and lowest authority. |
-| active          | Columns to activate and deactivate data                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| draft           | Column that marks that the data is new data that has not yet received approval.                                                                                                                                                                                                                                                                                                                                                                                         |
-| waiting_for     | Column that specifies what approvals are required by a row.                                                                                                                                                                                                                                                                                                                                                                                                             |
-| admin_create    | Column for user ID who created the data first                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| admin_edit      | Column for user ID who last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| admin_ask_edit  | Column for user ID who requested the data change                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| time_create     | Column for time when created the data first                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| time_edit       | Column for time when last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| time_ask_edit   | Column for time requested the data change                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ip_create       | Column for IP Address from where created the data first                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ip_edit         | Column for IP Address from where last changed the data                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ip_ask_edit     | Column for IP Address from where requested the data change                                                                                                                                                                                                                                                                                                                                                                                                              |
-| approval_id     | Column for ID of the data in the approval table                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| approval_note   | Column for approval note                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| approval_status | Column for approval status                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Original Key    | Description                                                 |
+| --------------- | ----------------------------------------------------------- |
+| name            | A column that will represent a single row as a whole in an entity. |
+| sort_order      | Column used for sorting data. For example, reference data such as song genres may be sorted based on the number of genres produced by a studio. Another example is sorting application user types based on authority level, ensuring that higher-authority users appear at the top when assigning roles. |
+| active          | Column that marks that the data is active or inactive       |
+| draft           | Column that marks that the data is new data that has not yet received approval. |
+| waiting_for     | Column that specifies what approvals are required by a row. |
+| admin_create    | Column for user ID who created the data first.              |
+| admin_edit      | Column for user ID who last changed the data.               |
+| admin_ask_edit  | Column for user ID who requested the data change.           |
+| admin_delete    | Column for the user ID of the person who deleted the data.  |
+| time_create     | Column for time when created the data first.                |
+| time_edit       | Column for time when last changed the data.                 |
+| time_ask_edit   | Column for time requested the data change.                  |
+| time_delete     | Column for the timestamp when the data was deleted.         |
+| ip_create       | Column for IP Address from where created the data first.    |
+| ip_edit         | Column for IP Address from where last changed the data.     |
+| ip_ask_edit     | Column for IP Address from where requested the data change. |
+| ip_delete       | Column for the IP address from where the data was deleted.  |
+| approval_id     | Column for ID of the data in the approval table.            |
+| approval_note   | Column for approval note.                                   |
+| approval_status | Column for approval status.                                 |
 
 
 ## Offline Usage Guide

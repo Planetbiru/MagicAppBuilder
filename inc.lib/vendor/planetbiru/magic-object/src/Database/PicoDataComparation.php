@@ -22,13 +22,13 @@ class PicoDataComparation // NOSONAR
 {
     const EQUALS                 = "=";
     const NOT_EQUALS             = "!=";
-    const IN                     = "in";
-    const BETWEEN                = "between";
-    const NOT_IN                 = "not in";
-    const IS                     = "is";
-    const IS_NOT                 = "is not";
-    const LIKE                   = "like";
-    const NOT_LIKE               = "not like";
+    const IN                     = "IN";
+    const BETWEEN                = "BETWEEN";
+    const NOT_IN                 = "NOT IN";
+    const IS                     = "IS";
+    const IS_NOT                 = "IS NOT";
+    const LIKE                   = "LIKE ";
+    const NOT_LIKE               = "NOT LIKE";
     const LESS_THAN              = "<";
     const GREATER_THAN           = ">";
     const LESS_THAN_OR_EQUALS    = "<=";

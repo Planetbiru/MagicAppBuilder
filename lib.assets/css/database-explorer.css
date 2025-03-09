@@ -601,4 +601,102 @@ a.all-table {
 
 .entity-name {
   width: 200px;
+}
+
+.tabs-container {
+  margin: auto;
+}
+
+.tabs-link-container {
+  position: relative;
+  width: calc(100% - 100px);
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.tabs {
+  display: flex;
+  white-space: nowrap;
+  padding: 0;
+  list-style: none;
+}
+.tabs li {
+  display: inline-block;
+  margin-right: 4px;
+  border: solid #EEEEEE;
+  border-width: 1px 1px 0 1px;
+  white-space: nowrap;
+  padding-right: 6px;
+  background-color: #EEEEEE;
+}
+.tabs li.active {
+  background-color: #FFFFFF;
+}
+.tabs li:last-child {
+  padding-right: 0px;
+}
+
+.tab-link {
+  display: inline-block;
+  padding: 6px 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #555;
+  transition: 0.3s;
+}
+.tab-link:hover, .tab-link.active {
+  color: #007bff;
+}
+
+.tab-content-container {
+  padding: 15px;
+  border-top: none;
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.diagram-list.tabs li input[type=text], .diagram-list.tabs li a.update-diagram {
+  display: none;
+}
+.diagram-list.tabs li[data-edit-mode=true] a.tab-link {
+  display: none;
+}
+.diagram-list.tabs li[data-edit-mode=true] a.update-diagram {
+  display: inline-block;
+}
+.diagram-list.tabs li[data-edit-mode=true] a.edit-diagram {
+  display: none;
+}
+.diagram-list.tabs li[data-edit-mode=true] input[type=text] {
+  display: inline-block;
+  height: 20px;
+  border: none;
+  width: 100px;
+  margin-top: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  background-color: transparent;
+}
+.diagram-list.tabs li[data-edit-mode=true] input[type=text]:focus-visible {
+  outline: none;
+}
+
+.tab-mover {
+  float: right;
+}
+.tab-mover li {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+.diagram-container .diagram {
+  display: none;
+}
+.diagram-container .diagram.active {
+  display: block;
 }/*# sourceMappingURL=database-explorer.css.map */

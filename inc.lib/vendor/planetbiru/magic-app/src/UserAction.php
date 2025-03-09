@@ -71,6 +71,8 @@ class UserAction
             $approvalMessage = $appLanguage->getMessageWaitingForDeactivate();
         } elseif ($waitingFor == WaitingFor::DELETE) {
             $approvalMessage = $appLanguage->getMessageWaitingForDelete();
+        } elseif ($waitingFor == WaitingFor::SORT_ORDER) {
+            $approvalMessage = $appLanguage->getMessageWaitingForSortOrder();
         }
         return $approvalMessage;
     }

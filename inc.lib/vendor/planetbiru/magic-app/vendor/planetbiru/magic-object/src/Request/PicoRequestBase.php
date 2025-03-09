@@ -821,4 +821,56 @@ class PicoRequestBase extends stdClass // NOSONAR
         }
         return json_encode($obj->value($this->isSnake()), $jsonFlag);
     }
+    
+    /**
+     * Forces conversion of string "true"/"false"/"null" to actual boolean/null values in the provided array.
+     *
+     * This method uses the `convertBooleanAndNull` function to modify the input array by converting
+     * string representations of boolean and null values to their actual boolean and null equivalents.
+     * After conversion, it returns the modified array.
+     *
+     * @param array $input The input array that will be modified in-place. This array can have nested
+     *                     structures that will also be processed by the `convertBooleanAndNull` function.
+     * 
+     * @return array The modified input array with the "true", "false", and "null" strings converted
+     *               to their actual boolean and null types.
+     */
+    public function forceBoolAndNull($input)
+    {
+        self::convertBooleanAndNull($input);
+        return $input;
+    }
+
+    /**
+     * Recursively converts string "true"/"false"/"null" to actual boolean/null values in the given array.
+     *
+     * This function processes each element in the array, and if the value is a string representing
+     * "true", "false", or "null", it will convert these strings to their corresponding boolean or null
+     * values. If a nested array is encountered, the function will call itself recursively to process
+     * the nested array.
+     *
+     * @param array &$array The array to be modified. It is passed by reference, so the original array
+     *                      will be directly modified.
+     * 
+     * @return void This function does not return any value; it modifies the array in place.
+     */
+    public static function convertBooleanAndNull(&$array)
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                // Recursively process nested arrays
+                self::convertBooleanAndNull($value);
+            } else {
+                // Replace string "true" with boolean true, "false" with boolean false, and "null" with null
+                if ($value === "true") {
+                    $value = true;
+                } elseif ($value === "false") {
+                    $value = false;
+                } elseif ($value === "null") {
+                    $value = null;
+                }
+            }
+        }
+    }
+
 }

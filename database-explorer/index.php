@@ -71,4 +71,8 @@ if (file_exists($appConfigPath)) {
 }
 
 $accessedFrom = "database-explorer";
+
+require_once __DIR__ . "/backend.php";
 require_once __DIR__ . "/database-explorer.php";
+
+

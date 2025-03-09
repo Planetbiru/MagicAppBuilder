@@ -13,3 +13,5 @@ if(file_exists($builderConfigPath))
 }
 $database = new PicoDatabase($builderConfig->getDatabase());
 $database->connect();
+
+$appConfig = new SecretObject();

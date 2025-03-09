@@ -3,12 +3,12 @@
   font-size: 13px;
 }
 
-.h4 {
+h4, .h4 {
   font-size: 1.2rem;
 }
 
-h4 {
-  font-size: 1.2rem;
+.modal-body h4 {
+  margin-top: 1.2rem;
 }
 
 body {
@@ -139,6 +139,9 @@ button {
 }
 .config-table td {
   padding: 3px 0;
+}
+.config-table td .btn {
+  margin-bottom: 0.5rem;
 }
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 200px;
