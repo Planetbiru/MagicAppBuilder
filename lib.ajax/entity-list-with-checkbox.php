@@ -44,7 +44,6 @@ try {
         
         return $div;
     };
-    
 
     $rootDiv->appendChild($createCheckbox('entity-check-controll', 'Select all', $chk));
     $rootDiv->appendChild($createCheckbox('entity-merge', 'Merge queries by table', true));
@@ -70,7 +69,6 @@ try {
         if ($chk) {
             $input->setAttribute('checked', 'checked');
         }
-        
         
         // Add space after checkbox (using span with &nbsp;)
         $span = $dom->createElement('span');
