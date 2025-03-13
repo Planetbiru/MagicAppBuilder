@@ -71,7 +71,7 @@ class PicoLimit
     /**
      * Get the maximum number of records to retrieve.
      *
-     * @return int
+     * @return int The maximum number of records.
      */
     public function getLimit()
     {
@@ -95,7 +95,7 @@ class PicoLimit
     /**
      * Get the current offset for record retrieval.
      *
-     * @return int
+     * @return int The number of records to skip.
      */
     public function getOffset()
     {
@@ -122,7 +122,7 @@ class PicoLimit
      * This method calculates the current page number and returns a 
      * PicoPage object containing the page number and limit.
      *
-     * @return PicoPage
+     * @return PicoPage The current page information.
      */
     public function getPage()
     {

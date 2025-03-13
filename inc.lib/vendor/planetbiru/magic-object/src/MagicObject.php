@@ -1364,7 +1364,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param self|mixed $source The source object or data from which values will be copied. If a non-object is provided, this may result in unexpected behavior.
      * @param array|null $filter An optional array of property names to filter which properties are copied. If null, all properties are copied.
      * @param bool $includeNull Flag indicating whether to include properties with null values. If false, properties with null values will be excluded from the copy.
-     * @return self Returns the current instance for method chaining after copying the values.
+     * @return self Returns the current instance for method chaining.
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
     {

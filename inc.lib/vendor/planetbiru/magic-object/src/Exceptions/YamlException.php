@@ -23,7 +23,7 @@ class YamlException extends Exception
     /**
      * Previous exception in the chain (if any).
      *
-     * @var Throwable|null
+     * @var Throwable|null The previous exception
      */
     private $previous;
 

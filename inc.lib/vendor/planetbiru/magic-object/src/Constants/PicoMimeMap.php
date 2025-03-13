@@ -2293,7 +2293,7 @@ class PicoMimeMap
      * Loock up mime type
      *
      * @param string $extension Extension
-     * @return string
+     * @return string MIME Type
      */
     public function lookupMimeType($extension)
     {
@@ -2304,7 +2304,7 @@ class PicoMimeMap
      * Look up extension
      *
      * @param string $mimetype MIME Type
-     * @return string
+     * @return string Extension
      */
     public function lookupExtension($mimetype)
     {
@@ -2315,7 +2315,7 @@ class PicoMimeMap
      * Look up all extensions
      *
      * @param string $mimetype MIME Type
-     * @return string[]
+     * @return string[] Extensions
      */
     public function lookupAllExtensions($mimetype)
     {

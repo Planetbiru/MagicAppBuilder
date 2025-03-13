@@ -293,6 +293,4 @@ class PicoTableInfoExtended extends PicoTableInfo
         $this->notNullColumns = $tmp;
         return $this;
     }
-
-
 }

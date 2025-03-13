@@ -25,7 +25,7 @@ class CurlException extends Exception
     /**
      * Previous exception
      *
-     * @var Throwable|null
+     * @var Throwable|null The previous exception
      */
     private $previous;
 
@@ -45,7 +45,7 @@ class CurlException extends Exception
     /**
      * Get the previous exception.
      *
-     * @return Throwable|null
+     * @return Throwable|null The previous exception
      */
     public function getPreviousException()
     {

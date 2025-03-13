@@ -208,7 +208,7 @@ class PicoEntityLanguage
      * @param PicoGenericObject $parameters Parameters associated with the property.
      * @param string $annotation Annotation name to search for.
      * @param string $attribute Attribute name to retrieve.
-     * @return mixed|null
+     * @return mixed|null The content of the annotation if found, otherwise null.
      */
     private function annotationContent($reflexProp, $parameters, $annotation, $attribute)
     {

@@ -129,10 +129,19 @@ class PicoSort
     /**
      * Get an instance of PicoSort.
      *
+     * This method provides a convenient way to create a new instance of the PicoSort class.
+     * If both the sorting field and sorting type are provided, they are used to initialize
+     * the new instance. Otherwise, a default instance is created.
+     *
+     * @param string|null $sortBy The field to sort by.
+     * @param string|null $sortType The type of sorting (asc or desc).
      * @return self A new instance of PicoSort.
      */
-    public static function getInstance()
+    public static function getInstance($sortBy = null, $sortType = null)
     {
+        if(isset($sortBy) && isset($sortType)) {
+            return new self($sortBy, $sortType);
+        }
         return new self;
     }
 

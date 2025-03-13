@@ -31,6 +31,13 @@ class MainMenu extends BasicMenu
     private $menu = array();
 
     /**
+     * Module
+     *
+     * @var array
+     */
+    private $module = array();
+
+    /**
      * Column name for menu group
      *
      * @var string
@@ -59,8 +66,10 @@ class MainMenu extends BasicMenu
         $this->columnName = $columnName;
         $this->joinColumnName = $joinColumnName;
         $this->menu = array();
+        $this->module = array();
         
         foreach ($menu as $menuItem) {
+            $this->module[$menuItem->getModuleCode()] = $menuItem->getName();
             $menuGroupId = $menuItem->get($columnName);
             if (!isset($this->menu[$menuGroupId])) {
                 $this->menu[$menuGroupId] = array();
@@ -81,5 +90,15 @@ class MainMenu extends BasicMenu
     public function getMenu()
     {
         return $this->menu;
+    }
+
+    /**
+     * Get module
+     *
+     * @return  array
+     */ 
+    public function getModule()
+    {
+        return $this->module;
     }
 }

@@ -20,7 +20,7 @@ class InvalidReturnTypeException extends Exception
     /**
      * Previous exception
      *
-     * @var Throwable|null
+     * @var Throwable|null The previous exception
      */
     private $previous;
 

@@ -2,6 +2,8 @@
 
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
@@ -731,18 +733,22 @@ try
 	//echo $r;
 	$database->setCallbackDebugQuery(function($sql)
 	{
-		echo $sql;
+		echo $sql."\r\n";
 	});
 	
 
 	$specs = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->between('name', "Album 2", 'Album 4'));
+
+	$sorts1 = PicoSortable::getInstance()->add(['name', PicoSort::ORDER_TYPE_DESC]);
+
+	//echo $sorts1;
 	
-	$result = $album->findAll($specs, null, null, true, $subqueryMap);
+	$result = $album->findAll($specs, null, $sorts1, true, $subqueryMap);
 	
 	foreach($result->getResult() as $row)
 	{
-		echo $row;
+		//echo $row;
 	}
 
 	
