@@ -327,7 +327,15 @@ let initAll = function () {
     e.preventDefault();
     let tableName = $('[name="source_table"]').val();
     let selector = $("table.main-table tbody");
-    loadColumn(tableName, selector);
+    if(tableName == '')
+    {
+      $('[name="source_table"]').focus();
+    }
+    else
+    {
+      loadColumn(tableName, selector);
+    }
+    
   });
 
   $(document).on("change", 'select[name="source_table"]', function (e) {
@@ -1388,24 +1396,17 @@ let initAll = function () {
     let updateBtn = $('#modal-application-menu .button-save-menu');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    let modal = $('#modal-application-menu');
-    modal.find('.modal-body').empty();
-    modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
-    modal.attr('data-application-id', applicationId);
-    modal.modal('show');
-    increaseAjaxPending();
-    $.ajax({
-      type: 'GET',
-      url: 'lib.ajax/application-menu.php',
-      data: { applicationId: applicationId },
-      dataType: 'html',
-      success: function (data) {
-        decreaseAjaxPending();
-        $('#modal-application-menu .modal-body').empty().append(data);
-        updateBtn[0].disabled = false;
-        initMenu();
-      }
-    });
+
+    showApplicationMenuDialog(applicationId);
+
+  });
+
+  $(document).on('click', '.button-manage-application-menu', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-menu .button-save-menu');
+    updateBtn[0].disabled = true;
+    let applicationId = $('meta[name="application-id"]').attr('content');
+    showApplicationMenuDialog(applicationId);
   });
 
   $(document).on('click', '#modal-application-menu .button-save-menu', function (e) {
@@ -1913,6 +1914,31 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Shows the application menu dialog for the specified application ID.
+ * @param {string} applicationId - The unique identifier for the application.
+ */
+function showApplicationMenuDialog(applicationId) {
+  let modal = $('#modal-application-menu');
+    modal.find('.modal-body').empty();
+    modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+    modal.attr('data-application-id', applicationId);
+    modal.modal('show');
+    increaseAjaxPending();
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-menu.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        $('#modal-application-menu .modal-body').empty().append(data);
+        updateBtn[0].disabled = false;
+        initMenu();
+      }
+    });
+}
 
 function loadReferenceResource()
 {

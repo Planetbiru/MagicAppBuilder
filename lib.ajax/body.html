@@ -82,13 +82,13 @@
                   <tbody>
                     <tr>
                       <td>Table</td>
-                      <td><select class="form-control" name="source_table"></select>
+                      <td><select class="form-control" name="source_table" required></select>
                       </td>
                     </tr>
                     <tr>
                       <td>&nbsp;</td>
                       <td>
-                        <button class="btn btn-primary" type="button" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
+                        <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
                       </td>
                     </tr>
                     <tr>
@@ -139,8 +139,8 @@
                     <tr>
                       <td>&nbsp;</td>
                       <td>
-                        <button class="btn btn-primary" type="button" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
-                        <button class="btn btn-primary" type="button" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
+                        <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
+                        <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
                       </td>
                     </tr>
                     <tr>
@@ -185,6 +185,13 @@
                       <td>Append To</td>
                       <td><select class="form-control" name="module_menu"></select></td>
                     </tr>
+                    <tr>
+                      <td></td>
+                      <td>
+                        <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> Reload Menu</button>
+                        <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> Manage Manage</button>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
 
@@ -192,7 +199,7 @@
                   <tbody>
                     <tr>
                       <td></td>
-                      <td><button class="btn btn-success" type="button" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
+                      <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -249,7 +256,7 @@
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
                   <i class="fa-solid fa-list-check"></i> Module Features
               </button>
-              <button class="btn btn-success" type="button" name="generate_script" id="generate_script" value="Generate Module">
+              <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
                   <i class="fa-solid fa-code"></i> Generate Module
               </button> &nbsp;
 
@@ -451,8 +458,8 @@
               <div class="column-body">
                 <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="button-area">
-                  <button class="btn btn-success" id="button_save_module_file" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
-                  <button class="btn btn-danger" id="button_delete_module_file" type="button" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
+                  <button type="button" class="btn btn-success" id="button_save_module_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
+                  <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
                 </div>
               </div>
             </div>
@@ -478,9 +485,9 @@
               <div class="column-body">
                 <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="button-area">
-                  <button class="btn btn-success" id="button_save_entity_file" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
-                  <button class="btn btn-success" id="button_save_entity_file_as" type="button"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
-                  <button class="btn btn-danger" id="button_delete_entity_file" type="button" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
+                  <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
                 </div>
               </div>
             </div>
@@ -542,9 +549,9 @@
               <div class="column-body">
                 <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="button-area">
-                  <button class="btn btn-success" id="button_save_entity_query" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
-                  <button class="btn btn-primary" id="button_execute_entity_query" type="button"><i class="fa-solid fa-play"></i>  Execute Query</button>
-                  <button class="btn btn-primary" id="button_explore_database" type="button"><i class="fa-solid fa-database"></i> Explore Database</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_query" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
+                  <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  Execute Query</button>
+                  <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> Explore Database</button>
                 </div>
               </div>
             </div>
@@ -573,8 +580,8 @@
                   <option value="untranslated">Untranslated</option>
                   <option value="all">All</option>
                 </select>
-                <button class="btn btn-primary default-language" type="button"><i class="fa-solid fa-check"></i> Default Language</button>
-                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
               </div>
               <div class="column-body">
                 <div class="row">
@@ -613,8 +620,8 @@
                   <option value="untranslated">Untranslated</option>
                   <option value="all">All</option>
                 </select>
-                <button class="btn btn-primary default-language" type="button"><i class="fa-solid fa-check"></i> Default Language</button>
-                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
               </div>
               <div class="column-body">
                 <div class="row">
@@ -623,7 +630,7 @@
                 </div>
                 <div class="button-area">
                   <input type="hidden" class="module-property-name" value="">
-                  <button class="btn btn-success" id="button-save-module-translation" type="button"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
+                  <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
                 </div>
               </div>
             </div>
