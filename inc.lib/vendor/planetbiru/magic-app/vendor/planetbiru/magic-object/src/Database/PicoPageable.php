@@ -126,7 +126,7 @@ class PicoPageable
     /**
      * Retrieves the sortable information.
      *
-     * @return PicoSortable|null
+     * @return PicoSortable|null The sortable information.
      */
     public function getSortable()
     {
@@ -187,7 +187,7 @@ class PicoPageable
     /**
      * Retrieves the current page information.
      *
-     * @return PicoPage|null
+     * @return PicoPage|null The current page information.
      */
     public function getPage()
     {
@@ -213,7 +213,7 @@ class PicoPageable
     /**
      * Retrieves the offset and limit for database queries.
      *
-     * @return PicoLimit|null
+     * @return PicoLimit|null The offset and limit information.
      */
     public function getOffsetLimit()
     {

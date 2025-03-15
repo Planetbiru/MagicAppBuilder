@@ -347,7 +347,7 @@ class DataTable extends SetterGetter
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
      * @param array $props Array of ReflectionProperty objects representing class properties.
      * @param string $className Name of the class for reflection.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     private function appendByProp($doc, $tbody, $props, $className)
     {
@@ -388,7 +388,7 @@ class DataTable extends SetterGetter
      * @param DOMDocument $doc The DOM document used to create elements.
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
      * @param stdClass $values Data to append as rows.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     private function appendByValues($doc, $tbody, $values)
     {
@@ -424,10 +424,8 @@ class DataTable extends SetterGetter
         if (isset($this->_lableLanguage[$this->_currentLanguage])) {
             $language = $this->_lableLanguage[$this->_currentLanguage];
             $label = $language->get($propertyName);
-        } else {
-            if (isset($this->_labels[$propertyName])) {
-                $label = $this->_labels[$propertyName];
-            }
+        } else if (isset($this->_labels[$propertyName])) {
+            $label = $this->_labels[$propertyName];
         }
         if (empty($label)) {
             $label = PicoStringUtil::camelToTitle($propertyName);
@@ -520,7 +518,7 @@ class DataTable extends SetterGetter
     /**
      * Gets table information.
      *
-     * @return PicoTableInfo
+     * @return PicoTableInfo Table information.
      */
     public function getTableInfo()
     {

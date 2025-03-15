@@ -5,7 +5,11 @@ require_once __DIR__ . "/inc.app/auth-with-form.php";
 
 $workspaceId = isset($activeWorkspace) ? $activeWorkspace->getWorkspaceId() : "";
 $applicationId = isset($activeApplication) ? $activeApplication->getApplicationId() : "";
+$activeApplicationName = isset($activeApplication) ? $activeApplication->getName() : "";
+$builderName = $builderConfig->getApplication()->getName();
+$adminLevelId = isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : "";
 
+$pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " . $builderName : $builderName;
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -17,7 +21,10 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <meta name="workspace-id" content="<?php echo $workspaceId; ?>">
   <meta name="application-id" content="<?php echo $applicationId; ?>">
-  <title><?php echo $builderConfig->getApplication()->getName(); ?></title>
+  <meta name="application-name" content="<?php echo $activeApplicationName; ?>">
+  <meta name="builder-name" content="<?php echo $builderName; ?>">
+  <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>">
+  <title><?php echo $pageTitle; ?></title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
@@ -34,7 +41,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
 
-<body data-admin-level-id="<?php echo isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : ""; ?>">
+<body data-admin-level-id="<?php echo $adminLevelId; ?>">
 </body>
 
 </html>

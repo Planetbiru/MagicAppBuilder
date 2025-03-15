@@ -1,4 +1,5 @@
 <?php
+
 namespace MagicObject\Database;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
@@ -178,5 +179,13 @@ class PicoDatabaseStructure
             }
         }
         return new PicoTableInfo($picoTableName, $columns, [], $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns);
+    }
+
+    /**
+     * Get the associated MagicObject instance.
+     */
+    public function getObject()
+    {
+        return $this->object;
     }
 }

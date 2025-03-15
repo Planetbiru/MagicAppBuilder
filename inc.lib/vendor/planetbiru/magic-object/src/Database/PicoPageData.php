@@ -413,7 +413,7 @@ class PicoPageData // NOSONAR
     /**
      * Get the PDO statement associated with the query.
      *
-     * @return PDOStatement
+     * @return PDOStatement PDO statement.
      * @throws FindOptionException if the statement is null.
      */
     public function getPDOStatement()

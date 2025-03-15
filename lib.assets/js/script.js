@@ -327,7 +327,15 @@ let initAll = function () {
     e.preventDefault();
     let tableName = $('[name="source_table"]').val();
     let selector = $("table.main-table tbody");
-    loadColumn(tableName, selector);
+    if(tableName == '')
+    {
+      $('[name="source_table"]').focus();
+    }
+    else
+    {
+      loadColumn(tableName, selector);
+    }
+    
   });
 
   $(document).on("change", 'select[name="source_table"]', function (e) {
@@ -1388,24 +1396,17 @@ let initAll = function () {
     let updateBtn = $('#modal-application-menu .button-save-menu');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    let modal = $('#modal-application-menu');
-    modal.find('.modal-body').empty();
-    modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
-    modal.attr('data-application-id', applicationId);
-    modal.modal('show');
-    increaseAjaxPending();
-    $.ajax({
-      type: 'GET',
-      url: 'lib.ajax/application-menu.php',
-      data: { applicationId: applicationId },
-      dataType: 'html',
-      success: function (data) {
-        decreaseAjaxPending();
-        $('#modal-application-menu .modal-body').empty().append(data);
-        updateBtn[0].disabled = false;
-        initMenu();
-      }
-    });
+
+    showApplicationMenuDialog(applicationId);
+
+  });
+
+  $(document).on('click', '.button-manage-application-menu', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-menu .button-save-menu');
+    updateBtn[0].disabled = true;
+    let applicationId = $('meta[name="application-id"]').attr('content');
+    showApplicationMenuDialog(applicationId);
   });
 
   $(document).on('click', '#modal-application-menu .button-save-menu', function (e) {
@@ -1904,6 +1905,11 @@ let initAll = function () {
     }
   });
 
+  $(document).on('click', '.button-reload-application-menu', function(e1){
+    e1.preventDefault();
+    loadMenu();
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
@@ -1913,6 +1919,33 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Shows the application menu dialog for the specified application ID.
+ * @param {string} applicationId - The unique identifier for the application.
+ */
+function showApplicationMenuDialog(applicationId) {
+  let modal = $('#modal-application-menu');
+  let updateBtn = $('#modal-application-menu .button-save-menu');
+  modal.find('.modal-body').empty();
+  modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+  modal.attr('data-application-id', applicationId);
+  
+  modal.modal('show');
+  increaseAjaxPending();
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-menu.php',
+    data: { applicationId: applicationId },
+    dataType: 'html',
+    success: function (data) {
+      decreaseAjaxPending();
+      $('#modal-application-menu .modal-body').empty().append(data);
+      updateBtn[0].disabled = false;
+      initMenu();
+    }
+  });
+}
 
 function loadReferenceResource()
 {
@@ -2074,9 +2107,13 @@ function loadApplicationList() {
     success: function (data) {
       decreaseAjaxPending();
       $('.application-card').empty().append(data);
-      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
-      window.localStorage.setItem('application-id', val1);
-      $('meta[name="application-id"]').attr('content', val1);
+      let applicationId = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
+      let applicationName = $('.application-item[data-selected="true"]').attr('data-application-name') || '';
+      window.localStorage.setItem('application-id', applicationId);
+      $('meta[name="application-id"]').attr('content', applicationId);
+      $('meta[name="application-name"]').attr('content', applicationName);
+      let builderName = $('meta[name="builder-name"]').attr('content');
+      document.title = applicationName + " | " + builderName;
     }
   });
 }
@@ -4305,6 +4342,12 @@ function loadTable() {
   });
 }
 
+/**
+ * Load the application menu and populate the module menu select element.
+ * This function sends an AJAX GET request to fetch the application menu data in JSON format.
+ * On success, it populates the select element with the received menu items.
+ * It also handles the increase and decrease of AJAX pending requests.
+ */
 function loadMenu() {
   increaseAjaxPending();
   $.ajax({
@@ -4322,8 +4365,7 @@ function loadMenu() {
         }
       }
     },
-    error: function(er)
-    {
+    error: function(er) {
       decreaseAjaxPending();
     }
   });
@@ -4734,7 +4776,6 @@ function generateSelectFilter(field, args)  //NOSONAR
         <option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>
     </select>
   `);
-
 
   let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";

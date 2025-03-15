@@ -195,7 +195,6 @@ class AppBuilderBase //NOSONAR
         $this->appFeatures = $appFeatures;
         $this->allField = $allField;
         $this->ajaxSupport = $ajaxSupport;
-        
         $this->currentAction = $appConfig->getCurrentAction();
         $this->configBaseDirectory = $appConfig->getConfigBaseDirectory();
         $this->entityInfo = $entityInfo;

@@ -30,13 +30,16 @@ try {
     $dbType = $database->getDatabaseType();
     if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
         $schemaName = $databaseConfig->getDatabaseSchema();
+        // Set schema for PostgreSQL
         $database->query("SET search_path TO $schemaName;");
     }    
     if ($dbType == PicoDatabaseType::DATABASE_TYPE_SQLITE) {
+        // SQLite does not have schema
         $databaseName = "";
     }
 } catch (Exception $e) {
-    echo $e->getMessage();
+    // Database connection error
+    require_once dirname(__DIR__) . "/inc.app/database-error.php";
     exit();
 }
 $accessedFrom = "magic-database";

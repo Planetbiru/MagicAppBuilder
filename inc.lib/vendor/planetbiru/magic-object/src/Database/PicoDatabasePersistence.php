@@ -126,6 +126,7 @@ class PicoDatabasePersistence // NOSONAR
 
     /**
      * Get namespace of class
+     * 
      * @var string
      */
     private $namespaceName = "";
@@ -334,7 +335,7 @@ class PicoDatabasePersistence // NOSONAR
      * Set a flag to include or skip null columns in the operation.
      *
      * @param bool $skip Flag indicating whether to skip null columns
-     * @return self Returns the current instance for method chaining
+     * @return self Returns the current instance for method chaining.
      */
     public function includeNull($skip)
     {
@@ -1032,7 +1033,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param PicoTableInfo $info Table information.
      * @param bool $firstCall Indicates whether this is the first call to the method.
-     * @return self Fluent interface; returns the current instance.
+     * @return self Returns the current instance for method chaining.
      */
     private function addGeneratedValue($info, $firstCall)
     {
@@ -1060,7 +1061,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param string $prop The property name to set the generated value for.
      * @param string $strategy The generation strategy to use (e.g., UUID, IDENTITY).
      * @param bool $firstCall Indicates whether this is the first call to the method.
-     * @return self Fluent interface; returns the current instance.
+     * @return self Returns the current instance for method chaining.
      */
     private function setGeneratedValue($prop, $strategy, $firstCall)
     {
@@ -1634,12 +1635,17 @@ class PicoDatabasePersistence // NOSONAR
      * @param array $arr Array of existing WHERE clauses
      * @param array $masterColumnMaps Master column mappings
      * @param PicoDatabaseQueryBuilder $sqlQuery Query builder instance
-     * @param PicoSpecification $spec Specification to process
+     * @param PicoSpecification|PicoPredicate|array|string $spec Specification to process
      * @param PicoTableInfo $info Table information
      * @return array Updated array of WHERE clauses
      */
     private function addWhere($arr, $masterColumnMaps, $sqlQuery, $spec, $info)
     {
+        if(isset($specs) && is_array($spec) && count($spec) == 2)
+        {
+            // Convert array to specification
+            $spec = PicoPredicate::getInstance()->equals($spec[0], $spec[1]);
+        }
         if($spec instanceof PicoPredicate)
         {
             $masterTable = $info->getTableName();

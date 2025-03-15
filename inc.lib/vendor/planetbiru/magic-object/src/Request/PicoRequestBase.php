@@ -113,7 +113,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      *
      * @param string $propertyName Name of the property to retrieve.
      * @param array|null $params Optional parameters for filtering the value.
-     * @return mixed|null
+     * @return mixed|null The value of the property, or null if the property is not set.
      */
     public function get($propertyName, $params = null)
     {
@@ -146,7 +146,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * Get the values of all properties as an object (optionally in snake_case).
      *
      * @param bool $snakeCase Flag to convert property names to snake_case.
-     * @return stdClass
+     * @return stdClass The object containing property values.
      */
     public function value($snakeCase = false)
     {
@@ -177,7 +177,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      *
      * @param bool $reflectSelf Flag to indicate whether to include only properties of the current class (not inherited).
      * @param bool $asArrayProps Flag to return properties as an array of names.
-     * @return array
+     * @return array An array of property names or a list of ReflectionProperty objects.
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
     {
@@ -216,7 +216,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * @param string $variableName The name of the variable to filter.
      * @param int $filter The filter type to apply (e.g., FILTER_SANITIZE_EMAIL).
      * @param bool $escapeSQL Flag to escape SQL-specific characters.
-     * @return mixed
+     * @return mixed The filtered value.
      */
     public function filterInput($type, $variableName, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL=false) // NOSONAR
     {
@@ -251,7 +251,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * @param bool $escapeSQL Flag to escape SQL-specific characters.
      * @param bool $nullIfEmpty Flag to return null if the value is empty.
      * @param bool $requireScalar Flag to require scalar values.
-     * @return mixed|null
+     * @return mixed|null The filtered value.
      */
     public function filterValue($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false, $requireScalar = false)
     {
@@ -314,7 +314,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * @param int $filter The filter type to apply (e.g., FILTER_SANITIZE_NUMBER_INT).
      * @param bool $escapeSQL Flag to escape SQL-specific characters.
      * @param bool $nullIfEmpty Flag to return null if the value is empty.
-     * @return mixed
+     * @return mixed The filtered value.
      */
     public function filterValueSingle($val, $filter = PicoFilterConstant::FILTER_DEFAULT, $escapeSQL = false, $nullIfEmpty = false) // NOSONAR
     {
@@ -457,7 +457,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * Add escape slashes to a string to protect against SQL injection or special character issues.
      *
      * @param string $input The input string to escape.
-     * @return string
+     * @return string The escaped string.
      */
     public function addslashes($input)
     {
@@ -470,7 +470,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      *
      * @param stdClass|MagicObject $cfg Configuration object containing separators.
      * @param mixed $input The input value to format.
-     * @return float
+     * @return float The formatted numeric value.
      */
     public function _getValue($cfg, $input)
     {

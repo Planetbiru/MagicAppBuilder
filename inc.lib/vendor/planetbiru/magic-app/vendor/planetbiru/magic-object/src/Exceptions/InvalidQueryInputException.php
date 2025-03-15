@@ -31,7 +31,7 @@ class InvalidQueryInputException extends Exception
     /**
      * Previous exception
      *
-     * @var Throwable|null
+     * @var Throwable|null The previous exception
      */
     private $previous;
 
@@ -51,7 +51,7 @@ class InvalidQueryInputException extends Exception
     /**
      * Get the previous exception.
      *
-     * @return Throwable|null
+     * @return Throwable|null The previous exception
      */
     public function getPreviousException()
     {

@@ -70,7 +70,7 @@ class PicoDatabaseEntity
     /**
      * Get default database connection
      *
-     * @return PicoDatabase
+     * @return PicoDatabase Default database connection
      */ 
     public function getDefaultDatabase()
     {
@@ -82,7 +82,7 @@ class PicoDatabaseEntity
      *
      * @param PicoDatabase $defaultDatabase Default database connection
      *
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setDefaultDatabase($defaultDatabase)
     {

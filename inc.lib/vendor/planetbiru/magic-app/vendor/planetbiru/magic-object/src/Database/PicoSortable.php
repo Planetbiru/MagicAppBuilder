@@ -90,7 +90,7 @@ class PicoSortable
      * @param bool $isRawSql Indicates whether the array-based sorting is raw SQL.
      * @return self Returns the current instance for method chaining.
      */
-    public function add($sort, bool $isRawSql = false)
+    public function add($sort, $isRawSql = false)
     {
         return $this->addSortable($sort, $isRawSql);
     }
@@ -110,15 +110,19 @@ class PicoSortable
             } else if (is_array($sort)) {
                 if($isRawSql)
                 {
-                    $sortable = $this->createSortable($sort[0], $sort[1]);
-                    $this->sortable[count($this->sortable)] = $sortable;
+                    // Raw SQL
+                    // No mapping
+                    $this->sortable[count($this->sortable)] = $sort[0] . " " . $sort[1];
                 }
                 else
                 {
-                    $this->sortable[count($this->sortable)] = $sort . " " . $sort[1];
+                    // Convert array to PicoSort
+                    $sortable = $this->createSortable($sort[0], $sort[1]);
+                    $this->sortable[count($this->sortable)] = $sortable;
                 }
                 
             } else if (is_string($sort)) {
+                // No mapping
                 $this->sortable[count($this->sortable)] = $sort;
             }
         }
@@ -130,7 +134,7 @@ class PicoSortable
      *
      * @param string $sortBy The field to sort by.
      * @param string $sortType The type of sorting (ASC or DESC).
-     * @return PicoSort
+     * @return PicoSort A new instance of PicoSort.
      */
     public function createSortable($sortBy, $sortType)
     {
