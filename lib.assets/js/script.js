@@ -2107,9 +2107,13 @@ function loadApplicationList() {
     success: function (data) {
       decreaseAjaxPending();
       $('.application-card').empty().append(data);
-      let val1 = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
-      window.localStorage.setItem('application-id', val1);
-      $('meta[name="application-id"]').attr('content', val1);
+      let applicationId = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
+      let applicationName = $('.application-item[data-selected="true"]').attr('data-application-name') || '';
+      window.localStorage.setItem('application-id', applicationId);
+      $('meta[name="application-id"]').attr('content', applicationId);
+      $('meta[name="application-name"]').attr('content', applicationName);
+      let builderName = $('meta[name="builder-name"]').attr('content');
+      document.title = applicationName + " | " + builderName;
     }
   });
 }
