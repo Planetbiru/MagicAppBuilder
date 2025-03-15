@@ -1905,6 +1905,11 @@ let initAll = function () {
     }
   });
 
+  $(document).on('click', '.button-reload-application-menu', function(e1){
+    e1.preventDefault();
+    loadMenu();
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
@@ -1921,23 +1926,25 @@ let initAll = function () {
  */
 function showApplicationMenuDialog(applicationId) {
   let modal = $('#modal-application-menu');
-    modal.find('.modal-body').empty();
-    modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
-    modal.attr('data-application-id', applicationId);
-    modal.modal('show');
-    increaseAjaxPending();
-    $.ajax({
-      type: 'GET',
-      url: 'lib.ajax/application-menu.php',
-      data: { applicationId: applicationId },
-      dataType: 'html',
-      success: function (data) {
-        decreaseAjaxPending();
-        $('#modal-application-menu .modal-body').empty().append(data);
-        updateBtn[0].disabled = false;
-        initMenu();
-      }
-    });
+  let updateBtn = $('#modal-application-menu .button-save-menu');
+  modal.find('.modal-body').empty();
+  modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
+  modal.attr('data-application-id', applicationId);
+  
+  modal.modal('show');
+  increaseAjaxPending();
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/application-menu.php',
+    data: { applicationId: applicationId },
+    dataType: 'html',
+    success: function (data) {
+      decreaseAjaxPending();
+      $('#modal-application-menu .modal-body').empty().append(data);
+      updateBtn[0].disabled = false;
+      initMenu();
+    }
+  });
 }
 
 function loadReferenceResource()
