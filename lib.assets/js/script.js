@@ -4342,6 +4342,12 @@ function loadTable() {
   });
 }
 
+/**
+ * Load the application menu and populate the module menu select element.
+ * This function sends an AJAX GET request to fetch the application menu data in JSON format.
+ * On success, it populates the select element with the received menu items.
+ * It also handles the increase and decrease of AJAX pending requests.
+ */
 function loadMenu() {
   increaseAjaxPending();
   $.ajax({
@@ -4359,8 +4365,7 @@ function loadMenu() {
         }
       }
     },
-    error: function(er)
-    {
+    error: function(er) {
       decreaseAjaxPending();
     }
   });
@@ -4771,7 +4776,6 @@ function generateSelectFilter(field, args)  //NOSONAR
         <option value="FILTER_SANITIZE_PASSWORD">PASSWORD</option>
     </select>
   `);
-
 
   let i, j, k;
   let filterType = "FILTER_SANITIZE_SPECIAL_CHARS";
