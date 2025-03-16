@@ -32,7 +32,7 @@ class PicoInputFieldFilter extends PicoInputFieldInsert
      * @param string|null $optionSource Optional source for options (e.g., for a select dropdown).
      * @param InputFieldOption[]|null $map Optional array of available options for the input field.
      * @param string|null $pattern Optional regular expression pattern for validation.
-     * @param PicoInputFieldValue $currentValue
+     * @param PicoInputFieldValue $currentValue Current value
      */
     public function __construct(
         $inputField,

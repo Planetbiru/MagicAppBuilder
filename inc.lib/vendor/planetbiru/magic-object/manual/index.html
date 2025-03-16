@@ -9128,10 +9128,10 @@ print_r($native11);
 // For the MagicObject return type, users can utilize the features of the MagicObject except for 
 // interacting with the database again because native queries are designed for a different purpose.
 
-echo "Alamat: " . $native8-&gt;getTelepon() . "\r\n";
-echo "Alamat: " . $native9[0]-&gt;getTelepon() . "\r\n";
-echo "Alamat: " . $native10-&gt;getTelepon() . "\r\n";
-echo "Alamat: " . $native11[0]-&gt;getTelepon() . "\r\n";
+echo "Phone: " . $native8-&gt;getTelepon() . "\r\n";
+echo "Phone: " . $native9[0]-&gt;getTelepon() . "\r\n";
+echo "Phone: " . $native10-&gt;getTelepon() . "\r\n";
+echo "Phone: " . $native11[0]-&gt;getTelepon() . "\r\n";
 
 $sortable = new PicoSortable();
 $sortable-&gt;addSortable(new PicoSort("nama", PicoSort::ORDER_TYPE_ASC));
@@ -9390,7 +9390,7 @@ while($row = $stmt-&gt;fetch(PDO::FETCH_ASSOC))
 }
 fclose($fp);</code></pre>
 <h3>Dynamic Query Template for Native Query</h3>
-<p>MagicObject version 2.11 introduces a new feature for native queries called the dynamic query template, which allows users to dynamically pass a query template to the native query method.</p>
+<p>MagicObject version <strong>2.11</strong> introduces a new feature for native queries called the <strong>dynamic query template</strong>, allowing users to dynamically pass a query template to the native query method.</p>
 <p><strong>Example 4</strong></p>
 <pre><code class="language-php">&lt;?php
 
@@ -9479,6 +9479,99 @@ $builder = "SELECT supervisor.* FROM supervisor WHERE supervisor.aktif = :aktif"
 $template = new PicoDatabaseQueryTemplate($builder);
 $result = $explort-&gt;exportActive($aktif, $pageable, $sortable, $template);</code></pre>
 <p>In the example above, the <code>PicoDatabaseQueryTemplate</code> object is initialized using a string.</p>
+<h3>Query Trimming for Native Query</h3>
+<p>MagicObject <strong>3.7</strong> introduces a new feature that allows users to <strong>trim left spaces and asterisks</strong> (<code>*</code>) from multiline SQL queries written in <strong>docblock annotations</strong>. This feature enhances <strong>readability</strong> and <strong>ensures better formatting</strong> of queries extracted from docblocks.</p>
+<h4>Feature Overview</h4>
+<ul>
+<li>
+<p><strong>Automatic Query Trimming:</strong> Removes leading <code>*</code> and spaces from SQL queries in docblocks.</p>
+</li>
+<li>
+<p><strong>Improved Readability:</strong> Prevents unwanted indentation when parsing queries.</p>
+</li>
+<li>
+<p><strong>Easy Activation:</strong> Just add <code>trim=true</code> in the <code>@query</code> annotation.</p>
+</li>
+</ul>
+<h4>Before MagicObject 3.7 (Without Trim)</h4>
+<p>When defining queries in docblocks, the indentation and leading <code>*</code> may cause unnecessary formatting issues:</p>
+<pre><code>&lt;?php
+
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @return PDOStatement The result of the executed query.
+     * @query("
+           SELECT supervisor.*
+           FROM supervisor
+           WHERE supervisor.aktif = :aktif
+      ")
+    */
+    public function exportActive($aktif, $pageable, $sortable)
+    {
+        return $this-&gt;executeNativeQuery();
+    }
+}</code></pre>
+<h4>After MagicObject 3.7 (With Trim Enabled)</h4>
+<p>With the <code>trim=true</code> option, MagicObject <strong>automatically removes leading</strong> <code>*</code> <strong>and spaces</strong>, keeping the query <strong>clean and properly formatted</strong>:</p>
+<pre><code>&lt;?php
+
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @return PDOStatement The result of the executed query.
+     * @query("
+     *      SELECT supervisor.*
+     *      FROM supervisor
+     *      WHERE supervisor.aktif = :aktif
+     * ", trim=true)
+    */
+    public function exportActive($aktif, $pageable, $sortable)
+    {
+        return $this-&gt;executeNativeQuery();
+    }
+}</code></pre>
+<h4>Configuration &amp; Parameters</h4>
+<p>The <code>trim</code> attribute is added inside the <code>@query</code> annotation:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Allowed Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trim</code></td>
+<td><code>true</code> or <code>false</code></td>
+<td>Removes leading <code>*</code> and spaces from multiline queries in docblocks. Default value is <code>true</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4>Notes &amp; Limitations</h4>
+<ul>
+<li><code>trim=true</code> <strong>does not modify the SQL syntax</strong> itself, meaning <code>SELECT * FROM table</code> remains unchanged.</li>
+<li>This feature only affects how queries are <strong>extracted</strong> from docblocks, improving clarity without changing functionality.</li>
+</ul>
 <h3>Best Practices</h3>
 <ol>
 <li><strong>Utilize Prepared Statements</strong>: Always prefer using prepared statements for security against SQL injection.</li>

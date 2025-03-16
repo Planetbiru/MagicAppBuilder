@@ -53,7 +53,7 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param XLSXWriter $writer XLSX writer instance
      * @param PicoPageData $pageData Page data to write
      * @param string $sheetName Name of the sheet
-     * @return XLSXWriter
+     * @return XLSXWriter XLSX writer instance
      */
     private function writeDataWithoutFormat($writer, $pageData, $sheetName)
     {
@@ -86,7 +86,7 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param XLSXWriter $writer XLSX writer instance
      * @param string $sheetName Name of the sheet
      * @param array $keys Data keys for the header
-     * @return XLSXWriter
+     * @return XLSXWriter XLSX writer instance
      */
     private function writeHeader($writer, $sheetName, $keys)
     {
@@ -104,7 +104,7 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param string $sheetName Name of the sheet
      * @param array $keys Data keys
      * @param MagicObject $row Data row to write
-     * @return XLSXWriter
+     * @return XLSXWriter XLSX writer instance
      */
     private function writeData($writer, $sheetName, $keys, $row)
     {
@@ -124,7 +124,7 @@ class XLSXDocumentWriter extends DocumentWriter
      * @param string $sheetName Name of the sheet
      * @param array $headerFormat Data format for the header
      * @param callable $writerFunction Function to format data
-     * @return XLSXWriter
+     * @return XLSXWriter XLSX writer instance
      */
     private function writeDataWithFormat($writer, $pageData, $sheetName, $headerFormat, $writerFunction)
     {

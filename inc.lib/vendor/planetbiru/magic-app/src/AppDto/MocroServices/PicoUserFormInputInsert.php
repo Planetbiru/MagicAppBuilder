@@ -40,7 +40,7 @@ class PicoUserFormInputInsert extends PicoEntityData
     /**
      * Get primary key
      *
-     * @return  string[]
+     * @return  string[] Primary key
      */ 
     public function getPrimaryKey()
     {

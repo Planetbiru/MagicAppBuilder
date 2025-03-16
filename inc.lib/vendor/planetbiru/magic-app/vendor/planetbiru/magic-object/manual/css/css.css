@@ -133,9 +133,9 @@ pre {
     background-color: #F4F4F4;
     width: 100%;
     padding: 16px 16px;
+    overflow: auto;
     overflow-x: hidden;
     box-sizing: border-box;
-    overflow: auto;
 }
 
 code {
@@ -167,4 +167,15 @@ pre .string {
 }
 pre .comment {
     color: grey; /* Warna untuk komentar */
+}
+
+table{
+    width: 100%;
+    border:1px solid #999999;
+    border-collapse: collapse;
+}
+
+table td, table th{
+    padding: 4px 8px;
+    border:1px solid #999999;
 }

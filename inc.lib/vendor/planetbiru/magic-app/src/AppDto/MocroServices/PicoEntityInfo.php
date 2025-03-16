@@ -73,7 +73,7 @@ class PicoEntityInfo extends PicoObjectToString
     /**
      * Get the active status of the entity.
      *
-     * @return string
+     * @return string The active status of the entity.
      */
     public function getActive()
     {
@@ -84,7 +84,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Set the active status of the entity.
      * Returns the current instance for method chaining.
      *
-     * @param string $active
+     * @param string $active The active status to set for the entity.
      * @return self Returns the current instance for method chaining.
      */
     public function setActive($active)
@@ -96,7 +96,7 @@ class PicoEntityInfo extends PicoObjectToString
     /**
      * Get the draft status of the entity.
      *
-     * @return string
+     * @return string The draft status of the entity.
      */
     public function getDraft()
     {
@@ -107,7 +107,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Set the draft status of the entity.
      * Returns the current instance for method chaining.
      *
-     * @param string $draft
+     * @param string $draft The draft status to set for the entity.
      * @return self Returns the current instance for method chaining.
      */
     public function setDraft($draft)
@@ -119,7 +119,7 @@ class PicoEntityInfo extends PicoObjectToString
     /**
      * Get the waitingFor value of the entity.
      *
-     * @return string
+     * @return string The waitingFor value of the entity.
      */
     public function getWaitingFor()
     {
@@ -130,7 +130,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Set the waitingFor value of the entity.
      * Returns the current instance for method chaining.
      *
-     * @param string $waitingFor
+     * @param string $waitingFor The waitingFor value to set for the entity.
      * @return self Returns the current instance for method chaining.
      */
     public function setWaitingFor($waitingFor)
@@ -142,7 +142,7 @@ class PicoEntityInfo extends PicoObjectToString
     /**
      * Get the approval ID of the entity.
      *
-     * @return string
+     * @return string The approval ID of the entity.
      */
     public function getApprovalId()
     {
@@ -153,7 +153,7 @@ class PicoEntityInfo extends PicoObjectToString
      * Set the approval ID of the entity.
      * Returns the current instance for method chaining.
      *
-     * @param string $approvalId
+     * @param string $approvalId The approval ID to set for the entity.
      * @return self Returns the current instance for method chaining.
      */
     public function setApprovalId($approvalId)

@@ -251,3 +251,81 @@ A new function, `bindSqlParams`, has been introduced to safely bind SQL paramete
 Several functions in the class with **private access level** have undergone changes, including function names, parameter names, and parameter order, to improve maintainability. These changes do not affect compatibility with previous versions, as the functions are only accessed within the class itself.
 
 Upgrade to **MagicObject 3.6** now and enjoy a more powerful and flexible query-building experience!
+
+# MagicObject version 3.7
+
+## What's New
+
+MagicObject version **3.7** introduces significant improvements in SQL query handling with a new feature:
+
+### **Added `trimQueryString` for Processing Queries in Docblocks**
+
+Now, MagicObject can **extract and clean up SQL queries** written in the `@query` annotation inside docblocks.
+
+####  **Key Features:**
+
+- **Extract SQL Queries from Docblocks** – Automatically retrieves queries from the `@query` annotation.  
+- **Supports Trim Parameter** – Removes `*` and leading spaces from each line.  
+- **Flexible Processing** – Ensures queries remain readable even when written in a multiline format within docblocks.
+
+####  **Usage Example:**
+
+```
+<?php
+
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\MagicObject;
+
+class SupervisorExport extends MagicObject
+{
+    /**
+     * Exports active supervisors based on the given active status.
+     *
+     * @param bool $aktif The active status filter (true for active, false for inactive).
+     * @param PicoPageable $pageable Pagination details.
+     * @param PicoSortable $sortable Sorting details.
+     * @return PDOStatement The result of the executed query.
+     * @query("
+     *      SELECT supervisor.*
+     *      FROM supervisor
+     *      WHERE supervisor.aktif = :aktif
+     * ", trim=true)
+    */
+    public function exportActive($aktif, $pageable, $sortable)
+    {
+        return $this->executeNativeQuery();
+    }
+}
+```
+
+This feature ensures that queries stay clean and usable without unnecessary formatting issues.
+
+### **Improved Return Type Handling in `handleReturnObject`**
+
+MagicObject now supports **both classic and PHP 7+ array return type annotations**:
+
+#### **Key Enhancements:**
+
+- **Supports Classic (`stdClass[]`) and PHP 7+ (`array<stdClass>`) Notation** – Now handles both styles seamlessly.
+- **Regex-Based Type Parsing** – Automatically detects and processes return types.
+- **Stronger Type Handling** – Improved switch case handling with lowercase normalization.
+
+#### **Updated Logic in `handleReturnObject`**
+
+Now, when specifying return types, you can use either:
+
+```php
+/**
+ * @return stdClass[]
+ */
+```
+**or**
+
+```php
+/**
+ * @return array<stdClass>
+ */
+```
+
+This ensures compatibility across different PHP versions while maintaining flexibility in return type definitions.

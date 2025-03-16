@@ -124,9 +124,10 @@ class NativeQueryUtil
                 break;
         }
 
-        // Handle array-type hinting (e.g., MagicObject[], MyClass[])
-        if (strpos($returnType, "[") !== false) {
-            return $this->handleArrayReturnType($stmt, $returnType);
+        // Handle array-type hinting (supports both classic and PHP 7+ styles)
+        if (preg_match('/^(array<([\w\\\\]+)>|([\w\\\\]+)\[\])$/i', $returnType, $matches)) {
+            $className = $matches[2] ?? $matches[3];
+            return $this->handleArrayReturnType($stmt, $className);
         }
 
         // Handle single class-type return (e.g., MagicObject, MyClass)
@@ -136,14 +137,16 @@ class NativeQueryUtil
     /**
      * Handles return types with array hinting (e.g., `MagicObject[]`, `MyClass[]`).
      *
+     * Supports both classic (`stdClass[]`) and PHP 7.0+ (`array<stdClass>`) annotation styles.
+     *
      * @param PDOStatement $stmt The executed PDO statement.
-     * @param string $returnType The array-type return type (e.g., `MagicObject[]`).
-     * @return array The processed result as an array of objects.
+     * @param string $returnType The array-type return type (e.g., `MagicObject[]`, `array<MyClass>`).
+     * @return stdClass[]|array<stdClass> The processed result as an array of objects.
      * @throws InvalidReturnTypeException If the return type is invalid or unrecognized.
      */
     private function handleArrayReturnType($stmt, $returnType)
     {
-        $className = trim(explode("[", $returnType)[0]);
+        $className = trim(str_replace(array('[', ']', 'array<', '>'), '', $returnType));
 
         if ($className === 'stdClass') {
             return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -260,13 +263,22 @@ class NativeQueryUtil
     }
 
     /**
-     * Extracts the SQL query string from the docblock or caller's parameters.
+     * Extracts the SQL query string from the docblock or the caller's parameters.
      *
-     * This method checks the caller's parameters for a `PicoDatabaseQueryTemplate` object to extract 
-     * the query string. If not found, it looks for the `@query` annotation in the docblock.
+     * This method first checks the caller's parameters for a `PicoDatabaseQueryTemplate` object
+     * to obtain the query string. If no such object is found, it attempts to extract the query 
+     * from the `@query` annotation in the docblock using different parsing methods.
+     *
+     * The extraction process follows these steps:
+     * 1. Attempts to retrieve a single-line query from the `@query` annotation.
+     * 2. If unsuccessful, attempts to extract a multi-line query.
+     * 3. If still unsuccessful, tries parsing a multi-line query with additional attributes.
+     * 4. Finally, trims and formats the extracted query string.
+     *
+     * If no query string is found, an `InvalidQueryInputException` is thrown.
      *
      * @param string $docComment The docblock of the caller function.
-     * @param array $callerParamValues The parameters passed to the caller.
+     * @param array $callerParamValues The parameters passed to the caller function.
      * @return string The extracted SQL query string.
      * @throws InvalidQueryInputException If no query string is found.
      */
@@ -274,21 +286,24 @@ class NativeQueryUtil
     {
         $queryString = $this->getQueryStringFromCallerParams($callerParamValues);
         
-        if(empty($queryString))
-        {
-            // Get the query from the @query annotation
-            preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
-            $queryString = $matches ? $matches[1] : '';
-            
-            // Trim the query string of whitespace and line breaks
-            $queryString = trim($queryString, " \r\n\t ");
+        if (empty($queryString)) {
+            // Attempts to retrieve a single-line query from the `@query` annotation.
+            $queryString = $this->parseSingleLine($docComment);
         }
         
         if (empty($queryString)) {
-            // Try reading the query in another way
-            preg_match('/@query\s*\(\s*"(.*?)"\s*\)/s', $docComment, $matches);
-            $queryString = $matches ? $matches[1] : '';
+            // If unsuccessful, attempts to extract a multi-line query.
+            $queryString = $this->parseMultiline($docComment);
         }
+
+        if (empty($queryString)) {
+            // If still unsuccessful, tries parsing a multi-line query with additional attributes.
+            $queryString = $this->parseMultilineWithAttributes($docComment);
+        }
+
+        // Finally, trims and formats the extracted query string.
+        $queryString = $this->trimQueryString($docComment, $queryString);
+
         if (empty($queryString)) {
             throw new InvalidQueryInputException("No query found.\r\n" . $docComment);
         }
@@ -296,10 +311,84 @@ class NativeQueryUtil
     }
 
     /**
-     * Extracts the query string from the caller's parameters.
+     * Parses and extracts an SQL query from the `@query` annotation in the docblock.
      *
-     * This method looks for a `PicoDatabaseQueryTemplate` object in the caller's parameters
-     * and returns the query string representation of that object.
+     * This method looks for a query pattern within the annotation and extracts it.
+     *
+     * @param string $docComment The docblock containing the `@query` annotation.
+     * @return string The extracted SQL query or an empty string if not found.
+     */
+    private function parseSingleLine($docComment)
+    {
+        preg_match('/@query\s*\("([^"]+)"\)/', $docComment, $matches);
+        return $matches ? $matches[1] : '';
+    }
+
+    /**
+     * An alternative method to parse and extract an SQL query from the `@query` annotation.
+     *
+     * This approach supports multi-line queries inside the annotation.
+     *
+     * @param string $docComment The docblock containing the `@query` annotation.
+     * @return string The extracted SQL query or an empty string if not found.
+     */
+    private function parseMultiline($docComment)
+    {
+        preg_match('/@query\s*\(\s*"(.*?)"\s*\)/s', $docComment, $matches);
+        return $matches ? $matches[1] : '';
+    }
+
+    /**
+     * A third approach to extract an SQL query from the `@query` annotation.
+     *
+     * This method handles different variations of query formatting.
+     *
+     * @param string $docComment The docblock containing the `@query` annotation.
+     * @return string The extracted SQL query or an empty string if not found.
+     */
+    private function parseMultilineWithAttributes($docComment)
+    {
+        preg_match('/@query\s*\(\s*"([\s\S]+?)"\s*(?:,|$)/', $docComment, $matches);
+        return $matches ? $matches[1] : '';
+    }
+
+    /**
+     * Cleans and trims the extracted SQL query string.
+     *
+     * If the `trim` parameter is set in the `@query` annotation, leading `*` 
+     * and spaces are removed from each line of the query.
+     *
+     * @param string $docComment The docblock containing the `@query` annotation.
+     * @param string $queryString The extracted SQL query string.
+     * @return string The cleaned and properly formatted SQL query.
+     */
+    private function trimQueryString($docComment, $queryString)
+    {
+        $params = [];
+
+        preg_match_all('/,\s*([\w-]+)\s*=\s*([\w-]+)/', $docComment, $paramMatches, PREG_SET_ORDER);
+        if (isset($paramMatches)) {
+            foreach ($paramMatches as $match) {
+                $params[$match[1]] = $match[2];
+            }
+        }
+
+        if (!isset($params['trim']) || strtolower($params['trim']) !== 'false') {
+            $lines = explode("\n", $queryString);
+            foreach ($lines as $idx => $ln) {
+                $lines[$idx] = ltrim($ln, " *");
+            }
+            $queryString = implode("\n", $lines);
+        }
+
+        return $queryString;
+    }
+
+    /**
+     * Extracts the SQL query string from the caller's parameters.
+     *
+     * This method searches the caller's parameters for a `PicoDatabaseQueryTemplate` object.
+     * If found, it returns the query string representation of the object.
      *
      * @param array $callerParamValues The parameters passed to the caller function.
      * @return string The SQL query string or an empty string if no valid object is found.
@@ -307,12 +396,9 @@ class NativeQueryUtil
     private function getQueryStringFromCallerParams($callerParamValues)
     {
         $queryString = "";
-        if(isset($callerParamValues) && is_array($callerParamValues) && !empty($callerParamValues))
-        {
-            foreach($callerParamValues as $param)
-            {
-                if($param instanceof PicoDatabaseQueryTemplate)
-                {
+        if (isset($callerParamValues) && is_array($callerParamValues) && !empty($callerParamValues)) {
+            foreach ($callerParamValues as $param) {
+                if ($param instanceof PicoDatabaseQueryTemplate) {
                     $queryString = (string) $param;
                     break;
                 }
@@ -320,6 +406,7 @@ class NativeQueryUtil
         }
         return $queryString;
     }
+
 
     /**
      * Maps a value to the corresponding PDO parameter type.

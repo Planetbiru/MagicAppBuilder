@@ -67,7 +67,7 @@ class PicoValueLabelConstructor extends PicoObjectToString
     /**
      * Get the label associated with the value.
      *
-     * @return string
+     * @return string The label associated with the value.
      */ 
     public function getLabel()
     {

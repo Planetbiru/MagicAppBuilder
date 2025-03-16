@@ -48,9 +48,9 @@ class PicoFilterDetail extends PicoObjectToString
      * This method assigns a `PicoInputField` instance to this filter detail, 
      * allowing the definition or modification of the filter criteria.
      *
-     * @param  PicoInputField  $field  The input field to associate with the filter detail.
+     * @param PicoInputField $field  The input field to associate with the filter detail.
      *
-     * @return  self  Returns the current instance for method chaining.
+     * @return self Returns the current instance for method chaining.
      */
     public function setField(PicoInputField $field)
     {

@@ -14,7 +14,7 @@ $databaseCredential = new SecretObject();
 $databaseCredential->loadYamlFile(dirname(dirname(__DIR__)) . "/test.yml.txt", false, true, true);
 $databaseCredential->getDatabase()->setDatabaseName("sipro");
 $database = new PicoDatabase($databaseCredential->getDatabase(), null, function($sql){
-    echo $sql.";\r\n\r\n";
+    // echo $sql.";\r\n\r\n";
 });
 $database->connect();
 
@@ -259,12 +259,12 @@ class Supervisor extends MagicObject
      * @param int $supervisorId The ID of the table to search for.
      * @param PicoPageable $pageable
      * @param PicoSortable $sortable
-     * @return MagicObject[]
+     * @return array<MagicObject>
      * @query("
-      SELECT supervisor.*
-      FROM supervisor 
-      WHERE supervisor.aktif = :aktif
-     ")
+     * SELECT supervisor.*
+     * FROM supervisor 
+     * WHERE supervisor.aktif = :aktif
+     * ")
      */
     public function native13($pageable, $sortable, $aktif)
     {
@@ -272,8 +272,9 @@ class Supervisor extends MagicObject
         return $this->executeNativeQuery();
     }
 }
-
 $obj = new Supervisor(null, $database);
+
+/*
 
 
 $native1 = $obj->native1(1, true);
@@ -326,7 +327,7 @@ echo "Telepon: " . $native9[0]->getTelepon() . "\r\n";
 echo "Telepon: " . $native10->getTelepon() . "\r\n";
 echo "Telepon: " . $native11[0]->getTelepon() . "\r\n";
 
-
+*/
 $sortable = new PicoSortable();
 $sortable->addSortable(new PicoSort("nama", PicoSort::ORDER_TYPE_ASC));
 $pageable = new PicoPageable(new PicoPage(1, 2));

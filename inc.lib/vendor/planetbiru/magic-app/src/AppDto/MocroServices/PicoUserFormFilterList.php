@@ -23,7 +23,7 @@ class PicoUserFormFilterList extends PicoObjectToString
     protected $filters;
 
     /**
-     * Undocumented variable
+     * An array of elements to be displayed in the filter list.
      *
      * @var array
      */
@@ -51,7 +51,7 @@ class PicoUserFormFilterList extends PicoObjectToString
      * This method allows for adding an `InputFieldFilter` object to the list of filters.
      *
      * @param InputFieldFilter $filter The filter to be added to the list.
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function addFilter($filter)
     {
@@ -63,7 +63,7 @@ class PicoUserFormFilterList extends PicoObjectToString
      * Undocumented function
      *
      * @param array $element
-     * @return self
+     * @return self Returns the current instance for method chaining.
      */
     public function addElement($element)
     {

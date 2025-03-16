@@ -95,7 +95,7 @@ class MainMenu extends BasicMenu
     /**
      * Get module
      *
-     * @return  array
+     * @return array The module structure grouped by specified column.
      */ 
     public function getModule()
     {

@@ -127,7 +127,7 @@ class XLSXDataType
      * Get number format based on precision
      * 
      * @param mixed $precision Precision
-     * @return string
+     * @return string Number format
      */
     public function getNumberFormat($precision)
     {
@@ -138,7 +138,7 @@ class XLSXDataType
     /**
      * Convert to string representation
      *
-     * @return string
+     * @return string Excel data type
      */
     public function toString()
     {
@@ -148,7 +148,7 @@ class XLSXDataType
     /**
      * Convert to string representation
      *
-     * @return string
+     * @return string Excel data type
      */
     public function __toString()
     {
