@@ -404,7 +404,7 @@ class AppField // NOSONAR
      *
      * @return self  The current instance for method chaining.
      */ 
-    public function setMultipleData(bool $multipleData)
+    public function setMultipleData($multipleData)
     {
         $this->multipleData = $multipleData;
 
@@ -434,7 +434,7 @@ class AppField // NOSONAR
      *
      * @return self  The current instance for method chaining.
      */ 
-    public function setMultipleFilter(bool $multipleFilter)
+    public function setMultipleFilter($multipleFilter)
     {
         $this->multipleFilter = $multipleFilter;
 

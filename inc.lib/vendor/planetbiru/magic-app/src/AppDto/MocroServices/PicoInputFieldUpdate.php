@@ -48,7 +48,7 @@ class PicoInputFieldUpdate extends PicoInputFieldInsert
     /**
      * Get the current value of the input field, typically used when editing or updating a record.
      *
-     * @return InputFieldValue
+     * @return InputFieldValue The current value of the input field, typically used when editing or updating a record.
      */ 
     public function getCurrentValue()
     {

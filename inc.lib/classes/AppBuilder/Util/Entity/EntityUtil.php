@@ -281,5 +281,34 @@ class EntityUtil
         return EntityUtil::formatTitle($entityName, $filetime, $tableInfo);
     }
 
+    /**
+     * Generates the tooltip for a given entity in JSON format based on its file path, class name, and last modified time.
+     *
+     * This method includes the PHP file located at the specified `$path`, instantiates the entity class 
+     * based on the `$className`, retrieves its table information, and generates the tooltip by formatting 
+     * the entity's details into a JSON structure. The JSON structure is then returned as an array.
+     *
+     * @param string $path The path to the entity file to include.
+     * @param string $className The class name of the entity, used to instantiate the entity object.
+     * @param string $filetime The last modified timestamp of the file, which is used to show the last update time in the tooltip.
+     *
+     * @return array The formatted tooltip content for the entity in JSON format, containing table information and other entity details.
+     * 
+     * @throws Exception If an error occurs while including the file or creating the entity object.
+     */
+    public static function getEntityTooltipFromFileAsJson($path, $className, $filetime)
+    {
+        include_once $path;
+        $entity = new $className();
+        $entityName = basename($className);
+        $tableInfo = $entity->tableInfo();
+        return [
+            'entityName'=>$entityName, 
+            'filetime'=>$filetime, 
+            'columns'=>$tableInfo->getColumns(),
+            'primaryKeys'=>$tableInfo->getPrimaryKeys(),
+            'joinColumns'=>$tableInfo->getJoinColumns()
+        ];
+    }
 
 }

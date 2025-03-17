@@ -61,7 +61,7 @@ class XLSXDataFormat
      *
      * @param string $name Method name
      * @param array $arguments Method arguments
-     * @return mixed|null|void
+     * @return mixed|null|void The Excel data type
      */
     public function __call($name, $arguments) // NOSONAR
     {
@@ -82,7 +82,7 @@ class XLSXDataFormat
      * Convert to Excel type
      *
      * @param string $type The type to convert
-     * @return XLSXDataType
+     * @return XLSXDataType The Excel data type
      */
     public function toExcelType($type)
     {

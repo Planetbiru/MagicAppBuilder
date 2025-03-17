@@ -171,7 +171,11 @@ class EntityRelationshipDiagram //NOSONAR
     /**
      * Constructor
      *
-     * @param MagicObject[] $entities
+     * @param array        $appConfig     Application configuration settings.
+     * @param int          $entityWidth   Width of an entity.
+     * @param int|null     $entityMarginX Optional horizontal margin between entities.
+     * @param int|null     $entityMarginY Optional vertical margin between entities.
+     * @param MagicObject[]|null $entities Optional array of MagicObject instances.
      */
     public function __construct($appConfig, $entityWidth, $entityMarginX = null, $entityMarginY = null, $entities = null)
     {
@@ -233,13 +237,16 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Table info
+     * Updates the entity diagram with table and column information.
      *
-     * @param ReflectionClass $reflectionClass
-     * @param string $entityName
-     * @param string $namespace
-     * @param PicoTableInfo $info
-     * @param integer $level
+     * This method ensures that the entity diagram includes the specified table and its columns,
+     * updates primary keys, and processes join columns to establish relationships.
+     *
+     * @param ReflectionClass $reflectionClass Reflection class of the entity.
+     * @param string $entityName Name of the entity.
+     * @param string $namespace Namespace of the entity.
+     * @param PicoTableInfo $info Table information object.
+     * @param integer $level Recursion depth level for processing references.
      * @return self Returns the current instance for method chaining.
      */
     private function updateDiagram($reflectionClass, $entityName, $namespace, $info, $level)
@@ -291,10 +298,12 @@ class EntityRelationshipDiagram //NOSONAR
     /**
      * Process reference
      *
-     * @param ReflectionClass $reflectionClass
-     * @param string $entityName
-     * @param PicoTableInfo $info
-     * @param integer $level
+     * @param ReflectionClass $reflectionClass  Reflection class of the entity.
+     * @param string         $tableName         Name of the table.
+     * @param string         $columnName        Name of the column.
+     * @param string         $referenceColumnName Name of the reference column.
+     * @param string         $propertyType      Type of the property.
+     * @param int            $level             Current recursion level.
      * @return void
      */
     private function processReference($reflectionClass, $tableName, $columnName, $referenceColumnName, $propertyType, $level)
@@ -328,10 +337,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Include file
+     * Includes the specified class file if it exists and passes error checking.
      *
-     * @param string $realClassName
-     * @return boolean
+     * @param string $realClassName Fully qualified class name to be included.
+     * @return bool Returns true if the file was included successfully, otherwise false.
      */
     private function includeFile($realClassName)
     {
@@ -353,22 +362,24 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get the value of width
-     */ 
+     * Get the width value.
+     *
+     * @return int The current width.
+     */
     public function getWidth()
     {
         return $this->width;
     }
 
     /**
-     * Set the value of width
+     * Set the width value.
      *
-     * @return  self
-     */ 
+     * @param int $width The new width to set.
+     * @return self Returns the instance for method chaining.
+     */
     public function setWidth($width)
     {
         $this->width = $width;
-
         return $this;
     }
 
@@ -383,7 +394,7 @@ class EntityRelationshipDiagram //NOSONAR
     /**
      * Set the value of height
      *
-     * @return  self
+     * @return self Returns the instance for method chaining.
      */ 
     public function setHeight($height)
     {
@@ -457,10 +468,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Get diagram by name
+     * Get the diagram associated with a given table name.
      *
-     * @param string $tableName
-     * @return void
+     * @param string $tableName The name of the table.
+     * @return EntityDiagramItem|null The diagram item if found, otherwise null.
      */
     private function getDiagramByTableName($tableName)
     {
@@ -468,10 +479,11 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Get column by name
+     * Get the column associated with a given table column name.
      *
-     * @param EntityDiagramItem $diagram
-     * @return EntityDiagramColumn
+     * @param EntityDiagramItem $diagram The diagram containing the column.
+     * @param string $columnName The name of the column.
+     * @return EntityDiagramColumn|null The diagram column if found, otherwise null.
      */
     private function getDiagramColumnByTableColumnName($diagram, $columnName)
     {
@@ -483,6 +495,14 @@ class EntityRelationshipDiagram //NOSONAR
         return isset($columns[$columnName]) ? $columns[$columnName] : null;
     }
     
+    /**
+     * Generate an image map representation of the entity diagram.
+     *
+     * This method arranges the diagram, prepares entity relationships, 
+     * and constructs an HTML-compatible image map for visualization.
+     *
+     * @return string The generated image map in HTML format.
+     */
     public function getImageMap()
     {
         $offsetX = self::OFFSET_X;
@@ -564,9 +584,13 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Draw ERD
+     * Generate an SVG representation of the Entity-Relationship Diagram (ERD).
      *
-     * @return string
+     * This method arranges the diagram, prepares entity relationships, and 
+     * constructs an SVG image representing the ERD, including entities and 
+     * their relationships.
+     *
+     * @return string The generated SVG as a string.
      */
     public function drawERD()
     {
@@ -626,10 +650,13 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Check if need to wrap diagram
+     * Determine if the diagram needs to wrap into multiple rows.
      *
-     * @param integer $countDiagram
-     * @return boolean
+     * This method checks if the number of diagrams exceeds the maximum allowed
+     * in a single row, indicating that wrapping is required.
+     *
+     * @param int $countDiagram The total number of diagrams.
+     * @return bool True if the diagram needs to wrap, false otherwise.
      */
     private function needWrapDiagram($countDiagram)
     {
@@ -637,7 +664,11 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Arange diagram into a atrix
+     * Arrange the diagram into a matrix layout.
+     *
+     * This method organizes entity diagrams into rows and columns based on 
+     * the maximum allowed columns. It calculates the necessary width and height, 
+     * positions each entity within the grid, and updates the overall diagram dimensions.
      *
      * @return void
      */
@@ -708,10 +739,17 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create entity item
+     * Create an SVG representation of an entity diagram item.
      *
-     * @param EntityDiagramItem $diagram
-     * @return SVGNode
+     * This method generates an SVG element representing an entity, including:
+     * - A main frame
+     * - A background
+     * - A header
+     * - Column representations
+     * - An icon table
+     *
+     * @param EntityDiagramItem $diagram The entity diagram item to be visualized.
+     * @return SVGNode The generated SVG representation of the entity.
      */
     private function createEntityItem($diagram)
     {
@@ -764,10 +802,13 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create separator
+     * Create a horizontal separator line for an entity diagram.
      *
-     * @param EntityDiagramItem $diagram
-     * @return SVGLine
+     * This method generates an SVG line that acts as a separator between different 
+     * sections of an entity diagram.
+     *
+     * @param EntityDiagramItem $diagram The entity diagram item for which the separator is created.
+     * @return SVGLine The generated SVG separator line.
      */
     private function createSeparatorLine($diagram)
     {
@@ -777,13 +818,20 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create column
+     * Create an SVG representation of a column within an entity diagram.
      *
-     * @param EntityDiagramItem $diagram
-     * @param EntityDiagramColumn $column
-     * @param integer $x X coordinate
-     * @param integer $y Y coordinate
-     * @return SVGLine
+     * This method generates an SVG element representing a column, including:
+     * - A background rectangle
+     * - Column text
+     * - A separator line
+     * - An optional reference attribute (if the column has a foreign key relationship)
+     * - An icon representing the column type
+     *
+     * @param EntityDiagramItem $diagram The entity diagram item to which the column belongs.
+     * @param EntityDiagramColumn $column The column to be visualized.
+     * @param integer $x The X coordinate of the column within the entity.
+     * @param integer $y The Y coordinate of the column within the entity.
+     * @return SVGNode The generated SVG representation of the column.
      */
     private function createColumn($diagram, $column, $x, $y)
     {
@@ -821,9 +869,14 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create icon table
+     * Create an SVG icon representing a database table.
      *
-     * @return SVGPath
+     * This method generates a table icon using SVG paths to visually represent 
+     * a tabular structure.
+     *
+     * @param integer $offsetX Optional X offset for positioning the icon.
+     * @param integer $offsetY Optional Y offset for positioning the icon.
+     * @return SVGGroup The generated SVG group representing the table icon.
      */
     private function createIconTable($offsetX = 0, $offsetY = 0)
     {
@@ -868,10 +921,17 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create icon column
+     * Create an SVG icon representing a column in an entity diagram.
      *
-     * @param EntityDiagramColumn $column
-     * @return SVGPath
+     * This method generates a small visual representation of a column, which can:
+     * - Indicate a **primary key** (colored using `ICON_COLUMN_PRIMARY_KEY_COLOR`)
+     * - Indicate a **foreign key/reference** (colored using `ICON_COLUMN_COLOR`)
+     * - Be a **regular column** (transparent fill with `ICON_COLUMN_COLOR` stroke)
+     *
+     * @param EntityDiagramColumn $column The column for which the icon is created.
+     * @param integer $offsetX Optional horizontal offset for positioning.
+     * @param integer $offsetY Optional vertical offset for positioning.
+     * @return SVGGroup The generated SVG group containing the column icon.
      */
     private function createIconColumn($column, $offsetX = 0, $offsetY = 0)
     {
@@ -912,11 +972,16 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Create path description from points
+     * Generate an SVG path description string from a set of points.
      *
-     * @param Point $points
-     * @param boolean $closed
-     * @return string
+     * This method constructs an SVG-compatible path description using `M` (move to)
+     * and `L` (line to) commands. If `$closed` is `true`, the path is closed using `Z`.
+     *
+     * @param Point[] $points An array of Point objects defining the path.
+     * @param boolean $closed Whether the path should be closed (default: true).
+     * @param integer $offsetX Optional horizontal offset applied to all points.
+     * @param integer $offsetY Optional vertical offset applied to all points.
+     * @return string The SVG path description string.
      */
     private function createPathDescription($points, $closed = true, $offsetX = 0, $offsetY = 0)
     {
@@ -929,9 +994,12 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Calculate diagram width
+     * Calculate the total width of the entity diagram.
      *
-     * @return integer
+     * This method iterates over all entity diagram items and determines 
+     * the maximum X-coordinate to compute the total width of the diagram.
+     *
+     * @return integer The calculated diagram width in pixels.
      */
     public function calculateWidth()
     {
@@ -949,9 +1017,12 @@ class EntityRelationshipDiagram //NOSONAR
     }
     
     /**
-     * Calculate diagram height
+     * Calculate the total height of the entity diagram.
      *
-     * @return integer
+     * This method iterates over all entity diagram items and determines 
+     * the maximum Y-coordinate to compute the total height of the diagram.
+     *
+     * @return integer The calculated diagram height in pixels.
      */
     public function calculateHeight()
     {
@@ -968,13 +1039,22 @@ class EntityRelationshipDiagram //NOSONAR
         return $maxY;
     }
     
+    /**
+     * Convert the entity diagram to a string representation.
+     *
+     * This method returns the diagram as an SVG string using `drawERD()`.
+     *
+     * @return string The SVG representation of the entity diagram.
+     */
     public function __toString()
     {
         return $this->drawERD();
     }
 
     /**
-     * Get the value of marginX
+     * Get the horizontal margin.
+     *
+     * @return integer The X margin value.
      */ 
     public function getMarginX()
     {
@@ -982,9 +1062,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set the value of marginX
+     * Set the horizontal margin.
      *
-     * @return  self
+     * @param integer $marginX The X margin value.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setMarginX($marginX)
     {
@@ -994,7 +1075,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get the value of marginY
+     * Get the vertical margin.
+     *
+     * @return integer The Y margin value.
      */ 
     public function getMarginY()
     {
@@ -1002,9 +1085,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set the value of marginY
+     * Set the vertical margin.
      *
-     * @return  self
+     * @param integer $marginY The Y margin value.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setMarginY($marginY)
     {
@@ -1014,7 +1098,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get the value of headerHeight
+     * Get the height of the entity header.
+     *
+     * @return integer The height of the header section in pixels.
      */ 
     public function getHeaderHeight()
     {
@@ -1022,9 +1108,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set the value of headerHeight
+     * Set the height of the entity header.
      *
-     * @return  self
+     * @param integer $headerHeight The header height in pixels.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setHeaderHeight($headerHeight)
     {
@@ -1034,9 +1121,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set the value of columnHeight
+     * Set the height of each column in the entity diagram.
      *
-     * @return  self
+     * @param integer $columnHeight The height of the columns in pixels.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setColumnHeight($columnHeight)
     {
@@ -1046,9 +1134,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get maximum level
+     * Get the maximum depth level of the diagram.
      *
-     * @return  integer
+     * @return integer The maximum hierarchy level.
      */ 
     public function getMaximumLevel()
     {
@@ -1056,11 +1144,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set maximum level
+     * Set the maximum depth level of the diagram.
      *
-     * @param  integer  $maximumLevel  Maximum level
-     *
-     * @return  self
+     * @param integer $maximumLevel The maximum hierarchy level.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setMaximumLevel($maximumLevel)
     {
@@ -1070,9 +1157,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get maximum columns
+     * Get the maximum number of columns allowed in the diagram.
      *
-     * @return  integer
+     * @return integer The maximum column count.
      */ 
     public function getMaximumColumn()
     {
@@ -1080,11 +1167,10 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set maximum columns
+     * Set the maximum number of columns in the diagram.
      *
-     * @param  integer  $maximumColumn  Maximum columns
-     *
-     * @return  self
+     * @param integer $maximumColumn The maximum column count.
+     * @return self Returns the instance for method chaining.
      */ 
     public function setMaximumColumn($maximumColumn)
     {
@@ -1094,7 +1180,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get the value of zoom
+     * Get the zoom level of the entity diagram.
+     *
+     * @return float The zoom factor applied to the diagram.
      */ 
     public function getZoom()
     {
@@ -1102,10 +1190,11 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set the value of zoom
+     * Set the zoom level of the entity diagram.
      *
-     * @return  self
-     */ 
+     * @param float $zoom The zoom factor to apply.
+     * @return self Returns the instance for method chaining.
+     */
     public function setZoom($zoom)
     {
         $this->zoom = $zoom;
@@ -1114,9 +1203,9 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Get cache directory
+     * Get the cache directory path.
      *
-     * @return  string
+     * @return string The directory path where cached diagrams are stored.
      */ 
     public function getCacheDir()
     {
@@ -1124,13 +1213,12 @@ class EntityRelationshipDiagram //NOSONAR
     }
 
     /**
-     * Set cache directory
+     * Set the cache directory path.
      *
-     * @param  string  $cacheDir  Cache directory
-     *
-     * @return  self
+     * @param string $cacheDir The directory path for storing cached diagrams.
+     * @return self Returns the instance for method chaining.
      */ 
-    public function setCacheDir(string $cacheDir)
+    public function setCacheDir($cacheDir)
     {
         $this->cacheDir = $cacheDir;
 

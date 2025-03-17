@@ -22,9 +22,9 @@ class EntityRenderer {
         this.xPadding = 5;
         this.yPadding = 5;
 
-        this.betweenX  = 24;
-        this.betweenY = 24;
-        this.tableWidth = 260; // Table width
+        this.betweenX  = 20;
+        this.betweenY = 20;
+        this.tableWidth = 250; // Table width
         this.maxTop = 0; // To track the maximum top position of the last row
         this.maxCol = 0; // The maximum number of columns in any table (used to wrap rows)
         this.lastMaxCol = 0; // The previous maximum column count for row wrapping
@@ -481,7 +481,8 @@ class EntityRenderer {
      * for export. It handles the process of downloading the SVG file.
      */
     downloadSVG() {
-        this.exportToSVG(this.svg);
+        let fileName = this.getFileName() + '.svg';
+        this.exportToSVG(this.svg, fileName);
     }
 
     /**
@@ -491,7 +492,34 @@ class EntityRenderer {
      * for export. It handles the process of downloading the PNG file.
      */
     downloadPNG() {
-        this.exportToPNG(this.svg);
+        let fileName = this.getFileName() + '.png';
+        this.exportToPNG(this.svg, fileName);
+    }
+
+    /**
+     * Retrieves the filename of the currently active diagram or the database name.
+     *
+     * This method checks the active tab in the diagram list to determine the filename.
+     * If an input field is present in the active tab, it retrieves the value from the input field.
+     * If the "all-entities" tab is active, it retrieves the database name from the meta tag.
+     *
+     * @return {string} The filename of the active diagram or the database name.
+     */
+    getFileName()
+    {
+        let ul = document.querySelector('.diagram-list.tabs');
+        let input = ul.querySelector('.diagram-tab.active input[type="text"]');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');;
+        let fileName = '';
+        if(input != null)
+        {
+            fileName = databaseName + ' - ' + input.value;
+        }
+        else
+        {
+            fileName = databaseName;
+        }
+        return fileName;
     }
 
     /**

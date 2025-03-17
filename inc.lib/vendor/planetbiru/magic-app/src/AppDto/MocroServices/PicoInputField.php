@@ -36,7 +36,7 @@ class PicoInputField extends PicoValueLabelConstructor
     /**
      * Get this can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      *
-     * @return mixed
+     * @return mixed This can be of any type, depending on the context of the field (e.g., string, integer, etc.).
      */ 
     public function getValue()
     {
@@ -60,7 +60,7 @@ class PicoInputField extends PicoValueLabelConstructor
     /**
      * Get this is a string used for displaying a label to the user for the input field.
      *
-     * @return string
+     * @return string This is a string used for displaying a label to the user for the input field.
      */ 
     public function getLabel()
     {

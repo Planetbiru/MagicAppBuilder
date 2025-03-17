@@ -86,7 +86,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
     /**
      * Get the human-readable code for the action.
      *
-     * @return string
+     * @return string The action code.
      */
     public function getCode()
     {
@@ -108,7 +108,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
     /**
      * Get the label describing the action for user-friendly display.
      *
-     * @return string
+     * @return string The action label.
      */
     public function getLabel()
     {

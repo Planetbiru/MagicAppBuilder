@@ -1021,7 +1021,7 @@ let initAll = function () {
     $('[name="application_namespace"]').val('');
     $('[name="application_author"]').val('');
     $('[name="magic_app_version"]').empty();
-    $('[name="dependencies-installation"]').val('');  
+    $('[name="installation_method"]').val('');  
     increaseAjaxPending();
     $.ajax({
       type: 'GET',
@@ -1043,10 +1043,10 @@ let initAll = function () {
           $('[name="application_id"]').val(data.application_id);
           $('[name="application_architecture"]').val(data.application_architecture);
           $('[name="application_directory"]').val(data.application_directory);
-          $('[name="dependencies-installation"]').val(data.composer_online ? 'Online' : 'Offline');         
           $('[name="composer_online"]').val(data.composer_online ? 1 : 0);
           $('[name="application_namespace"]').val(data.application_namespace);
           $('[name="application_workspace_id"]').empty();
+          $('[name="installation_method"]').empty();
           for(let workspace of data.application_workspace)
           {
             let opt = $('<option />');
@@ -1058,6 +1058,21 @@ let initAll = function () {
             }
             $('[name="application_workspace_id"]').append(opt);
           }
+          for(let method of data.installation_method)
+            {
+              let opt = $('<option />');
+              opt.text(method.label);
+              opt.attr('value', method.value);
+              if(method.selected)
+              {
+                opt.attr('selected', 'selected');
+              }
+              if(method.disabled)
+              {
+                opt.attr('disabled', 'disabled');
+              }
+              $('[name="installation_method"]').append(opt);
+            }
           $('[name="application_author"]').val(data.application_author);
           $('[name="application_description"]').val(data.application_description);
           for (let i in data.magic_app_versions) {

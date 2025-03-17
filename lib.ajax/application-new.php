@@ -111,7 +111,43 @@ catch(Exception $e)
 {
     // Do nothing
 }
-
+$installationMethod = array();
+if($composerOnline)
+{
+    $installationMethod = array(
+        array(
+            'value'=>'Online', 
+            'label'=>'Online',
+            'selected'=>true,
+            'disabled'=>false
+        ),
+        array(
+            'value'=>'Offline', 
+            'label'=>'Offline',
+            'selected'=>false,
+            'disabled'=>false
+        )
+    )
+    ;
+}
+else
+{
+    $installationMethod = array(
+        array(
+            'value'=>'Online', 
+            'label'=>'Online',
+            'selected'=>false,
+            'disabled'=>true
+        ),
+        array(
+            'value'=>'Offline', 
+            'label'=>'Offline',
+            'selected'=>true,
+            'disabled'=>false
+        )
+    )
+    ;
+}
 $data = array(
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
@@ -122,7 +158,7 @@ $data = array(
     'application_architecture' => AppArchitecture::MONOLITH,
     'application_description' => 'Description',
     'magic_app_versions' => $magicAppList,
-    'composer_online' => $composerOnline
+    'installation_method' => $installationMethod
 );
 
 ResponseUtil::sendJSON($data, false, true);

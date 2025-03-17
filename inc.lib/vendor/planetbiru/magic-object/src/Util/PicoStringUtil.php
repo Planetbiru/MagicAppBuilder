@@ -379,5 +379,77 @@ class PicoStringUtil
         // Combine all chunks with the specified delimiter and return the result
         return implode($delimiter, $result);
     }
+    
+    /**
+     * Masks a string by replacing certain characters with a masking character.
+     *
+     * @param string $string The original string to be masked.
+     * @param int $position The position where the masking should occur. Positive integers start from the beginning, negative integers start from the end.
+     * @param int $maskLength The number of characters to mask.
+     * @param string $maskChar The character to use for masking. Defaults to '*'.
+     * @return string The masked string.
+     */
+    public static function maskString($string, $position, $maskLength, $maskChar = '*') {
+        $stringLength = strlen($string);
 
+        // Ensure $maskLength is a positive integer
+        if ($maskLength < 0) {
+            $maskLength = abs($maskLength); // Convert to positive if negative
+        }
+
+        // If maskLength exceeds the string length, adjust it
+        if ($maskLength > $stringLength) {
+            $maskLength = $stringLength;
+        }
+
+        // Case 1: Positive position (masking starts from the beginning of the string)
+        if ($position > 0) {
+            // If position exceeds the string length, adjust to string length
+            if ($position > $stringLength) {
+                $position = $stringLength;
+            }
+
+            // Part 1: The portion before the mask starts
+            $part1 = substr($string, 0, $position - 1);
+
+            // Part 2: The masked portion
+            $part2 = str_repeat($maskChar, $maskLength);
+
+            // Part 3: The remaining portion after the mask ends
+            $part3 = substr($string, $position + $maskLength - 1);
+            
+            // Ensuring the final string has the correct length by adjusting Part 3
+            $part3 = substr($part3, 0, $stringLength - strlen($part1) - strlen($part2));
+
+            return $part1 . $part2 . $part3;
+        }
+
+        // Case 2: Negative position (masking starts from the end of the string)
+        if ($position < 0) {
+            // Convert negative position to the correct start index from the end
+            $start = $stringLength + $position - $maskLength;
+
+            // Ensure that start is not less than -1
+            if ($start < -1) {
+                $start = -1;
+            }
+
+            // Part 3: The portion after the mask starts (after the negative index)
+            $part3 = substr($string, $start + $maskLength + 1);
+
+            // Part 2: The masked portion
+            $part2 = str_repeat($maskChar, $maskLength);
+
+            // Part 1: The portion before the masking starts
+            $part1 = substr($string, 0, $start + 1);
+
+            // Ensuring the final string has the correct length by adjusting Part 3
+            $part3 = substr($part3, 0, $stringLength - strlen($part1) - strlen($part2));
+
+            return $part1 . $part2 . $part3;
+        }
+
+        // Default case: mask the entire string
+        return str_repeat($maskChar, $stringLength);
+    }
 }

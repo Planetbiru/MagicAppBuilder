@@ -41,7 +41,7 @@ body {
         display: flex;
         width: 100%;
         overflow: hidden;
-        height: calc(100vh - 410px);
+        height: calc(100vh - 395px);
     }
 
     .panel-title {
@@ -214,7 +214,7 @@ body {
                 width: 68px;
 
                 button {
-                    font-size: 14px;
+                    font-size: 13px;
                     margin-bottom: 2px;
                 }
             }
@@ -405,7 +405,7 @@ body {
         padding: 0;
         margin: 0;
         margin: 2px 0 10px 0;
-        height: 80px;
+        height: 100px;
         overflow: auto;
 
         li {

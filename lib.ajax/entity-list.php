@@ -36,9 +36,9 @@ try {
     $ulData->setAttribute('class', 'entity-ul');
     $div->appendChild($ulData);
 
-    $format1 = '<li class="entity-li"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
-    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name=$format3 data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
     $format3 = "%s\\%s";
+    $format1 = '<li class="entity-li"><a href="#" data-entity-name='.$format3.' data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
+    $format2 = '<li class="entity-li file-syntax-error"><a href="#" data-entity-name='.$format3.' data-toggle="tooltip" data-placement="top" data-title="%s">%s</a></li>';
 
     $liData = array();
 

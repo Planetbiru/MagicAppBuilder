@@ -35,7 +35,7 @@ class IOException extends Exception
     /**
      * Get the previous exception
      *
-     * @return Throwable|null
+     * @return Throwable|null Previous exception
      */
     public function getPreviousException()
     {
