@@ -329,12 +329,12 @@ class ScriptGenerator //NOSONAR
      * @param AppSecretObject $appConfig Application-specific configuration, including feature flags.
      * @param EntityInfo $entityInfo Information about the main entity being processed.
      * @param EntityApvInfo $entityApvInfo Information about the approval process for the entity.
-     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode
+     * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode
      *
      * @return int The number of entity files that were generated. It generates and writes the application module script
      * to the specified location, as defined in the request.
      */
-    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline) // NOSONAR
+    public function generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $onlineInstallation) // NOSONAR
     {
         $insertFields = array();
         $editFields = array();
@@ -533,7 +533,7 @@ class ScriptGenerator //NOSONAR
         $moduleFile = $request->getModuleFile();
 
         $baseDir = $appConf->getBaseApplicationDirectory();
-        $this->prepareApplication($builderConfig, $appConf, $baseDir, $composerOnline);
+        $this->prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
         
@@ -935,10 +935,10 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param string $baseDir Base directory for the application.
-     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode
+     * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode
      * @return void
      */
-    public function prepareApplication($builderConfig, $appConf, $baseDir, $composerOnline)
+    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation)
     {
         $composer = new MagicObject($appConf->getComposer());
         $magicApp = new MagicObject($appConf->getMagicApp());
@@ -950,7 +950,7 @@ class ScriptGenerator //NOSONAR
         if(!file_exists($libDir)) 
         {
             $this->prepareDir($libDir);
-            $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp, $composerOnline);
+            $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation);
                   
             $baseAppBuilder = $appConf->getBaseEntityDirectory()."";
             $this->prepareDir($baseAppBuilder);
@@ -972,12 +972,12 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param MagicObject $magicApp MagicApp configuration object.
-     * @param bool $composerOnline Flag indicating whether Composer should be used in online mode.
+     * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode.
      * @return void
      */
-    public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $composerOnline)
+    public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation)
     {
-        if($composerOnline)
+        if($onlineInstallation)
         {
             $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
         }
