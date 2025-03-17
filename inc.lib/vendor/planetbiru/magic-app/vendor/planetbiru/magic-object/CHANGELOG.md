@@ -329,3 +329,33 @@ Now, when specifying return types, you can use either:
 ```
 
 This ensures compatibility across different PHP versions while maintaining flexibility in return type definitions.
+
+### **Added `maskPropertyName` for String Masking in Properties**
+
+A new feature, `maskPropertyName`, allows you to **mask specific property values** within objects by replacing certain characters with a masking character. This enhances data privacy or prevents exposing sensitive information.
+
+#### **Key Features:**
+
+- **Mask Specific Property Values** – Easily mask specific parts of any property value.  
+- **Customizable Masking** – Supports various positions for masking: `start`, `center`, or `end`.
+- **Customizable Mask Character** – Choose your own masking character (defaults to `*`).
+
+#### **Usage Example:**
+
+```php
+<?php
+
+use MagicObject\MagicObject;
+
+class UserProfile extends MagicObject
+{
+
+}
+
+$object = new UserProfile();
+$object->setName('John Doe');
+$object->setEmail('john.doe@example.com');
+// Masks email property value by replacing certain characters with a masking character.
+echo $object->maskEmail(10, 6, '*')."\r\n";  // Output: john.doe@******e.com
+echo $object->maskEmail(-10, 6, '*')."\r\n"; // Output: john.******ample.com
+```
