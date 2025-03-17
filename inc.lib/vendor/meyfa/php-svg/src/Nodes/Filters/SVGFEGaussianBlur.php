@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGFEGaussianBlur extends SVGNodeContainer
 {
-    const TAG_NAME = 'feGaussianBlur';
+    public const TAG_NAME = 'feGaussianBlur';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGFEGaussianBlur extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

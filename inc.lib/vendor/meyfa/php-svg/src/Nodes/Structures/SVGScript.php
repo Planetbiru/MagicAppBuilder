@@ -11,12 +11,12 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGScript extends SVGNodeContainer implements CDataContainer
 {
-    const TAG_NAME = 'script';
+    public const TAG_NAME = 'script';
 
     /**
      * @param string $content The script content.
      */
-    public function __construct($content = '')
+    public function __construct(string $content = '')
     {
         parent::__construct();
 
@@ -26,7 +26,7 @@ class SVGScript extends SVGNodeContainer implements CDataContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
     }
 }

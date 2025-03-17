@@ -16,9 +16,9 @@ abstract class SVGStyleParser
      *
      * @return string[] An associative array of all declarations.
      */
-    public static function parseStyles($string)
+    public static function parseStyles(string $string): array
     {
-        $styles = array();
+        $styles = [];
         if (empty($string)) {
             return $styles;
         }
@@ -47,19 +47,21 @@ abstract class SVGStyleParser
      *
      * @return string[][] A 2D associative array with style declarations.
      */
-    public static function parseCss($css)
+    public static function parseCss(string $css): array
     {
-        $result = array();
+        $result = [];
         preg_match_all('/(?ims)([a-z0-9\s\,\.\:#_\-@^*()\[\]\"\'=]+)\{([^\}]*)\}/', $css, $arr);
 
         foreach ($arr[0] as $i => $x) {
-            $selectors = explode(',', Str::trim($arr[1][$i]));
-            if (in_array($selectors[0], array('@font-face', '@keyframes', '@media'))) {
+            $selectors = array_map(function (string $selector) {
+                return Str::trim($selector);
+            }, explode(',', Str::trim($arr[1][$i])));
+            if (in_array($selectors[0], ['@font-face', '@keyframes', '@media'])) {
                 continue;
             }
             $rules = self::parseStyles(Str::trim($arr[2][$i]));
             foreach ($selectors as $selector) {
-                $result[Str::trim($selector)] = $rules;
+                $result[$selector] = array_merge($result[$selector] ?? [], $rules);
             }
         }
 

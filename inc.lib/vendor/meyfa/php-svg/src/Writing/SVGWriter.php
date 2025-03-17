@@ -13,10 +13,12 @@ use SVG\Shims\Str;
  */
 class SVGWriter
 {
-    /** @var string $outString The XML output string being written */
-    private $outString = '';
+    /**
+     * @var string $outString The XML output string being written
+     */
+    private string $outString = '';
 
-    public function __construct($isStandalone = true)
+    public function __construct(bool $isStandalone = true)
     {
         if ($isStandalone) {
             $this->outString = '<?xml version="1.0" encoding="utf-8"?>';
@@ -24,9 +26,9 @@ class SVGWriter
     }
 
     /**
-     * @return string The XML output string up until the point currenly written.
+     * @return string The XML output string up until the point currently written.
      */
-    public function getString()
+    public function getString(): string
     {
         return $this->outString;
     }
@@ -45,7 +47,7 @@ class SVGWriter
      *
      * @return void
      */
-    public function writeNode(SVGNode $node)
+    public function writeNode(SVGNode $node): void
     {
         $this->outString .= '<' . $node->getName();
 
@@ -83,13 +85,13 @@ class SVGWriter
      * Appends all attributes defined in the given associative array to this
      * writer's output.
      *
-     * @param string[] $attrs An associative array of attribute strings.
+     * @param string[] $namespaces An associative array of attribute strings.
      *
      * @return void
      */
-    private function appendNamespaces(array $namespaces)
+    private function appendNamespaces(array $namespaces): void
     {
-        $normalized = array();
+        $normalized = [];
         foreach ($namespaces as $key => $value) {
             $namespace = self::serializeNamespace($key);
             $normalized[$namespace] = $value;
@@ -106,7 +108,7 @@ class SVGWriter
      *
      * @return string The modified namespace string to be added as attribute.
      */
-    private static function serializeNamespace($namespace)
+    private static function serializeNamespace(string $namespace): string
     {
         if ($namespace === '' || $namespace === 'xmlns') {
             return 'xmlns';
@@ -125,7 +127,7 @@ class SVGWriter
      *
      * @return void
      */
-    private function appendStyles(array $styles)
+    private function appendStyles(array $styles): void
     {
         if (empty($styles)) {
             return;
@@ -152,7 +154,7 @@ class SVGWriter
      *
      * @return void
      */
-    private function appendAttributes(array $attrs)
+    private function appendAttributes(array $attrs): void
     {
         foreach ($attrs as $key => $value) {
             $this->appendAttribute($key, $value);
@@ -168,7 +170,7 @@ class SVGWriter
      *
      * @return void
      */
-    private function appendAttribute($attrName, $attrValue)
+    private function appendAttribute(string $attrName, string $attrValue): void
     {
         $xml1 = defined('ENT_XML1') ? ENT_XML1 : 16;
 
@@ -185,7 +187,7 @@ class SVGWriter
      *
      * @return void
      */
-    private function writeCdata($cdata)
+    private function writeCdata(string $cdata): void
     {
         $this->outString .= '<![CDATA[' . $cdata . ']]>';
     }

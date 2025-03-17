@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Rasterization\Path\PathApproximator;
 use SVG\Rasterization\Transform\Transform;
 
@@ -20,14 +21,14 @@ class PathRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function prepareRenderParams(array $options, Transform $transform)
+    protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry): ?array
     {
         $approximator = new PathApproximator($transform);
         $approximator->approximate($options['commands']);
 
-        $subpaths = array();
+        $subpaths = [];
         foreach ($approximator->getSubpaths() as $subpath) {
-            $points = array();
+            $points = [];
             foreach ($subpath as $point) {
                 $points[] = $point[0];
                 $points[] = $point[1];
@@ -35,16 +36,16 @@ class PathRenderer extends MultiPassRenderer
             $subpaths[] = $points;
         }
 
-        return array(
+        return [
             'subpaths'  => $subpaths,
             'fill-rule' => $options['fill-rule'],
-        );
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderFill($image, array $params, $color)
+    protected function renderFill($image, $params, int $color): void
     {
         PathRendererImplementation::fillMultipath($image, $params['subpaths'], $color, $params['fill-rule']);
     }
@@ -52,7 +53,7 @@ class PathRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function renderStroke($image, array $params, $color, $strokeWidth)
+    protected function renderStroke($image, $params, int $color, float $strokeWidth): void
     {
         foreach ($params['subpaths'] as $points) {
             PathRendererImplementation::strokeOpenSubpath($image, $points, $color, $strokeWidth);

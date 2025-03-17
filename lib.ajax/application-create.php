@@ -208,6 +208,7 @@ file_put_contents($path3, $configYaml);
 
 $now = date("Y-m-d H:i:s");
 
+/*
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
@@ -240,3 +241,4 @@ catch(Exception $e)
 {
     error_log($e->getMessage());
 }
+    */

@@ -5,6 +5,7 @@ use AppBuilder\EntityInstaller\EntityAdminWorkspace;
 use AppBuilder\Util\Composer\ComposerUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicAdmin\Entity\Data\GeneralCache;
+use MagicObject\MagicObject;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -25,7 +26,7 @@ $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
 $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
-$bundeledMagicAppVersion = "2.15.18";
+
 
 if (ComposerUtil::checkInternetConnection()) {
     // Online
@@ -73,8 +74,17 @@ if (ComposerUtil::checkInternetConnection()) {
     }
     $composerOnline = true;
 }
-else
+
+// TODO: DEBUG
+$composerOnline = false;
+
+if(!$composerOnline)
 {
+    $composerJson = dirname(__DIR__) . "/inc.lib/composer.json";
+    $composerObject = (new MagicObject())->loadJsonFile($composerJson, false, true, true);
+    $bundeledMagicAppVersion = $composerObject->getRequire()->get("planetbiru/magic-app");
+    $bundeledMagicAppVersion = str_replace("^", "", $bundeledMagicAppVersion);
+
     $magicAppList = array(
         array("key"=>$bundeledMagicAppVersion, "value"=>"$bundeledMagicAppVersion (Offline)", "latest"=>false)
     );
@@ -111,6 +121,7 @@ catch(Exception $e)
 {
     // Do nothing
 }
+
 $installationMethod = array();
 if($composerOnline)
 {

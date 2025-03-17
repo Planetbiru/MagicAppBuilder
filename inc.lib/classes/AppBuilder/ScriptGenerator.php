@@ -1035,10 +1035,54 @@ class ScriptGenerator //NOSONAR
      */
     public function prepareComposerOffline($builderConfig, $appConf, $composer)
     {
+        $libPath = dirname(dirname(__DIR__));
         $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory());
         $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
         $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/".self::COMPOSER_PHAR;
-        $sourcePath = dirname(dirname(dirname(__DIR__)))."/".self::COMPOSER_PHAR;
+
+        $source3 = $libPath."/vendor/planetbiru";
+        $destination3 = $targetDir."/vendor/planetbiru";
+        $this->copyDirectory($source3, $destination3);
+
+        $source4 = $libPath."/vendor/autoload.php";
+        $destination4 = $targetDir."/vendor/autoload.php";
+        $this->copyDirectory($source4, $destination4);
+
+
+        $composerConfig = array();
+
+        $composerConfig['autoload'] = array();
+        $composerConfig['autoload']['psr-0'] = new stdClass();
+        $composerConfig['autoload']['psr-4'] = new stdClass();
+        $composerConfig['autoload']['require'] = new stdClass();
+
+        if($composer->getPsr0BaseDirecory() != null && is_array($composer->getPsr0BaseDirecory()))
+        {
+            foreach($composer->getPsr0BaseDirecory() as $psr)
+            {
+                $composerConfig['autoload']['psr-0']->{$psr->getNamespace()."\\"} = $psr->getDirectory();
+            }
+        }
+        if($composer->getPsr4BaseDirecory() != null && is_array($composer->getPsr4BaseDirecory()))
+        {
+            foreach($composer->getPsr4BaseDirecory() as $psr)
+            {
+                $composerConfig['autoload']['psr-4']->{$psr->getNamespace()."\\"} = $psr->getDirectory();
+            }
+        }
+
+        $magicAppVersion = $appConf->getMagicApp()->getVersion();
+        list($major, $minor) = explode(".", $magicAppVersion);
+
+        $composerConfig['autoload']['require']->{'planetbiru/magic-app'} = '^'.$major.'.'.$minor;
+
+        $jsonPath = $targetDir."/composer.json";
+        $jsonContent = json_encode($composerConfig, JSON_PRETTY_PRINT);
+
+        
+        file_put_contents($jsonPath, $jsonContent);
+
+        $sourcePath = $libPath."/".self::COMPOSER_PHAR;
         $success = copy($sourcePath, $targetPath);
         if($success)
         {
@@ -1047,9 +1091,8 @@ class ScriptGenerator //NOSONAR
             {
                 $phpPath = "php";
             }
-            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar composer dump-autoload --ignore-platform-reqs";
+            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar dump-autoload --ignore-platform-reqs";
             exec($cmd);     
-            $this->updateComposer($builderConfig, $appConf, $composer);
         }
     }
 

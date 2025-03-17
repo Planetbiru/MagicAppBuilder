@@ -2,32 +2,33 @@
     "packages": [
         {
             "name": "meyfa/php-svg",
-            "version": "v0.12.0",
-            "version_normalized": "0.12.0.0",
+            "version": "v0.16.1",
+            "version_normalized": "0.16.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/meyfa/php-svg.git",
-                "reference": "f6cc2fa743c4a2012cdec9143033f69eee3b501d"
+                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/f6cc2fa743c4a2012cdec9143033f69eee3b501d",
-                "reference": "f6cc2fa743c4a2012cdec9143033f69eee3b501d",
+                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
+                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=7.4.0"
             },
             "require-dev": {
-                "meyfa/phpunit-assert-gd": "^1.2",
-                "phpmd/phpmd": "@stable",
-                "phpunit/phpunit": "^4.8"
+                "meyfa/phpunit-assert-gd": "^v3.0.0",
+                "phpmd/phpmd": "^2.15.0",
+                "phpunit/phpunit": "^9.6.16",
+                "rector/rector": "^1.0"
             },
             "suggest": {
                 "ext-gd": "Needed to rasterize images",
                 "ext-simplexml": "Needed to read SVG strings and files"
             },
-            "time": "2022-11-15T15:49:03+00:00",
+            "time": "2025-03-10T22:28:37+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -42,7 +43,7 @@
             "authors": [
                 {
                     "name": "Fabian Meyer",
-                    "homepage": "http://meyfa.net"
+                    "homepage": "https://meyfa.net"
                 }
             ],
             "description": "Read, edit, write, and render SVG files with PHP",
@@ -52,7 +53,7 @@
             ],
             "support": {
                 "issues": "https://github.com/meyfa/php-svg/issues",
-                "source": "https://github.com/meyfa/php-svg/tree/v0.12.0"
+                "source": "https://github.com/meyfa/php-svg/tree/v0.16.1"
             },
             "install-path": "../meyfa/php-svg"
         },

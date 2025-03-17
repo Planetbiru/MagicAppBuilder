@@ -83,4 +83,39 @@ class FileDirUtil
         // Ensure the final path uses forward slashes (for consistency across systems)
         return str_replace($separator, "/", $newPath);
     }
+
+    /**
+     * Recursively copies all files and directories from the source to the destination.
+     * If a directory is empty, it will still be created at the destination.
+     *
+     * @param string $src Source directory path.
+     * @param string $dst Destination directory path.
+     * @return void
+     */
+    public static function copyTree($src, $dst) {
+        // Ensure the destination directory exists
+        if (!file_exists($dst)) {
+            mkdir($dst, 0777, true);
+        }
+        
+        // Scan the contents of the source directory
+        $files = scandir($src);
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+            
+            $srcPath = "$src/$file";
+            $dstPath = "$dst/$file";
+            
+            if (is_dir($srcPath)) {
+                // Recursively copy subdirectory
+                self::copyTree($srcPath, $dstPath);
+            } else {
+                // Copy file to destination
+                copy($srcPath, $dstPath);
+            }
+        }
+    }
+    
 }

@@ -2,8 +2,6 @@
 
 namespace SVG\Rasterization\Path;
 
-use SVG\Rasterization\Transform\Transform;
-
 /**
  * This class can approximate elliptical arc segments by calculating a series of
  * points on them (converting them to polylines).
@@ -35,42 +33,50 @@ class ArcApproximator
      *
      * @return array[] An approximation for the curve, as an array of points.
      */
-    public function approximate($start, $end, $large, $sweep, $radiusX, $radiusY, $rotation, $scale = 1.0)
-    {
+    public function approximate(
+        array $start,
+        array $end,
+        bool $large,
+        bool $sweep,
+        float $radiusX,
+        float $radiusY,
+        float $rotation,
+        float $scale = 1.0
+    ): array {
         // out-of-range parameter handling according to W3; see
         // https://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
         if (self::pointsClose($start, $end)) {
             // arc with equal points is treated as nonexistent
-            return array();
+            return [];
         }
         $radiusX = abs($radiusX);
         $radiusY = abs($radiusY);
         if ($radiusX < self::$EPSILON || $radiusY < self::$EPSILON) {
             // arc with no radius is treated as straight line
-            return array($start, $end);
+            return [$start, $end];
         }
 
         $cosr = cos($rotation);
         $sinr = sin($rotation);
 
-        list($center, $radiusX, $radiusY, $angleStart, $angleDelta) =
+        [$center, $radiusX, $radiusY, $angleStart, $angleDelta] =
             self::endpointToCenter($start, $end, $large, $sweep, $radiusX, $radiusY, $cosr, $sinr);
 
         $dist = abs($end[0] - $start[0]) + abs($end[1] - $start[1]);
         $numSteps = max(2, ceil(abs($angleDelta * $dist * $scale)));
         $stepSize = $angleDelta / $numSteps;
 
-        $points = array();
+        $points = [];
 
         for ($i = 0; $i <= $numSteps; ++$i) {
             $angle = $angleStart + $stepSize * $i;
             $first = $radiusX * cos($angle);
             $second = $radiusY * sin($angle);
 
-            $points[] = array(
+            $points[] = [
                 $cosr * $first - $sinr * $second + $center[0],
                 $sinr * $first + $cosr * $second + $center[1],
-            );
+            ];
         }
 
         return $points;
@@ -102,8 +108,16 @@ class ArcApproximator
      *
      * @return float[] A tuple with (center(cx,cy), radiusX, radiusY, angleStart, angleDelta).
      */
-    private static function endpointToCenter($start, $end, $large, $sweep, $radiusX, $radiusY, $cosr, $sinr)
-    {
+    private static function endpointToCenter(
+        array $start,
+        array $end,
+        bool $large,
+        bool $sweep,
+        float $radiusX,
+        float $radiusY,
+        float $cosr,
+        float $sinr
+    ): array {
         // Step 1: Compute (x1', y1') [F.6.5.1]
         $xsubhalf = ($start[0] - $end[0]) / 2;
         $ysubhalf = ($start[1] - $end[1]) / 2;
@@ -142,8 +156,8 @@ class ArcApproximator
             ($y1prime - $cyprime) / $radiusY
         );
         $angleDelta = self::vectorAngle2(
-            ( $x1prime - $cxprime) / $radiusX,
-            ( $y1prime - $cyprime) / $radiusY,
+            ($x1prime - $cxprime) / $radiusX,
+            ($y1prime - $cyprime) / $radiusY,
             (-$x1prime - $cxprime) / $radiusX,
             (-$y1prime - $cyprime) / $radiusY
         );
@@ -155,7 +169,7 @@ class ArcApproximator
             $angleDelta += M_PI * 2;
         }
 
-        return array(array($centerX, $centerY), $radiusX, $radiusY, $angleStart, $angleDelta);
+        return [[$centerX, $centerY], $radiusX, $radiusY, $angleStart, $angleDelta];
     }
 
     /**
@@ -168,7 +182,7 @@ class ArcApproximator
      *
      * @return float The angle, in radians.
      */
-    private static function vectorAngle($vecx, $vecy)
+    private static function vectorAngle(float $vecx, float $vecy): float
     {
         $norm = hypot($vecx, $vecy);
         return ($vecy >= 0 ? 1 : -1) * acos($vecx / $norm);
@@ -184,7 +198,7 @@ class ArcApproximator
      *
      * @return float The angle, in radians.
      */
-    private static function vectorAngle2($vec1x, $vec1y, $vec2x, $vec2y)
+    private static function vectorAngle2(float $vec1x, float $vec1y, float $vec2x, float $vec2y): float
     {
         // see W3C [F.6.5.4]
         $dotprod = $vec1x * $vec2x + $vec1y * $vec2y;
@@ -196,14 +210,14 @@ class ArcApproximator
     }
 
     /**
-     * Determine whether two points are basically the same, except for miniscule
+     * Determine whether two points are basically the same, except for minuscule
      * differences.
      *
      * @param float[] $vec1 The start point (x0, y0).
      * @param float[] $vec2 The end point (x1, y1).
      * @return bool Whether the points are close.
      */
-    private static function pointsClose($vec1, $vec2)
+    private static function pointsClose(array $vec1, array $vec2): bool
     {
         $distanceX = abs($vec1[0] - $vec2[0]);
         $distanceY = abs($vec1[1] - $vec2[1]);

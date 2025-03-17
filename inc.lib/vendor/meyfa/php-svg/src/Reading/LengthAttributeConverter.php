@@ -28,18 +28,17 @@ class LengthAttributeConverter implements AttributeConverter
      *
      * @codeCoverageIgnore
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new self();
-        }
+        self::$instance ??= new self();
+
         return self::$instance;
     }
 
     /**
      * @inheritdoc
      */
-    public function convert($value)
+    public function convert(string $value): string
     {
         if (preg_match('/^\s*([+-]?(?:\d+\.?|\d*\.?\d+))\s*$/', $value, $matches)) {
             return $matches[1] . 'px';

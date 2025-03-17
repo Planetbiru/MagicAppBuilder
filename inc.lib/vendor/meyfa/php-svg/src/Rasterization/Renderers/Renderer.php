@@ -22,7 +22,7 @@ abstract class Renderer
      * The node is required for access to things like the opacity as well as
      * stroke/fill attributes etc.
      * The options array is subclass-specific; for example, ellipse renderers
-     * might require the center and the radiuses while polygon renderers might
+     * might require the center and the radii, while polygon renderers might
      * require an array of points. For details, see the respective subclasses.
      *
      * Note that as part of the renderer contract, every option that is passed
@@ -30,10 +30,10 @@ abstract class Renderer
      * are dealt with by the renderer as needed.
      *
      * @param SVGRasterizer $rasterizer The rasterizer to render to.
-     * @param mixed[]       $options    Associative array of renderer options.
+     * @param array         $options    Associative array of renderer options.
      * @param SVGNode       $context    The SVGNode serving as the context.
      *
      * @return void
      */
-    abstract public function render(SVGRasterizer $rasterizer, array $options, SVGNode $context);
+    abstract public function render(SVGRasterizer $rasterizer, array $options, SVGNode $context): void;
 }

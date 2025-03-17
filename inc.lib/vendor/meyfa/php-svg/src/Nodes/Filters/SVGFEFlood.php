@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGFEFlood extends SVGNodeContainer
 {
-    const TAG_NAME = 'feFlood';
+    public const TAG_NAME = 'feFlood';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGFEFlood extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

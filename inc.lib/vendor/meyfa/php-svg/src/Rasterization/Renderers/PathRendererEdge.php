@@ -10,27 +10,27 @@ class PathRendererEdge
     /**
      * @var float The smaller of the two y values.
      */
-    public $minY;
+    public float $minY;
 
     /**
      * @var float The larger of the two y values.
      */
-    public $maxY;
+    public float $maxY;
 
     /**
      * @var int The vertical winding direction of this edge, 1 if top to bottom, -1 if bottom to top.
      */
-    public $direction;
+    public int $direction;
 
     /**
      * @var float Delta x over delta y of this edge, or 0 if the edge is fully horizontal (dy === 0).
      */
-    public $inverseSlope;
+    public float $inverseSlope;
 
     /**
      * @var float Initially, the x coordinate belonging to the maxY value, but slides upwards during scanning.
      */
-    public $x;
+    public float $x;
 
     /**
      * Construct a new edge object from the two end points. The order of points is important here,
@@ -41,7 +41,7 @@ class PathRendererEdge
      * @param $x2 float Second point X.
      * @param $y2 float Second point Y.
      */
-    public function __construct($x1, $y1, $x2, $y2)
+    public function __construct(float $x1, float $y1, float $x2, float $y2)
     {
         $this->minY = min($y1, $y2);
         $this->maxY = max($y1, $y2);
@@ -59,14 +59,9 @@ class PathRendererEdge
      * @param $b self The second edge.
      * @return int Comparison result.
      */
-    public static function compareMaxY($a, $b)
+    public static function compareMaxY(self $a, self $b): int
     {
-        if ($a->maxY < $b->maxY) {
-            return 1;
-        } elseif ($a->maxY > $b->maxY) {
-            return -1;
-        }
-        return 0;
+        return $b->maxY <=> $a->maxY;
     }
 
     /**
@@ -76,13 +71,8 @@ class PathRendererEdge
      * @param $b self The second edge.
      * @return int Comparison result.
      */
-    public static function compareX($a, $b)
+    public static function compareX(self $a, self $b): int
     {
-        if ($a->x < $b->x) {
-            return 1;
-        } elseif ($a->x > $b->x) {
-            return -1;
-        }
-        return 0;
+        return $b->x <=> $a->x;
     }
 }

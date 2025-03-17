@@ -668,7 +668,7 @@ let initAll = function () {
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
-    let composer_online = modal.find('[name="composer_online"]').val().trim();
+    let composer_online = modal.find('[name="installation_method"]').val().toLowerCase().indexOf('online') === 0;
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);

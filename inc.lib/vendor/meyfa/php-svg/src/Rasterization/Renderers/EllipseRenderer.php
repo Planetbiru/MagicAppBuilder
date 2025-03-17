@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Rasterization\Transform\Transform;
 
 /**
@@ -18,49 +19,43 @@ class EllipseRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function prepareRenderParams(array $options, Transform $transform)
+    protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry): ?array
     {
-        $cx = $options['cx'];
-        $cy = $options['cy'];
+        $cx = $options['cx'] ?? 0;
+        $cy = $options['cy'] ?? 0;
         $transform->map($cx, $cy);
 
-        $width = $options['rx'] * 2;
-        $height = $options['ry'] * 2;
+        $width = ($options['rx'] ?? $options['ry'] ?? 0) * 2;
+        $height = ($options['ry'] ?? $options['rx'] ?? 0) * 2;
         $transform->resize($width, $height);
 
-        return array(
+        return [
             'cx'        => $cx,
             'cy'        => $cy,
             'width'     => $width,
             'height'    => $height,
-        );
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderFill($image, array $params, $color)
+    protected function renderFill($image, $params, int $color): void
     {
-        imagefilledellipse($image, $params['cx'], $params['cy'], $params['width'], $params['height'], $color);
+        imagefilledellipse($image, (int)round($params['cx']), (int)round($params['cy']), (int)round($params['width']), (int)round($params['height']), $color);
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderStroke($image, array $params, $color, $strokeWidth)
+    protected function renderStroke($image, $params, int $color, float $strokeWidth): void
     {
         imagesetthickness($image, round($strokeWidth));
 
-        $width = $params['width'];
-        if ($width % 2 === 0) {
-            $width += 1;
-        }
-        $height = $params['height'];
-        if ($height % 2 === 0) {
-            $height += 1;
-        }
+        $width = (int)round($params['width']) | 1;
+        $height = (int)round($params['height']) | 1;
 
         // imageellipse ignores imagesetthickness; draw arc instead
-        imagearc($image, $params['cx'], $params['cy'], $width, $height, 0, 360, $color);
+        imagearc($image, (int)round($params['cx']), (int)round($params['cy']), $width, $height, 0, 360, $color);
     }
 }

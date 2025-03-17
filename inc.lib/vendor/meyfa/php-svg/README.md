@@ -5,6 +5,7 @@
 [![CI](https://github.com/meyfa/php-svg/actions/workflows/php.yml/badge.svg)](https://github.com/meyfa/php-svg/actions/workflows/php.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8f73468601a653aff0e8/maintainability)](https://codeclimate.com/github/meyfa/php-svg/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8f73468601a653aff0e8/test_coverage)](https://codeclimate.com/github/meyfa/php-svg/test_coverage)
+![Packagist PHP Version](https://img.shields.io/packagist/dependency-v/meyfa/php-svg/php?style=plastic)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/meyfa/php-svg)](https://packagist.org/packages/meyfa/php-svg)
 
 
@@ -27,7 +28,7 @@ Contributions are very welcome. [Find out how to contribute](#contributing).
 
 PHP-SVG is free of dependencies. All it needs is a PHP installation satisfying the following requirements:
 
-* PHP version 5.3.3 or newer. This library is tested against all versions up to PHP 8.
+* PHP version 7.4 or newer. This library is tested against all versions up to (and including) PHP 8.4.
 * If you wish to load SVG files, or strings containing SVG code, you need to have the
   ['simplexml' PHP extension](https://www.php.net/manual/en/book.simplexml.php).
 * If you wish to use the rasterization feature for converting SVGs to raster images (PNGs, JPEGs, ...), you need to
@@ -43,8 +44,8 @@ always work, even without any extension.
 This package is available on [Packagist](https://packagist.org/packages/meyfa/php-svg) and can be installed with
 Composer:
 
-```
-$ composer require meyfa/php-svg
+```bash
+composer require meyfa/php-svg
 ```
 
 This adds a dependency to your composer.json file. If you haven't already, setup autoloading for Composer dependencies
@@ -163,8 +164,8 @@ a GD image resource. GD then provides methods for encoding this resource to a nu
 * [imagejpeg](https://www.php.net/manual/en/function.imagejpeg.php)
 * [imagebmp](https://www.php.net/manual/en/function.imagebmp.php)
 * [imagegif](https://www.php.net/manual/en/function.imagegif.php)
-* [imagewebp](https://www.php.net/manual/en/function.imagewebp.php) (PHP 5.4.0 and later)
-* [imageavif](https://www.php.net/manual/en/function.imageavif.php) (PHP 8.1.0 and later)
+* [imagewebp](https://www.php.net/manual/en/function.imagewebp.php)
+* [imageavif](https://www.php.net/manual/en/function.imageavif.php) (requires PHP 8.1.0 or newer)
 
 ```php
 <?php
@@ -201,6 +202,43 @@ such as JPEG, that cannot encode alpha channel information. For example:
 $rasterImage = $image->toRasterImage(200, 200, '#FFFFFF');
 imagejpeg($rasterImage, 'path/to/output.jpg');
 ```
+
+### Text rendering (loading fonts)
+
+PHP-SVG implements support for TrueType fonts (`.ttf` files) using a handcrafted TTF parser. Since PHP doesn't come
+with any built-in font files, you will need to provide your own. The following example shows how to load a set of font
+files. PHP-SVG will try to pick the best matching font for a given text element, based on algorithms from the CSS spec.
+
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use SVG\SVG;
+
+// load a set of fonts from the "fonts" directory relative to the script directory
+SVG::addFont(__DIR__ . '/fonts/Ubuntu-Regular.ttf');
+SVG::addFont(__DIR__ . '/fonts/Ubuntu-Bold.ttf');
+SVG::addFont(__DIR__ . '/fonts/Ubuntu-Italic.ttf');
+SVG::addFont(__DIR__ . '/fonts/Ubuntu-BoldItalic.ttf');
+
+$image = SVG::fromString('
+<svg width="220" height="220">
+  <rect x="0" y="0" width="100%" height="100%" fill="lightgray"/>
+  <g font-size="15">
+    <text y="20">hello world</text>
+    <text y="100" font-weight="bold">in bold!</text>
+    <text y="120" font-style="italic">and italic!</text>
+    <text y="140" font-weight="bold" font-style="italic">bold and italic</text>
+  </g>
+</svg>
+');
+
+header('Content-Type: image/png');
+imagepng($image->toRasterImage(220, 220));
+```
+
+Note that PHP often behaves unexpectedly when using relative paths, especially with fonts. Hence, it is recommended to
+use absolute paths, or use the `__DIR__` constant to prepend the directory of the current script.
 
 
 ## Document model
@@ -299,6 +337,25 @@ Consider the following node:
 
 * `x`, `y` and `r` are attributes.
 * `fill`, `stroke` and `stroke-width` are styles.
+
+
+## Debugging
+
+If you aren't getting any output but only a blank page, try temporarily enabling PHP's error reporting to find the cause
+of the problem.
+
+```php
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// ... rest of the script ...
+```
+
+Make sure you disable this again when you're done, as it may leak sensitive information about your server setup.
+Additionally, ensure you're not setting the `Content-Type` header to an image format in this mode, as your browser will
+try to render the error message as an image, which won't work.
+
+Alternatively, you may attempt to find your server's error log file. Its location depends on how you're running PHP.
 
 
 ## Contributing

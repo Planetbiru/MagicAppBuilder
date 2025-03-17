@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGMetadata extends SVGNodeContainer
 {
-    const TAG_NAME = 'metadata';
+    public const TAG_NAME = 'metadata';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGMetadata extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

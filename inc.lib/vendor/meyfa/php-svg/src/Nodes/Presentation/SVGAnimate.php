@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGAnimate extends SVGNodeContainer
 {
-    const TAG_NAME = 'animate';
+    public const TAG_NAME = 'animate';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGAnimate extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }
