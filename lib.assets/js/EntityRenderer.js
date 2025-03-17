@@ -22,8 +22,8 @@ class EntityRenderer {
         this.xPadding = 5;
         this.yPadding = 5;
 
-        this.betweenX  = 24;
-        this.betweenY = 24;
+        this.betweenX  = 20;
+        this.betweenY = 20;
         this.tableWidth = 250; // Table width
         this.maxTop = 0; // To track the maximum top position of the last row
         this.maxCol = 0; // The maximum number of columns in any table (used to wrap rows)

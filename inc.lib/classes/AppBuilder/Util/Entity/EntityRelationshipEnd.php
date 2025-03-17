@@ -59,7 +59,7 @@ class EntityRelationshipEnd
      *
      * @return  self
      */ 
-    public function setType(string $type)
+    public function setType($type)
     {
         $this->type = $type;
 
