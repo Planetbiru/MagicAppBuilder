@@ -2552,6 +2552,14 @@ class MagicObject extends stdClass // NOSONAR
      * - **notEquals**: Checks if the specified property is set and does not equal the given value.
      *   - Example: `$isNotEqual = $object->notEqualsPropertyName($value);`
      *
+     * - **mask**: Masks the value of the property by replacing certain characters with a masking character.
+     *   - **Parameters**:
+     *     - `$position` (int): The starting position from where the masking begins (default is 1).
+     *     - `$maskLength` (int): The number of characters to mask (default is 3).
+     *     - `$maskChar` (string): The character to use for masking (default is '*').
+     *   - Example: `$object->maskPropertyName($position, $maskLength, $maskChar);`
+     *   - If `$object->maskPropertyName(1, 3, '*')` is called, it will mask the first 3 characters of the property value starting from position 1 with `*`.
+     * 
      * @param string $method Method name
      * @param mixed $params Parameters for the method
      * @return mixed|null The result of the called method, or null if not applicable
@@ -2819,6 +2827,13 @@ class MagicObject extends stdClass // NOSONAR
         else if (strncasecmp($method, "notEquals", 9) === 0) {
             $var = PicoStringUtil::camelize(substr($method, 9));
             return isset($this->{$var}) && $this->{$var} != $params[0];
+        }
+        else if(strncasecmp($method, "mask", 4) === 0)
+        {
+            $position = isset($params[0]) ? $params[0] : 1; // Position (default is from beginning)
+            $maskLength = isset($params[1]) ? $params[1] : 3; // Length
+            $maskChar = isset($params[2]) ? $params[2] : '*'; // Character           
+            return PicoStringUtil::maskString($this->get(substr($method, 4)), $position, $maskLength, $maskChar);
         }
     }
 
