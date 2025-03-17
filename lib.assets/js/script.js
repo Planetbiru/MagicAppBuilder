@@ -1058,14 +1058,18 @@ let initAll = function () {
             }
             $('[name="application_workspace_id"]').append(opt);
           }
-          for(let workspace of data.installation_method)
+          for(let method of data.installation_method)
             {
               let opt = $('<option />');
-              opt.text(workspace.label);
-              opt.attr('value', workspace.value);
-              if(workspace.selected)
+              opt.text(method.label);
+              opt.attr('value', method.value);
+              if(method.selected)
               {
                 opt.attr('selected', 'selected');
+              }
+              if(method.disabled)
+              {
+                opt.attr('disabled', 'disabled');
               }
               $('[name="installation_method"]').append(opt);
             }

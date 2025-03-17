@@ -111,7 +111,6 @@ catch(Exception $e)
 {
     // Do nothing
 }
-$composerOnline = true;
 $installationMethod = array();
 if($composerOnline)
 {
@@ -134,6 +133,12 @@ if($composerOnline)
 else
 {
     $installationMethod = array(
+        array(
+            'value'=>'Online', 
+            'label'=>'Online',
+            'selected'=>false,
+            'disabled'=>true
+        ),
         array(
             'value'=>'Offline', 
             'label'=>'Offline',
