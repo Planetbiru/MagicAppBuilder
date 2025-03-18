@@ -84,9 +84,9 @@ if(!$composerOnline)
 
     $magicAppList = array(
         array(
-            "key"=>$bundeledMagicAppVersion, 
-            "value"=>"$bundeledMagicAppVersion (Offline)", 
-            "latest"=>true
+            "key" => $bundeledMagicAppVersion, 
+            "value" => "$bundeledMagicAppVersion (Offline)", 
+            "latest" => true
         )
     );
 }
