@@ -3900,11 +3900,19 @@ $subqueryMap = '.$referece.';
      * @param mixed $value The value to format.
      * @return mixed The formatted value.
      */
-    public static function fixValue($value)
+    public static function fixValue($value) // NOSONAR
     {
-        if($value == null)
+        if($value === null)
         {
             return 'null';
+        }
+        if($value === true)
+        {
+            return 'true';
+        }
+        if($value === false)
+        {
+            return 'false';
         }
         $value = trim($value);
         if(is_bool($value))

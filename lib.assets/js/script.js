@@ -4223,22 +4223,28 @@ function parseJsonData(text)  //NOSONAR
 }
 
 /**
- * Generates code by sending data to the server and updating UI components.
+ * Sends data to the server for code generation and updates UI components.
  *
- * This function sends the provided data to a server endpoint
- * for code generation. Upon success, it updates the entity file,
- * entity query, and entity relationship diagram.
+ * This function makes a POST request to the script generator endpoint with the provided data.
+ * If the request is successful, it triggers various UI updates, including refreshing
+ * the entity file, entity query, and entity relationship diagram. Additionally, it handles
+ * UI feedback such as displaying toast notifications and closing alerts.
  *
- * @param {Object} dataToPost - The data to send to the server for code generation.
+ * @param {Object} dataToPost - The data to be sent to the server for generating code.
+ * @returns {void}
  */
+
 function generateAllCode(dataToPost) {
   increaseAjaxPending();
-  $.ajax({
-    type: "post",
-    url: "lib.ajax/script-generator.php",
-    dataType: "json",
-    data: dataToPost,
-    success: function (data) {
+  fetch('lib.ajax/script-generator.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dataToPost),
+    })
+    .then((response) => response.json())
+    .then((data) => {
       if (data.success) {
         showToast(data.title, data.message);
       }
@@ -4250,8 +4256,10 @@ function generateAllCode(dataToPost) {
         onModuleCreated();
         setTimeout(function () { closeAlertUI() }, 2000);
       }
-    },
-  });
+    })
+    .catch((error) => {
+      decreaseAjaxPending();
+    });
 }
 
 /**
@@ -4582,7 +4590,7 @@ function restoreForm(data)  //NOSONAR
   $(selector).find('.data-filter-column-name').val('');
   $(selector).find('.data-filter-column-value').val('');
 
-  if (typeof data.specification == 'undefined' || data.specification.length == 0) {
+  if (data.specification == null || typeof data.specification == 'undefined' && data.specification.length == 0) {
     $(selector).find('.data-filter-column-name').val('');
     $(selector).find('.data-filter-column-comparison').val('');
     $(selector).find('.data-filter-column-value').val('');
@@ -4597,15 +4605,15 @@ function restoreForm(data)  //NOSONAR
         let column = data.specification[i].column || '';
         let comparison = data.specification[i].comparison || '';
         let value = data.specification[i].value || '';
-        if(typeof column == 'undefined')
+        if(column == null)
         {
           column = '';
         }
-        if(typeof value == 'undefined')
+        if(value == null)
         {
           value = '';
         }
-        if(typeof comparison == 'undefined')
+        if(comparison == null)
         {
           comparison = '';
         }
