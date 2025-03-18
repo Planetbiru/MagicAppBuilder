@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Rasterization\Transform\Transform;
 
 /**
@@ -20,18 +21,18 @@ class RectRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function prepareRenderParams(array $options, Transform $transform)
+    protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry): ?array
     {
         $w = $options['width'];
         $h = $options['height'];
         $transform->resize($w, $h);
 
         if ($w <= 0 || $h <= 0) {
-            return array('empty' => true);
+            return null;
         }
 
-        $x1 = $options['x'];
-        $y1 = $options['y'];
+        $x1 = $options['x'] ?? 0;
+        $y1 = $options['y'] ?? 0;
         $transform->map($x1, $y1);
 
         // Corner radii may at most be (width-1)/2 pixels long.
@@ -52,26 +53,21 @@ class RectRenderer extends MultiPassRenderer
             $ry = 0;
         }
 
-        return array(
-            'empty' => false,
+        return [
             'x1' => $x1,
             'y1' => $y1,
             'x2' => $x1 + $w - 1,
             'y2' => $y1 + $h - 1,
             'rx' => $rx,
             'ry' => $ry,
-        );
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderFill($image, array $params, $color)
+    protected function renderFill($image, $params, int $color): void
     {
-        if ($params['empty']) {
-            return;
-        }
-
         if ($params['rx'] != 0 || $params['ry'] != 0) {
             $this->renderFillRounded($image, $params, $color);
             return;
@@ -87,7 +83,7 @@ class RectRenderer extends MultiPassRenderer
         );
     }
 
-    private function renderFillRounded($image, array $params, $color)
+    private function renderFillRounded($image, array $params, int $color): void
     {
         $x1 = $params['x1'];
         $y1 = $params['y1'];
@@ -130,12 +126,8 @@ class RectRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function renderStroke($image, array $params, $color, $strokeWidth)
+    protected function renderStroke($image, $params, int $color, float $strokeWidth): void
     {
-        if ($params['empty']) {
-            return;
-        }
-
         imagesetthickness($image, round($strokeWidth));
 
         if ($params['rx'] != 0 || $params['ry'] != 0) {
@@ -194,7 +186,7 @@ class RectRenderer extends MultiPassRenderer
         );
     }
 
-    private function renderStrokeRounded($image, array $params, $color, $strokeWidth)
+    private function renderStrokeRounded($image, array $params, int $color, float $strokeWidth): void
     {
         $x1 = $params['x1'];
         $y1 = $params['y1'];

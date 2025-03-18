@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Rasterization\Transform\Transform;
 
 /**
@@ -18,33 +19,33 @@ class PolygonRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function prepareRenderParams(array $options, Transform $transform)
+    protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry): ?array
     {
-        $points = array();
+        $points = [];
         foreach ($options['points'] as $point) {
             $transform->mapInto($point[0], $point[1], $points);
         }
 
-        return array(
-            'open'      => isset($options['open']) ? $options['open'] : false,
+        return [
+            'open'      => $options['open'] ?? false,
             'points'    => $points,
             'fill-rule' => $options['fill-rule'],
-        );
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderFill($image, array $params, $color)
+    protected function renderFill($image, $params, int $color): void
     {
         // Filling a polygon is equivalent to filling a path containing just a single polygonal subpath.
-        PathRendererImplementation::fillMultipath($image, array($params['points']), $color, $params['fill-rule']);
+        PathRendererImplementation::fillMultipath($image, [$params['points']], $color, $params['fill-rule']);
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderStroke($image, array $params, $color, $strokeWidth)
+    protected function renderStroke($image, $params, int $color, float $strokeWidth): void
     {
         if ($params['open']) {
             PathRendererImplementation::strokeOpenSubpath($image, $params['points'], $color, $strokeWidth);

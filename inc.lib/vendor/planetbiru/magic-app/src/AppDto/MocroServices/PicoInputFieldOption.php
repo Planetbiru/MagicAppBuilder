@@ -141,7 +141,7 @@ class PicoInputFieldOption extends PicoObjectToString
      *
      * @return self Returns the current instance for method chaining.
      */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = $value;
 
@@ -221,14 +221,10 @@ class PicoInputFieldOption extends PicoObjectToString
     }
 
     /**
-     * Determine whether the option is selected by default.
+     * Get indicates whether the option is selected by default.
      *
-     * This method returns a boolean value indicating whether 
-     * the option is pre-selected. It may return `null` if 
-     * the selection state is undefined.
-     *
-     * @return bool|null `true` if selected, `false` if not, `null` if undefined.
-     */
+     * @return  bool|null
+     */ 
     public function getSelected()
     {
         return $this->selected;

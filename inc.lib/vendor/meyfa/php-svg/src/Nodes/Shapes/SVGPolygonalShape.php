@@ -12,13 +12,13 @@ use SVG\Shims\Str;
 abstract class SVGPolygonalShape extends SVGNodeContainer
 {
     /**
-     * @param array[] $points Array of points (float 2-tuples).
+     * @param array[]|null $points Array of points (float 2-tuples).
      */
-    public function __construct(array $points = null)
+    public function __construct(?array $points = null)
     {
         parent::__construct();
 
-        if (isset($points)) {
+        if ($points !== null) {
             $this->setAttribute('points', self::joinPoints($points));
         }
     }
@@ -32,10 +32,10 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
      *
      * @return $this This node instance, for call chaining.
      */
-    public function addPoint($a, $b = null)
+    public function addPoint($a, $b = null): SVGPolygonalShape
     {
         if (is_array($a)) {
-            list($a, $b) = $a;
+            [$a, $b] = $a;
         }
 
         $pointsAttribute = $this->getAttribute('points') ?: '';
@@ -51,7 +51,7 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
      *
      * @return $this This node instance, for call chaining.
      */
-    public function removePoint($index)
+    public function removePoint(int $index): SVGPolygonalShape
     {
         $coords = self::splitCoordinates($this->getAttribute('points') ?: '');
         array_splice($coords, $index * 2, 2);
@@ -63,7 +63,7 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
     /**
      * @return int The number of points in this shape.
      */
-    public function countPoints()
+    public function countPoints(): int
     {
         $pointsAttribute = $this->getAttribute('points');
         if (isset($pointsAttribute)) {
@@ -76,13 +76,13 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
     /**
      * @return array[] All points in this shape (array of float 2-tuples).
      */
-    public function getPoints()
+    public function getPoints(): array
     {
         $pointsAttribute = $this->getAttribute('points');
         if (isset($pointsAttribute)) {
             return self::splitPoints($pointsAttribute);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -90,13 +90,13 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
      *
      * @return float[] The point at the given index (0 => x, 1 => y).
      */
-    public function getPoint($index)
+    public function getPoint(int $index): array
     {
         $coords = self::splitCoordinates($this->getAttribute('points') ?: '');
-        return array(
+        return [
             (float) $coords[$index * 2],
             (float) $coords[$index * 2 + 1],
-        );
+        ];
     }
 
     /**
@@ -107,7 +107,7 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setPoint($index, array $point)
+    public function setPoint(int $index, array $point): SVGPolygonalShape
     {
         $coords = self::splitCoordinates($this->getAttribute('points') ?: '');
         $coords[$index * 2] = $point[0];
@@ -117,12 +117,12 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
         return $this;
     }
 
-    private static function splitCoordinates($pointsString)
+    private static function splitCoordinates(?string $pointsString): array
     {
         return preg_split('/[\s,]+/', Str::trim($pointsString));
     }
 
-    private static function joinCoordinates(array $coordinatesArray)
+    private static function joinCoordinates(array $coordinatesArray): string
     {
         $pointsString = '';
         for ($i = 0, $n = count($coordinatesArray); $i < $n; ++$i) {
@@ -135,20 +135,20 @@ abstract class SVGPolygonalShape extends SVGNodeContainer
         return $pointsString;
     }
 
-    private static function splitPoints($pointsString)
+    private static function splitPoints(?string $pointsString): array
     {
-        $pointsArray = array();
+        $pointsArray = [];
         $coords = self::splitCoordinates($pointsString);
         for ($i = 0, $n = count($coords); $i + 1 < $n; $i += 2) {
-            $pointsArray[] = array(
+            $pointsArray[] = [
                 (float) $coords[$i],
                 (float) $coords[$i + 1],
-            );
+            ];
         }
         return $pointsArray;
     }
 
-    private static function joinPoints(array $pointsArray)
+    private static function joinPoints(array $pointsArray): string
     {
         $pointsString = '';
         foreach ($pointsArray as $point) {

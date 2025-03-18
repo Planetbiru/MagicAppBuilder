@@ -668,7 +668,7 @@ let initAll = function () {
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
     let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
-    let composer_online = modal.find('[name="composer_online"]').val().trim();
+    let composer_online = modal.find('[name="installation_method"]').val().toLowerCase().indexOf('online') === 0;
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);
@@ -1047,40 +1047,9 @@ let initAll = function () {
           $('[name="application_namespace"]').val(data.application_namespace);
           $('[name="application_workspace_id"]').empty();
           $('[name="installation_method"]').empty();
-          for(let workspace of data.application_workspace)
-          {
-            let opt = $('<option />');
-            opt.text(workspace.label);
-            opt.attr('value', workspace.value);
-            if(workspace.selected)
-            {
-              opt.attr('selected', 'selected');
-            }
-            $('[name="application_workspace_id"]').append(opt);
-          }
-          for(let method of data.installation_method)
-            {
-              let opt = $('<option />');
-              opt.text(method.label);
-              opt.attr('value', method.value);
-              if(method.selected)
-              {
-                opt.attr('selected', 'selected');
-              }
-              if(method.disabled)
-              {
-                opt.attr('disabled', 'disabled');
-              }
-              $('[name="installation_method"]').append(opt);
-            }
           $('[name="application_author"]').val(data.application_author);
           $('[name="application_description"]').val(data.application_description);
-          for (let i in data.magic_app_versions) {
-            let latest = data.magic_app_versions[i]['latest'];
-            $('[name="magic_app_version"]')[0].appendChild(
-              new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
-            );
-          }
+          updateNewApplicationForm(data);
           createBtn[0].disabled = false;
         }
       }
@@ -1934,6 +1903,57 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+
+/**
+ * Updates the application form with dynamic data for workspace, installation method, and magic app versions.
+ * 
+ * This function populates the dropdown options in a form using the provided data object. It adds options to 
+ * the "application_workspace_id" and "installation_method" fields, setting the selected and disabled attributes 
+ * based on the data. It also populates the "magic_app_version" field with a list of versions and highlights 
+ * the latest version.
+ * 
+ * @param {Object} data - The data object containing the information to update the form with.
+ * @param {Array} data.application_workspace - A list of workspaces, each containing a label, value, and selected flag.
+ * @param {Array} data.installation_method - A list of installation methods, each containing a label, value, 
+ *                                          selected flag, and disabled flag.
+ * @param {Array} data.magic_app_versions - A list of magic app versions, each containing a value, key, 
+ *                                           and a flag indicating the latest version.
+ */
+function updateNewApplicationForm(data) {
+  // Populate the application workspace dropdown
+  for (let workspace of data.application_workspace) {
+    let opt = $('<option />');
+    opt.text(workspace.label);
+    opt.attr('value', workspace.value);
+    if (workspace.selected) {
+      opt.attr('selected', 'selected');
+    }
+    $('[name="application_workspace_id"]').append(opt);
+  }
+
+  // Populate the installation method dropdown
+  for (let method of data.installation_method) {
+    let opt = $('<option />');
+    opt.text(method.label);
+    opt.attr('value', method.value);
+    if (method.selected) {
+      opt.attr('selected', 'selected');
+    }
+    if (method.disabled) {
+      opt.attr('disabled', 'disabled');
+    }
+    $('[name="installation_method"]').append(opt);
+  }
+
+  // Populate the magic app version dropdown
+  for (let i in data.magic_app_versions) {
+    let latest = data.magic_app_versions[i]['latest'];
+    $('[name="magic_app_version"]')[0].appendChild(
+      new Option(data.magic_app_versions[i]['value'], data.magic_app_versions[i]['key'], latest, latest)
+    );
+  }
+}
 
 /**
  * Shows the application menu dialog for the specified application ID.

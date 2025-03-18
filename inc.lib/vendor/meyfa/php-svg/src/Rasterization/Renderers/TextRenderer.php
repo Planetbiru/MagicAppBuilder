@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Rasterization\Transform\Transform;
 
 /**
@@ -11,8 +12,10 @@ use SVG\Rasterization\Transform\Transform;
  * - float x: the x coordinate of the text
  * - float y: the y coordinate of the baseline
  * - string anchor: the anchor point (start|middle|end) for x coordinate
- * - float size: the font size
- * - string font_path: the path to the font file (.ttf)
+ * - float fontSize: the font size
+ * - string fontFamily: the font family
+ * - string fontStyle: the font style (normal|italic|oblique)
+ * - string fontWeight: the font weight (normal|bold|bolder|lighter|(number))
  * - string text: the text to draw
  */
 class TextRenderer extends MultiPassRenderer
@@ -20,18 +23,31 @@ class TextRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function prepareRenderParams(array $options, Transform $transform)
+    protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry): ?array
     {
         // this assumes there is no rotation or skew, but that's fine, we can't deal with that anyway
-        $size1 = $options['size'];
+        $size1 = $options['fontSize'];
         $size2 = $size1;
         $transform->resize($size1, $size2);
         $size = min($size1, $size2);
 
+        $fontPath = null;
+        if (isset($fontRegistry)) {
+            $weight = self::resolveFontWeight($options['fontWeight']);
+            $matchingFont = $fontRegistry->findMatchingFont($options['fontFamily'], $options['fontStyle'], $weight);
+            if ($matchingFont !== null) {
+                $fontPath = $matchingFont->getPath();
+            }
+        }
+
+        if (!isset($fontPath)) {
+            return null;
+        }
+
         // text-anchor
         $anchorOffset = 0;
         if ($options['anchor'] === 'middle' || $options['anchor'] === 'end') {
-            $width = self::calculateTextWidth($options['text'], $options['font_path'], $size);
+            $width = self::calculateTextWidth($options['text'], $fontPath, $size);
             $anchorOffset = $options['anchor'] === 'middle' ? ($width / 2) : $width;
         }
 
@@ -39,19 +55,19 @@ class TextRenderer extends MultiPassRenderer
         $y = $options['y'];
         $transform->map($x, $y);
 
-        return array(
+        return [
             'x'         => $x - $anchorOffset,
             'y'         => $y,
             'size'      => $size,
-            'font_path' => $options['font_path'],
+            'fontPath'  => $fontPath,
             'text'      => $options['text'],
-        );
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function renderFill($image, array $params, $color)
+    protected function renderFill($image, $params, int $color): void
     {
         imagettftext(
             $image,
@@ -60,7 +76,7 @@ class TextRenderer extends MultiPassRenderer
             $params['x'],
             $params['y'],
             $color,
-            $params['font_path'],
+            $params['fontPath'],
             $params['text']
         );
     }
@@ -68,7 +84,7 @@ class TextRenderer extends MultiPassRenderer
     /**
      * @inheritdoc
      */
-    protected function renderStroke($image, array $params, $color, $strokeWidth)
+    protected function renderStroke($image, $params, int $color, float $strokeWidth): void
     {
         $x = $params['x'];
         $y = $params['y'];
@@ -76,7 +92,7 @@ class TextRenderer extends MultiPassRenderer
 
         for ($c1 = ($x - abs($px)); $c1 <= ($x + abs($px)); $c1++) {
             for ($c2 = ($y - abs($px)); $c2 <= ($y + abs($px)); $c2++) {
-                imagettftext($image, $params['size'], 0, $c1, $c2, $color, $params['font_path'], $params['text']);
+                imagettftext($image, $params['size'], 0, $c1, $c2, $color, $params['fontPath'], $params['text']);
             }
         }
     }
@@ -90,7 +106,7 @@ class TextRenderer extends MultiPassRenderer
      *
      * @return float The width in pixels.
      */
-    private static function calculateTextWidth($text, $fontFile, $size)
+    private static function calculateTextWidth(string $text, string $fontFile, float $size): float
     {
         // note for future: imagettfbbox is unable to calculate height properly.
         // width should be fine though.
@@ -101,5 +117,18 @@ class TextRenderer extends MultiPassRenderer
         $maxX = max($box[0], $box[2], $box[4], $box[6]);
 
         return abs($maxX - $minX);
+    }
+
+    private static function resolveFontWeight($weight): int
+    {
+        // TODO implement "bolder" and "lighter"
+
+        if (is_numeric($weight)) {
+            return (int) $weight;
+        } elseif ($weight === 'bold') {
+            return 700;
+        }
+
+        return 400;
     }
 }

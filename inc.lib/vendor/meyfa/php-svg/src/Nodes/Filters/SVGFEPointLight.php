@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGFEPointLight extends SVGNodeContainer
 {
-    const TAG_NAME = 'fePointLight';
+    public const TAG_NAME = 'fePointLight';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGFEPointLight extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

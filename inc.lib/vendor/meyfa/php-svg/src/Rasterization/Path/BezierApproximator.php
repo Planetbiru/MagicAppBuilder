@@ -22,11 +22,11 @@ class BezierApproximator
      *
      * @return array[] An approximation for the curve, as an array of points.
      */
-    public function quadratic($p0, $p1, $p2, $accuracy = 1.0)
+    public function quadratic(array $p0, array $p1, array $p2, float $accuracy = 1.0): array
     {
         $t      = 0;
         $prev   = $p0;
-        $points = array($p0);
+        $points = [$p0];
 
         $step = 0.1;
 
@@ -71,11 +71,11 @@ class BezierApproximator
      *
      * @return array[] An approximation for the curve, as an array of points.
      */
-    public function cubic($p0, $p1, $p2, $p3, $accuracy = 1.0)
+    public function cubic(array $p0, array $p1, array $p2, array $p3, float $accuracy = 1.0): array
     {
         $t      = 0;
         $prev   = $p0;
-        $points = array($p0);
+        $points = [$p0];
 
         $step  = 0.1;
 
@@ -116,14 +116,14 @@ class BezierApproximator
      *
      * @return float[] The point on the curve (0 => x, 1 => y).
      */
-    private static function calculateQuadratic($p0, $p1, $p2, $t)
+    private static function calculateQuadratic(array $p0, array $p1, array $p2, float $t): array
     {
         $ti = 1 - $t;
 
-        return array(
+        return [
             $ti * $ti * $p0[0] + 2 * $ti * $t * $p1[0] + $t * $t * $p2[0],
             $ti * $ti * $p0[1] + 2 * $ti * $t * $p1[1] + $t * $t * $p2[1],
-        );
+        ];
     }
 
     /**
@@ -138,7 +138,7 @@ class BezierApproximator
      *
      * @return float[] The point on the curve (0 => x, 1 => y).
      */
-    private static function calculateCubic($p0, $p1, $p2, $p3, $t)
+    private static function calculateCubic(array $p0, array $p1, array $p2, array $p3, float $t): array
     {
         $ti = 1 - $t;
 
@@ -157,10 +157,10 @@ class BezierApproximator
         $b1y = $ti * $a1y + $t * $a2y;
 
         // last step: line between points from step 3, result
-        return array(
+        return [
             $ti * $b0x + $t * $b1x,
             $ti * $b0y + $t * $b1y,
-        );
+        ];
     }
 
     /**
@@ -173,7 +173,7 @@ class BezierApproximator
      *
      * @return float The squared distance between the two points.
      */
-    private static function getDistanceSquared($p1, $p2)
+    private static function getDistanceSquared(array $p1, array $p2): float
     {
         $dx = $p2[0] - $p1[0];
         $dy = $p2[1] - $p1[1];

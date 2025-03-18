@@ -19,7 +19,7 @@ class PathApproximator
     /**
      * @var string[] $commands A map of command ids to approximation functions.
      */
-    private static $commands = array(
+    private static array $commands = [
         'M' => 'moveTo',                    'm' => 'moveTo',
         'L' => 'lineTo',                    'l' => 'lineTo',
         'H' => 'lineToHorizontal',          'h' => 'lineToHorizontal',
@@ -30,31 +30,31 @@ class PathApproximator
         'T' => 'curveToQuadraticSmooth',    't' => 'curveToQuadraticSmooth',
         'A' => 'arcTo',                     'a' => 'arcTo',
         'Z' => 'closePath',                 'z' => 'closePath',
-    );
+    ];
 
     /**
      * @var BezierApproximator $bezier The singleton bezier approximator.
      */
-    private static $bezier;
+    private static BezierApproximator $bezier;
     /**
      * @var ArcApproximator $arc The singleton arc approximator.
      */
-    private static $arc;
+    private static ArcApproximator $arc;
 
     /**
      * @var Transform $transform The transform to use.
      */
-    private $transform;
+    private Transform $transform;
 
     /**
      * @var float[][][] $subpaths The approximation result up until now.
      */
-    private $subpaths = array();
+    private array $subpaths = [];
 
     /**
      * @var PolygonBuilder|null $builder The current subpath builder.
      */
-    private $builder;
+    private ?PolygonBuilder $builder;
 
     // the start of the current subpath, in path coordinates
     private $firstX;
@@ -115,7 +115,7 @@ class PathApproximator
      *
      * @return void
      */
-    public function approximate(array $commands)
+    public function approximate(array $commands): void
     {
         // https://www.w3.org/TR/SVG/paths.html#PathDataMovetoCommands
         // "A path data segment (if there is one) must begin with a "moveto" command."
@@ -154,7 +154,7 @@ class PathApproximator
      *
      * @return float[][][] The approximated subpaths.
      */
-    public function getSubpaths()
+    public function getSubpaths(): array
     {
         return $this->subpaths;
     }
@@ -166,7 +166,7 @@ class PathApproximator
      *
      * @return void
      */
-    private function appendSubpath()
+    private function appendSubpath(): void
     {
         if (isset($this->builder)) {
             $points = $this->builder->build();
@@ -182,7 +182,7 @@ class PathApproximator
      *
      * @return void
      */
-    private function newSubpath()
+    private function newSubpath(): void
     {
         $this->appendSubpath();
 
@@ -201,12 +201,12 @@ class PathApproximator
      *
      * @return float[] The reflected point (x, y).
      */
-    private static function reflectPoint(array $p, array $r)
+    private static function reflectPoint(array $p, array $r): array
     {
-        return array(
+        return [
             2 * $r[0] - $p[0],
             2 * $r[1] - $p[1],
-        );
+        ];
     }
 
     /**
@@ -220,9 +220,9 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function moveTo($id, array $args)
+    private function moveTo(string $id, array $args): void
     {
-        list($x, $y) = $args;
+        [$x, $y] = $args;
         if ($id === 'm') {
             $x += $this->posX;
             $y += $this->posY;
@@ -243,9 +243,9 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function lineTo($id, array $args)
+    private function lineTo(string $id, array $args): void
     {
-        list($x, $y) = $args;
+        [$x, $y] = $args;
         if ($id === 'l') {
             $x += $this->posX;
             $y += $this->posY;
@@ -267,7 +267,7 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function lineToHorizontal($id, array $args)
+    private function lineToHorizontal(string $id, array $args): void
     {
         $x = $args[0];
         $y = $this->posY;
@@ -290,7 +290,7 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function lineToVertical($id, array $args)
+    private function lineToVertical(string $id, array $args): void
     {
         $x = $this->posX;
         $y = $args[0];
@@ -313,7 +313,7 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function curveToCubic($id, array $args)
+    private function curveToCubic(string $id, array $args): void
     {
         // NOTE: Bézier curves are invariant under affine transforms.
         //       This means transforming the control points vs. transforming the final approximated pixels does not
@@ -321,9 +321,9 @@ class PathApproximator
         //       accuracy properly for the output image size.
 
         // the transformed $p0 is simply $builder->getPosition()
-        $p1 = array($args[0], $args[1]);
-        $p2 = array($args[2], $args[3]);
-        $p3 = array($args[4], $args[5]);
+        $p1 = [$args[0], $args[1]];
+        $p2 = [$args[2], $args[3]];
+        $p3 = [$args[4], $args[5]];
 
         if ($id === 'c') {
             $p1[0] += $this->posX;
@@ -337,7 +337,7 @@ class PathApproximator
         }
 
         $this->cubicOld = $p2;
-        list($this->posX, $this->posY) = $p3;
+        [$this->posX, $this->posY] = $p3;
 
         $this->transform->map($p1[0], $p1[1]);
         $this->transform->map($p2[0], $p2[1]);
@@ -358,11 +358,11 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function curveToCubicSmooth($id, array $args)
+    private function curveToCubicSmooth(string $id, array $args): void
     {
-        $p1 = array($this->posX, $this->posY); // first control point defaults to current point
-        $p2 = array($args[0], $args[1]);
-        $p3 = array($args[2], $args[3]);
+        $p1 = [$this->posX, $this->posY]; // first control point defaults to current point
+        $p2 = [$args[0], $args[1]];
+        $p3 = [$args[2], $args[3]];
 
         if ($id === 's') {
             $p2[0] += $this->posX;
@@ -379,7 +379,7 @@ class PathApproximator
         }
 
         $this->cubicOld = $p2;
-        list($this->posX, $this->posY) = $p3;
+        [$this->posX, $this->posY] = $p3;
 
         $this->transform->map($p1[0], $p1[1]);
         $this->transform->map($p2[0], $p2[1]);
@@ -400,10 +400,10 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function curveToQuadratic($id, array $args)
+    private function curveToQuadratic(string $id, array $args): void
     {
-        $p1 = array($args[0], $args[1]);
-        $p2 = array($args[2], $args[3]);
+        $p1 = [$args[0], $args[1]];
+        $p2 = [$args[2], $args[3]];
 
         if ($id === 'q') {
             $p1[0] += $this->posX;
@@ -414,7 +414,7 @@ class PathApproximator
         }
 
         $this->quadraticOld = $p1;
-        list($this->posX, $this->posY) = $p2;
+        [$this->posX, $this->posY] = $p2;
 
         $this->transform->map($p1[0], $p1[1]);
         $this->transform->map($p2[0], $p2[1]);
@@ -434,10 +434,10 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function curveToQuadraticSmooth($id, array $args)
+    private function curveToQuadraticSmooth(string $id, array $args): void
     {
-        $p1 = array($this->posX, $this->posY); // control point defaults to current point
-        $p2 = array($args[0], $args[1]);
+        $p1 = [$this->posX, $this->posY]; // control point defaults to current point
+        $p2 = [$args[0], $args[1]];
 
         if ($id === 't') {
             $p2[0] += $this->posX;
@@ -451,7 +451,7 @@ class PathApproximator
         }
 
         $this->quadraticOld = $p1;
-        list($this->posX, $this->posY) = $p2;
+        [$this->posX, $this->posY] = $p2;
 
         $this->transform->map($p1[0], $p1[1]);
         $this->transform->map($p2[0], $p2[1]);
@@ -471,7 +471,7 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function arcTo($id, array $args)
+    private function arcTo(string $id, array $args): void
     {
         // NOTE: Unfortunately, it seems that arc segments are not invariant under affine transforms, as opposed to
         //       Bézier curves. Currently, our best strategy is to approximate the curve with path coordinates and
@@ -479,8 +479,8 @@ class PathApproximator
         //       decrease the number of approximated points.
 
         // start point, end point
-        $p0 = array($this->posX, $this->posY);
-        $p1 = array($args[5], $args[6]);
+        $p0 = [$this->posX, $this->posY];
+        $p1 = [$args[5], $args[6]];
         // radiuses, rotation
         $rx = $args[0];
         $ry = $args[1];
@@ -494,7 +494,7 @@ class PathApproximator
             $p1[1] += $this->posY;
         }
 
-        list($this->posX, $this->posY) = $p1;
+        [$this->posX, $this->posY] = $p1;
 
         // guess a scale factor
         $scaledRx = $rx;
@@ -521,7 +521,7 @@ class PathApproximator
      * @SuppressWarnings("unused")
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function closePath($id, array $args)
+    private function closePath(string $id, array $args): void
     {
         $first = $this->builder->getFirstPoint();
         $this->builder->addPoint($first[0], $first[1]);
@@ -532,7 +532,7 @@ class PathApproximator
         // The subpath is now complete and any following command should start a new one.
         // Also, since ClosePath can be immediately followed by a command such as LineTo,
         // we append ClosePath's position as a point to the new subpath.
-        // If the following command is, in fact, a MoveTo, this will simply be overriden.
+        // If the following command is, in fact, a MoveTo, this will simply be overridden.
         $this->newSubpath();
     }
 }

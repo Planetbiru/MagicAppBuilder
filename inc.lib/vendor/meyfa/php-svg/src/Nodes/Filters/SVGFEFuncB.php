@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGFEFuncB extends SVGNodeContainer
 {
-    const TAG_NAME = 'feFuncB';
+    public const TAG_NAME = 'feFuncB';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class SVGFEFuncB extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

@@ -2,6 +2,7 @@
 
 namespace SVG\Rasterization\Renderers;
 
+use SVG\Fonts\FontRegistry;
 use SVG\Nodes\SVGNode;
 use SVG\Rasterization\SVGRasterizer;
 use SVG\Rasterization\Transform\Transform;
@@ -19,11 +20,14 @@ abstract class MultiPassRenderer extends Renderer
     /**
      * @inheritdoc
      */
-    public function render(SVGRasterizer $rasterizer, array $options, SVGNode $context)
+    public function render(SVGRasterizer $rasterizer, array $options, SVGNode $context): void
     {
         $transform = $rasterizer->getCurrentTransform();
 
-        $params = $this->prepareRenderParams($options, $transform);
+        $params = $this->prepareRenderParams($options, $transform, $rasterizer->getFontRegistry());
+        if (!isset($params)) {
+            return;
+        }
 
         $paintOrder = self::getPaintOrder($context);
         foreach ($paintOrder as $paint) {
@@ -40,7 +44,7 @@ abstract class MultiPassRenderer extends Renderer
      * @param SVGNode $context
      * @param $params
      */
-    private function paintStroke(SVGRasterizer $rasterizer, SVGNode $context, $params)
+    private function paintStroke(SVGRasterizer $rasterizer, SVGNode $context, $params): void
     {
         $stroke = $context->getComputedStyle('stroke');
         if (isset($stroke) && $stroke !== 'none') {
@@ -62,7 +66,7 @@ abstract class MultiPassRenderer extends Renderer
      * @param SVGNode $context
      * @param $params
      */
-    private function paintFill(SVGRasterizer $rasterizer, SVGNode $context, $params)
+    private function paintFill(SVGRasterizer $rasterizer, SVGNode $context, $params): void
     {
         $fill = $context->getComputedStyle('fill');
         if (isset($fill) && $fill !== 'none') {
@@ -74,20 +78,21 @@ abstract class MultiPassRenderer extends Renderer
     }
 
     /**
-     * Converts the options array into a new parameters array that the render
-     * methods can make more sense of.
+     * Converts the options array into a new parameters array that the render methods can make more sense of.
      *
-     * Specifically, the intention is to allow subclasses to outsource
-     * coordinate translation, approximation of curves and the like to this
-     * method rather than dealing with it in the render methods. This shall
-     * encourage single passes over the input data (for performance reasons).
+     * Specifically, the intention is to allow subclasses to outsource coordinate translation, approximation of curves
+     * and the like to this method rather than dealing with it in the render methods. This shall encourage single passes
+     * over the input data (for performance reasons).
      *
-     * @param array     $options   The associative array of raw options.
-     * @param Transform $transform The coordinate transform to apply, to go from user coordinate to output coordinates.
+     * If this method determines that rendering isn't possible (e.g. because the shape is empty), it shall return null.
      *
-     * @return array The new associative array of computed render parameters.
+     * @param array             $options      The associative array of raw options.
+     * @param Transform         $transform    The coordinate transform to apply, to go from user to output coordinates.
+     * @param FontRegistry|null $fontRegistry The font registry to use for text rendering.
+     *
+     * @return array|null The new associative array of computed render parameters, if there is something to render.
      */
-    abstract protected function prepareRenderParams(array $options, Transform $transform);
+    abstract protected function prepareRenderParams(array $options, Transform $transform, ?FontRegistry $fontRegistry);
 
     /**
      * Renders the shape's filled version in the given color, using the params
@@ -99,12 +104,12 @@ abstract class MultiPassRenderer extends Renderer
      * @see Renderer::prepareRenderParams() For info on the params array.
      *
      * @param resource $image  The image resource to render to.
-     * @param mixed[]  $params The render params.
+     * @param array    $params The render params.
      * @param int      $color  The color (a GD int) to fill the shape with.
      *
      * @return void
      */
-    abstract protected function renderFill($image, array $params, $color);
+    abstract protected function renderFill($image, $params, int $color): void;
 
     /**
      * Renders the shape's outline in the given color, using the params array
@@ -113,24 +118,24 @@ abstract class MultiPassRenderer extends Renderer
      * @see Renderer::prepareRenderParams() For info on the params array.
      *
      * @param resource $image  The image resource to render to.
-     * @param mixed[]  $params The render params.
+     * @param array    $params The render params.
      * @param int      $color  The color (a GD int) to outline the shape with.
      * @param float    $strokeWidth  The stroke's thickness, in pixels.
      *
      * @return void
      */
-    abstract protected function renderStroke($image, array $params, $color, $strokeWidth);
+    abstract protected function renderStroke($image, $params, int $color, float $strokeWidth): void;
 
     /**
      * @param SVGNode $context
      * @return string[]
      */
-    private static function getPaintOrder(SVGNode $context)
+    private static function getPaintOrder(SVGNode $context): array
     {
         $paintOrder = $context->getComputedStyle('paint-order');
         $paintOrder = preg_replace('#\s{2,}#', ' ', Str::trim($paintOrder));
 
-        $defaultOrder = array('fill', 'stroke', 'markers');
+        $defaultOrder = ['fill', 'stroke', 'markers'];
 
         if ($paintOrder === 'normal' || empty($paintOrder)) {
             return $defaultOrder;
@@ -145,13 +150,13 @@ abstract class MultiPassRenderer extends Renderer
      * Parses the color string and applies the node's total opacity to it,
      * then returns it as a GD color int.
      *
-     * @param string  $color           The CSS color value.
-     * @param SVGNode $context         The node serving as the opacity reference.
-     * @param float   $specificOpacity An additional opacity factor specific to the paint operation.
+     * @param string|null  $color           The CSS color value.
+     * @param SVGNode      $context         The node serving as the opacity reference.
+     * @param float        $specificOpacity An additional opacity factor specific to the paint operation.
      *
      * @return int The prepared color as a GD color integer.
      */
-    private static function prepareColor($color, SVGNode $context, $specificOpacity = 1.0)
+    private static function prepareColor(?string $color, SVGNode $context, float $specificOpacity = 1.0): int
     {
         $color = Color::parse($color);
         $rgb   = ($color[0] << 16) + ($color[1] << 8) + ($color[2]);
@@ -159,7 +164,7 @@ abstract class MultiPassRenderer extends Renderer
         $opacity = self::calculateTotalOpacity($context) * $specificOpacity;
         $a = 127 - $opacity * (int) ($color[3] * 127 / 255);
 
-        return $rgb | ($a << 24);
+        return $rgb | ((int)$a << 24);
     }
 
     /**
@@ -170,7 +175,7 @@ abstract class MultiPassRenderer extends Renderer
      *
      * @return float The node's own opacity value.
      */
-    private static function getNodeOpacity(SVGNode $node)
+    private static function getNodeOpacity(SVGNode $node): float
     {
         $opacity = $node->getStyle('opacity');
 
@@ -192,7 +197,7 @@ abstract class MultiPassRenderer extends Renderer
      *
      * @return float The node's total opacity.
      */
-    private static function calculateTotalOpacity(SVGNode $node)
+    private static function calculateTotalOpacity(SVGNode $node): float
     {
         $opacity = self::getNodeOpacity($node);
 
@@ -207,16 +212,15 @@ abstract class MultiPassRenderer extends Renderer
     /**
      * Parse an alpha value (such as from the 'opacity', 'fill-opacity', or 'stroke-opacity' attributes).
      *
-     * @param string|null $attributeValue The raw attribute value.
-     * @return float|int The parsed alpha value in the range 0 to 1. Invalid inputs are mapped to 1.
+     * @param string|null $value The raw attribute value.
+     * @return float The parsed alpha value in the range 0 to 1. Invalid inputs are mapped to 1.
      */
-    private static function parseOpacity($value)
+    private static function parseOpacity(?string $value): float
     {
         // https://svgwg.org/svg2-draft/render.html#ObjectAndGroupOpacityProperties
         // https://drafts.csswg.org/css-color/#transparency
 
-        // null
-        if ($value == null) {
+        if ($value === null) {
             return 1;
         }
 
@@ -226,7 +230,7 @@ abstract class MultiPassRenderer extends Renderer
         }
 
         // percentages
-        $matches = array();
+        $matches = [];
         if (preg_match('/^([+-]?\d+(?:\.\d+)?|\.\d+)%$/', $value, $matches)) {
             return max(0, min(100, $matches[1])) / 100;
         }
