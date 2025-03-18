@@ -23,11 +23,24 @@ $entityApvInfo = $appConfig->getEntityApvInfo();
 
 $composerOnline = ComposerUtil::checkInternetConnection();
 
-header("Content-type: application/json");
-
+$fileGenerated = 0;
 $inputGet = new InputGet();
-if (isset($_POST) && !empty($_POST)) {
+if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && strtolower($_SERVER["CONTENT_TYPE"]) == 'application/json')) {
     // Initialize InputPost with raw data processing enabled
+    if(isset($_POST['data']))
+    {
+        $data = json_decode($_POST['data'], true);
+        unset($_POST['data']);
+    }
+    else
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+    }
+    foreach($data as $k=>$v)
+    {
+        $_POST[$k] = $v;
+    }
+
     $request = new InputPost(true, false);
     
     // Build target path if it's not empty
@@ -35,7 +48,7 @@ if (isset($_POST) && !empty($_POST)) {
     if (!empty($target)) {
         $target = "/" . $target;
     }
-
+    
     // Update path using sprintf for target inclusion
     $path = sprintf(
         "%s/applications/%s/module%s/%s.json",
@@ -51,7 +64,7 @@ if (isset($_POST) && !empty($_POST)) {
     }
 
     // Save the request data to the JSON file
-    file_put_contents($path, $request);
+    file_put_contents($path, json_encode(json_decode((string) $request), JSON_PRETTY_PRINT));
     $fileGenerated = 0;
 
     if ($request->issetFields()) {

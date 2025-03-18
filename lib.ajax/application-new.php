@@ -75,9 +75,6 @@ if (ComposerUtil::checkInternetConnection()) {
     $composerOnline = true;
 }
 
-// TODO: DEBUG
-$composerOnline = false;
-
 if(!$composerOnline)
 {
     $composerJson = dirname(__DIR__) . "/inc.lib/composer.json";
@@ -86,9 +83,12 @@ if(!$composerOnline)
     $bundeledMagicAppVersion = str_replace("^", "", $bundeledMagicAppVersion);
 
     $magicAppList = array(
-        array("key"=>$bundeledMagicAppVersion, "value"=>"$bundeledMagicAppVersion (Offline)", "latest"=>false)
+        array(
+            "key" => $bundeledMagicAppVersion, 
+            "value" => "$bundeledMagicAppVersion (Offline)", 
+            "latest" => true
+        )
     );
-    $composerOnline = false;
 }
 
 $magicAppList = array_slice($magicAppList, 0, 20);
