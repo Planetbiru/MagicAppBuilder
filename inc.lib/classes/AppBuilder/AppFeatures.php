@@ -2,6 +2,7 @@
 
 namespace AppBuilder;
 
+use AppBuilder\Util\DataUtil;
 use MagicObject\MagicObject;
 
 /**
@@ -147,7 +148,7 @@ class AppFeatures // NOSONAR
      */
     private function isTrue($value)
     {
-        return $value == '1' || strtolower($value) == 'true' || $value === 1 || $value === true;
+        return DataUtil::isTrue($value);
     }
 
     /**
