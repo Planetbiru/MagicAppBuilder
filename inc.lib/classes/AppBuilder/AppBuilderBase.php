@@ -3119,6 +3119,8 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('name', $field->getFieldName());
             }
 
+            $input = $this->addAttributeId($input, $id); 
+
             if($multipleData)
             {
                 $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
@@ -3129,7 +3131,6 @@ $subqueryMap = '.$referece.';
             }
 
 
-            $input = $this->addAttributeId($input, $id); 
             $input->setAttribute('autocomplete', 'off'); 
             if($field->getRequired())
             {
