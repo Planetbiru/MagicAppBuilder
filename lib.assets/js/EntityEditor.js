@@ -562,6 +562,9 @@ class EntityEditor {
             'SMALLINT'  : 5,
             'TINYINT'   : 4
         };
+        this.autonumberTypes = [
+            'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT'
+        ];
         this.addDomListeners();
 
         this.callbackLoadEntity = this.setting.callbackLoadEntity;
@@ -639,6 +642,18 @@ class EntityEditor {
                     tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
                     tr.querySelector('.column-nullable').checked = false;
                     tr.querySelector('.column-nullable').disabled = true;
+                    if(tr.querySelector('.column-primary-key').checked)
+                    {
+                        if(_this.autonumberTypes.includes(tr.querySelector('.column-type').value))
+                        {
+                            tr.querySelector('.column-autoIncrement').disabled = false;
+                        }
+                        else
+                        {
+                            tr.querySelector('.column-autoIncrement').disabled = true;
+                            tr.querySelector('.column-autoIncrement').checked = false;
+                        }
+                    }
                 }
                 else
                 {
@@ -858,7 +873,7 @@ class EntityEditor {
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
-            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''}></td>
+            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${column.autoIncrement ? '' : 'disabled'}></td>
         `;
 
         tableBody.appendChild(row);
@@ -1868,10 +1883,10 @@ class EntityEditor {
      * @param {HTMLElement} selectElement - The select element for the column type.
      */
     updateColumnLengthInput(selectElement) {
-        const row = selectElement.closest("tr");
+        const tr = selectElement.closest("tr");
         const columnType = selectElement.value;
-        const lengthInput = row.querySelector(".column-length");
-        const enumInput = row.querySelector(".column-enum");
+        const lengthInput = tr.querySelector(".column-length");
+        const enumInput = tr.querySelector(".column-enum");
 
         // Show length input for specific types
         if (this.withLengthTypes.includes(columnType)) {
@@ -1890,6 +1905,19 @@ class EntityEditor {
         {
             let defaultLength = this.defaultLength[columnType];
             lengthInput.value = defaultLength;
+        }
+
+        if(tr.querySelector('.column-primary-key').checked)
+        {
+            if(this.autonumberTypes.includes(tr.querySelector('.column-type').value))
+            {
+                tr.querySelector('.column-autoIncrement').disabled = false;
+            }
+            else
+            {
+                tr.querySelector('.column-autoIncrement').disabled = true;
+                tr.querySelector('.column-autoIncrement').checked = false;
+            }
         }
     }
 
