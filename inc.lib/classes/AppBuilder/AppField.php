@@ -2,6 +2,7 @@
 
 namespace AppBuilder;
 
+use AppBuilder\Util\DataUtil;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoObjectParser;
 
@@ -205,8 +206,7 @@ class AppField // NOSONAR
      */
     private function isTrue($value)
     {
-        return (is_string($value) && ($value == '1' || strtolower($value) == 'true')) || 
-               ($value === 1 || $value === true);
+        return DataUtil::isTrue($value);
     }
 
     /**

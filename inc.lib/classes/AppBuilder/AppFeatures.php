@@ -2,6 +2,7 @@
 
 namespace AppBuilder;
 
+use AppBuilder\Util\DataUtil;
 use MagicObject\MagicObject;
 
 /**
@@ -16,7 +17,7 @@ use MagicObject\MagicObject;
  * - Export Options (Excel, CSV)
  * - Temporary Exports
  */
-class AppFeatures
+class AppFeatures // NOSONAR
 {
     const BEFORE_DATA = 'before-data';
     const AFTER_DATA = 'after-data';
@@ -106,6 +107,13 @@ class AppFeatures
     private $exportUseTemporary = false;
 
     /**
+     * Only generate backend script
+     *
+     * @var bool
+     */
+    private $backendOnly = false;
+
+    /**
      * Constructor
      *
      * Initializes the AppFeatures instance based on the provided feature settings.
@@ -128,6 +136,7 @@ class AppFeatures
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
             $this->approvalByAnotherUser = $this->isTrue($features->get('approvalByAnotherUser'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
+            $this->backendOnly = $this->isTrue($features->get('backendOnly'));
         }
     }
     
@@ -139,7 +148,7 @@ class AppFeatures
      */
     private function isTrue($value)
     {
-        return $value == '1' || strtolower($value) == 'true' || $value === 1 || $value === true;
+        return DataUtil::isTrue($value);
     }
 
     /**
@@ -304,11 +313,10 @@ class AppFeatures
         return $this;
     }
 
-
     /**
-     * Get approval by Another User
+     * Get approval by another user.
      *
-     * @return  bool
+     * @return bool Returns whether approval is granted by another user.
      */ 
     public function getApprovalByAnotherUser()
     {
@@ -316,15 +324,39 @@ class AppFeatures
     }
 
     /**
-     * Set approval by Another User
+     * Set approval by another user.
      *
-     * @param  bool  $approvalByAnotherUser  Approval by Another User
+     * @param bool $approvalByAnotherUser Whether approval is granted by another user.
      *
-     * @return  self
+     * @return self Returns the current instance for method chaining.
      */ 
     public function setApprovalByAnotherUser($approvalByAnotherUser)
     {
         $this->approvalByAnotherUser = $approvalByAnotherUser;
+
+        return $this;
+    }
+
+    /**
+     * Check if only backend script should be generated.
+     *
+     * @return bool Returns true if only backend script should be generated, false otherwise.
+     */
+    public function isBackendOnly()
+    {
+        return $this->backendOnly;
+    }
+
+    /**
+     * Set whether only the backend script should be generated.
+     *
+     * @param bool $backendOnly Determines if only the backend script should be generated.
+     *
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setBackendOnly($backendOnly)
+    {
+        $this->backendOnly = $backendOnly;
 
         return $this;
     }

@@ -637,6 +637,24 @@ let initAll = function () {
     let createNew = $(".entity-create-new")[0].checked;
     getEntityQuery(ents, merged, createNew);
   });
+
+  $(document).on("change", "#backend_only", function (e) {
+    if($(this)[0].checked)
+    {
+      $('#ajax_support')[0].checked = false;
+      $('#subquery')[0].checked = false;
+
+      $('#ajax_support')[0].disabled = true;
+      $('#subquery')[0].disabled = true;
+    }
+    else
+    {
+      $('#ajax_support')[0].disabled = false;
+      $('#subquery')[0].disabled = false;
+    }
+  });
+
+  
   
   $(document).on("change", ".entity-create-new", function (e) {
     let ents = getEntitySelection();
@@ -4016,6 +4034,7 @@ function generateScript(selector) {
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
+  let backendOnly = $("#backend_only")[0].checked && true; //NOSONAR
   let entity = {
     mainEntity: {
       entityName: $('[name="entity_master_name"]').val(),
@@ -4043,7 +4062,6 @@ function generateScript(selector) {
   }
 
   let features = {
-    subquery: subquery,
     activateDeactivate: activateDeactivate,
     sortOrder: manualSortOrder,
     exportToExcel: exportToExcel,
@@ -4054,6 +4072,8 @@ function generateScript(selector) {
     approvalType: approvalType,
     approvalPosition: approvalPosition,
     approvalByAnotherUser: approvalByAnotherUser,
+    backendOnly: backendOnly,
+    subquery: subquery,
     ajaxSupport: ajaxSupport
   };
 

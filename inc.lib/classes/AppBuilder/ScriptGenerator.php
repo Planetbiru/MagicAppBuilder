@@ -389,11 +389,14 @@ class ScriptGenerator //NOSONAR
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
         
-        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder);   
+        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures);   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
-        $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
-        $uses = $this->addExporterLibrary($uses, $appFeatures);      
+        if(!$appFeatures->isBackendOnly())
+        {
+            $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
+            $uses = $this->addExporterLibrary($uses, $appFeatures);      
+        }
         $uses = $this->addAddEmptyLine($uses);     
         
         $uses[] = "";
@@ -473,6 +476,10 @@ class ScriptGenerator //NOSONAR
         $sortable = $request->getSortable();
 
         $ajaxSupport = $request->getFeatures()->getAjaxSupport() == 'true' || $request->getFeatures()->getAjaxSupport() == 1;
+        $guiInsert = null;
+        $guiUpdate = null;
+        $guiDetail = null;
+        $guiList = null;
 
         // prepare CRUD section begin
         if($approvalRequired) {
@@ -490,10 +497,13 @@ class ScriptGenerator //NOSONAR
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
 
             // GUI
-            $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
-            $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
-            $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
-            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+            if(!$appFeatures->isBackendOnly())
+            {
+                $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
+                $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
+                $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
+                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable);
+            } 
         } else {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
@@ -508,10 +518,13 @@ class ScriptGenerator //NOSONAR
 
             $approvalSection = "";
             $rejectionSection = "";
-            $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
-            $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields); 
-            $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData); 
-            $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+            if(!$appFeatures->isBackendOnly())
+            {
+                $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
+                $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields); 
+                $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData); 
+                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+            }
         }
         
         // prepare CRUD section end
@@ -845,29 +858,42 @@ class ScriptGenerator //NOSONAR
      * @param string $entityMainName Main entity name.
      * @param boolean $approvalRequired Flag indicating if approval is required.
      * @param boolean $sortOrder Flag indicating if sorting is required.
+     * @param AppFeatures $appFeatures
      * @return string[] Array of generated use statements.
      */
-    public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder)
+    public function createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures)
     {
         $uses = array();
         $uses[] = "// This script is generated automatically by MagicAppBuilder";
         $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
-        $uses[] = "use MagicObject\\MagicObject;";
+        if(!$appFeatures->isBackendOnly())
+        {
+            $uses[] = "use MagicObject\\MagicObject;";
+        }
         if($approvalRequired || $sortOrder)
         {
             $uses[] = "use MagicObject\\SetterGetter;";
         }
-        $uses[] = "use MagicObject\\Database\\PicoPage;";
-        $uses[] = "use MagicObject\\Database\\PicoPageable;";
+        if(!$appFeatures->isBackendOnly())
+        {
+            $uses[] = "use MagicObject\\Database\\PicoPage;";
+            $uses[] = "use MagicObject\\Database\\PicoPageable;";
+        }
         $uses[] = "use MagicObject\\Database\\PicoPredicate;";
-        $uses[] = "use MagicObject\\Database\\PicoSort;";
-        $uses[] = "use MagicObject\\Database\\PicoSortable;";
+        if(!$appFeatures->isBackendOnly())
+        {
+            $uses[] = "use MagicObject\\Database\\PicoSort;";
+            $uses[] = "use MagicObject\\Database\\PicoSortable;";
+        }
         $uses[] = "use MagicObject\\Database\\PicoSpecification;";
         $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
         $uses[] = "use MagicObject\\Request\\InputGet;";
         $uses[] = "use MagicObject\\Request\\InputPost;";
-        $uses[] = "use MagicApp\\AppEntityLanguage;";
+        if(!$appFeatures->isBackendOnly())
+        {
+            $uses[] = "use MagicApp\\AppEntityLanguage;";
+        }
         $uses[] = "use MagicApp\\AppFormBuilder;";
         $uses[] = "use MagicApp\\Field;";
         $uses[] = "use MagicApp\\PicoModule;";
