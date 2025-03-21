@@ -4,49 +4,94 @@ use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Response\PicoResponse;
 
-require_once dirname(__DIR__) . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/auth.php"; // Load authentication script
 
+// Retrieve data from the POST request
 $inputPost = new InputPost();
-$directory = FileDirUtil::normalizePath($inputPost->getDirectory());
-if($inputPost->getIsfile() == 'true')
-{
+$directory = FileDirUtil::normalizePath($inputPost->getDirectory()); // Normalize the directory path
+$failedIfExists = $inputPost->getFailedIfExists() == 'true'; // Check if the request should fail if the directory exists
+
+// If the input is a file, get its parent directory
+if ($inputPost->getIsfile() == 'true') {
     $directory = dirname($directory);
 }
 
-function hasSubdirectory($directory)
-{
-    $directory = str_replace("\\", "/", $directory);
-    $arr = explode("/", $directory);
-    return count($arr) > 2;
+/**
+ * Check if the given path has a subdirectory
+ * 
+ * @param string $directory The directory path to check
+ * @return bool True if it has a subdirectory, false otherwise
+ */
+function hasSubdirectory($directory) {
+    $directory = str_replace("\\", "/", $directory); // Normalize directory separators
+    $arr = explode("/", $directory); // Split the path into an array
+    return count($arr) > 2; // Return true if the path has more than two segments
 }
-$writeable = false;
-$permissions = 0;
-if($directory == null || empty($directory))
-{
+
+$writeable = false; // Default: directory is not writable
+$permissions = 0; // Default permissions
+$message = null; // Default message
+
+// Check if the directory is null
+if ($directory == null) {
     $writeable = false;
-}
-else
-{
-    if(file_exists($directory) && !is_dir($directory))
-    {
-        $writeable = false;
-    }
-    else
-    {
-        if(file_exists($directory))
-        {
+    $message = "Directory cannot be null";
+} 
+// Check if the directory is empty
+else if (empty($directory)) {
+    $writeable = false;
+    $message = "Directory cannot be empty";
+} 
+else {
+    // Check if the directory exists
+    if (file_exists($directory)) {
+        if ($failedIfExists) {
+            $writeable = false;
+            $message = "Path already exists";
+        }
+        // Check if the path is not a directory
+        else if (!is_dir($directory)) {
+            $writeable = false;
+            $message = "Path is not a directory";
+        } 
+        else {
+            // Check if the directory is writable
             $writeable = is_writable($directory);
-        }
-        else
-        {
-            $directoryToCheck = $directory;
-            while(!file_exists($directoryToCheck) && hasSubdirectory($directoryToCheck))
-            {
-                $directoryToCheck = dirname($directoryToCheck);
+            if ($writeable) {
+                $message = "Directory is writable";
+            } else {
+                $message = "Directory is not writable";
             }
-            $permissions = fileperms($directoryToCheck);
-            $writeable = is_writable($directoryToCheck);
+            $permissions = fileperms($directory); // Get directory permissions
+        }
+    } 
+    else {
+        // If the directory does not exist, check its parent directories
+        $directoryToCheck = $directory;
+        while (!file_exists($directoryToCheck) && hasSubdirectory($directoryToCheck)) {
+            $directoryToCheck = dirname($directoryToCheck);
+        }
+
+        // Check if the parent directory exists
+        if (file_exists($directoryToCheck)) {
+            $permissions = fileperms($directoryToCheck); // Get parent directory permissions
+            $writeable = is_writable($directoryToCheck); // Check if it is writable
+            if ($writeable) {
+                $message = "Directory is writable";
+            } else {
+                $message = "Directory is not writable";
+            }
+        } 
+        else {
+            $writeable = false;
+            $message = "Base directory does not exist";
         }
     }
 }
-PicoResponse::sendJSON(['writeable'=>$writeable, 'permissions'=>$permissions]);
+
+// Send the JSON response with the directory status
+PicoResponse::sendJSON([
+    'writeable' => $writeable, 
+    'permissions' => $permissions,
+    'message' => $message
+]);

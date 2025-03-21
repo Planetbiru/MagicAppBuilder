@@ -1303,7 +1303,7 @@ class DatabaseExplorer // NOSONAR
             $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
 
             $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-            $isPgSql = stripos($driver, 'pg') !== false || stripos($driver, 'postgre');
+            $isPgSql = stripos($driver, 'pg') !== false || stripos($driver, 'postgre') !== false;
             
             $offset = ($page - 1) * $limit;
             $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");

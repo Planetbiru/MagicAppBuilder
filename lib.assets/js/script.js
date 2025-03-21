@@ -1951,6 +1951,7 @@ function checkWriretableDirectory(input)
 {
     let container = $(input).closest('.directory-container');
     let isFile = container.attr('data-isfile') || '';
+    let failedIfExists = container.attr('data-failed-if-exists') || '';
     let directory = input.val();
     directory = directory.trim();
     
@@ -1960,7 +1961,11 @@ function checkWriretableDirectory(input)
       $.ajax({
         method: 'POST',
         url: 'lib.ajax/directory-writeable-test.php',
-        data: {directory: directory, isfile:isFile},
+        data: {
+          directory: directory, 
+          isfile: isFile,
+          failedIfExists: failedIfExists
+        },
         dataType: 'json',
         success: function(data) {
           container.attr('data-loading', 'false');
