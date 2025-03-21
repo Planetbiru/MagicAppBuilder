@@ -1040,6 +1040,7 @@ let initAll = function () {
     modal.find('[name="magic_app_version"]').empty();
     modal.find('[name="installation_method"]').val('');  
     increaseAjaxPending();
+    resetCheckWriretableDirectory(modal.find('[name="application_directory"]'));
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
@@ -1362,6 +1363,8 @@ let initAll = function () {
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
     increaseAjaxPending();
+    resetCheckWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
+    resetCheckWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-setting.php',
@@ -1914,7 +1917,7 @@ let initAll = function () {
     loadMenu();
   });
   
-  $(document).on('blur', '.directory-container input[type="text"]', function(e1){
+  $(document).on('change', '.directory-container input[type="text"]', function(e1){
     let input = $(this);
     checkWriretableDirectory(input);
   });
@@ -1948,12 +1951,12 @@ function checkWriretableDirectory(input)
 {
     let container = $(input).closest('.directory-container');
     let isFile = container.attr('data-isfile') || '';
-    container.removeAttr('data-writeable');
-    container.attr('data-loading', 'true');
     let directory = input.val();
     directory = directory.trim();
+    
     if(directory != '' && directory != '/' && directory != '\\')
     {
+      container.attr('data-loading', 'true');
       $.ajax({
         method: 'POST',
         url: 'lib.ajax/directory-writeable-test.php',
@@ -1975,6 +1978,25 @@ function checkWriretableDirectory(input)
         }
       });
     }
+}
+
+/**
+ * Resets the writable directory check by removing the `data-writeable` and `data-loading` attributes.
+ *
+ * This function clears the results of the directory writable check by removing the 
+ * `data-writeable` and `data-loading` attributes from the closest `.directory-container` 
+ * element, effectively resetting the UI state.
+ *
+ * @param {HTMLElement} input - The input element that triggers the reset of the directory check.
+ *                               This input element is used to find the closest `.directory-container`.
+ * 
+ * @returns {void}
+ */
+function resetCheckWriretableDirectory(input)
+{
+  let container = $(input).closest('.directory-container');
+  container.removeAttr('data-writeable');
+  container.removeAttr('data-loading');
 }
 
 /**
