@@ -1164,13 +1164,16 @@ class ScriptGenerator //NOSONAR
     /**
      * Copy a directory and its contents recursively.
      *
-     * Recursively copies all files and subdirectories from the source directory to the destination directory.
+     * This function recursively copies all files and subdirectories from the source directory to the destination directory.
+     * If specific file extensions are provided, files matching those extensions will be processed using a callback function.
      *
      * @param string $source The source directory path.
      * @param string $destination The destination directory path.
+     * @param array|null $extensions An optional array of file extensions to process with the callback.
+     * @param callable|null $callback An optional callback function to process files with the specified extensions.
      * @return bool Returns true if the operation is successful, false otherwise.
      */
-    public function copyDirectory($source, $destination)
+    public function copyDirectory($source, $destination, $extensions = null, $callback = null)
     {
         // Ensure the source directory exists
         if (!is_dir($source)) {
@@ -1188,10 +1191,10 @@ class ScriptGenerator //NOSONAR
             return false;
         }
 
-        // Copy each file and subdirectory
+        // Iterate through each file and subdirectory
         while (($file = readdir($directory)) !== false) {
             if ($file === '.' || $file === '..') {
-                continue; // Skip special directories
+                continue; // Skip special directory entries
             }
 
             $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
@@ -1199,13 +1202,27 @@ class ScriptGenerator //NOSONAR
 
             if (is_dir($sourcePath)) {
                 // Recursively copy subdirectories
-                $this->copyDirectory($sourcePath, $destinationPath);
+                $this->copyDirectory($sourcePath, $destinationPath, $extensions, $callback);
             } else {
-                // Copy individual files
-                copy($sourcePath, $destinationPath);
+                // Get the file extension
+                $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
+
+                // Check if the file extension matches the specified extensions and a callback is provided
+                if (isset($extensions) 
+                    && is_array($extensions) 
+                    && in_array($fileExtension, $extensions) 
+                    && isset($callback) 
+                    && is_callable($callback)) {
+                    // Process file using the callback function
+                    $callback($sourcePath, $destinationPath);
+                } else {
+                    // Copy the file normally
+                    copy($sourcePath, $destinationPath);
+                }
             }
         }
 
+        // Close the directory handle
         closedir($directory);
         return true;
     }
