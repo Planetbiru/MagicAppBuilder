@@ -638,6 +638,7 @@ let initAll = function () {
     getEntityQuery(ents, merged, createNew);
   });
 
+
   $(document).on("change", "#backend_only", function (e) {
     if($(this)[0].checked)
     {
@@ -653,8 +654,6 @@ let initAll = function () {
       $('#subquery')[0].disabled = false;
     }
   });
-
-  
   
   $(document).on("change", ".entity-create-new", function (e) {
     let ents = getEntitySelection();
@@ -1068,6 +1067,7 @@ let initAll = function () {
           $('[name="application_author"]').val(data.application_author);
           $('[name="application_description"]').val(data.application_description);
           updateNewApplicationForm(data);
+          checkWriretableDirectory($('[name="application_directory"]'));
           createBtn[0].disabled = false;
         }
       }
@@ -1370,6 +1370,7 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         $('#modal-application-setting .application-setting').empty().append(data);
+        checkWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
         setTimeout(function () {
           // set database_password to be empty
           // prevent autofill password
@@ -1911,6 +1912,11 @@ let initAll = function () {
     e1.preventDefault();
     loadMenu();
   });
+  
+  $(document).on('blur', '.directory-container input[type="text"]', function(e1){
+    let input = $(this);
+    checkWriretableDirectory(input);
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -1921,6 +1927,39 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+function checkWriretableDirectory(input)
+{
+    let container = $(input).closest('.directory-container');
+    let isFile = container.attr('data-isfile') || '';
+    container.removeAttr('data-writeable');
+    container.attr('data-loading', 'true');
+    let directory = input.val();
+    directory = directory.trim();
+    if(directory != '' && directory != '/' && directory != '\\')
+    {
+      $.ajax({
+        method: 'POST',
+        url: 'lib.ajax/directory-writeable-test.php',
+        data: {directory: directory, isfile:isFile},
+        dataType: 'json',
+        success: function(data) {
+          container.attr('data-loading', 'false');
+          if(data.writeable)
+          {
+            container.attr('data-writeable', 'true');
+          }
+          else
+          {
+            container.attr('data-writeable', 'false');
+          }
+        },
+        error: function(err) {
+          container.attr('data-loading', 'false');
+        }
+      });
+    }
+}
 
 
 /**
@@ -4243,17 +4282,21 @@ function parseJsonData(text)  //NOSONAR
 }
 
 /**
- * Sends data to the server for code generation and updates UI components.
+ * Generates code by sending data to the server and updating UI components.
  *
- * This function makes a POST request to the script generator endpoint with the provided data.
- * If the request is successful, it triggers various UI updates, including refreshing
- * the entity file, entity query, and entity relationship diagram. Additionally, it handles
- * UI feedback such as displaying toast notifications and closing alerts.
+ * This function sends the provided data to a server endpoint for code generation.
+ * Upon successful code generation, it updates the entity file, entity query,
+ * and entity relationship diagram. Additionally, it displays a success message 
+ * through a toast notification, triggers further actions upon module creation,
+ * and provides feedback on the process. If an error occurs, it handles the 
+ * failure gracefully.
  *
- * @param {Object} dataToPost - The data to be sent to the server for generating code.
+ * @param {Object} dataToPost - The data to send to the server for code generation.
+ *                              This object contains the necessary information 
+ *                              to generate the code, such as entity details.
+ * 
  * @returns {void}
  */
-
 function generateAllCode(dataToPost) {
   increaseAjaxPending();
   fetch('lib.ajax/script-generator.php', {
