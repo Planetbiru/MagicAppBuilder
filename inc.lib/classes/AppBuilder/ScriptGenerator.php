@@ -273,7 +273,7 @@ class ScriptGenerator //NOSONAR
      * @param array &$referenceEntitiesUse The array to hold entities that need to be used in both create and update operations.
      * @return void
      */
-    private function processField(AppField $field, &$insertFields, &$editFields, &$detailFields, &$listFields, &$exportFields, &$filterFields, &$referenceData, &$referenceEntities, &$referenceEntitiesUse) //NOSONAR
+    private function processField($field, &$insertFields, &$editFields, &$detailFields, &$listFields, &$exportFields, &$filterFields, &$referenceData, &$referenceEntities, &$referenceEntitiesUse) //NOSONAR
     {
         $create = false;
         $update = false;
