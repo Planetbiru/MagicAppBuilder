@@ -395,6 +395,9 @@ class ScriptGenerator //NOSONAR
         if(!$appFeatures->isBackendOnly())
         {
             $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
+        }
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
+        {
             $uses = $this->addExporterLibrary($uses, $appFeatures);      
         }
         $uses = $this->addAddEmptyLine($uses);     
@@ -500,7 +503,7 @@ class ScriptGenerator //NOSONAR
             // GUI
             if($appFeatures->isBackendOnly())
             {
-                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable);
+                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable);
             }
             else
             {
@@ -527,7 +530,7 @@ class ScriptGenerator //NOSONAR
             $rejectionSection = "";
             if($appFeatures->isBackendOnly())
             {
-                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable);                 
+                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable);                 
             }
             else
             {
@@ -903,7 +906,7 @@ class ScriptGenerator //NOSONAR
         $uses[] = "// This script is generated automatically by MagicAppBuilder";
         $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicObject\\MagicObject;";
         }
@@ -917,7 +920,7 @@ class ScriptGenerator //NOSONAR
             $uses[] = "use MagicObject\\Database\\PicoPageable;";
         }
         $uses[] = "use MagicObject\\Database\\PicoPredicate;";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicObject\\Database\\PicoSort;";
             $uses[] = "use MagicObject\\Database\\PicoSortable;";
@@ -926,7 +929,7 @@ class ScriptGenerator //NOSONAR
         $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
         $uses[] = "use MagicObject\\Request\\InputGet;";
         $uses[] = "use MagicObject\\Request\\InputPost;";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicApp\\AppEntityLanguage;";
         }

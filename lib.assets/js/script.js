@@ -4757,10 +4757,6 @@ function restoreForm(data)  //NOSONAR
 
   if (typeof data.features != 'undefined') {
 
-    if ($('#modal-module-features [name="subquery"]').length) {
-      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
-    }
-
     if ($('#modal-module-features [name="activate_deactivate"]').length) {
       $('#modal-module-features [name="activate_deactivate"]')[0].checked = isTrue(data.features.activateDeactivate);
     }
@@ -4797,8 +4793,25 @@ function restoreForm(data)  //NOSONAR
       $('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
     }
 
+    if ($('#modal-module-features [name="subquery"]').length) {
+      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
+    }
+
     if ($('#modal-module-features [name="ajax_support"]').length) {
       $('#modal-module-features [name="ajax_support"]')[0].checked = isTrue(data.features.ajaxSupport);
+    }
+
+    if ($('#modal-module-features [name="backend_only"]').length) {
+      let backendOnly = isTrue(data.features.backendOnly);
+      $('#modal-module-features [name="backend_only"]')[0].checked = backendOnly;
+      if(backendOnly)
+      {
+        $('#modal-module-features [name="ajax_support"]')[0].checked = false;
+        $('#modal-module-features [name="ajax_support"]')[0].disabled = true;
+
+        $('#modal-module-features [name="subquery"]')[0].checked = false;
+        $('#modal-module-features [name="subquery"]')[0].disabled = true;
+      }
     }
   }
 

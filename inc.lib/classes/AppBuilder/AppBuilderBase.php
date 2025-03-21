@@ -1371,14 +1371,23 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 }';
     }
     
-    public function createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable)
+    /**
+     * Creates an export file (Excel or CSV) based on provided entity data.
+     *
+     * @param object $entityMain The main entity to export.
+     * @param array $listFields List of fields for the export.
+     * @param array $exportFields Fields to be included in the export.
+     * @param array $referenceData Reference data for the fields.
+     * @param array $filterFields Filters applied to the export.
+     * @param array $sortable Sortable fields for data ordering.
+     *
+     * @return string|null The generated export content or null if export is not enabled.
+     */
+    public function createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable)
     {
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
             $entityName = $entityMain->getentityName();
-            $primaryKey = $entityMain->getPrimaryKey();
-            $objectName = lcfirst($entityName);
-            $dom = new DOMDocument();
 
             $getData = array();
             
@@ -1388,7 +1397,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             $getData[] = "\t".$this->constructEntityLabel($entityName);
 
             // before script
-            $beforeScript = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable);
+            $beforeScript = $this->beforeListScript($entityMain, $listFields, $filterFields, $referenceData, $sortable);
             $beforeScript = str_replace('$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);'."\n", '', $beforeScript);
             $beforeScript = trim($beforeScript, "\n");
             $arr = explode("\n", $beforeScript);
@@ -1402,43 +1411,43 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             $getData[] = $beforeScript;
             
             $entityName = $entityMain->getentityName();
-        $objectName = lcfirst($entityName);
-        $headers = array();
-        $data = array();
-        $globals = array();
-        $globals[] = '$appLanguage';
-        foreach($exportFields as $field)
-        {
-            $caption = PicoStringUtil::upperCamelize($field->getFieldName());
-            $caption = $this->fixFieldName($caption, $field);
-
-            if($field->getElementType() == InputType::SELECT 
-            && $field->getReferenceData() != null 
-            && $field->getReferenceData()->getType() == ReferenceType::MAP
-            && $field->getReferenceData()->getMap() != null
-            )
+            $objectName = lcfirst($entityName);
+            $headers = array();
+            $data = array();
+            $globals = array();
+            $globals[] = '$appLanguage';
+            foreach($exportFields as $field)
             {
-                $globals[] = '$'.PicoStringUtil::camelize('map_for_'.$field->getFieldName());
+                $caption = PicoStringUtil::upperCamelize($field->getFieldName());
+                $caption = $this->fixFieldName($caption, $field);
+
+                if($field->getElementType() == InputType::SELECT 
+                && $field->getReferenceData() != null 
+                && $field->getReferenceData()->getType() == ReferenceType::MAP
+                && $field->getReferenceData()->getMap() != null
+                )
+                {
+                    $globals[] = '$'.PicoStringUtil::camelize('map_for_'.$field->getFieldName());
+                }
+
+                if($field->getElementType() == InputType::TEXT)
+                {
+                    $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
+                }
+                else
+                {
+                    $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
+                }
+
+                $headers[] = $line1;
+                $line2 = $this->createExportValue($objectName, $field);          
+                $data[] = $line2;
+
             }
 
-            if($field->getElementType() == InputType::TEXT)
+            if($this->appFeatures->isExportToExcel())
             {
-                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
-            }
-            else
-            {
-                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
-            }
-
-            $headers[] = $line1;
-            $line2 = $this->createExportValue($objectName, $field);          
-            $data[] = $line2;
-
-        }
-
-        if($this->appFeatures->isExportToExcel())
-        {
-            $exporter = '
+                $exporter = '
 '."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
 '."\t".'$sheetName = "Sheet 1";
@@ -1476,7 +1485,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             
             
             $result = 
-            "\r\n"
+            "else "
             .implode(self::NEW_LINE, $getData)
             .self::NEW_LINE
             ;
@@ -1612,7 +1621,7 @@ catch(Exception $e)
         $getData[] = $this->constructEntityLabel($entityName);
 
         // before script
-        $getData[] = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable);
+        $getData[] = $this->beforeListScript($entityMain, $listFields, $filterFields, $referenceData, $sortable);
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
             $getData[] = $this->createExportScript($entityMain, $exportFields);
@@ -1788,7 +1797,6 @@ else
     /**
      * Create the script before the GUI list section.
      *
-     * @param DOMDocument $dom The DOM document for generating HTML.
      * @param MagicObject $mainEntity The main entity object.
      * @param AppField[] $listFields An array of fields to be displayed in the list.
      * @param AppField[] $filterFields An array of filter fields.
@@ -1796,7 +1804,7 @@ else
      * @param array $sortable Sortable field specifications.
      * @return string The generated script for the list section.
      */
-    public function beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable) // NOSONAR
+    public function beforeListScript($entityMain, $listFields, $filterFields, $referenceData, $sortable) // NOSONAR
     {
         $map = $this->defineMap($referenceData); 
         $additionalFilter = $this->getAdditionalFilter();
