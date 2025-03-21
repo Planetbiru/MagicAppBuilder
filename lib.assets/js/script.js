@@ -1031,14 +1031,14 @@ let initAll = function () {
     let modal = $('#modal-create-application');
     let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
-    $('[name="application_name"]').val('');
-    $('[name="application_id"]').val('');
-    $('[name="application_directory"]').val('');
-    $('[name="application_workspace_id"]').val('');
-    $('[name="application_namespace"]').val('');
-    $('[name="application_author"]').val('');
-    $('[name="magic_app_version"]').empty();
-    $('[name="installation_method"]').val('');  
+    modal.find('[name="application_name"]').val('');
+    modal.find('[name="application_id"]').val('');
+    modal.find('[name="application_directory"]').val('');
+    modal.find('[name="application_workspace_id"]').val('');
+    modal.find('[name="application_namespace"]').val('');
+    modal.find('[name="application_author"]').val('');
+    modal.find('[name="magic_app_version"]').empty();
+    modal.find('[name="installation_method"]').val('');  
     increaseAjaxPending();
     $.ajax({
       type: 'GET',
@@ -1056,18 +1056,18 @@ let initAll = function () {
           createBtn[0].disabled = true;
         }
         else {
-          $('[name="application_name"]').val(data.application_name);
-          $('[name="application_id"]').val(data.application_id);
-          $('[name="application_architecture"]').val(data.application_architecture);
-          $('[name="application_directory"]').val(data.application_directory);
-          $('[name="composer_online"]').val(data.composer_online ? 1 : 0);
-          $('[name="application_namespace"]').val(data.application_namespace);
-          $('[name="application_workspace_id"]').empty();
-          $('[name="installation_method"]').empty();
-          $('[name="application_author"]').val(data.application_author);
-          $('[name="application_description"]').val(data.application_description);
+          modal.find('[name="application_name"]').val(data.application_name);
+          modal.find('[name="application_id"]').val(data.application_id);
+          modal.find('[name="application_architecture"]').val(data.application_architecture);
+          modal.find('[name="application_directory"]').val(data.application_directory);
+          modal.find('[name="composer_online"]').val(data.composer_online ? 1 : 0);
+          modal.find('[name="application_namespace"]').val(data.application_namespace);
+          modal.find('[name="application_workspace_id"]').empty();
+          modal.find('[name="installation_method"]').empty();
+          modal.find('[name="application_author"]').val(data.application_author);
+          modal.find('[name="application_description"]').val(data.application_description);
           updateNewApplicationForm(data);
-          checkWriretableDirectory($('[name="application_directory"]'));
+          checkWriretableDirectory(modal.find('[name="application_directory"]'));
           createBtn[0].disabled = false;
         }
       }
@@ -1371,6 +1371,7 @@ let initAll = function () {
         decreaseAjaxPending();
         $('#modal-application-setting .application-setting').empty().append(data);
         checkWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
+        checkWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
         setTimeout(function () {
           // set database_password to be empty
           // prevent autofill password
@@ -1928,6 +1929,21 @@ let initAll = function () {
   loadReferenceResource();
 };
 
+/**
+ * Checks if the specified directory is writable and updates the UI accordingly.
+ *
+ * This function sends an AJAX request to the server to check if the given directory 
+ * is writable. It updates the associated UI container with a loading state during 
+ * the request and changes the state to indicate whether the directory is writable 
+ * or not once the response is received. The result is reflected in the `data-writeable` 
+ * attribute of the closest `.directory-container` element. It also handles the case 
+ * where the directory is being checked for being a file or directory.
+ *
+ * @param {HTMLElement} input - The input element that triggers the directory check.
+ *                               This input element contains the directory path.
+ * 
+ * @returns {void}
+ */
 function checkWriretableDirectory(input)
 {
     let container = $(input).closest('.directory-container');
@@ -1960,7 +1976,6 @@ function checkWriretableDirectory(input)
       });
     }
 }
-
 
 /**
  * Updates the application form with dynamic data for workspace, installation method, and magic app versions.

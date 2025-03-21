@@ -32,7 +32,7 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <link rel="stylesheet" type="text/css" href="lib.assets/css/css.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
@@ -40,63 +40,6 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
 </head>
-
-<style>
-  .directory-container .form-control {
-    padding-right: 1.75rem;
-  }
-
-  .directory-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-  }
-
-  .directory-container::after {
-    content: '';
-    position: absolute;
-    width: 1.75rem;
-    height: 1.5rem;
-    right: 0.5rem;
-    top: 0.5rem;
-  }
-
-  .directory-container[data-writeable="true"]::after {
-    content: '\2713'; 
-    color: green; 
-    font-size: 1.2rem;
-    text-align: center;
-  }
-
-  .directory-container[data-writeable="false"]::after {
-    content: '\2717'; 
-    color: red; 
-    font-size: 1.2rem;
-    text-align: center;
-  }
-
-  .directory-container[data-loading="true"]::after {
-    content: '\2022 \2022 \2022'; 
-    color: green; 
-    font-size: 1.5rem;
-    text-align: center;
-    animation: blink 1s infinite;
-    white-space: nowrap;
-  }
-
-  @keyframes blink {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-</style>
-
 
 <body data-admin-level-id="<?php echo $adminLevelId; ?>">
 </body>

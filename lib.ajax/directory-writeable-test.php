@@ -8,7 +8,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $directory = FileDirUtil::normalizePath($inputPost->getDirectory());
-if($inputPost->getIsFile() == 'true')
+if($inputPost->getIsfile() == 'true')
 {
     $directory = dirname($directory);
 }
