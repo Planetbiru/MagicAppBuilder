@@ -1370,6 +1370,126 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
 '."\t".'exit();
 }';
     }
+    
+    public function createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable)
+    {
+        if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
+        {
+            $entityName = $entityMain->getentityName();
+            $primaryKey = $entityMain->getPrimaryKey();
+            $objectName = lcfirst($entityName);
+            $dom = new DOMDocument();
+
+            $getData = array();
+            
+            $getData[] = 'if($inputGet->getUserAction() == UserAction::EXPORT)';
+            $getData[] = '{';
+            
+            $getData[] = "\t".$this->constructEntityLabel($entityName);
+
+            // before script
+            $beforeScript = $this->beforeListScript($dom, $entityMain, $listFields, $filterFields, $referenceData, $sortable);
+            $beforeScript = str_replace('$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);'."\n", '', $beforeScript);
+            $beforeScript = trim($beforeScript, "\n");
+            $arr = explode("\n", $beforeScript);
+            foreach($arr as $k=>$v)
+            {
+                $arr[$k] = "\t".$v;
+            }
+            $beforeScript = implode("\n", $arr);
+            $beforeScript = trim($beforeScript, "\n");
+            
+            $getData[] = $beforeScript;
+            
+            $entityName = $entityMain->getentityName();
+        $objectName = lcfirst($entityName);
+        $headers = array();
+        $data = array();
+        $globals = array();
+        $globals[] = '$appLanguage';
+        foreach($exportFields as $field)
+        {
+            $caption = PicoStringUtil::upperCamelize($field->getFieldName());
+            $caption = $this->fixFieldName($caption, $field);
+
+            if($field->getElementType() == InputType::SELECT 
+            && $field->getReferenceData() != null 
+            && $field->getReferenceData()->getType() == ReferenceType::MAP
+            && $field->getReferenceData()->getMap() != null
+            )
+            {
+                $globals[] = '$'.PicoStringUtil::camelize('map_for_'.$field->getFieldName());
+            }
+
+            if($field->getElementType() == InputType::TEXT)
+            {
+                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
+            }
+            else
+            {
+                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat->asString()";
+            }
+
+            $headers[] = $line1;
+            $line2 = $this->createExportValue($objectName, $field);          
+            $data[] = $line2;
+
+        }
+
+        if($this->appFeatures->isExportToExcel())
+        {
+            $exporter = '
+'."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter();
+'."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+'."\t".'$sheetName = "Sheet 1";
+';
+        }
+        else
+        {
+            $exporter = '
+'."\t".'$exporter = DocumentWriter::getCSVDocumentWriter();
+'."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+'."\t".'$sheetName = "Sheet 1";
+';
+        }
+        $uses = "";
+        if(!empty($globals))
+        {
+            $uses = " use (".implode(", ", $globals).") ";
+        }
+
+        $getData[] = ''.$exporter.'
+'."\t".'$headerFormat = new XLSXDataFormat($dataLoader, 3);
+'."\t".'$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+'."\t".'$exporter->write($pageData, $fileName, $sheetName, array(
+'."\t\t".'$appLanguage->getNumero() => $headerFormat->asNumber(),
+'."\t\t".implode(",\n\t\t", $headers).'
+'."\t".'), 
+'."\t".'function($index, $row)'.$uses.'{
+'."\t\t".'return array(
+'.self::TAB3.'sprintf("%d", $index + 1),
+'.self::TAB3.implode(",\n\t\t\t", $data).'
+'."\t\t".');
+'."\t".'});
+'."\t".'exit();
+}';
+            
+            
+            $result = 
+            "\r\n"
+            .implode(self::NEW_LINE, $getData)
+            .self::NEW_LINE
+            ;
+            
+            if(stripos($result, ' multiple=""') !== false && stripos($result, ' data-multi-select=""')  !== false)
+            {
+                $result = str_replace(array(' multiple=""', ' data-multi-select=""'), array(' multiple', ' data-multi-select'), $result);
+            }
+            
+            return $result;
+        }
+        return null;
+    }
 
     /**
      * Create the GUI list section for displaying entities.
