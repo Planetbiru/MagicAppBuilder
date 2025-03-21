@@ -61,11 +61,10 @@ body {
         border: $panel-border;
         width: calc(70% - 5px);
         background-color: $primary-bg-color;
-
-        input[type="checkbox"] {
+        input[type="checkbox"]
+        {
             vertical-align: text-top;
         }
-
         .object-container {
             width: 224px;
             height: 100%;

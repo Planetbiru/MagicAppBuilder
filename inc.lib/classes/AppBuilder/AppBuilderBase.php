@@ -16,6 +16,7 @@ use MagicObject\SecretObject;
 use AppBuilder\AppSecretObject;
 use AppBuilder\AppEntityGenerator;
 use AppBuilder\DataType;
+use AppBuilder\Util\DataUtil;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Database\PicoDatabase;
 
@@ -2551,7 +2552,15 @@ $subqueryMap = '.$referece.';
                 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
-                $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                if($multipleFilter)
+                {
+                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+                    $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                }
+                else
+                {
+                    $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                }
                 $input->setAttribute('autocomplete', 'off'); 
                 if($multipleFilter)
                 {
@@ -3109,7 +3118,19 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('name', $field->getFieldName());
             }
+
             $input = $this->addAttributeId($input, $id); 
+
+            if($multipleData)
+            {
+                $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+            }
+            else
+            {
+                $input->setAttribute('value', '');
+            }
+
+
             $input->setAttribute('autocomplete', 'off'); 
             if($field->getRequired())
             {
@@ -3236,7 +3257,17 @@ $subqueryMap = '.$referece.';
 
             $input = $this->addAttributeId($input, $id);  
             
-            $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+            if($multipleData)
+            {
+                $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+                $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$upperFieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+            }
+            else
+            {
+                $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+            }
+
+            
             $input->setAttribute('autocomplete', 'off');
             if($field->getRequired())
             {
@@ -3900,11 +3931,19 @@ $subqueryMap = '.$referece.';
      * @param mixed $value The value to format.
      * @return mixed The formatted value.
      */
-    public static function fixValue($value)
+    public static function fixValue($value) // NOSONAR
     {
-        if($value == null)
+        if($value === null)
         {
             return 'null';
+        }
+        if($value === true)
+        {
+            return 'true';
+        }
+        if($value === false)
+        {
+            return 'false';
         }
         $value = trim($value);
         if(is_bool($value))
@@ -4733,7 +4772,7 @@ $subqueryMap = '.$referece.';
      */
     public static function isTrue($value)
     {
-        return $value == '1' || strtolower($value) == 'true' || $value === 1 || $value === true;
+        return DataUtil::isTrue($value);
     }
 
     /**
