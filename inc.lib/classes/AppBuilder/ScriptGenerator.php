@@ -995,13 +995,14 @@ class ScriptGenerator //NOSONAR
     /**
      * Prepare the application directory structure and configuration.
      *
-     * Creates necessary directories and prepares the application setup based on the configuration.
+     * This function ensures that necessary directories exist, sets up Composer dependencies, and copies template files.
+     * It also processes PHP files in the template directory using a callback to replace namespace placeholders.
      *
-     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
-     * @param SecretObject $appConf Application configuration object.
-     * @param string $baseDir Base directory for the application.
-     * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode
-     * @return void
+     * @param SecretObject $builderConfig The configuration object for MagicAppBuilder.
+     * @param SecretObject $appConf The application configuration object.
+     * @param string $baseDir The base directory for the application.
+     * @param bool $onlineInstallation Determines whether Composer should be run in online mode.
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation)
     {
@@ -1026,6 +1027,28 @@ class ScriptGenerator //NOSONAR
                 copy(dirname(dirname(__DIR__))."/".$file, $baseAppBuilder."/".$file);
             }
         }
+
+        // Copy inc.app/*
+        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/inc.app";
+        $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.app";
+        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
+
+        // Copy lib.themes/*
+        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/lib.themes";
+        $destinationDir = $appConf->getBaseApplicationDirectory()."/lib.themes";
+        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
+
+        return $this;
     }
     
     /**
@@ -1038,17 +1061,17 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $composer Composer configuration object.
      * @param MagicObject $magicApp MagicApp configuration object.
      * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation)
     {
         if($onlineInstallation)
         {
-            $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
+            return $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
         }
         else
         {
-            $this->prepareComposerOffline($builderConfig, $appConf, $composer);
+            return $this->prepareComposerOffline($builderConfig, $appConf, $composer);
         }
     }
 
@@ -1086,6 +1109,7 @@ class ScriptGenerator //NOSONAR
             exec($cmd);     
             $this->updateComposer($builderConfig, $appConf, $composer);
         }
+        return $this;
     }
 
     /**
@@ -1096,7 +1120,7 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareComposerOffline($builderConfig, $appConf, $composer)
     {
@@ -1159,6 +1183,7 @@ class ScriptGenerator //NOSONAR
             $cmd = "cd $targetDir"."&&"."$phpPath composer.phar dump-autoload --ignore-platform-reqs";
             exec($cmd);     
         }
+        return $this;
     }
 
     /**
@@ -1231,13 +1256,14 @@ class ScriptGenerator //NOSONAR
      * Prepare a directory by creating it if it does not exist.
      *
      * @param string $baseDir Directory path to prepare.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareDir($baseDir)
     {
         if(!file_exists($baseDir)) {
             mkdir($baseDir, 0755, true);
         }
+        return $this;
     }
     
     /**
@@ -1248,7 +1274,7 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param SecretObject $composer Composer configuration object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function updateComposer($builderConfig, $appConf, $composer)
     {
@@ -1286,6 +1312,7 @@ class ScriptGenerator //NOSONAR
         }
         $cmd = "cd $targetDir"."&&"."$phpPath composer.phar update";
         exec($cmd);
+        return $this;
     }
     
     /**
@@ -1294,7 +1321,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param stdClass $composerJson Decoded composer.json object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     private function updatePsr0($appConf, $composer, $composerJson)
     {
@@ -1336,6 +1363,7 @@ class ScriptGenerator //NOSONAR
                 $this->fixNamespace($entityAppDir."/".$file, $entityNamespace);
             }
         }
+        return $this;
     }
     
     /**
@@ -1344,7 +1372,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param stdClass $composerJson Decoded composer.json object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function updatePsr4($appConf, $composer, $composerJson)
     {
@@ -1361,6 +1389,7 @@ class ScriptGenerator //NOSONAR
                 $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/classes/".$dir->getNamespace());
             }
         }
+        return $this;
     }
     
     /**
@@ -1370,12 +1399,13 @@ class ScriptGenerator //NOSONAR
      *
      * @param string $path Path to the file to update.
      * @param string $entityNamespace The new namespace to set in the file.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     private function fixNamespace($path, $entityNamespace)
     {
         $str = file_get_contents($path);
         $str = str_replace("namespace AppBuilder\App\\", "namespace $entityNamespace\\", $str);
         file_put_contents($path, $str);
+        return $this;
     }
 }
