@@ -1,3 +1,13 @@
+let tabsLinkContainer;
+let currentMarginLeft = 0;
+
+// Instantiate the class
+const converter = new SQLConverter();
+let editor;
+let entityRenderer;
+let diagramRenderer = {};
+let resizablePanels;
+
 /**
  * Initializes the event listeners and sets up the modal dialogs.
  */
@@ -126,12 +136,7 @@ function openStructure(file)
     reader.readAsText(file); // Read the file as text
 }
 
-// Instantiate the class
-const converter = new SQLConverter();
-let editor;
-let entityRenderer;
-let diagramRenderer = {};
-let resizablePanels;
+
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -372,8 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-let tabsLinkContainer;
-let currentMarginLeft = 0;
+
 
 /**
  * Updates the margin-left of the tabs to scroll them left or right.
