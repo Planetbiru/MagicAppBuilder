@@ -93,35 +93,35 @@
 </tr>
 <tr>
 <td>Master Entity Name</td>
-<td><input class="form-control" type="text" name="entity_master_name" id="entity_master_name"></td>
+<td><input type="text" class="form-control" name="entity_master_name" id="entity_master_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Master Primary Key</td>
-<td><input class="form-control" type="text" name="primary_key_master" id="primary_key_master"></td>
+<td><input type="text" class="form-control" name="primary_key_master" id="primary_key_master" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Approval Table Name</td>
-<td><input class="form-control" type="text" name="table_approval_name" id="table_approval_name"></td>
+<td><input type="text" class="form-control" name="table_approval_name" id="table_approval_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Approval Primary Key</td>
-<td><input class="form-control" type="text" name="primary_key_approval" id="primary_key_approval"></td>
+<td><input type="text" class="form-control" name="primary_key_approval" id="primary_key_approval" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Approval Entity Name</td>
-<td><input class="form-control" type="text" name="entity_approval_name" id="entity_approval_name"></td>
+<td><input type="text" class="form-control" name="entity_approval_name" id="entity_approval_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Trash Table Name</td>
-<td><input class="form-control" type="text" name="table_trash_name" id="table_trash_name"></td>
+<td><input type="text" class="form-control" name="table_trash_name" id="table_trash_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Trash Primary Key</td>
-<td><input class="form-control" type="text" name="primary_key_trash" id="primary_key_trash"></td>
+<td><input type="text" class="form-control" name="primary_key_trash" id="primary_key_trash" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Trash Entity Name</td>
-<td><input class="form-control" type="text" name="entity_trash_name" id="entity_trash_name"></td>
+<td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
 </tr>
 </tbody>
 </table>
@@ -155,15 +155,15 @@
 <tbody>
 <tr>
 <td>File Name</td>
-<td><input class="form-control" type="text" name="module_file" id="module_file"></td>
+<td><input type="text" class="form-control" name="module_file" id="module_file" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Module Code</td>
-<td><input class="form-control" type="text" name="module_code" id="module_code"></td>
+<td><input type="text" class="form-control" name="module_code" id="module_code" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Module Name</td>
-<td><input class="form-control" type="text" name="module_name" id="module_name"></td>
+<td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Load Saved Module</td>
@@ -283,7 +283,7 @@
 </thead>
 <tbody>
 <tr>
-<td><input class="form-control data-filter-column-name" type="text" value=""></td>
+<td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off"></td>
 <td>
 <select class="form-control data-filter-column-comparison">
 <option value="equals">=</option>
@@ -294,7 +294,7 @@
 <option value="lessThanOrEquals">&lt;=</option>
 </select>
 </td>
-<td><input class="form-control data-filter-column-value" type="text" value=""></td>
+<td><input type="text" class="form-control data-filter-column-value" value="" autocomplete="off"></td>
 <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
 <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
 <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
@@ -337,7 +337,7 @@
 </thead>
 <tbody>
 <tr>
-<td><input class="form-control data-order-column-name" type="text" value=""></td>
+<td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off"></td>
 <td><select class="form-control data-order-order-type">
 <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
 <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
@@ -398,7 +398,7 @@
 <td>Approval</td>
 <td><label for="with_approval"><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
 </tr>
-<tr>
+<tr style="display: none;">
 <td>Approval Note</td>
 <td><label for="with_approval_note"><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1"> Approval Note</label> &nbsp;</td>
 </tr>
@@ -516,13 +516,13 @@
 </div>
 <div class="column-body">
 <div class="diagram-option">
-<span>Max Level</span> <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
-<span>Max Column</span> <input class="form-control" type="number" step="1" name="maximum_column" value="8" min="4">
-<span>Margin X</span> <input class="form-control" type="number" name="margin_x" value="0" min="0">
-<span>Margin Y</span> <input class="form-control" type="number" name="margin_y" value="0" min="0">
-<span>H Space</span> <input class="form-control" type="number" name="entity_margin_x" value="40" min="0">
-<span>V Space</span> <input class="form-control" type="number" name="entity_margin_y" value="20" min="0">
-<span>Zoom</span> <input class="form-control" type="number" step="0.05" name="zoom" value="1" min="0.5">
+<span>Max Level</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
+<span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
+<span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
+<span>Margin Y</span> <input type="number" class="form-control" name="margin_y" value="0" min="0">
+<span>H Space</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
+<span>V Space</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
+<span>Zoom</span> <input type="number" class="form-control" step="0.05" name="zoom" value="1" min="0.5">
 <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> Reload</button>
 <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> SVG</button>
 <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i> PNG</button>
@@ -660,11 +660,11 @@
 <tbody>
 <tr>
 <td>Application Name</td>
-<td><input class="form-control" type="text" name="application_name"></td>
+<td><input type="text" class="form-control" name="application_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Application ID</td>
-<td><input class="form-control" type="text" name="application_id"></td>
+<td><input type="text" class="form-control" name="application_id" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Architecture</td>
@@ -701,15 +701,15 @@
 </tr>
 <tr>
 <td>Application Directory</td>
-<td><input class="form-control" type="text" name="application_directory"></td>
+<td><span class="directory-container" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
 </tr>                
 <tr>
 <td>Base Namespace</td>
-<td><input class="form-control" type="text" name="application_namespace"></td>
+<td><input type="text" class="form-control" name="application_namespace" autocomplete="off" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Author</td>
-<td><input class="form-control" type="text" name="application_author"></td>
+<td><input type="text" class="form-control" name="application_author" autocomplete="off"></td>
 </tr>           
 <tr>
 <td>Path</td>
@@ -725,8 +725,8 @@
 </thead>
 <tbody>
 <tr>
-<td><input class="form-control" type="text" name="name[0]" value="root"></td>
-<td><input class="form-control" type="text" name="path[0]" value="/"></td>
+<td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
+<td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
 <td><input type="checkbox" name="checked[0]" checked></td>
 <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
 </tr>
@@ -789,11 +789,11 @@
 <tbody>
 <tr>
 <td>Language</td>
-<td><input class="form-control" type="text" name="language_name"></td>
+<td><input type="text" class="form-control" name="language_name" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Code</td>
-<td><input class="form-control" type="text" name="language_code"></td>
+<td><input type="text" class="form-control" name="language_code" autocomplete="off"></td>
 </tr>
 </tbody>
 </table>      
@@ -833,8 +833,8 @@
 </thead>
 <tbody>
 <tr>
-<td><input class="form-control location-name" type="text" name="name[0]" value=""></td>
-<td><input class="form-control location-path" type="text" name="path[0]" value=""></td>
+<td><input type="text" class="form-control location-name" name="name[0]" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control location-path" name="path[0]" value="" autocomplete="off"></td>
 <td><input type="checkbox" name="checked[0]" checked></td>
 <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
 </tr>
@@ -888,8 +888,8 @@
 </thead>
 <tbody>
 <tr>
-<td><input class="form-control language-name" type="text" name="language_name[0]" value=""></td>
-<td><input class="form-control language-code" type="text" name="language_code[0]" value=""></td>
+<td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
 <td><input type="checkbox" name="checked[0]" checked></td>
 <td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
 </tr>
@@ -970,7 +970,7 @@
 <tbody>
 <tr>
 <td>Name</td>
-<td><input class="form-control" type="text" name="workspace_name" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control" name="workspace_name" value="" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Description</td>
@@ -978,11 +978,11 @@
 </tr>
 <tr>
 <td>Directory</td>
-<td><input class="form-control" type="text" name="workspace_directory" value="" autocomplete="off"></td>
+<td><span class="directory-container"><input type="text" class="form-control" name="workspace_directory" value="" autocomplete="off"></span></td>
 </tr>
 <tr>
 <td>PHP Path</td>
-<td><input class="form-control" type="text" name="php_path" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control" name="php_path" value="" autocomplete="off"></td>
 </tr>
 </tbody>
 </table>

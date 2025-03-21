@@ -395,6 +395,9 @@ class ScriptGenerator //NOSONAR
         if(!$appFeatures->isBackendOnly())
         {
             $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
+        }
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
+        {
             $uses = $this->addExporterLibrary($uses, $appFeatures);      
         }
         $uses = $this->addAddEmptyLine($uses);     
@@ -480,6 +483,7 @@ class ScriptGenerator //NOSONAR
         $guiUpdate = null;
         $guiDetail = null;
         $guiList = null;
+        $export = null;
 
         // prepare CRUD section begin
         if($approvalRequired) {
@@ -497,14 +501,20 @@ class ScriptGenerator //NOSONAR
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
 
             // GUI
-            if(!$appFeatures->isBackendOnly())
+            if($appFeatures->isBackendOnly())
+            {
+                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable);
+            }
+            else
             {
                 $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
                 $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
                 $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
                 $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable);
-            } 
-        } else {
+            }
+        } 
+        else 
+        {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
             
@@ -518,7 +528,11 @@ class ScriptGenerator //NOSONAR
 
             $approvalSection = "";
             $rejectionSection = "";
-            if(!$appFeatures->isBackendOnly())
+            if($appFeatures->isBackendOnly())
+            {
+                $export = $appBuilder->createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable);                 
+            }
+            else
             {
                 $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
                 $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields); 
@@ -531,6 +545,7 @@ class ScriptGenerator //NOSONAR
         
         $crudSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))->add($createSection)->add($updateSection)->add($activationSection)->add($deactivationSection)->add($deleteSection)->add($approvalSection)->add($rejectionSection);
 
+        
         if($appFeatures->isSortOrder()) {
             $primaryKey = $entityMain->getPrimaryKey();
             $entityName = $entityMain->getEntityName();
@@ -538,10 +553,34 @@ class ScriptGenerator //NOSONAR
             $sortOrderSection = $appBuilder->createSortOrderSection($objectName, $entityName, $primaryKey);  
             $crudSection->add($sortOrderSection);
         }
-            
-        $guiSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))->add($guiInsert)->add($guiUpdate)->add($guiDetail)->add($guiList);
+        
+        if($appFeatures->isBackendOnly())
+        {
+            $merged = (new AppSection(AppSection::SEPARATOR_NEW_LINE))
+                ->add($usesSection)
+                ->add($includeSection)
+                ->add($declarationSection)
+                ->add($crudSection)
+                ->add($export)
+                ;
+        }
+        else
+        {
+            $guiSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))
+                ->add($guiInsert)
+                ->add($guiUpdate)
+                ->add($guiDetail)
+                ->add($guiList)
+                ;
 
-        $merged = (new AppSection(AppSection::SEPARATOR_NEW_LINE))->add($usesSection)->add($includeSection)->add($declarationSection)->add($crudSection)->add($guiSection);
+            $merged = (new AppSection(AppSection::SEPARATOR_NEW_LINE))
+                ->add($usesSection)
+                ->add($includeSection)
+                ->add($declarationSection)
+                ->add($crudSection)
+                ->add($guiSection)
+                ;
+        }
 
         $moduleFile = $request->getModuleFile();
 
@@ -867,7 +906,7 @@ class ScriptGenerator //NOSONAR
         $uses[] = "// This script is generated automatically by MagicAppBuilder";
         $uses[] = "// Visit https://github.com/Planetbiru/MagicAppBuilder";
         $uses[] = "";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicObject\\MagicObject;";
         }
@@ -881,7 +920,7 @@ class ScriptGenerator //NOSONAR
             $uses[] = "use MagicObject\\Database\\PicoPageable;";
         }
         $uses[] = "use MagicObject\\Database\\PicoPredicate;";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicObject\\Database\\PicoSort;";
             $uses[] = "use MagicObject\\Database\\PicoSortable;";
@@ -890,7 +929,7 @@ class ScriptGenerator //NOSONAR
         $uses[] = "use MagicObject\\Request\\PicoFilterConstant;";
         $uses[] = "use MagicObject\\Request\\InputGet;";
         $uses[] = "use MagicObject\\Request\\InputPost;";
-        if(!$appFeatures->isBackendOnly())
+        if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
             $uses[] = "use MagicApp\\AppEntityLanguage;";
         }

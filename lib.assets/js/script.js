@@ -638,6 +638,7 @@ let initAll = function () {
     getEntityQuery(ents, merged, createNew);
   });
 
+
   $(document).on("change", "#backend_only", function (e) {
     if($(this)[0].checked)
     {
@@ -653,8 +654,6 @@ let initAll = function () {
       $('#subquery')[0].disabled = false;
     }
   });
-
-  
   
   $(document).on("change", ".entity-create-new", function (e) {
     let ents = getEntitySelection();
@@ -1032,15 +1031,16 @@ let initAll = function () {
     let modal = $('#modal-create-application');
     let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
-    $('[name="application_name"]').val('');
-    $('[name="application_id"]').val('');
-    $('[name="application_directory"]').val('');
-    $('[name="application_workspace_id"]').val('');
-    $('[name="application_namespace"]').val('');
-    $('[name="application_author"]').val('');
-    $('[name="magic_app_version"]').empty();
-    $('[name="installation_method"]').val('');  
+    modal.find('[name="application_name"]').val('');
+    modal.find('[name="application_id"]').val('');
+    modal.find('[name="application_directory"]').val('');
+    modal.find('[name="application_workspace_id"]').val('');
+    modal.find('[name="application_namespace"]').val('');
+    modal.find('[name="application_author"]').val('');
+    modal.find('[name="magic_app_version"]').empty();
+    modal.find('[name="installation_method"]').val('');  
     increaseAjaxPending();
+    resetCheckWriretableDirectory(modal.find('[name="application_directory"]'));
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-new.php',
@@ -1057,17 +1057,18 @@ let initAll = function () {
           createBtn[0].disabled = true;
         }
         else {
-          $('[name="application_name"]').val(data.application_name);
-          $('[name="application_id"]').val(data.application_id);
-          $('[name="application_architecture"]').val(data.application_architecture);
-          $('[name="application_directory"]').val(data.application_directory);
-          $('[name="composer_online"]').val(data.composer_online ? 1 : 0);
-          $('[name="application_namespace"]').val(data.application_namespace);
-          $('[name="application_workspace_id"]').empty();
-          $('[name="installation_method"]').empty();
-          $('[name="application_author"]').val(data.application_author);
-          $('[name="application_description"]').val(data.application_description);
+          modal.find('[name="application_name"]').val(data.application_name);
+          modal.find('[name="application_id"]').val(data.application_id);
+          modal.find('[name="application_architecture"]').val(data.application_architecture);
+          modal.find('[name="application_directory"]').val(data.application_directory);
+          modal.find('[name="composer_online"]').val(data.composer_online ? 1 : 0);
+          modal.find('[name="application_namespace"]').val(data.application_namespace);
+          modal.find('[name="application_workspace_id"]').empty();
+          modal.find('[name="installation_method"]').empty();
+          modal.find('[name="application_author"]').val(data.application_author);
+          modal.find('[name="application_description"]').val(data.application_description);
           updateNewApplicationForm(data);
+          checkWriretableDirectory(modal.find('[name="application_directory"]'));
           createBtn[0].disabled = false;
         }
       }
@@ -1362,6 +1363,8 @@ let initAll = function () {
     $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
     increaseAjaxPending();
+    resetCheckWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
+    resetCheckWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/application-setting.php',
@@ -1370,6 +1373,8 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         $('#modal-application-setting .application-setting').empty().append(data);
+        checkWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
+        checkWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
         setTimeout(function () {
           // set database_password to be empty
           // prevent autofill password
@@ -1911,6 +1916,11 @@ let initAll = function () {
     e1.preventDefault();
     loadMenu();
   });
+  
+  $(document).on('change', '.directory-container input[type="text"]', function(e1){
+    let input = $(this);
+    checkWriretableDirectory(input);
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -1922,6 +1932,77 @@ let initAll = function () {
   loadReferenceResource();
 };
 
+/**
+ * Checks if the specified directory is writable and updates the UI accordingly.
+ *
+ * This function sends an AJAX request to the server to check if the given directory 
+ * is writable. It updates the associated UI container with a loading state during 
+ * the request and changes the state to indicate whether the directory is writable 
+ * or not once the response is received. The result is reflected in the `data-writeable` 
+ * attribute of the closest `.directory-container` element. It also handles the case 
+ * where the directory is being checked for being a file or directory.
+ *
+ * @param {HTMLElement} input - The input element that triggers the directory check.
+ *                               This input element contains the directory path.
+ * 
+ * @returns {void}
+ */
+function checkWriretableDirectory(input)
+{
+    let container = $(input).closest('.directory-container');
+    let isFile = container.attr('data-isfile') || '';
+    let failedIfExists = container.attr('data-failed-if-exists') || '';
+    let directory = input.val();
+    directory = directory.trim();
+    
+    if(directory != '' && directory != '/' && directory != '\\')
+    {
+      container.attr('data-loading', 'true');
+      $.ajax({
+        method: 'POST',
+        url: 'lib.ajax/directory-writeable-test.php',
+        data: {
+          directory: directory, 
+          isfile: isFile,
+          failedIfExists: failedIfExists
+        },
+        dataType: 'json',
+        success: function(data) {
+          container.attr('data-loading', 'false');
+          if(data.writeable)
+          {
+            container.attr('data-writeable', 'true');
+          }
+          else
+          {
+            container.attr('data-writeable', 'false');
+          }
+        },
+        error: function(err) {
+          container.attr('data-loading', 'false');
+        }
+      });
+    }
+}
+
+/**
+ * Resets the writable directory check by removing the `data-writeable` and `data-loading` attributes.
+ *
+ * This function clears the results of the directory writable check by removing the 
+ * `data-writeable` and `data-loading` attributes from the closest `.directory-container` 
+ * element, effectively resetting the UI state.
+ *
+ * @param {HTMLElement} input - The input element that triggers the reset of the directory check.
+ *                               This input element is used to find the closest `.directory-container`.
+ * 
+ * @returns {void}
+ */
+function resetCheckWriretableDirectory(input)
+{
+  let container = $(input).closest('.directory-container');
+  container.removeAttr('data-writeable');
+  container.removeAttr('data-loading');
+}
 
 /**
  * Updates the application form with dynamic data for workspace, installation method, and magic app versions.
@@ -4243,17 +4324,21 @@ function parseJsonData(text)  //NOSONAR
 }
 
 /**
- * Sends data to the server for code generation and updates UI components.
+ * Generates code by sending data to the server and updating UI components.
  *
- * This function makes a POST request to the script generator endpoint with the provided data.
- * If the request is successful, it triggers various UI updates, including refreshing
- * the entity file, entity query, and entity relationship diagram. Additionally, it handles
- * UI feedback such as displaying toast notifications and closing alerts.
+ * This function sends the provided data to a server endpoint for code generation.
+ * Upon successful code generation, it updates the entity file, entity query,
+ * and entity relationship diagram. Additionally, it displays a success message 
+ * through a toast notification, triggers further actions upon module creation,
+ * and provides feedback on the process. If an error occurs, it handles the 
+ * failure gracefully.
  *
- * @param {Object} dataToPost - The data to be sent to the server for generating code.
+ * @param {Object} dataToPost - The data to send to the server for code generation.
+ *                              This object contains the necessary information 
+ *                              to generate the code, such as entity details.
+ * 
  * @returns {void}
  */
-
 function generateAllCode(dataToPost) {
   increaseAjaxPending();
   fetch('lib.ajax/script-generator.php', {
@@ -4677,10 +4762,6 @@ function restoreForm(data)  //NOSONAR
 
   if (typeof data.features != 'undefined') {
 
-    if ($('#modal-module-features [name="subquery"]').length) {
-      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
-    }
-
     if ($('#modal-module-features [name="activate_deactivate"]').length) {
       $('#modal-module-features [name="activate_deactivate"]')[0].checked = isTrue(data.features.activateDeactivate);
     }
@@ -4717,8 +4798,25 @@ function restoreForm(data)  //NOSONAR
       $('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
     }
 
+    if ($('#modal-module-features [name="subquery"]').length) {
+      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
+    }
+
     if ($('#modal-module-features [name="ajax_support"]').length) {
       $('#modal-module-features [name="ajax_support"]')[0].checked = isTrue(data.features.ajaxSupport);
+    }
+
+    if ($('#modal-module-features [name="backend_only"]').length) {
+      let backendOnly = isTrue(data.features.backendOnly);
+      $('#modal-module-features [name="backend_only"]')[0].checked = backendOnly;
+      if(backendOnly)
+      {
+        $('#modal-module-features [name="ajax_support"]')[0].checked = false;
+        $('#modal-module-features [name="ajax_support"]')[0].disabled = true;
+
+        $('#modal-module-features [name="subquery"]')[0].checked = false;
+        $('#modal-module-features [name="subquery"]')[0].disabled = true;
+      }
     }
   }
 

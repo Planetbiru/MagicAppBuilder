@@ -937,4 +937,56 @@ p {
 
 .modal-body td > input[type=checkbox] {
   margin-top: 8px;
+}
+
+.directory-container .form-control {
+  padding-right: 2.5rem;
+}
+
+.directory-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.directory-container::after {
+  content: "";
+  position: absolute;
+  text-align: right;
+  width: 1.75rem;
+  height: 1.5rem;
+  right: 0.5rem;
+  top: 0.5rem;
+}
+
+.directory-container[data-writeable=true]::after {
+  content: "✓";
+  color: green;
+  font-size: 1.2rem;
+}
+
+.directory-container[data-writeable=false]::after {
+  content: "✗";
+  color: red;
+  font-size: 1.2rem;
+}
+
+.directory-container[data-loading=true]::after {
+  content: "•••";
+  color: green;
+  font-size: 1.5rem;
+  animation: blink 1s infinite;
+  white-space: nowrap;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
 }/*# sourceMappingURL=css.css.map */
