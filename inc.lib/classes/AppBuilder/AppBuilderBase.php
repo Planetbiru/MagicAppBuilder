@@ -1487,7 +1487,6 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             $result = 
             "else "
             .implode(self::NEW_LINE, $getData)
-            .self::NEW_LINE
             ;
             
             if(stripos($result, ' multiple=""') !== false && stripos($result, ' data-multi-select=""')  !== false)
