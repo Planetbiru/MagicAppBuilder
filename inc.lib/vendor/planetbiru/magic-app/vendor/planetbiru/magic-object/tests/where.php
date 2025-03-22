@@ -447,6 +447,10 @@ try
 	foreach($res->getResult() as $row)
 	{
 		echo $row."\r\n\r\n";
+		echo $row->dateFormatTimeCreate("j F Y H:i:s")."\r\n";
+		echo $row->getProducer()->dateFormatBirthDay("j F Y")."\r\n";
+		echo $row->numberFormatDuration(6, ",", "")."\r\n";
+		echo $row->formatTimeCreate("%+40s")."\r\n";
 	}
 }
 catch(Exception $e)

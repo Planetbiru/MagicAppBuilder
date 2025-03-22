@@ -126,7 +126,7 @@ class NativeQueryUtil
 
         // Handle array-type hinting (supports both classic and PHP 7+ styles)
         if (preg_match('/^(array<([\w\\\\]+)>|([\w\\\\]+)\[\])$/i', $returnType, $matches)) {
-            $className = $matches[2] ?? $matches[3];
+            $className = isset($matches[2]) ? $matches[2] : $matches[3];
             return $this->handleArrayReturnType($stmt, $className);
         }
 

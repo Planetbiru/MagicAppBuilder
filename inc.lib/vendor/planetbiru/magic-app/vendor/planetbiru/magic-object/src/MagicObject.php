@@ -2,6 +2,7 @@
 
 namespace MagicObject;
 
+use DateTime;
 use Exception;
 use PDOException;
 use PDOStatement;
@@ -2560,6 +2561,15 @@ class MagicObject extends stdClass // NOSONAR
      *   - Example: `$object->maskPropertyName($position, $maskLength, $maskChar);`
      *   - If `$object->maskPropertyName(1, 3, '*')` is called, it will mask the first 3 characters of the property value starting from position 1 with `*`.
      * 
+     * - **dateFormat**: Format a date value into a specified format.
+     *   - Example: `$formattedDate = $object->dateFormatDate("j F Y H:i:s");`
+     *
+     * - **numberFormat**: Format a number with grouped thousands
+     *   - Example: `$numberFormat = $object->numberFormatData(6, ".", ",");`
+     *
+     * - **format**: Format a date value into a specified format.
+     *   - Example: `$formattedData = $object->formatData("%7.3f");`
+     *
      * @param string $method Method name
      * @param mixed $params Parameters for the method
      * @return mixed|null The result of the called method, or null if not applicable
@@ -2835,6 +2845,83 @@ class MagicObject extends stdClass // NOSONAR
             $maskChar = isset($params[2]) ? $params[2] : '*'; // Character           
             return PicoStringUtil::maskString($this->get(substr($method, 4)), $position, $maskLength, $maskChar);
         }
+        else if(strncasecmp($method, "dateFormat", 10) === 0)
+        {
+            if(isset($params[0]))
+            {
+                return $this->_dateFormat($params[0], $this->get(substr($method, 10)));
+            }
+            else
+            {
+                return $this->get(substr($method, 10));
+            }
+        }
+        else if(strncasecmp($method, "numberFormat", 12) === 0)
+        {
+            if(isset($params[0]))
+            {
+                $param0 = $params[0];
+                $param1 = $params[1];
+                $param2 = $params[2];
+                return number_format($this->get(substr($method, 12)), $param0, $param1, $param2);
+            }
+            else
+            {
+                return $this->get(substr($method, 12));
+            }
+        }
+        else if(strncasecmp($method, "format", 6) === 0)
+        {
+            if(isset($params[0]))
+            {
+                return $this->_format($params[0], $this->get(substr($method, 6)));
+            }
+            else
+            {
+                return $this->get(substr($method, 6));
+            }
+        }
+    }
+
+    /**
+     * Format a date value into a specified format.
+     *
+     * @param string $format Date time format
+     * @param DateTime|string|int|float $value The date value to format
+     * @return string Formatted date string
+     */
+    private function _dateFormat($format, $value) // NOSONAR
+    {
+        if ($value instanceof DateTime) {
+            return $value->format($format);
+        } elseif (is_int($value)) {
+            return date($format, $value);
+        } elseif (is_float($value)) {
+            return date($format, (int) $value);
+        } elseif (is_string($value)) {
+            $dateTime = strtotime($value);
+            if ($dateTime !== false) {
+                return date($format, $dateTime);
+            }
+        }
+        return "Invalid date";
+    }
+
+    /**
+     * Formats a string using a specified format pattern.
+     *
+     * The format string consists of ordinary characters (except `%`, which 
+     * introduces a conversion specification). Each conversion specification 
+     * fetches and formats a corresponding parameter. This behavior applies 
+     * to both `sprintf` and `printf`.
+     *
+     * @param string $format The format string containing conversion specifications.
+     * @param mixed $value The value to be formatted.
+     * @return string The formatted string.
+     */
+    private function _format($format, $value)
+    {
+        return sprintf($format, $value);
     }
 
     /**
