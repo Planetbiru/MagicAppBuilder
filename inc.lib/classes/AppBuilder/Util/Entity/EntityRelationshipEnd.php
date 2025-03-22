@@ -4,36 +4,47 @@ namespace AppBuilder\Util\Entity;
 
 use MagicObject\Geometry\Point;
 
+/**
+ * Class representing an entity relationship endpoint.
+ */
 class EntityRelationshipEnd
 {
     /**
-     * Type
+     * The type of relationship endpoint.
      *
      * @var string
      */
     private $type;
     
     /**
-     * Relative position
+     * The position relative to a reference point.
      *
      * @var Point
      */
     private $relativePosition;
     
     /**
-     * Absolute position
+     * The absolute position in the coordinate system.
      *
      * @var Point
      */
     private $absolutePosition;
     
     /**
-     * Column
+     * The associated column in the entity diagram.
      *
      * @var EntityDiagramColumn
      */
     private $column;
     
+    /**
+     * Constructor.
+     *
+     * @param string               $type              The type of relationship endpoint.
+     * @param Point                $relativePosition  The position relative to a reference point.
+     * @param Point                $absolutePosition  The absolute position in the coordinate system.
+     * @param EntityDiagramColumn  $column            The associated column in the entity diagram.
+     */
     public function __construct($type, $relativePosition, $absolutePosition, $column)
     {
         $this->type = $type;
@@ -43,9 +54,9 @@ class EntityRelationshipEnd
     }
 
     /**
-     * Get type
+     * Get the type of relationship endpoint.
      *
-     * @return  string
+     * @return string
      */ 
     public function getType()
     {
@@ -53,23 +64,22 @@ class EntityRelationshipEnd
     }
 
     /**
-     * Set type
+     * Set the type of relationship endpoint.
      *
-     * @param  string  $type  Type
+     * @param string $type The type of relationship endpoint.
      *
-     * @return  self
+     * @return self
      */ 
     public function setType($type)
     {
         $this->type = $type;
-
         return $this;
     }
 
     /**
-     * Get relative position
+     * Get the relative position.
      *
-     * @return  Point
+     * @return Point
      */ 
     public function getRelativePosition()
     {
@@ -77,23 +87,22 @@ class EntityRelationshipEnd
     }
 
     /**
-     * Set relative position
+     * Set the relative position.
      *
-     * @param  Point  $relativePosition  Relative position
+     * @param Point $relativePosition The position relative to a reference point.
      *
-     * @return  self
+     * @return self
      */ 
     public function setRelativePosition(Point $relativePosition)
     {
         $this->relativePosition = $relativePosition;
-
         return $this;
     }
 
     /**
-     * Get absolute position
+     * Get the absolute position.
      *
-     * @return  Point
+     * @return Point
      */ 
     public function getAbsolutePosition()
     {
@@ -101,23 +110,22 @@ class EntityRelationshipEnd
     }
 
     /**
-     * Set absolute position
+     * Set the absolute position.
      *
-     * @param  Point  $absolutePosition  Absolute position
+     * @param Point $absolutePosition The absolute position in the coordinate system.
      *
-     * @return  self
+     * @return self
      */ 
     public function setAbsolutePosition(Point $absolutePosition)
     {
         $this->absolutePosition = $absolutePosition;
-
         return $this;
     }
 
     /**
-     * Get column
+     * Get the associated column.
      *
-     * @return  EntityDiagramColumn
+     * @return EntityDiagramColumn
      */ 
     public function getColumn()
     {
@@ -125,16 +133,15 @@ class EntityRelationshipEnd
     }
 
     /**
-     * Set column
+     * Set the associated column.
      *
-     * @param  EntityDiagramColumn  $column  Column
+     * @param EntityDiagramColumn $column The associated column in the entity diagram.
      *
-     * @return  self
+     * @return self
      */ 
     public function setColumn($column)
     {
         $this->column = $column;
-
         return $this;
     }
 }

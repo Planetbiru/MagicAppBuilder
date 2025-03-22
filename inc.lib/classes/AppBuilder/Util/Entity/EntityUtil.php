@@ -14,6 +14,12 @@ use MagicObject\Util\ClassUtil\PicoEmptyParameter;
 
 class EntityUtil
 {
+    /**
+     * Extracts table name from an entity file.
+     *
+     * @param string $entityFile The path to the entity file.
+     * @return array The parsed key-value pairs from the @Table annotation.
+     */
     public static function getTableName($entityFile)
     {
         if(file_exists($entityFile))
@@ -41,11 +47,11 @@ class EntityUtil
     }
 
     /**
-     * Parse parameters. Note that all numeric attributes will be started with underscore (_). Do not use it as is
+     * Parses a query string into key-value pairs.
      *
-     * @param string $queryString
-     * @return string[]
-     * @throws InvalidQueryInputException 
+     * @param string $queryString The query string to parse.
+     * @return string[] Parsed key-value pairs.
+     * @throws InvalidQueryInputException
      */
     public static function parseKeyValue($queryString)
     {
@@ -101,11 +107,11 @@ class EntityUtil
     }
 
     /**
-     * Check if argument is match
+     * Matches arguments ensuring they are valid.
      *
-     * @param array $keys
-     * @param string $val
-     * @return boolean
+     * @param array $keys The list of existing keys.
+     * @param string $val The value to check.
+     * @return bool True if it is a valid argument, false otherwise.
      */
     public static function matchArgs($keys, $val)
     {
@@ -113,11 +119,11 @@ class EntityUtil
     }
 
     /**
-     * Combine and merge array
+     * Combines and merges arrays of matches.
      *
-     * @param array $matches2
-     * @param array $pair
-     * @return array
+     * @param array $matches2 The matched attributes.
+     * @param array $pair The existing array.
+     * @return array The merged result.
      */
     public static function combineAndMerge($matches2, $pair)
     {
