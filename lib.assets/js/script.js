@@ -1922,6 +1922,14 @@ let initAll = function () {
     checkWriretableDirectory(input);
   });
 
+  $(document).on('change keyup', '#modal-create-application input[name="application_name"]', function(e1){
+    changeApplicationName($(this).val());
+  });
+
+  $(document).on('change keyup', '#modal-create-application input[name="application_id"]', function(e1){
+    changeApplicationId($(this).val());
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
@@ -1931,6 +1939,107 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Initiates the download of a Markdown file for the entity-relationship diagram.
+ * 
+ * - Collects selected entities from checkboxes.
+ * - Appends a random timestamp to avoid caching issues.
+ * - Constructs a URL and triggers the download.
+ */
+function downloadMarkdown()
+{
+  let params = [];
+  params = addDiagramOption(params);
+
+  $('.entity-container-relationship .entity-checkbox').each(function (e) {
+    if ($(this)[0].checked) {
+      params.push('entity[]=' + $(this).val());
+    }
+  });
+  params.push('rnd=' + (new Date()).getTime());
+  let urlMap = 'lib.ajax/entity-relationship-diagram-markdown.php?' + params.join('&');
+  window.location = urlMap;
+}
+
+let checkTimeout = setTimeout('', 10000);
+
+/**
+ * Updates the application namespace and application ID based on the provided application name.
+ * 
+ * @param {string} applicationName - The name of the application entered by the user.
+ */
+function changeApplicationName(applicationName) {
+    // Remove all non-alphabetic characters to create a namespace
+    let namespace = applicationName.replace(/[^a-zA-Z]/g, '');
+
+    // Generate a valid application ID:
+    // - Remove non-alphanumeric characters except '-'
+    // - Replace multiple '-' with a single '-'
+    // - Trim leading and trailing '-'
+    // - Convert to lowercase
+    let applicationId = applicationName.replace(/[^a-zA-Z0-9-]/g, '-')
+                                       .replace(/-+/g, '-')
+                                       .replace(/^-+|-+$/g, '') // NOSONAR
+                                       .toLowerCase();
+
+    // Set the values in the modal form
+    $('#modal-create-application input[name="application_namespace"]').val(namespace);
+    changeApplicationId(applicationId);
+}
+
+/**
+ * Updates the application ID field and triggers an update for the application directory.
+ * 
+ * @param {string} applicationId - The formatted application ID.
+ */
+function changeApplicationId(applicationId) {
+    $('#modal-create-application input[name="application_id"]').val(applicationId);
+    changeApplicationDirectory(applicationId);
+}
+
+/**
+ * Updates the application directory path based on the application ID.
+ * 
+ * @param {string} applicationId - The application ID used to rename the directory.
+ */
+function changeApplicationDirectory(applicationId) {
+    // Get the original directory path
+    let originalPath = $('#modal-create-application input[name="application_directory"]').val();
+
+    // Replace the last part of the path (basename) with the application ID
+    let newPath = replaceBasename(originalPath, applicationId);
+
+    // Update the input field with the new directory path
+    $('#modal-create-application input[name="application_directory"]').val(newPath);
+
+    // Delay checking the directory's writability status to prevent multiple rapid checks
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(function() {
+        checkWriretableDirectory($('#modal-create-application input[name="application_directory"]'));
+    }, 500);
+}
+
+/**
+ * Replaces the basename of a directory path with a new name, keeping the original separator format.
+ * 
+ * @param {string} dirPath - The full directory path.
+ * @param {string} newBasename - The new basename to replace the existing one.
+ * @returns {string} The updated directory path.
+ */
+function replaceBasename(dirPath, newBasename) {
+    // Normalize the path separator to '/'
+    let normalizedPath = dirPath.replace(/\\/g, '/');
+
+    // Split the path into parts
+    let pathParts = normalizedPath.split('/');
+
+    // Replace the last part (basename) with the new name
+    pathParts[pathParts.length - 1] = newBasename;
+
+    // Reconstruct the path using the original separator
+    return dirPath.includes('\\') ? pathParts.join('\\') : pathParts.join('/');
+}
 
 /**
  * Checks if the specified directory is writable and updates the UI accordingly.
@@ -2064,7 +2173,6 @@ function showApplicationMenuDialog(applicationId) {
   modal.find('.modal-body').empty();
   modal.find('.modal-body').append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
   modal.attr('data-application-id', applicationId);
-  
   modal.modal('show');
   increaseAjaxPending();
   $.ajax({
@@ -2081,6 +2189,14 @@ function showApplicationMenuDialog(applicationId) {
   });
 }
 
+/**
+ * Loads reference resource content via an AJAX GET request.
+ * 
+ * - Increases the AJAX pending counter before making the request.
+ * - Fetches the reference resource from 'lib.ajax/reference.min.html'.
+ * - Stores the retrieved data in `referenceResource` on success.
+ * - Decreases the AJAX pending counter after completion.
+ */
 function loadReferenceResource()
 {
   increaseAjaxPending();
@@ -2097,8 +2213,6 @@ function loadReferenceResource()
     }
   });
 }
-
-
 
 /**
  * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
@@ -2134,7 +2248,11 @@ function generateFaviconICO(applicationId, image) {
   sendIconToServer(applicationId, iconImages, 'favicon.ico');
 }
 
-
+/**
+ * Filters workspace cards based on the search input value.
+ *
+ * @param {HTMLElement} elem - The input element containing the search query.
+ */
 function doFilterWorkspace(elem)
 {
   let searchValue = $(elem).val().toLowerCase().trim();
@@ -2148,6 +2266,12 @@ function doFilterWorkspace(elem)
     );
   });
 }
+
+/**
+ * Filters application cards based on the search input value.
+ *
+ * @param {HTMLElement} elem - The input element containing the search query.
+ */
 function doFilterApplication(elem)
 {
   let searchValue = $(elem).val().toLowerCase().trim();

@@ -29,15 +29,15 @@ if($inputPost->issetCreateDatabase())
     $databaseTimeZone = $inputPost->getDatabaseTimeZone();
 
     $databaseConfig = new SecretObject(array(
-        'driver'=>$databaseDriver,
-        'databaseFilePath'=>$databaseDatabaseFilePath,
-        'host'=>$databaseHost,
-        'port'=>$databasePort,
-        'username'=>$databaseUsername,
-        'password'=>$databasePassword,
-        'databaseName'=>$databaseName,
-        'databaseSchema'=>$databaseSchema,
-        'timeZone'=>$databaseTimeZone
+        'driver'           => $databaseDriver,
+        'databaseFilePath' => $databaseDatabaseFilePath,
+        'host'             => $databaseHost,
+        'port'             => $databasePort,
+        'username'         => $databaseUsername,
+        'password'         => $databasePassword,
+        'databaseName'     => $databaseName,
+        'databaseSchema'   => $databaseSchema,
+        'timeZone'         => $databaseTimeZone
     ));
 
     $database = new PicoDatabase($databaseConfig);
