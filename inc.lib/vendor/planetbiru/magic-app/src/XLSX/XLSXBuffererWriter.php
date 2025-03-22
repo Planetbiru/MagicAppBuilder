@@ -29,7 +29,7 @@ class XLSXBuffererWriter
     /**
      * Flag to check UTF-8 encoding
      *
-     * @var boolean
+     * @var bool
      */
     protected $checkUtf8 = false;
 

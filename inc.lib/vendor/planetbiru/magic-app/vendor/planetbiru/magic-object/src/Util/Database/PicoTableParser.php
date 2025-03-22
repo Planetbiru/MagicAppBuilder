@@ -218,7 +218,7 @@ class PicoTableParser {
         }
 
         if ($primaryKey == null) {
-            $primaryKey = $primaryKeyList[0] ?? null;
+            $primaryKey = isset($primaryKeyList[0]) ? $primaryKeyList[0] : null;
         }
 
         return ['tableName' => $tableName, 'columns' => $fieldList, 'primaryKey' => $primaryKey];

@@ -65,14 +65,14 @@ class ImageUtil
     /**
      * Image width
      *
-     * @var integer
+     * @var int
      */
     protected $width;
 
     /**
      * Image height
      *
-     * @var integer
+     * @var int
      */
     protected $height;
 

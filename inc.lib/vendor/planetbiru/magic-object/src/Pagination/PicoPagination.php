@@ -17,21 +17,21 @@ class PicoPagination
     /**
      * Current page number.
      *
-     * @var integer
+     * @var int
      */
     private $currentPage = 0;
 
     /**
      * Number of items per page.
      *
-     * @var integer
+     * @var int
      */
     private $pageSize = 0;
 
     /**
      * Offset for the current page.
      *
-     * @var integer
+     * @var int
      */
     private $offset = 0;
 

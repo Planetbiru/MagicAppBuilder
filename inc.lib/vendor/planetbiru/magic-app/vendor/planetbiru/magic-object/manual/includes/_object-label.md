@@ -37,7 +37,7 @@ class UserType extends MagicObject
 	 * Admin
 	 * 
 	 * @Column(name="admin", type="tinyint(1)", length=1, nullable=true)
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $admin;
 
@@ -46,7 +46,7 @@ class UserType extends MagicObject
 	 * 
 	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Sort Order")
-	 * @var integer
+	 * @var int
 	 */
 	protected $sortOrder;
 
@@ -109,7 +109,7 @@ class UserType extends MagicObject
 	 * 
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 

@@ -359,3 +359,27 @@ $object->setEmail('john.doe@example.com');
 echo $object->maskEmail(10, 6, '*')."\r\n";  // Output: john.doe@******e.com
 echo $object->maskEmail(-10, 6, '*')."\r\n"; // Output: john.******ample.com
 ```
+
+# MagicObject version 3.8
+
+## What's New
+
+- **dateFormat**: Added a function to format a date value into a specified format.  
+  - **Example Usage:**  
+    ```php
+    $formattedDate = $object->dateFormatDate("j F Y H:i:s");
+    ```
+  
+- **numberFormat**: Added a function to format a number with grouped thousands.  
+  - **Example Usage:**  
+    ```php
+    $numberFormat = $object->numberFormatData(6, ".", ",");
+    ```
+
+- **format**: Added a function to format a value using a specified format string.  
+  - **Example Usage:**  
+    ```php
+    $formattedData = $object->formatData("%7.3f");
+    ```
+
+With the addition of this formatting function, users can easily format object properties according to their needs.

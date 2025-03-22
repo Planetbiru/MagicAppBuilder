@@ -122,7 +122,7 @@ class SecretObject extends stdClass // NOSONAR
      * The property name starts with an underscore to prevent child classes 
      * from overriding its value.
      *
-     * @var boolean
+     * @var bool
      */
     private $_readonly = false; // NOSONAR
 

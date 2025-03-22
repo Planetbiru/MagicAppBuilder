@@ -40,70 +40,70 @@ class AppUserPermission
     /**
      * Allowed show list
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedList;
     
     /**
      * Allowed show detail
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedDetail;
     
     /**
      * Allowed create
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedCreate;
     
     /**
      * Allowed update
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedUpdate;
     
     /**
      * Allowed delete
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedDelete;
     
     /**
      * Allowed approve/reject
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedApprove;
     
     /**
      * Allowed short order
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedSortOrder;
 
     /**
      * Allowed export
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedExport;
 
     /**
      * Allowed batch action
      *
-     * @var boolean
+     * @var bool
      */
     private $allowedBatchAction;
     
     /**
      * Indicates if permissions have been initialized.
      *
-     * @var boolean
+     * @var bool
      */
     private $initialized = false;
     

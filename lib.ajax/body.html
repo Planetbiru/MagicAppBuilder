@@ -404,11 +404,17 @@
                           </tr>
                           <tr>
                             <td>Approval Type</td>
-                            <td><label for="approval_type"><input type="radio" name="approval_type" id="approval_type" value="1"> Separated</label> &nbsp; <label for="approval_type"><input type="radio" name="approval_type" id="approval_type" value="2" checked> Combined</label> &nbsp;</td>
+                            <td>
+                              <label for="approval_type1"><input type="radio" name="approval_type" id="approval_type1" value="1"> Separated</label> &nbsp; 
+                              <label for="approval_type2"><input type="radio" name="approval_type" id="approval_type2" value="2" checked> Combined</label> &nbsp;
+                            </td>
                           </tr>
                           <tr>
                             <td>Approval Position</td>
-                            <td><label for="approval_position"><input type="radio" name="approval_position" id="approval_position" value="before-data"> Before Data</label> &nbsp; <label for="approval_position"><input type="radio" name="approval_position" id="approval_position" value="after-data" checked> After Data</label> &nbsp;</td>
+                            <td>
+                              <label for="approval_position1"><input type="radio" name="approval_position" id="approval_position1" value="before-data"> Before Data</label> &nbsp; 
+                              <label for="approval_position2"><input type="radio" name="approval_position" id="approval_position2" value="after-data" checked> After Data</label> &nbsp;
+                            </td>
                           </tr>
                           <tr>
                             <td>Approval by Another User</td>
@@ -526,6 +532,7 @@
                   <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> Reload</button>
                   <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> SVG</button>
                   <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i> PNG</button>
+                  <button type="button" class="btn btn-primary download-file" onclick="downloadMarkdown()"><i class="fa-solid fa-file"></i> Markdown</button>
                 </div>
                 <div class="erd-image"></div>
                 <map name="erd-map"></map>

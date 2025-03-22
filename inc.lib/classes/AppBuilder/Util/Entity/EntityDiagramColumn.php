@@ -81,6 +81,20 @@ class EntityDiagramColumn //NOSONAR
     private $primaryKey = false;
 
     /**
+     * Indicates whether this column is nullable.
+     *
+     * @var boolean
+     */
+    private $nullable;
+
+    /**
+     * Extra information
+     *
+     * @var string
+     */
+    private $extra;
+
+    /**
      * Constructor for the EntityDiagramColumn class.
      *
      * Initializes the column with the provided attributes.
@@ -103,7 +117,8 @@ class EntityDiagramColumn //NOSONAR
     {
         $this->columnName = $column['name'];
         $this->dataType = $column['type'];
-        
+        $this->nullable = $column['nullable'];
+        $this->extra = isset($column['extra']) ? $column['extra'] : '';  
         if(isset($column['length']))
         {
             $dataLength = intval($column['length']);
@@ -377,4 +392,51 @@ class EntityDiagramColumn //NOSONAR
 
         return $this;
     }
+
+    /**
+     * Get whether this column is nullable.
+     *
+     * @return bool|null Returns true if nullable, false if not, or null if not set.
+     */
+    public function getNullable()
+    {
+        return $this->nullable;
+    }
+
+    /**
+     * Set whether this column is nullable.
+     *
+     * @param bool|null $nullable True if nullable, false if not, or null if unset.
+     * @return self Returns the instance for method chaining.
+     */
+    public function setNullable($nullable)
+    {
+        $this->nullable = $nullable;
+
+        return $this;
+    }
+
+    /**
+     * Get extra information about the column.
+     *
+     * @return string|null The extra information, or null if not set.
+     */
+    public function getExtra()
+    {
+        return $this->extra;
+    }
+
+    /**
+     * Set extra information for the column.
+     *
+     * @param string|null $extra The extra information to be set.
+     * @return self Returns the instance for method chaining.
+     */
+    public function setExtra($extra)
+    {
+        $this->extra = $extra;
+
+        return $this;
+    }
+
 }

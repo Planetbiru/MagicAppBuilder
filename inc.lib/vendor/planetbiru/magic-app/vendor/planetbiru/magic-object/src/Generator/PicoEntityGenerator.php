@@ -61,7 +61,7 @@ class PicoEntityGenerator
     /**
      * Flag indicating whether to prettify the output.
      *
-     * @var boolean
+     * @var bool
      */
     protected $prettify = false;
 

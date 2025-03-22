@@ -273,7 +273,7 @@ class ScriptGenerator //NOSONAR
      * @param array &$referenceEntitiesUse The array to hold entities that need to be used in both create and update operations.
      * @return void
      */
-    private function processField(AppField $field, &$insertFields, &$editFields, &$detailFields, &$listFields, &$exportFields, &$filterFields, &$referenceData, &$referenceEntities, &$referenceEntitiesUse) //NOSONAR
+    private function processField($field, &$insertFields, &$editFields, &$detailFields, &$listFields, &$exportFields, &$filterFields, &$referenceData, &$referenceEntities, &$referenceEntitiesUse) //NOSONAR
     {
         $create = false;
         $update = false;
@@ -995,13 +995,14 @@ class ScriptGenerator //NOSONAR
     /**
      * Prepare the application directory structure and configuration.
      *
-     * Creates necessary directories and prepares the application setup based on the configuration.
+     * This function ensures that necessary directories exist, sets up Composer dependencies, and copies template files.
+     * It also processes PHP files in the template directory using a callback to replace namespace placeholders.
      *
-     * @param SecretObject $builderConfig MagicAppBuilder configuration object.
-     * @param SecretObject $appConf Application configuration object.
-     * @param string $baseDir Base directory for the application.
-     * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode
-     * @return void
+     * @param SecretObject $builderConfig The configuration object for MagicAppBuilder.
+     * @param SecretObject $appConf The application configuration object.
+     * @param string $baseDir The base directory for the application.
+     * @param bool $onlineInstallation Determines whether Composer should be run in online mode.
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation)
     {
@@ -1026,6 +1027,28 @@ class ScriptGenerator //NOSONAR
                 copy(dirname(dirname(__DIR__))."/".$file, $baseAppBuilder."/".$file);
             }
         }
+
+        // Copy inc.app/*
+        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/inc.app";
+        $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.app";
+        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
+
+        // Copy lib.themes/*
+        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/lib.themes";
+        $destinationDir = $appConf->getBaseApplicationDirectory()."/lib.themes";
+        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
+
+        return $this;
     }
     
     /**
@@ -1038,17 +1061,17 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $composer Composer configuration object.
      * @param MagicObject $magicApp MagicApp configuration object.
      * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation)
     {
         if($onlineInstallation)
         {
-            $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
+            return $this->prepareComposerOnline($builderConfig, $appConf, $composer, $magicApp);
         }
         else
         {
-            $this->prepareComposerOffline($builderConfig, $appConf, $composer);
+            return $this->prepareComposerOffline($builderConfig, $appConf, $composer);
         }
     }
 
@@ -1086,6 +1109,7 @@ class ScriptGenerator //NOSONAR
             exec($cmd);     
             $this->updateComposer($builderConfig, $appConf, $composer);
         }
+        return $this;
     }
 
     /**
@@ -1096,7 +1120,7 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareComposerOffline($builderConfig, $appConf, $composer)
     {
@@ -1159,18 +1183,22 @@ class ScriptGenerator //NOSONAR
             $cmd = "cd $targetDir"."&&"."$phpPath composer.phar dump-autoload --ignore-platform-reqs";
             exec($cmd);     
         }
+        return $this;
     }
 
     /**
      * Copy a directory and its contents recursively.
      *
-     * Recursively copies all files and subdirectories from the source directory to the destination directory.
+     * This function recursively copies all files and subdirectories from the source directory to the destination directory.
+     * If specific file extensions are provided, files matching those extensions will be processed using a callback function.
      *
      * @param string $source The source directory path.
      * @param string $destination The destination directory path.
+     * @param array|null $extensions An optional array of file extensions to process with the callback.
+     * @param callable|null $callback An optional callback function to process files with the specified extensions.
      * @return bool Returns true if the operation is successful, false otherwise.
      */
-    public function copyDirectory($source, $destination)
+    public function copyDirectory($source, $destination, $extensions = null, $callback = null)
     {
         // Ensure the source directory exists
         if (!is_dir($source)) {
@@ -1188,10 +1216,10 @@ class ScriptGenerator //NOSONAR
             return false;
         }
 
-        // Copy each file and subdirectory
+        // Iterate through each file and subdirectory
         while (($file = readdir($directory)) !== false) {
             if ($file === '.' || $file === '..') {
-                continue; // Skip special directories
+                continue; // Skip special directory entries
             }
 
             $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
@@ -1199,13 +1227,27 @@ class ScriptGenerator //NOSONAR
 
             if (is_dir($sourcePath)) {
                 // Recursively copy subdirectories
-                $this->copyDirectory($sourcePath, $destinationPath);
+                $this->copyDirectory($sourcePath, $destinationPath, $extensions, $callback);
             } else {
-                // Copy individual files
-                copy($sourcePath, $destinationPath);
+                // Get the file extension
+                $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
+
+                // Check if the file extension matches the specified extensions and a callback is provided
+                if (isset($extensions) 
+                    && is_array($extensions) 
+                    && in_array($fileExtension, $extensions) 
+                    && isset($callback) 
+                    && is_callable($callback)) {
+                    // Process file using the callback function
+                    $callback($sourcePath, $destinationPath);
+                } else {
+                    // Copy the file normally
+                    copy($sourcePath, $destinationPath);
+                }
             }
         }
 
+        // Close the directory handle
         closedir($directory);
         return true;
     }
@@ -1214,13 +1256,14 @@ class ScriptGenerator //NOSONAR
      * Prepare a directory by creating it if it does not exist.
      *
      * @param string $baseDir Directory path to prepare.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function prepareDir($baseDir)
     {
         if(!file_exists($baseDir)) {
             mkdir($baseDir, 0755, true);
         }
+        return $this;
     }
     
     /**
@@ -1231,7 +1274,7 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $builderConfig MagicAppBuilder configuration object.
      * @param SecretObject $appConf Application configuration object.
      * @param SecretObject $composer Composer configuration object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function updateComposer($builderConfig, $appConf, $composer)
     {
@@ -1269,6 +1312,7 @@ class ScriptGenerator //NOSONAR
         }
         $cmd = "cd $targetDir"."&&"."$phpPath composer.phar update";
         exec($cmd);
+        return $this;
     }
     
     /**
@@ -1277,7 +1321,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param stdClass $composerJson Decoded composer.json object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     private function updatePsr0($appConf, $composer, $composerJson)
     {
@@ -1319,6 +1363,7 @@ class ScriptGenerator //NOSONAR
                 $this->fixNamespace($entityAppDir."/".$file, $entityNamespace);
             }
         }
+        return $this;
     }
     
     /**
@@ -1327,7 +1372,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $appConf Application configuration object.
      * @param MagicObject $composer Composer configuration object.
      * @param stdClass $composerJson Decoded composer.json object.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     public function updatePsr4($appConf, $composer, $composerJson)
     {
@@ -1344,6 +1389,7 @@ class ScriptGenerator //NOSONAR
                 $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/classes/".$dir->getNamespace());
             }
         }
+        return $this;
     }
     
     /**
@@ -1353,12 +1399,13 @@ class ScriptGenerator //NOSONAR
      *
      * @param string $path Path to the file to update.
      * @param string $entityNamespace The new namespace to set in the file.
-     * @return void
+     * @return self Returns the current instance for method chaining.
      */
     private function fixNamespace($path, $entityNamespace)
     {
         $str = file_get_contents($path);
         $str = str_replace("namespace AppBuilder\App\\", "namespace $entityNamespace\\", $str);
         file_put_contents($path, $str);
+        return $this;
     }
 }

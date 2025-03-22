@@ -88,7 +88,7 @@ class EntityAlbum extends MagicObject
 	 * 
 	 * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Number Of Song")
-	 * @var integer
+	 * @var int
 	 */
 	protected $numberOfSong;
 
@@ -115,7 +115,7 @@ class EntityAlbum extends MagicObject
 	 * 
 	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Sort Order")
-	 * @var integer
+	 * @var int
 	 */
 	protected $sortOrder;
 
@@ -179,7 +179,7 @@ class EntityAlbum extends MagicObject
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 
@@ -188,7 +188,7 @@ class EntityAlbum extends MagicObject
 	 * 
 	 * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $asDraft;
 
@@ -318,7 +318,7 @@ class Producer extends MagicObject
 	 * Picture
 	 * 
 	 * @Column(name="picture", type="tinyint(1)", length=1, nullable=true)
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $picture;
 
@@ -400,7 +400,7 @@ class Producer extends MagicObject
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 
@@ -537,7 +537,7 @@ class Artist extends MagicObject
 	 * Picture
 	 * 
 	 * @Column(name="picture", type="tinyint(1)", length=1, nullable=true)
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $picture;
 
@@ -620,7 +620,7 @@ class Artist extends MagicObject
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 

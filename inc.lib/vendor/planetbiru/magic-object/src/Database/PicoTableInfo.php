@@ -77,7 +77,7 @@ class PicoTableInfo // NOSONAR
     /**
      * Flag to disable cache when any entities join with this entity
      *
-     * @var boolean
+     * @var bool
      */
     protected $noCache = false;
 

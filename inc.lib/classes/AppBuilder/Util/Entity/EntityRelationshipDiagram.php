@@ -582,6 +582,39 @@ class EntityRelationshipDiagram //NOSONAR
         }
         return implode("\r\n", $result);
     }
+
+
+    public function getMarkdown()
+    {
+        $this->arrangeDiagram();
+        $this->prepareEntityRelationship();
+        
+        $result = [];
+        $result[] = '# Diagram Explanation';
+        $result[] = '';
+        
+        foreach($this->entitieDiagramItem as $diagram)
+        {
+            $result[] = '## Table `'.$diagram->getTableName().'`';
+            $result[] = '';
+            $result[] = '### Description';
+            $result[] = '';
+
+            $result[] = '| '.sprintf('%-40s', 'Field').' | '.sprintf('%-15s', 'Type').' | '.sprintf('%-6s', 'Length').' | '.sprintf('%-8s', 'Nullable').' | '.sprintf('%-5s', 'PK').' | '.sprintf('%-14s', 'Extra').' |';
+            $result[] = '| '.str_repeat('-', 40).' | '.str_repeat('-', 15).' | '.str_repeat('-', 6).' | '.str_repeat('-', 8).' | '.str_repeat('-', 5).' | '.str_repeat('-', 14).' |';
+
+
+            $columns = $diagram->getColumns();
+            foreach($columns as $field=>$column)
+            {
+                $result[] = '| '.sprintf('%-40s', $field).' | '.sprintf('%-15s', $column->getDataType()).' | '.sprintf('%-6s', $column->getDataLength()).' | '.sprintf('%-8s', $column->getNullable() ? 'YES' : 'NO').' | '.sprintf('%-5s', $column->getPrimaryKey() ? 'TRUE' : 'FALSE').' | '.sprintf('%-14s', $column->getExtra()).' |';
+            }
+
+            $result[] = '';
+        }
+        
+        return implode("\r\n", $result);
+    }
     
     /**
      * Generate an SVG representation of the Entity-Relationship Diagram (ERD).

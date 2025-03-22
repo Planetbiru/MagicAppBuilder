@@ -31,7 +31,7 @@ class AppFormOption
     /**
      * Indicates whether the option is selected.
      *
-     * @var boolean
+     * @var bool
      */
     public $selected;
 

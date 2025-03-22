@@ -61,7 +61,7 @@ class DtoSong extends SetterGetter
 	 * Track Number
 	 * 
 	 * @Label(content="Track Number")
-	 * @var integer
+	 * @var int
 	 */
 	protected $trackNumber;
 
@@ -133,7 +133,7 @@ class DtoSong extends SetterGetter
 	 * File Size
 	 * 
 	 * @Label(content="File Size")
-	 * @var integer
+	 * @var int
 	 */
 	protected $fileSize;
 
@@ -261,7 +261,7 @@ class DtoSong extends SetterGetter
 	 * Subtitle Complete
 	 * 
 	 * @Label(content="Subtitle Complete")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $subtitleComplete;
 
@@ -293,7 +293,7 @@ class DtoSong extends SetterGetter
 	 * Vocal
 	 * 
 	 * @Label(content="Vocal")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $vocal;
 
@@ -309,7 +309,7 @@ class DtoSong extends SetterGetter
 	 * Midi Vocal Channel
 	 * 
 	 * @Label(content="Midi Vocal Channel")
-	 * @var integer
+	 * @var int
 	 */
 	protected $midiVocalChannel;
 
@@ -397,7 +397,7 @@ class DtoSong extends SetterGetter
 	 * Active
 	 * 
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 

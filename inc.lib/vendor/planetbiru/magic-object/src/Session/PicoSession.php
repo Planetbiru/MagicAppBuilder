@@ -29,7 +29,7 @@ class PicoSession
      * The property name starts with an underscore to prevent child classes 
      * from overriding its value.
      *
-     * @var boolean
+     * @var bool
      */
     private $_sessionState = self::SESSION_NOT_STARTED; // NOSONAR
 

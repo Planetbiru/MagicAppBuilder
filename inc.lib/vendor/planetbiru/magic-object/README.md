@@ -317,7 +317,7 @@ class Album extends MagicObject
 	 * 
 	 * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Number Of Song")
-	 * @var integer
+	 * @var int
 	 */
 	protected $numberOfSong;
 
@@ -344,7 +344,7 @@ class Album extends MagicObject
 	 * 
 	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Sort Order")
-	 * @var integer
+	 * @var int
 	 */
 	protected $sortOrder;
 
@@ -407,7 +407,7 @@ class Album extends MagicObject
 	 * 
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 
@@ -416,7 +416,7 @@ class Album extends MagicObject
 	 * 
 	 * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $asDraft;
 
