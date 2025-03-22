@@ -2884,11 +2884,20 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Format a date value into a specified format.
+     * Format a given date value into a specified format.
      *
-     * @param string $format Date time format
-     * @param DateTime|string|int|float $value The date value to format
-     * @return string Formatted date string
+     * This method accepts various types of date input, including:
+     * - `DateTime` object: Directly formatted using its `format` method.
+     * - `int` (timestamp): Formatted using `date()`.
+     * - `float` (timestamp with microseconds): Cast to `int` and formatted using `date()`.
+     * - `string` (date representation): Parsed with `strtotime()` and formatted if valid.
+     *
+     * If the provided string value is `null`, empty, or an invalid date 
+     * (such as '0000-00-00' or '0000-00-00 00:00:00'), the function returns `null`.
+     *
+     * @param string $format The desired date format (e.g., 'Y-m-d H:i:s').
+     * @param DateTime|string|int|float $value The date value to format.
+     * @return string|null Formatted date string or `null` if the value is invalid.
      */
     private function _dateFormat($format, $value) // NOSONAR
     {
@@ -2899,12 +2908,15 @@ class MagicObject extends stdClass // NOSONAR
         } elseif (is_float($value)) {
             return date($format, (int) $value);
         } elseif (is_string($value)) {
-            $dateTime = strtotime($value);
-            if ($dateTime !== false) {
-                return date($format, $dateTime);
+            if($value != null && $value != '' && $value != '0000-00-00' && $value != '0000-00-00 00:00:00')
+            {
+                $dateTime = strtotime($value);
+                if ($dateTime !== false) {
+                    return date($format, $dateTime);
+                }
             }
         }
-        return "Invalid date";
+        return null;
     }
 
     /**

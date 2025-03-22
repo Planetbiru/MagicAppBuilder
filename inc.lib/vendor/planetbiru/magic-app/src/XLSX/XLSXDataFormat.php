@@ -26,7 +26,7 @@ class XLSXDataFormat
 
     /**
      * Precision
-     * @var integer
+     * @var int
      */
     private $precision;
     

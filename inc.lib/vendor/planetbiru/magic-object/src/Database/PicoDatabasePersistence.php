@@ -106,7 +106,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Skip null
      *
-     * @var boolean
+     * @var bool
      */
     private $flagIncludeNull = false;
 
@@ -120,7 +120,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Flag that class list has been processed or not
      * 
-     * @var boolean
+     * @var bool
      */
     private $processClassList = false;
 
@@ -134,21 +134,21 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Flag that generated value has been added
      *
-     * @var boolean
+     * @var bool
      */
     private $generatedValue = false;
 
     /**
      * Flag that entity require database autoincrement
      *
-     * @var boolean
+     * @var bool
      */
     private $requireDbAutoincrement = false;
 
     /**
      * Flag that database autoincrement has been completed
      *
-     * @var boolean
+     * @var bool
      */
     private $dbAutoinrementCompleted = false;
     
@@ -176,7 +176,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Flag that WHERE is defined first
      *
-     * @var boolean
+     * @var bool
      */
     protected $whereIsDefinedFirst = false;
 

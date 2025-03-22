@@ -86,7 +86,7 @@ class XLSXDataType
 
     /**
      * Precision
-     * @var integer
+     * @var int
      */
     private $precision;
     

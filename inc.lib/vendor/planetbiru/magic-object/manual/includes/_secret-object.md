@@ -32,7 +32,7 @@ class PicoDatabaseCredentials extends SecretObject
 
 	/**
 	 * Database server port
-	 * @var integer
+	 * @var int
 	 */
 	protected $port = 3306;
 
@@ -156,7 +156,7 @@ class SecretGenerator extends SecretObject
 
 	/**
 	 * Database server port
-	 * @var integer
+	 * @var int
 	 */
 	protected $port;
 
@@ -331,7 +331,7 @@ class PicoDatabaseCredentials extends SecretObject
 
 	/**
 	 * Database server port
-	 * @var integer
+	 * @var int
 	 */
 	protected $port = 3306;
 
@@ -561,7 +561,7 @@ class PicoDatabaseCredentials extends SecretObject
 
 	/**
 	 * Database server port
-	 * @var integer
+	 * @var int
 	 */
 	protected $port = 3306;
 

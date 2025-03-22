@@ -83,7 +83,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="track_number", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Track Number")
-	 * @var integer
+	 * @var int
 	 */
 	protected $trackNumber;
 
@@ -200,7 +200,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="file_size", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="File Size")
-	 * @var integer
+	 * @var int
 	 */
 	protected $fileSize;
 
@@ -352,7 +352,7 @@ class EntitySong extends MagicObject
 	 * Subtitle Complete
 	 * 
 	 * @Column(name="subtitle_complete", type="tinyint(1)", length=1, nullable=true)
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $subtitleComplete;
 
@@ -387,7 +387,7 @@ class EntitySong extends MagicObject
 	 * Vocal
 	 * 
 	 * @Column(name="vocal", type="tinyint(1)", length=1, nullable=true)
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $vocal;
 
@@ -405,7 +405,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="midi_vocal_channel", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Midi Vocal Channel")
-	 * @var integer
+	 * @var int
 	 */
 	protected $midiVocalChannel;
 
@@ -504,7 +504,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
 	 * @DefaultColumn(value="1")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 }

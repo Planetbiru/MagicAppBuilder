@@ -26,7 +26,7 @@ class PicoFieldWaitingFor extends PicoObjectToString
      * The numeric value representing the action waiting for the field.
      * This value corresponds to a specific action (e.g., 1 for create, 2 for update).
      *
-     * @var integer
+     * @var int
      */
     protected $value;
 
