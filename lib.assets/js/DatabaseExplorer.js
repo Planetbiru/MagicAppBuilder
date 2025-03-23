@@ -375,6 +375,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 
+    if($('input[data-type="datetime"]').length)
+    {
+        $('input[data-type="datetime"]').datetimepicker({
+            format: 'Y-m-d H:i:s'
+        });
+    }
+    if($('input[data-type="date"]').length)
+    {
+        $('input[data-type="date"]').datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d'
+        });
+    }
+    if($('input[data-type="time"]').length)
+    {
+        $('input[data-type="time"]').datetimepicker({
+            datepicker: false,
+            format: 'H:i:s'
+        });
+    }
 });
 
 

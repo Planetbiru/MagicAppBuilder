@@ -18,14 +18,17 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <title>Database Explorer</title>
     <link rel="icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
-    <link rel="stylesheet" href="../lib.assets/css/entity-editor.css">
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
-    <script src="../lib.assets/js/TableParser.js"></script>
-    <script src="../lib.assets/js/SQLConverter.js"></script>
-    <script src="../lib.assets/js/EntityEditor.js"></script>
-    <script src="../lib.assets/js/EntityRenderer.js"></script>
-    <script src="../lib.assets/js/ResizablePanel.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
+    <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.js"></script>
+    <script src="../lib.assets/js/TableParser.min.js"></script>
+    <script src="../lib.assets/js/SQLConverter.min.js"></script>
+    <script src="../lib.assets/js/EntityEditor.min.js"></script>
+    <script src="../lib.assets/js/EntityRenderer.min.js"></script>
+    <script src="../lib.assets/js/ResizablePanel.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
+    <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
+    <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
