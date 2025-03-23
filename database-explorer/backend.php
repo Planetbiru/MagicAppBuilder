@@ -1820,7 +1820,8 @@ class DatabaseExplorer // NOSONAR
             $input->setAttribute('step', '1');
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
-            $input->setAttribute('value', $value);  
+            $input->setAttribute('value', $value);
+            $input->setAttribute('data-type', 'integer');    
         }
         else if(self::isFloat($type))
         {
@@ -1830,6 +1831,7 @@ class DatabaseExplorer // NOSONAR
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
             $input->setAttribute('value', $value);  
+            $input->setAttribute('data-type', 'float');  
         }
         else if(self::isDateTime($type))
         {
@@ -1837,7 +1839,19 @@ class DatabaseExplorer // NOSONAR
             $input->setAttribute('type', 'text');
             $input->setAttribute('name', htmlspecialchars($key));
             $input->setAttribute('class', 'data-editor');
-            $input->setAttribute('value', $value);  
+            $input->setAttribute('value', $value);
+            if(stripos($type, 'datetime') === 0 || stripos($type, 'timestamp') === 0)
+            {
+                $input->setAttribute('data-type', 'datetime'); 
+            }
+            else if(stripos($type, 'time') === 0)
+            {
+                $input->setAttribute('data-type', 'time'); 
+            } 
+            else if(stripos($type, 'date') === 0)
+            {
+                $input->setAttribute('data-type', 'date'); 
+            } 
         }
         else
         {
@@ -1897,7 +1911,7 @@ class DatabaseExplorer // NOSONAR
      */
     private static function isDateTime($type)
     {
-        return stripos($type, 'datetime') === 0 || stripos($type, 'date') === 0 || stripos($type, 'time') === 0;
+        return stripos($type, 'datetime') === 0 || stripos($type, 'timestamp') === 0 || stripos($type, 'time') === 0 || stripos($type, 'date') === 0;
     }
 
 
