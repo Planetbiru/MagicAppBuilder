@@ -141,7 +141,7 @@ button {
   padding: 3px 0;
 }
 .config-table td .btn {
-  margin-bottom: 0.5rem;
+  margin-bottom: -3px;
 }
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 200px;
