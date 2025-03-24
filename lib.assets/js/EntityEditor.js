@@ -1889,16 +1889,22 @@ class EntityEditor {
         const enumInput = tr.querySelector(".column-enum");
 
         // Show length input for specific types
-        if (this.withLengthTypes.includes(columnType)) {
+        if (this.withLengthTypes.includes(columnType)) 
+        {
             lengthInput.style.display = "inline";
-        } else {
+        } 
+        else 
+        {
             lengthInput.style.display = "none";
         }
 
         // Show enum input for ENUM type
-        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType)) {
+        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType)) 
+        {
             enumInput.style.display = "inline";
-        } else {
+        } 
+        else 
+        {
             enumInput.style.display = "none";
         }
         if(typeof this.defaultLength[columnType] != 'undefined')

@@ -132,23 +132,28 @@ button {
   padding-top: 20px;
 }
 
+.btn {
+  margin-top: -3px;
+  margin-bottom: 8px;
+}
+
 .config-table {
   width: 100%;
   max-width: 800px;
-  margin: auto;
+  margin: 0 auto 0 auto;
 }
 .config-table td {
-  padding: 3px 0;
+  padding: 4px 0;
 }
 .config-table td .btn {
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 200px;
 }
 
-.btn {
-  margin-top: -3px;
+td .btn.btn-remove-row, td .btn.btn-move-up, td .btn.btn-move-down, td .btn.path-remover, td .btn.language-remover {
+  margin-bottom: 0;
 }
 
 .modal-header {
