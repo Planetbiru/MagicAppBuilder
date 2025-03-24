@@ -201,16 +201,14 @@ button {
 		}
 	}
 }
-.table-reference
-{
-	td {
-		padding: 4px 0;
-		.btn.btn-remove-row, .btn.btn-move-up, .btn.btn-move-down
-		{
-			margin-bottom: 0;
-		}
+
+td {
+	.btn.btn-remove-row, .btn.btn-move-up, .btn.btn-move-down, .btn.path-remover, .btn.language-remover
+	{
+		margin-bottom: 0;
 	}
 }
+
 
 
 
