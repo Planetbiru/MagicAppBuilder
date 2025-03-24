@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App\Entity\App;
+namespace AppBuilder\App;
 
 use MagicObject\MagicObject;
 
@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_role")
- * @package AppBuilder\App\Entity\App
+ * @package AppBuilder\App
  */
 class AppAdminRoleImpl extends MagicObject
 {
@@ -20,7 +20,6 @@ class AppAdminRoleImpl extends MagicObject
      * @Id
      * @GeneratedValue(strategy=GenerationType.UUID)
      * @Column(name="admin_role_id", type="varchar(40)", length=40, nullable=false)
-     * @DefaultColumn(value="NULL")
      * @Label(content="Admin ID")
      * @var string
      */
@@ -70,7 +69,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_list", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed List")
-     * @var boolean
+     * @var bool
      */
     protected $allowedList;
 
@@ -79,7 +78,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_detail", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Detail")
-     * @var boolean
+     * @var bool
      */
     protected $allowedDetail;
 
@@ -88,7 +87,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_create", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Create")
-     * @var boolean
+     * @var bool
      */
     protected $allowedCreate;
 
@@ -97,7 +96,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_update", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Update")
-     * @var boolean
+     * @var bool
      */
     protected $allowedUpdate;
 
@@ -106,7 +105,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_delete", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Delete")
-     * @var boolean
+     * @var bool
      */
     protected $allowedDelete;
 
@@ -115,7 +114,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_approve", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Approve")
-     * @var boolean
+     * @var bool
      */
     protected $allowedApprove;
 
@@ -124,7 +123,7 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_sort_order", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Sort Order")
-     * @var boolean
+     * @var bool
      */
     protected $allowedSortOrder;
 
@@ -133,16 +132,16 @@ class AppAdminRoleImpl extends MagicObject
      *
      * @Column(name="allowed_export", type="tinyint(1)", length=1, default_value="0", nullable=true)
      * @Label(content="Allowed Export")
-     * @var boolean
+     * @var bool
      */
-    protected $allowedSortExport;
+    protected $allowedExport;
 
     /**
      * Active
      *
      * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
      * @Label(content="Active")
-     * @var boolean
+     * @var bool
      */
     protected $active;
 }

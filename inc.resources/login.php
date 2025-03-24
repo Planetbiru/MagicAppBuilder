@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 
-$entityAdmin = new EntityAdmin(null, $databaseBuilder);
+$currentUser = new EntityAdmin(null, $databaseBuilder);
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
@@ -17,7 +17,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     try
     {
         $hashPassword = sha1($inputPost->getPassword());
-        $entityAdmin->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
+        $currentUser->findOneByUsernameAndPassword($inputPost->getUsername(), sha1($hashPassword));
         $userLoggedIn = true;
         $sessions->username = $inputPost->getUsername();
         $sessions->userPassword = $hashPassword;
@@ -31,7 +31,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         require_once __DIR__ . "/inc.app/login-form.php";
         exit();
     }
-    else if($entityAdmin->getAdminLevelId() != 'superuser')
+    else if($currentUser->getAdminLevelId() != 'superuser')
     {
         header("Location: ./profile.php");
     }

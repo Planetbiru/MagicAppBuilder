@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App\Entity\App;
+namespace AppBuilder\App;
 
 use MagicObject\MagicObject;
 
@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="module")
- * @package AppBuilder\App\Entity\App
+ * @package AppBuilder\App
  */
 class AppModuleImpl extends MagicObject
 {
@@ -20,7 +20,6 @@ class AppModuleImpl extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
-	 * @DefaultColumn(value="NULL")
 	 * @Label(content="Module ID")
 	 * @var string
 	 */
@@ -72,7 +71,7 @@ class AppModuleImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="special_access", type="tinyint(1)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Special Access")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $specialAccess;
 
@@ -92,7 +91,7 @@ class AppModuleImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Default Data")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $defaultData;
 
@@ -102,7 +101,7 @@ class AppModuleImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="active", type="tinyint(1)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 }

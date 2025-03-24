@@ -69,21 +69,21 @@ class EntityDiagramColumn //NOSONAR
     /**
      * Indicates whether this column is a reference column.
      *
-     * @var boolean
+     * @var bool
      */
     private $referenceColumn = false;
 
     /**
      * Indicates whether this column is a primary key.
      *
-     * @var boolean
+     * @var bool
      */
     private $primaryKey = false;
 
     /**
      * Indicates whether this column is nullable.
      *
-     * @var boolean
+     * @var bool
      */
     private $nullable;
 

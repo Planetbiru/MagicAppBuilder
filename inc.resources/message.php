@@ -46,7 +46,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$message = new Message(null, $database);
 	$message->setSubject($inputPost->getSubject(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setContent($inputPost->getContent(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
-	$message->setSenderId($entityAdmin->getAdminId());
+	$message->setSenderId($currentUser->getAdminId());
 	$message->setReceiverId($inputPost->getReceiverId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setAdminCreate($currentAction->getUserId());
 	$message->setTimeCreate($currentAction->getTime());
@@ -266,7 +266,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false))
-									->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $entityAdmin->getAdminId())), 
+									->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $currentUser->getAdminId())), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 

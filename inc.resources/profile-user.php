@@ -19,7 +19,7 @@ use MagicAdmin\Entity\Data\Admin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
 
 
-require_once __DIR__ . "/inc.app/auth-profile.php";
+require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
@@ -69,11 +69,10 @@ $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $cu
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 $dataFilter = PicoSpecification::getInstance()
-	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $entityAdmin->getAdminId()));
-
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentUser->getAdminId()));
 if($inputPost->getUserAction() == UserAction::UPDATE)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $entityAdmin->getAdminId());
+	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $currentUser->getAdminId());
 	$admin = new Admin(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -89,7 +88,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	try
 	{
 		$updater->update();
-		$adminId = $entityAdmin->getAdminId();
+		$adminId = $currentUser->getAdminId();
 
         $plainPassword = trim($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true), " \t\r\n ");
         if(!empty($plainPassword))
@@ -124,7 +123,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 
 		if($admin->getWorkspaceId() != "")
 		{
-			setAdminWorkspace($database, $adminId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+			setAdminWorkspace($database, $adminId, $admin->getWorkspaceId(), $currentUser->getAdminId());
 		}
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $adminId);
 	}
@@ -144,7 +143,7 @@ if($inputGet->getUserAction() == UserAction::UPDATE)
 		if($admin->issetAdminId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
-require_once __DIR__ ."/inc.app/simple-header.php";
+require_once __DIR__ ."/inc.app/header.php";
 ?>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
@@ -243,16 +242,16 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
 			<?php 
 		}
-require_once __DIR__ ."/inc.app/simple-footer.php";
+require_once __DIR__ ."/inc.app/footer.php";
 	}
 	catch(Exception $e)
 	{
-require_once __DIR__ ."/inc.app/simple-header.php";
+require_once __DIR__ ."/inc.app/header.php";
 		// Do somtething here when exception
 		?>
 		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
 		<?php 
-require_once __DIR__ ."/inc.app/simple-footer.php";
+require_once __DIR__ ."/inc.app/footer.php";
 	}
 }
 else
@@ -307,7 +306,7 @@ else
 		if($admin->issetAdminId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
-require_once __DIR__ ."/inc.app/simple-header.php";
+require_once __DIR__ ."/inc.app/header.php";
 			// Define map here
 			$mapForGender = array(
 				"M" => array("value" => "M", "label" => "Man", "default" => "false"),
@@ -423,7 +422,7 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 	</div>
 </div>
 <?php 
-require_once __DIR__ ."/inc.app/simple-footer.php";
+require_once __DIR__ ."/inc.app/footer.php";
 		}
 		else
 		{
@@ -435,11 +434,11 @@ require_once __DIR__ ."/inc.app/simple-footer.php";
 	}
 	catch(Exception $e)
 	{
-require_once __DIR__ ."/inc.app/simple-header.php";
+require_once __DIR__ ."/inc.app/header.php";
 		// Do somtething here when exception
 		?>
 		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
 		<?php 
-require_once __DIR__ ."/inc.app/simple-footer.php";
+require_once __DIR__ ."/inc.app/footer.php";
 	}
 }

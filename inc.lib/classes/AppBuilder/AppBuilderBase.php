@@ -146,7 +146,7 @@ class AppBuilderBase //NOSONAR
 
     /**
      * AJAX Support
-     * @var boolean
+     * @var bool
      */
     protected $ajaxSupport = false;
     
@@ -165,7 +165,7 @@ class AppBuilderBase //NOSONAR
 
     /**
      * Update entity
-     * @var boolean
+     * @var bool
      */
     protected $updateEntity = false;
 

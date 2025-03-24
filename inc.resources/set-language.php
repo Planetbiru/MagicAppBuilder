@@ -9,8 +9,8 @@ $inputGet = new InputGet();
 
 if($inputGet->getLanguageId())
 {
-    $entityAdmin->setLanguageId($inputGet->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-    $entityAdmin->update();
+    $currentUser->setLanguageId($inputGet->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
+    $currentUser->update();
 }
 
 if(isset($_SERVER['HTTP_REFERER']))

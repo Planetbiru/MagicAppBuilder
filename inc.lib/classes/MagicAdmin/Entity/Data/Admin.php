@@ -258,6 +258,16 @@ class Admin extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
+
+	/**
+	 * Blocked
+	 * 
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Blocked")
+	 * @var bool
+	 */
+	protected $blocked;
 	
 	/**
 	 * Active

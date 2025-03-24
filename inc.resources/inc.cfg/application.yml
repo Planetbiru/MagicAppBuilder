@@ -1,0 +1,31 @@
+application:
+    entityBaseNamespace: 'MagicAdmin\Entity'
+    name: 'MagicAppBuilder'
+data_limit: 20
+database:
+    driver: sqlite
+    host: ''
+    port: 3306
+    username: ''
+    password: ''
+    database_name: ''
+    database_schema: public
+    time_zone: Asia/Jakarta
+    database_file_path: 'D:/xampp/htdocs/MagicAppBuilder/inc.database/database.sqlite'
+role:
+    bypass_role: true
+data:
+    page_size: 20
+    page_margin: 3
+    two_user_approval: true
+    prev: '<i class="fa-solid fa-angle-left"></i>'
+    next: '<i class="fa-solid fa-angle-right"></i>'
+    first: '<i class="fa-solid fa-angles-left"></i>'
+    last: '<i class="fa-solid fa-angles-right"></i>'
+languages:
+    -
+        name: English
+        code: en
+    -
+        name: Indonesia
+        code: id

@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . "/inc.app/auth-profile.php";
+require_once __DIR__ . "/inc.app/auth.php";
 
-if(isset($entityAdmin) && $entityAdmin->getAdminLevelId() == "superuser")
+if(isset($currentUser) && $currentUser->getAdminLevelId() == "superuser")
 {
     require_once __DIR__ . "/profile-superuser.php";
 }

@@ -36,7 +36,7 @@ class UserProfile
     /**
      * Boolean flag indicating whether the user is logged in.
      *
-     * @var boolean
+     * @var bool
      */
     private $loggedIn;
     

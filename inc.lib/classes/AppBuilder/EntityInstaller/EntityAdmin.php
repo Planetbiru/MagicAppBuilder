@@ -242,6 +242,16 @@ class EntityAdmin extends MagicObject
 	protected $ipEdit;
 
 	/**
+	 * Blocked
+	 * 
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Blocked")
+	 * @var bool
+	 */
+	protected $blocked;
+
+	/**
 	 * Active
 	 * 
 	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
