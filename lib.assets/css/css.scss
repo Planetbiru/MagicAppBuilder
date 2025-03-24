@@ -173,16 +173,19 @@ button {
 .tab-content {
 	padding-top: 20px;
 }
-
+.btn {
+	margin-top: -3px;
+	margin-bottom: 8px;
+}
 .config-table {
 	width: 100%;
 	max-width: 800px;
-	margin: auto;
+	margin: 0 auto 0 auto;
 
 	td {
-		padding: 3px 0;
-		.btn {
-			margin-bottom: -3px;
+		padding: 4px 0;
+		.btn{
+			margin-bottom: 8px;
 		}
 	}
 
@@ -198,10 +201,18 @@ button {
 		}
 	}
 }
-
-.btn {
-	margin-top: -3px;
+.table-reference
+{
+	td {
+		padding: 4px 0;
+		.btn.btn-remove-row, .btn.btn-move-up, .btn.btn-move-down
+		{
+			margin-bottom: 0;
+		}
+	}
 }
+
+
 
 .modal-header {
 	padding: 0.6rem 1rem;
@@ -1152,3 +1163,4 @@ white-space: nowrap;
 	opacity: 1;
 }
 }
+

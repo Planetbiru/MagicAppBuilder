@@ -8,6 +8,23 @@ require_once dirname(__DIR__) . "/inc.app/entity-diagram-config.php";
 
 $inputGet = new InputGet();
 
+/**
+ * Send document to output buffer
+ *
+ * @param string $document
+ * @return void
+ */
+function sendDocument($document)
+{
+    header('Content-Type: text/plain');
+    header('Content-Disposition: download; filename="Entity Description.md"');
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+    header('Content-Length: '.strlen($document));
+    echo $document;
+}
+
 try
 {
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
@@ -59,23 +76,14 @@ try
                 $entityRelationshipDiagram->addEntity($entity);
             }
         }
-        header('Content-Type: text/plain');
-        header('Content-Disposition: download; filename="Entity Description.md"');
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        echo $entityRelationshipDiagram->getMarkdown();
+        sendDocument($entityRelationshipDiagram->getMarkdown());
     }
     else
     {
-        header('Content-Type: text/plain');
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
+        sendDocument('');
     }
 }
 catch(Exception $e)
 {
-    error_log($e->getMessage());
-    // do nothing
+    sendDocument('');
 }
