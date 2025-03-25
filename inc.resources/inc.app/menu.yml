@@ -53,12 +53,3 @@ menu:
       - title: "Error Cache"
         icon: "fas fa-hdd"
         href: "error-cache.php"
-  - title: "MagicAppBuilder"
-    icon: "fas fa-desktop"
-    href: "../"
-    submenu: []
-  - title: "Database"
-    icon: "fas fa-database"
-    href: "../magic-database/"
-    submenu: []
-    target: "_blank"

@@ -11,7 +11,6 @@ if(file_exists($appConfigPath))
 {
     $appConfig->loadYamlFile(dirname(__DIR__)."/inc.cfg/application.yml", false, true, true);
 
-
     $dataControlConfig = new SecretObject($appConfig->getData());
     $entityInfo = $appConfig->getEntityInfo();
     $entityApvInfo = $appConfig->getEntityApvInfo();

@@ -79,7 +79,6 @@ $appLanguage = new AppLanguage(
     {
         $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
         $inputSource = FileUtil::fixFilePath($inputSource);
-
         if(!file_exists(dirname($inputSource)))
         {
             mkdir(dirname($inputSource), 0755, true);
