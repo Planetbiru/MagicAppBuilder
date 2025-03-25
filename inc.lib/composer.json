@@ -2,7 +2,8 @@
     "autoload": {
         "psr-0": {
             "AppBuilder\\": "classes/",
-            "MagicAdmin\\": "classes/"
+            "MagicAdmin\\": "classes/",
+            "MagicAppTemplate\\": "classes/"
         }
     },
     "require": {

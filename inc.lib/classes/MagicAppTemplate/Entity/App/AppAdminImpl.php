@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App;
+namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
 
@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
- * @package AppBuilder\App
+ * @package MagicAppTemplate\Entity\App
  */
 class AppAdminImpl extends MagicObject
 {

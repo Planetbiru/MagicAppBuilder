@@ -1,28 +1,28 @@
 <?php
 
-namespace AppBuilder\App;
+namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
 
 /**
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="message")
- * @package AppBuilder\App
+ * @Table(name="notification")
+ * @package MagicAppTemplate\Entity\App
  */
-class AppMessageImpl extends MagicObject
+class AppNotificationImpl extends MagicObject
 {
 	/**
-	 * Message ID
+	 * Notification ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Message ID")
+	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Notification ID")
 	 * @var integer
 	 */
-	protected $messageId;
+	protected $notificationId;
 
 	/**
 	 * Admin Group
@@ -103,7 +103,7 @@ class AppMessageImpl extends MagicObject
 	 * @Label(content="Subject")
 	 * @var string
 	 */
-	protected $subject;
+	protected $subjek;
 
 	/**
 	 * Content

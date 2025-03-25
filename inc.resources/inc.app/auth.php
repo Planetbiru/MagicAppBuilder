@@ -1,11 +1,11 @@
 <?php
 
-use AppBuilder\App\AppAdminImpl;
-use AppBuilder\App\AppAdminRoleImpl;
-use AppBuilder\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicApp\AppLanguage;
-use MagicApp\AppMenu;
 use MagicApp\Field;
+use MagicAppTemplate\ApplicationMenu;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
@@ -107,5 +107,5 @@ if(file_exists($appMenuPath))
 {
     $appMenuData->loadYamlFile($appMenuPath, false, true, true);
 }
-$curretHref = isset($_SERVER['REQUEST_URI']) ? isset($_SERVER['REQUEST_URI']) : '';
-$appMenu = new AppMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);
+$curretHref = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+$appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);

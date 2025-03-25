@@ -1,17 +1,18 @@
 <?php
 
-namespace MagicApp;
+namespace MagicAppTemplate;
 
-use AppBuilder\App\AppAdminRoleImpl;
-use AppBuilder\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 use Exception;
+use MagicApp\Field;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 
-class AppMenu
+class ApplicationMenu
 {
     /**
      * Database connection.
@@ -56,90 +57,142 @@ class AppMenu
     private $appLanguage;
     
     /**
-     * Generates an HTML sidebar menu based on a JSON structure and the current active link.
+     * Generates an HTML sidebar menu based on the given JSON data.
+     * This method uses the DOMDocument to dynamically create the sidebar HTML structure.
      *
-     * This function dynamically generates a sidebar in HTML format. It reads menu data from a provided
-     * JSON object, and adds submenu items if available. If the `currentHref` matches any submenu item's href,
-     * the respective submenu will be expanded by adding the "show" class to its `collapse` div.
+     * @param array $jsonData The JSON data representing the menu structure, including menu items and their submenus.
+     * @param string $currentHref The current active page's href to determine the active menu and submenu items.
+     * @param object $appLanguage The application language object used to fetch localized menu item titles.
      *
-     * @param string $jsonData A JSON-encoded string representing the menu structure, including main items and submenus.
-     * @param string $currentHref The href of the current page, used to determine which submenu (if any) should be expanded.
-     * @param AppLanguage $appLanguage Application language object.
-     * 
-     * @return string The generated HTML for the sidebar, including the main menu and any expanded submenus.
+     * @return string The generated HTML for the sidebar.
      */
     public static function generateSidebar($jsonData, $currentHref, $appLanguage) // NOSONAR
     {
-        
-        // Start the sidebar HTML structure
-        $sidebarHTML = '<ul class="nav flex-column" id="sidebarMenu">';
+        // Create a new DOMDocument instance to build the sidebar HTML structure
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true; // To format the output for better readability
 
-        if(isset($jsonData['menu']) && is_array($jsonData['menu']) && !empty($jsonData['menu']))
-        {
-            // Loop through each main menu item
+        // Create the root <ul> element for the sidebar menu
+        $sidebarMenu = $dom->createElement('ul');
+        $sidebarMenu->setAttribute('class', 'nav flex-column'); // Set classes for sidebar menu
+        $sidebarMenu->setAttribute('id', 'sidebarMenu'); // Set the ID for the sidebar menu
+        $dom->appendChild($sidebarMenu); // Append the sidebar <ul> to the DOM
+
+        // Check if the 'menu' key exists in the provided JSON data and if it's a valid array
+        if (isset($jsonData['menu']) && is_array($jsonData['menu']) && !empty($jsonData['menu'])) {
+            // Loop through each main menu item in the JSON data
             foreach ($jsonData['menu'] as $item) {
-                $sidebarHTML .= '<li class="nav-item">';
+                // Create the <li> element for the main menu item
+                $li = $dom->createElement('li');
+                $li->setAttribute('class', 'nav-item'); // Set the class for the main menu item
+                $sidebarMenu->appendChild($li); // Append the <li> to the sidebar menu
 
+                // Get the localized title of the menu item
                 $item['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $item['title'])));
-                
-                // Link for the main menu item, add collapse toggle if there are submenus
-                $sidebarHTML .= '<a class="nav-link" href="' . $item['href'] . '"';
-                
-                // Add target="_blank" if specified in the JSON (or set default)
-                $target = isset($item['target']) ? $item['target'] : '';
-                if ($target) {
-                    $sidebarHTML .= ' target="' . $target . '"';
+
+                // Create the <a> tag for the main menu item
+                $a = $dom->createElement('a', ''); // Create an empty anchor tag
+                $a->setAttribute('class', 'nav-link'); // Set the class for the anchor tag
+                $a->setAttribute('href', $item['href']); // Set the href for the menu item
+
+                // Add target="_blank" if the target attribute is provided in the JSON data
+                if (isset($item['target']) && $item['target']) {
+                    $a->setAttribute('target', $item['target']);
                 }
 
+                // Add collapse toggle for submenu if there are submenus
                 if (count($item['submenu']) > 0) {
-                    $sidebarHTML .= ' data-toggle="collapse" aria-expanded="false"';
+                    $a->setAttribute('data-toggle', 'collapse');
+                    $a->setAttribute('aria-expanded', 'false');
                 }
-                $sidebarHTML .= '><i class="' . $item['icon'] . '"></i> ' . $item['title'] . '</a>'."\r\n";
-                
-                // Check if there are submenus
+
+                // Create and append the icon inside the <a> tag
+                $icon = $dom->createElement('i', '');
+                $icon->setAttribute('class', $item['icon']);
+                $a->appendChild($icon);  // Append the icon element to the anchor tag
+
+                // Add a space after the icon
+                $space = $dom->createTextNode(' '); // Space between icon and title
+                $a->appendChild($space);
+
+                // Append the title text of the menu item after the space
+                $a->appendChild($dom->createTextNode($item['title']));
+
+                // Append the <a> tag to the <li> element
+                $li->appendChild($a);
+
+                // Check if the menu item has submenus
                 if (count($item['submenu']) > 0) {
-                    // Check if currentHref matches any of the submenu items' href
-                    $isActive = false;
+                    $isActive = false; // Flag to track if any submenu item is active
+                    
+                    // Loop through each submenu item and check if it's active
                     foreach ($item['submenu'] as $subItem) {
-                        if ($subItem['href'] === $currentHref) {
-                            $isActive = true;
+                        if (stripos($currentHref, $subItem['href']) !== false) {
+                            $isActive = true; // Set as active if currentHref matches the submenu item's href
                             break;
                         }
                     }
-                    
-                    // Add class "show" if the currentHref matches any submenu item
-                    $collapseClass = $isActive ? 'collapse show' : 'collapse';
-                    $sidebarHTML .= '<div id="' . substr($item['href'], 1) . '" class="' . $collapseClass . '">'."\r\n";
-                    $sidebarHTML .= '<ul class="nav flex-column pl-3">'."\r\n";
-                    
-                    // Loop through each submenu item
+
+                    // Create the <div> for the submenu and add 'collapse' or 'collapse show' class
+                    $collapseClass = $isActive ? 'collapse show' : 'collapse'; // Show submenu if active
+                    $submenuDiv = $dom->createElement('div');
+                    $submenuDiv->setAttribute('id', substr($item['href'], 1)); // Use item href as ID for submenu
+                    $submenuDiv->setAttribute('class', $collapseClass); // Set the collapse class for submenu
+                    $li->appendChild($submenuDiv); // Append the submenu div to the main <li>
+
+                    // Create the submenu <ul> list
+                    $submenuList = $dom->createElement('ul');
+                    $submenuList->setAttribute('class', 'nav flex-column pl-3'); // Set classes for the submenu list
+                    $submenuDiv->appendChild($submenuList); // Append the submenu list to the submenu div
+
+                    // Loop through each submenu item and create the submenu HTML
                     foreach ($item['submenu'] as $subItem) {
+                        // Get the localized title for each submenu item
                         $subItem['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $subItem['title'])));
-                        $sidebarHTML .= '<li class="nav-item">';
-                        $sidebarHTML .= '<a class="nav-link" href="' . $subItem['href'] . '"';
+
+                        // Create the <li> element for each submenu item
+                        $subLi = $dom->createElement('li');
                         
-                        // Add target="_blank" for submenu links if specified
-                        $subTarget = isset($subItem['target']) ? $subItem['target'] : '';
-                        if ($subTarget) {
-                            $sidebarHTML .= ' target="' . $subTarget . '"';
+                        // Mark the submenu item as active if it matches the currentHref
+                        if (stripos($currentHref, $subItem['href']) !== false) {
+                            $subLi->setAttribute('class', 'nav-item active'); // Set active class for the active submenu item
+                        } else {
+                            $subLi->setAttribute('class', 'nav-item'); // Set regular class for non-active items
+                        }
+                        
+                        $submenuList->appendChild($subLi); // Append the submenu <li> to the submenu list
+
+                        // Create the <a> tag for each submenu item
+                        $subA = $dom->createElement('a', ''); // Create an empty anchor tag
+                        $subA->setAttribute('class', 'nav-link'); // Set the class for the submenu anchor tag
+                        $subA->setAttribute('href', $subItem['href']); // Set the href for the submenu item
+
+                        // Add target="_blank" if the target attribute is provided for submenu links
+                        if (isset($subItem['target']) && $subItem['target']) {
+                            $subA->setAttribute('target', $subItem['target']);
                         }
 
-                        $sidebarHTML .= '><i class="' . $subItem['icon'] . '"></i> ' . $subItem['title'] . '</a>';
-                        $sidebarHTML .= '</li>'."\r\n";
-                    }
-                    
-                    $sidebarHTML .= '</ul>'."\r\n";
-                    $sidebarHTML .= '</div>'."\r\n";
-                }
+                        // Create and append the icon for submenu items
+                        $subIcon = $dom->createElement('i', '');
+                        $subIcon->setAttribute('class', $subItem['icon']);
+                        $subA->appendChild($subIcon);  // Append the icon to the submenu anchor tag
 
-                $sidebarHTML .= '</li>'."\r\n";
+                        // Add a space after the icon for submenu items
+                        $subSpace = $dom->createTextNode(' '); // Space between icon and title
+                        $subA->appendChild($subSpace);
+
+                        // Append the title text for the submenu item
+                        $subA->appendChild($dom->createTextNode($subItem['title']));
+
+                        // Append the submenu link to the <li> element
+                        $subLi->appendChild($subA);
+                    }
+                }
             }
         }
-        // Close the sidebar HTML structure
-        $sidebarHTML .= '</ul>';
 
-        // Return the generated sidebar HTML
-        return $sidebarHTML;
+        // Return the generated sidebar HTML as a string
+        return $dom->saveHTML();
     }
     
     /**
@@ -152,7 +205,7 @@ class AppMenu
      * @param string $currentHref The current active page's href.
      * @param AppLanguage $appLanguage Application language object.
      */
-    public function __construct($database, $appConfig, $currentUser, $jsonData, $currentHref, $appLanguage)
+    public function __construct($database, $appConfig, $currentUser, $jsonData, $currentHref, $appLanguage) // NOSONAR
     {
         $this->database = $database;
         $this->appConfig = $appConfig;
@@ -170,30 +223,7 @@ class AppMenu
 	public function getMenuFromDatabase()
 	{
 		$moduleGroups = $this->getModuleGrouped();
-        
-/*
-menu:
-  - title: "Home"
-    icon: "fas fa-home"
-    href: "index.php"
-    submenu: []
-  - title: "Master"
-    icon: "fas fa-folder"
-    href: "#submenu1"
-    submenu:
-      - title: "Application"
-        icon: "fas fa-microchip"
-        href: "application.php"
-      - title: "Application Group"
-        icon: "fas fa-microchip"
-        href: "application-group.php"
-      - title: "Workspace"
-        icon: "fas fa-building"
-        href: "workspace.php"
-      - title: "Administrator"
-        icon: "fas fa-user"
-        href: "admin.php"
-*/
+
         $menuList = array();
         $menuList['menu'] = array();
         foreach($moduleGroups as $moduleGoup)
@@ -201,7 +231,8 @@ menu:
             $menu = array(
                 'title' => $moduleGoup->getName(),
                 'icon' => $moduleGoup->getIcon(),
-                'href' => $moduleGoup->getIcon(),
+                'href' => $moduleGoup->getUrl(),
+                'target' => $moduleGoup->getTarget(),
                 'submenu' => array()
             );
             $submenus = array();
@@ -212,7 +243,8 @@ menu:
                     $submenus[] = array(
                         'title' => $module->getName(),
                         'icon' => $module->getIcon(),
-                        'href' => $module->getIcon(),
+                        'href' => $module->getUrl(),
+                        'target' => $module->getTarget()
                     );
                 }
             }
@@ -227,7 +259,7 @@ menu:
      *
      * @return MagicObject[] Array of grouped modules.
      */
-    public function getModuleGrouped()
+    public function getModuleGrouped() // NOSONAR
     {
         $modules = $this->loadModule();
         $adminRoles = $this->loadAminRole();
@@ -316,21 +348,22 @@ menu:
         return false;
     }
 	
-     /**
+    /**
      * Loads the modules from the database.
      *
-     * @return AppModuleImpl[] Array of modules.
+     * @return MagicObject[] Array of modules.
      */
 	public function loadModule()
 	{
         $modules = [];
 		$module = new AppModuleImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->menu, true))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
         ;
         $sorts = PicoSortable::getInstance()
             ->addSortable(new PicoSort('moduleGroup.sortOrder', PicoSort::ORDER_TYPE_ASC))
-            ->addSortable(new PicoSort('sortOrder', PicoSort::ORDER_TYPE_ASC))
+            ->addSortable(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
         ;
         try
         {
@@ -349,13 +382,13 @@ menu:
      *
      * @return AppAdminRoleImpl[] Array of admin roles.
      */
-    function loadAminRole()
+    public function loadAminRole()
     {
         $adminRoles = [];
 		$adminRole = new AppAdminRoleImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $this->currentUser->getAdminLevelId()))
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $this->currentUser->getAdminLevelId()))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
         ;
 
         try

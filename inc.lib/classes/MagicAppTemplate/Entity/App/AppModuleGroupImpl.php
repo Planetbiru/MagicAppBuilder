@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App;
+namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
 
@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="module_group")
- * @package AppBuilder\App
+ * @package MagicAppTemplate\Entity\App
  */
 class AppModuleGroupImpl extends MagicObject
 {
@@ -29,11 +29,42 @@ class AppModuleGroupImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, default_value="NULL", nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
 	protected $name;
+	
+	/**
+	 * URL
+	 * 
+	 * @NotNull
+	 * @Column(name="url", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Label(content="URL")
+	 * @var string
+	 */
+	protected $url;
+	
+	/**
+	 * Target
+	 * 
+	 * @NotNull
+	 * @Column(name="target", type="varchar(20)", length=20, default_value="NULL", nullable=true)
+	 * @Label(content="Target")
+	 * @var string
+	 */
+	protected $target;
+	
+	/**
+	 * Icon
+	 * 
+	 * @NotNull
+	 * @Column(name="icon", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Icon")
+	 * @var string
+	 */
+	protected $icon;
+
 
 	/**
 	 * Sort Order
