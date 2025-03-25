@@ -65,10 +65,10 @@ body {
 .main-table tbody tr > td .btn.button-format-data {
   display: none;
 }
-.main-table tbody tr[data-include-detail=true][element-type=text] td .btn.button-format-data {
+.main-table tbody tr[data-include-detail=true][data-element-type=text] td .btn.button-format-data {
   display: inline-block;
 }
-.main-table tbody tr[data-include-list=true][element-type=text] td .btn.button-format-data {
+.main-table tbody tr[data-include-list=true][data-element-type=text] td .btn.button-format-data {
   display: inline-block;
 }
 .main-table tr td button.reference-button {

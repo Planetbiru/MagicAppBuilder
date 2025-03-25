@@ -1928,10 +1928,13 @@ let initAll = function () {
         tr.find('.input-multiple-data')[0].disabled = true;
         tr.find('.input-multiple-data')[0].checked = false;
       }
-      tr.attr('element-type', 'text');
+      tr.attr('data-element-type', 'text');
     }
     let elementType = tr.find('.input-element-type:checked').val();
-    tr.attr('element-type', elementType);
+    if(elementType != '')
+    {
+      tr.attr('data-element-type', elementType);
+    }
   });
   
   $(document).on('change', '.input-field-filter', function(e1){
@@ -2081,7 +2084,7 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
     let decimal = numberFormat.decimal ?? '';
     let decimalSeparator = numberFormat.decimalSeparator ?? '';
     let thousandsSeparator = numberFormat.thousandsSeparator ?? '';
-    
+
     $('#input-control-decimal').val(decimal);
     $('#input-control-decimal-separator').val(decimalSeparator);
     $('#input-control-thousands-separator').val(thousandsSeparator);
@@ -4846,6 +4849,10 @@ function loadColumn(tableName, selector) {
         args = { data_type: data[i].data_type, column_type: data[i].column_type };
         domHtml = generateRow(field, args, skippedOnInsertEdit);
         $(selector).append(domHtml);
+
+        $('[data-field-name="'+field+'"]').attr('data-include-detail', 'true');
+        $('[data-field-name="'+field+'"]').attr('data-include-list', 'true');
+        $('[data-field-name="'+field+'"]').attr('data-element-type', 'text');
       }
 
       if (typeof answer.primary_keys != 'undefined' && answer.primary_keys.length) {
@@ -4950,7 +4957,7 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-format-data').val(JSON.stringify(dataFormat));
           }
 
-          tr.attr('element-type', data.fields[i].elementType);
+          tr.attr('data-element-type', data.fields[i].elementType);
           tr.attr('data-type', data.fields[i].dataType);
 
           if (data.fields[i].filterElementType == 'select') {
