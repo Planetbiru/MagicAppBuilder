@@ -2077,9 +2077,11 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
   }
   else if(formatType == 'numberFormat')
   {
-    let decimal = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.decimal ? currentFormat.numberFormat.decimal : '';
-    let decimalSeparator = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.decimalSeparator ? currentFormat.numberFormat.decimalSeparator : '';
-    let thousandsSeparator = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.thousandsSeparator ? currentFormat.numberFormat.thousandsSeparator : '';
+    let numberFormat = currentFormat?.numberFormat ?? {};
+    let decimal = numberFormat.decimal ?? '';
+    let decimalSeparator = numberFormat.decimalSeparator ?? '';
+    let thousandsSeparator = numberFormat.thousandsSeparator ?? '';
+    
     $('#input-control-decimal').val(decimal);
     $('#input-control-decimal-separator').val(decimalSeparator);
     $('#input-control-thousands-separator').val(thousandsSeparator);
