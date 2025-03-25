@@ -1874,11 +1874,51 @@ let initAll = function () {
     });
     inputFile.click();
   });
-  
-  $(document).on('change', '.input-element-type', function(e1){
+
+  $(document).on('change', '.include-list', function(e1){
+    let tr = $(this).closest('tr');
     if($(this)[0].checked)
     {
-      let tr = $(this).closest('tr');
+      tr.attr('data-include-list', 'true');
+    }
+    else
+    {
+      tr.attr('data-include-list', 'false');
+    }
+  });
+  $(document).on('change', '.include-detail', function(e1){
+    let tr = $(this).closest('tr');
+    if($(this)[0].checked)
+    {
+      tr.attr('data-include-detail', 'true');
+    }
+    else
+    {
+      tr.attr('data-include-detail', 'false');
+    }
+  });
+
+  $(document).on('click', '.button-format-data', function(e1){
+    let tr = $(this).closest('tr');
+    let dataType = tr.attr('data-type');
+    let fieldName = tr.attr('data-field-name');
+    let currentFormat = {};
+    let currentFormatStr = $(this).siblings('.input-format-data').val();
+    try
+    {
+      currentFormat = JSON.parse(currentFormatStr);
+    }
+    catch(e)
+    {
+      currentFormat = {};
+    }
+    showDataFormatDialog(fieldName, dataType, currentFormat);
+  });
+  
+  $(document).on('change', '.input-element-type', function(e1){
+    let tr = $(this).closest('tr');
+    if($(this)[0].checked)
+    {
       if(isSupportMultiple($(this).val()))
       {
         tr.find('.input-multiple-data')[0].disabled = false;
@@ -1888,7 +1928,10 @@ let initAll = function () {
         tr.find('.input-multiple-data')[0].disabled = true;
         tr.find('.input-multiple-data')[0].checked = false;
       }
+      tr.attr('element-type', 'text');
     }
+    let elementType = tr.find('.input-element-type:checked').val();
+    tr.attr('element-type', elementType);
   });
   
   $(document).on('change', '.input-field-filter', function(e1){
@@ -1930,6 +1973,10 @@ let initAll = function () {
     changeApplicationId($(this).val());
   });
 
+  $(document).on('click', '#button-save-data-format', function(e1){
+    saveDataFormat();
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);
@@ -1939,6 +1986,117 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Saves the selected data format and updates the corresponding table field.
+ */
+function saveDataFormat()
+{
+  $('#data-format').modal('hide');
+  let stringFormat = $('#input-control-string-format').val() || '';
+  let dateFormat = $('#input-control-date-format').val() || '';
+  let decimal = $('#input-control-decimal').val() || '';
+  let decimalSeparator = $('#input-control-decimal-separator').val() || '';
+  let thousandsSeparator = $('#input-control-thousands-separator').val() || '';
+
+  let fieldName = $('#data-format').attr('data-field-name');
+
+  stringFormat = stringFormat.trim();
+  dateFormat = dateFormat.trim();
+  decimal = decimal.trim();
+  decimalSeparator = decimalSeparator.trim();
+  thousandsSeparator = thousandsSeparator.trim();
+
+  let dataFormat = {};
+  if(stringFormat != '')
+  {
+    dataFormat.formatType = 'stringFormat';
+    dataFormat.stringFormat = stringFormat;
+  }
+  else if(dateFormat != '')
+  {
+    dataFormat.formatType = 'dateFormat';
+    dataFormat.dateFormat = dateFormat;
+  }
+  else if(decimal != '')
+  {
+    dataFormat.formatType = 'numberFormat';
+    dataFormat.numberFormat = {
+      decimal: parseInt(decimal),
+      decimalSeparator: decimalSeparator,
+      thousandsSeparator: thousandsSeparator
+    };
+  }
+  $('.main-table tbody tr[data-field-name="'+fieldName+'"]').find('.input-format-data').val(JSON.stringify(dataFormat));
+}
+
+/**
+ * Displays the data format selection dialog and initializes the fields.
+ *
+ * @param {string} fieldName - The name of the field to update.
+ * @param {string} dataType - The data type (e.g., 'string', 'date', 'number').
+ * @param {object} currentFormat - The current format object.
+ */
+function showDataFormatDialog(fieldName, dataType, currentFormat) {
+  // Show the modal
+  $('#data-format').modal('show');
+  $('#data-format').attr('data-field-name', fieldName);
+
+  // Mapping format types to tab content IDs
+  const formatTabs = {
+    'stringFormat': '#string-format-tab',
+    'dateFormat': '#date-format-tab',
+    'numberFormat': '#number-format-tab'
+  };
+  let formatType = 'stringFormat';
+  // Ensure currentFormat exists and has a formatType
+  if (!currentFormat || !currentFormat.formatType) {
+    // Use data type instead
+    if(dataType == 'timestamp' || dataType == 'datetime' || dataType == 'datetime-local' || dataType == 'date' || dataType == 'time')
+    {
+      formatType = 'dateFormat';
+    }
+  }
+  else
+  {
+    formatType = currentFormat.formatType;
+  }
+  $('#input-control-string-format').val('');
+  $('#input-control-date-format').val('');
+  $('#input-control-decimal').val('');
+  $('#input-control-decimal-separator').val('');
+  $('#input-control-thousands-separator').val('');
+  
+  if(formatType == 'stringFormat')
+  {
+    $('#input-control-string-format').val(currentFormat.stringFormat || '');
+  }
+  else if(formatType == 'dateFormat')
+  {
+    $('#input-control-date-format').val(currentFormat.dateFormat || '');
+  }
+  else if(formatType == 'numberFormat')
+  {
+    let decimal = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.decimal ? currentFormat.numberFormat.decimal : '';
+    let decimalSeparator = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.decimalSeparator ? currentFormat.numberFormat.decimalSeparator : '';
+    let thousandsSeparator = typeof currentFormat.numberFormat != 'undefined' && typeof currentFormat.numberFormat.thousandsSeparator ? currentFormat.numberFormat.thousandsSeparator : '';
+    $('#input-control-decimal').val(decimal);
+    $('#input-control-decimal-separator').val(decimalSeparator);
+    $('#input-control-thousands-separator').val(thousandsSeparator);
+  }
+
+  let tabSelector = formatTabs[formatType];
+
+  if (tabSelector) {
+    // Deactivate currently active tab
+    $('#data-format .nav-link.active').removeClass('active');
+    $('#data-format .tab-pane.active').removeClass('active show');
+
+    // Activate the selected tab
+    $('#data-format .nav-link[data-target="' + tabSelector + '"]').addClass('active');
+    $(tabSelector).addClass('active show');
+  }
+}
 
 /**
  * Initiates the download of a Markdown file for the entity-relationship diagram.
@@ -4193,6 +4351,19 @@ function generateScript(selector) {
           ? $(this).find("input.input-field-filter:checked").val()
           : null;
       let dataType = $(this).find("select.input-field-data-type").val();
+      let dataFormatStr = $(this).find("input.input-format-data").val();
+      let dataFormat = {};
+      if(dataFormatStr.indexOf('{') != -1 && dataFormatStr.indexOf('}') != -1)
+      {
+        try
+        {
+          dataFormat = JSON.parse(dataFormatStr);
+        }
+        catch(e)
+        {
+          dataFormat = {};
+        }
+      }
       let inputFilter = $(this).find("select.input-data-filter").val();
 
       let referenceData = parseJsonData(
@@ -4218,6 +4389,7 @@ function generateScript(selector) {
         elementType: elementType,
         filterElementType: filterElementType,
         dataType: dataType,
+        dataFormat: dataFormat,
         inputFilter: inputFilter,
         referenceData: referenceData,
         referenceFilter: referenceFilter,
@@ -4758,10 +4930,26 @@ function restoreForm(data)  //NOSONAR
           tr.find('.include-required')[0].checked = isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
 
+          if(isTrue(data.fields[i].includeDetail))
+          {
+            tr.attr('data-include-detail', 'true');
+          }
+          if(isTrue(data.fields[i].includeList))
+          {
+            tr.attr('data-include-list', 'true');
+          }
+
           if (data.fields[i].elementType == 'select') {
             tr.find('.reference-data').val(JSON.stringify(data.fields[i].referenceData));
             tr.find('.reference_button_data').css('display', 'inline');
           }
+          if (data.fields[i].elementType == 'text') {
+            let dataFormat = data.fields[i].dataFormat || {};
+            tr.find('.input-format-data').val(JSON.stringify(dataFormat));
+          }
+
+          tr.attr('element-type', data.fields[i].elementType);
+          tr.attr('data-type', data.fields[i].dataType);
 
           if (data.fields[i].filterElementType == 'select') {
             tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
@@ -5087,9 +5275,15 @@ function generateSelectFilter(field, args)  //NOSONAR
   return virtualDOM[0].outerHTML;
 }
 
-function generateDataFormat()
+/**
+ * 
+ * @param {string} field - Field name
+ * @param {object} args - Additional arguments that may influence the row's configuration.
+ * @returns {string} Button and hidden input containing data format
+ */
+function generateDataFormat(field, args)
 {
-  return '';
+  return `<button type="button" id="format_data_${field}" class="btn btn-sm btn-primary button-format-data" data-type="${args.data_type}">Format</button><input type="hidden" class="input-format-data" value="">`;
 }
 
 /**

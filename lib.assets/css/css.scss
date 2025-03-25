@@ -51,7 +51,9 @@ body {
 			width: 100%;
 			box-sizing: border-box;
 		}
+		
 	}
+
 
 	thead {
 		td {
@@ -86,14 +88,37 @@ body {
 				&:nth-child(1) {
 					padding-left: 10px;
 				}
-
+				.btn{
+					margin-bottom: 0px;
+					margin-top: 1px;
+					
+					&.button-format-data{
+						display: none;
+					}
+				}
+			}
+			&[data-include-detail="true"][element-type="text"]{
+				td
+				{
+					.btn.button-format-data{
+						display: inline-block;
+					}
+				}
+			}
+			&[data-include-list="true"][element-type="text"]{
+				td
+				{
+					.btn.button-format-data{
+						display: inline-block;
+					}
+				}
 			}
 		}
 	}
 
 	tr {
 		td {
-			button {
+			button.reference-button {
 				display: none;
 			}
 		}
@@ -1027,6 +1052,9 @@ input[type=number][name="database_port"] {
 
 .input-label {
 	padding-bottom: 2px;
+}
+.input-description{
+	padding-top: 4px;
 }
 
 .nav-tabs a.nav-link {
