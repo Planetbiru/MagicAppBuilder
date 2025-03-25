@@ -4,6 +4,7 @@ use AppBuilder\App\AppAdminImpl;
 use AppBuilder\App\AppAdminRoleImpl;
 use AppBuilder\App\AppModuleImpl;
 use MagicApp\AppLanguage;
+use MagicApp\AppMenu;
 use MagicApp\Field;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -99,4 +100,12 @@ $appLanguage = new AppLanguage(
 
 $appConfig->setAssets('lib.themes/default/assets/');
 
+$appMenuData = new SecretObject();
 
+$appMenuPath = __DIR__ . "/menu.yml";
+if(file_exists($appMenuPath))
+{
+    $appMenuData->loadYamlFile($appMenuPath, false, true, true);
+}
+$curretHref = isset($_SERVER['REQUEST_URI']) ? isset($_SERVER['REQUEST_URI']) : '';
+$appMenu = new AppMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);

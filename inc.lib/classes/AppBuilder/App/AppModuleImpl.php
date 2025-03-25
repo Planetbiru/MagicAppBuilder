@@ -104,4 +104,6 @@ class AppModuleImpl extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
+	
+	
 }

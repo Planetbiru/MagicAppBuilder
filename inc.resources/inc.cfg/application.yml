@@ -11,7 +11,7 @@ database:
     database_name: ''
     database_schema: public
     time_zone: Asia/Jakarta
-    database_file_path: 'D:/xampp/htdocs/MagicAppBuilder/inc.database/database.sqlite'
+    database_file_path: C:/bitbucket/MagicAppBuilder/inc.database/database.sqlite
 role:
     bypass_role: true
 data:
@@ -29,3 +29,5 @@ languages:
     -
         name: Indonesia
         code: id
+
+developmentMode: true

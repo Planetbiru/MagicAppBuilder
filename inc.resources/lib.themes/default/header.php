@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/lib.php";
+use MagicApp\AppMenu;
 
 $themeAssetsPath = $appConfig->getAssets();
 
@@ -35,7 +35,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
         <?php
-        echo AdminPage::generateSidebar($appMenuData, basename($_SERVER['PHP_SELF']), $appLanguage);
+        echo $appMenu;
         ?>
     </div>
 
