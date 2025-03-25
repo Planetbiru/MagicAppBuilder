@@ -211,6 +211,7 @@
       <div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
         <div class="define-wrapper">
           <form name="formgenerator" id="formgenerator" method="post" action="">
+            
             <table width="100%" border="1" cellspacing="0" cellpadding="0" class="main-table">
               <thead>
                 <tr>
@@ -225,9 +226,10 @@
                   <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">K</td>
                   <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">R</td>
                   <td colspan="6" align="center">Input</td>
-                  <td colspan="4" align="center" width="60">Filter</td>
-                  <td rowspan="2" align="center" width="100">Data Type</td>
-                  <td rowspan="2" align="center" width="180">Filter Type</td>
+                  <td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Filter">Filter</td>
+                  <td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
+                  <td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
+                  <td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
                 </tr>
                 <tr>
                   <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
@@ -246,6 +248,7 @@
               <tbody class="data-table-manual-sort">
               </tbody>
             </table>
+            
             <div class="button-area">
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
                   <i class="fa-solid fa-filter"></i> Data Filter

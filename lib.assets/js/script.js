@@ -5087,6 +5087,11 @@ function generateSelectFilter(field, args)  //NOSONAR
   return virtualDOM[0].outerHTML;
 }
 
+function generateDataFormat()
+{
+  return '';
+}
+
 /**
  * Generates a select dropdown for input types based on the provided field and data type.
  *
@@ -5378,6 +5383,9 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
       <td>
         ${generateSelectType(field, args)}
+      </td>
+      <td>
+        ${generateDataFormat(field, args)}
       </td>
       <td>
         ${generateSelectFilter(field, args)}
