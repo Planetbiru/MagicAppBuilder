@@ -474,7 +474,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</table>
 				</div>
 				<div class="button-wrapper">
-					<div class="button-area">
+					<div class="form-control-container button-area">
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>

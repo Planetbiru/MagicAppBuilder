@@ -151,6 +151,13 @@ class AppField // NOSONAR
     private $multipleFilter = false;
 
     /**
+     * Data format
+     *
+     * @var MagicObject
+     */
+    private $dataFormat;
+
+    /**
      * Constructor that initializes the AppField object based on the provided MagicObject.
      *
      * @param MagicObject $value A MagicObject containing field properties to initialize the instance.
@@ -175,6 +182,7 @@ class AppField // NOSONAR
         $this->additionalOutput = $value->getAdditionalOutput();
         $this->multipleData = $this->isTrue($value->getMultipleData());
         $this->multipleFilter = $this->isTrue($value->getMultipleFilter());
+        $this->dataFormat = PicoObjectParser::parseJsonRecursive($value->getDataFormat());
     }
 
     /**
@@ -441,4 +449,42 @@ class AppField // NOSONAR
         return $this;
     }
 
+    /**
+     * Retrieve the data format.
+     *
+     * This method returns the current data format stored in the object.
+     *
+     * @return MagicObject The current data format.
+     */
+    public function getDataFormat()
+    {
+        return $this->dataFormat;
+    }
+
+    /**
+     * Set the data format.
+     *
+     * This method assigns a new data format to the object.
+     *
+     * @param MagicObject $dataFormat The data format to set.
+     * @return self Returns the instance of the class for method chaining.
+     */
+    public function setDataFormat($dataFormat)
+    {
+        $this->dataFormat = $dataFormat;
+        return $this;
+    }
+
+    /**
+     * Convert the object to a JSON string representation.
+     *
+     * This method retrieves all accessible properties of the object
+     * and encodes them into a formatted JSON string.
+     *
+     * @return string JSON representation of the object.
+     */
+    public function __toString()
+    {
+        return json_encode(get_object_vars($this), JSON_PRETTY_PRINT);
+    }
 }

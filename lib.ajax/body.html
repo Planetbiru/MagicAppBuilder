@@ -249,7 +249,7 @@
               </tbody>
             </table>
             
-            <div class="button-area">
+            <div class="form-control-container button-area">
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
                   <i class="fa-solid fa-filter"></i> Data Filter
               </button>
@@ -262,6 +262,8 @@
               <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
                   <i class="fa-solid fa-code"></i> Generate Module
               </button> &nbsp;
+            </div>
+
 
               <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
                 <div class="modal-dialog modal-md modal-dialog-centered">
@@ -457,7 +459,7 @@
         <div class="module-container">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Modules</h4>
               </div>
               <div class="column-body">
@@ -465,12 +467,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Content</h4>
               </div>
               <div class="column-body">
                 <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button type="button" class="btn btn-success" id="button_save_module_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
                   <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
                 </div>
@@ -484,7 +486,7 @@
         <div class="entity-container-file">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Entities</h4>
               </div>
               <div class="column-body">
@@ -492,12 +494,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Content</h4>
               </div>
               <div class="column-body">
                 <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
                   <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
                   <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
@@ -512,7 +514,7 @@
         <div class="entity-container-relationship">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Entities</h4>
               </div>
               <div class="column-body">
@@ -520,11 +522,11 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Entity Relationship Diagram</h4>
               </div>
               <div class="column-body">
-                <div class="diagram-option">
+                <div class="form-control-container diagram-option">
                   <span>Max Level</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
                   <span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
                   <span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
@@ -549,7 +551,7 @@
         <div class="entity-container-query">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Entities</h4>
               </div>
               <div class="column-body">
@@ -557,12 +559,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Query</h4>
               </div>
               <div class="column-body">
                 <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button type="button" class="btn btn-success" id="button_save_entity_query" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
                   <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  Execute Query</button>
                   <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> Explore Database</button>
@@ -577,7 +579,7 @@
         <div class="container-translate-entity">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Entities</h4>
               </div>
               <div class="column-body">
@@ -585,7 +587,7 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title"> 
+              <div class="form-control-container column-title"> 
                 <span>Target Language</span>
                 <select class="form-control target-language" data-translate-for="entity">
                 </select>
@@ -602,7 +604,7 @@
                   <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
                   <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
                 </div>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <input type="hidden" class="entity-property-name" value="">
                   <input type="hidden" class="entity-name" value="">
                   <button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
@@ -617,7 +619,7 @@
       <div class="container-translate-module">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>Modules</h4>
               </div>
               <div class="column-body">
@@ -625,7 +627,7 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title"> 
+              <div class="form-control-container column-title"> 
                 <span>Target Language</span>
                 <select class="form-control target-language" data-translate-for="module">
                 </select>
@@ -642,7 +644,7 @@
                   <div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
                   <div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
                 </div>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <input type="hidden" class="module-property-name" value="">
                   <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
                 </div>
@@ -1133,7 +1135,7 @@
               </div>
               <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
                   <div class="input-label">Decimal</div>                 
-                  <input type="text" id="input-control-decimal" class="form-control">
+                  <input type="number" min="0" step="1" id="input-control-decimal" class="form-control">
                   <div class="input-label">Decimal Separator</div>                
                   <input type="text" id="input-control-decimal-separator" class="form-control">
                   <div class="input-label">Thousands Separator</div>                

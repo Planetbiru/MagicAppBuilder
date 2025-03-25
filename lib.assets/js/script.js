@@ -4943,9 +4943,17 @@ function restoreForm(data)  //NOSONAR
           {
             tr.attr('data-include-detail', 'true');
           }
+          else
+          {
+            tr.attr('data-include-detail', 'false');
+          }
           if(isTrue(data.fields[i].includeList))
           {
             tr.attr('data-include-list', 'true');
+          }
+          else
+          {
+            tr.attr('data-include-list', 'false');
           }
 
           if (data.fields[i].elementType == 'select') {
