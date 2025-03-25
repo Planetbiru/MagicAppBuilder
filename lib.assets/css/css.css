@@ -80,6 +80,13 @@ form {
   padding: 0;
 }
 
+.form-control-container {
+  line-height: 38px;
+}
+.form-control-container .btn {
+  margin-bottom: 0;
+}
+
 input {
   margin: 0;
 }

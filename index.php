@@ -29,10 +29,10 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.min.css">
-  <link rel="stylesheet" type="text/css" href="lib.assets/css/css.css">
+  <link rel="stylesheet" type="text/css" href="lib.assets/css/css.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
