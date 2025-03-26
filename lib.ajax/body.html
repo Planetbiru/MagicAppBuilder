@@ -43,7 +43,7 @@
     </ul>
     <div class="tab-content" id="myTabContent">
 
-    <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+      <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
         <div class="main-menu">
           <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> Create New</button>
           <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> Refresh</button>
@@ -208,6 +208,7 @@
           </div>
         </form>
       </div>
+      
       <div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
         <div class="define-wrapper">
           <form name="formgenerator" id="formgenerator" method="post" action="">
@@ -348,7 +349,6 @@
               </div>
             </div>
             <!-- Data Format End -->
-
 
             <!-- Filter Data Begin -->
             <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
@@ -707,7 +707,7 @@
       </div>
 
       <div id="translate-application" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-application-tab">
-      <div class="container-translate-module">
+        <div class="container-translate-module">
           <div class="row">
             <div class="col col-2">
               <div class="form-control-container column-title">
@@ -744,483 +744,482 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
 <div class="modal fade" id="modal-create-application" tabindex="-1" aria-labelledby="application_modal_label" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Create New Application</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form action="">
-        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tbody>
-            <tr>
-              <td>Application Name</td>
-              <td><input type="text" class="form-control" name="application_name" autocomplete="off"></td>
-            </tr>
-            <tr>
-              <td>Application ID</td>
-              <td><input type="text" class="form-control" name="application_id" autocomplete="off"></td>
-            </tr>
-            <tr>
-              <td>Architecture</td>
-              <td>
-                  <select class="form-control" name="application_architecture">
-                      <option value="monolith">Monolith Application</option>
-                      <option value="microservices">Microservices Aplication</option>
-                  </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Description</td>
-              <td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
-            </tr>
-            <tr>
-              <td>Installation Method</td>
-              <td>
-                  <select class="form-control" type="text" name="installation_method">
-                
-                  </select>
-              </td>
-            </tr>
-            <tr>
-              <td>MagicApp Version</td>
-              <td>
-                  <select class="form-control" name="magic_app_version">
-                      
-                  </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Workspace</td>
-              <td><select class="form-control" name="application_workspace_id"></select></td>
-            </tr>
-            <tr>
-              <td>Application Directory</td>
-              <td><span class="directory-container" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
-            </tr>                
-            <tr>
-              <td>Base Namespace</td>
-              <td><input type="text" class="form-control" name="application_namespace" autocomplete="off" autocomplete="off"></td>
-            </tr>
-            <tr>
-              <td>Author</td>
-              <td><input type="text" class="form-control" name="application_author" autocomplete="off"></td>
-            </tr>           
-            <tr>
-              <td>Path</td>
-              <td class="paths">
-                <table class="path-manager">
-                  <thead>
-                    <tr>
-                      <td>Name</td>
-                      <td>Path</td>
-                      <td width="20"></td>
-                      <td width="35"></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
-                      <td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
-                      <td><input type="checkbox" name="checked[0]" checked></td>
-                      <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="4">
-                      <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> Create</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Application</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="">
+          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              <tr>
+                <td>Application Name</td>
+                <td><input type="text" class="form-control" name="application_name" autocomplete="off"></td>
+              </tr>
+              <tr>
+                <td>Application ID</td>
+                <td><input type="text" class="form-control" name="application_id" autocomplete="off"></td>
+              </tr>
+              <tr>
+                <td>Architecture</td>
+                <td>
+                    <select class="form-control" name="application_architecture">
+                        <option value="monolith">Monolith Application</option>
+                        <option value="microservices">Microservices Aplication</option>
+                    </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
+              </tr>
+              <tr>
+                <td>Installation Method</td>
+                <td>
+                    <select class="form-control" type="text" name="installation_method">
+                  
+                    </select>
+                </td>
+              </tr>
+              <tr>
+                <td>MagicApp Version</td>
+                <td>
+                    <select class="form-control" name="magic_app_version">
+                        
+                    </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Workspace</td>
+                <td><select class="form-control" name="application_workspace_id"></select></td>
+              </tr>
+              <tr>
+                <td>Application Directory</td>
+                <td><span class="directory-container" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
+              </tr>                
+              <tr>
+                <td>Base Namespace</td>
+                <td><input type="text" class="form-control" name="application_namespace" autocomplete="off" autocomplete="off"></td>
+              </tr>
+              <tr>
+                <td>Author</td>
+                <td><input type="text" class="form-control" name="application_author" autocomplete="off"></td>
+              </tr>           
+              <tr>
+                <td>Path</td>
+                <td class="paths">
+                  <table class="path-manager">
+                    <thead>
+                      <tr>
+                        <td>Name</td>
+                        <td>Path</td>
+                        <td width="20"></td>
+                        <td width="35"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
+                        <td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
+                        <td><input type="checkbox" name="checked[0]" checked></td>
+                        <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="4">
+                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> Create</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
 </div>
-</div>
-
-
 
 <div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
-<div class="modal-dialog modal-md modal-dialog-centered">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Add Language</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">            
-          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tbody>
-            <tr>
-              <td>Language</td>
-              <td><input type="text" class="form-control" name="language_name" autocomplete="off"></td>
-            </tr>
-            <tr>
-              <td>Code</td>
-              <td><input type="text" class="form-control" name="language_code" autocomplete="off"></td>
-            </tr>
-          </tbody>
-        </table>      
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i> Add</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Language</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">            
+            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              <tr>
+                <td>Language</td>
+                <td><input type="text" class="form-control" name="language_name" autocomplete="off"></td>
+              </tr>
+              <tr>
+                <td>Code</td>
+                <td><input type="text" class="form-control" name="language_code" autocomplete="off"></td>
+              </tr>
+            </tbody>
+          </table>      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i> Add</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-update-path" tabindex="-1" aria-labelledby="application_path" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Module Location Manager</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form action="">
-        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tbody>
-            <tr>
-              <td>Path</td>
-              <td class="paths">
-                <table class="path-manager">
-                  <thead>
-                    <tr>
-                      <td>Name</td>
-                      <td>Path</td>
-                      <td width="20"></td>
-                      <td width="35"></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type="text" class="form-control location-name" name="name[0]" value="" autocomplete="off"></td>
-                      <td><input type="text" class="form-control location-path" name="path[0]" value="" autocomplete="off"></td>
-                      <td><input type="checkbox" name="checked[0]" checked></td>
-                      <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="4">
-                      <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i> Update</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Module Location Manager</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="">
+          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              <tr>
+                <td>Path</td>
+                <td class="paths">
+                  <table class="path-manager">
+                    <thead>
+                      <tr>
+                        <td>Name</td>
+                        <td>Path</td>
+                        <td width="20"></td>
+                        <td width="35"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="text" class="form-control location-name" name="name[0]" value="" autocomplete="off"></td>
+                        <td><input type="text" class="form-control location-path" name="path[0]" value="" autocomplete="off"></td>
+                        <td><input type="checkbox" name="checked[0]" checked></td>
+                        <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="4">
+                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_language" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Application Language Manager</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form action="">
-        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tbody>
-            <tr>
-              <td>Language</td>
-              <td class="languages">
-                <table class="language-manager">
-                  <thead>
-                    <tr>
-                      <td>Name</td>
-                      <td>Code</td>
-                      <td width="20"></td>
-                      <td width="35"></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
-                      <td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
-                      <td><input type="checkbox" name="checked[0]" checked></td>
-                      <td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="4">
-                      <button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i> Add</button>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i> Update</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Application Language Manager</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="">
+          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              <tr>
+                <td>Language</td>
+                <td class="languages">
+                  <table class="language-manager">
+                    <thead>
+                      <tr>
+                        <td>Name</td>
+                        <td>Code</td>
+                        <td width="20"></td>
+                        <td width="35"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
+                        <td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
+                        <td><input type="checkbox" name="checked[0]" checked></td>
+                        <td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="4">
+                        <button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i> Add</button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-entity-detail" tabindex="-1" aria-labelledby="application_entity" aria-hidden="true">
-<div class="modal-dialog modal-lg">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Entity Detail</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="entity-detail"></div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Entity Detail</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="entity-detail"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Application Setting</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="application-setting"></div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Application Setting</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="application-setting"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-workspace" tabindex="-1" aria-labelledby="application_workspace" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Workspace</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form action="">
-        <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tbody>
-          <tr>
-              <td>Name</td>
-              <td><input type="text" class="form-control" name="workspace_name" value="" autocomplete="off"></td>
-            </tr>
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Workspace</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="">
+          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
             <tr>
-              <td>Description</td>
-              <td><textarea class="form-control" name="workspace_description"></textarea></td>
-            </tr>
-            <tr>
-              <td>Directory</td>
-              <td><span class="directory-container"><input type="text" class="form-control" name="workspace_directory" value="" autocomplete="off"></span></td>
-            </tr>
-            <tr>
-              <td>PHP Path</td>
-              <td><input type="text" class="form-control" name="php_path" value="" autocomplete="off"></td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+                <td>Name</td>
+                <td><input type="text" class="form-control" name="workspace_name" value="" autocomplete="off"></td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td><textarea class="form-control" name="workspace_description"></textarea></td>
+              </tr>
+              <tr>
+                <td>Directory</td>
+                <td><span class="directory-container"><input type="text" class="form-control" name="workspace_directory" value="" autocomplete="off"></span></td>
+              </tr>
+              <tr>
+                <td>PHP Path</td>
+                <td><input type="text" class="form-control" name="php_path" value="" autocomplete="off"></td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-application-menu" tabindex="-1" aria-labelledby="application_menu" aria-hidden="true">
-<div class="modal-dialog modal-md">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Application Menu</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Application Menu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
 
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i> Add</button>
-      <button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i> Add</button>
+        <button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-application-menu-add" tabindex="-1" aria-labelledby="application_menu_add" aria-hidden="true">
-<div class="modal-dialog modal-sm">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Add Menu</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i> OK</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Menu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i> OK</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-<div class="modal-dialog modal-fullscreen">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Database Explorer</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="database-explorer">
-        
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Database Explorer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="database-explorer">
+          
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="modal-query-executor" tabindex="-1" aria-labelledby="application_query_executor" aria-hidden="true" >
-<div class="modal-dialog modal-lg">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Query Executor</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="query-container">
-        <textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Query Executor</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="query-container">
+          <textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success button-execute-query">
+            <i class="fas fa-play"></i> Execute
+        </button>
+        
+        <button type="button" class="btn btn-primary button-open-file">
+            <i class="fas fa-folder-open"></i> Open File
+        </button>
+        
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times"></i> Close
+        </button>        
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success button-execute-query">
-          <i class="fas fa-play"></i> Execute
-      </button>
-      
-      <button type="button" class="btn btn-primary button-open-file">
-          <i class="fas fa-folder-open"></i> Open File
-      </button>
-      
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          <i class="fas fa-times"></i> Close
-      </button>        
-    </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
-<div class="modal-dialog modal-md modal-dialog-centered">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Data Format</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="tabs">
-          <ul class="nav nav-tabs" id="maintab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
-              </li>               
-          </ul>
-          <div id="data-format-tab" class="tab-content">
-              <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                  <input type="text" id="input-control-string-format" class="form-control">
-                  <div class="input-description">
-                  <p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter. </p>
-                  </div>
-              </div>
-              <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                  <input type="text" id="input-control-date-format" class="form-control">
-                  <div class="input-description">
-                  <p>Format accepted by <code></code>DateTimeInterface::format()</code>.</p>
-                  </div>
-              </div>
-              <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-                  <div class="input-label">Decimal</div>                 
-                  <input type="text" id="input-control-decimal" class="form-control">
-                  <div class="input-label">Decimal Separator</div>                
-                  <input type="text" id="input-control-decimal-separator" class="form-control">
-                  <div class="input-label">Thousands Separator</div>                
-                  <input type="text" id="input-control-thousands-separator" class="form-control">
-              </div>
-          </div>
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Data Format</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+            <ul class="nav nav-tabs" id="maintab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
+                </li>               
+            </ul>
+            <div id="data-format-tab" class="tab-content">
+                <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+                    <input type="text" id="input-control-string-format" class="form-control">
+                    <div class="input-description">
+                    <p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter. </p>
+                    </div>
+                </div>
+                <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+                    <input type="text" id="input-control-date-format" class="form-control">
+                    <div class="input-description">
+                    <p>Format accepted by <code></code>DateTimeInterface::format()</code>.</p>
+                    </div>
+                </div>
+                <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+                    <div class="input-label">Decimal</div>                 
+                    <input type="text" id="input-control-decimal" class="form-control">
+                    <div class="input-label">Decimal Separator</div>                
+                    <input type="text" id="input-control-decimal-separator" class="form-control">
+                    <div class="input-label">Thousands Separator</div>                
+                    <input type="text" id="input-control-thousands-separator" class="form-control">
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
-    </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
@@ -1264,8 +1263,9 @@
 
 <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
 </div>
+
 <div class="status-bar-container position-fixed bottom-0 right-0 p-3">
-<div class="status-bar">
-    <div class="ajax-pending"></div>
-</div>
+  <div class="status-bar">
+      <div class="ajax-pending"></div>
+  </div>
 </div>
