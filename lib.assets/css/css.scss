@@ -97,22 +97,18 @@ body {
 					}
 				}
 			}
-			&[data-include-detail="true"][data-element-type="text"]{
-				td
-				{
-					.btn.button-format-data{
-						display: inline-block;
-					}
+			&[data-element-type="text"],
+			&[data-element-type="select"] {
+			&[data-include-detail="true"],
+			&[data-include-list="true"] {
+				td {
+				.btn.button-format-data {
+					display: inline-block;
+				}
 				}
 			}
-			&[data-include-list="true"][data-element-type="text"]{
-				td
-				{
-					.btn.button-format-data{
-						display: inline-block;
-					}
-				}
 			}
+
 		}
 	}
 

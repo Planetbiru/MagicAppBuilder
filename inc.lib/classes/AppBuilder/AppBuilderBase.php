@@ -3075,8 +3075,8 @@ $subqueryMap = '.$referece.';
             $propName = $field->getReferenceData()->getEntity()->getPropertyName();
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
-
-            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
+            $v = $this->getDetailValueString($field, $objectName.self::CALL_GET.$upperObjName.self::BRACKETS, $upperPropName);
+            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? ' . $v . ' : ""';
             $result = self::VAR.$objectName.$val;
         }
         else if($field->getElementType() == InputType::SELECT 
@@ -3165,9 +3165,12 @@ $subqueryMap = '.$referece.';
             $upperObjName = PicoStringUtil::upperCamelize($objName);
             $upperPropName = PicoStringUtil::upperCamelize($propName);
 
-            $val = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
-            $val2 = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? $'.$objectApprovalName.self::CALL_GET.$upperObjName.self::BRACKETS.self::CALL_GET.$upperPropName.self::BRACKETS.' : ""';
-            $result = self::VAR.$objectName.$val;
+            $v1 = $this->getDetailValueString($field, $objectName.self::CALL_GET.$upperObjName.self::BRACKETS, $upperPropName);
+            $v2 = $this->getDetailValueString($field, $objectApprovalName.self::CALL_GET.$upperObjName.self::BRACKETS, $upperPropName);
+
+            $val1 = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? ' . $v1 . ' : ""'; 
+            $val2 = self::CALL_ISSET.$upperObjName.self::BRACKETS.' ? ' . $v2 . ' : ""'; 
+            $result = self::VAR.$objectName.$val1;
             $result2 = self::VAR.$objectApprovalName.$val2;
         }
         else if($field->getElementType() == InputType::SELECT 
@@ -3231,7 +3234,7 @@ $subqueryMap = '.$referece.';
     public function getDetailValueString($field, $objectName, $upperFieldName)
     {
         $result = '';
-        if($field->getElementType() == 'text' && $field->getDataFormat() != null)
+        if(($field->getElementType() == 'text' || $field->getElementType() == 'select') && $field->getDataFormat() != null)
         {
             // text
             
