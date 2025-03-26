@@ -8,6 +8,6 @@
     },
     "require": {
         "meyfa/php-svg": "^0.16.1",
-        "planetbiru/magic-app": "^3.7"
+        "planetbiru/magic-app": "^3.8"
     }
 }
