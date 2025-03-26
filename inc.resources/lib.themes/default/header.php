@@ -1,7 +1,6 @@
 <?php
 
-use MagicAdmin\AdminPage;
-use MagicObject\SecretObject;
+use MagicApp\AppMenu;
 
 $themeAssetsPath = $appConfig->getAssets();
 
@@ -17,8 +16,8 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/font-awesome/all.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/css.min.css">
-    <link rel="icon" type="image/x-icon" href="<?php echo $themeAssetsPath;?>../favicon.ico" />
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $themeAssetsPath;?>../favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/fontawesome-free-6.5.2-web/css/all.min.css">
     <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
@@ -29,22 +28,14 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <script src="<?php echo $themeAssetsPath;?>js/custom.min.js"></script>
 </head>
 
-<?php
-
-// Sample JSON data (can be replaced with your own)
-
-// Call the function to generate the sidebar
-
-?>
-
 <body>
     <script src="<?php echo $themeAssetsPath;?>js/color-mode.min.js"></script>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
-        <h4 class="text-white text-center"><a href="./"><?php echo $appLanguage->getDashboard();?></a></h4>
+        <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
         <?php
-        echo AdminPage::generateSidebar($appMenuData, basename($_SERVER['PHP_SELF']), $appLanguage);
+        echo $appMenu;
         ?>
     </div>
 
@@ -55,7 +46,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="javascript:" id="notificationDropdown" role="button"
                             data-toggle="dropdown">
                             <i class="fas fa-bell"></i>
                         </a>
@@ -64,7 +55,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="javascript:" id="messageDropdown" role="button"
                             data-toggle="dropdown">
                             <i class="fas fa-comments"></i>
                         </a>
@@ -73,7 +64,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="javascript:" id="accountDropdown" role="button"
                             data-toggle="dropdown">
                             <i class="fas fa-user"></i>
                         </a>
@@ -85,7 +76,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="javascript:" id="languageDropdown" role="button"
                             data-toggle="dropdown">
                             <i class="fas fa-globe"></i>
                         </a>

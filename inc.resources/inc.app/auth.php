@@ -1,23 +1,111 @@
 <?php
 
+use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicApp\AppLanguage;
+use MagicApp\Field;
+use MagicAppTemplate\ApplicationMenu;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
+use MagicObject\Session\PicoSession;
+use MagicObject\SetterGetter;
+use MagicObject\Util\File\FileUtil;
+use MagicObject\Util\PicoIniUtil;
+use MagicObject\Util\PicoStringUtil;
 
-require_once __DIR__."/auth-core.php";
+require_once __DIR__ . "/app.php";
 
-if(!$userLoggedIn)
+$appModule = new AppModuleImpl(null, $database);
+$appUserRole = new AppAdminRoleImpl(null, $database);
+$currentUser = new AppAdminImpl(null, $database);
+
+$sessions = new PicoSession();
+$sessions->startSession();
+try
+{
+    $appSessionUsername = $sessions->username;
+    $appSessionPassword = $sessions->userPassword;
+    $appSpecsLogin = PicoSpecification::getInstance()
+        ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
+        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+        ->addAnd(PicoSpecification::getInstance()
+            ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
+            ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+        )
+    ;
+    $currentUser->findOne($appSpecsLogin);
+}
+
+catch(Exception $e)
 {
     require_once __DIR__ . "/login-form.php";
     exit();
 }
-if(isset($entityAdmin) && $entityAdmin->getAdminLevelId() != "superuser")
+
+$currentAction = new SetterGetter();
+$currentAction->setTime(date('Y-m-d H:i:s'));
+$currentAction->setIp($_SERVER['REMOTE_ADDR']);
+$currentAction->setUserId($currentUser->getAdminId());
+
+if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    $currentAction->setRequestViaAjax(true);
+} 
+else
 {
-    require_once __DIR__ . "/not-superuser.php";
-    exit();
+    $currentAction->setRequestViaAjax(false);
 }
 
+if($currentUser->getLanguageId() == null || $currentUser->getLanguageId() == "")
+{
+    // Default value
+    $currentUser->setLanguageId("en");
+}
+if($appConfig->getApplication() == null)
+{
+    $appConfig->setApplication(new SecretObject());
+}
+$appConfig->getApplication()->setBaseLanguageDirectory(dirname(__DIR__) . "/inc.lang");
 
-$appConfig->setAssets('/inc.resources/lib.themes/default/assets/');
-$menuLoader = new SecretObject();
+if($appConfig->getLanguages() == null)
+{
+    $appConfig->setLanguages([new SecretObject()]);
+}
+$appLanguage = new AppLanguage(
+    $appConfig->getApplication(),
+    $currentUser->getLanguageId(),
+    function($var, $value)
+    {
+        $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
+        $inputSource = FileUtil::fixFilePath($inputSource);
+        if(!file_exists(dirname($inputSource)))
+        {
+            mkdir(dirname($inputSource), 0755, true);
+        }
+        $sourceData = null;
+        if(file_exists($inputSource) && filesize($inputSource) > 3)
+        {
+            $sourceData = PicoIniUtil::parseIniFile($inputSource);
+        }
+        if($sourceData == null || $sourceData === false)
+        {
+            $sourceData = array();
+        }   
+        $output = array_merge($sourceData, array(PicoStringUtil::snakeize($var) => $value));
+        PicoIniUtil::writeIniFile($output, $inputSource);
+    }
+);
 
-$appMenuData = $menuLoader->loadYamlFile(dirname(dirname(__DIR__)) . "/magic-admin/inc.app/menu.yml", false, true, true);
+$appConfig->setAssets('lib.themes/default/assets/');
 
+$appMenuData = new SecretObject();
+
+$appMenuPath = __DIR__ . "/menu.yml";
+if(file_exists($appMenuPath))
+{
+    $appMenuData->loadYamlFile($appMenuPath, false, true, true);
+}
+$curretHref = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+$appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);

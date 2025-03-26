@@ -242,6 +242,8 @@ class DatabaseExporter
                 $foreignKeys = [];
 
                 $columns = $this->getPostgreSQLColumn($tableName, $schema);
+                $tableName = str_replace("'", "", $tableName);
+                $schema = str_replace("'", "", $schema);
 
                 // Query to get primary key columns
                 $primaryKeyQuery = $this->db->query("

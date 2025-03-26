@@ -75,11 +75,11 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 }
 
 $dataFilter = PicoSpecification::getInstance()
-	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $entityAdmin->getAdminId()));
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentUser->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::UPDATE)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $entityAdmin->getAdminId());
+	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $currentUser->getAdminId());
 	$admin = new Admin(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -94,7 +94,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	try
 	{
 		$updater->update();
-		$adminId = $entityAdmin->getAdminId();
+		$adminId = $currentUser->getAdminId();
 
         $plainPassword = trim($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true), " \t\r\n ");
         if(!empty($plainPassword))
@@ -129,7 +129,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 
 		if($admin->getWorkspaceId() != "")
 		{
-			setAdminWorkspace($database, $adminId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+			setAdminWorkspace($database, $adminId, $admin->getWorkspaceId(), $currentUser->getAdminId());
 		}
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $adminId);
 	}

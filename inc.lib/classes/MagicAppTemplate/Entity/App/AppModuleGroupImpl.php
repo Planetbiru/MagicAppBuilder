@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App\Entity\App;
+namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
 
@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="module_group")
- * @package AppBuilder\App\Entity\App
+ * @package MagicAppTemplate\Entity\App
  */
 class AppModuleGroupImpl extends MagicObject
 {
@@ -20,7 +20,6 @@ class AppModuleGroupImpl extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="module_group_id", type="varchar(40)", length=40, nullable=false)
-	 * @DefaultColumn(value="NULL")
 	 * @Label(content="Module Group ID")
 	 * @var string
 	 */
@@ -30,11 +29,42 @@ class AppModuleGroupImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, default_value="NULL", nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
 	protected $name;
+	
+	/**
+	 * URL
+	 * 
+	 * @NotNull
+	 * @Column(name="url", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Label(content="URL")
+	 * @var string
+	 */
+	protected $url;
+	
+	/**
+	 * Target
+	 * 
+	 * @NotNull
+	 * @Column(name="target", type="varchar(20)", length=20, default_value="NULL", nullable=true)
+	 * @Label(content="Target")
+	 * @var string
+	 */
+	protected $target;
+	
+	/**
+	 * Icon
+	 * 
+	 * @NotNull
+	 * @Column(name="icon", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Icon")
+	 * @var string
+	 */
+	protected $icon;
+
 
 	/**
 	 * Sort Order
@@ -52,7 +82,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Default Data")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $defaultData;
 
@@ -62,7 +92,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="active", type="tinyint(1)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Active")
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $active;
 }

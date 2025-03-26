@@ -58,13 +58,33 @@ body {
 .main-table tbody tr > td:nth-child(1) {
   padding-left: 10px;
 }
-.main-table tr td button {
+.main-table tbody tr > td .btn {
+  margin-bottom: 0px;
+  margin-top: 1px;
+}
+.main-table tbody tr > td .btn.button-format-data {
+  display: none;
+}
+.main-table tbody tr[data-include-detail=true][data-element-type=text] td .btn.button-format-data {
+  display: inline-block;
+}
+.main-table tbody tr[data-include-list=true][data-element-type=text] td .btn.button-format-data {
+  display: inline-block;
+}
+.main-table tr td button.reference-button {
   display: none;
 }
 
 form {
   margin: 0;
   padding: 0;
+}
+
+.form-control-container {
+  line-height: 38px;
+}
+.form-control-container .btn {
+  margin-bottom: 0;
 }
 
 input {
@@ -863,7 +883,12 @@ input[type=number][name=database_port] {
 }
 
 .input-label {
+  padding-top: 2px;
   padding-bottom: 2px;
+}
+
+.input-description {
+  padding-top: 4px;
 }
 
 .nav-tabs a.nav-link {

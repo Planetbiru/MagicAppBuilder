@@ -146,7 +146,7 @@ class AppBuilderBase //NOSONAR
 
     /**
      * AJAX Support
-     * @var boolean
+     * @var bool
      */
     protected $ajaxSupport = false;
     
@@ -165,7 +165,7 @@ class AppBuilderBase //NOSONAR
 
     /**
      * Update entity
-     * @var boolean
+     * @var bool
      */
     protected $updateEntity = false;
 
@@ -705,7 +705,7 @@ class AppBuilderBase //NOSONAR
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
             $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_CLOSE_TAG;
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageNoneditableDataWaitingApproval();?></div>';
-            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="button-area"><button type="button" class="btn btn-primary" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="form-control-container button-area"><button type="button" class="btn btn-primary" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
             $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_OPEN_TAG;
     
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
@@ -3020,7 +3020,7 @@ $subqueryMap = '.$referece.';
 
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         $upperFieldName = $this->fixFieldName($upperFieldName, $field);
-
+        
         $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$upperFieldName.self::BRACKETS.";".self::PHP_CLOSE_TAG;
         $label = $dom->createTextNode($caption);
 
@@ -3044,7 +3044,7 @@ $subqueryMap = '.$referece.';
      * @param AppField $field              The field whose value is to be displayed.
      * @return DOMElement|DOMText          The generated value element or text node.
      */
-    private function createDetailValue($dom, $objectName, $field)
+    private function createDetailValue($dom, $objectName, $field) // NOSONAR
     {
         $upperFieldName = PicoStringUtil::upperCamelize($field->getFieldName());
         
@@ -3110,13 +3110,16 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
-            $result = self::VAR.$objectName.$val;
+            
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
+            
         }
         
         return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
 
     }
+
+    
 
     /**
      * Create a row to compare values between the main and approval entities.
@@ -3189,9 +3192,8 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
-            $result = self::VAR.$objectName.$val;
-            $result2 = self::VAR.$objectApprovalName.$val;
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
+            $result2 = $this->getDetailValueString($field, $objectApprovalName, $upperFieldName);
         }
         
         $value = $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
@@ -3216,6 +3218,53 @@ $subqueryMap = '.$referece.';
         $tr->appendChild($td3);
 
         return $tr;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param AppField $field
+     * @param string $objectName
+     * @param string $upperFieldName
+     * @return string
+     */
+    public function getDetailValueString($field, $objectName, $upperFieldName)
+    {
+        $result = '';
+        if($field->getElementType() == 'text' && $field->getDataFormat() != null)
+        {
+            // text
+            
+            if($field->getDataFormat()->getFormatType() == 'dateFormat')
+            {
+                // date
+                $val = "->dateFormat".$upperFieldName."('".$field->getDataFormat()->getDateFormat()."')";
+                $result = self::VAR.$objectName.$val;
+            }
+            else if($field->getDataFormat()->getFormatType() == 'numberFormat')
+            {
+                // number
+                $val = "->numberFormat".$upperFieldName."(".$field->getDataFormat()->getDecimal().", '".$field->getDataFormat()->getDecimalSeparator()."', '".$field->getDataFormat()->getThousandsSeparator()."')";
+                $result = self::VAR.$objectName.$val;
+            }
+            else if($field->getDataFormat()->getFormatType() == 'stringFormat')
+            {
+                // string
+                $val = "->format".$upperFieldName."('".$field->getDataFormat()->getStringFormat()."')";
+                $result = self::VAR.$objectName.$val;
+            }
+            else
+            {
+                $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
+                $result = self::VAR.$objectName.$val;
+            }
+        }
+        else
+        {
+            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
+            $result = self::VAR.$objectName.$val;
+        }
+        return $result;
     }
     
     /**

@@ -32,7 +32,6 @@
     </style>
 </head>
 <body>
-
     <!-- Login Form Section -->
     <div class="container login-form-container d-flex justify-content-center">
         <div class="card login-form-card">

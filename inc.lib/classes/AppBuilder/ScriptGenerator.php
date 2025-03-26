@@ -1404,7 +1404,7 @@ class ScriptGenerator //NOSONAR
     private function fixNamespace($path, $entityNamespace)
     {
         $str = file_get_contents($path);
-        $str = str_replace("namespace AppBuilder\App\\", "namespace $entityNamespace\\", $str);
+        $str = str_replace("namespace MagicAppTemplate\Entity\App\\", "namespace $entityNamespace\\", $str);
         file_put_contents($path, $str);
         return $this;
     }

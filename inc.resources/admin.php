@@ -83,7 +83,7 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 }
 
 $dataFilter = PicoSpecification::getInstance()
-	->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $entityAdmin->getAdminId()));
+	->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $currentUser->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
@@ -114,7 +114,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 
 		if($admin->getWorkspaceId() != "")
 		{
-			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $currentUser->getAdminId());
 		}
 
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
@@ -183,7 +183,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 
 		if($admin->getWorkspaceId() != "")
 		{
-			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
+			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $currentUser->getAdminId());
 		}
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
 	}
@@ -1016,7 +1016,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</table>
 				</div>
 				<div class="button-wrapper">
-					<div class="button-area">
+					<div class="form-control-container button-area">
 						<?php if($userPermission->isAllowedUpdate()){ ?>
 						<button type="submit" class="btn btn-success" name="user_action" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
 						<button type="submit" class="btn btn-warning" name="user_action" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>

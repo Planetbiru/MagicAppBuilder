@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBuilder\App\Entity\App;
+namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
 
@@ -8,7 +8,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="notification")
- * @package AppBuilder\App\Entity\App
+ * @package MagicAppTemplate\Entity\App
  */
 class AppNotificationImpl extends MagicObject
 {
@@ -22,7 +22,7 @@ class AppNotificationImpl extends MagicObject
 	 * @Label(content="Notification ID")
 	 * @var integer
 	 */
-	protected $notification;
+	protected $notificationId;
 
 	/**
 	 * Admin Group
@@ -109,7 +109,7 @@ class AppNotificationImpl extends MagicObject
 	 * Content
 	 * 
 	 * @Column(name="content", type="text", nullable=true)
-	 * @Label(content="Teks")
+	 * @Label(content="Content")
 	 * @var string
 	 */
 	protected $content;

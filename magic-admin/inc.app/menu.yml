@@ -62,3 +62,7 @@ menu:
     href: "../magic-database/"
     submenu: []
     target: "_blank"
+  - title: "Tools"
+    icon: "fas fa-tools"
+    href: "tools.php"
+    submenu: []

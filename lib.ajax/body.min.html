@@ -44,7 +44,7 @@
 <div class="tab-content" id="myTabContent">
 
 <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-<div class="main-menu">
+<div class="form-control-container main-menu">
 <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> Create New</button>
 <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> Refresh</button>
 <input type="text" class="form-control" id="search-workspace" placeholder="Type to search...">
@@ -58,7 +58,7 @@
 
 <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
 
-<div class="main-menu">
+<div class="form-control-container main-menu">
 <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> Create New</button>
 <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> Refresh</button>
 <input type="text" class="form-control" id="search-application" placeholder="Type to search...">
@@ -208,9 +208,11 @@
 </div>
 </form>
 </div>
+
 <div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
 <div class="define-wrapper">
 <form name="formgenerator" id="formgenerator" method="post" action="">
+
 <table width="100%" border="1" cellspacing="0" cellpadding="0" class="main-table">
 <thead>
 <tr>
@@ -225,9 +227,10 @@
 <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">K</td>
 <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">R</td>
 <td colspan="6" align="center">Input</td>
-<td colspan="4" align="center" width="60">Filter</td>
-<td rowspan="2" align="center" width="100">Data Type</td>
-<td rowspan="2" align="center" width="180">Filter Type</td>
+<td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Filter">Filter</td>
+<td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
+<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
+<td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
 </tr>
 <tr>
 <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
@@ -246,7 +249,8 @@
 <tbody class="data-table-manual-sort">
 </tbody>
 </table>
-<div class="button-area">
+
+<div class="form-control-container button-area">
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
 <i class="fa-solid fa-filter"></i> Data Filter
 </button>
@@ -259,7 +263,94 @@
 <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
 <i class="fa-solid fa-code"></i> Generate Module
 </button> &nbsp;
+</div>
 
+<!-- Reference Begin -->
+<div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Create Data Reference</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i> Load</button>
+<button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Reference End -->
+
+<!-- Data Format Begin -->
+<div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Data Format</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="tabs">
+<ul class="nav nav-tabs" id="maintab" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
+</li>               
+</ul>
+<div id="data-format-tab" class="tab-content">
+<div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-string-format" class="form-control">
+<div class="input-description">
+<p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter (PHP language). </p>
+<p><a href="https://www.php.net/manual/en/function.sprintf.php" target="_blank">https://www.php.net/manual/en/function.sprintf.php</a></p>
+</div>
+</div>
+<div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-date-format" class="form-control">
+<div class="input-description">
+<p>The format of the outputted date string.</p>
+<p><a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">https://www.php.net/manual/en/datetime.format.php</a></p>
+</div>
+</div>
+<div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+<div class="input-label">Decimal</div>                 
+<input type="number" min="0" step="" id="input-control-decimal" class="form-control">
+<div class="input-label">Decimal Separator</div>                
+<input type="text" id="input-control-decimal-separator" class="form-control">
+<div class="input-label">Thousands Separator</div>                
+<input type="text" id="input-control-thousands-separator" class="form-control">
+<div class="input-description">
+<p><a href="https://www.php.net/manual/en/function.number-format.php" target="_blank">https://www.php.net/manual/en/function.number-format.php</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Format End -->
+
+<!-- Filter Data Begin -->
 <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
 <div class="modal-dialog modal-md modal-dialog-centered">
 <div class="modal-content">
@@ -314,7 +405,9 @@
 </div>
 </div>
 </div>
+<!-- Filter Data End -->
 
+<!-- Order Data Begin -->
 <div class="modal fade" id="modal-order-data" tabindex="-1" aria-labelledby="modal_order_label" aria-hidden="true">
 <div class="modal-dialog modal-md modal-dialog-centered">
 <div class="modal-content">
@@ -361,7 +454,9 @@
 </div>
 </div>
 </div>
+<!-- Order Data End -->
 
+<!-- Module Features Begin -->
 <div class="modal fade" id="modal-module-features" tabindex="-1" aria-labelledby="modal_features_label" aria-hidden="true">
 <div class="modal-dialog modal-md modal-dialog-centered">
 <div class="modal-content">
@@ -445,7 +540,8 @@
 </div>
 </div>
 </div>
-</div>
+<!-- Module Features End -->
+
 </form>
 </div>
 </div>
@@ -454,7 +550,7 @@
 <div class="module-container">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Modules</h4>
 </div>
 <div class="column-body">
@@ -462,12 +558,12 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Content</h4>
 </div>
 <div class="column-body">
 <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
-<div class="button-area">
+<div class="form-control-container button-area">
 <button type="button" class="btn btn-success" id="button_save_module_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
 <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
 </div>
@@ -481,7 +577,7 @@
 <div class="entity-container-file">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Entities</h4>
 </div>
 <div class="column-body">
@@ -489,12 +585,12 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Content</h4>
 </div>
 <div class="column-body">
 <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
-<div class="button-area">
+<div class="form-control-container button-area">
 <button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
 <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
 <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
@@ -509,7 +605,7 @@
 <div class="entity-container-relationship">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Entities</h4>
 </div>
 <div class="column-body">
@@ -517,11 +613,11 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Entity Relationship Diagram</h4>
 </div>
 <div class="column-body">
-<div class="diagram-option">
+<div class="form-control-container diagram-option">
 <span>Max Level</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
 <span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
 <span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
@@ -546,7 +642,7 @@
 <div class="entity-container-query">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Entities</h4>
 </div>
 <div class="column-body">
@@ -554,12 +650,12 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Query</h4>
 </div>
 <div class="column-body">
 <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
-<div class="button-area">
+<div class="form-control-container button-area">
 <button type="button" class="btn btn-success" id="button_save_entity_query" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
 <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  Execute Query</button>
 <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> Explore Database</button>
@@ -574,7 +670,7 @@
 <div class="container-translate-entity">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Entities</h4>
 </div>
 <div class="column-body">
@@ -582,7 +678,7 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title"> 
+<div class="form-control-container column-title"> 
 <span>Target Language</span>
 <select class="form-control target-language" data-translate-for="entity">
 </select>
@@ -599,7 +695,7 @@
 <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
 <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
 </div>
-<div class="button-area">
+<div class="form-control-container button-area">
 <input type="hidden" class="entity-property-name" value="">
 <input type="hidden" class="entity-name" value="">
 <button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
@@ -614,7 +710,7 @@
 <div class="container-translate-module">
 <div class="row">
 <div class="col col-2">
-<div class="column-title">
+<div class="form-control-container column-title">
 <h4>Modules</h4>
 </div>
 <div class="column-body">
@@ -622,7 +718,7 @@
 </div>
 </div>
 <div class="col col-10">
-<div class="column-title"> 
+<div class="form-control-container column-title"> 
 <span>Target Language</span>
 <select class="form-control target-language" data-translate-for="module">
 </select>
@@ -639,7 +735,7 @@
 <div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
 <div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
 </div>
-<div class="button-area">
+<div class="form-control-container button-area">
 <input type="hidden" class="module-property-name" value="">
 <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
 </div>
@@ -648,6 +744,7 @@
 </div>
 </div>
 </div>
+
 </div>
 </div>
 </div>
@@ -755,28 +852,6 @@
 <div class="modal-footer">
 <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> Create</button>
 <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-</div>
-</div>
-</div>
-</div>
-
-<div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
-<div class="modal-dialog modal-lg">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Create Data Reference</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-
-</div>
-<div class="modal-footer">
-<button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i> Load</button>
-<button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-<button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i> OK</button>
-<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Cancel</button>
 </div>
 </div>
 </div>
@@ -981,7 +1056,7 @@
 </tr>
 <tr>
 <td>Description</td>
-<td><textarea class="form-control" name="workspace_description"></textarea></td>
+<td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
 </tr>
 <tr>
 <td>Directory</td>
@@ -1093,6 +1168,60 @@
 </div>
 </div>
 
+<div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Data Format</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="tabs">
+<ul class="nav nav-tabs" id="maintab" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
+</li>               
+</ul>
+<div id="data-format-tab" class="tab-content">
+<div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-string-format" class="form-control">
+<div class="input-description">
+<p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter. </p>
+</div>
+</div>
+<div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-date-format" class="form-control">
+<div class="input-description">
+<p>Format accepted by <code></code>DateTimeInterface::format()</code>.</p>
+</div>
+</div>
+<div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+<div class="input-label">Decimal</div>                 
+<input type="text" id="input-control-decimal" class="form-control">
+<div class="input-label">Decimal Separator</div>                
+<input type="text" id="input-control-decimal-separator" class="form-control">
+<div class="input-label">Thousands Separator</div>                
+<input type="text" id="input-control-thousands-separator" class="form-control">
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+</div>
+
 <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
 <div class="modal-dialog modal-md modal-dialog-centered">
 <div class="modal-content">
@@ -1134,6 +1263,7 @@ aria-hidden="true">
 
 <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
 </div>
+
 <div class="status-bar-container position-fixed bottom-0 right-0 p-3">
 <div class="status-bar">
 <div class="ajax-pending"></div>

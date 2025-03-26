@@ -83,8 +83,12 @@ else {
             }
         } 
         else {
-            $writeable = false;
-            $message = "Base directory does not exist";
+            $writeable = is_writable(dirname($directoryToCheck));
+            if ($writeable) {
+                $message = "Directory is writable";
+            } else {
+                $message = "Directory is not writable";
+            }
         }
     }
 }

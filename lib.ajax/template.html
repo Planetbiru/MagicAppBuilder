@@ -45,7 +45,7 @@
     <div class="tab-content" id="myTabContent">
 
     <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-        <div class="main-menu">
+        <div class="form-control-container main-menu">
           <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace">{{lang['create_new']}}</button>
           <button type="button" class="btn btn-primary refresh-workspace-list">{{lang['refresh']}}</button>
           <input type="text" class="form-control" id="search-workspace" placeholder="{{lang['type_to_search_']}}">
@@ -59,7 +59,7 @@
 
       <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
 
-        <div class="main-menu">
+        <div class="form-control-container main-menu">
           <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">{{lang['create_new']}}</button>
           <button type="button" class="btn btn-primary refresh-application-list">{{lang['refresh']}}</button>
           <input type="text" class="form-control" id="search-application" placeholder="{{lang['type_to_search_']}}">
@@ -238,7 +238,7 @@
               <tbody class="data-table-manual-sort">
               </tbody>
             </table>
-            <div class="button-area">
+            <div class="form-control-container button-area">
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">{{lang['data_filter']}}</button>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-order-data">{{lang['data_order']}}</button>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">{{lang['module_features']}}</button>
@@ -428,7 +428,7 @@
         <div class="module-container">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['modules']}}</h4>
               </div>
               <div class="column-body">
@@ -436,12 +436,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['content']}}</h4>
               </div>
               <div class="column-body">
                 <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button class="btn btn-success" id="button_save_module_file" type="button" disabled="">{{lang['save_module']}}</button>
                   <button class="btn btn-danger" id="button_delete_module_file" type="button" disabled="">{{lang['delete_module']}}</button>
                 </div>
@@ -455,7 +455,7 @@
         <div class="entity-container-file">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['entities']}}</h4>
               </div>
               <div class="column-body">
@@ -463,12 +463,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['content']}}</h4>
               </div>
               <div class="column-body">
                 <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button class="btn btn-success" id="button_save_entity_file" type="button" disabled="">{{lang['save_entity']}}</button>
                   <button class="btn btn-success" id="button_save_entity_file_as" type="button">{{lang['save_entity_as']}}</button>
                   <button class="btn btn-danger" id="button_delete_entity_file" type="button" disabled="">{{lang['delete_entity']}}</button>
@@ -483,7 +483,7 @@
         <div class="entity-container-relationship">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['entities']}}</h4>
               </div>
               <div class="column-body">
@@ -491,11 +491,11 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['entity_relationship_diagram']}}</h4>
               </div>
               <div class="column-body">
-                <div class="diagram-option">
+                <div class="form-control-container diagram-option">
                   <span>{{lang['max_level']}}</span> <input class="form-control" type="number" step="1" name="maximum_level" value="0" min="0" max="20">
                   <span>{{lang['max_column']}}</span> <input class="form-control" type="number" step="1" name="maximum_column" value="8" min="4">
                   <span>{{lang['margin_x']}}</span> <input class="form-control" type="number" name="margin_x" value="0" min="0">
@@ -519,7 +519,7 @@
         <div class="entity-container-query">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['entities']}}</h4>
               </div>
               <div class="column-body">
@@ -527,12 +527,12 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['query']}}</h4>
               </div>
               <div class="column-body">
                 <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <button class="btn btn-success" id="button_save_entity_query" type="button" disabled="">{{lang['save_query']}}</button>
                   <button class="btn btn-primary" id="button_execute_entity_query" type="button">{{lang['execute_query']}}</button>
                   <button class="btn btn-primary" id="button_explore_database" type="button">{{lang['explore_database']}}</button>
@@ -547,7 +547,7 @@
         <div class="container-translate-entity">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['entities']}}</h4>
               </div>
               <div class="column-body">
@@ -555,7 +555,7 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title"> 
+              <div class="form-control-container column-title"> 
                 <span>{{lang['target_language']}}</span>
                 <select class="form-control target-language" data-translate-for="entity">
                 </select>
@@ -572,7 +572,7 @@
                   <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
                   <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
                 </div>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <input type="hidden" class="entity-property-name" value="">
                   <input type="hidden" class="entity-name" value="">
                   <button class="btn btn-success" id="button-save-entity-translation" type="button">{{lang['save_translation']}}</button>
@@ -587,7 +587,7 @@
       <div class="container-translate-module">
           <div class="row">
             <div class="col col-2">
-              <div class="column-title">
+              <div class="form-control-container column-title">
                 <h4>{{lang['modules']}}</h4>
               </div>
               <div class="column-body">
@@ -595,7 +595,7 @@
               </div>
             </div>
             <div class="col col-10">
-              <div class="column-title"> 
+              <div class="form-control-container column-title"> 
                 <span>{{lang['target_language']}}</span>
                 <select class="form-control target-language" data-translate-for="module">
                 </select>
@@ -612,7 +612,7 @@
                   <div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
                   <div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
                 </div>
-                <div class="button-area">
+                <div class="form-control-container button-area">
                   <input type="hidden" class="module-property-name" value="">
                   <button class="btn btn-success" id="button-save-module-translation" type="button">{{lang['save_translation']}}</button>
                 </div>
@@ -954,7 +954,7 @@
             </tr>
             <tr>
               <td>{{lang['description']}}</td>
-              <td><textarea class="form-control" name="workspace_description"></textarea></td>
+              <td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
             </tr>
             <tr>
               <td>{{lang['directory']}}</td>
