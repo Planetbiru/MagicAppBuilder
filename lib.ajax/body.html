@@ -262,7 +262,6 @@
               <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
                   <i class="fa-solid fa-code"></i> Generate Module
               </button> &nbsp;
-            </div>
 
             <!-- Filter Data Begin -->
             <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
@@ -1163,7 +1162,59 @@
 </div>
 </div>
 
-
+<div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Data Format</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+          <ul class="nav nav-tabs" id="maintab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
+              </li>               
+          </ul>
+          <div id="data-format-tab" class="tab-content">
+              <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+                  <input type="text" id="input-control-string-format" class="form-control">
+                  <div class="input-description">
+                  <p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter (PHP language). </p>
+                  </div>
+              </div>
+              <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+                  <input type="text" id="input-control-date-format" class="form-control">
+                  <div class="input-description">
+                  <p>Format accepted by <code></code>DateTimeInterface::format()</code> (PHP language).</p>
+                  </div>
+              </div>
+              <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+                  <div class="input-label">Decimal</div>                 
+                  <input type="text" id="input-control-decimal" class="form-control">
+                  <div class="input-label">Decimal Separator</div>                
+                  <input type="text" id="input-control-decimal-separator" class="form-control">
+                  <div class="input-label">Thousands Separator</div>                
+                  <input type="text" id="input-control-thousands-separator" class="form-control">
+              </div>
+          </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+    </div>
+  </div>
+</div>
+</div>
 
 <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
   <div class="modal-dialog modal-md modal-dialog-centered">
