@@ -1,4 +1,4 @@
-# MagicAppBuilder: Revolutionizing Fast Application Development
+# MagicAppBuilder: Codeless Programming Platform
 
 ## History and Introduction
 

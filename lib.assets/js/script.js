@@ -1624,14 +1624,6 @@ let initAll = function () {
     $(this).closest('table').find('tr.database-credential').attr('data-current-database-type', base)
   });
 
-  $(document).on('blur keyup', 'input[type="number"]', function (e) {
-    if (isNaN($(this).val()) || $(this).val().trim() === '') {
-      $(this).addClass('input-invalid-value');
-    } else {
-      $(this).removeClass('input-invalid-value');
-    }
-  });
-
   $(document).on('click', '#test-database-connection', function (e1) {
     let table = $(this).closest('table');
     let input = { 'testConnection': 'test' };
