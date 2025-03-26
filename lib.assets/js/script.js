@@ -1571,7 +1571,7 @@ let initAll = function () {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     let workspaceName = modal.find('[name="workspace_name"]').val();
-    let workspaceDescription = modal.find('[name="workspace_description"]').val();
+    let workspaceDescription = modal.find('[name="workspace_description" spellcheck="false"]').val();
     let workspaceDirectory = modal.find('[name="workspace_directory"]').val();
     let phpPath = modal.find('[name="php_path"]').val();
     increaseAjaxPending();

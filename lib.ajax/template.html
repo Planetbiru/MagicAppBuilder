@@ -45,7 +45,7 @@
     <div class="tab-content" id="myTabContent">
 
     <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-        <div class="main-menu">
+        <div class="form-control-container main-menu">
           <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace">{{lang['create_new']}}</button>
           <button type="button" class="btn btn-primary refresh-workspace-list">{{lang['refresh']}}</button>
           <input type="text" class="form-control" id="search-workspace" placeholder="{{lang['type_to_search_']}}">
@@ -59,7 +59,7 @@
 
       <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
 
-        <div class="main-menu">
+        <div class="form-control-container main-menu">
           <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application">{{lang['create_new']}}</button>
           <button type="button" class="btn btn-primary refresh-application-list">{{lang['refresh']}}</button>
           <input type="text" class="form-control" id="search-application" placeholder="{{lang['type_to_search_']}}">
@@ -954,7 +954,7 @@
             </tr>
             <tr>
               <td>{{lang['description']}}</td>
-              <td><textarea class="form-control" name="workspace_description"></textarea></td>
+              <td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
             </tr>
             <tr>
               <td>{{lang['directory']}}</td>

@@ -44,7 +44,7 @@
 <div class="tab-content" id="myTabContent">
 
 <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-<div class="main-menu">
+<div class="form-control-container main-menu">
 <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> Create New</button>
 <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> Refresh</button>
 <input type="text" class="form-control" id="search-workspace" placeholder="Type to search...">
@@ -58,7 +58,7 @@
 
 <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
 
-<div class="main-menu">
+<div class="form-control-container main-menu">
 <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> Create New</button>
 <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> Refresh</button>
 <input type="text" class="form-control" id="search-application" placeholder="Type to search...">
@@ -1056,7 +1056,7 @@
 </tr>
 <tr>
 <td>Description</td>
-<td><textarea class="form-control" name="workspace_description"></textarea></td>
+<td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
 </tr>
 <tr>
 <td>Directory</td>
