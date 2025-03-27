@@ -503,11 +503,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $application->getTimeCreate();?></td>
+						<td><?php echo $application->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
-						<td><?php echo $application->getTimeEdit();?></td>
+						<td><?php echo $application->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>

@@ -57,6 +57,8 @@ languages:
     -
         name: Indonesia
         code: id
+
+dateFormatDetail: 'j F Y H:i:s'
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
