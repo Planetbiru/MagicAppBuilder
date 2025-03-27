@@ -977,12 +977,10 @@ class AppBuilderBase //NOSONAR
         $getData[] = $this->constructEntityLabel($entityName);
         $getData[] = $this->getIncludeHeader();
 
-
         $getData[] = self::PHP_CLOSE_TAG.self::NEW_LINE.$htmlDetail.self::NEW_LINE.self::PHP_OPEN_TAG;
         $getData[] = $this->getIncludeFooter();
 
         $getData[] = self::TAB1.self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
-            
 
         $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
         $getData[] = self::TAB1.self::TAB1."else";
@@ -3109,17 +3107,11 @@ $subqueryMap = '.$referece.';
             $result = self::VAR.$objectName.$val;
         }
         else
-        {
-            
+        {      
             $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
-            
         }
-        
         return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
-
     }
-
-    
 
     /**
      * Create a row to compare values between the main and approval entities.
@@ -3224,47 +3216,47 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Undocumented function
+     * Returns a formatted detail value string based on the specified data format.
      *
-     * @param AppField $field
-     * @param string $objectName
-     * @param string $upperFieldName
-     * @return string
+     * @param AppField $field The field object containing element and data format information.
+     * @param string $objectName The name of the object being processed.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @return string The formatted detail value string.
      */
     public function getDetailValueString($field, $objectName, $upperFieldName)
     {
         $result = '';
         if(($field->getElementType() == 'text' || $field->getElementType() == 'select') && $field->getDataFormat() != null)
         {
-            // text
+            // text and select
             
             if($field->getDataFormat()->getFormatType() == 'dateFormat')
             {
-                // date
+                // Date Format
                 $val = "->dateFormat".$upperFieldName."('".$field->getDataFormat()->getDateFormat()."')";
                 $result = self::VAR.$objectName.$val;
             }
             else if($field->getDataFormat()->getFormatType() == 'numberFormat')
             {
-                // number
+                // Number Format
                 $val = "->numberFormat".$upperFieldName."(".$field->getDataFormat()->getDecimal().", '".$field->getDataFormat()->getDecimalSeparator()."', '".$field->getDataFormat()->getThousandsSeparator()."')";
                 $result = self::VAR.$objectName.$val;
             }
             else if($field->getDataFormat()->getFormatType() == 'stringFormat')
             {
-                // string
+                // String Format
                 $val = "->format".$upperFieldName."('".$field->getDataFormat()->getStringFormat()."')";
                 $result = self::VAR.$objectName.$val;
             }
             else
             {
-                $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
+                $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
                 $result = self::VAR.$objectName.$val;
             }
         }
         else
         {
-            $val = "".self::CALL_GET.$upperFieldName.self::BRACKETS."";
+            $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
             $result = self::VAR.$objectName.$val;
         }
         return $result;
@@ -3308,7 +3300,6 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('value', '');
             }
-
 
             $input->setAttribute('autocomplete', 'off'); 
             if($field->getRequired())
