@@ -3233,19 +3233,19 @@ $subqueryMap = '.$referece.';
             if($field->getDataFormat()->getFormatType() == 'dateFormat')
             {
                 // Date Format
-                $val = "->dateFormat".$upperFieldName."('".$field->getDataFormat()->getDateFormat()."')";
+                $val = "->dateFormat".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getDateFormat(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
             else if($field->getDataFormat()->getFormatType() == 'numberFormat')
             {
                 // Number Format
-                $val = "->numberFormat".$upperFieldName."(".$field->getDataFormat()->getDecimal().", '".$field->getDataFormat()->getDecimalSeparator()."', '".$field->getDataFormat()->getThousandsSeparator()."')";
+                $val = "->numberFormat".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getDecimal(), 'int').", ".$this->fixFormat($field->getDataFormat()->getDecimalSeparator(), 'string').", ".$this->fixFormat($field->getDataFormat()->getThousandsSeparator(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
             else if($field->getDataFormat()->getFormatType() == 'stringFormat')
             {
                 // String Format
-                $val = "->format".$upperFieldName."('".$field->getDataFormat()->getStringFormat()."')";
+                $val = "->format".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getStringFormat(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
             else
@@ -3261,6 +3261,23 @@ $subqueryMap = '.$referece.';
         }
         return $result;
     }
+
+    /**
+     * Fixes the format of a string based on the given type.
+     *
+     * @param string $format The format to be fixed.
+     * @param string $type The expected data type ('string', 'int', etc.).
+     * @return string The corrected format.
+     */
+    public function fixFormat($format, $type)
+    {
+        $format = trim($format);
+        if ($type == 'string' && strpos($format, '$') !== 0) {
+            $format = sprintf("'%s'", $format);
+        }
+        return $format;
+    }
+
     
     /**
      * Create an input control for an insert form.
