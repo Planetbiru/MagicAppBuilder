@@ -111,12 +111,6 @@ The system is built with localization in mind. It supports multiple languages, a
 
 The system provides dynamic filters that adapt to the data type, ensuring accurate and efficient data querying based on user-defined criteria.
 
-**17. Favicon Maker**
-
-Users can upload images, and the system automatically generates the appropriate favicon format for different browsers and devices. This feature ensures that your web application maintains a professional and branded appearance across all user interactions.
-
-Apart from the features above, the module is also equipped with data filters that are adjusted to the data type.
-
 ## Using MagicAppBuilder
 
 Visit Official user manual on [https://github.com/Planetbiru/MagicAppBuilder/blob/main/manual.md]() 
