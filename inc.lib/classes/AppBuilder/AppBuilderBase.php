@@ -1316,7 +1316,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
 
             if($field->getElementType() == InputType::TEXT)
             {
-                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS.""; 
+                $line1 = self::VAR.self::APP_ENTITY_LANGUAGE.self::CALL_GET.$caption.self::BRACKETS." => ".self::VAR."headerFormat".self::CALL_GET.$caption.self::BRACKETS; 
             }
             else
             {
@@ -1334,7 +1334,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $exporter = '
 '."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
-'."\t".'$sheetName = "Sheet 1";
+'."\t".'$sheetName = "Sheet 1"; 
 ';
         }
         else
@@ -1342,7 +1342,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $exporter = '
 '."\t".'$exporter = DocumentWriter::getCSVDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
-'."\t".'$sheetName = "Sheet 1";
+'."\t".'$sheetName = "CSV Document";
 ';
         }
         $uses = "";
@@ -1381,7 +1381,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
      *
      * @return string|null The generated export content or null if export is not enabled.
      */
-    public function createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable)
+    public function createExport($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortable) // NOSONAR
     {
         if($this->appFeatures->isExportToExcel() || $this->appFeatures->isExportToCsv())
         {
@@ -1456,7 +1456,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             $exporter = '
 '."\t".'$exporter = DocumentWriter::getCSVDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
-'."\t".'$sheetName = "Sheet 1";
+'."\t".'$sheetName = "CSV Document";
 ';
         }
         $uses = "";
@@ -1487,7 +1487,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             .implode(self::NEW_LINE, $getData)
             ;
             
-            if(stripos($result, ' multiple=""') !== false && stripos($result, ' data-multi-select=""')  !== false)
+            if(stripos($result, ' multiple=""') !== false && stripos($result, ' data-multi-select=""')  !== false) // NOSONAR
             {
                 $result = str_replace(array(' multiple=""', ' data-multi-select=""'), array(' multiple', ' data-multi-select'), $result);
             }
@@ -2679,7 +2679,7 @@ $subqueryMap = '.$referece.';
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
                 if($multipleFilter)
                 {
-                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG); // NOSONAR
                     $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
                 }
                 else
