@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '042887be9b176d4905f5f04b85aa7926ad970a09',
+        'reference' => '780050c01b59dcea206ac3633e763410196b206f',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '042887be9b176d4905f5f04b85aa7926ad970a09',
+            'reference' => '780050c01b59dcea206ac3633e763410196b206f',
             'dev_requirement' => false,
         ),
         'meyfa/php-svg' => array(
@@ -29,12 +29,12 @@
             'dev_requirement' => false,
         ),
         'planetbiru/magic-app' => array(
-            'pretty_version' => '3.8.1',
-            'version' => '3.8.1.0',
+            'pretty_version' => '3.8.2',
+            'version' => '3.8.2.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-app',
             'aliases' => array(),
-            'reference' => '1fe58c9e8ebfcad957b0e1189af857d1ecda0746',
+            'reference' => '77aca617b85e938178b5b2ede97775353fb1c8e5',
             'dev_requirement' => false,
         ),
         'planetbiru/magic-object' => array(

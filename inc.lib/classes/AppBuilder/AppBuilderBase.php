@@ -1334,7 +1334,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
             $exporter = '
 '."\t".'$exporter = DocumentWriter::getXLSXDocumentWriter();
 '."\t".'$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
-'."\t".'$sheetName = "Sheet 1"; 
+'."\t".'$sheetName = "Sheet 1";
 ';
         }
         else
