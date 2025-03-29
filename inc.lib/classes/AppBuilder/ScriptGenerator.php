@@ -432,6 +432,11 @@ class ScriptGenerator //NOSONAR
         "\t".'require_once $appInclude->appForbiddenPage(__DIR__);'."\r\n".
         "\t".'exit();'."\r\n".
         '}';
+        $declaration[] = '';
+        if($appFeatures->isUserActivityLogger())
+        {
+            $declaration[] = '$userActivityLogger->logActivity($currentUser, $currentAction);';
+        }
         
         $declaration[] = '';
         

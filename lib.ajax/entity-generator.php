@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\AppField;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\Request\InputPost;
@@ -23,10 +24,12 @@ try
     $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     $tableName = $inputPost->getTableName();
     $entityName = $inputPost->getEntityName();
+    $entityInfo = $appConfig->getEntityInfo();
     if(!empty($tableName) && !empty($entityName))
     {
         $gen = new PicoEntityGenerator($database, $baseDirectory, $tableName, $baseEntity, $entityName);
-        $gen->generate();
+        $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
+        $gen->generate($nonupdatables);
     }
 }
 catch(Exception $e)

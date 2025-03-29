@@ -39,7 +39,6 @@ if (file_exists($appConfigPath)) {
     
     $appConfig->loadYamlFile($appConfigPath, false, true, true);
     $databaseConfig = $appConfig->getDatabase();
-
     if (!isset($databaseConfig)) {
         exit();
     }
@@ -48,6 +47,14 @@ if (file_exists($appConfigPath)) {
     }
     if (empty($schemaName)) {
         $schemaName = $databaseConfig->getDatabaseSchema();
+    }
+    if(stripos($databaseConfig->getDriver(), 'sqlite') !== false)
+    {
+        if(!file_exists(dirname($databaseConfig->getDatabaseFilePath())))
+        {
+            // Create direcory
+            mkdir(dirname($databaseConfig->getDatabaseFilePath()), 0755, true);
+        }
     }
     $databaseConfig->setCharset('UTF8');
     $database = new PicoDatabase($databaseConfig);
@@ -70,9 +77,7 @@ if (file_exists($appConfigPath)) {
 } else {
     exit();
 }
-
 $accessedFrom = "database-explorer";
 
 require_once __DIR__ . "/backend.php";
 require_once __DIR__ . "/database-explorer.php";
-

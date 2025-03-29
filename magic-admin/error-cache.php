@@ -402,11 +402,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $errorCache->getTimeCreate();?></td>
+						<td><?php echo $errorCache->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
-						<td><?php echo $errorCache->getTimeEdit();?></td>
+						<td><?php echo $errorCache->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>

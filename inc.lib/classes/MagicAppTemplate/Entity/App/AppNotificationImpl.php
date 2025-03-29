@@ -63,7 +63,7 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Admin Group 1
 	 * 
-	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_group_1")
+	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 1")
 	 * @var AppAdminImpl
 	 */
@@ -72,7 +72,7 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Admin Group 2
 	 * 
-	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_group_2")
+	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 2")
 	 * @var AppAdminImpl
 	 */
@@ -81,7 +81,7 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Admin Group 3
 	 * 
-	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_group_3")
+	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 3")
 	 * @var AppAdminImpl
 	 */

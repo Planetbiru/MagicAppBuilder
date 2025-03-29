@@ -4403,6 +4403,7 @@ function generateScript(selector) {
   let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
   let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
   let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
+  let userActivityLogger = $("#user_activity_logger")[0].checked && true; //NOSONAR
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
@@ -4440,6 +4441,7 @@ function generateScript(selector) {
     sortOrder: manualSortOrder,
     exportToExcel: exportToExcel,
     exportToCsv: exportToCsv,
+    userActivityLogger: userActivityLogger,
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
     trashRequired: withTrash,

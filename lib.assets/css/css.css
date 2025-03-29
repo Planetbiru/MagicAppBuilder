@@ -72,6 +72,11 @@ body {
   display: none;
 }
 
+.accordion .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 form {
   margin: 0;
   padding: 0;

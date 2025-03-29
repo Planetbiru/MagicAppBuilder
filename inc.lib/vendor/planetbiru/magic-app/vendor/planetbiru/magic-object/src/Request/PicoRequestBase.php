@@ -803,6 +803,43 @@ class PicoRequestBase extends stdClass // NOSONAR
     }
 
     /**
+     * Retrieves the accepted languages from the request headers.
+     *
+     * This function parses the "Accept-Language" header and returns an array of 
+     * languages sorted by priority.
+     *
+     * @return array An array of accepted languages sorted by quality value (q).
+     */
+    public function getAcceptedLanguages() {
+        // Check if the "Accept-Language" header is set
+        if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            return array();
+        }
+
+        // Split the header value by comma to extract individual language preferences
+        $languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        $parsedLanguages = array();
+
+        foreach ($languages as $lang) {
+            // Split each language entry by ";q=" to separate the locale from its priority
+            $parts = explode(';q=', $lang);
+            $locale = trim($parts[0]);
+            
+            // Assign a default quality value of 1.0 if not explicitly provided
+            $quality = isset($parts[1]) ? (float)$parts[1] : 1.0;
+            
+            // Store the language and its priority
+            $parsedLanguages[$locale] = $quality;
+        }
+
+        // Sort languages by quality value in descending order
+        arsort($parsedLanguages);
+
+        // Return only the language codes, sorted by priority
+        return array_keys($parsedLanguages);
+    }
+
+    /**
      * Convert the object to a JSON string representation.
      *
      * This method serializes the object to JSON format, with options for pretty printing

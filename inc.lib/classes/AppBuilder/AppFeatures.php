@@ -100,6 +100,13 @@ class AppFeatures // NOSONAR
     private $exportToCsv = false;
 
     /**
+     * User Activity Logger
+     *
+     * @var bool
+     */
+    private $userActivityLogger = false;
+
+    /**
      * Use temporary for export feature
      *
      * @var bool
@@ -128,6 +135,7 @@ class AppFeatures // NOSONAR
             $this->sortOrder = $this->isTrue($features->get('sortOrder'));
             $this->exportToExcel = $this->isTrue($features->get('exportToExcel'));
             $this->exportToCsv = $this->isTrue($features->get('exportToCsv'));
+            $this->userActivityLogger = $this->isTrue($features->get('userActivityLogger'));
             $this->approvalRequired = $this->isTrue($features->get('approvalRequired'));
             $this->approvalNote = $this->isTrue($features->get('approvalNote'));
             $this->trashRequired = $this->isTrue($features->get('trashRequired'));
@@ -357,6 +365,24 @@ class AppFeatures // NOSONAR
     public function setBackendOnly($backendOnly)
     {
         $this->backendOnly = $backendOnly;
+
+        return $this;
+    }
+
+    /**
+     * Get user Activity Logger
+     */
+    public function isUserActivityLogger()
+    {
+        return $this->userActivityLogger;
+    }
+
+    /**
+     * Set user Activity Logger
+     */
+    public function setUserActivityLogger($userActivityLogger)
+    {
+        $this->userActivityLogger = $userActivityLogger;
 
         return $this;
     }

@@ -392,11 +392,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $applicationGroupMember->getTimeCreate();?></td>
+						<td><?php echo $applicationGroupMember->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
-						<td><?php echo $applicationGroupMember->getTimeEdit();?></td>
+						<td><?php echo $applicationGroupMember->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>

@@ -17,7 +17,7 @@ try
 
     $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
 
-    $applicationToUpdate->find($appId);
+    $applicationToUpdate->findOneByApplicationId($appId);
 
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
