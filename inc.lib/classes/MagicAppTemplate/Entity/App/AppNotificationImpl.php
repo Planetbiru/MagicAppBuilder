@@ -20,7 +20,7 @@ class AppNotificationImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Notification ID")
-	 * @var integer
+	 * @var int
 	 */
 	protected $notificationId;
 
@@ -128,7 +128,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="read", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Read")
-	 * @var integer
+	 * @var int
 	 */
 	protected $read;
 

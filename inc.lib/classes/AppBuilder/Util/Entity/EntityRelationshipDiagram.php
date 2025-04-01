@@ -2,7 +2,6 @@
 
 namespace AppBuilder\Util\Entity;
 
-use AppBuilder\Util\DataUtil;
 use AppBuilder\Util\Error\ErrorChecker;
 use Exception;
 use MagicObject\Database\PicoDatabase;
@@ -58,49 +57,49 @@ class EntityRelationshipDiagram //NOSONAR
     /**
      * Entity width
      *
-     * @var integer
+     * @var int
      */
     private $entityWidth = 1;
 
     /**
      * Margin between 2 entities in X axis
      *
-     * @var integer
+     * @var int
      */
     private $entityMarginX = 40;
     
     /**
      * Margin between 2 entities in Y axis
      *
-     * @var integer
+     * @var int
      */
     private $entityMarginY = 20;
     
     /**
      * Width
      *
-     * @var integer
+     * @var int
      */
     private $width = 1;
     
     /**
      * Height
      *
-     * @var integer
+     * @var int
      */
     private $height = 1;
     
     /**
      * Margin X
      *
-     * @var integer
+     * @var int
      */
     private $marginX = 20;
     
     /**
      * Margin Y
      *
-     * @var integer
+     * @var int
      */
     private $marginY = 20;
     
@@ -128,28 +127,28 @@ class EntityRelationshipDiagram //NOSONAR
     /**
      * Header height
      *
-     * @var integer
+     * @var int
      */
     private $headerHeight = 20;
     
     /**
      * Column height
      *
-     * @var integer
+     * @var int
      */
     private $columnHeight = 20;
     
     /**
      * Maximum level
      *
-     * @var integer
+     * @var int
      */
     private $maximumLevel;
     
     /**
      * Maximum columns
      *
-     * @var integer
+     * @var int
      */
     private $maximumColumn = 0;
     

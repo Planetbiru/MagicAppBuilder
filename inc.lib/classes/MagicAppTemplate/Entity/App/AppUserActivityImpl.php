@@ -20,7 +20,7 @@ class AppUserActivityImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="user_activity_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User Activity ID")
-	 * @var integer
+	 * @var int
 	 */
 	protected $userActivityId;
 
