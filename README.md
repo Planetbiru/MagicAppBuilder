@@ -238,15 +238,14 @@ composer dump-autoload --ignore-platform-reqs
 | Table creator          | Yes       | Yes       |
 | Table modifier         | Yes       | Yes       |
 | Number of project      | Unlimited | Unlimited |
-| Simultaneous projects  | 1         | Unlimited |
+| Simultaneous projects  | Unlimited | Unlimited |
 | Number of table        | Unlimited | Unlimited |
 | Number of directory    | Unlimited | Unlimited |
 | Number of entity       | Unlimited | Unlimited |
 | Number of module       | Unlimited | Unlimited |
 | Number of theme        | 1         | 3         |
-| Number of user         | 1         | 100       |
+| Number of user         | 10        | Unlimited |
 | User management        | No        | Yes       |
-| Collaboration          | No        | Yes       |
 | Push notification      | No        | Yes       |
 
 ## Conclusion
