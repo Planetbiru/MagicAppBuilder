@@ -61,7 +61,7 @@ class AppUserActivityLogger
         if ($this->appConfig->getLogUserActivity()) {
             try {
                 $this->entity->setUserAction($userAction);
-                $this->entity->setAdminId($currentAction->getUserId());
+                $this->entity->setUserId($currentAction->getUserId());
                 $this->entity->setUsername($currentUser->getUsername());
                 $this->entity->setTimeCreate($currentAction->getTime());
                 $this->entity->setIpCreate($currentAction->getIp());

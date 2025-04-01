@@ -2,6 +2,7 @@
 
 namespace SVG\Nodes;
 
+use SVG\Nodes\SVGNodeContainer;
 use SVG\Rasterization\SVGRasterizer;
 
 /**
@@ -10,26 +11,20 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGGenericNodeType extends SVGNodeContainer
 {
-    private string $tagName;
+    private $tagName;
 
-    public function __construct(string $tagName)
+    public function __construct($tagName)
     {
         parent::__construct();
         $this->tagName = $tagName;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName(): string
+    public function getName()
     {
         return $this->tagName;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         // do nothing
     }

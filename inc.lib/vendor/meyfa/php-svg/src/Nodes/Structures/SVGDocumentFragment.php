@@ -2,7 +2,6 @@
 
 namespace SVG\Nodes\Structures;
 
-use SVG\Nodes\SVGNode;
 use SVG\Nodes\SVGNodeContainer;
 use SVG\Rasterization\SVGRasterizer;
 use SVG\Utilities\Units\Length;
@@ -13,26 +12,29 @@ use SVG\Utilities\Units\Length;
  */
 class SVGDocumentFragment extends SVGNodeContainer
 {
-    public const TAG_NAME = 'svg';
+    const TAG_NAME = 'svg';
 
-    /**
-     * @var array $initialStyles A map of style keys to their defaults.
-     */
-    private static array $initialStyles = [
+    /** @var mixed[] $initialStyles A map of style keys to their defaults. */
+    private static $initialStyles = array(
         'fill'          => '#000000',
         'stroke'        => 'none',
         'stroke-width'  => '1',
         'opacity'       => '1',
-        'font-size'     => '16px',
-    ];
+    );
+
+    /** @var string[] $namespaces A map of custom namespaces to their URIs. */
+    private $namespaces;
 
     /**
-     * @param mixed $width  The declared width.
-     * @param mixed $height The declared height.
+     * @param string|null $width      The declared width.
+     * @param string|null $height     The declared height.
+     * @param string[]    $namespaces A map of custom namespaces to their URIs.
      */
-    public function __construct($width = null, $height = null)
+    public function __construct($width = null, $height = null, array $namespaces = array())
     {
         parent::__construct();
+
+        $this->namespaces = $namespaces;
 
         $this->setAttribute('width', $width);
         $this->setAttribute('height', $height);
@@ -41,15 +43,15 @@ class SVGDocumentFragment extends SVGNodeContainer
     /**
      * @return bool Whether this is the root document.
      */
-    public function isRoot(): bool
+    public function isRoot()
     {
         return $this->getParent() === null;
     }
 
     /**
-     * @return string|null The declared width of this document or null.
+     * @return string The declared width of this document.
      */
-    public function getWidth(): ?string
+    public function getWidth()
     {
         return $this->getAttribute('width');
     }
@@ -57,19 +59,19 @@ class SVGDocumentFragment extends SVGNodeContainer
     /**
      * Declares a new width for this document.
      *
-     * @param mixed $width The new width.
+     * @param string $width The new width.
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setWidth($width): SVGDocumentFragment
+    public function setWidth($width)
     {
         return $this->setAttribute('width', $width);
     }
 
     /**
-     * @return string|null The declared height of this document or null.
+     * @return string The declared height of this document.
      */
-    public function getHeight(): ?string
+    public function getHeight()
     {
         return $this->getAttribute('height');
     }
@@ -77,19 +79,16 @@ class SVGDocumentFragment extends SVGNodeContainer
     /**
      * Declares a new height for this document.
      *
-     * @param mixed $height The new height.
+     * @param string $height The new height.
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setHeight($height): SVGDocumentFragment
+    public function setHeight($height)
     {
         return $this->setAttribute('height', $height);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getComputedStyle(string $name): ?string
+    public function getComputedStyle($name)
     {
         // return either explicit declarations ...
         $style = parent::getComputedStyle($name);
@@ -102,9 +101,13 @@ class SVGDocumentFragment extends SVGNodeContainer
     }
 
     /**
-     * @inheritdoc
+     * Draws this node to the given rasterizer.
+     *
+     * @param SVGRasterizer $rasterizer The rasterizer to draw to.
+     *
+     * @return void
      */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         if ($this->isRoot()) {
             parent::rasterize($rasterizer);
@@ -128,22 +131,26 @@ class SVGDocumentFragment extends SVGNodeContainer
         imagecopy(
             $rasterizer->getImage(),    // destination
             $img,                       // source
-            0,                          // dst_x
-            0,                          // dst_y
-            0,                          // srx_x
-            0,                          // src_y
+            0, 0,                       // dst_x, dst_y
+            0, 0,                       // src_x, src_y
             $subRasterizer->getWidth(), // src_w
             $subRasterizer->getHeight() // src_h
         );
         imagedestroy($img);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSerializableAttributes(): array
+    public function getSerializableAttributes()
     {
         $attrs = parent::getSerializableAttributes();
+
+        if ($this->isRoot()) {
+            $attrs['xmlns'] = 'http://www.w3.org/2000/svg';
+            $attrs['xmlns:xlink'] = 'http://www.w3.org/1999/xlink';
+            foreach ($this->namespaces as $namespace => $uri) {
+                $namespace = $this->serializeNamespace($namespace);
+                $attrs[$namespace] = $uri;
+            }
+        }
 
         if (isset($attrs['width']) && $attrs['width'] === '100%') {
             unset($attrs['width']);
@@ -156,17 +163,22 @@ class SVGDocumentFragment extends SVGNodeContainer
     }
 
     /**
-     * @inheritdoc
+     * Converts the given namespace string to standard form, i.e. ensuring that
+     * it either equals 'xmlns' or starts with 'xmlns:'.
+     *
+     * @param string $namespace The namespace string.
+     *
+     * @return string The modified namespace string to be added as attribute.
      */
-    public function getSerializableNamespaces(): array
+    private function serializeNamespace($namespace)
     {
-        if ($this->isRoot()) {
-            return parent::getSerializableNamespaces() + [
-                '' => 'http://www.w3.org/2000/svg',
-                'xlink' => 'http://www.w3.org/1999/xlink',
-            ];
+        if ($namespace === '' || $namespace === 'xmlns') {
+            return 'xmlns';
         }
-        return parent::getSerializableNamespaces();
+        if (substr($namespace, 0, 6) !== 'xmlns:') {
+            return 'xmlns:'.$namespace;
+        }
+        return $namespace;
     }
 
     /**
@@ -177,10 +189,10 @@ class SVGDocumentFragment extends SVGNodeContainer
      *
      * @return SVGNode|null The node with the given id if it exists.
      */
-    public function getElementById(string $id): ?SVGNode
+    public function getElementById($id)
     {
         // start with document
-        $stack = [$this];
+        $stack = array($this);
 
         while (!empty($stack)) {
             $elem = array_pop($stack);
@@ -191,7 +203,7 @@ class SVGDocumentFragment extends SVGNodeContainer
             // add children to stack (tree order traversal)
             if ($elem instanceof SVGNodeContainer) {
                 for ($i = $elem->countChildren() - 1; $i >= 0; --$i) {
-                    $stack[] = $elem->getChild($i);
+                    array_push($stack, $elem->getChild($i));
                 }
             }
         }

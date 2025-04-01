@@ -125,11 +125,15 @@ class NativeQueryUtil
         }
 
         // Handle array-type hinting (supports both classic and PHP 7+ styles)
-        if (preg_match('/^(array<([\w\\\\]+)>|([\w\\\\]+)\[\])$/i', $returnType, $matches)) {
+        if (stripos($returnType, '<') !== false && preg_match('/^(array<([\w\\\\]+)>|([\w\\\\]+)\[\])$/i', $returnType, $matches)) 
+        {
             $className = isset($matches[2]) ? $matches[2] : $matches[3];
             return $this->handleArrayReturnType($stmt, $className);
         }
-
+        else if(stripos($returnType, '[') !== false)
+        {
+            return $this->handleArrayReturnType($stmt, $returnType);
+        }
         // Handle single class-type return (e.g., MagicObject, MyClass)
         return $this->handleSingleClassReturnType($stmt, $returnType);
     }
@@ -376,7 +380,8 @@ class NativeQueryUtil
         if (!isset($params['trim']) || strtolower($params['trim']) !== 'false') {
             $lines = explode("\n", $queryString);
             foreach ($lines as $idx => $ln) {
-                $lines[$idx] = ltrim($ln, " *");
+                // Fix regex to remove spaces before * and one space after *
+                $lines[$idx] = preg_replace('/^\s*\*\s?/', '', $ln);
             }
             $queryString = implode("\n", $lines);
         }

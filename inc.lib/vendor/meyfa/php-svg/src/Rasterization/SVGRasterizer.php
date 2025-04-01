@@ -2,14 +2,8 @@
 
 namespace SVG\Rasterization;
 
-use InvalidArgumentException;
-use RuntimeException;
-use SVG\Fonts\FontRegistry;
 use SVG\Nodes\SVGNode;
-use SVG\Rasterization\Renderers\Renderer;
-use SVG\Rasterization\Transform\Transform;
 use SVG\Utilities\Units\Length;
-use SVG\Utilities\Colors\Color;
 
 /**
  * This class is the main entry point for the rasterization process.
@@ -19,87 +13,54 @@ use SVG\Utilities\Colors\Color;
  * renderer, e.g. 'ellipse' or 'polygon', which then performs the actual
  * drawing.
  * Note that renderers DO NOT correspond 1:1 to node types (e.g. there is no
- * renderer 'circle', but 'ellipse' with equal radii is used).
+ * renderer 'circle', but 'ellipse' with equal radiuses is used).
  *
  * @SuppressWarnings("coupling")
  */
 class SVGRasterizer
 {
-    /**
-     * @var Renderers\Renderer[] $renderers Map of shapes to renderers.
-     */
+    /** @var Renderers\SVGRenderer[] $renderers Map of shapes to renderers. */
     private static $renderers;
+    /** @var Path\SVGPathParser The singleton path parser. */
+    private static $pathParser;
+    /** @var Path\SVGPathApproximator The singleton path approximator. */
+    private static $pathApproximator;
 
-    private $fontRegistry;
-
+    /**
+     * @var int $docWidth  The original SVG document width, in pixels.
+     * @var int $docHeight The original SVG document height, in pixels.
+     */
+    private $docWidth, $docHeight;
     /**
      * @var float[] The document's viewBox (x, y, w, h).
      */
     private $viewBox;
-
     /**
      * @var int $width  The output image width, in pixels.
-     */
-    private int $width;
-    /**
      * @var int $height The output image height, in pixels.
      */
-    private int $height;
-
-    /**
-     * @var resource $outImage The output image as a GD resource.
-     */
+    private $width, $height;
+    /** @var resource $outImage The output image as a GD resource. */
     private $outImage;
 
-    // precomputed properties for getter methods, used often during render
-    private $docWidth;
-    private $docHeight;
-    private $diagonalScale;
-
-    private $transformStack;
-
     /**
-     * @param string|null $docWidth   The original SVG document width, as a string.
-     * @param string|null $docHeight  The original SVG document height, as a string.
-     * @param float[]|null $viewBox   The document's viewBox.
-     * @param int $width              The output image width, in pixels.
-     * @param int $height             The output image height, in pixels.
-     * @param string|null $background The background color (hex/rgb[a]/hsl[a]/...).
+     * @param string $docWidth  The original SVG document width, as a string.
+     * @param string $docHeight The original SVG document height, as a string.
+     * @param float[] $viewBox  The document's viewBox.
+     * @param int $width        The output image width, in pixels.
+     * @param int $height       The output image height, in pixels.
      */
-    public function __construct(
-        ?string $docWidth,
-        ?string $docHeight,
-        ?array $viewBox,
-        int $width,
-        int $height,
-        ?string $background = null
-    ) {
+    public function __construct($docWidth, $docHeight, $viewBox, $width, $height)
+    {
+        $this->docWidth  = $docWidth;
+        $this->docHeight = $docHeight;
+
         $this->viewBox = empty($viewBox) ? null : $viewBox;
 
         $this->width  = $width;
         $this->height = $height;
 
-        // precompute properties
-
-        $this->docWidth  = Length::convert($docWidth ?: '100%', $width);
-        $this->docHeight = Length::convert($docHeight ?: '100%', $height);
-
-        $scaleX =  $width / (!empty($viewBox) ? $viewBox[2] : $this->docWidth ?? 0);
-        $scaleY =  $height / (!empty($viewBox) ? $viewBox[3] : $this->docHeight ?? 0);
-        $this->diagonalScale = hypot($scaleX, $scaleY) / M_SQRT2;
-
-        $offsetX = !empty($viewBox) ? -($viewBox[0] * $scaleX) : 0;
-        $offsetY = !empty($viewBox) ? -($viewBox[1] * $scaleY) : 0;
-
-        // the transform stack starts out with a simple viewport transform
-        $transform = Transform::identity();
-        $transform->translate($offsetX, $offsetY);
-        $transform->scale($scaleX, $scaleY);
-        $this->transformStack = [$transform];
-
-        // create image
-
-        $this->outImage = self::createImage($width, $height, $background);
+        $this->outImage = self::createImage($width, $height);
 
         self::createDependencies();
     }
@@ -109,27 +70,19 @@ class SVGRasterizer
      *
      * The returned image supports and is filled with transparency.
      *
-     * @param int $width              The output image width, in pixels.
-     * @param int $height             The output image height, in pixels.
-     * @param string|null $background The background color (hex/rgb[a]/hsl[a]/...).
+     * @param int $width  The output image width, in pixels.
+     * @param int $height The output image height, in pixels.
      *
      * @return resource The created GD image resource.
      */
-    private static function createImage(int $width, int $height, ?string $background)
+    private static function createImage($width, $height)
     {
         $img = imagecreatetruecolor($width, $height);
 
         imagealphablending($img, true);
         imagesavealpha($img, true);
 
-        $bgRgb = 0x7F000000;
-        if (!empty($background)) {
-            $bgColor = Color::parse($background);
-
-            $alpha = 127 - (int) ($bgColor[3] * 127 / 255);
-            $bgRgb = ($alpha << 24) + ($bgColor[0] << 16) + ($bgColor[1] << 8) + ($bgColor[2]);
-        }
-        imagefill($img, 0, 0, $bgRgb);
+        imagefill($img, 0, 0, 0x7F000000);
 
         return $img;
     }
@@ -142,21 +95,23 @@ class SVGRasterizer
      *
      * @return void
      */
-    private static function createDependencies(): void
+    private static function createDependencies()
     {
         if (isset(self::$renderers)) {
             return;
         }
 
-        self::$renderers = [
-            'rect'      => new Renderers\RectRenderer(),
-            'line'      => new Renderers\LineRenderer(),
-            'ellipse'   => new Renderers\EllipseRenderer(),
-            'polygon'   => new Renderers\PolygonRenderer(),
-            'path'      => new Renderers\PathRenderer(),
-            'image'     => new Renderers\ImageRenderer(),
-            'text'      => new Renderers\TextRenderer(),
-        ];
+        self::$renderers = array(
+            'rect'      => new Renderers\SVGRectRenderer(),
+            'line'      => new Renderers\SVGLineRenderer(),
+            'ellipse'   => new Renderers\SVGEllipseRenderer(),
+            'polygon'   => new Renderers\SVGPolygonRenderer(),
+            'image'     => new Renderers\SVGImageRenderer(),
+            'text'      => new Renderers\SVGTextRenderer(),
+        );
+
+        self::$pathParser       = new Path\SVGPathParser();
+        self::$pathApproximator = new Path\SVGPathApproximator();
     }
 
     /**
@@ -164,25 +119,34 @@ class SVGRasterizer
      *
      * @param string $id The id of a registered renderer instance.
      *
-     * @return Renderer The requested renderer.
-     * @throws InvalidArgumentException If no such renderer exists.
+     * @return Renderers\SVGRenderer The requested renderer.
+     * @throws \InvalidArgumentException If no such renderer exists.
      */
-    private static function getRenderer(string $id): Renderer
+    private static function getRenderer($id)
     {
         if (!isset(self::$renderers[$id])) {
-            throw new InvalidArgumentException('no such renderer: ' . $id);
+            throw new \InvalidArgumentException("no such renderer: ".$id);
         }
         return self::$renderers[$id];
     }
 
-    public function setFontRegistry(FontRegistry $fontRegistry): void
+    /**
+     * @return Path\SVGPathParser The path parser used by this instance.
+     */
+    // implementation note: although $pathParser is static, this method isn't,
+    // to encourage access via passed instances (better for testing etc)
+    public function getPathParser()
     {
-        $this->fontRegistry = $fontRegistry;
+        return self::$pathParser;
     }
 
-    public function getFontRegistry(): ?FontRegistry
+    /**
+     * @return Path\SVGPathApproximator The approximator used by this instance.
+     */
+    // implementation note: (see 'getPathParser()')
+    public function getPathApproximator()
     {
-        return $this->fontRegistry;
+        return self::$pathApproximator;
     }
 
     /**
@@ -193,60 +157,38 @@ class SVGRasterizer
      * stroke/fill attributes etc.
      *
      * @param string  $rendererId The id of the renderer to use.
-     * @param array $params       An array of options to pass to the renderer.
+     * @param mixed[] $params     An array of options to pass to the renderer.
      * @param SVGNode $context    The SVGNode that serves as drawing context.
      *
-     * @return void
-     *
-     * @throws InvalidArgumentException If no such renderer exists.
+     * @return mixed Whatever the renderer returned (in most cases void).
+     * @throws \InvalidArgumentException If no such renderer exists.
      */
-    public function render(string $rendererId, array $params, SVGNode $context): void
+    public function render($rendererId, array $params, SVGNode $context)
     {
         $renderer = self::getRenderer($rendererId);
-        $renderer->render($this, $params, $context);
+        return $renderer->render($this, $params, $context);
     }
 
     /**
-     * @return float|null The original SVG document width, in pixels.
+     * @return float The original SVG document width, in pixels.
      */
-    public function getDocumentWidth(): ?float
+    public function getDocumentWidth()
     {
-        return $this->docWidth;
+        return Length::convert($this->docWidth ?: '100%', $this->width);
     }
 
     /**
-     * @return float|null The original SVG document height, in pixels.
+     * @return float The original SVG document height, in pixels.
      */
-    public function getDocumentHeight(): ?float
+    public function getDocumentHeight()
     {
-        return $this->docHeight;
-    }
-
-    /**
-     * Obtain the normalized diagonal of the SVG viewport. The normalized diagonal is to be used as the reference size
-     * for percentages that don't strictly refer to the horizontal or vertical axis. Examples of such values are
-     * a circle's radius attribute or the stroke-width.
-     *
-     * This is computed by the formula <code>hypot(documentWidth, documentHeight)/sqrt(2)</code>.
-     *
-     * @return float The normalized diagonal length.
-     */
-    public function getNormalizedDiagonal(): float
-    {
-        // https://svgwg.org/svg2-draft/coords.html#Units
-
-        // For any other length value expressed as a percentage of the SVG viewport, the percentage must be calculated
-        // as a percentage of the normalized diagonal of the ‘viewBox’ applied to that viewport. If no ‘viewBox’ is
-        // specified, then the normalized diagonal of the SVG viewport must be used. The normalized diagonal length must
-        // be calculated with sqrt((width)**2 + (height)**2)/sqrt(2).
-
-        return hypot($this->docWidth ?? 0, $this->docHeight ?? 0) / M_SQRT2;
+        return Length::convert($this->docHeight ?: '100%', $this->height);
     }
 
     /**
      * @return int The output image width, in pixels.
      */
-    public function getWidth(): int
+    public function getWidth()
     {
         return $this->width;
     }
@@ -254,72 +196,66 @@ class SVGRasterizer
     /**
      * @return int The output image height, in pixels.
      */
-    public function getHeight(): int
+    public function getHeight()
     {
         return $this->height;
     }
 
     /**
-     * Determine the normalized diagonal scaling factor. This is the factor that should be used when scaling percentages
-     * for properties that are not strictly horizontal or strictly vertical, such as stroke-width.
-     *
-     * @return float The scaling factor of the view diagonal.
+     * @return float The factor by which the output is scaled on the x axis.
      */
-    public function getDiagonalScale(): float
+    public function getScaleX()
     {
-        return $this->diagonalScale;
+        if (!empty($this->viewBox)) {
+            return $this->width / $this->viewBox[2];
+        }
+        return $this->width / $this->getDocumentWidth();
+    }
+
+    /**
+     * @return float The factor by which the output is scaled on the y axis.
+     */
+    public function getScaleY()
+    {
+        if (!empty($this->viewBox)) {
+            return $this->height / $this->viewBox[3];
+        }
+
+        return $this->height / $this->getDocumentHeight();
+    }
+
+    /**
+     * @return float The amount by which renderers must offset their drawings
+     *               on the x-axis (not to be scaled).
+     */
+    public function getOffsetX()
+    {
+        if (!empty($this->viewBox)) {
+            $scale = $this->getScaleX();
+            return -($this->viewBox[0] * $scale);
+        }
+        return 0;
+    }
+
+    /**
+     * @return float The amount by which renderers must offset their drawings
+     *               on the y-axis (not to be scaled).
+     */
+    public function getOffsetY()
+    {
+        if (!empty($this->viewBox)) {
+            $scale = $this->getScaleY();
+            return -($this->viewBox[1] * $scale);
+        }
+        return 0;
     }
 
     /**
      * @return float[]|null The document's viewBox.
      */
-    public function getViewBox(): ?array
+    public function getViewBox()
     {
         return $this->viewBox;
-    }
-
-    /**
-     * Obtain a Transform object from userspace coordinates into output image coordinates.
-     *
-     * This will NOT create a copy, so mutating the returned object is unsafe (= might affect later code in unexpected
-     * ways). Instead, perform a call to <code>pushTransform()</code> and mutate the return value of that. Then, when
-     * done using the changed transform, call <code>popTransform()</code> to revert back to the previous state.
-     *
-     * @return Transform The created transform.
-     */
-    public function getCurrentTransform(): Transform
-    {
-        return $this->transformStack[count($this->transformStack) - 1];
-    }
-
-    /**
-     * Create a copy of the current transform and push it onto the transform stack, so that it becomes the new
-     * current transform. The copied transform is then returned and can be manipulated. When done rendering with this
-     * mutated transform, call <code>popTransform()</code> to revert back to the previous transform.
-     *
-     * @return Transform The copy of the current transform, ready to have operations appended to it.
-     */
-    public function pushTransform(): Transform
-    {
-        $nextTransform = clone $this->transformStack[count($this->transformStack) - 1];
-        $this->transformStack[] = $nextTransform;
-        return $nextTransform;
-    }
-
-    /**
-     * Revert back to the previous transform, by removing the last transform that was pushed via
-     * <code>pushTransform()</code>. There must be a matching call to <code>popTransform</code> for every call to
-     * <code>pushTransform()</code>. Popping a transform when no pushed transform remains is an error.
-     *
-     * @return void
-     * @throws RuntimeException If trying to pop a transform but the stack contains only the initial transform.
-     */
-    public function popTransform(): void
-    {
-        if (count($this->transformStack) <= 1) {
-            throw new RuntimeException('popTransform() called with no transform on the stack!');
-        }
-        array_pop($this->transformStack);
     }
 
     /**

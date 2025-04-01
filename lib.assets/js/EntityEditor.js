@@ -779,16 +779,16 @@ class EntityEditor {
         let _this = this;
         entityRenderer.svg.addEventListener('click', function(e) {
             if (e.target.closest('.erd-svg .move-down-icon')) {
-                _this.moveEntityUp(parseInt(e.target.getAttribute('data-index')))
+                _this.moveEntityUp(parseInt(e.target.dataset.index))
             }
             if (e.target.closest('.erd-svg .move-up-icon')) {
-                _this.moveEntityDown(parseInt(e.target.getAttribute('data-index')))
+                _this.moveEntityDown(parseInt(e.target.dataset.index))
             }
             if (e.target.closest('.erd-svg .edit-icon')) {
-                _this.editEntity(parseInt(e.target.getAttribute('data-index')))
+                _this.editEntity(parseInt(e.target.dataset.index))
             }
             if (e.target.closest('.erd-svg .delete-icon')) {
-                _this.deleteEntity(parseInt(e.target.getAttribute('data-index')))
+                _this.deleteEntity(parseInt(e.target.dataset.index))
             }
         });
     }
@@ -958,7 +958,7 @@ class EntityEditor {
         diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
             let id = diagram.getAttribute('id');
             let updatedWidth = diagram.closest('.left-panel').offsetWidth;
-            let dataEntities = diagram.getAttribute('data-entities') || '';
+            let dataEntities = diagram.dataset.entities || '';
             let entities = dataEntities.split(',');
             let data = [];
             entities.forEach((entityName) => {
@@ -1268,7 +1268,7 @@ class EntityEditor {
         let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
         diagrams.forEach((diagram) => {
             let id = diagram.getAttribute('id');
-            let entities = diagram.getAttribute('data-entities');
+            let entities = diagram.dataset.entities;
             diagramEntities[id] = entities ? entities.split(',') : [];
         });
         return diagramEntities;
@@ -1290,10 +1290,10 @@ class EntityEditor {
         let diagram = document.querySelector('.diagram-entity.tab-content.active');
         if(diagram)
         {
-            let entities = diagram.getAttribute('data-entities');
+            let entities = diagram.dataset.entities;
             let checked = entities ? entities.split(',') : [];
             document.querySelectorAll('.left-panel .table-list [type="checkbox"]').forEach((input) => {
-                input.checked = checked.includes(input.getAttribute('data-name'));
+                input.checked = checked.includes(input.dataset.name);
                 input.disabled = false;
             });
         }
@@ -1322,7 +1322,7 @@ class EntityEditor {
         
         if (selectedEntities) {
             selectedEntities.forEach(checkbox => {
-                selectedEntity.push(checkbox.getAttribute('data-name'));
+                selectedEntity.push(checkbox.dataset.name);
             });
         }
 
@@ -1355,10 +1355,10 @@ class EntityEditor {
             tabelListMain.appendChild(entityCbMain);
 
             entityCbMain.querySelector('a.edit-table').addEventListener('click', function(e){
-                editor.editEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+                editor.editEntity(parseInt(e.target.parentNode.dataset.index))
             });
             entityCbMain.querySelector('a.delete-table').addEventListener('click', function(e){
-                editor.deleteEntity(parseInt(e.target.parentNode.getAttribute('data-index')))
+                editor.deleteEntity(parseInt(e.target.parentNode.dataset.index))
             });
 
 
@@ -1454,18 +1454,18 @@ class EntityEditor {
         li.classList.add('active');
 
         // Get the selected diagram ID and activate the corresponding diagram
-        let selector = li.getAttribute('data-id');
+        let selector = li.dataset.id;
         let diagram = diagramContainer.querySelector('#' + selector);
         diagram.classList.add('active');
 
         // Retrieve associated entities for the selected diagram
-        let dataEntity = diagram.getAttribute('data-entities') || '';
+        let dataEntity = diagram.dataset.entities || '';
         let entities = dataEntity.split(',');
 
         // Update entity checkboxes based on selected diagram's entities
         document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
             let input = li2.querySelector('input[type="checkbox"]');
-            let value = input.getAttribute('data-name');
+            let value = input.dataset.name;
 
             if (entities.length > 0 && value !== '') {
                 input.checked = entities.includes(value);
@@ -1593,7 +1593,7 @@ class EntityEditor {
             _this.showConfirmationDialog(`<p>Are you sure you want to delete the diagram &quot;${diagramName}&quot;?</p>`, 'Delete Confirmation', 'Yes', 'No', function(isConfirmed) {
                 if (isConfirmed) {
                     let li = e.target.closest('li');
-                    let selector = '#'+li.getAttribute('data-id');
+                    let selector = '#'+li.dataset.id;
                     let ul = li.closest('ul');
                     li.parentNode.removeChild(li);
                     let diagram = diagramContainer.querySelector(selector);
@@ -1693,28 +1693,28 @@ class EntityEditor {
     {
         let _this = this;
         if (e.target.closest('.erd-svg .move-down-icon')) {
-            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
-            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let haystack = e.target.closest('.diagram-entity').dataset.entities;
+            let needle = e.target.closest('.svg-entity').dataset.entity;
             let newEntities = _this.arrayElementOperation(haystack, needle, 1);
             e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
             _this.updateDiagram();
             _this.saveDiagram();
         }
         if (e.target.closest('.erd-svg .move-up-icon')) {
-            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
-            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let haystack = e.target.closest('.diagram-entity').dataset.entities;
+            let needle = e.target.closest('.svg-entity').dataset.entity;
             let newEntities = _this.arrayElementOperation(haystack, needle, -1);
             e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
             _this.updateDiagram();
             _this.saveDiagram();
         }
         if (e.target.closest('.erd-svg .edit-icon')) {
-            let index = parseInt(e.target.getAttribute('data-index'));
+            let index = parseInt(e.target.dataset.index);
             _this.editEntity(index);
         }
         if (e.target.closest('.erd-svg .delete-icon')) {
-            let haystack = e.target.closest('.diagram-entity').getAttribute('data-entities');
-            let needle = e.target.closest('.svg-entity').getAttribute('data-entity');
+            let haystack = e.target.closest('.diagram-entity').dataset.entities;
+            let needle = e.target.closest('.svg-entity').dataset.entity;
             let newEntities = _this.removeUniqueElements(haystack.split(','), needle).join(',');
             document.querySelector(`.selected-entity[data-name="${needle}"]`).checked = false;
             e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);

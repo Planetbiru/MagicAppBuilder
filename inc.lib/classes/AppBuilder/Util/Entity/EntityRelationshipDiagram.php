@@ -683,7 +683,7 @@ class EntityRelationshipDiagram //NOSONAR
         $doc->setAttribute('height', $height2);
         $doc->setAttribute('viewBox', "0 0 $width $height");
         
-        return $image->__toString();
+        return (string) $image;
     }
     
     /**

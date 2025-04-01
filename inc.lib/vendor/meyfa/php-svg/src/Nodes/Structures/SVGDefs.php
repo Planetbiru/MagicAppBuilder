@@ -10,7 +10,7 @@ use SVG\Rasterization\SVGRasterizer;
  */
 class SVGDefs extends SVGNodeContainer
 {
-    public const TAG_NAME = 'defs';
+    const TAG_NAME = 'defs';
 
     public function __construct()
     {
@@ -18,9 +18,11 @@ class SVGDefs extends SVGNodeContainer
     }
 
     /**
-     * @inheritdoc
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
+     * @param SVGRasterizer $rasterizer
      */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         // Nothing to rasterize.
     }

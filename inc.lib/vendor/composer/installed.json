@@ -2,33 +2,28 @@
     "packages": [
         {
             "name": "meyfa/php-svg",
-            "version": "v0.16.1",
-            "version_normalized": "0.16.1.0",
+            "version": "v0.9.0",
+            "version_normalized": "0.9.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/meyfa/php-svg.git",
-                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c"
+                "reference": "1680eca33c0e107439969650904ab08ecfe83603"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
-                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
+                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/1680eca33c0e107439969650904ab08ecfe83603",
+                "reference": "1680eca33c0e107439969650904ab08ecfe83603",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.4.0"
+                "ext-gd": "*",
+                "php": ">=5.3.3"
             },
             "require-dev": {
-                "meyfa/phpunit-assert-gd": "^v3.0.0",
-                "phpmd/phpmd": "^2.15.0",
-                "phpunit/phpunit": "^9.6.16",
-                "rector/rector": "^1.0"
+                "meyfa/phpunit-assert-gd": "^1.1",
+                "phpunit/phpunit": "^4.8"
             },
-            "suggest": {
-                "ext-gd": "Needed to rasterize images",
-                "ext-simplexml": "Needed to read SVG strings and files"
-            },
-            "time": "2025-03-10T22:28:37+00:00",
+            "time": "2018-07-25T10:30:00+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -43,7 +38,7 @@
             "authors": [
                 {
                     "name": "Fabian Meyer",
-                    "homepage": "https://meyfa.net"
+                    "homepage": "http://meyfa.net"
                 }
             ],
             "description": "Read, edit, write, and render SVG files with PHP",
@@ -53,30 +48,30 @@
             ],
             "support": {
                 "issues": "https://github.com/meyfa/php-svg/issues",
-                "source": "https://github.com/meyfa/php-svg/tree/v0.16.1"
+                "source": "https://github.com/meyfa/php-svg/tree/master"
             },
             "install-path": "../meyfa/php-svg"
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "3.8.2",
-            "version_normalized": "3.8.2.0",
+            "version": "3.8.4",
+            "version_normalized": "3.8.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "77aca617b85e938178b5b2ede97775353fb1c8e5"
+                "reference": "bc962d535582d2c0e219b11608dcf21a7ce62880"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/77aca617b85e938178b5b2ede97775353fb1c8e5",
-                "reference": "77aca617b85e938178b5b2ede97775353fb1c8e5",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/bc962d535582d2c0e219b11608dcf21a7ce62880",
+                "reference": "bc962d535582d2c0e219b11608dcf21a7ce62880",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "planetbiru/magic-object": "^3.8"
             },
-            "time": "2025-03-27T14:56:53+00:00",
+            "time": "2025-03-30T08:44:35+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -96,29 +91,29 @@
             "description": "MagicApp",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/3.8.2"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/3.8.4"
             },
             "install-path": "../planetbiru/magic-app"
         },
         {
             "name": "planetbiru/magic-object",
-            "version": "3.8.1",
-            "version_normalized": "3.8.1.0",
+            "version": "3.8.2",
+            "version_normalized": "3.8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "6206080a8858a3b9bc3270077dd4de9de7ad48fc"
+                "reference": "ac19ad0164ff6d6f635fce073b29b8ffc8979b1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/6206080a8858a3b9bc3270077dd4de9de7ad48fc",
-                "reference": "6206080a8858a3b9bc3270077dd4de9de7ad48fc",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/ac19ad0164ff6d6f635fce073b29b8ffc8979b1c",
+                "reference": "ac19ad0164ff6d6f635fce073b29b8ffc8979b1c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
-            "time": "2025-03-27T13:45:08+00:00",
+            "time": "2025-03-30T08:40:15+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -138,7 +133,7 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/3.8.1"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/3.8.2"
             },
             "install-path": "../planetbiru/magic-object"
         }

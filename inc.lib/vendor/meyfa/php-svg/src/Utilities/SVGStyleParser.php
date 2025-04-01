@@ -2,8 +2,6 @@
 
 namespace SVG\Utilities;
 
-use SVG\Shims\Str;
-
 /**
  * This is a utility class used to parse CSS rules.
  */
@@ -16,9 +14,9 @@ abstract class SVGStyleParser
      *
      * @return string[] An associative array of all declarations.
      */
-    public static function parseStyles(string $string): array
+    public static function parseStyles($string)
     {
-        $styles = [];
+        $styles = array();
         if (empty($string)) {
             return $styles;
         }
@@ -26,7 +24,7 @@ abstract class SVGStyleParser
         $declarations = preg_split('/\s*;\s*/', $string);
 
         foreach ($declarations as $declaration) {
-            $declaration = Str::trim($declaration);
+            $declaration = trim($declaration);
             if ($declaration === '') {
                 continue;
             }
@@ -47,21 +45,19 @@ abstract class SVGStyleParser
      *
      * @return string[][] A 2D associative array with style declarations.
      */
-    public static function parseCss(string $css): array
+    public static function parseCss($css)
     {
-        $result = [];
+        $result = array();
         preg_match_all('/(?ims)([a-z0-9\s\,\.\:#_\-@^*()\[\]\"\'=]+)\{([^\}]*)\}/', $css, $arr);
 
         foreach ($arr[0] as $i => $x) {
-            $selectors = array_map(function (string $selector) {
-                return Str::trim($selector);
-            }, explode(',', Str::trim($arr[1][$i])));
-            if (in_array($selectors[0], ['@font-face', '@keyframes', '@media'])) {
+            $selectors = explode(',', trim($arr[1][$i]));
+            if (in_array($selectors[0], array('@font-face', '@keyframes', '@media'))) {
                 continue;
             }
-            $rules = self::parseStyles(Str::trim($arr[2][$i]));
+            $rules = self::parseStyles(trim($arr[2][$i]));
             foreach ($selectors as $selector) {
-                $result[$selector] = array_merge($result[$selector] ?? [], $rules);
+                $result[trim($selector)] = $rules;
             }
         }
 

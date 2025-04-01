@@ -4,8 +4,6 @@ namespace SVG\Nodes;
 
 use SVG\Nodes\Structures\SVGStyle;
 use SVG\Rasterization\SVGRasterizer;
-use SVG\Rasterization\Transform\TransformParser;
-use SVG\Shims\Str;
 use SVG\Utilities\SVGStyleParser;
 
 /**
@@ -13,22 +11,20 @@ use SVG\Utilities\SVGStyleParser;
  */
 abstract class SVGNodeContainer extends SVGNode
 {
-    /**
-     * @var SVGNode[] $children This node's child nodes.
-     */
-    protected array $children;
+    /** @var SVGNode[] $children This node's child nodes. */
+    protected $children;
 
     /**
      * @var string[] $globalStyles A 2D array mapping CSS selectors to values.
      */
-    protected array $containerStyles;
+    protected $containerStyles;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->containerStyles = [];
-        $this->children = [];
+        $this->containerStyles = array();
+        $this->children = array();
     }
 
     /**
@@ -36,12 +32,12 @@ abstract class SVGNodeContainer extends SVGNode
      * at the end of the child list.
      * Does nothing if the node already exists in this container.
      *
-     * @param SVGNode  $node  The node to add to this container's children.
-     * @param int|null $index The position to insert at (optional).
+     * @param SVGNode $node  The node to add to this container's children.
+     * @param int     $index The position to insert at (optional).
      *
      * @return $this This node instance, for call chaining.
      */
-    public function addChild(SVGNode $node, ?int $index = null): SVGNodeContainer
+    public function addChild(SVGNode $node, $index = null)
     {
         if ($node === $this || $node->parent === $this) {
             return $this;
@@ -51,10 +47,10 @@ abstract class SVGNodeContainer extends SVGNode
             $node->parent->removeChild($node);
         }
 
-        $index ??= count($this->children);
+        $index = ($index !== null) ? $index : count($this->children);
 
         // insert and set new parent
-        array_splice($this->children, $index, 0, [$node]);
+        array_splice($this->children, $index, 0, array($node));
         $node->parent = $this;
 
         if ($node instanceof SVGStyle) {
@@ -73,7 +69,7 @@ abstract class SVGNodeContainer extends SVGNode
      *
      * @return $this This node instance, for call chaining.
      */
-    public function removeChild($child): SVGNodeContainer
+    public function removeChild($child)
     {
         $index = $this->resolveChildIndex($child);
         if ($index === false) {
@@ -96,7 +92,7 @@ abstract class SVGNodeContainer extends SVGNode
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setChild($child, SVGNode $node): SVGNodeContainer
+    public function setChild($child, SVGNode $node)
     {
         $index = $this->resolveChildIndex($child);
         if ($index === false) {
@@ -131,16 +127,15 @@ abstract class SVGNodeContainer extends SVGNode
     /**
      * @return int The amount of children in this container.
      */
-    public function countChildren(): int
+    public function countChildren()
     {
         return count($this->children);
     }
 
     /**
-     * @param int $index The index of the child to get.
      * @return SVGNode The child node at the given index.
      */
-    public function getChild(int $index): SVGNode
+    public function getChild($index)
     {
         return $this->children[$index];
     }
@@ -152,18 +147,16 @@ abstract class SVGNodeContainer extends SVGNode
      *
      * @return $this This node instance, for call chaining.
      */
-    public function addContainerStyle(SVGStyle $styleNode): SVGNodeContainer
+    public function addContainerStyle(SVGStyle $styleNode)
     {
-        $newStyles = SVGStyleParser::parseCss($styleNode->getValue());
+        $newStyles = SVGStyleParser::parseCss($styleNode->getCss());
         $this->containerStyles = array_merge($this->containerStyles, $newStyles);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rasterize(SVGRasterizer $rasterizer): void
+
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         if ($this->getComputedStyle('display') === 'none') {
             return;
@@ -171,13 +164,9 @@ abstract class SVGNodeContainer extends SVGNode
 
         // 'visibility' can be overridden -> only applied in shape nodes.
 
-        TransformParser::parseTransformString($this->getAttribute('transform'), $rasterizer->pushTransform());
-
         foreach ($this->children as $child) {
             $child->rasterize($rasterizer);
         }
-
-        $rasterizer->popTransform();
     }
 
     /**
@@ -188,7 +177,7 @@ abstract class SVGNodeContainer extends SVGNode
      *
      * @return string[] The style rules to be applied.
      */
-    public function getContainerStyleForNode(SVGNode $node): array
+    public function getContainerStyleForNode(SVGNode $node)
     {
         $pattern = $node->getIdAndClassPattern();
 
@@ -198,17 +187,17 @@ abstract class SVGNodeContainer extends SVGNode
     /**
      * Returns style rules for the given node id + class pattern.
      *
-     * @param string|null $pattern The node's pattern.
+     * @param string $pattern The node's pattern.
      *
      * @return string[] The style rules to be applied.
      */
-    public function getContainerStyleByPattern(?string $pattern): array
+    public function getContainerStyleByPattern($pattern)
     {
         if ($pattern === null) {
-            return [];
+            return array();
         }
 
-        $nodeStyles = [];
+        $nodeStyles = array();
         if (!empty($this->parent)) {
             $nodeStyles = $this->parent->getContainerStyleByPattern($pattern);
         }
@@ -229,15 +218,12 @@ abstract class SVGNodeContainer extends SVGNode
      *
      * @return string[] The matches array
      */
-    private function pregGrepStyle(string $pattern): array
+    private function pregGrepStyle($pattern)
     {
         return preg_grep($pattern, array_keys($this->containerStyles));
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getElementsByTagName(string $tagName, array &$result = []): array
+    public function getElementsByTagName($tagName, array &$result = array())
     {
         foreach ($this->children as $child) {
             if ($tagName === '*' || $child->getName() === $tagName) {
@@ -249,13 +235,10 @@ abstract class SVGNodeContainer extends SVGNode
         return $result;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getElementsByClassName($className, array &$result = []): array
+    public function getElementsByClassName($className, array &$result = array())
     {
         if (!is_array($className)) {
-            $className = preg_split('/\s+/', Str::trim($className));
+            $className = preg_split('/\s+/', trim($className));
         }
         // shortcut if empty
         if (empty($className) || $className[0] === '') {
@@ -263,10 +246,10 @@ abstract class SVGNodeContainer extends SVGNode
         }
 
         foreach ($this->children as $child) {
-            $class = ' ' . $child->getAttribute('class') . ' ';
+            $class = ' '.$child->getAttribute('class').' ';
             $allMatch = true;
             foreach ($className as $cn) {
-                if (strpos($class, ' ' . $cn . ' ') === false) {
+                if (strpos($class, ' '.$cn.' ') === false) {
                     $allMatch = false;
                     break;
                 }
