@@ -176,6 +176,24 @@ class EntityAdmin extends MagicObject
 	 * @var string
 	 */
 	protected $lastResetPassword;
+	
+	/**
+	 * Git Profile ID
+	 * 
+	 * @Column(name="git_profile_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Git Profile ID")
+	 * @var string
+	 */
+	protected $gitProfileId;
+	
+	/**
+	 * Git Profile
+	 * 
+	 * @JoinColumn(name="git_profile_id", referenceColumnName="git_profile_id")
+	 * @Label(content="Git Profile")
+	 * @var EntityGitProfileMin
+	 */
+	protected $gitProfile;
 
 	/**
 	 * Bloked

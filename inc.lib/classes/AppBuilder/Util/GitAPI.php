@@ -161,6 +161,23 @@ class GitAPI
         exec("cd {$repoPath} && git checkout {$branchName}", $output, $resultCode);
         return $output; // Return the output of the 'git checkout' command
     }
+    
+    /**
+     * Get the current branch of the repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @return string The name of the current branch
+     */
+    public function getCurrentBranch($repoPath)
+    {
+        exec("cd {$repoPath} && git rev-parse --abbrev-ref HEAD", $output, $resultCode);
+        
+        if ($resultCode === 0) {
+            return trim($output[0]); // Return the current branch name
+        } else {
+            throw new PlatformException("Failed to get current branch.");
+        }
+    }
 
     /**
      * Get repository information from either GitHub, GitLab, or Bitbucket.

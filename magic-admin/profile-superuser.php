@@ -17,7 +17,9 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\Admin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
-
+use MagicAdmin\Entity\Data\GitProfileMin;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -87,6 +89,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setGitProfileId($inputPost->getGitProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
@@ -200,6 +203,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td>
 							<input class="form-control" type="tel" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getGitProfile();?></td>
+						<td>
+							<select class="form-control" name="git_profile_id" id="git_profile_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new GitProfileMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false))
+									->addAnd(new PicoPredicate(Field::of()->adminId, $admin->getAdminId())), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->gitProfileId, Field::of()->name, $admin->getGitProfileId())
+								; ?>
+							</select>
 						</td>
 					</tr>
 				</tbody>
@@ -339,6 +360,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td><?php echo $admin->getPhone();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getGitProfile();?></td>
+						<td><?php echo $admin->issetGitProfile() ? $admin->getGitProfile()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getApplication();?></td>

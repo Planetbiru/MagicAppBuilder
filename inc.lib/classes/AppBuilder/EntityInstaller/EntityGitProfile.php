@@ -5,9 +5,9 @@ namespace AppBuilder\EntityInstaller;
 use MagicObject\MagicObject;
 
 /**
- * The EntityApplication class represents an entity in the "application" table.
+ * The EntityGitProfile class represents an entity in the "module" table.
  *
- * This entity maps to the "application" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -17,112 +17,84 @@ use MagicObject\MagicObject;
  * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="application")
+ * @Table(name="git_profile")
  */
-class EntityApplication extends MagicObject
+class EntityGitProfile extends MagicObject
 {
 	/**
-	 * Application ID
+	 * Git Profile ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=false)
-	 * @Label(content="Application ID")
+	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Git Profile ID")
 	 * @var string
 	 */
-	protected $applicationId;
+	protected $gitProfileId;
 
 	/**
-	 * Workspace ID
+	 * Admin ID
 	 * 
-	 * @Column(name="workspace_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Workspace ID")
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $workspaceId;
+	protected $adminId;
 
 	/**
-	 * Workspace
+	 * Admin
 	 * 
-	 * @JoinColumn(name="workspace_id", referenceColumnName="workspace_id")
-	 * @Label(content="Workspace")
-	 * @var EntityWorkspace
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
+	 * @var EntityAdmin
 	 */
-	protected $workspace;
-
-	/**
-	 * Architecture
-	 * 
-	 * @Column(name="architecture", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Architecture")
-	 * @var string
-	 */
-	protected $architecture;
+	protected $admin;
 
 	/**
 	 * Name
 	 * 
-	 * @Column(name="name", type="varchar(255)", length=255, nullable=true)
+	 * @Column(name="name", type="text", nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
 	protected $name;
-
-	/**
-	 * Description
+    
+    /**
+	 * Platform
 	 * 
-	 * @Column(name="description", type="text", nullable=true)
-	 * @Label(content="Description")
+	 * @Column(name="platform", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Platform")
 	 * @var string
 	 */
-	protected $description;
-
-	/**
-	 * Project Directory
+	protected $platform;
+    
+    /**
+	 * Token
 	 * 
-	 * @Column(name="project_directory", type="text", nullable=true)
-	 * @Label(content="Project Directory")
+	 * @Column(name="token", type="text", nullable=true)
+	 * @Label(content="Token")
 	 * @var string
 	 */
-	protected $projectDirectory;
-
-	/**
-	 * Base Application Directory
+	protected $token;
+    
+    /**
+	 * Username
 	 * 
-	 * @Column(name="base_application_directory", type="text", nullable=true)
-	 * @Label(content="Base Application Directory")
+	 * @Column(name="username", type="text", nullable=true)
+	 * @Label(content="Username")
 	 * @var string
 	 */
-	protected $baseApplicationDirectory;
+	protected $username;
 	
 	/**
-	 * Git Remote URL
+	 * Website
 	 * 
-	 * @Column(name="git_remote_url", type="text", nullable=true)
-	 * @Label(content="Git Remote URL")
+	 * @Column(name="website", type="text", nullable=true)
+	 * @Label(content="Website")
 	 * @var string
 	 */
-	protected $gitRemoteUrl;
-
-	/**
-	 * Author
-	 * 
-	 * @Column(name="author", type="varchar(100)", length=100, nullable=true)
-	 * @Label(content="Author")
-	 * @var string
-	 */
-	protected $author;
-	
-	/**
-	 * Sort Order
-	 * 
-	 * @Column(name="sort_order", type="int(11)", length=11, defaultValue="NULL", nullable=true)
-	 * @DefaultColumn(value="NULL")
-	 * @Label(content="Sort Order")
-	 * @var int
-	 */
-	protected $sortOrder;
+	protected $website;
 
 	/**
 	 * Time Create
@@ -177,7 +149,7 @@ class EntityApplication extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
-
+	
 	/**
 	 * Active
 	 * 
