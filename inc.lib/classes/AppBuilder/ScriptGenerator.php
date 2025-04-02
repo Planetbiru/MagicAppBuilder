@@ -489,6 +489,8 @@ class ScriptGenerator //NOSONAR
         $guiDetail = null;
         $guiList = null;
         $export = null;
+        $activationSection = null;
+        $deactivationSection = null;
 
         // prepare CRUD section begin
         if($approvalRequired) {
@@ -498,9 +500,11 @@ class ScriptGenerator //NOSONAR
             // CRUD
             $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval, $callbackCreateSuccess, $callbackCreateFailed);
             $updateSection = $appBuilder->createUpdateApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval, $callbackUpdateSuccess, $callbackUpdateFailed);
-            
-            $activationSection = $appBuilder->createActivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
-            $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);     
+            if($appFeatures->isActivateDeactivate())
+            {
+                $activationSection = $appBuilder->createActivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+                $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);  
+            }   
             $deleteSection = $appBuilder->createDeleteApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
             $approvalSection = $appBuilder->createApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval, $trashRequired, $entityTrash);
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
@@ -527,8 +531,11 @@ class ScriptGenerator //NOSONAR
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
             $updateSection = $appBuilder->createUpdateSection($entityMain, $editFields, $callbackUpdateSuccess, $callbackUpdateFailed);
             
-            $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
-            $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);           
+            if($appFeatures->isActivateDeactivate())
+            {
+                $activationSection = $appBuilder->createActivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+                $deactivationSection = $appBuilder->createDeactivationSection($entityMain, $activationKey, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);     
+            }      
             $deleteSection = $this->createDeleteWithoutApproval($appBuilder, $entityMain, $trashRequired, $entityTrash, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
 
             $approvalSection = "";
