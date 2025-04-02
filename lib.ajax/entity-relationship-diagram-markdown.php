@@ -11,7 +11,7 @@ $inputGet = new InputGet();
 /**
  * Send document to output buffer
  *
- * @param string $document
+ * @param string $document Document to sent
  * @return void
  */
 function sendDocument($document)

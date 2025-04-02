@@ -64,8 +64,7 @@ try
                 if($returnVar == 0)
                 {
                     include_once $path;   
-                    $entity = new $className(null);
-                    
+                    $entity = new $className(null);              
                     $entityRelationshipDiagram->addEntity($entity);
                 }
             }
@@ -74,7 +73,9 @@ try
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
-        echo $entityRelationshipDiagram;
+        $buffer = (string) $entityRelationshipDiagram;
+        header('Content-Length: '.strlen($buffer));
+        echo $buffer;
     }
     else
     {
