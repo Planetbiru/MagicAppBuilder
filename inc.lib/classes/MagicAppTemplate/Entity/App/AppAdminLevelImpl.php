@@ -51,7 +51,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="sort_order", type="int(11)", length=1, default_value="0", nullable=true)
 	 * @Label(content="Sort Order")
-	 * @var integer
+	 * @var int
 	 */
 	protected $sortOrder;
 

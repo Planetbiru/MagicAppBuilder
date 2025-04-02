@@ -1,29 +1,24 @@
 <?php
-
 namespace SVG\Nodes\Texts;
 
-use SVG\Nodes\SVGNodeContainer;
+use SVG\Nodes\SVGNode;
 use SVG\Rasterization\SVGRasterizer;
 
 /**
  * Represents the SVG tag 'title'.
  */
-class SVGTitle extends SVGNodeContainer
+class SVGTitle extends SVGNode
 {
-    public const TAG_NAME = 'title';
-
-    public function __construct(string $text = '')
-    {
-        parent::__construct();
-        $this->setValue($text);
-    }
+    const TAG_NAME = 'title';
 
     /**
      * Dummy implementation
      *
-     * @inheritdoc
+     * @param SVGRasterizer $rasterizer
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         // nothing to rasterize
     }

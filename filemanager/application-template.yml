@@ -1,0 +1,55 @@
+application:
+  id: your-application
+  name: Your Application Name
+  application_base_namespace: YourApplication
+  application_base_directory: /var/www/html/your-application
+  entity_base_namespace: YourApplication\Data\Entity
+  entity_base_directory: /var/www/html/your-application/inc.lib/classes
+  entity_base_namespace: YourApplication\\Data\Entity
+  base_include_directory: inc.app
+  base_asset_directory: lib.assets
+  composer:
+    base_directory: inc.lib
+    psr0: true
+    psr4: false
+    psr0_base_directory: 
+      -
+        namespace: YourApplication
+        directory: classes
+    psr4_base_directory: 
+database:
+  driver: mysql
+  host: localhost
+  port: 3306
+  username: root
+  password:
+  database_name: yourdatabase
+  time_zone: Asia/Jakarta
+  time_zone_system: Asia/Jakarta
+  salt:
+  
+entity_info:
+  active: active
+  draft: draft
+  waiting_for: waiting_for
+  admin_create: admin_create
+  admin_edit: admin_edit
+  admin_ask_edit: admin_ask_edit
+  time_create: time_create
+  time_edit: time_edit
+  time_ask_edit: time_ask_edit
+  ip_create: ip_create
+  ip_edit: ip_edit
+  ip_ask_edit: ip_ask_edit
+  sort_order: sort_order
+  approval_id: approval_id
+  approval_note: approval_note
+  approval_status: approval_status
+  name: name
+entity_apv_info:
+  approval_status: approval_status
+current_action:
+    user_function: currentAction->getUserId()
+    time_function: currentAction->getTime()
+    ip_function: currentAction->getIp()
+global_variable_database: database

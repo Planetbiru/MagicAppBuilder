@@ -2,23 +2,21 @@
 
 namespace SVG\Nodes\Shapes;
 
-use SVG\Nodes\SVGNodeContainer;
+use SVG\Nodes\SVGNode;
 use SVG\Rasterization\SVGRasterizer;
-use SVG\Rasterization\Transform\TransformParser;
-use SVG\Utilities\Units\Length;
 
 /**
  * Represents the SVG tag 'circle'.
  * Has the special attributes cx, cy, r.
  */
-class SVGCircle extends SVGNodeContainer
+class SVGCircle extends SVGNode
 {
-    public const TAG_NAME = 'circle';
+    const TAG_NAME = 'circle';
 
     /**
-     * @param mixed $cx The center's x coordinate.
-     * @param mixed $cy The center's y coordinate.
-     * @param mixed $r  The radius.
+     * @param string|null $cx The center's x coordinate.
+     * @param string|null $cy The center's y coordinate.
+     * @param string|null $r  The radius.
      */
     public function __construct($cx = null, $cy = null, $r = null)
     {
@@ -30,9 +28,9 @@ class SVGCircle extends SVGNodeContainer
     }
 
     /**
-     * @return string|null The center's x coordinate.
+     * @return string The center's x coordinate.
      */
-    public function getCenterX(): ?string
+    public function getCenterX()
     {
         return $this->getAttribute('cx');
     }
@@ -40,19 +38,19 @@ class SVGCircle extends SVGNodeContainer
     /**
      * Sets the center's x coordinate.
      *
-     * @param mixed $cx The new coordinate.
+     * @param string $cx The new coordinate.
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setCenterX($cx): SVGCircle
+    public function setCenterX($cx)
     {
         return $this->setAttribute('cx', $cx);
     }
 
     /**
-     * @return string|null The center's y coordinate.
+     * @return string The center's y coordinate.
      */
-    public function getCenterY(): ?string
+    public function getCenterY()
     {
         return $this->getAttribute('cy');
     }
@@ -60,19 +58,19 @@ class SVGCircle extends SVGNodeContainer
     /**
      * Sets the center's y coordinate.
      *
-     * @param mixed $cy The new coordinate.
+     * @param string $cy The new coordinate.
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setCenterY($cy): SVGCircle
+    public function setCenterY($cy)
     {
         return $this->setAttribute('cy', $cy);
     }
 
     /**
-     * @return string|null The radius.
+     * @return string The radius.
      */
-    public function getRadius(): ?string
+    public function getRadius()
     {
         return $this->getAttribute('r');
     }
@@ -80,19 +78,16 @@ class SVGCircle extends SVGNodeContainer
     /**
      * Sets the radius.
      *
-     * @param mixed $r The new radius.
+     * @param string $r The new radius.
      *
      * @return $this This node instance, for call chaining.
      */
-    public function setRadius($r): SVGCircle
+    public function setRadius($r)
     {
         return $this->setAttribute('r', $r);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         if ($this->getComputedStyle('display') === 'none') {
             return;
@@ -103,19 +98,12 @@ class SVGCircle extends SVGNodeContainer
             return;
         }
 
-        TransformParser::parseTransformString($this->getAttribute('transform'), $rasterizer->pushTransform());
-
-        // https://svgwg.org/svg2-draft/geometry.html#R
-        // Percentages: refer to the normalized diagonal of the current SVG viewport
-        $r = Length::convert($this->getRadius(), $rasterizer->getNormalizedDiagonal());
-
-        $rasterizer->render('ellipse', [
-            'cx'    => Length::convert($this->getCenterX(), $rasterizer->getDocumentWidth()),
-            'cy'    => Length::convert($this->getCenterY(), $rasterizer->getDocumentHeight()),
+        $r = $this->getRadius();
+        $rasterizer->render('ellipse', array(
+            'cx'    => $this->getCenterX(),
+            'cy'    => $this->getCenterY(),
             'rx'    => $r,
             'ry'    => $r,
-        ], $this);
-
-        $rasterizer->popTransform();
+        ), $this);
     }
 }

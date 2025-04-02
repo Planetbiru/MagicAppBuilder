@@ -4,8 +4,10 @@ use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicApp\AppLanguage;
+use MagicApp\AppUserActivityLogger;
 use MagicApp\Field;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppUserActivityImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
@@ -109,3 +111,5 @@ if(file_exists($appMenuPath))
 }
 $curretHref = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 $appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);
+
+$userActivityLogger = new AppUserActivityLogger($appConfig, new AppUserActivityImpl(null, $database));

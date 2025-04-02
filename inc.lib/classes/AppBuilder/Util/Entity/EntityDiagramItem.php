@@ -41,42 +41,42 @@ class EntityDiagramItem //NOSONAR
     /**
      * The width of the entity item in the diagram.
      *
-     * @var integer
+     * @var int
      */
     private $width = 1;
     
     /**
      * The height of the entity item in the diagram.
      *
-     * @var integer
+     * @var int
      */
     private $height = 20;
     
     /**
      * The height of the header in the entity item.
      *
-     * @var integer
+     * @var int
      */
     private $headerHeight = 20;
     
     /**
      * The height of each column in the entity item.
      *
-     * @var integer
+     * @var int
      */
     private $columnHeight = 20;
     
     /**
      * The X coordinate of the entity item in the diagram.
      *
-     * @var integer
+     * @var int
      */
     private $x = 0;
     
     /**
      * The Y coordinate of the entity item in the diagram.
      *
-     * @var integer
+     * @var int
      */
     private $y = 0;
 

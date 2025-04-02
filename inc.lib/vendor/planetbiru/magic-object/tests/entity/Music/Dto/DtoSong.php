@@ -221,7 +221,7 @@ class DtoSong extends SetterGetter
 	 * Duration
 	 * 
 	 * @Label(content="Duration")
-	 * @var double
+	 * @var float
 	 */
 	protected $duration;
 
@@ -237,7 +237,7 @@ class DtoSong extends SetterGetter
 	 * Bpm
 	 * 
 	 * @Label(content="Bpm")
-	 * @var double
+	 * @var float
 	 */
 	protected $bpm;
 
@@ -317,7 +317,7 @@ class DtoSong extends SetterGetter
 	 * Rating
 	 * 
 	 * @Label(content="Rating")
-	 * @var double
+	 * @var float
 	 */
 	protected $rating;
 

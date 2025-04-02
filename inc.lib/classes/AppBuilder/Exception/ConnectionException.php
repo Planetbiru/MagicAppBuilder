@@ -20,7 +20,7 @@ class ConnectionException extends Exception
      * @param int $code The error code (optional)
      * @param Exception|null $previous The previous exception used for exception chaining (optional)
      */
-    public function __construct($message = "", $code = 0, Exception $previous = null)
+    public function __construct($message = "", $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

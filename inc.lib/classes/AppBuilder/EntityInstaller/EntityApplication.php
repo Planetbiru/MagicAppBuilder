@@ -95,6 +95,15 @@ class EntityApplication extends MagicObject
 	 * @var string
 	 */
 	protected $baseApplicationDirectory;
+	
+	/**
+	 * Git Remote URL
+	 * 
+	 * @Column(name="git_remote_url", type="text", nullable=true)
+	 * @Label(content="Git Remote URL")
+	 * @var string
+	 */
+	protected $gitRemoteUrl;
 
 	/**
 	 * Author

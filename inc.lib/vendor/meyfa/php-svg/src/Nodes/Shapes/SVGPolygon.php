@@ -3,7 +3,6 @@
 namespace SVG\Nodes\Shapes;
 
 use SVG\Rasterization\SVGRasterizer;
-use SVG\Rasterization\Transform\TransformParser;
 
 /**
  * Represents the SVG tag 'polygon'.
@@ -11,20 +10,17 @@ use SVG\Rasterization\Transform\TransformParser;
  */
 class SVGPolygon extends SVGPolygonalShape
 {
-    public const TAG_NAME = 'polygon';
+    const TAG_NAME = 'polygon';
 
     /**
      * @param array[] $points Array of points (float 2-tuples).
      */
-    public function __construct(array $points = [])
+    public function __construct($points = array())
     {
         parent::__construct($points);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
         if ($this->getComputedStyle('display') === 'none') {
             return;
@@ -35,14 +31,9 @@ class SVGPolygon extends SVGPolygonalShape
             return;
         }
 
-        TransformParser::parseTransformString($this->getAttribute('transform'), $rasterizer->pushTransform());
-
-        $rasterizer->render('polygon', [
+        $rasterizer->render('polygon', array(
             'open'      => false,
             'points'    => $this->getPoints(),
-            'fill-rule' => strtolower($this->getComputedStyle('fill-rule') ?: 'nonzero')
-        ], $this);
-
-        $rasterizer->popTransform();
+        ), $this);
     }
 }

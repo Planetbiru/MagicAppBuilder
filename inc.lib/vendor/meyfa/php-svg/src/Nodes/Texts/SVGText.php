@@ -1,33 +1,39 @@
 <?php
-
 namespace SVG\Nodes\Texts;
 
+use SVG\Nodes\Structures\SVGFont;
 use SVG\Nodes\SVGNodeContainer;
 use SVG\Rasterization\SVGRasterizer;
-use SVG\Rasterization\Transform\TransformParser;
-use SVG\Utilities\Units\Length;
 
 /**
  * Represents the SVG tag 'text'.
  *
- * Usage example:
- *
- * \SVG\SVG::addFont('./fonts/Ubuntu-Regular.ttf');
+ * Usage:
  *
  * $svg = new \SVG\SVG(600, 400);
  *
+ * $font = new \SVG\Nodes\Structures\SVGFont('openGost', 'OpenGostTypeA-Regular.ttf');
+ * $svg->getDocument()->addChild($font);
+ *
  * $svg->getDocument()->addChild(
  *   (new \SVG\Nodes\Texts\SVGText('hello', 50, 50))
- *     ->setFontFamily('Ubuntu')
- *     ->setFontSize(15)
+ *     ->setFont($font)
+ *     ->setSize(15)
+ *     ->setStyle('stroke', '#f00')
+ *     ->setStyle('stroke-width', 1)
  * );
  *
  */
 class SVGText extends SVGNodeContainer
 {
-    public const TAG_NAME = 'text';
+    const TAG_NAME = 'text';
 
-    public function __construct(string $text = '', $x = 0, $y = 0)
+    /**
+     * @var SVGFont
+     */
+    private $font;
+
+    public function __construct($text = '', $x = 0, $y = 0)
     {
         parent::__construct();
         $this->setValue($text);
@@ -37,33 +43,31 @@ class SVGText extends SVGNodeContainer
     }
 
     /**
-     * Set the CSS font-family property.
+     * Set font
      *
-     * @param string $fontFamily The value for the CSS font-family property.
+     * @param SVGFont $font
      * @return $this
      */
-    public function setFontFamily(string $fontFamily): SVGText
+    public function setFont(SVGFont $font)
     {
-        $this->setStyle('font-family', $fontFamily);
+        $this->font = $font;
+        $this->setStyle('font-family', $font->getFontName());
         return $this;
     }
 
     /**
-     * Set the CSS font-size property.
+     * Set font size
      *
-     * @param $fontSize mixed The value for the CSS font-size property.
+     * @param $size
      * @return $this
      */
-    public function setFontSize($fontSize): SVGText
+    public function setSize($size)
     {
-        $this->setStyle('font-size', $fontSize);
+        $this->setStyle('font-size', $size);
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getComputedStyle(string $name): ?string
+    public function getComputedStyle($name)
     {
         // force stroke before fill
         if ($name === 'paint-order') {
@@ -74,31 +78,18 @@ class SVGText extends SVGNodeContainer
         return parent::getComputedStyle($name);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rasterize(SVGRasterizer $rasterizer): void
+    public function rasterize(SVGRasterizer $rasterizer)
     {
-        TransformParser::parseTransformString($this->getAttribute('transform'), $rasterizer->pushTransform());
+        if (empty($this->font)) {
+            return;
+        }
 
-        // TODO: support percentage font sizes
-        //       https://www.w3.org/TR/SVG11/text.html#FontSizeProperty
-        //       "Percentages: refer to parent element's font size"
-        // For now, assume the standard font size of 16px as reference size
-        // Default to 16px if font size could not be parsed
-        $fontSize = Length::convert($this->getComputedStyle('font-size'), 16) ?? 16;
-
-        $rasterizer->render('text', [
-            'x'          => Length::convert($this->getAttribute('x'), $rasterizer->getDocumentWidth()),
-            'y'          => Length::convert($this->getAttribute('y'), $rasterizer->getDocumentHeight()),
-            'fontFamily' => $this->getComputedStyle('font-family'),
-            'fontWeight' => $this->getComputedStyle('font-weight'),
-            'fontStyle'  => $this->getComputedStyle('font-style'),
-            'fontSize'   => $fontSize,
-            'anchor'     => $this->getComputedStyle('text-anchor'),
-            'text'       => $this->getValue(),
-        ], $this);
-
-        $rasterizer->popTransform();
+        $rasterizer->render('text', array(
+            'x'         => $this->getAttribute('x'),
+            'y'         => $this->getAttribute('y'),
+            'size'      => $this->getComputedStyle('font-size'),
+            'text'      => $this->getValue(),
+            'font_path' => $this->font->getFontPath(),
+        ), $this);
     }
 }

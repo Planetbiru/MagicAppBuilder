@@ -20,7 +20,7 @@ class AppMessageImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message ID")
-	 * @var integer
+	 * @var int
 	 */
 	protected $messageId;
 
@@ -128,7 +128,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="read", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Read")
-	 * @var integer
+	 * @var int
 	 */
 	protected $read;
 

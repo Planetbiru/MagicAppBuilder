@@ -74,7 +74,7 @@ $data->addFilter(
         "checkbox", 
         "boolean", 
         null, 
-        new PicoInputField(true, "Ya")
+        new PicoInputField(true, "Aktif")
     )
 );
 
@@ -82,8 +82,18 @@ $data->addElement([
     'tag' => 'button',
     'textNode'=>'Search',
     'attribute' => [
-        'type' => 'button',
+        'type' => 'submit',
         'id'=>'search',
+        'class' => 'btn btn-success'
+    ]
+]);
+
+$data->addElement([
+    'tag' => 'button',
+    'textNode'=>'Add',
+    'attribute' => [
+        'type' => 'button',
+        'id'=>'add',
         'class' => 'btn btn-primary'
     ]
 ]);

@@ -28,21 +28,18 @@ if($applicationId != null)
     }
 }
 
-if(!$appConfig->issetApplication() && isset($appList) && $appList instanceof SecretObject)
+if($appConfig->getApplication() == null)
 {
-    $arr = $appList->valueArray();
-    foreach($arr as $app)
-    {
-        if($applicationId == $app['id'])
-        {
-            $fixApp = new SecretObject([
-                'name'=>$app['name']
-            ]);
-            $appConfig->setApplication($fixApp);
-        }
-    }
+    $appConfig->setApplication(new SecretObject()); 
 }
-
+if($appConfig->getDatabase() == null)
+{
+    $appConfig->setDatabase(new SecretObject()); 
+}
+if($appConfig->getSessions() == null)
+{
+    $appConfig->setSessions(new SecretObject()); 
+}
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
 $cfgSession = new SecretObject($appConfig->getSessions());
 $app = new SecretObject($appConfig->getApplication());
@@ -135,7 +132,7 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Application Directory</td>
-                                <td><span class="directory-container"><input class="form-control" type="text" name="application_base_directory" value="<?php echo $app->getBaseApplicationDirectory(); ?>"></span></td>
+                                <td><span class="directory-container input-with-checker"><input class="form-control" type="text" name="application_base_directory" value="<?php echo $app->getBaseApplicationDirectory(); ?>"></span></td>
                             </tr>
                             <tr>
                                 <td>Path</td>
@@ -220,7 +217,7 @@ $nameInIndonesian = array(
                             </tr>
                             <tr class="database-credential file-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Database File Path</td>
-                                <td><span class="directory-container" data-isfile="true"><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>"></span></td>
+                                <td><span class="directory-container input-with-checker" data-isfile="true"><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>"></span></td>
                             </tr>
                             <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Host</td>

@@ -55,14 +55,14 @@ class EntityDiagramColumn //NOSONAR
     /**
      * The X coordinate of the column's position in the diagram.
      *
-     * @var integer|null
+     * @var int|null
      */
     private $x;
 
     /**
      * The Y coordinate of the column's position in the diagram.
      *
-     * @var integer|null
+     * @var int|null
      */
     private $y;
 

@@ -461,6 +461,8 @@ let initAll = function () {
       loadReference(fieldName, key, function (obj) {
         if (obj != null) {
           deserializeForm(obj);
+          validateEntityName();
+          validateReference();
         }
       });
     }
@@ -470,6 +472,8 @@ let initAll = function () {
         obj = {};
       }
       deserializeForm(obj);
+      validateEntityName();
+      validateReference();
     }
     $("#modal-create-reference-data").modal("show");
   });
@@ -495,6 +499,8 @@ let initAll = function () {
       loadReference(fieldName, key, function (obj) {
         if (obj != null) {
           deserializeForm(obj);
+          validateEntityName();
+          validateReference();
         }
       });
     }
@@ -504,6 +510,8 @@ let initAll = function () {
         obj = {};
       }
       deserializeForm(obj);
+      validateEntityName();
+      validateReference();
     }
     $("#modal-create-reference-data").modal("show");
   });
@@ -1571,7 +1579,7 @@ let initAll = function () {
     e.preventDefault();
     let modal = $(this).closest('.modal');
     let workspaceName = modal.find('[name="workspace_name"]').val();
-    let workspaceDescription = modal.find('[name="workspace_description" spellcheck="false"]').val();
+    let workspaceDescription = modal.find('[name="workspace_description"]').val();
     let workspaceDirectory = modal.find('[name="workspace_directory"]').val();
     let phpPath = modal.find('[name="php_path"]').val();
     increaseAjaxPending();
@@ -1971,6 +1979,14 @@ let initAll = function () {
   $(document).on('click', '#button-save-data-format', function(e1){
     saveDataFormat();
   });
+  
+  $(document).on('change', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-object-name, .rd-reference-property-name', function(e){
+    validateReference();
+  });
+  
+  $(document).on('change', '.rd-entity-name', function(e){
+    validateEntityName();
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -1981,6 +1997,99 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Validates the class name to ensure it starts with an uppercase letter and 
+ * only contains alphanumeric characters.
+ * 
+ * @param {string} className - The class name to validate.
+ * @returns {boolean} - Returns true if the class name is valid, false otherwise.
+ */
+function validateClassName(className) {
+  // Regular expression to ensure class name starts with an uppercase letter 
+  // and only contains alphanumeric characters (letters and digits).
+  let regex = /^[A-Z][a-zA-Z0-9]*$/; 
+  return regex.test(className);
+}
+
+/**
+ * Validates the entity name input field by checking if the entered value is 
+ * a valid class name.
+ * 
+ * This function updates the data-valid attribute of the entity name container 
+ * based on whether the class name is valid or not.
+ */
+function validateEntityName() {
+  // Get the value of the entity name input field
+  let entityName = $('.rd-entity-name').val();
+
+  // Validate the entity name using the validateClassName function
+  let valid = validateClassName(entityName);
+
+  // Update the data-valid attribute of the entity name container based on validity
+  $('.rd-entity-name-container').attr('data-valid', valid ? 'true' : 'false');
+}
+
+/**
+ * Validates the reference information by making an AJAX request to check 
+ * if the reference values (e.g., table name, primary key, etc.) are valid.
+ * 
+ * This function updates the data-valid attribute of various containers based 
+ * on the validation results from the server response.
+ */
+function validateReference() {
+  // Collect values from various input fields
+  let table_name = $('select[name="source_table"]').val();
+  let reference_table_name = $('.rd-table-name').val();
+  let reference_primary_key = $('.rd-primary-key').val();
+  let reference_value_column = $('.rd-value-column').val();
+  let reference_object_name = $('.rd-reference-object-name').val();
+  let reference_property_name = $('.rd-reference-property-name').val();
+
+  // Get references to the container elements for each input field
+  let tableContainer = $('.rd-table-name-container');
+  let primaryKeyContainer = $('.rd-primary-key-container');
+  let valueColumnContainer = $('.rd-value-column-container');
+  let referenceObjectNameContainer = $('.rd-reference-object-name-container');
+  let referencePropertyNameContainer = $('.rd-reference-property-name-container');
+  
+  // Set loading state to true for all containers
+  tableContainer.attr('data-loading', 'true');
+  primaryKeyContainer.attr('data-loading', 'true');
+  valueColumnContainer.attr('data-loading', 'true');
+  referenceObjectNameContainer.attr('data-loading', 'true');
+  referencePropertyNameContainer.attr('data-loading', 'true');
+
+  // Make an AJAX request to validate the reference information
+  $.ajax({
+    method: 'POST',
+    url: 'lib.ajax/entity-reference-test.php',
+    data: {
+      table_name: table_name,
+      reference_table_name: reference_table_name,
+      reference_primary_key: reference_primary_key,
+      reference_value_column: reference_value_column,
+      reference_object_name: reference_object_name,
+      reference_property_name: reference_property_name
+    },
+    dataType: 'json',
+    success: function(data) {
+      // Set loading state to false once the request is complete
+      tableContainer.attr('data-loading', 'false');
+      primaryKeyContainer.attr('data-loading', 'false');
+      valueColumnContainer.attr('data-loading', 'false');
+      referenceObjectNameContainer.attr('data-loading', 'false');
+      referencePropertyNameContainer.attr('data-loading', 'false');
+      
+      // Update the data-valid attribute for each container based on the server response
+      tableContainer.attr('data-valid', data.tableName ? 'true' : 'false');
+      primaryKeyContainer.attr('data-valid', data.primaryKey ? 'true' : 'false');
+      valueColumnContainer.attr('data-valid', data.valueColumn ? 'true' : 'false');
+      referenceObjectNameContainer.attr('data-valid', data.referenceObjectName ? 'true' : 'false');
+      referencePropertyNameContainer.attr('data-valid', data.referencePropertyName ? 'true' : 'false');
+    }
+  });
+}
 
 /**
  * Saves the selected data format and updates the corresponding table field.
@@ -2202,7 +2311,7 @@ function replaceBasename(dirPath, newBasename) {
  * This function sends an AJAX request to the server to check if the given directory 
  * is writable. It updates the associated UI container with a loading state during 
  * the request and changes the state to indicate whether the directory is writable 
- * or not once the response is received. The result is reflected in the `data-writeable` 
+ * or not once the response is received. The result is reflected in the `data-valid` 
  * attribute of the closest `.directory-container` element. It also handles the case 
  * where the directory is being checked for being a file or directory.
  *
@@ -2235,11 +2344,11 @@ function checkWriretableDirectory(input)
           container.attr('data-loading', 'false');
           if(data.writeable)
           {
-            container.attr('data-writeable', 'true');
+            container.attr('data-valid', 'true');
           }
           else
           {
-            container.attr('data-writeable', 'false');
+            container.attr('data-valid', 'false');
           }
         },
         error: function(err) {
@@ -2250,10 +2359,10 @@ function checkWriretableDirectory(input)
 }
 
 /**
- * Resets the writable directory check by removing the `data-writeable` and `data-loading` attributes.
+ * Resets the writable directory check by removing the `data-valid` and `data-loading` attributes.
  *
  * This function clears the results of the directory writable check by removing the 
- * `data-writeable` and `data-loading` attributes from the closest `.directory-container` 
+ * `data-valid` and `data-loading` attributes from the closest `.directory-container` 
  * element, effectively resetting the UI state.
  *
  * @param {HTMLElement} input - The input element that triggers the reset of the directory check.
@@ -2264,7 +2373,7 @@ function checkWriretableDirectory(input)
 function resetCheckWriretableDirectory(input)
 {
   let container = $(input).closest('.directory-container');
-  container.removeAttr('data-writeable');
+  container.removeAttr('data-valid');
   container.removeAttr('data-loading');
 }
 
@@ -4403,6 +4512,7 @@ function generateScript(selector) {
   let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
   let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
   let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
+  let userActivityLogger = $("#user_activity_logger")[0].checked && true; //NOSONAR
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
@@ -4440,6 +4550,7 @@ function generateScript(selector) {
     sortOrder: manualSortOrder,
     exportToExcel: exportToExcel,
     exportToCsv: exportToCsv,
+    userActivityLogger: userActivityLogger,
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
     trashRequired: withTrash,

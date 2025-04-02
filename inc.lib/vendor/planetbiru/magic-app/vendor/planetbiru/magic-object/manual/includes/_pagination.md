@@ -299,7 +299,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="duration", type="float", nullable=true)
 	 * @Label(content="Duration")
-	 * @var double
+	 * @var float
 	 */
 	protected $duration;
 
@@ -326,7 +326,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="bpm", type="float", nullable=true)
 	 * @Label(content="Bpm")
-	 * @var double
+	 * @var float
 	 */
 	protected $bpm;
 
@@ -414,7 +414,7 @@ class EntitySong extends MagicObject
 	 * 
 	 * @Column(name="rating", type="float", nullable=true)
 	 * @Label(content="Rating")
-	 * @var double
+	 * @var float
 	 */
 	protected $rating;
 
