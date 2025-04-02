@@ -519,7 +519,7 @@ class ScriptGenerator //NOSONAR
                 $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
                 $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields, $approvalRequired); 
                 $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData, $approvalRequired, $entityApproval); 
-                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable);
+                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $approvalRequired, $sortable);
             }
         } 
         else 
@@ -549,13 +549,21 @@ class ScriptGenerator //NOSONAR
                 $guiInsert = $appBuilder->createGuiInsert($entityMain, $insertFields); 
                 $guiUpdate = $appBuilder->createGuiUpdate($entityMain, $editFields); 
                 $guiDetail = $appBuilder->createGuiDetail($entityMain, $detailFields, $referenceData); 
-                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable); 
+                $guiList = $appBuilder->createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $approvalRequired, $sortable); 
             }
         }
         
         // prepare CRUD section end
         
-        $crudSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))->add($createSection)->add($updateSection)->add($activationSection)->add($deactivationSection)->add($deleteSection)->add($approvalSection)->add($rejectionSection);
+        $crudSection = (new AppSection(AppSection::SEPARATOR_IF_ELSE))
+            ->add($createSection)
+            ->add($updateSection)
+            ->add($activationSection)
+            ->add($deactivationSection)
+            ->add($deleteSection)
+            ->add($approvalSection)
+            ->add($rejectionSection)
+            ;
 
         
         if($appFeatures->isSortOrder()) {
@@ -993,9 +1001,9 @@ class ScriptGenerator //NOSONAR
                 $path = str_replace("\\", "/", $path);
                 if($updateEntity || !file_exists($path))
                 {
-                    $gen = new PicoEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
+                    $generator = new PicoEntityGenerator($database, $baseDir, $tableName, $baseNamespace, $entityName);
                     $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
-                    $gen->generate($nonupdatables);
+                    $generator->generate($nonupdatables);
                     $fileGenerated++;
                 }
                 $checked[] = $entityName;
@@ -1030,7 +1038,7 @@ class ScriptGenerator //NOSONAR
             $this->prepareDir($libDir);
             $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation);
                   
-            $baseAppBuilder = $appConf->getBaseEntityDirectory()."";
+            $baseAppBuilder = $appConf->getBaseEntityDirectory();
             $this->prepareDir($baseAppBuilder);
             $arr = array(           
             );
