@@ -1505,13 +1505,11 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
      * @param AppField[] $exportFields An array of fields available for export.
      * @param MagicObject[] $referenceData Additional reference data objects.
      * @param AppField[] $filterFields An array of fields used for filtering.
-     * @param boolean $sortOrder The sorting order (true for ascending, false for descending).
      * @param boolean $approvalRequired Indicates if approval is required.
-     * @param array $specification Additional specifications for data retrieval.
      * @param array $sortable Sorting options for the list.
      * @return string The generated HTML output for the list section.
      */
-    public function createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $sortOrder, $approvalRequired, $specification, $sortable) //NOSONAR
+    public function createGuiList($entityMain, $listFields, $exportFields, $referenceData, $filterFields, $approvalRequired, $sortable) //NOSONAR
     {
         $entityName = $entityMain->getentityName();
         $primaryKey = $entityMain->getPrimaryKey();
