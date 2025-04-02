@@ -1149,17 +1149,17 @@ p {
 }
 
 
-.directory-container .form-control {
+.input-with-checker .form-control {
 padding-right: 2.5rem;
 }
 
-.directory-container {
+.input-with-checker {
 position: relative;
 display: inline-block;
 width: 100%;
 }
 
-.directory-container::after {
+.input-with-checker::after {
 content: '';
 position: absolute;
 text-align: right;
@@ -1169,19 +1169,19 @@ right: 0.5rem;
 top: 0.5rem;
 }
 
-.directory-container[data-writeable="true"]::after {
+.input-with-checker[data-valid="true"]::after {
 content: '\2713'; 
 color: green; 
 font-size: 1.2rem;
 }
 
-.directory-container[data-writeable="false"]::after {
+.input-with-checker[data-valid="false"]::after {
 content: '\2717'; 
 color: red; 
 font-size: 1.2rem;
 }
 
-.directory-container[data-loading="true"]::after {
+.input-with-checker[data-loading="true"]::after {
 content: '\2022 \2022 \2022'; 
 color: green; 
 font-size: 1.5rem;
@@ -1200,4 +1200,3 @@ white-space: nowrap;
 	opacity: 1;
 }
 }
-
