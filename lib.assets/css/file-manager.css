@@ -1,0 +1,105 @@
+@charset "UTF-8";
+.file-manager-left-panel {
+  padding: 10px 10px 0 10px;
+  overflow-y: auto;
+}
+
+.file-manager-right-panel {
+  padding: 10px 0 0 10px;
+  overflow-y: auto;
+}
+
+h3 {
+  margin: 0;
+  padding: 4px 0;
+  font-size: 16px;
+}
+
+#dir-tree {
+  list-style-type: none;
+  padding: 0px;
+  margin: 0;
+  width: 100%;
+  height: calc(100vh - 118px);
+  box-sizing: border-box;
+  overflow: auto;
+}
+#dir-tree > li {
+  margin: 0;
+  list-style-type: none;
+  white-space: nowrap;
+}
+#dir-tree li ul {
+  margin: 0;
+  padding: 0px 0px 0px 10px;
+}
+#dir-tree li ul li {
+  padding: 0;
+  margin: 0;
+  margin-left: 10px;
+  list-style-type: none;
+  white-space: nowrap;
+}
+#dir-tree span {
+  white-space: nowrap;
+}
+
+.image-mode {
+  display: none;
+}
+
+li[data-type=dir], li[data-type=file] {
+  cursor: pointer;
+}
+
+li[data-type=dir]::before {
+  content: "📂";
+  display: inline-block;
+  width: 22px;
+}
+
+li[data-type=file]::before {
+  content: "📄";
+  display: inline-block;
+  width: 22px;
+}
+
+li[data-type=dir]:hover::before {
+  color: #007bff;
+}
+
+li[data-type=file]:hover::before {
+  color: #28a745;
+}
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #cccccc;
+}
+textarea:focus-visible {
+  outline: none;
+}
+
+/* Optional styling for the path-bar container */
+.path-bar {
+  margin-bottom: 10px;
+}
+
+/* Optional margin between buttons */
+.path-bar .btn {
+  margin-left: 10px;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* Ensure buttons don't get too big */
+.path-bar .file-path {
+  flex-grow: 1;
+}
+
+.text-mode {
+  padding-right: 1rem;
+}/*# sourceMappingURL=file-manager.css.map */

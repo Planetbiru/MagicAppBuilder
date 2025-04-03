@@ -205,6 +205,7 @@ jQuery(function () {
   $('body').load('lib.ajax/body.min.html', function () {
     initAll();
     initEditor();
+    initFileManager();
   });
 });
 
@@ -234,6 +235,7 @@ let initAll = function () {
               success: function (data) {
                 decreaseAjaxPending();
                 updateModuleFile();
+                resetFileManager();
                 if(data.success)
                 {
                   $('#button_save_module_file').attr('disabled', 'disabled');
@@ -280,6 +282,7 @@ let initAll = function () {
               success: function (data) {
                 decreaseAjaxPending();
                 updateEntityFile();
+                resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
                 removeHilightLineError();
@@ -953,6 +956,7 @@ let initAll = function () {
               success: function (data) {
                 decreaseAjaxPending();
                 updateEntityFile();
+                resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
               },
@@ -2837,6 +2841,7 @@ function loadAllResource() {
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
+  resetFileManager();
   initTooltip();
   
 }
@@ -2867,6 +2872,7 @@ function onSetDefaultApplication() {
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
+  resetFileManager();
   initTooltip();
 }
 
@@ -2881,6 +2887,7 @@ function onModuleCreated() {
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateModuleFile();
+  resetFileManager();
   initTooltip();
 }
 
@@ -4054,6 +4061,7 @@ function saveEntityAs() {
             success: function (data) {
               decreaseAjaxPending();
               updateEntityFile();
+              resetFileManager();
               updateEntityQuery(true);
               updateEntityRelationshipDiagram();
               removeHilightLineError();

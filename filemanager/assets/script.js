@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function () {
+function initFileManager()
+{
     // When a directory is clicked
     document.getElementById('dir-tree').addEventListener('click', function (e) {
         if (e.target) {
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let ulDir = document.querySelector('#dir-tree');
     loadDirContent(ulDir.dataset.baseDirectory, ulDir);
     initCodeMirror();
-});
+}
 
 let modified = true;
 let editor = null;   

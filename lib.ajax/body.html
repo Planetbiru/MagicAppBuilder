@@ -38,6 +38,9 @@
           <button class="nav-link" id="translate-application-tab" data-toggle="tab" data-target="#translate-application" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Module</button>
         </li>
         <li class="nav-item" role="presentation">
+          <button class="nav-link" id="file-manager-tab" data-toggle="tab" data-target="#file-manager" type="button" role="tab" aria-controls="config" aria-selected="true">File Manager</button>
+        </li>
+        <li class="nav-item" role="presentation">
           <button class="nav-link" type="button" role="tab" aria-controls="config" onclick="window.location='logout.php'">Logout</button>
         </li>
     </ul>
@@ -748,6 +751,35 @@
           </div>
         </div>
       </div>
+      
+      <div id="file-manager" class="tab-pane fade" role="tabpanel" aria-labelledby="file-manager-tab">
+        <div class="container-file-manager">
+          <div class="row">
+              <div class="file-manager-left-panel col col-2">
+                  <div>Directory</div>
+                  <ul id="dir-tree" data-base-directory="./">
+                  </ul>
+              </div>
+          
+              <div class="file-manager-right-panel col col-10">
+                  <div>File Contents</div>
+                  <div id="file-content">
+                      <div class="media-display image-mode"></div>
+                      <div class="code text-mode">
+                          <div class="path-bar d-flex">
+                              <input type="text" class="file-path form-control me-2" placeholder="File Path">
+                              <button type="button" class="btn btn-primary btn-open-file">Open</button>
+                              <button type="button" class="btn btn-success btn-save-file">Save</button>
+                          </div>
+                          <div class="file-editor">
+                              <textarea id="code" name="code"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>  
 
     </div>
   </div>

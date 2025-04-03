@@ -1,6 +1,7 @@
 <?php
 
 use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -33,7 +34,7 @@ if ($appConfig->getApplication() == null) {
     exit();
 }
 
-$inputGet = new InputGet();
+$inputPost = new InputPost();
 
 header('Content-type: text/plain');
 
@@ -43,11 +44,12 @@ try {
     // Remove trailing slash if exists
     $baseDirectory = rtrim($baseDirectory, "/");
 
-    // Construct the full path based on the base directory and the requested directory
-    $file = $baseDirectory . "/" . $inputGet->getFile();
+    $file = $baseDirectory . "/" . $inputPost->getFile();
     $file = normalizationPath($file);
+    
+    $content = $inputPost->getContent();
 
-    echo file_get_contents($file);
+    file_put_contents($file, $content);
 
 } catch (Exception $e) {
     // Log any errors that occur
