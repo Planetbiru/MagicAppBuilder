@@ -37,12 +37,12 @@ function initFileManager()
     initCodeMirror();
 }
 
-let modified = true;
-let editor = null;   
+let contentModified = true;
+let fileManagerEditor = null;   
 let currentMode = null;
 function format(){
-    let totalLines = editor.lineCount();  
-    editor.autoFormatRange({line:0, ch:0}, {line:totalLines});
+    let totalLines = fileManagerEditor.lineCount();  
+    fileManagerEditor.autoFormatRange({line:0, ch:0}, {line:totalLines});
 }
 let modeInput = null;
 
@@ -54,7 +54,7 @@ let modeInput = null;
  */
 function loadDirContent(dir, subDirUl) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'load-dir.php?dir=' + encodeURIComponent(dir), true); // Send GET request to the server
+    xhr.open('GET', 'lib.ajax/load-dir.php?dir=' + encodeURIComponent(dir), true); // Send GET request to the server
     xhr.onload = function () {
         if (xhr.status === 200) {
             const dirs = JSON.parse(xhr.responseText); // Parse the JSON response
@@ -116,7 +116,7 @@ function initCodeMirror()
       });
     modeInput = document.getElementById('filename');
     CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js";
-    editor = CodeMirror.fromTextArea(document.getElementById("code"), 
+    fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
     {
         lineNumbers: true,
         lineWrapping: true,
@@ -127,14 +127,14 @@ function initCodeMirror()
 
     window.addEventListener('resize', function(e){
         let w = window.innerWidth - 300;
-        let h = window.innerHeight - 50;
-        editor.setSize(w, h);
+        let h = window.innerHeight - 150;
+        fileManagerEditor.setSize(w, h);
     });
     
     
     let w = window.innerWidth - 300;
-    let h = window.innerHeight - 50;
-    editor.setSize(w, h);
+    let h = window.innerHeight - 150;
+    fileManagerEditor.setSize(w, h);
 }
 
 function saveFile()
@@ -162,18 +162,18 @@ function openFile(file, extension) {
         }
         // Use fetch to get the file content through server-side PHP for text files
         setDisplayMode('text');
-        fetch('load-file.php?file=' + encodeURIComponent(file))
+        fetch('lib.ajax/load-file.php?file=' + encodeURIComponent(file))
             .then(response => response.text())
             .then(text => {
                 changeMode(file, extension);                
-                editor.setValue(text);
+                fileManagerEditor.setValue(text);
             })
             .catch(error => {
             });
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(extension.toLowerCase())) {
         setDisplayMode('image');
         // For supported image extensions, use the server-side script to load the image as base64
-        fetch('load-image.php?file=' + encodeURIComponent(file))
+        fetch('lib.ajax/load-image.php?file=' + encodeURIComponent(file))
             .then(response => response.text())
             .then(base64ImageData => {
                 let mediaDisplay = document.querySelector('.media-display');
@@ -236,7 +236,7 @@ function changeMode(filename, extension) {
 	}
 	if (mode) 
 	{
-		editor.setOption("mode", spec);
-		CodeMirror.autoLoadMode(editor, mode);
+		fileManagerEditor.setOption("mode", spec);
+		CodeMirror.autoLoadMode(fileManagerEditor, mode);
 	} 
 }

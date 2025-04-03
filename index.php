@@ -31,6 +31,7 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/css.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="lib.assets/css/file-manager.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -39,6 +40,7 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/file-manager.js"></script>
 </head>
 
 <body data-admin-level-id="<?php echo $adminLevelId; ?>">

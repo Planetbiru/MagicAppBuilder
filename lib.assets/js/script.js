@@ -205,6 +205,7 @@ jQuery(function () {
   $('body').load('lib.ajax/body.min.html', function () {
     initAll();
     initEditor();
+    initFileManager();
   });
 });
 
