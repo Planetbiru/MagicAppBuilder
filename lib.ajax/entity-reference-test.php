@@ -352,10 +352,7 @@ try {
         'tables' => null
     );
     
-    if(!$validation['tableName'])
-    {
-        $validation['tables'] = getTableList($databaseConfig, $database);
-    }
+    $validation['tables'] = getTableList($databaseConfig, $database);
     
     ResponseUtil::sendJSON($validation);
 } catch (Exception $e) {
