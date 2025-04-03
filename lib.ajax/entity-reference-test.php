@@ -16,41 +16,45 @@ if(!$database->isConnected())
 }
 
 /**
- * Undocumented function
+ * Check if the database type is MySQL or MariaDB.
  *
- * @param string $databaseType
- * @return boolean
+ * @param string $databaseType The type of the database.
+ * @return boolean Returns true if the database type is MySQL or MariaDB, otherwise false.
  */
 function isMySql($databaseType)
 {
     return $databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL;
 }
+
 /**
- * Undocumented function
+ * Check if the database type is PostgreSQL.
  *
- * @param string $databaseType
- * @return boolean
+ * @param string $databaseType The type of the database.
+ * @return boolean Returns true if the database type is PostgreSQL, otherwise false.
  */
 function isPostgreSql($databaseType)
 {
     return $databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL;
 }
+
 /**
- * Undocumented function
+ * Check if the database type is SQLite.
  *
- * @param string $databaseType
- * @return boolean
+ * @param string $databaseType The type of the database.
+ * @return boolean Returns true if the database type is SQLite, otherwise false.
  */
 function isSqlite($databaseType)
 {
     return $databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE;
 }
+
 /**
- * Undocumented function
+ * Get detailed information about a table including its columns and primary keys.
  *
- * @param SecretObject $databaseConfig
- * @param PicoDatabase $database
- * @return array
+ * @param SecretObject $databaseConfig The configuration of the database.
+ * @param PicoDatabase $database The database connection.
+ * @param string $tableName The name of the table.
+ * @return array Returns an array with fields, columns, and primary keys information.
  */
 function getTableInfo($databaseConfig, $database, $tableName)
 {
@@ -144,13 +148,13 @@ function getTableInfo($databaseConfig, $database, $tableName)
 }
 
 /**
- * Undocumented function
+ * Get a list of tables in the database with their primary keys.
  *
- * @param SecretObject $databaseConfig
- * @param PicoDatabase $database
- * @return array
+ * @param SecretObject $databaseConfig The configuration of the database.
+ * @param PicoDatabase $database The database connection.
+ * @return array Returns an array of tables with their primary keys.
  */
-function getTableList($databaseConfig, $database)
+function getTableList($databaseConfig, $database) // NOSONAR
 {
     $databaseName = $databaseConfig->getDatabaseName();
     $schemaName = $databaseConfig->getDatabaseSchema();
