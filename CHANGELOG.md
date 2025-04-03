@@ -17,7 +17,7 @@ If a user enters an incorrect table name, MagicAppBuilder will display the avail
 
 Once all values are correct, MagicAppBuilder will mark the reference or filter entity as correctly created and it won't be checked again if the user returns to the reference or filter entity editor within the same session. However, MagicAppBuilder will revalidate if the user switches to another module, as there is a potential for changes in the database structure.
 
-# MagicAppBuilder version 0.34
+# MagicAppBuilder version 0.35
 
 ## What's New
 
