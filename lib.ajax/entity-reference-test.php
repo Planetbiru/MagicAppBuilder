@@ -188,12 +188,42 @@ try {
         }
     }
     
+    $skipped = array();
+    
+    $skipped[] = $appConfig->entityInfo->getDraft();
+    $skipped[] = $appConfig->entityInfo->getWaitingFor();
+    $skipped[] = $appConfig->entityInfo->getApprovalNote();
+    $skipped[] = $appConfig->entityInfo->getApprovalId();
+    $skipped[] = $appConfig->entityInfo->getAdminCreate();
+    $skipped[] = $appConfig->entityInfo->getAdminEdit();
+    $skipped[] = $appConfig->entityInfo->getAdminAskEdit();
+    $skipped[] = $appConfig->entityInfo->getTimeCreate();
+    $skipped[] = $appConfig->entityInfo->getTimeEdit();
+    $skipped[] = $appConfig->entityInfo->getTimeAskEdit();
+    $skipped[] = $appConfig->entityInfo->getIpCreate();
+    $skipped[] = $appConfig->entityInfo->getIpEdit();
+    $skipped[] = $appConfig->entityInfo->getIpAskEdit();
+    $skipped[] = $appConfig->entityInfo->getActive();
+    
+    $skipped = array_merge($skipped, $referenceData['primary_keys']);
+    
+    $columns = array();
+    foreach($referenceData['columns'] as $column)
+    {
+        if(!in_array($column, $skipped))
+        {
+            $columns[] = $column;
+        }
+    }
+    
     $validation = array(
         'tableName' => $validTableName && !empty($referenceTableName),
         'primaryKey' => $validPrimaryKey && !empty($referencePrimaryKey),
         'valueColumn' => $validValueColumn && !empty($referenceValueColumn),
         'referenceObjectName' => $validReferenceObjectName && !empty($referenceObjectName),
-        'referencePropertyName' => $validReferencePropertyName && !empty($validReferencePropertyName)
+        'referencePropertyName' => $validReferencePropertyName && !empty($validReferencePropertyName),
+        'columns' => $columns,
+        'primaryKeys' => $referenceData['primary_keys']
     );
     
     ResponseUtil::sendJSON($validation);
