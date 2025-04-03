@@ -330,6 +330,7 @@ try {
     $skipped[] = $appConfig->entityInfo->getIpAskEdit();
     $skipped[] = $appConfig->entityInfo->getActive();
     
+    // Exclude primary keys
     $skipped = array_merge($skipped, $referenceData['primary_keys']);
     
     $columns = array();
