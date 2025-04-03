@@ -1987,6 +1987,46 @@ let initAll = function () {
   $(document).on('change', '.rd-entity-name', function(e){
     validateEntityName();
   });
+  
+  $(document).on('focus', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
+    let value = $(this).val();
+    let td = $(this).closest('td');
+    td.find('.column-container a').removeClass('column-selected');
+    td.find('.column-container a[data-column="'+value+'"]').addClass('column-selected');
+    td.attr('data-focus', 'true');
+  });
+  $(document).on('blur', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
+    let td = $(this).closest('td');
+    setTimeout(function(){
+      td.attr('data-focus', 'false');  
+    }, 240);
+  });
+  
+  $(document).on('click', '.primary-key-list a, .column-list a', function(e){
+    e.preventDefault();
+    let column = $(this).attr('data-column');
+    let td = $(this).closest('td');
+    td.attr('data-focus', 'false');
+    let input = td.find('input[type="text"]');
+    input.val(column);
+    input.closest('.input-with-checker').attr('data-valid', 'true');
+  });
+  
+  $(document).on('click', '.table-list a', function(e){
+    e.preventDefault();
+    let table = $(this).attr('data-table');
+    let td = $(this).closest('td');
+    td.attr('data-focus', 'false');
+    let input = td.find('input[type="text"]');
+    input.closest('.input-with-checker').attr('data-valid', 'true');
+    let primaryKey = $(this).attr('data-primary-key');
+    input.val(table);
+    input.closest('.input-with-checker').attr('data-valid', 'true');
+    let inputPk = input.closest('table').find('.rd-primary-key');
+    inputPk.val(primaryKey);
+    inputPk.closest('.input-with-checker').attr('data-valid', 'true');
+    validateReference();
+  });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
@@ -2038,6 +2078,9 @@ function validateEntityName() {
  * on the validation results from the server response.
  */
 function validateReference() {
+  $('.column-list').empty();
+  $('.primary-key-list').empty();
+
   // Collect values from various input fields
   let table_name = $('select[name="source_table"]').val();
   let reference_table_name = $('.rd-table-name').val();
@@ -2087,6 +2130,34 @@ function validateReference() {
       valueColumnContainer.attr('data-valid', data.valueColumn ? 'true' : 'false');
       referenceObjectNameContainer.attr('data-valid', data.referenceObjectName ? 'true' : 'false');
       referencePropertyNameContainer.attr('data-valid', data.referencePropertyName ? 'true' : 'false');
+      
+      let ul1 = $('<ul />');
+      for(let i in data.primaryKeys)
+      {
+        let li1 = $(`<li><a href="javascript:;" data-column="${data.primaryKeys[i]}">${data.primaryKeys[i]}</a></li>`);
+        ul1.append(li1);
+      }
+      $('.primary-key-list').append(ul1);
+      
+      let ul2 = $('<ul />');
+      for(let i in data.columns)
+      {
+        let li2 = $(`<li><a href="javascript:;" data-column="${data.columns[i]}">${data.columns[i]}</a></li>`);
+        ul2.append(li2);
+      }
+      $('.column-list').append(ul2);
+      
+      if(!data.tableName)
+      {
+        let ul3 = $('<ul />');
+        for(let i in data.tables)
+        {
+          let li3 = $(`<li><a href="javascript:;" data-table="${data.tables[i].tableName}" data-primary-key="${data.tables[i].primaryKeys[0]}">${data.tables[i].tableName}</a></li>`);
+          ul3.append(li3);
+        }
+        $('.table-list').append(ul3);
+      }
+      
     }
   });
 }
@@ -5165,7 +5236,6 @@ function restoreForm(data)  //NOSONAR
       }
     }
   }
-  cnt = 0;
   selector = '#modal-order-data tbody tr:last-child';
 
   while ($('#modal-order-data tbody tr').length > 1) {
@@ -5174,15 +5244,16 @@ function restoreForm(data)  //NOSONAR
   $(selector).find('.data-filter-column-name').val('');
   $(selector).find('.data-filter-column-value').val('');
 
-  if (typeof data.sortable == 'undefined' || data.sortable.length == 0) {
+  cnt = 0;
+
+  if (!data.sortable || data.sortable.length === 0) {
     $(selector).find('.data-order-column-name').val('');
     $(selector).find('.data-order-order-type').val('PicoSort::ORDER_TYPE_ASC');
-  }
-  else {
+  } else {
     for (let i in data.sortable) {
       if (data.sortable.hasOwnProperty(i)) {
         if (cnt > 0) {
-          let trHtml = $(selector)[0].outerHTML;
+          let trHtml = $(selector).clone(true); 
           $(selector).parent().append(trHtml);
         }
         $(selector).find('.data-order-column-name').val(data.sortable[i].sortBy);
@@ -5191,7 +5262,7 @@ function restoreForm(data)  //NOSONAR
       }
     }
   }
-
+  
   if (typeof data.features != 'undefined') {
 
     if ($('#modal-module-features [name="activate_deactivate"]').length) {
