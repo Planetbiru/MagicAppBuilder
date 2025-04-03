@@ -1,1246 +1,1253 @@
 <div class="all">
-    <div class="tabs">
-      <ul class="nav nav-tabs" id="maintab" role="tablist">
-          <li class="nav-item level-superuser" role="presentation">
-              <a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
-          </li>
-          <li class="nav-item level-user" role="presentation">
-              <a href="magic-admin/profile.php" class="nav-link" type="button" role="tab" aria-controls="config">Profile</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="define-workspace-tab" data-toggle="tab" data-target="#define-workspace" type="button" role="tab" aria-controls="config" aria-selected="true">Workspace</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#define-application" type="button" role="tab" aria-controls="config" aria-selected="true">Apps</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="define-module-tab" data-toggle="tab" data-target="#define-module" type="button" role="tab" aria-controls="config" aria-selected="true">Select Table</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="define-column-tab" data-toggle="tab" data-target="#define-column" type="button" role="tab" aria-controls="config" aria-selected="true">Generate Module</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="module-file-tab" data-toggle="tab" data-target="#module-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Module</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="entity-file-tab" data-toggle="tab" data-target="#entity-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Entity</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="entity-relationship-tab" data-toggle="tab" data-target="#entity-relationship" type="button" role="tab" aria-controls="config" aria-selected="true">ERD</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="entity-query-tab" data-toggle="tab" data-target="#entity-query" type="button" role="tab" aria-controls="config" aria-selected="true">Query</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="translate-entity-tab" data-toggle="tab" data-target="#translate-entity" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Entity</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="translate-application-tab" data-toggle="tab" data-target="#translate-application" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Module</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="file-manager-tab" data-toggle="tab" data-target="#file-manager" type="button" role="tab" aria-controls="config" aria-selected="true">File Manager</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" role="tab" aria-controls="config" onclick="window.location='logout.php'">Logout</button>
-          </li>
-      </ul>
-      <div class="tab-content" id="myTabContent">
-  
-        <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-          <div class="form-control-container main-menu">
-            <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> Create New</button>
-            <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> Refresh</button>
-            <input type="text" class="form-control" id="search-workspace" placeholder="Type to search...">
-          </div>
-          
-          <div class="container-fluid workspace-container">
-          <div class="row workspace-card">
-          </div>
-          </div>
-        </div>
-  
-        <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
-  
-          <div class="form-control-container main-menu">
-            <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> Create New</button>
-            <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> Refresh</button>
-            <input type="text" class="form-control" id="search-application" placeholder="Type to search...">
-          </div>
-  
-          <div class="container-fluid application-container">
-            <div class="row application-card">
-            
-            </div>
-          </div>  
-        </div>
-  
-        <div id="define-module" class="tab-pane fade show active" role="tabpanel" aria-labelledby="define-module-tab">
-  
-          <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
-            <div class="card">
-              <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
-                <div class="card-body">
-                  <h4>Entity</h4>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>Table</td>
-                        <td><select class="form-control" name="source_table" required></select>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>
-                          <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Master Entity Name</td>
-                        <td><input type="text" class="form-control" name="entity_master_name" id="entity_master_name" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Master Primary Key</td>
-                        <td><input type="text" class="form-control" name="primary_key_master" id="primary_key_master" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Approval Table Name</td>
-                        <td><input type="text" class="form-control" name="table_approval_name" id="table_approval_name" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Approval Primary Key</td>
-                        <td><input type="text" class="form-control" name="primary_key_approval" id="primary_key_approval" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Approval Entity Name</td>
-                        <td><input type="text" class="form-control" name="entity_approval_name" id="entity_approval_name" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Trash Table Name</td>
-                        <td><input type="text" class="form-control" name="table_trash_name" id="table_trash_name" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Trash Primary Key</td>
-                        <td><input type="text" class="form-control" name="primary_key_trash" id="primary_key_trash" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Trash Entity Name</td>
-                        <td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-  
-                  <h4>Module Option</h4>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>Target</td>
-                        <td>
-                          <select class="form-control" name="current_module_location" id="current_module_location">
-                          </select>  
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>
-                          <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
-                          <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Update Entity</td>
-                        <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> Yes</label></td>
-                      </tr>
-                    </tbody>
-                  </table>
-  
-                  <h4>Module</h4>
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td>File Name</td>
-                        <td><input type="text" class="form-control" name="module_file" id="module_file" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Module Code</td>
-                        <td><input type="text" class="form-control" name="module_code" id="module_code" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Module Name</td>
-                        <td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
-                      </tr>
-                      <tr>
-                        <td>Load Saved Module</td>
-                        <td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked> Yes</label></td>
-                      </tr>
-                      <tr>
-                        <td>Add To Module List</td>
-                        <td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1"> Yes</label></td>
-                      </tr>
-                      <tr>
-                        <td>Special Access</td>
-                        <td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1"> Yes</label></td>
-                      </tr>
-                      <tr>
-                        <td>Add Menu</td>
-                        <td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate> Yes</label></td>
-                      </tr>
-                      <tr>
-                        <td>Append To</td>
-                        <td><select class="form-control" name="module_menu"></select></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>
-                          <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> Reload Menu</button>
-                          <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> Manage Manage</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-  
-                  <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tbody>
-                      <tr>
-                        <td></td>
-                        <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        
-        <div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
-          <div class="define-wrapper">
-            <form name="formgenerator" id="formgenerator" method="post" action="">
-              
-              <table width="100%" border="1" cellspacing="0" cellpadding="0" class="main-table">
-                <thead>
-                  <tr>
-                    <td rowspan="2" class="data-sort data-sort-header"></td>
-                    <td rowspan="2" align="center">Field</td>
-                    <td rowspan="2" align="center">Caption</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert">I</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update">U</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail">D</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List">L</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export">E</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">K</td>
-                    <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">R</td>
-                    <td colspan="6" align="center">Input</td>
-                    <td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Filter">Filter</td>
-                    <td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
-                    <td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
-                    <td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
-                  </tr>
-                  <tr>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea">TA</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox">CB</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
-                    <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Multiple">MU</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
-                    <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
-                    <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
-                    <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Multiple">MU</td>
-                  </tr>
-                </thead>
-  
-                <tbody class="data-table-manual-sort">
-                </tbody>
-              </table>
-              
-              <div class="form-control-container button-area">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
-                    <i class="fa-solid fa-filter"></i> Data Filter
-                </button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-order-data">
-                    <i class="fa-solid fa-arrow-up-a-z"></i> Data Order
-                </button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
-                    <i class="fa-solid fa-list-check"></i> Module Features
-                </button>
-                <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
-                    <i class="fa-solid fa-code"></i> Generate Module
-                </button> &nbsp;
-              </div>
-  
-              <!-- Reference Begin -->
-              <div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Create Data Reference</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i> Load</button>
-                        <button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-                        <button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i> OK</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Cancel</button>
-                    </div>
-                    </div>
-                </div>
-              </div>
-              <!-- Reference End -->
-  
-              <!-- Data Format Begin -->
-              <div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Data Format</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="tabs">
-                          <ul class="nav nav-tabs" id="maintab" role="tablist">
-                              <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
-                              </li>
-                              <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
-                              </li>
-                              <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
-                              </li>               
-                          </ul>
-                          <div id="data-format-tab" class="tab-content">
-                              <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                                  <input type="text" id="input-control-string-format" class="form-control">
-                                  <div class="input-description">
-                                  <p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter. </p>
-                                  <p><a href="https://www.php.net/manual/en/function.sprintf.php" target="_blank">https://www.php.net/manual/en/function.sprintf.php</a></p>
-                                  </div>
-                              </div>
-                              <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                                  <input type="text" id="input-control-date-format" class="form-control">
-                                  <div class="input-description">
-                                  <p>The format of the outputted date string.</p>
-                                  <p><a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">https://www.php.net/manual/en/datetime.format.php</a></p>
-                                  </div>
-                              </div>
-                              <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
-                                  <div class="input-label">Decimal</div>                 
-                                  <input type="text" id="input-control-decimal" class="form-control">
-                                  <div class="input-label">Decimal Separator</div>                
-                                  <input type="text" id="input-control-decimal-separator" class="form-control">
-                                  <div class="input-label">Thousands Separator</div>                
-                                  <input type="text" id="input-control-thousands-separator" class="form-control">
-                                  <div class="input-description">
-                                    <p><a href="https://www.php.net/manual/en/function.number-format.php" target="_blank">https://www.php.net/manual/en/function.number-format.php</a></p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Data Format End -->
-  
-              <!-- Filter Data Begin -->
-              <div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Data Filter</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="table-reference-container">
-                      <table class="table table-reference table-data-filter" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
-                        <thead>
-                          <tr>
-                            <td width="35%">Column</td>
-                            <td width="12%">Comp</td>
-                            <td>Value</td>
-                            <td width="42">Rem</td>
-                            <td colspan="2">Move</td>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off"></td>
-                            <td>
-                              <select class="form-control data-filter-column-comparison">
-                                <option value="equals">=</option>
-                                <option value="notEquals">!=</option>
-                                <option value="greaterThan">&gt;</option>
-                                <option value="greaterThanOrEquals">&gt;=</option>
-                                <option value="lessThan">&lt;</option>
-                                <option value="lessThanOrEquals">&lt;=</option>
-                              </select>
-                            </td>
-                            <td><input type="text" class="form-control data-filter-column-value" value="" autocomplete="off"></td>
-                            <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                            <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                            <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                          </tr>
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td colspan="6"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> Add Row</button></td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Filter Data End -->
-  
-              <!-- Order Data Begin -->
-              <div class="modal fade" id="modal-order-data" tabindex="-1" aria-labelledby="modal_order_label" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Data Order</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                    <div class="table-reference-container">
-                      <table class="table table-reference table-data-order" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
-                        <thead>
-                          <tr>
-                            <td width="55%">Column</td>
-                            <td>Value</td>
-                            <td width="42">Rem</td>
-                            <td colspan="2">Move</td>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off"></td>
-                            <td><select class="form-control data-order-order-type">
-                                <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
-                                <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
-                              </select></td>
-                            <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
-                            <td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
-                            <td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
-                          </tr>
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td colspan="5"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> Add Row</button></td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Order Data End -->
-  
-              <!-- Module Features Begin -->
-              <div class="modal fade" id="modal-module-features" tabindex="-1" aria-labelledby="modal_features_label" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Module Features</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tbody>
-                          <tr>
-                            <td>Activate/Decativate</td>
-                            <td><label for="activate_deactivate"><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1"> Activate/Decativate</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Manual Sort Order</td>
-                            <td><label for="manualsortorder"><input type="checkbox" name="manualsortorder" id="manualsortorder" value="1"> Manual Sort Order</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Export to Excel</td>
-                            <td><label for="export_to_excel"><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1"> Export to Excel</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Export to CSV</td>
-                            <td><label for="export_to_csv"><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1"> Export to CSV</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Use Temporary File</td>
-                            <td><label for="export_use_temporary"><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled> Use Temporary File</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>User Activity Logger</td>
-                            <td><label for="user_activity_logger"><input type="checkbox" name="user_activity_logger" id="user_activity_logger" value="1"> User Activity Logger</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Approval</td>
-                            <td><label for="with_approval"><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
-                          </tr>
-                          <tr style="display: none;">
-                            <td>Approval Note</td>
-                            <td><label for="with_approval_note"><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1"> Approval Note</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Approval Type</td>
-                            <td>
-                              <label for="approval_type1"><input type="radio" name="approval_type" id="approval_type1" value="1"> Separated</label> &nbsp; 
-                              <label for="approval_type2"><input type="radio" name="approval_type" id="approval_type2" value="2" checked> Combined</label> &nbsp;
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Approval Position</td>
-                            <td>
-                              <label for="approval_position1"><input type="radio" name="approval_position" id="approval_position1" value="before-data"> Before Data</label> &nbsp; 
-                              <label for="approval_position2"><input type="radio" name="approval_position" id="approval_position2" value="after-data" checked> After Data</label> &nbsp;
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Approval by Another User</td>
-                            <td><label for="approval_by_other_user"><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1"> Approval by Another User</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Trash</td>
-                            <td><label for="with_trash"><input type="checkbox" name="with_trash" id="with_trash" value="1"> Trash</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Backend Only</td>
-                            <td><label for="backend_only"><input type="checkbox" name="backend_only" id="backend_only" value="1"> Backend Only</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>AJAX Support</td>
-                            <td><label for="ajax_support"><input type="checkbox" name="ajax_support" id="ajax_support" value="1"> AJAX Support</label> &nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td>Subquery</td>
-                            <td><label for="subquery"><input type="checkbox" name="subquery" id="subquery" value="1"> Subquery</label> &nbsp;</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Module Features End -->
-  
-            </form>
-          </div>
-        </div>
-  
-        <div id="module-file" class="tab-pane fade" role="tabpanel" aria-labelledby="module-file-tab">
-          <div class="module-container">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Modules</h4>
-                </div>
-                <div class="column-body">
-                  <div class="module-list module-list-file"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title">
-                  <h4>Content</h4>
-                </div>
-                <div class="column-body">
-                  <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                  <div class="form-control-container button-area">
-                    <button type="button" class="btn btn-success" id="button_save_module_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
-                    <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div id="entity-file" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-file-tab">
-          <div class="entity-container-file">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Entities</h4>
-                </div>
-                <div class="column-body">
-                  <div class="entity-list"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title">
-                  <h4>Content</h4>
-                </div>
-                <div class="column-body">
-                  <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
-                  <div class="form-control-container button-area">
-                    <button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
-                    <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
-                    <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div id="entity-relationship" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-relationship-tab">
-          <div class="entity-container-relationship">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Entities</h4>
-                </div>
-                <div class="column-body">
-                  <div class="entity-list"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title">
-                  <h4>Entity Relationship Diagram</h4>
-                </div>
-                <div class="column-body">
-                  <div class="form-control-container diagram-option">
-                    <span>Max Level</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
-                    <span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
-                    <span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
-                    <span>Margin Y</span> <input type="number" class="form-control" name="margin_y" value="0" min="0">
-                    <span>H Space</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
-                    <span>V Space</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
-                    <span>Zoom</span> <input type="number" class="form-control" step="0.05" name="zoom" value="1" min="0.5">
-                    <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> Reload</button>
-                    <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> SVG</button>
-                    <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i> PNG</button>
-                    <button type="button" class="btn btn-primary download-file" onclick="downloadMarkdown()"><i class="fa-solid fa-file"></i> Markdown</button>
-                  </div>
-                  <div class="erd-image"></div>
-                  <map name="erd-map"></map>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div id="entity-query" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-query-tab">
-          <div class="entity-container-query">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Entities</h4>
-                </div>
-                <div class="column-body">
-                  <div class="entity-list"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title">
-                  <h4>Query</h4>
-                </div>
-                <div class="column-body">
-                  <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
-                  <div class="form-control-container button-area">
-                    <button type="button" class="btn btn-success" id="button_save_entity_query" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
-                    <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  Execute Query</button>
-                    <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> Explore Database</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div id="translate-entity" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-entity-tab">
-          <div class="container-translate-entity">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Entities</h4>
-                </div>
-                <div class="column-body">
-                  <div class="entity-list"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title"> 
-                  <span>Target Language</span>
-                  <select class="form-control target-language" data-translate-for="entity">
-                  </select>
-                  <span>Filter</span>
-                  <select class="form-control filter-translate" data-translate-for="entity">
-                    <option value="untranslated">Untranslated</option>
-                    <option value="all">All</option>
-                  </select>
-                  <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
-                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
-                </div>
-                <div class="column-body">
-                  <div class="row">
-                    <div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
-                    <div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
-                  </div>
-                  <div class="form-control-container button-area">
-                    <input type="hidden" class="entity-property-name" value="">
-                    <input type="hidden" class="entity-name" value="">
-                    <button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div id="translate-application" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-application-tab">
-          <div class="container-translate-module">
-            <div class="row">
-              <div class="col col-2">
-                <div class="form-control-container column-title">
-                  <h4>Modules</h4>
-                </div>
-                <div class="column-body">
-                  <div class="module-list module-list-translate"></div>
-                </div>
-              </div>
-              <div class="col col-10">
-                <div class="form-control-container column-title"> 
-                  <span>Target Language</span>
-                  <select class="form-control target-language" data-translate-for="module">
-                  </select>
-                  <span>Filter</span>
-                  <select class="form-control filter-translate" data-translate-for="module">
-                    <option value="untranslated">Untranslated</option>
-                    <option value="all">All</option>
-                  </select>
-                  <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
-                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
-                </div>
-                <div class="column-body">
-                  <div class="row">
-                    <div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
-                    <div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
-                  </div>
-                  <div class="form-control-container button-area">
-                    <input type="hidden" class="module-property-name" value="">
-                    <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div id="file-manager" class="tab-pane fade" role="tabpanel" aria-labelledby="file-manager-tab">
-          <div class="container-file-manager">
-            <div class="row">
-                <div class="file-manager-left-panel">
-                    <h3>Directory</h3>
-                    <ul id="dir-tree" data-base-directory="./">
-                    </ul>
-                </div>
-            
-                <div class="file-manager-right-panel">
-                    <h3>File Contents</h3>
-                    <div id="file-content">
-                        <div class="media-display image-mode"></div>
-                        <div class="code text-mode">
-                            <textarea id="code" name="code"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>  
-  
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-create-application" tabindex="-1" aria-labelledby="application_modal_label" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Create New Application</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="">
-            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tbody>
-                <tr>
-                  <td>Application Name</td>
-                  <td><input type="text" class="form-control" name="application_name" autocomplete="off"></td>
-                </tr>
-                <tr>
-                  <td>Application ID</td>
-                  <td><input type="text" class="form-control" name="application_id" autocomplete="off"></td>
-                </tr>
-                <tr>
-                  <td>Architecture</td>
-                  <td>
-                      <select class="form-control" name="application_architecture">
-                          <option value="monolith">Monolith Application</option>
-                          <option value="microservices">Microservices Aplication</option>
-                      </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Description</td>
-                  <td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
-                </tr>
-                <tr>
-                  <td>Installation Method</td>
-                  <td>
-                      <select class="form-control" type="text" name="installation_method">
-                    
-                      </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>MagicApp Version</td>
-                  <td>
-                      <select class="form-control" name="magic_app_version">
-                          
-                      </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Workspace</td>
-                  <td><select class="form-control" name="application_workspace_id"></select></td>
-                </tr>
-                <tr>
-                  <td>Application Directory</td>
-                  <td><span class="directory-container input-with-checker" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
-                </tr>                
-                <tr>
-                  <td>Base Namespace</td>
-                  <td><input type="text" class="form-control" name="application_namespace" autocomplete="off" autocomplete="off"></td>
-                </tr>
-                <tr>
-                  <td>Author</td>
-                  <td><input type="text" class="form-control" name="application_author" autocomplete="off"></td>
-                </tr>           
-                <tr>
-                  <td>Path</td>
-                  <td class="paths">
-                    <table class="path-manager">
-                      <thead>
-                        <tr>
-                          <td>Name</td>
-                          <td>Path</td>
-                          <td width="20"></td>
-                          <td width="35"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
-                          <td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
-                          <td><input type="checkbox" name="checked[0]" checked></td>
-                          <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                        </tr>
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colspan="4">
-                          <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> Create</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add Language</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">            
-              <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tbody>
-                <tr>
-                  <td>Language</td>
-                  <td><input type="text" class="form-control" name="language_name" autocomplete="off"></td>
-                </tr>
-                <tr>
-                  <td>Code</td>
-                  <td><input type="text" class="form-control" name="language_code" autocomplete="off"></td>
-                </tr>
-              </tbody>
-            </table>      
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i> Add</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-update-path" tabindex="-1" aria-labelledby="application_path" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Module Location Manager</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="">
-            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tbody>
-                <tr>
-                  <td>Path</td>
-                  <td class="paths">
-                    <table class="path-manager">
-                      <thead>
-                        <tr>
-                          <td>Name</td>
-                          <td>Path</td>
-                          <td width="20"></td>
-                          <td width="35"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="text" class="form-control location-name" name="name[0]" value="" autocomplete="off"></td>
-                          <td><input type="text" class="form-control location-path" name="path[0]" value="" autocomplete="off"></td>
-                          <td><input type="checkbox" name="checked[0]" checked></td>
-                          <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                        </tr>
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colspan="4">
-                          <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i> Update</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_language" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Application Language Manager</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="">
-            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tbody>
-                <tr>
-                  <td>Language</td>
-                  <td class="languages">
-                    <table class="language-manager">
-                      <thead>
-                        <tr>
-                          <td>Name</td>
-                          <td>Code</td>
-                          <td width="20"></td>
-                          <td width="35"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
-                          <td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
-                          <td><input type="checkbox" name="checked[0]" checked></td>
-                          <td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
-                        </tr>
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colspan="4">
-                          <button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i> Add</button>
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i> Update</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-entity-detail" tabindex="-1" aria-labelledby="application_entity" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Entity Detail</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="entity-detail"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Application Setting</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="application-setting"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-workspace" tabindex="-1" aria-labelledby="application_workspace" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Workspace</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="">
-            <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tbody>
-              <tr>
-                  <td>Name</td>
-                  <td><input type="text" class="form-control" name="workspace_name" value="" autocomplete="off"></td>
-                </tr>
-                <tr>
-                  <td>Description</td>
-                  <td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
-                </tr>
-                <tr>
-                  <td>Directory</td>
-                  <td><span class="directory-container input-with-checker"><input type="text" class="form-control" name="workspace_directory" value="" autocomplete="off"></span></td>
-                </tr>
-                <tr>
-                  <td>PHP Path</td>
-                  <td><input type="text" class="form-control" name="php_path" value="" autocomplete="off"></td>
-                </tr>
-              </tbody>
-            </table>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-application-menu" tabindex="-1" aria-labelledby="application_menu" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Application Menu</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-  
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i> Add</button>
-          <button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-application-menu-add" tabindex="-1" aria-labelledby="application_menu_add" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add Menu</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i> OK</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog modal-fullscreen">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Database Explorer</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="database-explorer">
-            
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="modal-query-executor" tabindex="-1" aria-labelledby="application_query_executor" aria-hidden="true" >
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Query Executor</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="query-container">
-            <textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success button-execute-query">
-              <i class="fas fa-play"></i> Execute
-          </button>
-          
-          <button type="button" class="btn btn-primary button-open-file">
-              <i class="fas fa-folder-open"></i> Open File
-          </button>
-          
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-              <i class="fas fa-times"></i> Close
-          </button>        
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Alert</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-    
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="alertOverlay" id="alertOverlay"></div>
-  <div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="alertTitle">Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="alertMessage">This is the alert message.</p>
-            </div>
-            <div class="modal-footer" id="modalFooter">
-            </div>
-        </div>
-    </div>
-  </div>
-  
-  <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
-  </div>
-  
-  <div class="status-bar-container position-fixed bottom-0 right-0 p-3">
-    <div class="status-bar">
-        <div class="ajax-pending"></div>
-    </div>
-  </div>
+<div class="tabs">
+<ul class="nav nav-tabs" id="maintab" role="tablist">
+<li class="nav-item level-superuser" role="presentation">
+<a href="magic-admin/" class="nav-link" type="button" role="tab" aria-controls="config">Administration</a>
+</li>
+<li class="nav-item level-user" role="presentation">
+<a href="magic-admin/profile.php" class="nav-link" type="button" role="tab" aria-controls="config">Profile</a>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-workspace-tab" data-toggle="tab" data-target="#define-workspace" type="button" role="tab" aria-controls="config" aria-selected="true">Workspace</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#define-application" type="button" role="tab" aria-controls="config" aria-selected="true">Apps</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link active" id="define-module-tab" data-toggle="tab" data-target="#define-module" type="button" role="tab" aria-controls="config" aria-selected="true">Select Table</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-column-tab" data-toggle="tab" data-target="#define-column" type="button" role="tab" aria-controls="config" aria-selected="true">Generate Module</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="module-file-tab" data-toggle="tab" data-target="#module-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Module</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="entity-file-tab" data-toggle="tab" data-target="#entity-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Entity</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="entity-relationship-tab" data-toggle="tab" data-target="#entity-relationship" type="button" role="tab" aria-controls="config" aria-selected="true">ERD</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="entity-query-tab" data-toggle="tab" data-target="#entity-query" type="button" role="tab" aria-controls="config" aria-selected="true">Query</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="translate-entity-tab" data-toggle="tab" data-target="#translate-entity" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Entity</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="translate-application-tab" data-toggle="tab" data-target="#translate-application" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Module</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="file-manager-tab" data-toggle="tab" data-target="#file-manager" type="button" role="tab" aria-controls="config" aria-selected="true">File Manager</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" type="button" role="tab" aria-controls="config" onclick="window.location='logout.php'">Logout</button>
+</li>
+</ul>
+<div class="tab-content" id="myTabContent">
+
+<div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+<div class="form-control-container main-menu">
+<button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> Create New</button>
+<button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> Refresh</button>
+<input type="text" class="form-control" id="search-workspace" placeholder="Type to search...">
+</div>
+
+<div class="container-fluid workspace-container">
+<div class="row workspace-card">
+</div>
+</div>
+</div>
+
+<div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
+
+<div class="form-control-container main-menu">
+<button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> Create New</button>
+<button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> Refresh</button>
+<input type="text" class="form-control" id="search-application" placeholder="Type to search...">
+</div>
+
+<div class="container-fluid application-container">
+<div class="row application-card">
+
+</div>
+</div>  
+</div>
+
+<div id="define-module" class="tab-pane fade show active" role="tabpanel" aria-labelledby="define-module-tab">
+
+<form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+<div class="card">
+<div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
+<div class="card-body">
+<h4>Entity</h4>
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Table</td>
+<td><select class="form-control" name="source_table" required></select>
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
+</td>
+</tr>
+<tr>
+<td>Master Entity Name</td>
+<td><input type="text" class="form-control" name="entity_master_name" id="entity_master_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Master Primary Key</td>
+<td><input type="text" class="form-control" name="primary_key_master" id="primary_key_master" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Approval Table Name</td>
+<td><input type="text" class="form-control" name="table_approval_name" id="table_approval_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Approval Primary Key</td>
+<td><input type="text" class="form-control" name="primary_key_approval" id="primary_key_approval" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Approval Entity Name</td>
+<td><input type="text" class="form-control" name="entity_approval_name" id="entity_approval_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Trash Table Name</td>
+<td><input type="text" class="form-control" name="table_trash_name" id="table_trash_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Trash Primary Key</td>
+<td><input type="text" class="form-control" name="primary_key_trash" id="primary_key_trash" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Trash Entity Name</td>
+<td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
+</tr>
+</tbody>
+</table>
+
+<h4>Module Option</h4>
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Target</td>
+<td>
+<select class="form-control" name="current_module_location" id="current_module_location">
+</select>  
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
+<button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
+</td>
+</tr>
+<tr>
+<td>Update Entity</td>
+<td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> Yes</label></td>
+</tr>
+</tbody>
+</table>
+
+<h4>Module</h4>
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>File Name</td>
+<td><input type="text" class="form-control" name="module_file" id="module_file" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Module Code</td>
+<td><input type="text" class="form-control" name="module_code" id="module_code" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Module Name</td>
+<td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Load Saved Module</td>
+<td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked> Yes</label></td>
+</tr>
+<tr>
+<td>Add To Module List</td>
+<td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1"> Yes</label></td>
+</tr>
+<tr>
+<td>Special Access</td>
+<td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1"> Yes</label></td>
+</tr>
+<tr>
+<td>Add Menu</td>
+<td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate> Yes</label></td>
+</tr>
+<tr>
+<td>Append To</td>
+<td><select class="form-control" name="module_menu"></select></td>
+</tr>
+<tr>
+<td></td>
+<td>
+<button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> Reload Menu</button>
+<button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> Manage Manage</button>
+</td>
+</tr>
+</tbody>
+</table>
+
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td></td>
+<td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</form>
+</div>
+
+<div id="define-column" class="tab-pane fade" role="tabpanel" aria-labelledby="define-column-tab">
+<div class="define-wrapper">
+<form name="formgenerator" id="formgenerator" method="post" action="">
+
+<table width="100%" border="1" cellspacing="0" cellpadding="0" class="main-table">
+<thead>
+<tr>
+<td rowspan="2" class="data-sort data-sort-header"></td>
+<td rowspan="2" align="center">Field</td>
+<td rowspan="2" align="center">Caption</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert">I</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update">U</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail">D</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List">L</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export">E</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key">K</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required">R</td>
+<td colspan="6" align="center">Input</td>
+<td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Filter">Filter</td>
+<td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
+<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
+<td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
+</tr>
+<tr>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea">TA</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox">CB</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
+<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Multiple">MU</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text">TE</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select">SE</td>
+<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select">Source</td>
+<td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Multiple">MU</td>
+</tr>
+</thead>
+
+<tbody class="data-table-manual-sort">
+</tbody>
+</table>
+
+<div class="form-control-container button-area">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
+<i class="fa-solid fa-filter"></i> Data Filter
+</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-order-data">
+<i class="fa-solid fa-arrow-up-a-z"></i> Data Order
+</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
+<i class="fa-solid fa-list-check"></i> Module Features
+</button>
+<button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
+<i class="fa-solid fa-code"></i> Generate Module
+</button> &nbsp;
+</div>
+
+<!-- Reference Begin -->
+<div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Create Data Reference</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i> Load</button>
+<button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Reference End -->
+
+<!-- Data Format Begin -->
+<div class="modal fade" id="data-format" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Data Format</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="tabs">
+<ul class="nav nav-tabs" id="maintab" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" id="define-workspace-tab" data-toggle="tab" data-target="#string-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">String Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-application-tab" data-toggle="tab" data-target="#date-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Date Format</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="define-module-tab" data-toggle="tab" data-target="#number-format-tab" type="button" role="tab" aria-controls="config" aria-selected="true">Number Format</button>
+</li>               
+</ul>
+<div id="data-format-tab" class="tab-content">
+<div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-string-format" class="form-control">
+<div class="input-description">
+<p>The format string is composed of zero or more directives: ordinary characters (excluding %) that are copied directly to the result and conversion specifications, each of which results in fetching its own parameter. </p>
+<p><a href="https://www.php.net/manual/en/function.sprintf.php" target="_blank">https://www.php.net/manual/en/function.sprintf.php</a></p>
+</div>
+</div>
+<div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
+<input type="text" id="input-control-date-format" class="form-control">
+<div class="input-description">
+<p>The format of the outputted date string.</p>
+<p><a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">https://www.php.net/manual/en/datetime.format.php</a></p>
+</div>
+</div>
+<div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
+<div class="input-label">Decimal</div>                 
+<input type="text" id="input-control-decimal" class="form-control">
+<div class="input-label">Decimal Separator</div>                
+<input type="text" id="input-control-decimal-separator" class="form-control">
+<div class="input-label">Thousands Separator</div>                
+<input type="text" id="input-control-thousands-separator" class="form-control">
+<div class="input-description">
+<p><a href="https://www.php.net/manual/en/function.number-format.php" target="_blank">https://www.php.net/manual/en/function.number-format.php</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Format End -->
+
+<!-- Filter Data Begin -->
+<div class="modal fade" id="modal-filter-data" tabindex="-1" aria-labelledby="modal_filter_label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Data Filter</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="table-reference-container">
+<table class="table table-reference table-data-filter" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
+<thead>
+<tr>
+<td width="35%">Column</td>
+<td width="12%">Comp</td>
+<td>Value</td>
+<td width="42">Rem</td>
+<td colspan="2">Move</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off"></td>
+<td>
+<select class="form-control data-filter-column-comparison">
+<option value="equals">=</option>
+<option value="notEquals">!=</option>
+<option value="greaterThan">&gt;</option>
+<option value="greaterThanOrEquals">&gt;=</option>
+<option value="lessThan">&lt;</option>
+<option value="lessThanOrEquals">&lt;=</option>
+</select>
+</td>
+<td><input type="text" class="form-control data-filter-column-value" value="" autocomplete="off"></td>
+<td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+<td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+<td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="6"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> Add Row</button></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Data End -->
+
+<!-- Order Data Begin -->
+<div class="modal fade" id="modal-order-data" tabindex="-1" aria-labelledby="modal_order_label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Data Order</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="table-reference-container">
+<table class="table table-reference table-data-order" width="100%" border="0" cellspacing="0" cellpadding="0" data-empty-on-remove="true">
+<thead>
+<tr>
+<td width="55%">Column</td>
+<td>Value</td>
+<td width="42">Rem</td>
+<td colspan="2">Move</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off"></td>
+<td><select class="form-control data-order-order-type">
+<option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
+<option value="PicoSort::ORDER_TYPE_DESC">DESC</option>
+</select></td>
+<td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa-regular fa-trash-can"></i></button></td>
+<td width="30"><button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button></td>
+<td width="30"><button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="5"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> Add Row</button></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Data End -->
+
+<!-- Module Features Begin -->
+<div class="modal fade" id="modal-module-features" tabindex="-1" aria-labelledby="modal_features_label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Module Features</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Activate/Decativate</td>
+<td><label for="activate_deactivate"><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1"> Activate/Decativate</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Manual Sort Order</td>
+<td><label for="manualsortorder"><input type="checkbox" name="manualsortorder" id="manualsortorder" value="1"> Manual Sort Order</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Export to Excel</td>
+<td><label for="export_to_excel"><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1"> Export to Excel</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Export to CSV</td>
+<td><label for="export_to_csv"><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1"> Export to CSV</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Use Temporary File</td>
+<td><label for="export_use_temporary"><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled> Use Temporary File</label> &nbsp;</td>
+</tr>
+<tr>
+<td>User Activity Logger</td>
+<td><label for="user_activity_logger"><input type="checkbox" name="user_activity_logger" id="user_activity_logger" value="1"> User Activity Logger</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Approval</td>
+<td><label for="with_approval"><input type="checkbox" name="with_approval" id="with_approval" value="1"> Approval</label> &nbsp;</td>
+</tr>
+<tr style="display: none;">
+<td>Approval Note</td>
+<td><label for="with_approval_note"><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1"> Approval Note</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Approval Type</td>
+<td>
+<label for="approval_type1"><input type="radio" name="approval_type" id="approval_type1" value="1"> Separated</label> &nbsp; 
+<label for="approval_type2"><input type="radio" name="approval_type" id="approval_type2" value="2" checked> Combined</label> &nbsp;
+</td>
+</tr>
+<tr>
+<td>Approval Position</td>
+<td>
+<label for="approval_position1"><input type="radio" name="approval_position" id="approval_position1" value="before-data"> Before Data</label> &nbsp; 
+<label for="approval_position2"><input type="radio" name="approval_position" id="approval_position2" value="after-data" checked> After Data</label> &nbsp;
+</td>
+</tr>
+<tr>
+<td>Approval by Another User</td>
+<td><label for="approval_by_other_user"><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1"> Approval by Another User</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Trash</td>
+<td><label for="with_trash"><input type="checkbox" name="with_trash" id="with_trash" value="1"> Trash</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Backend Only</td>
+<td><label for="backend_only"><input type="checkbox" name="backend_only" id="backend_only" value="1"> Backend Only</label> &nbsp;</td>
+</tr>
+<tr>
+<td>AJAX Support</td>
+<td><label for="ajax_support"><input type="checkbox" name="ajax_support" id="ajax_support" value="1"> AJAX Support</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Subquery</td>
+<td><label for="subquery"><input type="checkbox" name="subquery" id="subquery" value="1"> Subquery</label> &nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Module Features End -->
+
+</form>
+</div>
+</div>
+
+<div id="module-file" class="tab-pane fade" role="tabpanel" aria-labelledby="module-file-tab">
+<div class="module-container">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Modules</h4>
+</div>
+<div class="column-body">
+<div class="module-list module-list-file"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title">
+<h4>Content</h4>
+</div>
+<div class="column-body">
+<textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
+<div class="form-control-container button-area">
+<button type="button" class="btn btn-success" id="button_save_module_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Module</button>
+<button type="button" class="btn btn-danger" id="button_delete_module_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Module</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="entity-file" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-file-tab">
+<div class="entity-container-file">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Entities</h4>
+</div>
+<div class="column-body">
+<div class="entity-list"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title">
+<h4>Content</h4>
+</div>
+<div class="column-body">
+<textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
+<div class="form-control-container button-area">
+<button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
+<button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
+<button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="entity-relationship" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-relationship-tab">
+<div class="entity-container-relationship">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Entities</h4>
+</div>
+<div class="column-body">
+<div class="entity-list"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title">
+<h4>Entity Relationship Diagram</h4>
+</div>
+<div class="column-body">
+<div class="form-control-container diagram-option">
+<span>Max Level</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
+<span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
+<span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
+<span>Margin Y</span> <input type="number" class="form-control" name="margin_y" value="0" min="0">
+<span>H Space</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
+<span>V Space</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
+<span>Zoom</span> <input type="number" class="form-control" step="0.05" name="zoom" value="1" min="0.5">
+<button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> Reload</button>
+<button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> SVG</button>
+<button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i> PNG</button>
+<button type="button" class="btn btn-primary download-file" onclick="downloadMarkdown()"><i class="fa-solid fa-file"></i> Markdown</button>
+</div>
+<div class="erd-image"></div>
+<map name="erd-map"></map>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="entity-query" class="tab-pane fade" role="tabpanel" aria-labelledby="entity-query-tab">
+<div class="entity-container-query">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Entities</h4>
+</div>
+<div class="column-body">
+<div class="entity-list"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title">
+<h4>Query</h4>
+</div>
+<div class="column-body">
+<textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
+<div class="form-control-container button-area">
+<button type="button" class="btn btn-success" id="button_save_entity_query" disabled><i class="fa-solid fa-floppy-disk"></i> Save Query</button>
+<button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  Execute Query</button>
+<button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> Explore Database</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="translate-entity" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-entity-tab">
+<div class="container-translate-entity">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Entities</h4>
+</div>
+<div class="column-body">
+<div class="entity-list"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title"> 
+<span>Target Language</span>
+<select class="form-control target-language" data-translate-for="entity">
+</select>
+<span>Filter</span>
+<select class="form-control filter-translate" data-translate-for="entity">
+<option value="untranslated">Untranslated</option>
+<option value="all">All</option>
+</select>
+<button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
+</div>
+<div class="column-body">
+<div class="row">
+<div class="col-6"><textarea class="entity-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+<div class="col-6"><textarea class="entity-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+</div>
+<div class="form-control-container button-area">
+<input type="hidden" class="entity-property-name" value="">
+<input type="hidden" class="entity-name" value="">
+<button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="translate-application" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-application-tab">
+<div class="container-translate-module">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Modules</h4>
+</div>
+<div class="column-body">
+<div class="module-list module-list-translate"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title"> 
+<span>Target Language</span>
+<select class="form-control target-language" data-translate-for="module">
+</select>
+<span>Filter</span>
+<select class="form-control filter-translate" data-translate-for="module">
+<option value="untranslated">Untranslated</option>
+<option value="all">All</option>
+</select>
+<button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
+</div>
+<div class="column-body">
+<div class="row">
+<div class="col-6"><textarea class="module-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+<div class="col-6"><textarea class="module-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+</div>
+<div class="form-control-container button-area">
+<input type="hidden" class="module-property-name" value="">
+<button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="file-manager" class="tab-pane fade" role="tabpanel" aria-labelledby="file-manager-tab">
+<div class="container-file-manager">
+<div class="row">
+<div class="file-manager-left-panel col col-2">
+<div>Directory</div>
+<ul id="dir-tree" data-base-directory="./">
+</ul>
+</div>
+
+<div class="file-manager-right-panel col col-10">
+<div>File Contents</div>
+<div id="file-content">
+<div class="media-display image-mode"></div>
+<div class="code text-mode">
+<div class="path-bar d-flex">
+<input type="text" class="file-path form-control me-2" placeholder="File Path">
+<button type="button" class="btn btn-primary btn-open-file">Open</button>
+<button type="button" class="btn btn-success btn-save-file">Save</button>
+</div>
+<div class="file-editor">
+<textarea id="code" name="code"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>  
+
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-create-application" tabindex="-1" aria-labelledby="application_modal_label" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Create New Application</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<form action="">
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Application Name</td>
+<td><input type="text" class="form-control" name="application_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Application ID</td>
+<td><input type="text" class="form-control" name="application_id" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td>
+<select class="form-control" name="application_architecture">
+<option value="monolith">Monolith Application</option>
+<option value="microservices">Microservices Aplication</option>
+</select>
+</td>
+</tr>
+<tr>
+<td>Description</td>
+<td><textarea class="form-control" name="application_description" spellcheck="false"></textarea></td>
+</tr>
+<tr>
+<td>Installation Method</td>
+<td>
+<select class="form-control" type="text" name="installation_method">
+
+</select>
+</td>
+</tr>
+<tr>
+<td>MagicApp Version</td>
+<td>
+<select class="form-control" name="magic_app_version">
+
+</select>
+</td>
+</tr>
+<tr>
+<td>Workspace</td>
+<td><select class="form-control" name="application_workspace_id"></select></td>
+</tr>
+<tr>
+<td>Application Directory</td>
+<td><span class="directory-container input-with-checker" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
+</tr>                
+<tr>
+<td>Base Namespace</td>
+<td><input type="text" class="form-control" name="application_namespace" autocomplete="off" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Author</td>
+<td><input type="text" class="form-control" name="application_author" autocomplete="off"></td>
+</tr>           
+<tr>
+<td>Path</td>
+<td class="paths">
+<table class="path-manager">
+<thead>
+<tr>
+<td>Name</td>
+<td>Path</td>
+<td width="20"></td>
+<td width="35"></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
+<td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
+<td><input type="checkbox" name="checked[0]" checked></td>
+<td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
+</td>
+</tr>
+</tfoot>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> Create</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="add-language-dialog" tabindex="-1" aria-labelledby="add-language-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Add Language</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">            
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Language</td>
+<td><input type="text" class="form-control" name="language_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Code</td>
+<td><input type="text" class="form-control" name="language_code" autocomplete="off"></td>
+</tr>
+</tbody>
+</table>      
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i> Add</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-update-path" tabindex="-1" aria-labelledby="application_path" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Module Location Manager</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<form action="">
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Path</td>
+<td class="paths">
+<table class="path-manager">
+<thead>
+<tr>
+<td>Name</td>
+<td>Path</td>
+<td width="20"></td>
+<td width="35"></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="text" class="form-control location-name" name="name[0]" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control location-path" name="path[0]" value="" autocomplete="off"></td>
+<td><input type="checkbox" name="checked[0]" checked></td>
+<td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> Add</button>
+</td>
+</tr>
+</tfoot>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-update-language" tabindex="-1" aria-labelledby="application_language" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Application Language Manager</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<form action="">
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Language</td>
+<td class="languages">
+<table class="language-manager">
+<thead>
+<tr>
+<td>Name</td>
+<td>Code</td>
+<td width="20"></td>
+<td width="35"></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
+<td><input type="checkbox" name="checked[0]" checked></td>
+<td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i> Add</button>
+</td>
+</tr>
+</tfoot>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-entity-detail" tabindex="-1" aria-labelledby="application_entity" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Entity Detail</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="entity-detail"></div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-setting" tabindex="-1" aria-labelledby="application_setting" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Application Setting</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="application-setting"></div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-workspace" tabindex="-1" aria-labelledby="application_workspace" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Workspace</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<form action="">
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Name</td>
+<td><input type="text" class="form-control" name="workspace_name" value="" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Description</td>
+<td><textarea class="form-control" name="workspace_description" spellcheck="false"></textarea></td>
+</tr>
+<tr>
+<td>Directory</td>
+<td><span class="directory-container input-with-checker"><input type="text" class="form-control" name="workspace_directory" value="" autocomplete="off"></span></td>
+</tr>
+<tr>
+<td>PHP Path</td>
+<td><input type="text" class="form-control" name="php_path" value="" autocomplete="off"></td>
+</tr>
+</tbody>
+</table>
+</form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-menu" tabindex="-1" aria-labelledby="application_menu" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Application Menu</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i> Add</button>
+<button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-menu-add" tabindex="-1" aria-labelledby="application_menu_add" aria-hidden="true">
+<div class="modal-dialog modal-sm">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Add Menu</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-database-explorer" tabindex="-1" aria-labelledby="database_exsplorer" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal-dialog modal-fullscreen">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Database Explorer</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="database-explorer">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-query-executor" tabindex="-1" aria-labelledby="application_query_executor" aria-hidden="true" >
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Query Executor</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="query-container">
+<textarea name="query_to_execute" id="query_to_execute" spellcheck="false"></textarea>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success button-execute-query">
+<i class="fas fa-play"></i> Execute
+</button>
+
+<button type="button" class="btn btn-primary button-open-file">
+<i class="fas fa-folder-open"></i> Open File
+</button>
+
+<button type="button" class="btn btn-secondary" data-dismiss="modal">
+<i class="fas fa-times"></i> Close
+</button>        
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="alert-dialog" tabindex="-1" aria-labelledby="alert-dialog-label" aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Alert</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="alertOverlay" id="alertOverlay"></div>
+<div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-labelledby="alertTitle"
+aria-hidden="true">
+<div class="modal-dialog modal-md modal-dialog-centered" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="alertTitle">Confirmation</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<p id="alertMessage">This is the alert message.</p>
+</div>
+<div class="modal-footer" id="modalFooter">
+</div>
+</div>
+</div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="toast-container position-fixed bottom-0 right-0 p-3">
+</div>
+
+<div class="status-bar-container position-fixed bottom-0 right-0 p-3">
+<div class="status-bar">
+<div class="ajax-pending"></div>
+</div>
+</div>

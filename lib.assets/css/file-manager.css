@@ -1,12 +1,10 @@
 @charset "UTF-8";
 .file-manager-left-panel {
-  width: 250px;
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   overflow-y: auto;
 }
 
 .file-manager-right-panel {
-  flex: 1;
   padding: 10px 0 0 10px;
   overflow-y: auto;
 }
@@ -22,7 +20,7 @@ h3 {
   padding: 0px;
   margin: 0;
   width: 100%;
-  height: calc(100vh - 146px);
+  height: calc(100vh - 118px);
   box-sizing: border-box;
   overflow: auto;
 }
@@ -85,23 +83,23 @@ textarea:focus-visible {
   outline: none;
 }
 
-/*
-.CodeMirror-lines {
-	padding-left: 0.5rem;
+/* Optional styling for the path-bar container */
+.path-bar {
+  margin-bottom: 10px;
 }
 
-.CodeMirror-linenumber {
-	left: -0.5em !important;
+/* Optional margin between buttons */
+.path-bar .btn {
+  margin-left: 10px;
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
-.CodeMirror {
-	line-height: 1.6;
-	height: calc(100vh - 184px);
+/* Ensure buttons don't get too big */
+.path-bar .file-path {
+  flex-grow: 1;
 }
 
-.CodeMirror-linebackground {
-	margin-left: -0.5rem;
-	margin-right: -0.5rem;
-	width: calc(100% + 1.0rem);
-}
-*//*# sourceMappingURL=file-manager.css.map */
+.text-mode {
+  padding-right: 1rem;
+}/*# sourceMappingURL=file-manager.css.map */

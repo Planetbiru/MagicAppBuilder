@@ -1,3 +1,13 @@
+/**
+ * Initializes the file manager, sets up event listeners, and initializes the CodeMirror editor.
+ * 
+ * This function handles:
+ * - Clicking on directories to load their contents.
+ * - Toggling the visibility of subdirectories.
+ * - Opening and saving files.
+ * 
+ * It sets up event listeners for directory clicks, file open/save buttons, and initializes the editor.
+ */
 function initFileManager()
 {
     // When a directory is clicked
@@ -31,11 +41,82 @@ function initFileManager()
         }
     });
     
-    // Initial directory load
-    let ulDir = document.querySelector('#dir-tree');
-    loadDirContent(ulDir.dataset.baseDirectory, ulDir);
+    document.querySelector('.btn-save-file').addEventListener('click', function(e){
+        let file = document.querySelector('.file-path').value;
+        let content = fileManagerEditor.getValue();
+        saveFile(file, content);
+    });
+    
+    document.querySelector('.btn-open-file').addEventListener('click', function(e){
+        let file = document.querySelector('.file-path').value;
+        let extension = getFileExtension(file);
+        openTextFile(file, extension);
+    });
+    
     initCodeMirror();
 }
+
+/**
+ * This function returns the caller function's name using the stack trace.
+ * 
+ * @returns {string} - The name of the caller function, or an empty string if unavailable.
+ */
+function getCaller() {
+    try {
+        // Generate an error to get the stack trace
+        throw new Error();
+    } catch (e) {
+        // Split the stack trace by line and extract the caller's function name
+        const stackLines = e.stack.split('\n');
+        
+        // For most browsers, the caller's function will be in line 3
+        if (stackLines.length > 2) {
+            // The third line usually contains the caller's information
+            const callerInfo = stackLines[2];
+            // Extract the function name from the line, if possible
+            const callerName = callerInfo.match(/at (\w+)/);
+            return callerName ? callerName[1] : 'Unknown';
+        }
+        return 'Unknown';
+    }
+}
+
+/**
+ * Resets the file manager, clearing all contents and resetting the UI elements.
+ * 
+ * This function:
+ * - Clears the directory tree.
+ * - Clears the file editor.
+ * - Disables the save button.
+ * - Reloads the directory content.
+ */
+function resetFileManager()
+{    
+    let ulDir = document.querySelector('#dir-tree');
+    if(fileManagerEditor)
+    {
+        fileManagerEditor.setValue('');
+    }
+    document.querySelector('.btn-save-file').disabled = true;
+    document.querySelector('#dir-tree').innerHTML = '';
+    document.querySelector('.file-path').value = '';
+    loadDirContent('', ulDir, true);
+}
+
+/**
+ * This function returns the file extension from a given file name or file path.
+ * 
+ * @param {string} filename - The name or path of the file (e.g., 'example.txt', 'folder/image.jpg').
+ * @returns {string} - The file extension, or an empty string if no extension is found.
+ */
+function getFileExtension(filename) {
+    // Use a regular expression to match the file extension
+    const match = filename.match(/\.(\w+)$/);  // Looks for a dot followed by one or more word characters
+
+    // If a match is found, return the file extension, otherwise return an empty string
+    return match ? match[1] : '';
+}
+
 
 let contentModified = true;
 let fileManagerEditor = null;   
@@ -51,26 +132,42 @@ let modeInput = null;
  * 
  * @param {string} dir - The directory path to load.
  * @param {HTMLElement} subDirUl - The <ul> element where the subdirectory content will be appended.
+ * @param {boolean} reset - Reset content
  */
-function loadDirContent(dir, subDirUl) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'lib.ajax/load-dir.php?dir=' + encodeURIComponent(dir), true); // Send GET request to the server
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            const dirs = JSON.parse(xhr.responseText); // Parse the JSON response
-            displayDirContent(dirs, subDirUl); // Display the contents of the directory
-        }
-    };
-    xhr.send(); // Send the request
+function loadDirContent(dir, subDirUl, reset) {
+    // Indicate that an AJAX request is pending (if you have such a function)
+    increaseAjaxPending();
+
+    // Fetch the directory content from the server using the GET method
+    fetch('lib.ajax/file-manager-load-dir.php?dir=' + encodeURIComponent(dir))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();  // Parse the JSON response
+        })
+        .then(dirs => {
+            // Decrease the AJAX pending counter (if you have such a function)
+            decreaseAjaxPending();
+            displayDirContent(dirs, subDirUl, reset);  // Display the directory content
+        })
+        .catch(error => {
+            // Handle any errors
+            console.error('There was a problem with the fetch operation:', error);
+            decreaseAjaxPending();
+        });
 }
+
 
 /**
  * This function processes the directory data and appends directories and files to the subdirectory list.
  * 
  * @param {Array} dirs - The list of directories and files to display.
  * @param {HTMLElement} subDirUl - The <ul> element where the directory content will be appended.
+ * @param {boolean} reset - Reset content
  */
-function displayDirContent(dirs, subDirUl) {
+function displayDirContent(dirs, subDirUl, reset) {
+    subDirUl.innerHTML = '';
     dirs.forEach(function (dir) {
         if (dir.type === 'dir') { // If the item is a directory
             const dirLi = document.createElement('li');
@@ -98,22 +195,11 @@ function displayDirContent(dirs, subDirUl) {
             fileLi.appendChild(fileSpan);
             subDirUl.appendChild(fileLi); // Append the file <li> to the subdirectory <ul>
         }
-    });
-    
-   
-    
-   
+    }); 
 }
 
 function initCodeMirror()
 {
-    document.addEventListener('keydown', function(e) {
-        if(e.ctrlKey && (e.which == 83)) {
-          e.preventDefault();
-          saveFile();
-          return false;
-        }
-      });
     modeInput = document.getElementById('filename');
     CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js";
     fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
@@ -126,20 +212,47 @@ function initCodeMirror()
     });
 
     window.addEventListener('resize', function(e){
-        let w = window.innerWidth - 300;
-        let h = window.innerHeight - 150;
+        let w = document.querySelector('#file-content').offsetWidth - 16;
+        let h = window.innerHeight - 160;
         fileManagerEditor.setSize(w, h);
     });
     
     
-    let w = window.innerWidth - 300;
-    let h = window.innerHeight - 150;
+    let w = document.querySelector('#file-content').offsetWidth - 16;
+    let h = window.innerHeight - 160;
     fileManagerEditor.setSize(w, h);
 }
 
-function saveFile()
-{
-    
+/**
+ * Function to send file name and content to the server using a POST request.
+ * 
+ * @param {string} file - The name of the file to save.
+ * @param {string} content - The content to save in the file.
+ */
+function saveFile(file, content) {
+    // Create a new FormData object to send data with a POST request
+    let formData = new FormData();
+
+    // Append file name and content to FormData
+    formData.append('file', file);
+    formData.append('content', content);
+    increaseAjaxPending();
+    // Send the data to the server using Fetch API with a POST request
+    fetch('lib.ajax/file-manager-save-file.php', {
+        method: 'POST',  // HTTP method is POST
+        body: formData   // The FormData object contains the file name and content
+    })
+    .then(response => response.text())  // Convert the response into text
+    .then(data => {
+        // Successfully received response from the server
+        console.log('File saved successfully:', data);
+        decreaseAjaxPending();
+    })
+    .catch(error => {
+        // Handle any errors that occurred during the request
+        console.error('Error saving file:', error);
+        decreaseAjaxPending();
+    });
 }
 
 /**
@@ -160,20 +273,12 @@ function openFile(file, extension) {
         {
             changeMode(file, extension); 
         }
-        // Use fetch to get the file content through server-side PHP for text files
-        setDisplayMode('text');
-        fetch('lib.ajax/load-file.php?file=' + encodeURIComponent(file))
-            .then(response => response.text())
-            .then(text => {
-                changeMode(file, extension);                
-                fileManagerEditor.setValue(text);
-            })
-            .catch(error => {
-            });
+        openTextFile(file, extension);
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(extension.toLowerCase())) {
         setDisplayMode('image');
         // For supported image extensions, use the server-side script to load the image as base64
-        fetch('lib.ajax/load-image.php?file=' + encodeURIComponent(file))
+        increaseAjaxPending();
+        fetch('lib.ajax/file-manager-load-image.php?file=' + encodeURIComponent(file))
             .then(response => response.text())
             .then(base64ImageData => {
                 let mediaDisplay = document.querySelector('.media-display');
@@ -183,8 +288,10 @@ function openFile(file, extension) {
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '400px';
                 mediaDisplay.appendChild(img); // Append the image to the file content div
+                decreaseAjaxPending();
             })
             .catch(error => {
+                decreaseAjaxPending();
             });
     } else {
         // For unsupported file extensions, display an error message
@@ -192,6 +299,38 @@ function openFile(file, extension) {
     }
 }
 
+/**
+ * Open text file
+ * 
+ * @param {string} file - The file path.
+ * @param {string} extension - The file extension.
+ */
+function openTextFile(file, extension)
+{
+    // Use fetch to get the file content through server-side PHP for text files
+    document.querySelector('.btn-open-file').disabled = true;
+    document.querySelector('.btn-save-file').disabled = true;
+    setDisplayMode('text');
+    document.querySelector('.file-path').value = file;
+    fileManagerEditor.setValue('Loading...');
+    changeMode('any.txt', 'txt'); 
+    increaseAjaxPending();
+    fetch('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file))
+        .then(response => response.text())
+        .then(text => {
+            changeMode(file, extension);                
+            fileManagerEditor.setValue(text);
+            document.querySelector('.btn-open-file').disabled = false;
+            document.querySelector('.btn-save-file').disabled = false;
+            decreaseAjaxPending();
+        })
+        .catch(error => {
+            document.querySelector('.btn-open-file').disabled = false;
+            document.querySelector('.btn-save-file').disabled = false;
+            setDisplayMode('');
+            decreaseAjaxPending();
+        });
+}
 function setDisplayMode(mode)
 {
     if(mode == 'text')
