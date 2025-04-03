@@ -441,18 +441,20 @@ let initAll = function () {
 
   $(document).on("click", ".reference_button_data", function (e) {
     e.preventDefault();
-    $("#modal-create-reference-data")
+    let referenceDialog = $("#modal-create-reference-data");
+    referenceDialog
       .find(".modal-title")
       .text("Create Data Reference");
-    $("#modal-create-reference-data").attr("data-reference-type", "data");
-    let parentTr = $(this).closest("tr");
+    referenceDialog.attr("data-reference-type", "data");
+    let parentTd = $(this).closest("td");
+    let parentTr = parentTd.closest("tr");
     let fieldName = parentTr.attr("data-field-name");
     let key = $(this).siblings("input").attr("name");
 
-    $("#modal-create-reference-data").attr("data-input-name", key);
-    $("#modal-create-reference-data").attr("data-field-name", fieldName);
-    $("#modal-create-reference-data").find(".modal-body").empty();
-    $("#modal-create-reference-data")
+    referenceDialog.attr("data-input-name", key);
+    referenceDialog.attr("data-field-name", fieldName);
+    referenceDialog.find(".modal-body").empty();
+    referenceDialog
       .find(".modal-body")
       .append(getReferenceResource());
 
@@ -461,8 +463,15 @@ let initAll = function () {
       loadReference(fieldName, key, function (obj) {
         if (obj != null) {
           deserializeForm(obj);
-          validateEntityName();
-          validateReference();
+          if(parentTd.attr('data-valid') != 'true')
+          {
+            validateEntityName();
+            validateReference();
+          }
+          else
+          {
+            referenceDialog.find('.input-with-checker').attr('data-valid', 'true');
+          }
         }
       });
     }
@@ -472,35 +481,53 @@ let initAll = function () {
         obj = {};
       }
       deserializeForm(obj);
-      validateEntityName();
-      validateReference();
+      if(parentTd.attr('data-valid') != 'true')
+      {
+        validateEntityName();
+        validateReference();
+      }
+      else
+      {
+        referenceDialog.find('.input-with-checker').attr('data-valid', 'true');
+      }
+      
     }
-    $("#modal-create-reference-data").modal("show");
+    referenceDialog.attr('data-type', 'reference');
+    referenceDialog.modal("show");
   });
 
   $(document).on("click", ".reference_button_filter", function (e) {
     e.preventDefault();
-    $("#modal-create-reference-data")
+    let referenceDialog = $("#modal-create-reference-data");
+    referenceDialog
       .find(".modal-title")
       .text("Create Filter Reference");
-    $("#modal-create-reference-data").attr("data-reference-type", "filter");
+    referenceDialog.attr("data-reference-type", "filter");
 
-    let parentTr = $(this).closest("tr");
+    let parentTd = $(this).closest("td");
+    let parentTr = parentTd.closest("tr");
     let fieldName = parentTr.attr("data-field-name");
     let key = $(this).siblings("input").attr("name");
 
-    $("#modal-create-reference-data").attr("data-input-name", key);
-    $("#modal-create-reference-data").attr("data-field-name", fieldName);
-    $("#modal-create-reference-data").find(".modal-body").empty();
-    $("#modal-create-reference-data").find(".modal-body").append(getReferenceResource());
+    referenceDialog.attr("data-input-name", key);
+    referenceDialog.attr("data-field-name", fieldName);
+    referenceDialog.find(".modal-body").empty();
+    referenceDialog.find(".modal-body").append(getReferenceResource());
 
     let value = $('[name="' + key + '"]').val().trim();
     if (value.length < 60) {
       loadReference(fieldName, key, function (obj) {
         if (obj != null) {
           deserializeForm(obj);
-          validateEntityName();
-          validateReference();
+          if(parentTd.attr('data-valid') != 'true')
+          {
+            validateEntityName();
+            validateReference();
+          }
+          else
+          {
+            referenceDialog.find('.input-with-checker').attr('data-valid', 'true');
+          }
         }
       });
     }
@@ -510,17 +537,34 @@ let initAll = function () {
         obj = {};
       }
       deserializeForm(obj);
-      validateEntityName();
-      validateReference();
+      if(parentTd.attr('data-valid') != 'true')
+      {
+        validateEntityName();
+        validateReference();
+      }
+      else
+      {
+        referenceDialog.find('.input-with-checker').attr('data-valid', 'true');
+      }
     }
-    $("#modal-create-reference-data").modal("show");
+    referenceDialog.attr('data-type', 'filter');
+    referenceDialog.modal("show");
   });
 
   $(document).on("click", "#apply_reference", function (e) {
-    let key = $("#modal-create-reference-data").attr("data-input-name");
+    let referenceDialog = $("#modal-create-reference-data");
+    let key = referenceDialog.attr("data-input-name");
     let value = JSON.stringify(serializeForm());
     $('[name="' + key + '"]').val(value);
-    $("#modal-create-reference-data").modal("hide");
+    
+    let valid = (referenceDialog.attr('data-type') == 'filter' && referenceDialog.find('.entity-section .input-with-checker[data-valid="true"]').length >= 4) || 
+    (referenceDialog.attr('data-type') == 'reference' && referenceDialog.find('.entity-section .input-with-checker[data-valid="true"]').length >= 6);
+    
+    $('[name="' + key + '"]').closest('td').attr('data-valid', valid ? 'true' : 'false');
+    
+    referenceDialog.modal("hide");
+    
+    
   });
 
   $(document).on("click", "#save_to_cache", function (e) {
