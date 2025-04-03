@@ -1988,21 +1988,21 @@ let initAll = function () {
     validateEntityName();
   });
   
-  $(document).on('focus', '.rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
+  $(document).on('focus', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
     let value = $(this).val();
     let td = $(this).closest('td');
     td.find('.column-container a').removeClass('column-selected');
     td.find('.column-container a[data-column="'+value+'"]').addClass('column-selected');
     td.attr('data-focus', 'true');
   });
-  $(document).on('blur', '.rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
+  $(document).on('blur', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
     let td = $(this).closest('td');
     setTimeout(function(){
       td.attr('data-focus', 'false');  
     }, 240);
   });
   
-  $(document).on('click', '.column-container a', function(e){
+  $(document).on('click', '.primary-key-list a, .column-list a', function(e){
     e.preventDefault();
     let column = $(this).attr('data-column');
     let td = $(this).closest('td');
@@ -2010,6 +2010,22 @@ let initAll = function () {
     let input = td.find('input[type="text"]');
     input.val(column);
     input.closest('.input-with-checker').attr('data-valid', 'true');
+  });
+  
+  $(document).on('click', '.table-list a', function(e){
+    e.preventDefault();
+    let table = $(this).attr('data-table');
+    let td = $(this).closest('td');
+    td.attr('data-focus', 'false');
+    let input = td.find('input[type="text"]');
+    input.closest('.input-with-checker').attr('data-valid', 'true');
+    let primaryKey = $(this).attr('data-primary-key');
+    input.val(table);
+    input.closest('.input-with-checker').attr('data-valid', 'true');
+    let inputPk = input.closest('table').find('.rd-primary-key');
+    inputPk.val(primaryKey);
+    inputPk.closest('.input-with-checker').attr('data-valid', 'true');
+    validateReference();
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -2130,6 +2146,17 @@ function validateReference() {
         ul2.append(li2);
       }
       $('.column-list').append(ul2);
+      
+      if(!data.tableName)
+      {
+        let ul3 = $('<ul />');
+        for(let i in data.tables)
+        {
+          let li3 = $(`<li><a href="javascript:;" data-table="${data.tables[i].tableName}" data-primary-key="${data.tables[i].primaryKeys[0]}">${data.tables[i].tableName}</a></li>`);
+          ul3.append(li3);
+        }
+        $('.table-list').append(ul3);
+      }
       
     }
   });

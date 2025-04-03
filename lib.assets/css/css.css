@@ -1032,6 +1032,8 @@ p {
 
 [data-focus=true] .column-container {
   display: block;
+  max-height: 300px;
+  overflow: auto;
 }
 
 .column-container ul {

@@ -1190,17 +1190,16 @@ white-space: nowrap;
 }
 
 @keyframes blink {
-0% {
-	opacity: 1;
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
+	100% {
+		opacity: 1;
+	}
 }
-50% {
-	opacity: 0.4;
-}
-100% {
-	opacity: 1;
-}
-}
-
 
 .column-container
 {
@@ -1213,6 +1212,8 @@ white-space: nowrap;
 [data-focus="true"] .column-container
 {
 	display: block;
+	max-height: 300px;
+	overflow: auto;
 }
 .column-container ul{
 	
