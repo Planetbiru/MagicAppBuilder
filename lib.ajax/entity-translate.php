@@ -103,6 +103,7 @@ else if($inputPost->getUserAction() == 'set')
     {
         unset($keys[count($keys) - 1]);
     }
+    $values = array_map('trim', $values);
     $translatedLabel = array_combine($keys, $values);
 
     try
