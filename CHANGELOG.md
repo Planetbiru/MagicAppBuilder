@@ -28,3 +28,4 @@ New Features:
 Improvements:
 
 -    File Editing Capabilities: Users can now view, edit, and save any files located within the application's directory. This feature makes it easier to work with and manage the content of your project directly within MagicAppBuilder.
+
