@@ -45,8 +45,6 @@ h3 {
     }
 }
 
-
-
 .image-mode{
 	display: none;
 }
@@ -68,6 +66,20 @@ li[data-type="dir"]:hover {
 		color: #007bff;
 	}
 }
+li[data-type="dir"] ul:empty {
+    display: none;
+}
+li[data-type="dir"][data-loading="true"]::after{
+    content: '\2022 \2022 \2022'; 
+    color: green;
+    font-size: 1.2rem;
+    animation: blink 1s infinite;
+    white-space: nowrap;
+    line-height: 4px;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
 li[data-type="file"]:hover {
 	&::before {
 		color: #28a745;

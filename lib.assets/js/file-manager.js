@@ -26,7 +26,7 @@ function initFileManager()
                     subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
                     subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
 
-                    loadDirContent(dir, subDirUl); // Load the subdirectory content
+                    loadDirContent(dir, subDirUl, subDirLi); // Load the subdirectory content
                 } else {
                     // Toggle the visibility of subdirectories
                     const isVisible = getComputedStyle(subDirUl).display !== 'none';
@@ -100,7 +100,7 @@ function resetFileManager()
     document.querySelector('.btn-save-file').disabled = true;
     document.querySelector('#dir-tree').innerHTML = '';
     document.querySelector('.file-path').value = '';
-    loadDirContent('', ulDir, true);
+    loadDirContent('', ulDir, null, true);
 }
 
 /**
@@ -132,9 +132,14 @@ let modeInput = null;
  * 
  * @param {string} dir - The directory path to load.
  * @param {HTMLElement} subDirUl - The <ul> element where the subdirectory content will be appended.
+ * @param {HTMLElement} subdirLi - The <li> parent element of subdirUl
  * @param {boolean} reset - Reset content
  */
-function loadDirContent(dir, subDirUl, reset) {
+function loadDirContent(dir, subDirUl, subdirLi, reset) {
+    if(subdirLi != null)
+    {
+        subdirLi.setAttribute('data-loading', 'true');
+    }
     // Indicate that an AJAX request is pending (if you have such a function)
     increaseAjaxPending();
 
@@ -149,12 +154,20 @@ function loadDirContent(dir, subDirUl, reset) {
         .then(dirs => {
             // Decrease the AJAX pending counter (if you have such a function)
             decreaseAjaxPending();
-            displayDirContent(dirs, subDirUl, reset);  // Display the directory content
+            if(subdirLi != null)
+            {
+                subdirLi.removeAttribute('data-loading');
+            }
+            displayDirContent(dirs, subDirUl, reset);  // Display the directory content    
         })
         .catch(error => {
             // Handle any errors
             console.error('There was a problem with the fetch operation:', error);
             decreaseAjaxPending();
+            if(subdirLi != null)
+            {
+                subdirLi.removeAttribute('data-loading');
+            }
         });
 }
 
