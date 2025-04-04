@@ -1,3 +1,9 @@
+let contentModified = true;
+let fileManagerEditor = null;   
+let currentMode = null;
+let modeInput = null;
+
+
 /**
  * Initializes the file manager, sets up event listeners, and initializes the CodeMirror editor.
  * 
@@ -25,12 +31,11 @@ function initFileManager()
                 if (!subDirUl) {
                     subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
                     subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
-
                     loadDirContent(dir, subDirUl, subDirLi); // Load the subdirectory content
+                    subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
                 } else {
                     // Toggle the visibility of subdirectories
-                    const isVisible = getComputedStyle(subDirUl).display !== 'none';
-                    subDirUl.style.display = isVisible ? 'none' : 'block';
+                    subDirLi.setAttribute('data-open', subDirLi.getAttribute('data-open') === 'true' ? 'false' : 'true');
                 }
             }
             // If the clicked element is a file
@@ -118,14 +123,19 @@ function getFileExtension(filename) {
 }
 
 
-let contentModified = true;
-let fileManagerEditor = null;   
-let currentMode = null;
-function format(){
-    let totalLines = fileManagerEditor.lineCount();  
-    fileManagerEditor.autoFormatRange({line:0, ch:0}, {line:totalLines});
+
+/**
+ * Formats the entire content of the CodeMirror editor.
+ * 
+ * This function automatically formats the content of the editor by adjusting the indentation 
+ * and layout of the code. It formats all lines in the editor from the first line to the last.
+ * 
+ * It uses CodeMirror's `autoFormatRange` method to format the content.
+ */
+function format() {
+    let totalLines = fileManagerEditor.lineCount();  // Get the total number of lines in the editor
+    fileManagerEditor.autoFormatRange({line: 0, ch: 0}, {line: totalLines});  // Format all lines
 }
-let modeInput = null;
 
 /**
  * This function loads the content of the specified directory and appends the content to the subdirectory list.
@@ -191,8 +201,6 @@ function displayDirContent(dirs, subDirUl, reset) {
             dirSpan.classList.add('dir');
 
             // Create a <ul> for subdirectories, initially hidden
-            const subUl = document.createElement('ul');
-            subUl.style.display = 'none'; // Hide subdirectories by default
             dirLi.appendChild(dirSpan);
             subDirUl.appendChild(dirLi);
 
@@ -211,26 +219,37 @@ function displayDirContent(dirs, subDirUl, reset) {
     }); 
 }
 
-function initCodeMirror()
-{
+/**
+ * Initializes the CodeMirror editor for the file manager.
+ * 
+ * This function sets up the CodeMirror editor with various configurations such as line numbers,
+ * line wrapping, bracket matching, and indentation settings. It also adjusts the editor's size 
+ * based on the window's size, ensuring the editor fits within the available space in the UI.
+ * 
+ * - CodeMirror's mode URL is configured to load the correct syntax mode files.
+ * - The editor is initialized with the content of the textarea with ID 'code'.
+ * - A resize event listener is added to dynamically adjust the editor's size when the window is resized.
+ */
+function initCodeMirror() {
     modeInput = document.getElementById('filename');
-    CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js";
+    CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
     fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
     {
-        lineNumbers: true,
-        lineWrapping: true,
-        matchBrackets: true,
-        indentUnit: 4,
-        indentWithTabs: true
+        lineNumbers: true,           // Show line numbers in the editor
+        lineWrapping: true,          // Enable line wrapping to prevent horizontal scrolling
+        matchBrackets: true,         // Highlight matching brackets
+        indentUnit: 4,               // Set the indentation unit to 4 spaces
+        indentWithTabs: true         // Use tabs for indentation
     });
 
+    // Adjust editor size when window is resized
     window.addEventListener('resize', function(e){
-        let w = document.querySelector('#file-content').offsetWidth - 16;
-        let h = window.innerHeight - 160;
-        fileManagerEditor.setSize(w, h);
+        let w = document.querySelector('#file-content').offsetWidth - 16;  // Adjust width
+        let h = window.innerHeight - 160;  // Adjust height based on window height
+        fileManagerEditor.setSize(w, h);  // Apply the new size to the editor
     });
     
-    
+    // Initial editor size adjustment
     let w = document.querySelector('#file-content').offsetWidth - 16;
     let h = window.innerHeight - 160;
     fileManagerEditor.setSize(w, h);
@@ -313,82 +332,120 @@ function openFile(file, extension) {
 }
 
 /**
- * Open text file
+ * Opens a text file and loads its content into the editor.
  * 
- * @param {string} file - The file path.
- * @param {string} extension - The file extension.
+ * This function fetches the content of the specified text file from the server using 
+ * a PHP script, then loads the content into the CodeMirror editor. The file's extension
+ * is used to set the appropriate syntax highlighting mode for the editor.
+ * 
+ * It also manages UI elements, such as disabling the open/save buttons during the loading process.
+ * 
+ * @param {string} file - The path to the file to be opened.
+ * @param {string} extension - The extension of the file to determine the mode for the editor (e.g., 'txt', 'js', 'html').
  */
-function openTextFile(file, extension)
-{
-    // Use fetch to get the file content through server-side PHP for text files
+function openTextFile(file, extension) {
+    // Disable open/save buttons while loading
     document.querySelector('.btn-open-file').disabled = true;
     document.querySelector('.btn-save-file').disabled = true;
+    
+    // Set display mode to 'text' and update the file path input
     setDisplayMode('text');
     document.querySelector('.file-path').value = file;
+    
+    // Display a loading message in the editor
     fileManagerEditor.setValue('Loading...');
+    
+    // Change the mode based on the file's extension
     changeMode('any.txt', 'txt'); 
+    
+    // Indicate that an AJAX request is pending
     increaseAjaxPending();
+    
+    // Fetch the file content from the server
     fetch('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file))
-        .then(response => response.text())
+        .then(response => response.text())  // Parse the response as text
         .then(text => {
+            // Change the editor mode based on the file's extension
             changeMode(file, extension);                
+            
+            // Set the file content in the editor
             fileManagerEditor.setValue(text);
+            
+            // Enable the open/save buttons once loading is complete
             document.querySelector('.btn-open-file').disabled = false;
             document.querySelector('.btn-save-file').disabled = false;
+            
+            // Indicate that the AJAX request has completed
             decreaseAjaxPending();
         })
         .catch(error => {
+            // If there's an error, enable the buttons and reset the display mode
             document.querySelector('.btn-open-file').disabled = false;
             document.querySelector('.btn-save-file').disabled = false;
             setDisplayMode('');
+            
+            // Indicate that the AJAX request has completed
             decreaseAjaxPending();
         });
 }
-function setDisplayMode(mode)
-{
-    if(mode == 'text')
-    {
-        document.querySelector('.image-mode').style.display = 'none';
-        document.querySelector('.text-mode').style.display = 'block';
-    } 
-    else if(mode == 'image')
-    {
-        document.querySelector('.text-mode').style.display = 'none';
-        document.querySelector('.image-mode').style.display = 'block';
+
+/**
+ * Sets the display mode for the file viewer (either 'text' or 'image').
+ * 
+ * This function toggles between the text and image modes by changing the visibility
+ * of the corresponding HTML elements.
+ * 
+ * @param {string} mode - The mode to set ('text' or 'image').
+ */
+function setDisplayMode(mode) {
+    if (mode === 'text') {
+        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
+        document.querySelector('.text-mode').style.display = 'block';  // Show the text editor
+    } else if (mode === 'image') {
+        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
+        document.querySelector('.image-mode').style.display = 'block';  // Show the image viewer
     }
 }
 
+/**
+ * Changes the mode of the CodeMirror editor based on the file's extension.
+ * 
+ * This function configures the syntax highlighting for the CodeMirror editor according
+ * to the file extension or MIME type. It ensures that the editor uses the correct mode
+ * for the opened file to provide proper syntax highlighting.
+ * 
+ * @param {string} filename - The name of the file, used to determine the mode.
+ * @param {string} extension - The file extension, used to identify the correct mode.
+ */
 function changeMode(filename, extension) {
     currentMode = extension;
-	let val = filename;
+    let val = filename;
     let mode;
     let spec;
-    let m;
-	if (m = /.+\.([^.]+)$/.exec(val)) 
-	{
-		let info = CodeMirror.findModeByExtension(m[1]);
-		if (info)
-		{
-			mode = info.mode;
-			spec = info.mime;
-		}
-	}
-	else if (/\//.test(val))
-	{
-		let info = CodeMirror.findModeByMIME(val);
-		if (info) 
-		{
-			mode = info.mode;
-			spec = val;
-		}
-	} 
-	else 
-	{
-		mode = spec = val;
-	}
-	if (mode) 
-	{
-		fileManagerEditor.setOption("mode", spec);
-		CodeMirror.autoLoadMode(fileManagerEditor, mode);
-	} 
+    let m = /.+\.([^.]+)$/.exec(val);
+    
+    // Check if the file has a valid extension
+    if (m) {
+        let info = CodeMirror.findModeByExtension(m[1]);  // Find the mode based on the extension
+        if (info) {
+            mode = info.mode;
+            spec = info.mime;
+        }
+    }
+    // Check if the filename is a MIME type
+    else if (/\//.test(val)) {
+        let info = CodeMirror.findModeByMIME(val);  // Find the mode based on the MIME type
+        if (info) {
+            mode = info.mode;
+            spec = val;
+        }
+    } else {
+        mode = spec = val;
+    }
+    
+    // If a valid mode is found, set it in the editor
+    if (mode) {
+        fileManagerEditor.setOption("mode", spec);
+        CodeMirror.autoLoadMode(fileManagerEditor, mode);  // Load the mode dynamically
+    }
 }

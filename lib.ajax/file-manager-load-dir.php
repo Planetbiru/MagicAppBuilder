@@ -25,21 +25,16 @@ function normalizationPath($path)
 }
 
 /**
- * Scans the directory at the specified path and returns the directory tree, 
- * including all files and subdirectories, in a JSON-encoded format.
- * 
- * This function organizes the directory and file information separately and 
- * returns them in a merged array as a JSON string. The paths are returned relative 
- * to the base directory.
+ * Scans the directory at the specified path with a given depth and returns the directory tree.
  * 
  * @param string $dir The directory path to scan.
  * @param string $baseDirectory The base directory that the path should be relative to.
+ * @param int $depth The depth of recursion. Default is 0 (no recursion).
  * @return string A JSON-encoded string containing the directory tree with files and subdirectories.
  */
-function getDirTree($dir, $baseDirectory) {
+function getDirTree($dir, $baseDirectory, $depth = 0) {
     // Scan the folder and retrieve files and subdirectories
     $files = scandir($dir);
-    $result = [];   // Array to hold the final result
     $result1 = [];  // Array to hold directories
     $result2 = [];  // Array to hold files
 
@@ -53,13 +48,20 @@ function getDirTree($dir, $baseDirectory) {
             // Make the path relative to the base directory
             $relativePath = str_replace($baseDirectory . "/", "", $path);
 
-            // If it's a directory, add it to the $result1 array
+            // If it's a directory
             if (is_dir($path)) {
-                $result1[] = [
+                $res = [
                     'type' => 'dir',  // Specify the type as 'dir' for directory
                     'name' => $file,  // Name of the directory
                     'path' => $relativePath   // Full path to the directory, relative to the base directory
                 ];
+
+                // If depth is greater than 0, recursively scan subdirectories
+                if ($depth > 0) {
+                    $res['childrens'] = getDirTree($path, $baseDirectory, $depth - 1);
+                }
+                
+                $result1[] = $res;
             } 
             // If it's a file, get its extension and add it to the $result2 array
             else if (is_file($path)) {
@@ -76,10 +78,7 @@ function getDirTree($dir, $baseDirectory) {
     }
 
     // Merge directories and files arrays into one result array
-    $result = array_merge($result1, $result2);
-    
-    // Return the result as a JSON-encoded string
-    return json_encode($result);
+    return array_merge($result1, $result2);
 }
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -92,7 +91,6 @@ if ($appConfig->getApplication() == null) {
 }
 
 $inputGet = new InputGet();
-
 header('Content-type: application/json');
 try {
     // Get the base directory of the active application
@@ -106,7 +104,9 @@ try {
     $dir = normalizationPath($dir);
 
     // Get the directory tree and output it as a JSON string
-    echo getDirTree($dir, $baseDirectory);
+    $buffer = json_encode(getDirTree($dir, $baseDirectory, 0));
+    header(('Content-length: ' . strlen($buffer)));
+    echo $buffer;
 
 } catch (Exception $e) {
     // Log any errors that occur
