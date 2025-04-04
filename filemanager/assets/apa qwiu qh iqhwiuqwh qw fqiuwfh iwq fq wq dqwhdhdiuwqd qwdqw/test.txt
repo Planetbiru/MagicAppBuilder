@@ -1,6 +1,0 @@
-Ini isi file
-ini baris kedua
-ini baris ke tiga
-
-
-ini baris ke enam
