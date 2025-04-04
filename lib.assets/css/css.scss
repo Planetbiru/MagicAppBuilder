@@ -1263,3 +1263,147 @@ white-space: nowrap;
 	right: 9px;
 	top: 11px;
 }
+
+
+
+
+
+
+
+
+/* File Manager Styles */
+
+.file-manager-left-panel {
+	padding: 10px 10px 0 10px;
+	overflow-y: auto;
+}
+.file-manager-right-panel {
+	padding: 10px 0 0 10px;
+	overflow-y: auto;
+}
+h3 {
+	margin: 0;
+	padding: 4px 0;
+	font-size: 16px;
+}
+#dir-tree {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0;
+    width: 100%;
+    height: calc(100vh - 118px);
+    box-sizing: border-box;
+    overflow: auto;
+	& > li {
+		margin: 0;
+		list-style-type: none;
+        white-space: nowrap;
+	}
+	li {
+		ul {
+			margin: 0;
+			padding: 0px 0px 0px 10px;
+			li {
+				padding: 0;
+				margin: 0;
+				margin-left: 10px;
+				list-style-type: none;
+                white-space: nowrap;
+			}
+		}
+	}
+    
+    span
+    {
+        white-space: nowrap;
+    }
+}
+
+.image-mode{
+	display: none;
+}
+li[data-type="dir"], li[data-type="file"] {
+	cursor: pointer;
+}
+
+
+/* Folder closed state */
+li[data-type="dir"] > span::before, li[data-type="dir"][data-open="false"] > span::before {
+    content: '\1F4C1'; /* Unicode character for folder (closed) */
+    display: inline-block;
+    width: 20px;
+    
+}
+
+/* Folder open state */
+li[data-type="dir"][data-open="true"] > span::before {
+    content: '\1F4C2'; /* Unicode character for folder (open) */
+    display: inline-block;
+    width: 20px;
+   
+}
+
+/* File state */
+li[data-type="file"] > span::before {
+    content: '\1F4C4'; /* Unicode character for document */
+    display: inline-block;
+    width: 20px;
+    
+}
+
+li[data-type="dir"]:hover {
+	&::before {
+		color: #007bff;
+	}
+}
+li[data-type="dir"] ul:empty {
+    display: none;
+}
+li[data-type="dir"][data-loading="true"]::after{
+    content: '\2022 \2022 \2022'; 
+    color: green;
+    font-size: 1.2rem;
+    animation: blink 1s infinite;
+    white-space: nowrap;
+    line-height: 4px;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+li[data-type="file"]:hover {
+	&::before {
+		color: #28a745;
+	}
+}
+textarea {
+	width: 100%;
+	min-height: 200px;
+	box-sizing: border-box;
+	padding: 20px;
+	border: 1px solid #cccccc;
+	&:focus-visible {
+		outline: none;
+	}
+}
+
+/* Optional styling for the path-bar container */
+.path-bar {
+    margin-bottom: 10px;
+}
+
+/* Optional margin between buttons */
+.path-bar .btn {
+    margin-left: 10px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+/* Ensure buttons don't get too big */
+.path-bar .file-path {
+    flex-grow: 1;
+}
+
+.text-mode
+{
+    padding-right: 1rem;
+}
