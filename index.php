@@ -38,9 +38,7 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/file-manager.min.js"></script>
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
-  <link rel="stylesheet" type="text/css" href="lib.assets/css/file-manager.min.css">
 </head>
 
 <body data-admin-level-id="<?php echo $adminLevelId; ?>">
