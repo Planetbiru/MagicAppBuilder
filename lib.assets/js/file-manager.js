@@ -31,12 +31,11 @@ function initFileManager()
                 if (!subDirUl) {
                     subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
                     subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
-
                     loadDirContent(dir, subDirUl, subDirLi); // Load the subdirectory content
+                    subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
                 } else {
                     // Toggle the visibility of subdirectories
-                    const isVisible = getComputedStyle(subDirUl).display !== 'none';
-                    subDirUl.style.display = isVisible ? 'none' : 'block';
+                    subDirLi.setAttribute('data-open', subDirLi.getAttribute('data-open') === 'true' ? 'false' : 'true');
                 }
             }
             // If the clicked element is a file
@@ -202,8 +201,6 @@ function displayDirContent(dirs, subDirUl, reset) {
             dirSpan.classList.add('dir');
 
             // Create a <ul> for subdirectories, initially hidden
-            const subUl = document.createElement('ul');
-            subUl.style.display = 'none'; // Hide subdirectories by default
             dirLi.appendChild(dirSpan);
             subDirUl.appendChild(dirLi);
 

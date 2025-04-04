@@ -2457,6 +2457,9 @@ class MagicObject extends stdClass // NOSONAR
      * - **get**: Retrieves the property value.
      *   - Example: `$value = $object->getPropertyName();`
      *
+     * - **trim**: Retrieves the property value and trims any leading and trailing whitespace.
+     *   - Example: `$value = $object->trimPropertyName();`
+     *
      * - **set**: Sets the property value.
      *   - Example: `$object->setPropertyName($value);`
      *
@@ -2595,6 +2598,9 @@ class MagicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "get", 3) === 0) {
             return $this->get(substr($method, 3));
+        }
+        else if (strncasecmp($method, "trim", 4) === 0) {
+            return trim($this->get(substr($method, 4)));
         }
         else if (strncasecmp($method, "set", 3) === 0 && $this->_isArray($params) && !empty($params) && !$this->_readonly) {
             $var = substr($method, 3);
