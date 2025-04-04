@@ -383,3 +383,18 @@ echo $object->maskEmail(-10, 6, '*')."\r\n"; // Output: john.******ample.com
     ```
 
 With the addition of this formatting function, users can easily format object properties according to their needs.
+
+# MagicObject vesrion 3.9
+
+## What's New
+
+- **trim**: Added a function to trim string.  
+  - **Example Usage:**  
+    ```php
+    $dms = $object->trimName();
+    ```
+- **dms**: Added a function to convert decimal to DMS format.  
+  - **Example Usage:**  
+    ```php
+    $dms = $object->dmsDuration(true, ":", 2, true, 2, true);
+    ```

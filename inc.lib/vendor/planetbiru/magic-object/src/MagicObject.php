@@ -2,7 +2,6 @@
 
 namespace MagicObject;
 
-use DateTime;
 use Exception;
 use PDOException;
 use PDOStatement;
@@ -31,6 +30,7 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 use MagicObject\Util\Database\NativeQueryUtil;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\PicoArrayUtil;
+use MagicObject\Util\PicoDataFormat;
 use MagicObject\Util\PicoEnvironmentVariable;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
@@ -2573,11 +2573,20 @@ class MagicObject extends stdClass // NOSONAR
      * - **format**: Format a date value into a specified format.
      *   - Example: `$formattedData = $object->formatData("%7.3f");`
      *
+     * - **dms**: Convert decimal to DMS format.
+     *   - **Parameters**:
+     *     - `$inSeconds` (bool): Whether to convert in seconds (default is false)
+     *     - `$decimal` (string): Separator (default is ":")
+     *     - `$decimalPlaces` (int): Number of decimal places (default is 0)
+     *     - `$withSign` (bool): Whether to include sign (default is false)
+     *     - `$zeroPadding` (int): Number of zero padding (default is 0)
+     *     - `$trimDegreeMinute` (bool): Whether to trim degree and minute if they are 0 (default is false)
+     *   - Example: `$formattedData = $object->dmsData(";");`
+     *
      * @param string $method Method name
      * @param mixed $params Parameters for the method
      * @return mixed|null The result of the called method, or null if not applicable
      */
-
     public function __call($method, $params) // NOSONAR
     {
         if (strncasecmp($method, "hasValue", 8) === 0) {
@@ -2855,7 +2864,7 @@ class MagicObject extends stdClass // NOSONAR
         {
             if(isset($params[0]))
             {
-                return $this->_dateFormat($params[0], $this->get(substr($method, 10)));
+                return PicoDataFormat::dateFormat($params[0], $this->get(substr($method, 10)));
             }
             else
             {
@@ -2880,66 +2889,22 @@ class MagicObject extends stdClass // NOSONAR
         {
             if(isset($params[0]))
             {
-                return $this->_format($params[0], $this->get(substr($method, 6)));
+                return PicoDataFormat::format($params[0], $this->get(substr($method, 6)));
             }
             else
             {
                 return $this->get(substr($method, 6));
             }
         }
-    }
-
-    /**
-     * Format a given date value into a specified format.
-     *
-     * This method accepts various types of date input, including:
-     * - `DateTime` object: Directly formatted using its `format` method.
-     * - `int` (timestamp): Formatted using `date()`.
-     * - `float` (timestamp with microseconds): Cast to `int` and formatted using `date()`.
-     * - `string` (date representation): Parsed with `strtotime()` and formatted if valid.
-     *
-     * If the provided string value is `null`, empty, or an invalid date 
-     * (such as '0000-00-00' or '0000-00-00 00:00:00'), the function returns `null`.
-     *
-     * @param string $format The desired date format (e.g., 'Y-m-d H:i:s').
-     * @param DateTime|string|int|float $value The date value to format.
-     * @return string|null Formatted date string or `null` if the value is invalid.
-     */
-    private function _dateFormat($format, $value) // NOSONAR
-    {
-        if ($value instanceof DateTime) {
-            return $value->format($format);
-        } elseif (is_int($value)) {
-            return date($format, $value);
-        } elseif (is_float($value)) {
-            return date($format, (int) $value);
-        } elseif (is_string($value)) {
-            if($value != null && $value != '' && $value != '0000-00-00' && $value != '0000-00-00 00:00:00')
-            {
-                $dateTime = strtotime($value);
-                if ($dateTime !== false) {
-                    return date($format, $dateTime);
-                }
-            }
+        else if(strncasecmp($method, "dms", 3) === 0)
+        {
+            // Convert real number to DMS (Degrees, Minutes, Seconds) format
+            $decimal = floatval($this->get(substr($method, 3)));
+            
+            
+            // Call function to convert decimal to DMS format
+            return PicoDataFormat::convertDecimalToDMS($decimal, $params);
         }
-        return null;
-    }
-
-    /**
-     * Formats a string using a specified format pattern.
-     *
-     * The format string consists of ordinary characters (except `%`, which 
-     * introduces a conversion specification). Each conversion specification 
-     * fetches and formats a corresponding parameter. This behavior applies 
-     * to both `sprintf` and `printf`.
-     *
-     * @param string $format The format string containing conversion specifications.
-     * @param mixed $value The value to be formatted.
-     * @return string The formatted string.
-     */
-    private function _format($format, $value)
-    {
-        return sprintf($format, $value);
     }
 
     /**
