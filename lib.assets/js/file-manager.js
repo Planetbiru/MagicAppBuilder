@@ -319,6 +319,7 @@ function openFile(file, extension) {
                 img.src = base64ImageData; // Set the base64 image data as the source
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '400px';
+                mediaDisplay.innerHTML = '';
                 mediaDisplay.appendChild(img); // Append the image to the file content div
                 decreaseAjaxPending();
             })
