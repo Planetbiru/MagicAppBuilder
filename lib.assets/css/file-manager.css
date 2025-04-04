@@ -52,16 +52,25 @@ li[data-type=dir], li[data-type=file] {
   cursor: pointer;
 }
 
-li[data-type=dir]::before {
-  content: "📂";
+/* Folder closed state */
+li[data-type=dir] > span::before, li[data-type=dir][data-open=false] > span::before {
+  content: "📁"; /* Unicode character for folder (closed) */
   display: inline-block;
-  width: 22px;
+  width: 20px;
 }
 
-li[data-type=file]::before {
-  content: "📄";
+/* Folder open state */
+li[data-type=dir][data-open=true] > span::before {
+  content: "📂"; /* Unicode character for folder (open) */
   display: inline-block;
-  width: 22px;
+  width: 20px;
+}
+
+/* File state */
+li[data-type=file] > span::before {
+  content: "📄"; /* Unicode character for document */
+  display: inline-block;
+  width: 20px;
 }
 
 li[data-type=dir]:hover::before {

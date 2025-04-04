@@ -1872,6 +1872,7 @@ let initAll = function () {
 
                   // Additional step: Generate favicon.ico
                   generateFaviconICO(applicationId, image);
+                  resetFileManager();
               };
             
               // Load the image data
@@ -3577,10 +3578,8 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
       // Check if the response indicates success
       if (data.success) {
           decreaseAjaxPending();
-          console.log('Icon uploaded successfully:', data.filePath);  // Log success
       } else {
           decreaseAjaxPending();
-          console.error('Error uploading icon:', data.error);  // Log error
       }
   })
   .catch(error => {
