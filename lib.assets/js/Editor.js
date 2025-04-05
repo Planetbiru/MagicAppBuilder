@@ -12,6 +12,8 @@ let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
 
+let fileManagerEditor = null;
+
 /**
  * Clears the content of the module editor.
  * 
@@ -187,6 +189,15 @@ let initEditor = function () {
       transEd3.refresh();
       transEd4.refresh();
     }
+    
+    if (currId == 'module-file-tab') {
+      cmEditorModule.refresh();
+    }
+    
+    if( currId == 'file-manager-tab') {
+      fileManagerEditor.refresh();
+    }
+    
   });
 
   $(document).on('keydown', function (e) {

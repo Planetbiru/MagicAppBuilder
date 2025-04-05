@@ -6557,7 +6557,7 @@ function getReferenceResource() {
 
 let selectedItem = null; // To store the selected file or directory
 let contentModified = true;
-let fileManagerEditor = null;   
+   
 let currentMode = null;
 let modeInput = null;
 
@@ -6668,9 +6668,10 @@ function initFileManager()
             `;
         } else if (itemType === 'dir') {
             menuList.innerHTML = `
+            <li data-type="dir" data-operation="new" data-dir="${itemName}">Create New File</li>
             <li data-type="dir" data-operation="open" data-dir="${itemName}">Expand Directory</li>
             <li data-type="dir" data-operation="rename" data-dir="${itemName}">Rename Directory</li>
-            <li data-type="dir" data-operation="compress" data-dir="${itemName}">Compress & Download Directory</li>
+            <li data-type="dir" data-operation="compress" data-dir="${itemName}">Download Directory</li>
             <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
             `;
         }
@@ -6679,6 +6680,27 @@ function initFileManager()
         contextMenu.style.display = "block";
         }
     });
+    document.querySelector('.root-directory').addEventListener("contextmenu", function (event) {
+      event.preventDefault(); // Prevent the default context menu from appearing
+      // Show the context menu at the cursor position
+      const menuX = event.pageX;
+      const menuY = event.pageY;
+
+      // Position the context menu
+      contextMenu.style.left = `${menuX}px`;
+      contextMenu.style.top = `${menuY}px`;
+
+      // Reset the context menu and set up the options
+      contextMenu.className = 'context-menu'; // Reset any previous state
+      const menuList = contextMenu.querySelector("ul");
+      menuList.innerHTML = `
+        <li data-type="dir" data-operation="root-new" data-dir="">Create New File</li>
+        <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
+        <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
+        `;
+      contextMenu.style.display = "block";
+    });
+      
 
     // Hide context menu on click outside
     document.addEventListener("click", function () {
@@ -6699,22 +6721,35 @@ function initFileManager()
         } else if (dataType === 'dir') {
             name = target.dataset.dir;
         }
+        
         // Action based on the clicked option
         switch (clickedOption) {
+            case "root-new":
+              createNewFile(''); // Create a new file in the root directory
+              break;
+            case "reset":
+              resetFileManager(); // Reset the file manager content
+              break;
+            case "root-dowload":
+              downloadFile('', 'dir'); // Download all files in the root directory
+              break;
+            case "new":
+              createNewFile(name); // Create a new file in the selected directory
+            break;
             case "open":
-              selectedItem.click();
+              selectedItem.click(); // Open the directory or file
             break;
             case "rename":
-            renameFile(name, dataType); // Call the rename function
+            renameFile(name, dataType); // Rename file or directory
             break;
             case "download":
-            downloadFile(name, dataType); // Call the download function
+            downloadFile(name, dataType); // Download file or directory
             break;
             case "delete":
-            deleteFile(name, dataType);
+            deleteFile(name, dataType); // Delete file or directory
             break;
             case "compress":
-            compressDirectory(name); // Call the compress function
+            compressDirectory(name); // Compress and download the directory
             break;
             default:
             break;
@@ -6730,9 +6765,44 @@ function initFileManager()
         event.stopPropagation();
     });
     
+    document.querySelector('.file-path').addEventListener('change', function(e){ 
+      let file = e.target.value;
+      let extension = getFileExtension(file);
+      if (extension) {
+        changeMode(file, extension); // Call changeMode function with the file and extension
+      }  
+    });
+    
     initCodeMirror();
+    fileManagerEditor.refresh();
 }
 
+/**
+ * Creates a new file in the specified directory.
+ * If no directory is provided, it creates the file in the default location.
+ * 
+ * @param {string} dir - The directory in which the new file will be created.
+ * If an empty string is passed, the default location will be used.
+ */
+function createNewFile(dir)
+{
+  let filename = dir !== '' ? dir + '/new-file.txt' : 'new-file.txt'; // Default filename
+  let extension = 'txt';
+  document.querySelector('.file-path').value = filename;
+  document.querySelector('.btn-save-file').disabled = false;
+  fileManagerEditor.setValue('');
+  changeMode(filename, extension);
+  setDisplayMode('text'); // Set the display mode to text
+  fileManagerEditor.focus(); // Focus on the editor
+}
+
+/**
+ * Renames an existing file and updates the display accordingly.
+ * Prompts the user to enter a new name and submits the change to the server.
+ * 
+ * @param {string} name - The current name of the file to be renamed.
+ * @param {string} dataType - The type of the file (e.g., text, image, etc.).
+ */
 function renameFile(name, dataType) {
   asyncPrompt('Enter new name for ' + name, 'Rename', [{
     'caption': 'OK',
@@ -6742,9 +6812,9 @@ function renameFile(name, dataType) {
       let dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path
       increaseAjaxPending();
 
-      // Menggunakan metode POST
+      // 
       fetch('lib.ajax/file-manager-rename.php', {
-        method: 'POST', // Menggunakan POST
+        method: 'POST', 
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' // Atau 'application/json' jika Anda mengirim JSON
         },
@@ -6801,10 +6871,16 @@ function renameFile(name, dataType) {
   }], name, function (newName) { });
 }
 
+/**
+ * Downloads a file from the server.
+ * 
+ * @param {string} name - The name of the file to download.
+ * @param {string} dataType - The type of the file to download (e.g., text, image, etc.).
+ */
 function downloadFile(name, dataType) {
   // TODO: Implement download functionality
   fetch('lib.ajax/file-manager-download.php', {
-    method: 'POST', // Menggunakan POST
+    method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
@@ -6827,6 +6903,13 @@ function downloadFile(name, dataType) {
     });
 }
 
+/**
+ * Deletes a file from the server and updates the display accordingly.
+ * Prompts the user for confirmation before deleting.
+ * 
+ * @param {string} name - The name of the file to delete.
+ * @param {string} dataType - The type of the file (e.g., text, image, etc.).
+ */
 function deleteFile(name, dataType) {
   // TODO: Implement delete functionality
   asyncAlert(
@@ -6839,9 +6922,9 @@ function deleteFile(name, dataType) {
           let subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
           increaseAjaxPending();
 
-          // Menggunakan metode POST
+          // 
           fetch('lib.ajax/file-manager-delete.php', {
-            method: 'POST', // Menggunakan POST
+            method: 'POST', 
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -6894,9 +6977,9 @@ function compressDirectory(name) {
         let dirToLoad = subdirLi ? subdirLi.dataset.dir : '/'; // Get the directory path
         increaseAjaxPending();
 
-        // Menggunakan metode POST
+        // 
         fetch('lib.ajax/file-manager-compress.php', {
-          method: 'POST', // Menggunakan POST
+          method: 'POST', 
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
