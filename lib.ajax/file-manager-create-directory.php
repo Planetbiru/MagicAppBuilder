@@ -33,25 +33,25 @@ try {
     
     $dir = dirname($name); // Get the directory name from the file path
     
-    $newName = $baseDirectory . "/" . $inputPost->getNewName();
-    $newName = FileDirUtil::normalizationPath($newName);
-    
-    
-    if (file_exists($name)) {
-        // Check if the new name already exists
-        if (file_exists($newName)) {
-            $response['status'] = 'error';
-            $response['message'] = 'File already exists';
+    if (!file_exists($name)) {
+        // Check if the file is not exists and enable to create new directory
+        $created = mkdir($name, 0755, true);
+        if ($created) {
+            $response['status'] = 'success';
+            $response['message'] = 'Directory created successfully';
         } else {
-            // Rename the file
-            if (rename($name, $newName)) {
-                $response['status'] = 'success';
-                $response['message'] = 'File renamed successfully';
-            } else {
-                $response['status'] = 'error';
-                $response['message'] = 'Error renaming file';
-            }
+            $response['status'] = 'error';
+            $response['message'] = 'Failed to create directory';
         }
+    } else if (is_dir($name)) {
+        // If the directory already exists, return a message
+        $response['status'] = 'error';
+        $response['message'] = 'Directory already exists';
+    } else if (is_file($name)) {
+        // If the file already exists, return a message
+        $response['status'] = 'error';
+        $response['message'] = 'File already exists';
+        
     } else {
         $response['status'] = 'error';
         $response['message'] = 'File not found';

@@ -7,7 +7,6 @@ use MagicObject\Request\InputPost;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 
-
 $separatorNLT = "\r\n\t";
 
 // Exit if the application is not set up
@@ -33,23 +32,27 @@ try {
     
     $dir = dirname($name); // Get the directory name from the file path
     
-    $newName = $baseDirectory . "/" . $inputPost->getNewName();
-    $newName = FileDirUtil::normalizationPath($newName);
-    
+    $type = $inputPost->getType();
     
     if (file_exists($name)) {
-        // Check if the new name already exists
-        if (file_exists($newName)) {
-            $response['status'] = 'error';
-            $response['message'] = 'File already exists';
-        } else {
-            // Rename the file
-            if (rename($name, $newName)) {
+        // Check if the file already exists and can be deleted
+        if ($type == "file") {
+            // If it's a file, delete it
+            if (unlink($name)) {
                 $response['status'] = 'success';
-                $response['message'] = 'File renamed successfully';
+                $response['message'] = 'File deleted successfully';
             } else {
                 $response['status'] = 'error';
-                $response['message'] = 'Error renaming file';
+                $response['message'] = 'Error deleting file';
+            }
+        } else if ($type == "dir") {
+            // If it's a directory, delete it
+            if (rmdir($name)) {
+                $response['status'] = 'success';
+                $response['message'] = 'Directory deleted successfully';
+            } else {
+                $response['status'] = 'error';
+                $response['message'] = 'Error deleting directory';
             }
         }
     } else {

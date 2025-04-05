@@ -1493,14 +1493,26 @@ ul {
 }
 
 /* Icon for 'new' operation (Purple) */
-.context-menu [data-operation="new"]::before, .context-menu [data-operation="root-new"]::before  {
+.context-menu [data-operation="new-file"]::before, .context-menu [data-operation="root-new-file"]::before  {
     content: '\f15b'; /* Font Awesome icon for file (new) */
     color: rgb(0, 38, 255); /* Blue for new */
 }
 
+/* Icon for 'new-dir' operation (Yellow) */
+.context-menu [data-operation="new-dir"]::before, .context-menu [data-operation="root-new-dir"]::before {
+    content: '\f114'; /* Font Awesome icon for folder (new directory) */
+    color: #FFC107; /* Yellow for new directory */
+}
+
+
+/* Icon for 'upload' operation (Green for upload) */
+.context-menu [data-operation="upload-file"]::before {
+    content: '\f093'; /* Font Awesome icon for upload */
+    color: #4CAF50; /* Green for upload */
+}
 
 /* Icon for 'reset' operation (Gray for Reset Content) */
-.context-menu [data-operation="reset"]::before {
+.context-menu [data-operation="reset"]::before, .context-menu [data-operation="refresh-dir"]::before {
     content: '\f021'; /* Font Awesome icon for refresh (reset) */
     color: #2196F3; /* Blue for reset */
 }
