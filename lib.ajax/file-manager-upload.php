@@ -1,11 +1,11 @@
 <?php
 
 use AppBuilder\Util\FileDirUtil;
+use MagicObject\File\PicoUploadFile;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
 
 $separatorNLT = "\r\n\t";
 
@@ -27,19 +27,25 @@ try {
     // Remove trailing slash if exists
     $baseDirectory = rtrim($baseDirectory, "/");
 
-    $file = $baseDirectory . "/" . $inputPost->getFile();
-    $file = FileDirUtil::normalizationPath($file);
-    $dir = dirname($file);
+    $dir = $baseDirectory . "/" . $inputPost->getDir();
     $dir = FileDirUtil::normalizationPath($dir);
     
-    $content = $inputPost->getContent();
-
-    file_put_contents($file, $content);
+    $uploadedFile = new PicoUploadFile();
+    $files = $uploadedFile->files;
+    foreach($files->getAll() as $key => $fileItem) {
+        $fileName = $fileItem->getName();
+        $filePath = $dir . "/" . $fileName;
+        $filePath = FileDirUtil::normalizationPath($filePath);
+        
+        $temporaryName = $fileItem->getTmpName();
+        $name = $fileItem->getName();
+        $size = $fileItem->getSize();
+        move_uploaded_file($temporaryName, $filePath);
+    }
     
     $response = [
         'status' => 'success',
-        'message' => 'File saved successfully.',
-        'file' => $file,
+        'message' => 'Files uploaded successfully',
         'dirs' => FileDirUtil::getDirTree($dir, $baseDirectory, 1)
     ];
     // Return the response as JSON
