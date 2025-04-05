@@ -1645,7 +1645,6 @@ let initAll = function () {
       error(e)
       {
         decreaseAjaxPending();
-        console.log(e)
       }
     });
   });
@@ -3579,14 +3578,14 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
   .then(data => {
       // Check if the response indicates success
       if (data.success) {
-          decreaseAjaxPending();
-      } else {
-          decreaseAjaxPending();
+          // Do something with the success response, e.g., log the file path
+      } else {  
+          // Handle the error case, e.g., log the error message
       }
+      decreaseAjaxPending();
   })
   .catch(error => {
     decreaseAjaxPending();
-    console.error('Error:', error);
   });  // Log any errors during the fetch request
 }
 
@@ -3618,15 +3617,12 @@ function sendIconToServer(applicationId, iconImages, iconName) {
   .then(data => {
       if (data.success) {
           decreaseAjaxPending();
-          console.log('Icon uploaded successfully:', data.filePath);
       } else {
           decreaseAjaxPending();
-          console.error('Error uploading icon:', data.error);
       }
   })
   .catch(error => {
     decreaseAjaxPending();
-    console.error('Error:', error);
   });
 }
 
@@ -6619,9 +6615,140 @@ function initFileManager()
         openTextFile(file, extension);
     });
     
+    const dirTree = document.getElementById("dir-tree");
+  
+      
+
+      
+    
+    const contextMenu = document.getElementById("context-menu");
+    let selectedItem = null; // To store the selected file or directory
+
+    dirTree.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+
+        // Find the closest li element
+        const target = event.target.closest("li");
+        
+        if (target && target.dataset.type) {
+        // Store the selected item for future use
+        selectedItem = event.target;
+
+        // Get the name (file or directory) from data attributes
+        let itemName = '';
+        let itemType = target.dataset.type; // Accessing data-type
+
+        if (itemType === 'file') {
+            itemName = target.querySelector("span").dataset.file;
+        } else if (itemType === 'dir') {
+            itemName = target.querySelector("span").dataset.dir;
+        }
+
+        // Show the context menu at the cursor position
+        const menuX = event.pageX;
+        const menuY = event.pageY;
+
+        // Position the context menu
+        contextMenu.style.left = `${menuX}px`;
+        contextMenu.style.top = `${menuY}px`;
+
+        // Reset the context menu and set up the options
+        contextMenu.className = 'context-menu'; // Reset any previous state
+        const menuList = contextMenu.querySelector("ul");
+        menuList.innerHTML = ""; // Clear previous items
+
+        // Add appropriate menu options for file or directory
+        if (itemType === 'file') {
+            menuList.innerHTML = `
+            <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
+            <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+            <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+            <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+            `;
+        } else if (itemType === 'dir') {
+            menuList.innerHTML = `
+            <li data-type="dir" data-operation="open" data-dir="${itemName}">Expand Directory</li>
+            <li data-type="dir" data-operation="rename" data-dir="${itemName}">Rename Directory</li>
+            <li data-type="dir" data-operation="compress" data-dir="${itemName}">Compress & Download Directory</li>
+            <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
+            `;
+        }
+
+        // Show the context menu
+        contextMenu.style.display = "block";
+        }
+    });
+
+    // Hide context menu on click outside
+    document.addEventListener("click", function () {
+        contextMenu.style.display = "none";
+    });
+
+    // Add functionality for context menu options
+    contextMenu.addEventListener("click", function (event) {
+        let target = event.target.closest("li");
+        const clickedOption = target.dataset.operation;
+
+        if (clickedOption) {
+        let name = '';
+        const dataType = target.dataset.type;
+
+        if (dataType === 'file') {
+            name = target.dataset.file;
+        } else if (dataType === 'dir') {
+            name = target.dataset.dir;
+        }
+
+        // Action based on the clicked option
+        switch (clickedOption) {
+            case "open":
+              selectedItem.click();
+            break;
+            case "rename":
+            renameFile(name, dataType); // Call the rename function
+            break;
+            case "download":
+            downloadFile(name, dataType); // Call the download function
+            break;
+            case "delete":
+            deleteFile(name, dataType);
+            break;
+            case "compress":
+            compressDirectory(name); // Call the compress function
+            break;
+            default:
+            break;
+        }
+
+        // Hide the context menu after selection
+        contextMenu.style.display = "none";
+        }
+    });
+
+    // Prevent context menu from closing when clicking inside the context menu
+    contextMenu.addEventListener("contextmenu", function (event) {
+        event.stopPropagation();
+    });
+    
     initCodeMirror();
 }
 
+function renameFile(name, dataType)
+{
+  // TODO: Implement rename functionality
+}
+function downloadFile(name, dataType)
+{
+  // TODO: Implement download functionality
+}
+function deleteFile(name, dataType)
+{
+  // TODO: Implement delete functionality 
+}
+function compressDirectory(name)
+{
+   // TODO: Implement compress functionality
+}
 /**
  * This function returns the caller function's name using the stack trace.
  * 
@@ -6733,7 +6860,6 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
         })
         .catch(error => {
             // Handle any errors
-            console.error('There was a problem with the fetch operation:', error);
             decreaseAjaxPending();
             if(subdirLi != null)
             {
@@ -6838,12 +6964,10 @@ function saveFile(file, content) {
     .then(response => response.text())  // Convert the response into text
     .then(data => {
         // Successfully received response from the server
-        console.log('File saved successfully:', data);
         decreaseAjaxPending();
     })
     .catch(error => {
         // Handle any errors that occurred during the request
-        console.error('Error saving file:', error);
         decreaseAjaxPending();
     });
 }
@@ -6856,7 +6980,10 @@ function saveFile(file, content) {
  * @param {string} extension - The file extension.
  */
 function openFile(file, extension) {
-  
+    if(!extension)
+    {
+      extension = getFileExtension(file); // Get the file extension if not provided 
+    }
     // List of non-text extensions (images, videos, audio, etc.)
     const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'mp4', 'mp3', 'avi', 'exe', 'pdf'];
 
