@@ -3576,12 +3576,6 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
   })
   .then(response => response.json())  // Parse the server's response as JSON
   .then(data => {
-      // Check if the response indicates success
-      if (data.success) {
-          // Do something with the success response, e.g., log the file path
-      } else {  
-          // Handle the error case, e.g., log the error message
-      }
       decreaseAjaxPending();
   })
   .catch(error => {
@@ -3615,11 +3609,6 @@ function sendIconToServer(applicationId, iconImages, iconName) {
   })
   .then(response => response.json())
   .then(data => {
-      if (data.success) {
-          // Handle success response, e.g., log the file path or show a message
-      } else {
-          // Handle error response, e.g., log the error message
-      }
       decreaseAjaxPending();
   })
   .catch(error => {
@@ -6668,8 +6657,11 @@ function initFileManager()
             `;
         } else if (itemType === 'dir') {
             menuList.innerHTML = `
-            <li data-type="dir" data-operation="new" data-dir="${itemName}">Create New File</li>
+            <li data-type="dir" data-operation="new-file" data-dir="${itemName}">Create New File</li>
+            <li data-type="dir" data-operation="new-dir" data-dir="${itemName}">Create New Directory</li>
+            <li data-type="dir" data-operation="upload-file" data-dir="${itemName}">Upload Files</li>
             <li data-type="dir" data-operation="open" data-dir="${itemName}">Expand Directory</li>
+            <li data-type="dir" data-operation="refresh-dir" data-dir="${itemName}">Reload Directory</li>
             <li data-type="dir" data-operation="rename" data-dir="${itemName}">Rename Directory</li>
             <li data-type="dir" data-operation="compress" data-dir="${itemName}">Download Directory</li>
             <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
@@ -6682,6 +6674,8 @@ function initFileManager()
     });
     document.querySelector('.root-directory').addEventListener("contextmenu", function (event) {
       event.preventDefault(); // Prevent the default context menu from appearing
+      selectedItem = null; // Reset selected item
+      // Store the selected item for future use 
       // Show the context menu at the cursor position
       const menuX = event.pageX;
       const menuY = event.pageY;
@@ -6694,7 +6688,9 @@ function initFileManager()
       contextMenu.className = 'context-menu'; // Reset any previous state
       const menuList = contextMenu.querySelector("ul");
       menuList.innerHTML = `
-        <li data-type="dir" data-operation="root-new" data-dir="">Create New File</li>
+        <li data-type="dir" data-operation="root-new-file" data-dir="">Create New File</li>
+        <li data-type="dir" data-operation="root-new-dir" data-dir="">Create New Directory</li>
+        <li data-type="dir" data-operation="upload-file" data-dir="">Upload Files</li>
         <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
         <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
         `;
@@ -6724,7 +6720,7 @@ function initFileManager()
         
         // Action based on the clicked option
         switch (clickedOption) {
-            case "root-new":
+            case "root-new-file":
               createNewFile(''); // Create a new file in the root directory
               break;
             case "reset":
@@ -6733,11 +6729,23 @@ function initFileManager()
             case "root-dowload":
               downloadFile('', 'dir'); // Download all files in the root directory
               break;
-            case "new":
+            case "new-file":
               createNewFile(name); // Create a new file in the selected directory
+            break;
+            case "upload-file":
+              uploadFile(name); // Create a new file in the selected directory
+            break;
+            case "new-dir":
+              createNewDirectory(name); // Create a new directory in the selected directory
+            break;
+            case "root-new-dir":
+              createNewDirectory(''); // Create a new directory in the root directory
             break;
             case "open":
               selectedItem.click(); // Open the directory or file
+            break;
+            case "refresh-dir":
+            refreshDirectory(name); // Refresh the directory content
             break;
             case "rename":
             renameFile(name, dataType); // Rename file or directory
@@ -6778,6 +6786,84 @@ function initFileManager()
 }
 
 /**
+ * Uploads files to the server by creating an invisible file input element, 
+ * selecting files, and sending them to the server via a POST request.
+ * 
+ * This function handles the entire process of:
+ * 1. Triggering a file input dialog to select files.
+ * 2. Sending the selected files to the server.
+ * 3. Updating the UI with the uploaded files if the upload is successful.
+ * 
+ * @param {string} dir - The directory path where the files should be uploaded. This directory is passed 
+ *                       as a parameter to the server to store the uploaded files in the appropriate location.
+ */
+function uploadFile(dir)
+{
+  // Create a file input element
+  let fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '*'; // Accept all file types
+  fileInput.multiple = true; // Allow multiple file selection
+  fileInput.style.display = 'none'; // Hide the input element
+  
+  // Upload file when a file is selected
+  fileInput.addEventListener('change', function(event) {
+    let file = event.target.files; 
+    if (file) {
+      let formData = new FormData(); // Create a FormData object
+      
+      
+      for (let i = 0; i < file.length; i++) // NOSONAR
+      {
+        formData.append('files[]', file[i]); // Append each selected file to the FormData object
+      }
+      
+      formData.append('dir', dir); // Append the directory to the FormData object
+
+      increaseAjaxPending();
+      fetch('lib.ajax/file-manager-upload.php', {
+        method: 'POST',
+        body: formData // Send the FormData object as the request body
+      })
+      .then(response => response.json()) // Parse the JSON response
+      .then(data => {
+        decreaseAjaxPending();
+        if (data.status == 'success') {
+          
+          if(selectedItem != null)
+          {
+            let subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+            let subDirUl = subDirLi.querySelector('ul'); // Get the <ul> that contains subdirectories
+            if(subDirUl == null)
+            {
+              subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
+              subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory  
+            }
+            if(subDirLi != null)
+            {
+              displayDirContent(data.dirs, subDirUl, true); // Display the directory content
+              subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+            }
+          }
+          else
+          {
+            resetFileManager(); // Reset the file manager content
+          }
+        } else {
+          console.error('Error uploading file:', data.error);
+        }
+      })
+      .catch(error => {
+        decreaseAjaxPending();
+        console.error('Error uploading file:', error);
+      });
+    }
+  });
+  
+  fileInput.click(); // Trigger the file input click event to open the file dialog
+}
+
+/**
  * Creates a new file in the specified directory.
  * If no directory is provided, it creates the file in the default location.
  * 
@@ -6797,6 +6883,103 @@ function createNewFile(dir)
 }
 
 /**
+ * Creates a new directory in the file manager system. This function handles the 
+ * process of prompting the user for a new directory name, then sending a request 
+ * to the server to create the directory. It also updates the UI based on the 
+ * server's response, either by adding the new directory to the current directory 
+ * structure or resetting the file manager content.
+ * 
+ * @param {string} dir - The directory where the new directory should be created. 
+ *                        If an empty string is passed, the new directory will be 
+ *                        created at the root level. 
+ */
+function createNewDirectory(dir)
+{
+  let newDir = 'new-directory'; // Default directory name
+  if(dir != '')
+  {
+    newDir = dir + '/' + newDir; // Append the directory path
+  }
+  asyncPrompt('Enter new directory name', 'Create Directory', [{
+    'caption': 'OK',
+    'fn': function (newDirName) {
+      let subDirLi = null;
+      let subDirUl = null;
+      let dirToLoad = '/'; // Default directory path
+      if(selectedItem != null)
+      {
+        subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+        subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
+        dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path      
+      }
+      increaseAjaxPending();
+      
+      fetch('lib.ajax/file-manager-create-directory.php', {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          name: newDirName,
+          type: 'dir',
+          dir: dirToLoad
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json(); // Parse the JSON response
+        })
+        .then(response => {
+          // Decrease the AJAX pending counter (if you have such a function)
+          decreaseAjaxPending();
+          if (subDirLi != null) {
+            subDirLi.removeAttribute('data-loading');
+          }
+            // Wait for a moment before reloading the directory content
+            if(response.dirs)
+            {
+              if(subDirLi != null && subDirUl != null) 
+              {
+                displayDirContent(response.dirs, subDirUl, true);
+              }
+              else
+              {
+                resetFileManager();
+              }
+            }
+            else if(dirToLoad == '/')
+            {
+              resetFileManager();
+            }
+            else
+            {
+              loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
+            }
+            
+          
+        })
+        .catch(error => {
+          // Handle any errors
+          decreaseAjaxPending();
+          if (subDirLi != null) {
+            subDirLi.removeAttribute('data-loading');
+          }
+        });
+    },
+    'class': 'btn-primary'
+  }, {
+    'caption': 'Cancel',
+    'fn': function () { },
+    'class': 'btn-secondary'
+  }], newDir, function () {
+    // Callback function after the prompt is closed
+    // You can add any additional logic here if needed
+  });
+}
+
+/**
  * Renames an existing file and updates the display accordingly.
  * Prompts the user to enter a new name and submits the change to the server.
  * 
@@ -6812,7 +6995,6 @@ function renameFile(name, dataType) {
       let dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path
       increaseAjaxPending();
 
-      // 
       fetch('lib.ajax/file-manager-rename.php', {
         method: 'POST', 
         headers: {
@@ -6878,30 +7060,18 @@ function renameFile(name, dataType) {
  * @param {string} dataType - The type of the file to download (e.g., text, image, etc.).
  */
 function downloadFile(name, dataType) {
-  // TODO: Implement download functionality
-  fetch('lib.ajax/file-manager-download.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      name: name,
-      type: dataType
-    })
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json(); // Parse the JSON response
-    })
-    .then(data => {
-      // Handle download logic, for example, creating a download link
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
-    });
+  // Construct the URL with query parameters for the GET request
+  const url = `lib.ajax/file-manager-download.php?name=${encodeURIComponent(name)}&type=${encodeURIComponent(dataType)}`;
+
+  // Create an anchor element to trigger the download
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name; // This sets the name of the file when downloading
+
+  // Programmatically click the link to start the download
+  link.click();
 }
+
 
 /**
  * Deletes a file from the server and updates the display accordingly.
@@ -6911,7 +7081,6 @@ function downloadFile(name, dataType) {
  * @param {string} dataType - The type of the file (e.g., text, image, etc.).
  */
 function deleteFile(name, dataType) {
-  // TODO: Implement delete functionality
   asyncAlert(
     'Do you want to delete ' + name + '?',
     'Confirmation',
@@ -6966,48 +7135,31 @@ function deleteFile(name, dataType) {
   );
 }
 
+/**
+ * Prompts the user to confirm if they want to compress a given directory, and if confirmed,
+ * triggers the download of the compressed directory.
+ *
+ * This function constructs a URL to send a GET request to the server to download the directory 
+ * as a compressed file. It dynamically creates an anchor (`<a>`) element, sets its `href` to the 
+ * server's download URL, and programmatically clicks the link to initiate the download.
+ *
+ * @param {string} name - The name of the directory to compress and download.
+ */
 function compressDirectory(name) {
-  // TODO: Implement compress functionality
   asyncAlert('Do you want to compress ' + name + '?', 'Confirmation', [
     {
       'caption': 'Yes',
       'fn': () => {
-        let subdirLi = selectedItem.closest('ul').closest('li'); // Get the <li> that contains the subdirectory
-        let subDirUl = selectedItem.querySelector('ul'); // Get the <ul> that contains subdirectories
-        let dirToLoad = subdirLi ? subdirLi.dataset.dir : '/'; // Get the directory path
-        increaseAjaxPending();
+        // Construct the URL with query parameters for the GET request
+        const url = `lib.ajax/file-manager-download.php?name=${encodeURIComponent(name)}&type=dir`;
 
-        // 
-        fetch('lib.ajax/file-manager-compress.php', {
-          method: 'POST', 
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            name: name
-          })
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json(); // Parse the JSON response
-          })
-          .then(dirs => {
-            // Decrease the AJAX pending counter (if you have such a function)
-            decreaseAjaxPending();
-            if (subdirLi != null) {
-              subdirLi.removeAttribute('data-loading');
-            }
-            loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
-          })
-          .catch(error => {
-            // Handle any errors
-            decreaseAjaxPending();
-            if (subdirLi != null) {
-              subdirLi.removeAttribute('data-loading');
-            }
-          });
+        // Create an anchor element to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name; // This sets the name of the file when downloading
+
+        // Programmatically click the link to start the download
+        link.click();
       },
       'class': 'btn-primary'
     },
@@ -7080,8 +7232,6 @@ function getFileExtension(filename) {
     return match ? match[1] : '';
 }
 
-
-
 /**
  * Formats the entire content of the CodeMirror editor.
  * 
@@ -7093,6 +7243,31 @@ function getFileExtension(filename) {
 function format() {
     let totalLines = fileManagerEditor.lineCount();  // Get the total number of lines in the editor
     fileManagerEditor.autoFormatRange({line: 0, ch: 0}, {line: totalLines});  // Format all lines
+}
+
+/**
+ * Refreshes the content of a specified directory and updates the DOM structure to reflect
+ * the current content of the directory.
+ *
+ * This function attempts to refresh the list of files and subdirectories within the specified
+ * directory. If the directory's subdirectories are not already loaded in the DOM, it creates
+ * a new `<ul>` element to display them.
+ *
+ * @param {string} name - The name or path of the directory whose content needs to be refreshed.
+ */
+function refreshDirectory(name) {
+  let subdirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+  let subDirUl = subdirLi.querySelector('ul'); // Get the <ul> that contains subdirectories
+  if(subDirUl == null)
+  {
+    subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
+    subdirLi.appendChild(subDirUl); // Append it to the <li> for the current directory    
+  }
+  loadDirContent(name, subDirUl, subdirLi, true)
+  if(subdirLi != null)
+  {
+    subdirLi.setAttribute('data-open', 'true');
+  }
 }
 
 /**
@@ -7231,10 +7406,41 @@ function saveFile(file, content) {
         method: 'POST',  // HTTP method is POST
         body: formData   // The FormData object contains the file name and content
     })
-    .then(response => response.text())  // Convert the response into text
-    .then(data => {
+    .then(response => response.json())  // Parse the JSON response
+    .then(response => {
         // Successfully received response from the server
         decreaseAjaxPending();
+        let subDirUl = null;
+        let subDirLi = null;
+        if(selectedItem != null)
+        {
+            subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+            subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
+            if(subDirUl == null)
+            {
+                subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
+                subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
+            }
+            if(response.dirs)
+            {
+                subDirLi.removeAttribute('data-loading');
+                displayDirContent(response.dirs, subDirUl, true); // Display the directory content
+                if(subDirLi != null)
+                {
+                    subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+                }
+            }
+            else
+            {
+              let dirUl = document.querySelector('#dir-tree');
+              loadDirContent('', dirUl, null, true);
+            }
+        }
+        else
+        {
+          let dirUl = document.querySelector('#dir-tree');
+          loadDirContent('', dirUl, null, true);
+        }
     })
     .catch(error => {
         // Handle any errors that occurred during the request
