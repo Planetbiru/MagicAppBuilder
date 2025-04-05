@@ -6690,6 +6690,7 @@ function initFileManager()
       menuList.innerHTML = `
         <li data-type="dir" data-operation="root-new-file" data-dir="">Create New File</li>
         <li data-type="dir" data-operation="root-new-dir" data-dir="">Create New Directory</li>
+        <li data-type="dir" data-operation="upload-file" data-dir="">Upload Files</li>
         <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
         <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
         `;
