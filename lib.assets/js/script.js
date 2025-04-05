@@ -3092,7 +3092,7 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
           } else {
             resolve(button.caption);  // In case of other buttons, resolve with their caption
           }
-          button.fn();  // Execute the callback for this button
+          button.fn($('.prompt-input').val());  // Execute the callback for this button
         });
       modalFooter.append(buttonElement);
     });
@@ -3616,10 +3616,11 @@ function sendIconToServer(applicationId, iconImages, iconName) {
   .then(response => response.json())
   .then(data => {
       if (data.success) {
-          decreaseAjaxPending();
+          // Handle success response, e.g., log the file path or show a message
       } else {
-          decreaseAjaxPending();
+          // Handle error response, e.g., log the error message
       }
+      decreaseAjaxPending();
   })
   .catch(error => {
     decreaseAjaxPending();
@@ -6554,7 +6555,7 @@ function getReferenceResource() {
 
 
 
-
+let selectedItem = null; // To store the selected file or directory
 let contentModified = true;
 let fileManagerEditor = null;   
 let currentMode = null;
@@ -6622,7 +6623,7 @@ function initFileManager()
       
     
     const contextMenu = document.getElementById("context-menu");
-    let selectedItem = null; // To store the selected file or directory
+    
 
     dirTree.addEventListener("contextmenu", function (event) {
         event.preventDefault();
@@ -6698,7 +6699,6 @@ function initFileManager()
         } else if (dataType === 'dir') {
             name = target.dataset.dir;
         }
-
         // Action based on the clicked option
         switch (clickedOption) {
             case "open":
@@ -6733,22 +6733,209 @@ function initFileManager()
     initCodeMirror();
 }
 
-function renameFile(name, dataType)
-{
-  // TODO: Implement rename functionality
+function renameFile(name, dataType) {
+  asyncPrompt('Enter new name for ' + name, 'Rename', [{
+    'caption': 'OK',
+    'fn': function (newName) {
+      let subDirLi = selectedItem.closest('ul').closest('li'); // Get the <li> that contains the subdirectory
+      let subDirUl = selectedItem.closest('ul'); // Get the <ul> that contains subdirectories
+      let dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path
+      increaseAjaxPending();
+
+      // Menggunakan metode POST
+      fetch('lib.ajax/file-manager-rename.php', {
+        method: 'POST', // Menggunakan POST
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded' // Atau 'application/json' jika Anda mengirim JSON
+        },
+        body: new URLSearchParams({
+          name: name,
+          newName: newName,
+          type: dataType
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json(); // Parse the JSON response
+        })
+        .then(response => {
+          // Decrease the AJAX pending counter (if you have such a function)
+          decreaseAjaxPending();
+          if (subDirLi != null) {
+            subDirLi.removeAttribute('data-loading');
+          }
+            // Wait for a moment before reloading the directory content
+            if(response.dirs)
+            {
+              displayDirContent(response.dirs, subDirUl, true);
+            }
+            else
+            {
+              if(dirToLoad == '/')
+              {
+                resetFileManager();
+              }
+              else
+              {
+                loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
+              }
+            }
+          
+        })
+        .catch(error => {
+          // Handle any errors
+          decreaseAjaxPending();
+          if (subDirLi != null) {
+            subDirLi.removeAttribute('data-loading');
+          }
+        });
+    },
+    'class': 'btn-primary'
+
+  }, {
+    'caption': 'Cancel',
+    'fn': function () { },
+    'class': 'btn-secondary'
+  }], name, function (newName) { });
 }
-function downloadFile(name, dataType)
-{
+
+function downloadFile(name, dataType) {
   // TODO: Implement download functionality
+  fetch('lib.ajax/file-manager-download.php', {
+    method: 'POST', // Menggunakan POST
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({
+      name: name,
+      type: dataType
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse the JSON response
+    })
+    .then(data => {
+      // Handle download logic, for example, creating a download link
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
 }
-function deleteFile(name, dataType)
-{
-  // TODO: Implement delete functionality 
+
+function deleteFile(name, dataType) {
+  // TODO: Implement delete functionality
+  asyncAlert(
+    'Do you want to delete ' + name + '?',
+    'Confirmation',
+    [
+      {
+        'caption': 'Yes',
+        'fn': () => {
+          let subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+          increaseAjaxPending();
+
+          // Menggunakan metode POST
+          fetch('lib.ajax/file-manager-delete.php', {
+            method: 'POST', // Menggunakan POST
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+              name: name,
+              type: dataType
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json(); // Parse the JSON response
+            })
+            .then(dirs => {
+              // Decrease the AJAX pending counter (if you have such a function)
+              decreaseAjaxPending();
+              if(subDirLi != null)
+              {
+                subDirLi.parentNode.removeChild(subDirLi); // Remove the <li> element from the DOM                
+              }
+            })
+            .catch(error => {
+              // Handle any errors
+              decreaseAjaxPending();
+              if (subDirLi != null) {
+                subDirLi.removeAttribute('data-loading');
+              }
+            });
+        },
+        'class': 'btn-primary'
+      },
+      {
+        'caption': 'No',
+        'fn': () => { },
+        'class': 'btn-secondary'
+      }
+    ]
+  );
 }
-function compressDirectory(name)
-{
-   // TODO: Implement compress functionality
+
+function compressDirectory(name) {
+  // TODO: Implement compress functionality
+  asyncAlert('Do you want to compress ' + name + '?', 'Confirmation', [
+    {
+      'caption': 'Yes',
+      'fn': () => {
+        let subdirLi = selectedItem.closest('ul').closest('li'); // Get the <li> that contains the subdirectory
+        let subDirUl = selectedItem.querySelector('ul'); // Get the <ul> that contains subdirectories
+        let dirToLoad = subdirLi ? subdirLi.dataset.dir : '/'; // Get the directory path
+        increaseAjaxPending();
+
+        // Menggunakan metode POST
+        fetch('lib.ajax/file-manager-compress.php', {
+          method: 'POST', // Menggunakan POST
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            name: name
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse the JSON response
+          })
+          .then(dirs => {
+            // Decrease the AJAX pending counter (if you have such a function)
+            decreaseAjaxPending();
+            if (subdirLi != null) {
+              subdirLi.removeAttribute('data-loading');
+            }
+            loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
+          })
+          .catch(error => {
+            // Handle any errors
+            decreaseAjaxPending();
+            if (subdirLi != null) {
+              subdirLi.removeAttribute('data-loading');
+            }
+          });
+      },
+      'class': 'btn-primary'
+    },
+    {
+      'caption': 'No',
+      'fn': () => { },
+      'class': 'btn-secondary'
+    }
+  ]);
 }
+
 /**
  * This function returns the caller function's name using the stack trace.
  * 
@@ -6785,7 +6972,7 @@ function getCaller() {
  */
 function resetFileManager()
 {    
-    let ulDir = document.querySelector('#dir-tree');
+    let dirUl = document.querySelector('#dir-tree');
     if(fileManagerEditor)
     {
         fileManagerEditor.setValue('');
@@ -6793,7 +6980,7 @@ function resetFileManager()
     document.querySelector('.btn-save-file').disabled = true;
     document.querySelector('#dir-tree').innerHTML = '';
     document.querySelector('.file-path').value = '';
-    loadDirContent('', ulDir, null, true);
+    loadDirContent('', dirUl, null, true);
 }
 
 /**
