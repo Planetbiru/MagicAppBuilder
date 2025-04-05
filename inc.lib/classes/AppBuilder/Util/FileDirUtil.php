@@ -218,27 +218,27 @@ class FileDirUtil
         
         // Close the file after reading the data
         fclose($finfo);
-
+        $result = 'application/octet-stream';
         // Check for specific image file signatures (magic bytes)
         if ($bin === "\xFF\xD8\xFF\xE0" || $bin === "\xFF\xD8\xFF\xE1") {
             // JPEG image signature
-            return 'image/jpeg';
+            $result = 'image/jpeg';
         } elseif ($bin === "\x89\x50\x4E\x47") {
             // PNG image signature
-            return 'image/png';
+            $result = 'image/png';
         } elseif ($bin === "GIF8" || $bin === "GIF87a") {
             // GIF image signature
-            return 'image/gif';
+            $result = 'image/gif';
         } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "WEBP") {
             // WEBP image signature
-            return 'image/webp';
+            $result = 'image/webp';
         } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "BMP") {
             // BMP image signature
-            return 'image/bmp';
+            $result = 'image/bmp';
         }
         
         // Return a default binary stream MIME type if no image signature is found
-        return 'application/octet-stream';
+        return $result;
     }
 
     
