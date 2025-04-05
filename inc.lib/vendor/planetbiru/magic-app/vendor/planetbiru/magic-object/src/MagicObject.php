@@ -2460,6 +2460,12 @@ class MagicObject extends stdClass // NOSONAR
      * - **trim**: Retrieves the property value and trims any leading and trailing whitespace.
      *   - Example: `$value = $object->trimPropertyName();`
      *
+     * - **upper**: Retrieves the property value and transform it to uppercase.
+     *   - Example: `$value = $object->upperPropertyName();`
+     *
+     * - **lower**: Retrieves the property value and transform it to lowercase.
+     *   - Example: `$value = $object->lowerPropertyName();`
+     *
      * - **set**: Sets the property value.
      *   - Example: `$object->setPropertyName($value);`
      *
@@ -2485,46 +2491,47 @@ class MagicObject extends stdClass // NOSONAR
      *   - Example: `$removedElement = $object->shiftPropertyName();`
      *
      * - **findOneBy**: Searches for data in the database and returns one record.
-     *   - Example: `$record = $object->findOneByPropertyName($value);`
+     *   - Example: `$record = $object->findOneByPropertyName($columnName);`
      *   - *Requires a database connection.*
      *
      * - **findOneIfExistsBy**: Searches for data in the database by any column values and returns one record.
-     *   - Example: `$record = $object->findOneIfExistsByPropertyName($value, $sortable);`
+     *   - Example: `$record = $object->findOneIfExistsByPropertyName($columnName, $sortable);`
      *   - *Requires a database connection.*
      *
      * - **deleteOneBy**: Deletes data from the database by any column values and returns one record.
-     *   - Example: `$deletedRecord = $object->deleteOneByPropertyName($value, $sortable);`
+     *   - Example: `$deletedRecord = $object->deleteOneByPropertyName($columnName, $sortable);`
      *   - *Requires a database connection.*
      *
      * - **findFirstBy**: Searches for data in the database by any column values and returns the first record.
-     *   - Example: `$firstRecord = $object->findFirstByColumnName($value);`
+     *   - Example: `$firstRecord = $object->findFirstByColumnName($columnName);`
      *   - *Requires a database connection.*
      *
      * - **findFirstIfExistsBy**: Similar to `findFirstBy`, but returns the first record if it exists.
-     *   - Example: `$firstRecord = $object->findFirstIfExistsByPropertyName($value, $sortable);`
+     *   - Example: `$firstRecord = $object->findFirstIfExistsByPropertyName($columnName, $sortable);`
      *   - *Requires a database connection.*
      *
      * - **findLastBy**: Searches for data in the database by any column values and returns the last record.
-     *   - Example: `$lastRecord = $object->findLastByColumnName($value);`
+     *   - Example: `$lastRecord = $object->findLastByColumnName($columnName);`
      *   - *Requires a database connection.*
      *
      * - **findLastIfExistsBy**: Similar to `findLastBy`, but returns the last record if it exists.
-     *   - Example: `$lastRecord = $object->findLastIfExistsByPropertyName($value, $sortable);`
+     *   - Example: `$lastRecord = $object->findLastIfExistsByPropertyName($columnName, $sortable);`
      *   - *Requires a database connection.*
      *
      * - **findBy**: Searches for multiple records in the database by any column values.
-     *   - Example: `$records = $object->findByColumnName($value);`
+     *   - Example: `$records = $object->findByColumnName($columnName);`
      *   - *Requires a database connection.*
      *
      * - **countBy**: Counts data from the database.
      *   - Example: `$count = $object->countByColumnName();`
+     *   - *Requires a database connection.*
      *
      * - **existsBy**: Checks for data in the database.
      *   - Example: `$exists = $object->existsByColumn($column);`
      *   - *Requires a database connection.*
      *
      * - **deleteBy**: Deletes data from the database without reading it first.
-     *   - Example: `$object->deleteByPropertyName($value);`
+     *   - Example: `$object->deleteByPropertyName($columnName);`
      *   - *Requires a database connection.*
      *
      * - **booleanToTextBy**: Converts a boolean value to "yes/no" or "true/false" based on given parameters.
@@ -2610,6 +2617,12 @@ class MagicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "trim", 4) === 0) {
             return trim($this->get(substr($method, 4)));
+        }
+        else if (strncasecmp($method, "upper", 5) === 0) {
+            return strtoupper($this->get(substr($method, 5)));
+        }
+        else if (strncasecmp($method, "lower", 5) === 0) {
+            return strtolower($this->get(substr($method, 5)));
         }
         else if (strncasecmp($method, "set", 3) === 0 && $this->_isArray($params) && !empty($params) && !$this->_readonly) {
             $var = substr($method, 3);

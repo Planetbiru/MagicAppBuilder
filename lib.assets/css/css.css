@@ -1163,7 +1163,15 @@ li[data-type=dir]:hover::before {
   color: #007bff;
 }
 
-li[data-type=dir] ul:empty {
+li[data-type=dir][data-open=true] > ul {
+  display: block;
+}
+
+li[data-type=dir] > ul, li[data-type=dir][data-open=true][data-loading=true] > ul {
+  display: none;
+}
+
+li[data-type=dir] > ul:empty {
   display: none;
 }
 

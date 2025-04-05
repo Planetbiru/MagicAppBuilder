@@ -3320,6 +3320,18 @@ invokes the appropriate method according to its name and parameters.</p>
 </ul>
 </li>
 <li>
+<p><strong>upper</strong>: Retrieves the property value and transform it to uppercase.</p>
+<ul>
+<li>Example: <code>$value = $object-&gt;upperPropertyName();</code></li>
+</ul>
+</li>
+<li>
+<p><strong>lower</strong>: Retrieves the property value and transform it to lowercase.</p>
+<ul>
+<li>Example: <code>$value = $object-&gt;lowerPropertyName();</code></li>
+</ul>
+</li>
+<li>
 <p><strong>set</strong>: Sets the property value.</p>
 <ul>
 <li>Example: <code>$object-&gt;setPropertyName($value);</code></li>
@@ -3370,56 +3382,56 @@ invokes the appropriate method according to its name and parameters.</p>
 <li>
 <p><strong>findOneBy</strong>: Searches for data in the database and returns one record.</p>
 <ul>
-<li>Example: <code>$record = $object-&gt;findOneByPropertyName($value);</code></li>
+<li>Example: <code>$record = $object-&gt;findOneByPropertyName($columnName);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findOneIfExistsBy</strong>: Searches for data in the database by any column values and returns one record.</p>
 <ul>
-<li>Example: <code>$record = $object-&gt;findOneIfExistsByPropertyName($value, $sortable);</code></li>
+<li>Example: <code>$record = $object-&gt;findOneIfExistsByPropertyName($columnName, $sortable);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>deleteOneBy</strong>: Deletes data from the database by any column values and returns one record.</p>
 <ul>
-<li>Example: <code>$deletedRecord = $object-&gt;deleteOneByPropertyName($value, $sortable);</code></li>
+<li>Example: <code>$deletedRecord = $object-&gt;deleteOneByPropertyName($columnName, $sortable);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findFirstBy</strong>: Searches for data in the database by any column values and returns the first record.</p>
 <ul>
-<li>Example: <code>$firstRecord = $object-&gt;findFirstByColumnName($value);</code></li>
+<li>Example: <code>$firstRecord = $object-&gt;findFirstByColumnName($columnName);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findFirstIfExistsBy</strong>: Similar to <code>findFirstBy</code>, but returns the first record if it exists.</p>
 <ul>
-<li>Example: <code>$firstRecord = $object-&gt;findFirstIfExistsByPropertyName($value, $sortable);</code></li>
+<li>Example: <code>$firstRecord = $object-&gt;findFirstIfExistsByPropertyName($columnName, $sortable);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findLastBy</strong>: Searches for data in the database by any column values and returns the last record.</p>
 <ul>
-<li>Example: <code>$lastRecord = $object-&gt;findLastByColumnName($value);</code></li>
+<li>Example: <code>$lastRecord = $object-&gt;findLastByColumnName($columnName);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findLastIfExistsBy</strong>: Similar to <code>findLastBy</code>, but returns the last record if it exists.</p>
 <ul>
-<li>Example: <code>$lastRecord = $object-&gt;findLastIfExistsByPropertyName($value, $sortable);</code></li>
+<li>Example: <code>$lastRecord = $object-&gt;findLastIfExistsByPropertyName($columnName, $sortable);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
 <p><strong>findBy</strong>: Searches for multiple records in the database by any column values.</p>
 <ul>
-<li>Example: <code>$records = $object-&gt;findByColumnName($value);</code></li>
+<li>Example: <code>$records = $object-&gt;findByColumnName($columnName);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
@@ -3427,6 +3439,7 @@ invokes the appropriate method according to its name and parameters.</p>
 <p><strong>countBy</strong>: Counts data from the database.</p>
 <ul>
 <li>Example: <code>$count = $object-&gt;countByColumnName();</code></li>
+<li><em>Requires a database connection.</em></li>
 </ul>
 </li>
 <li>
@@ -3439,7 +3452,7 @@ invokes the appropriate method according to its name and parameters.</p>
 <li>
 <p><strong>deleteBy</strong>: Deletes data from the database without reading it first.</p>
 <ul>
-<li>Example: <code>$object-&gt;deleteByPropertyName($value);</code></li>
+<li>Example: <code>$object-&gt;deleteByPropertyName($columnName);</code></li>
 <li><em>Requires a database connection.</em></li>
 </ul>
 </li>
@@ -3528,6 +3541,21 @@ invokes the appropriate method according to its name and parameters.</p>
 <p><strong>format</strong>: Format a date value into a specified format.</p>
 <ul>
 <li>Example: <code>$formattedData = $object-&gt;formatData("%7.3f");</code></li>
+</ul>
+</li>
+<li>
+<p><strong>dms</strong>: Convert decimal to DMS format.</p>
+<ul>
+<li><strong>Parameters</strong>:
+<ul>
+<li><code>$inSeconds</code> (bool): Whether to convert in seconds (default is false)</li>
+<li><code>$decimal</code> (string): Separator (default is &quot;:&quot;)</li>
+<li><code>$decimalPlaces</code> (int): Number of decimal places (default is 0)</li>
+<li><code>$withSign</code> (bool): Whether to include sign (default is false)</li>
+<li><code>$zeroPadding</code> (int): Number of zero padding (default is 0)</li>
+<li><code>$trimDegreeMinute</code> (bool): Whether to trim degree and minute if they are 0 (default is false)</li>
+</ul></li>
+<li>Example: <code>$formattedData = $object-&gt;dmsData(";");</code></li>
 </ul>
 </li>
 </ul>
@@ -33914,11 +33942,8 @@ Initializes the cURL handle.</p>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">convertDecimalToDMS</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">float</span> <span class="parameter-name">$decimal</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$separator</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">int</span> <span class="parameter-name">$decimalPlaces</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">bool</span> <span class="parameter-name">$withSign</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">int</span> <span class="parameter-name">$zeroPadding</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">bool</span> <span class="parameter-name">$trimDegreeMinute</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$params <span class="parameter-equal-sign">=</span> <span class="parameter-default">array (
+)</span></span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
@@ -33926,16 +33951,8 @@ Initializes the cURL handle.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$decimal</div>
 <div class="parameter-description"><p>The decimal value to convert.</p></div>
-<div class="parameter-name">$separator</div>
-<div class="parameter-description"><p>The separator between degree, minute, and second.</p></div>
-<div class="parameter-name">$decimalPlaces</div>
-<div class="parameter-description"><p>The number of decimal places for seconds.</p></div>
-<div class="parameter-name">$withSign</div>
-<div class="parameter-description"><p>Whether to include a sign ('+' or '-') for negative values.</p></div>
-<div class="parameter-name">$zeroPadding</div>
-<div class="parameter-description"><p>The number of leading zeros to pad for degree, minute, and second.</p></div>
-<div class="parameter-name">$trimDegreeMinute</div>
-<div class="parameter-description"><p>Whether to trim degree and minute if they are zero.</p></div>
+<div class="parameter-name">$params</div>
+<div class="parameter-description"><p>An associative array containing the following optional parameters:</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The formatted DMS string.</p></div>

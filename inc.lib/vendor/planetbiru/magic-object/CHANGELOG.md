@@ -384,17 +384,39 @@ echo $object->maskEmail(-10, 6, '*')."\r\n"; // Output: john.******ample.com
 
 With the addition of this formatting function, users can easily format object properties according to their needs.
 
-# MagicObject vesrion 3.9
+# MagicObject version 3.9
 
 ## What's New
 
-- **trim**: Added a function to trim string.  
-  - **Example Usage:**  
-    ```php
-    $dms = $object->trimName();
-    ```
-- **dms**: Added a function to convert decimal to DMS format.  
-  - **Example Usage:**  
-    ```php
-    $dms = $object->dmsDuration(true, ":", 2, true, 2, true);
-    ```
+- **Add Magic Methods**
+
+    -  **trim**: A function to retrieves the property value and trims any leading and trailing whitespace.  
+       
+       **Example Usage:**  
+        ```php
+        $name = $object->trimName();
+        ```
+    -  **upper**: A function to retrieves the property value and transform it to uppercase.  
+       
+       **Example Usage:**  
+       
+        ```php
+        $code = $object->upperCode();
+        ```
+    -  **lower**: A function to retrieves the property value and transform it to lowercase.  
+       
+       **Example Usage:**  
+        ```php
+        $username = $object->lowerUsername();
+        ```
+    -  **dms**: A function to retrieves the property value and convert it to DMS (Degrees, Minutes, Seconds) format.  
+       
+       **Example Usage:**  
+        ```php
+        $dms = $object->dmsDuration(true, ":", 2, true, 2, true);
+        ```
+
+- **Update documentation**
+  The documentation has been updated to reflect the new magic methods added in this version, ensuring clarity on how to use them in your code.
+  
+This version introduces essential new functions for better handling of data transformations such as trimming, converting to uppercase or lowercase, and formatting data into DMS (Degrees, Minutes, Seconds). These enhancements streamline property value manipulation and provide additional flexibility when interacting with data.

@@ -310,8 +310,7 @@ After Pop
 After Pop
 {"data":["Text 1","Text 2"]}</code></pre>
 <p><code>push</code> and <code>pop</code> only apply to properties that are arrays.</p>
-<pre><code class="language-php">
-&lt;?php
+<pre><code class="language-php">&lt;?php
 use MagicObject\MagicObject;
 
 require_once __DIR__ . "/vendor/autoload.php";
@@ -337,8 +336,468 @@ echo "After Pop\r\n";
 echo $someObject."\r\n\r\n";
 echo $someObject-&gt;popData()."\r\n";
 echo "After Pop\r\n";
-echo $someObject."\r\n\r\n";
-``</code></pre>
+echo $someObject."\r\n\r\n";</code></pre>
+<p>The following are the magic methods of the MagicObject class.</p>
+<h3>1. <strong>hasValue</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if a property has a value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;hasValuePropertyName();</code></pre>
+<h3>2. <strong>isset</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if a property is set.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;issetPropertyName();</code></pre>
+<h3>3. <strong>is</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the property value as a boolean.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isActive = $object-&gt;isActive();</code></pre>
+<h3>4. <strong>equals</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the property value equals the given value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isEqual = $object-&gt;equalsPropertyName($value);</code></pre>
+<h3>5. <strong>get</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the property value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$value = $object-&gt;getPropertyName();</code></pre>
+<h3>6. <strong>trim</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the property value and trims any leading and trailing whitespace.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$value = $object-&gt;trimPropertyName();</code></pre>
+<h3>7. <strong>upper</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the property value and transforms it to uppercase.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$value = $object-&gt;upperPropertyName();</code></pre>
+<h3>8. <strong>lower</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the property value and transforms it to lowercase.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$value = $object-&gt;lowerPropertyName();</code></pre>
+<h3>9. <strong>set</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Sets the property value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;setPropertyName($value);</code></pre>
+<h3>10. <strong>unset</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Unsets the property value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;unsetPropertyName();</code></pre>
+<h3>11. <strong>push</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Adds array elements to a property at the end.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;pushPropertyName($newElement);</code></pre>
+<h3>12. <strong>append</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Appends array elements to a property at the end.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;appendPropertyName($newElement);</code></pre>
+<h3>13. <strong>unshift</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Adds array elements to a property at the beginning.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;unshiftPropertyName($newElement);</code></pre>
+<h3>14. <strong>prepend</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Prepends array elements to a property at the beginning.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;prependPropertyName($newElement);</code></pre>
+<h3>15. <strong>pop</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Removes the last element from the property.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$removedElement = $object-&gt;popPropertyName();</code></pre>
+<h3>16. <strong>shift</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Removes the first element from the property.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$removedElement = $object-&gt;shiftPropertyName();</code></pre>
+<h3>17. <strong>findOneBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Searches for data in the database and returns one record.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$record = $object-&gt;findOneByPropertyName($columnName);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>18. <strong>findOneIfExistsBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Searches for data in the database by any column values and returns one record if it exists.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$record = $object-&gt;findOneIfExistsByPropertyName($columnName, $sortable);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>19. <strong>deleteOneBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Deletes data from the database by any column values and returns one record.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$deletedRecord = $object-&gt;deleteOneByPropertyName($columnName, $sortable);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>20. <strong>findFirstBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Searches for data in the database by any column values and returns the first record.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$firstRecord = $object-&gt;findFirstByColumnName($columnName);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>21. <strong>findFirstIfExistsBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Similar to <code>findFirstBy</code>, but returns the first record if it exists.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$firstRecord = $object-&gt;findFirstIfExistsByPropertyName($columnName, $sortable);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>22. <strong>findLastBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Searches for data in the database by any column values and returns the last record.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$lastRecord = $object-&gt;findLastByColumnName($columnName);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>23. <strong>findLastIfExistsBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Similar to <code>findLastBy</code>, but returns the last record if it exists.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$lastRecord = $object-&gt;findLastIfExistsByPropertyName($columnName, $sortable);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>24. <strong>findBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Searches for multiple records in the database by any column values.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$records = $object-&gt;findByColumnName($columnName);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>25. <strong>countBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Counts the data from the database.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">`$count = $object-&gt;countByColumnName();`</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>26. <strong>existsBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks for data in the database.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">`$exists = $object-&gt;existsByColumn($column);`</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>27. <strong>deleteBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Deletes data from the database without reading it first.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;deleteByPropertyName($columnName);</code></pre>
+<p><strong>Note</strong>: Requires a database connection.</p>
+<h3>28. <strong>booleanToTextBy</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Converts a boolean value to &quot;yes/no&quot; or &quot;true/false&quot; based on the given parameters.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$result = $object-&gt;booleanToTextByActive("Yes", "No");</code></pre>
+<p><strong>Note</strong>: If <code>$obj-&gt;active</code> is <code>true</code>, <code>$result</code> will be &quot;Yes&quot;, otherwise &quot;No&quot;.</p>
+<h3>29. <strong>startsWith</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the value starts with a given string.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$startsWith = $object-&gt;startsWithPropertyName("prefix");</code></pre>
+<h3>30. <strong>endsWith</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the value ends with a given string.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$endsWith = $object-&gt;endsWithPropertyName("suffix");</code></pre>
+<h3>31. <strong>label</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Retrieves the label associated with the given property. If the label is not set, it attempts to fetch it from annotations.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$label = $object-&gt;labelPropertyName();</code></pre>
+<h3>32. <strong>option</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Returns the first parameter if the property is set to <code>true</code> or equals <code>1</code>; otherwise, returns the second parameter.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$option = $object-&gt;optionPropertyName("Yes", "No");</code></pre>
+<h3>33. <strong>notNull</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the specified property is set (not null).</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isNotNull = $object-&gt;notNullPropertyName();</code></pre>
+<h3>34. <strong>notEmpty</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the specified property is set and not empty.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isNotEmpty = $object-&gt;notEmptyPropertyName();</code></pre>
+<h3>35. <strong>notZero</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the specified property is set and not equal to zero.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isNotZero = $object-&gt;notZeroPropertyName();</code></pre>
+<h3>36. <strong>notEquals</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Checks if the specified property is set and does not equal the given value.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$isNotEqual = $object-&gt;notEqualsPropertyName($value);</code></pre>
+<h3>37. <strong>mask</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Masks the value of the property by replacing certain characters with a masking character.</p>
+</li>
+<li>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li>
+<p><code>$position</code> (int): Starting position for the mask (default is 1).</p>
+</li>
+<li>
+<p><code>$maskLength</code> (int): Number of characters to mask (default is 3).</p>
+</li>
+<li>
+<p><code>$maskChar</code> (string): Character used for masking (default is <code>*</code>).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object-&gt;maskPropertyName(1, 3, '*');</code></pre>
+<p><strong>Description</strong>: If <code>maskPropertyName(1, 3, '*')</code> is called, it masks the first 3 characters of the property value starting from position 1 with <code>*</code>.</p>
+<h3>38. <strong>dateFormat</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Format a date value into a specified format.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$formattedDate = $object-&gt;dateFormatDate("j F Y H:i:s");</code></pre>
+<h3>39. <strong>numberFormat</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Format a number with grouped thousands.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$numberFormat = $object-&gt;numberFormatData(6, ".", ",");</code></pre>
+<h3>40. <strong>format</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Format a date value into a specified format.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$formattedData = $object-&gt;formatData("%7.3f");</code></pre>
+<h3>41. <strong>dms</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Convert decimal to DMS (Degree, Minute, Second) format.</p>
+</li>
+<li>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li>
+<p><code>$inSeconds</code> (bool): Whether to convert in seconds (default is false).</p>
+</li>
+<li>
+<p><code>$decimal</code> (string): Separator (default is &quot;:&quot;).</p>
+</li>
+<li>
+<p><code>$decimalPlaces</code> (int): Number of decimal places (default is 0).</p>
+</li>
+<li>
+<p><code>$withSign</code> (bool): Whether to include the sign (default is false).</p>
+</li>
+<li>
+<p><code>$zeroPadding</code> (int): Number of zero padding (default is 0).</p>
+</li>
+<li>
+<p><code>$trimDegreeMinute</code> (bool): Whether to trim degree and minute if they are 0 (default is false).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">`$formattedData = $object-&gt;dmsData(";");`</code></pre>
 </article>
 
 <article class="article" id="part5">
