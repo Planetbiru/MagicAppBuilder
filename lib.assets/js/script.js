@@ -6616,85 +6616,93 @@ function initFileManager()
 
     dirTree.addEventListener("contextmenu", function (event) {
         event.preventDefault();
+        
 
         // Find the closest li element
         const target = event.target.closest("li");
         
-        if (target && target.dataset.type) {
-        // Store the selected item for future use
-        selectedItem = event.target;
+        if (target && target.dataset.type) 
+        {
+          // Store the selected item for future use
+          selectedItem = event.target;
 
-        // Get the name (file or directory) from data attributes
-        let itemName = '';
-        let itemType = target.dataset.type; // Accessing data-type
+          // Get the name (file or directory) from data attributes
+          let itemName = '';
+          let itemType = target.dataset.type; // Accessing data-type
 
-        if (itemType === 'file') {
-            itemName = target.querySelector("span").dataset.file;
-        } else if (itemType === 'dir') {
-            itemName = target.querySelector("span").dataset.dir;
-        }
+          if (itemType === 'file') {
+              itemName = target.querySelector("span").dataset.file;
+          } else if (itemType === 'dir') {
+              itemName = target.querySelector("span").dataset.dir;
+          }
 
-        // Show the context menu at the cursor position
-        const menuX = event.pageX;
-        const menuY = event.pageY;
+          // Show the context menu at the cursor position
+          let menuX = event.pageX;
+          let menuY = event.pageY;
 
-        // Position the context menu
-        contextMenu.style.left = `${menuX}px`;
-        contextMenu.style.top = `${menuY}px`;
 
-        // Reset the context menu and set up the options
-        contextMenu.className = 'context-menu'; // Reset any previous state
-        const menuList = contextMenu.querySelector("ul");
-        menuList.innerHTML = ""; // Clear previous items
+          // Reset the context menu and set up the options
+          contextMenu.className = 'context-menu'; // Reset any previous state
+          const menuList = contextMenu.querySelector("ul");
+          menuList.innerHTML = ""; // Clear previous items
+          
+          // Add appropriate menu options for file or directory
+          if (itemType === 'file') {
+              menuList.innerHTML = `
+              <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
+              <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+              <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+              <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+              `;
+              // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
+              if (menuY + contextMenu.offsetHeight > window.innerHeight) {
+                menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
+              }
+              
+              contextMenu.style.left = `${menuX}px`;
+              contextMenu.style.top = `${menuY}px`;
 
-        // Add appropriate menu options for file or directory
-        if (itemType === 'file') {
-            menuList.innerHTML = `
-            <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
-            <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
-            <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
-            <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
-            `;
-        } else if (itemType === 'dir') {
-            menuList.innerHTML = `
-            <li data-type="dir" data-operation="new-file" data-dir="${itemName}">Create New File</li>
-            <li data-type="dir" data-operation="new-dir" data-dir="${itemName}">Create New Directory</li>
-            <li data-type="dir" data-operation="upload-file" data-dir="${itemName}">Upload Files</li>
-            <li data-type="dir" data-operation="open" data-dir="${itemName}">Expand Directory</li>
-            <li data-type="dir" data-operation="refresh-dir" data-dir="${itemName}">Reload Directory</li>
-            <li data-type="dir" data-operation="rename" data-dir="${itemName}">Rename Directory</li>
-            <li data-type="dir" data-operation="compress" data-dir="${itemName}">Download Directory</li>
-            <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
-            `;
-        }
+              // Show the context menu
+              contextMenu.style.display = "block";
+          } else if (itemType === 'dir') {
+              menuList.innerHTML = `
+              <li data-type="dir" data-operation="new-file" data-dir="${itemName}">Create New File</li>
+              <li data-type="dir" data-operation="new-dir" data-dir="${itemName}">Create New Directory</li>
+              <li data-type="dir" data-operation="upload-file" data-dir="${itemName}">Upload Files</li>
+              <li data-type="dir" data-operation="open" data-dir="${itemName}">Expand Directory</li>
+              <li data-type="dir" data-operation="refresh-dir" data-dir="${itemName}">Reload Directory</li>
+              <li data-type="dir" data-operation="rename" data-dir="${itemName}">Rename Directory</li>
+              <li data-type="dir" data-operation="compress" data-dir="${itemName}">Download Directory</li>
+              <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
+              `;
+              
+              // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
+              if (menuY + contextMenu.offsetHeight > window.innerHeight) {
+                menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
+              }
+              
+              contextMenu.style.left = `${menuX}px`;
+              contextMenu.style.top = `${menuY}px`;
 
-        // Show the context menu
-        contextMenu.style.display = "block";
+              // Show the context menu
+              contextMenu.style.display = "block";
+          } else {
+            showRootContextMenu(event, contextMenu);
+            event.preventDefault();  
+            event.stopPropagation();
+          }
+          
+        
+        } else {
+          showRootContextMenu(event, contextMenu);
+          event.preventDefault();  
+          event.stopPropagation();
         }
     });
     document.querySelector('.root-directory').addEventListener("contextmenu", function (event) {
-      event.preventDefault(); // Prevent the default context menu from appearing
-      selectedItem = null; // Reset selected item
-      // Store the selected item for future use 
-      // Show the context menu at the cursor position
-      const menuX = event.pageX;
-      const menuY = event.pageY;
-
-      // Position the context menu
-      contextMenu.style.left = `${menuX}px`;
-      contextMenu.style.top = `${menuY}px`;
-
-      // Reset the context menu and set up the options
-      contextMenu.className = 'context-menu'; // Reset any previous state
-      const menuList = contextMenu.querySelector("ul");
-      menuList.innerHTML = `
-        <li data-type="dir" data-operation="root-new-file" data-dir="">Create New File</li>
-        <li data-type="dir" data-operation="root-new-dir" data-dir="">Create New Directory</li>
-        <li data-type="dir" data-operation="upload-file" data-dir="">Upload Files</li>
-        <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
-        <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
-        `;
-      contextMenu.style.display = "block";
+      showRootContextMenu(event, contextMenu);
+      event.stopPropagation();
+      event.preventDefault();
     });
       
 
@@ -6767,11 +6775,6 @@ function initFileManager()
         contextMenu.style.display = "none";
         }
     });
-
-    // Prevent context menu from closing when clicking inside the context menu
-    contextMenu.addEventListener("contextmenu", function (event) {
-        event.stopPropagation();
-    });
     
     document.querySelector('.file-path').addEventListener('change', function(e){ 
       let file = e.target.value;
@@ -6783,6 +6786,40 @@ function initFileManager()
     
     initCodeMirror();
     fileManagerEditor.refresh();
+}
+
+function showRootContextMenu(event, contextMenu) {
+  event.preventDefault(); // Prevent the default context menu from appearing
+  selectedItem = null; // Reset selected item
+  // Store the selected item for future use 
+  // Show the context menu at the cursor position
+  let menuX = event.pageX;
+  let menuY = event.pageY;
+
+  // Position the context menu
+  
+  
+
+  // Reset the context menu and set up the options
+  contextMenu.className = 'context-menu'; // Reset any previous state
+  const menuList = contextMenu.querySelector("ul");
+  menuList.innerHTML = `
+    <li data-type="dir" data-operation="root-new-file" data-dir="">Create New File</li>
+    <li data-type="dir" data-operation="root-new-dir" data-dir="">Create New Directory</li>
+    <li data-type="dir" data-operation="upload-file" data-dir="">Upload Files</li>
+    <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
+    <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
+    `;
+    
+  // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
+  if (menuY + contextMenu.offsetHeight > window.innerHeight) {
+    menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
+  }
+  
+  contextMenu.style.left = `${menuX}px`;
+  contextMenu.style.top = `${menuY}px`;
+  
+  contextMenu.style.display = "block";
 }
 
 /**
