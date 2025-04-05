@@ -4907,9 +4907,15 @@ $subqueryMap = '.$referece.';
             $cols["timeAskEdit"]     = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
         }
 
-        $cols["adminDelete"]         = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_ask_edit",
-        $cols["ipDelete"]            = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
-        $cols["timeDelete"]          = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
+        $cols["adminDelete"]         = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_delete",
+        $cols["ipDelete"]            = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_delete",
+        $cols["timeDelete"]          = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_delete",
+
+        $cols["restored"]            = array('Type'=>DataType::TINYINT_1, 'Null'=>'YES', 'Key'=>'', 'Default'=>'0', 'Extra'=>'');     //restored",
+        $cols["adminRestore"]        = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_restore",
+        $cols["ipRestore"]           = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_restore",
+        $cols["timeRestore"]         = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_restore",
+
         $result = array();
 
         foreach($cols as $key=>$value)
