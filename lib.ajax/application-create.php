@@ -132,18 +132,22 @@ $entityInfo = array(
     'admin_edit' => 'admin_edit',
     'admin_ask_edit' => 'admin_ask_edit',
     'admin_delete' => 'admin_delete',
+    'admin_restore' => 'admin_restore',
     'time_create' => 'time_create',
     'time_edit' => 'time_edit',
     'time_ask_edit' => 'time_ask_edit',
     'time_delete' => 'time_delete',
+    'time_restore' => 'time_restore',
     'ip_create' => 'ip_create',
     'ip_edit' => 'ip_edit',
     'ip_ask_edit' => 'ip_ask_edit',
     'ip_delete' => 'ip_delete',
+    'ip_restore' => 'ip_restore',
     'sort_order' => 'sort_order',
     'approval_id' => 'approval_id',
     'approval_note' => 'approval_note',
-    'approval_status' => 'approval_status'
+    'approval_status' => 'approval_status',
+    'restored' => 'restored'
 );
 
 $entityApvInfo = array(

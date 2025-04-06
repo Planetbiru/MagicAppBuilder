@@ -11,10 +11,33 @@ use Exception;
  */
 class GitAPI
 {
-    private $platform; // 'github', 'gitlab', or 'bitbucket'
-    private $token;    // Personal access token for authentication
-    private $username; // GitHub/GitLab username or Bitbucket team for identifying repositories
-    private $apiUrl;   // GitHub, GitLab, or Bitbucket API base URL
+    /**
+     * The platform for the API ('github', 'gitlab', or 'bitbucket').
+     *
+     * @var string
+     */
+    private $platform; 
+    
+    /**
+     * The personal access token for authentication.
+     *
+     * @var string
+     */
+    private $token;   
+    
+    /**
+     * The username for GitHub/GitLab or team name for Bitbucket.
+     *
+     * @var string
+     */
+    private $username; 
+    
+    /**
+     * The API base URL for the selected platform.
+     *
+     * @var string
+     */
+    private $apiUrl;   
 
     /**
      * Constructor to initialize the API with platform, token, and optional username (for GitHub and Bitbucket).
@@ -124,6 +147,88 @@ class GitAPI
         // Return the response as an array
         return json_decode($response, true);
     }
+    
+    /**
+     * Commit changes in the repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @param string $commitMessage The commit message
+     * @param bool $addAll Whether to add all changes (including new, modified, and deleted files) before committing
+     * @return array The output of the 'git commit' command
+     */
+    public function commit($repoPath, $commitMessage, $addAll = false)
+    {
+        // If $addAll is true, we stage all changes first using 'git add .'
+        if ($addAll) {
+            exec("cd {$repoPath} && git add .", $output, $resultCode);
+            if ($resultCode !== 0) {
+                return ['success' => false, 'message' => 'Failed to stage files.', 'output' => $output];
+            }
+        }
+
+        // Execute the 'git commit' command with the provided commit message
+        exec("cd {$repoPath} && git commit -m \"{$commitMessage}\"", $output, $resultCode);
+        
+        // If the result code is 0, the commit was successful
+        if ($resultCode === 0) {
+            return ['success' => true, 'message' => "Successfully committed changes with message: {$commitMessage}"];
+        } else {
+            return ['success' => false, 'message' => 'Failed to commit changes.', 'output' => $output];
+        }
+    }
+    
+    /**
+     * Discard changes in the repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @param string|null $filePath The specific file to discard changes (optional). If null, discard all changes.
+     * @return array The output of the 'git checkout' or 'git reset' command
+     */
+    public function discardChanges($repoPath, $filePath = null)
+    {
+        // If no file path is provided, discard all changes (hard reset)
+        if ($filePath === null) {
+            exec("cd {$repoPath} && git reset --hard", $output, $resultCode);
+        } else {
+            // Discard changes for the specific file (checkout)
+            exec("cd {$repoPath} && git checkout -- {$filePath}", $output, $resultCode);
+        }
+
+        // Check if the operation was successful
+        if ($resultCode === 0) {
+            return ['success' => true, 'message' => 'Changes discarded successfully.'];
+        } else {
+            return ['success' => false, 'message' => 'Failed to discard changes.', 'output' => $output];
+        }
+    }
+    
+    /**
+     * Stash changes in the repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @param string $stashMessage The optional message to describe the stash
+     * @return array The output of the 'git stash' command
+     */
+    public function stashChanges($repoPath, $stashMessage = '')
+    {
+        // Prepare the command to stash changes
+        $command = "cd {$repoPath} && git stash";
+        
+        // If a stash message is provided, include it in the stash command
+        if (!empty($stashMessage)) {
+            $command .= " save \"{$stashMessage}\"";
+        }
+
+        // Execute the stash command
+        exec($command, $output, $resultCode);
+
+        // Check if the operation was successful
+        if ($resultCode === 0) {
+            return ['success' => true, 'message' => 'Changes have been stashed successfully.'];
+        } else {
+            return ['success' => false, 'message' => 'Failed to stash changes.', 'output' => $output];
+        }
+    }
 
     /**
      * Pull changes from the specified repository.
@@ -148,6 +253,79 @@ class GitAPI
         exec("cd {$repoPath} && git push", $output, $resultCode);
         return $output; // Return the output of the 'git push' command
     }
+    
+    /**
+     * List branches of a repository from GitHub, GitLab, or Bitbucket.
+     *
+     * @param string $repoName The name of the repository
+     * @return array The list of branches as an array
+     */
+    public function listBranches($repoName) // NOSONAR
+    {
+        // Construct the URL for listing branches
+        $url = $this->apiUrl;
+
+        if ($this->platform == 'github') {
+            $url .= "repos/{$this->username}/{$repoName}/branches";
+        } elseif ($this->platform == 'gitlab') {
+            $url .= "projects/{$repoName}/repository/branches";
+        } elseif ($this->platform == 'bitbucket') {
+            $url .= "repositories/{$this->username}/{$repoName}/refs/branches";
+        }
+
+        // Set headers for authentication
+        $headers = $this->getRequestHeaders();
+
+        // Send GET request to fetch the branches
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // Return the response as an array of branches
+        $branches = json_decode($response, true);
+
+        // If the response is empty or there is an error, return an empty array
+        if (!$branches) {
+            return [];
+        }
+
+        // Different platforms return different formats, so we process them accordingly
+        if ($this->platform == 'github' || $this->platform == 'gitlab') {
+            // GitHub and GitLab return an array of branch objects, so we extract the branch names
+            return array_map(function ($branch) {
+                return $branch['name'];
+            }, $branches);
+        } elseif ($this->platform == 'bitbucket') {
+            // Bitbucket returns a paginated result, we need to handle pagination if necessary
+            $branchNames = [];
+            do {
+                foreach ($branches['values'] as $branch) {
+                    $branchNames[] = $branch['name'];
+                }
+                // If there's a next page, make another request to get more branches
+                if (isset($branches['next'])) {
+                    $url = $branches['next'];
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+                    $branches = json_decode($response, true);
+                } else {
+                    break;
+                }
+            } while (isset($branches['next']));
+            
+            return $branchNames;
+        }
+
+        return [];
+    }
+
 
     /**
      * Switch to a different branch in the repository.
@@ -176,6 +354,26 @@ class GitAPI
             return trim($output[0]); // Return the current branch name
         } else {
             throw new PlatformException("Failed to get current branch.");
+        }
+    }
+    
+    /**
+     * Merge a branch into the current branch in the repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @param string $sourceBranch The name of the branch to merge (source)
+     * @return array The output of the 'git merge' command
+     */
+    public function mergeBranch($repoPath, $sourceBranch)
+    {
+        // Execute the 'git merge' command to merge the source branch into the current branch
+        exec("cd {$repoPath} && git merge {$sourceBranch}", $output, $resultCode);
+        
+        // If the result code is 0, the merge was successful
+        if ($resultCode === 0) {
+            return ['success' => true, 'message' => "Successfully merged {$sourceBranch} into the current branch."];
+        } else {
+            return ['success' => false, 'message' => 'Failed to merge branch.', 'output' => $output];
         }
     }
 
@@ -251,6 +449,27 @@ class GitAPI
 
         return true; // Repository exists
     }
+    
+    /**
+     * Change the origin URL of a repository.
+     *
+     * @param string $repoPath The local path of the repository
+     * @param string $newUrl The new origin URL to set
+     * @return array The output of the 'git remote set-url' command
+     */
+    public function changeOriginUrl($repoPath, $newUrl)
+    {
+        // Execute the 'git remote set-url' command to change the origin URL
+        exec("cd {$repoPath} && git remote set-url origin {$newUrl}", $output, $resultCode);
+        
+        // If the result code is 0, the operation was successful
+        if ($resultCode === 0) {
+            return ['success' => true, 'message' => 'Origin URL changed successfully.'];
+        } else {
+            return ['success' => false, 'message' => 'Failed to change origin URL.', 'output' => $output];
+        }
+    }
+
 }
 
 

@@ -32,6 +32,13 @@ class EntityInfo extends SecretObject
      * @var string
      */
     protected $draft;
+    
+    /**
+     * Key indicating if the entity has been restored from trash to master table.
+     *
+     * @var string
+     */
+    protected $restored;
 
     /**
      * Admin user who created the entity.
@@ -60,6 +67,13 @@ class EntityInfo extends SecretObject
      * @var string
      */
     protected $adminDelete;
+    
+    /**
+     * Admin user who restore the entity.
+     *
+     * @var string
+     */
+    protected $adminRestore;
 
     /**
      * IP address of the user who created the entity.
@@ -88,6 +102,13 @@ class EntityInfo extends SecretObject
      * @var string
      */
     protected $ipDelete;
+    
+    /**
+     * IP address of the user who restore the entity.
+     *
+     * @var string
+     */
+    protected $ipRestore;
 
     /**
      * Timestamp of when the entity was created.
@@ -116,6 +137,13 @@ class EntityInfo extends SecretObject
      * @var string
      */
     protected $timeDelete;
+    
+    /**
+     * Timestamp of when the entity was restored.
+     *
+     * @var string
+     */
+    protected $timeRestore;
 
     /**
      * Key indicating who the entity is waiting for approval from.
