@@ -1950,7 +1950,7 @@ let initAll = function () {
 
   $(document).on('click', '.button-format-data', function(e1){
     let tr = $(this).closest('tr');
-    let dataType = tr.attr('data-type');
+    let dataType = tr.find('.input-field-data-type').val();
     let fieldName = tr.attr('data-field-name');
     let currentFormat = {};
     let currentFormatStr = $(this).siblings('.input-format-data').val();
