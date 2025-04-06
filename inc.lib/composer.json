@@ -7,8 +7,7 @@
         }
     },
     "require": {
-        "planetbiru/magic-app": "^3.8",
-        "planetbiru/magic-object": "^3.8",
-        "meyfa/php-svg": "0.9"
+        "meyfa/php-svg": "0.9",
+        "planetbiru/magic-app": "^3.9"
     }
 }

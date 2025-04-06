@@ -36,7 +36,14 @@ function fixValue($original)
         'Button Deactivate' => 'Deactivate',
         'Numero' => 'Numero',
         'Warning Delete Confirmation' => 'Delete Confirmation',
-        'Label Option Select One' => 'Option Select One'
+        'Label Option Select One' => 'Option Select One',
+        'Message Noneditable Data Waiting Approval' => 'Data Waiting Approval',
+        'Button Show Require Approval' => 'Show Require Approval',
+        'Button Export' => 'Export',
+        'Button Approve Tiny' => 'Approve',
+        'Message No Data Require Approval' => 'No Data Require Approval',
+        'Option Select One' => 'Select One',
+        'Option Select All' => 'Select All',
     );
     return str_replace(
         array_keys($labels), 

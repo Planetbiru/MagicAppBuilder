@@ -7414,13 +7414,13 @@ function initCodeMirror() {
     // Adjust editor size when window is resized
     window.addEventListener('resize', function(e){
         let w = document.querySelector('#file-content').offsetWidth - 16;  // Adjust width
-        let h = window.innerHeight - 160;  // Adjust height based on window height
+        let h = document.innerHeight - 160;  // Adjust height based on window height
         fileManagerEditor.setSize(w, h);  // Apply the new size to the editor
     });
     
     // Initial editor size adjustment
     let w = document.querySelector('#file-content').offsetWidth - 16;
-    let h = window.innerHeight - 160;
+    let h = document.innerHeight - 160;
     fileManagerEditor.setSize(w, h);
 }
 

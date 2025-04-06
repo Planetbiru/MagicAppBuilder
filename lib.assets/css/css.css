@@ -777,7 +777,6 @@ input[type=number][name=database_port] {
   color: #fff;
   border-radius: 3px;
   font-size: 12px;
-  height: 30px;
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s;
