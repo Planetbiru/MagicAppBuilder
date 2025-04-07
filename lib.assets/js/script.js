@@ -2317,11 +2317,14 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
   if (tabSelector) {
     // Deactivate currently active tab
     $('#data-format .nav-link.active').removeClass('active');
-    $('#data-format .tab-pane.active').removeClass('active show');
-
+    $('#data-format .tab-pane.active').removeClass('active');
+    $('#data-format .tab-pane.active').removeClass('show');
     // Activate the selected tab
     $('#data-format .nav-link[data-target="' + tabSelector + '"]').addClass('active');
     $(tabSelector).addClass('active show');
+    setTimeout(function(){
+    $(tabSelector).find('input:first').focus(); // Focus on the first input in the selected tab
+    }, 380);
   }
 }
 

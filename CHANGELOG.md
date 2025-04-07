@@ -29,3 +29,57 @@ Improvements:
 
 -    File Editing Capabilities: Users can now view, edit, and save any files located within the application's directory. This feature makes it easier to work with and manage the content of your project directly within MagicAppBuilder.
 
+
+
+# MagicAppBuilder Version 0.36
+
+## What's New
+
+### 1. **Updated Application Preparation Process**
+
+-   The application preparation process has been enhanced with the following updates:
+    
+    -   **Directory Structure**: New directories have been added for better organization and scalability:
+        
+        -   `inc.app`: Centralized directory for application-related configurations and assets.
+            
+        -   `inc.themes`: Dedicated folder to manage application themes.
+            
+        -   `inc.lib/classes/{{AppNamespace}}`: Namespace-specific class directory to facilitate better class management and easy updates.
+            
+    -   These directories ensure better modularity and separation of concerns for future app extensions and theme management.
+        
+
+### 2. **Improved Composer Setup**
+
+-   The Composer setup has been updated for a smoother and more efficient development workflow:
+    
+    -   **Dependency Management**: Improved handling of project dependencies, ensuring that third-party libraries and components are properly managed.
+        
+    -   **Autoloading**: Updated autoloading mechanism for better performance and compatibility with the new directory structure.
+        
+    -   **Composer Scripts**: Enhanced Composer scripts for easier installation and setup of the application and its dependencies.
+        
+    -   These changes will help streamline the setup process and ensure that dependencies are correctly configured every time the project is initialized or updated.
+        
+
+### 3. **Integration with Themes**
+
+-   **Theme Integration**: MagicAppBuilder now has built-in support for managing themes directly within the framework:
+    
+    -   **Flexible Theme System**: Easily switch between different themes by simply updating the configuration.
+        
+    -   **Custom Theme Support**: You can create and integrate custom themes to provide tailored designs for different parts of the application.
+        
+    -   **Theme Management**: The new `inc.themes` directory allows for easy management, adding, and switching between themes across different sections of your app.
+        
+    -   **Enhanced UI Customization**: The integration with themes gives developers the ability to easily customize the visual appearance of the app without modifying the core code.
+        
+
+### 4. **Other Improvements**
+
+-   **Bug Fixes**: Several bug fixes and minor improvements have been applied to ensure smoother operation.
+    
+-   **Performance Optimization**: Optimized certain functions and processes to improve the overall performance of the app.
+    
+-   **Documentation Updates**: The documentation has been updated to reflect the changes in the application preparation process and new directory structure.
