@@ -605,7 +605,6 @@ class ScriptGenerator //NOSONAR
         $moduleFile = $request->getModuleFile();
 
         $baseDir = $appConf->getBaseApplicationDirectory();
-        $this->prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation);
 
         $path = $this->getModulePath($request, $baseDir, $moduleFile);
         
@@ -1047,24 +1046,37 @@ class ScriptGenerator //NOSONAR
                 copy(dirname(dirname(__DIR__))."/".$file, $baseAppBuilder."/".$file);
             }
         }
+        
 
         // Copy inc.app/*
-        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/inc.app";
+        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/inc.app";
         $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.app";
         $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
-            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             file_put_contents($destination, $content);
         });
+        
+        
 
         // Copy lib.themes/*
-        $sourceDir = dirname(dirname(__DIR__))."/inc.resources/lib.themes";
+        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/lib.themes";
         $destinationDir = $appConf->getBaseApplicationDirectory()."/lib.themes";
         $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
-            $content = str_replace('{{base_application_namespace}}', $baseApplicationNamespace, $content);
+            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
+        
+        // Copy lib.themes/*
+        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.lib/classes/MagicAppTemplate";
+        $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.lib/classes/".$appConf->getBaseApplicationNamespace();
+        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             file_put_contents($destination, $content);
         });
 
@@ -1220,8 +1232,10 @@ class ScriptGenerator //NOSONAR
      */
     public function copyDirectory($source, $destination, $extensions = null, $callback = null)
     {
+        
         // Ensure the source directory exists
         if (!is_dir($source)) {
+            echo "Source directory does not exist: $source\n";
             return false;
         }
 
@@ -1244,7 +1258,6 @@ class ScriptGenerator //NOSONAR
 
             $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
             $destinationPath = $destination . DIRECTORY_SEPARATOR . $file;
-
             if (is_dir($sourcePath)) {
                 // Recursively copy subdirectories
                 $this->copyDirectory($sourcePath, $destinationPath, $extensions, $callback);
@@ -1259,7 +1272,7 @@ class ScriptGenerator //NOSONAR
                     && isset($callback) 
                     && is_callable($callback)) {
                     // Process file using the callback function
-                    $callback($sourcePath, $destinationPath);
+                    call_user_func($callback,$sourcePath, $destinationPath);
                 } else {
                     // Copy the file normally
                     copy($sourcePath, $destinationPath);
