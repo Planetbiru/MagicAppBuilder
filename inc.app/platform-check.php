@@ -1,4 +1,5 @@
 <?php
+
 try {
     $pdo = new PDO('sqlite::memory:');
 } catch (PDOException $e) {

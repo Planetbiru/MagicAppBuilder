@@ -1021,12 +1021,14 @@ class ScriptGenerator //NOSONAR
      * @param SecretObject $appConf The application configuration object.
      * @param string $baseDir The base directory for the application.
      * @param bool $onlineInstallation Determines whether Composer should be run in online mode.
+     * @param string $magicObjectVersion MagicObject version for offline installation.
      * @return self Returns the current instance for method chaining.
      */
-    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation)
+    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation, $magicObjectVersion)
     {
         $composer = new MagicObject($appConf->getComposer());
         $magicApp = new MagicObject($appConf->getMagicApp());
+        $composer->setMagicObjectVersion($magicObjectVersion);
         $libDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory();
         if(!file_exists($baseDir))
         {
@@ -1065,6 +1067,7 @@ class ScriptGenerator //NOSONAR
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
+            $content = str_replace('dirname(dirname(__DIR__))', 'dirname(__DIR__)', $content);
             file_put_contents($destination, $content);
         });
 
@@ -1103,6 +1106,7 @@ class ScriptGenerator //NOSONAR
      * @param MagicObject $composer Composer configuration object.
      * @param MagicObject $magicApp MagicApp configuration object.
      * @param bool $onlineInstallation Flag indicating whether Composer should be used in online mode.
+     * @param string $magicObjectVersion MagicObject version for offline installation.
      * @return self Returns the current instance for method chaining.
      */
     public function prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation)
@@ -1138,7 +1142,7 @@ class ScriptGenerator //NOSONAR
         $this->prepareDir($appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory());
         $targetDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."";
         $targetPath = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/".self::COMPOSER_PHAR;
-        $sourcePath = dirname(dirname(dirname(__DIR__)))."/".self::COMPOSER_PHAR;
+        $sourcePath = dirname(dirname(__DIR__))."/".self::COMPOSER_PHAR;
         $success = copy($sourcePath, $targetPath);
         if($success)
         {
@@ -1178,6 +1182,11 @@ class ScriptGenerator //NOSONAR
         $source4 = $libPath."/vendor/autoload.php";
         $destination4 = $targetDir."/vendor/autoload.php";
         $this->copyDirectory($source4, $destination4, true);
+        
+        unlink($destination3."/magic-object/composer.lock");
+        unlink($destination3."/magic-app/composer.lock");
+        
+
 
         $composerConfig = array();
 
@@ -1200,31 +1209,80 @@ class ScriptGenerator //NOSONAR
                 $composerConfig['autoload']['psr-4']->{$psr->getNamespace()."\\"} = $psr->getDirectory();
             }
         }
+        
+        $magicObjectVersion = $composer->getMagicObjectVersion();
 
         $magicAppVersion = $appConf->getMagicApp()->getVersion();
         list($major, $minor) = explode(".", $magicAppVersion);
 
-        $composerConfig['autoload']['require']->{'planetbiru/magic-app'} = '^'.$major.'.'.$minor;
+        
+        $composerConfig['require']['planetbiru/magic-app'] = '^'.$major.'.'.$minor;
+        $composerConfig['require']['planetbiru/magic-object'] = '^'.$magicObjectVersion;
+        
+        
 
         $jsonPath = $targetDir."/composer.json";
         $jsonContent = json_encode($composerConfig, JSON_PRETTY_PRINT);
 
+        $composerConfig['repositories'] = array();
+        $composerConfig['repositories'][] = array(
+            'type'=>'path', 
+            'url' => './vendor/planetbiru/magic-app'
+        );
+        $composerConfig['repositories'][] = array(
+            'type'=>'path', 
+            'url' => './vendor/planetbiru/magic-object'
+        );
         
         file_put_contents($jsonPath, $jsonContent);
 
         $sourcePath = $libPath."/".self::COMPOSER_PHAR;
         $success = copy($sourcePath, $targetPath);
+        
+        $version = sprintf("%s.%s.%s", $major, $minor, "0");
+        
+        $this->addComposerVersion($destination3."/magic-object/composer.json", $magicObjectVersion);
+        $this->addComposerVersion($destination3."/magic-app/composer.json", $version);
+
+        
         if($success)
         {
+        
             $phpPath = trim($builderConfig->getPhpPath());
             if(empty($phpPath))
             {
                 $phpPath = "php";
             }
-            $cmd = "cd $targetDir"."&&"."$phpPath composer.phar dump-autoload --ignore-platform-reqs";
-            exec($cmd);     
+            
+            // Command line to install Composer offline
+            $cmd = sprintf(
+                'cd %s && %s composer.phar install --no-dev --prefer-dist --ignore-platform-reqs',
+                escapeshellarg($targetDir),
+                escapeshellarg($phpPath)
+            );            
+            exec($cmd);
+                
         }
         return $this;
+    }
+    
+    /**
+     * Add or update version
+     *
+     * @param string $path composer.json path
+     * @param string $version version
+     * @return void
+     */
+    private function addComposerVersion($path, $version)
+    {
+        // Read composer.json
+        $data = json_decode(file_get_contents($path), true);
+        
+        // Add version
+        $data['version'] = $version;
+        
+        // Wrire composer.json
+        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -1411,27 +1469,10 @@ class ScriptGenerator //NOSONAR
                 if(!isset($entityAppDir))
                 {
                     $entityAppDir = $appConf->getBaseApplicationDirectory()."/".$composer->getBaseDirectory()."/classes/".$dir->getNamespace()."/Entity/App";
-                    $entityNamespace = $dir->getNamespace();
                 }
             }
         }
-        if(isset($entityAppDir))
-        {
-            $sourceDir = dirname(__DIR__)."/App";
-            $arr = array(
-                "AppAdminImpl.php",
-                "AppAdminLevelImpl.php",
-                "AppAdminRoleImpl.php",
-                "AppModuleGroupImpl.php",
-                "AppModuleImpl.php",
-                "AppNotificationImpl.php",          
-            );
-            foreach($arr as $file)
-            {
-                copy($sourceDir."/".$file, $entityAppDir."/".$file);
-                $this->fixNamespace($entityAppDir."/".$file, $entityNamespace);
-            }
-        }
+        
         return $this;
     }
     
@@ -1470,7 +1511,7 @@ class ScriptGenerator //NOSONAR
      * @param string $entityNamespace The new namespace to set in the file.
      * @return self Returns the current instance for method chaining.
      */
-    private function fixNamespace($path, $entityNamespace)
+    public function fixNamespace($path, $entityNamespace)
     {
         $str = file_get_contents($path);
         $str = str_replace("namespace MagicAppTemplate\Entity\App\\", "namespace $entityNamespace\\", $str);
