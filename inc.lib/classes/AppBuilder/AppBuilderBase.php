@@ -705,7 +705,7 @@ class AppBuilderBase //NOSONAR
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
             $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_CLOSE_TAG;
             $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="alert alert-warning"><?php echo $appLanguage->getMessageNoneditableDataWaitingApproval();?></div>';
-            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="form-control-container button-area"><button type="button" class="btn btn-primary" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
+            $getData[] = self::TAB1.self::TAB1.self::TAB1.'<div class="form-control-container button-area"><button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';"><?php echo $appLanguage->getButtonBackToList();?></button></div>';
             $getData[] = self::TAB1.self::TAB1.self::TAB1.self::PHP_OPEN_TAG;
     
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_CLOSE;
@@ -1990,6 +1990,7 @@ $subqueryMap = '.$referece.';
             $activate->setAttribute('type', 'submit');
             $activate->setAttribute('class', ElementClass::BUTTON_SUCCESS);
             $activate->setAttribute('name', 'user_action');
+            $activate->setAttribute('id', 'activate_selected');
             $activate->setAttribute('value', 'activate');
             $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
 
@@ -1997,6 +1998,7 @@ $subqueryMap = '.$referece.';
             $deactivate->setAttribute('type', 'submit');
             $deactivate->setAttribute('class', 'btn btn-warning'); // NOSONAR
             $deactivate->setAttribute('name', 'user_action');
+            $deactivate->setAttribute('id', 'deactivate_selected');
             $deactivate->setAttribute('value', 'deactivate');
             $deactivate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDeactivate();'.self::PHP_CLOSE_TAG));
 
@@ -2013,6 +2015,7 @@ $subqueryMap = '.$referece.';
         $delete->setAttribute('type', 'submit');
         $delete->setAttribute('class', 'btn btn-danger');
         $delete->setAttribute('name', 'user_action');
+        $delete->setAttribute('id', 'delete_selected');
         $delete->setAttribute('value', 'delete');
         $delete->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());'.self::PHP_CLOSE_TAG);
         $delete->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDelete();'.self::PHP_CLOSE_TAG));
@@ -2028,6 +2031,7 @@ $subqueryMap = '.$referece.';
             $order->setAttribute('type', 'submit');
             $order->setAttribute('class', ElementClass::BUTTON_PRIMARY);
             $order->setAttribute('name', 'user_action');
+            $order->setAttribute('id', 'save_current_order');
             $order->setAttribute('value', 'sort_order');
             $order->setAttribute('disabled', 'disabled');
             $order->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonSaveCurrentOrder();'.self::PHP_CLOSE_TAG));
@@ -2523,6 +2527,7 @@ $subqueryMap = '.$referece.';
         $buttonSearch = $dom->createElement('button');
         $buttonSearch->setAttribute('type', 'submit');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
+        $buttonSearch->setAttribute('id', 'show_data');
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonSearch();".self::PHP_CLOSE_TAG));
 
         $submitWrapper->appendChild($dom->createTextNode(self::N_TAB3));
@@ -2534,6 +2539,7 @@ $subqueryMap = '.$referece.';
         $buttonSearch = $dom->createElement('button');
         $buttonSearch->setAttribute('type', 'button');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_PRIMARY);
+        $buttonSearch->setAttribute('id', 'add_data');
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonAdd();".self::PHP_CLOSE_TAG));
         $buttonSearch->setAttribute('onclick', "window.location='".self::PHP_OPEN_TAG.self::ECHO.self::VAR."currentModule".self::CALL_GET."RedirectUrl(UserAction::CREATE);".self::PHP_CLOSE_TAG."'");       
         
@@ -2547,6 +2553,7 @@ $subqueryMap = '.$referece.';
         $buttonSearch = $dom->createElement('button');
         $buttonSearch->setAttribute('type', 'submit');
         $buttonSearch->setAttribute('name', 'show_require_approval_only');
+        $buttonSearch->setAttribute('id', 'show_require_approval_data');
         $buttonSearch->setAttribute('value', 'true');
         $buttonSearch->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonSearch->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonShowRequireApproval();".self::PHP_CLOSE_TAG));
@@ -2562,6 +2569,7 @@ $subqueryMap = '.$referece.';
         $buttonExport = $dom->createElement('button');
         $buttonExport->setAttribute('type', 'submit');
         $buttonExport->setAttribute('name', 'user_action');
+        $buttonExport->setAttribute('id', 'export_data');
         $buttonExport->setAttribute('value', 'export');
         $buttonExport->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $buttonExport->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage".self::CALL_GET."ButtonExport();".self::PHP_CLOSE_TAG));
@@ -4238,12 +4246,14 @@ $subqueryMap = '.$referece.';
         $btn1->setAttribute('type', 'submit');
         $btn1->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $btn1->setAttribute('name', 'user_action');
+        $btn1->setAttribute('id', 'create_new_data');
         $btn1->setAttribute('value', 'create');
         $btn1->appendChild($dom->createTextNode($this->getTextOfLanguage('button_save')));
 
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'button');
         $btn2->setAttribute('class', ElementClass::BUTTON_PRIMARY);
+        $btn2->setAttribute('id', 'back_to_list');
         $btn2->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';');
         $btn2->appendChild($dom->createTextNode($this->getTextOfLanguage('button_cancel')));
                 
@@ -4289,12 +4299,14 @@ $subqueryMap = '.$referece.';
         $btn1->setAttribute('type', 'submit');
         $btn1->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $btn1->setAttribute('name', 'user_action');
+        $btn1->setAttribute('id', 'update_data');
         $btn1->setAttribute('value', 'update');
         $btn1->appendChild($dom->createTextNode($this->getTextOfLanguage('button_save')));
 
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'button');
         $btn2->setAttribute('class', ElementClass::BUTTON_PRIMARY);
+        $btn2->setAttribute('id', 'back_to_list');
         $btn2->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';');
         $btn2->appendChild($dom->createTextNode($this->getTextOfLanguage('button_cancel')));
 
@@ -4302,6 +4314,7 @@ $subqueryMap = '.$referece.';
         $pkInput = $dom->createElement('input');
         $pkInput->setAttribute("type", "hidden");
         $pkInput->setAttribute('name', $primaryKeyName);
+        $pkInput->setAttribute('id', 'primary_key_value');
         $pkInput->setAttribute('value', self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -4348,6 +4361,7 @@ $subqueryMap = '.$referece.';
         $btn3->setAttribute('type', 'submit');
         $btn3->setAttribute('class', 'btn btn-success');
         $btn3->setAttribute('name', 'user_action');
+        $btn3->setAttribute('id', 'approve_data');
         $btn3->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
         $btn3->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonApprove();'.self::PHP_CLOSE_TAG));
         $btn32 = clone $btn3;
@@ -4356,6 +4370,7 @@ $subqueryMap = '.$referece.';
         $btn4->setAttribute('type', 'submit');
         $btn4->setAttribute('class', 'btn btn-warning');
         $btn4->setAttribute('name', 'user_action');
+        $btn4->setAttribute('id', 'reject_data');
         $btn4->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
         $btn4->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
         $btn42 = clone $btn4;
@@ -4404,6 +4419,7 @@ $subqueryMap = '.$referece.';
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
         $pkInputApprove->setAttribute('name', $primaryKeyName);
+        $pkInputApprove->setAttribute('id', 'primary_key_value');
         $pkInputApprove->setAttribute('value', self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
@@ -4447,6 +4463,7 @@ $subqueryMap = '.$referece.';
         $btn1->setAttribute('type', 'submit');
         $btn1->setAttribute('class', 'btn btn-success');
         $btn1->setAttribute('name', 'user_action');
+        $btn1->setAttribute('id', 'approve_data');
         $btn1->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
         $btn1->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonApprove();'.self::PHP_CLOSE_TAG));
 
@@ -4456,6 +4473,7 @@ $subqueryMap = '.$referece.';
         $btn2->setAttribute('type', 'submit');
         $btn2->setAttribute('class', 'btn btn-warning');
         $btn2->setAttribute('name', 'user_action');
+        $btn2->setAttribute('id', 'reject_data');
         $btn2->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
         $btn2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonReject();'.self::PHP_CLOSE_TAG));
 
@@ -4467,6 +4485,7 @@ $subqueryMap = '.$referece.';
         
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
+        $pkInputApprove->setAttribute('id', 'primary_key_value');
         $pkInputApprove->setAttribute('name', $primaryKeyName);
         $pkInputApprove->setAttribute('value', self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
@@ -4474,6 +4493,7 @@ $subqueryMap = '.$referece.';
 
         $pkInputReject = $dom->createElement('input');
         $pkInputReject->setAttribute("type", "hidden");
+        $pkInputReject->setAttribute('id', 'primary_key_value');
         $pkInputReject->setAttribute('name', $primaryKeyName);
         $pkInputReject->setAttribute('value', self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
