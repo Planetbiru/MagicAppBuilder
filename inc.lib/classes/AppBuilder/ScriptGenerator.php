@@ -1034,46 +1034,56 @@ class ScriptGenerator //NOSONAR
         }
         if(!file_exists($libDir)) 
         {
+            // Create the base application directory if it doesn't exist
             $this->prepareDir($libDir);
+            
+            // Copy the composer.phar file to the base application directory
             $this->prepareComposer($builderConfig, $appConf, $composer, $magicApp, $onlineInstallation);
-                  
+            
+            // Copy the composer.json file to the base application directory
             $baseAppBuilder = $appConf->getBaseEntityDirectory();
             $this->prepareDir($baseAppBuilder);
-            $arr = array(           
-            );
-            foreach($arr as $file)
-            {
-                copy(dirname(dirname(__DIR__))."/".$file, $baseAppBuilder."/".$file);
-            }
         }
         
+        // Copy inc.resources/*
+        // Not recursive, only copy the files in the directory
+        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
+        $destinationDir = $appConf->getBaseApplicationDirectory();
+        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
+            $content = str_replace('MagicAdmin', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
 
-        // Copy inc.app/*
+        // Copy inc.resources/inc.app/*
+        // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/inc.app";
         $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.app";
-        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+        $this->copyDirectory($sourceDir, $destinationDir, true, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             file_put_contents($destination, $content);
         });
-        
-        
 
-        // Copy lib.themes/*
+        // Copy inc.resources/lib.themes/*
+        // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/lib.themes";
         $destinationDir = $appConf->getBaseApplicationDirectory()."/lib.themes";
-        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+        $this->copyDirectory($sourceDir, $destinationDir, true, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             file_put_contents($destination, $content);
         });
         
-        // Copy lib.themes/*
+        // Copy inc.lib/classes/MagicAppTemplate/*
+        // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.lib/classes/MagicAppTemplate";
         $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.lib/classes/".$appConf->getBaseApplicationNamespace();
-        $this->copyDirectory($sourceDir, $destinationDir, array('php'), function($source, $destination) use ($appConf) {
+        $this->copyDirectory($sourceDir, $destinationDir, true, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
@@ -1163,12 +1173,11 @@ class ScriptGenerator //NOSONAR
 
         $source3 = $libPath."/vendor/planetbiru";
         $destination3 = $targetDir."/vendor/planetbiru";
-        $this->copyDirectory($source3, $destination3);
+        $this->copyDirectory($source3, $destination3, true);
 
         $source4 = $libPath."/vendor/autoload.php";
         $destination4 = $targetDir."/vendor/autoload.php";
-        $this->copyDirectory($source4, $destination4);
-
+        $this->copyDirectory($source4, $destination4, true);
 
         $composerConfig = array();
 
@@ -1226,16 +1235,15 @@ class ScriptGenerator //NOSONAR
      *
      * @param string $source The source directory path.
      * @param string $destination The destination directory path.
+     * @param bool $recursive Whether to copy subdirectories recursively.
      * @param array|null $extensions An optional array of file extensions to process with the callback.
      * @param callable|null $callback An optional callback function to process files with the specified extensions.
      * @return bool Returns true if the operation is successful, false otherwise.
      */
-    public function copyDirectory($source, $destination, $extensions = null, $callback = null)
+    public function copyDirectory($source, $destination, $recursive = false, $extensions = null, $callback = null) // NOSONAR
     {
-        
         // Ensure the source directory exists
         if (!is_dir($source)) {
-            echo "Source directory does not exist: $source\n";
             return false;
         }
 
@@ -1252,7 +1260,7 @@ class ScriptGenerator //NOSONAR
 
         // Iterate through each file and subdirectory
         while (($file = readdir($directory)) !== false) {
-            if ($file === '.' || $file === '..') {
+            if ($this->dottedDirectory($file)) {
                 continue; // Skip special directory entries
             }
 
@@ -1260,19 +1268,17 @@ class ScriptGenerator //NOSONAR
             $destinationPath = $destination . DIRECTORY_SEPARATOR . $file;
             if (is_dir($sourcePath)) {
                 // Recursively copy subdirectories
-                $this->copyDirectory($sourcePath, $destinationPath, $extensions, $callback);
+                if($recursive) {
+                    $this->copyDirectory($sourcePath, $destinationPath, true, $extensions, $callback);
+                }
             } else {
                 // Get the file extension
                 $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
 
                 // Check if the file extension matches the specified extensions and a callback is provided
-                if (isset($extensions) 
-                    && is_array($extensions) 
-                    && in_array($fileExtension, $extensions) 
-                    && isset($callback) 
-                    && is_callable($callback)) {
+                if ($this->needCallUserFfunction($extensions, $fileExtension, $callback)) {
                     // Process file using the callback function
-                    call_user_func($callback,$sourcePath, $destinationPath);
+                    call_user_func($callback, $sourcePath, $destinationPath);
                 } else {
                     // Copy the file normally
                     copy($sourcePath, $destinationPath);
@@ -1283,6 +1289,36 @@ class ScriptGenerator //NOSONAR
         // Close the directory handle
         closedir($directory);
         return true;
+    }
+    
+    /**
+     * Check if the directory is a special entry ('.' or '..').
+     *
+     * @param string $directory Directory name to check.
+     * @return bool Returns true if the directory is '.' or '..', false otherwise.
+     */
+    private function dottedDirectory($directory)
+    {
+        return $directory === '.' || $directory === '..';
+    }
+    
+    /**
+     * Check if the callback function should be called based on file extensions.
+     * 
+     * This function checks if the provided file extension is in the list of allowed extensions
+     *
+     * @param array|null $extensions File extensions to check against.
+     * @param string|null $fileExtension File extension to check.
+     * @param callable|null $callback Callback function to execute if conditions are met.
+     * @return bool Returns true if the callback should be called, false otherwise.
+     */
+    private function needCallUserFfunction($extensions, $fileExtension, $callback)
+    {
+        return isset($extensions) 
+            && is_array($extensions) 
+            && in_array($fileExtension, $extensions) 
+            && isset($callback) 
+            && is_callable($callback);
     }
     
     /**
