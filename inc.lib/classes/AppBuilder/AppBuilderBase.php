@@ -68,6 +68,8 @@ class AppBuilderBase //NOSONAR
     const WRAPPER_UPDATE = "update";
     const WRAPPER_DETAIL = "detail";
     const WRAPPER_LIST = "list";
+    
+    const BACK_TO_LIST = 'back_to_list';
 
     const APP_ENTITY_LANGUAGE = 'appEntityLanguage';
     const APP_CONFIG = "appConfig";
@@ -1996,7 +1998,7 @@ $subqueryMap = '.$referece.';
 
             $deactivate = $dom->createElement('button');
             $deactivate->setAttribute('type', 'submit');
-            $deactivate->setAttribute('class', 'btn btn-warning'); // NOSONAR
+            $deactivate->setAttribute('class', ElementClass::BUTTON_WARNING); // NOSONAR
             $deactivate->setAttribute('name', 'user_action');
             $deactivate->setAttribute('id', 'deactivate_selected');
             $deactivate->setAttribute('value', 'deactivate');
@@ -4253,7 +4255,7 @@ $subqueryMap = '.$referece.';
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'button');
         $btn2->setAttribute('class', ElementClass::BUTTON_PRIMARY);
-        $btn2->setAttribute('id', 'back_to_list');
+        $btn2->setAttribute('id', self::BACK_TO_LIST);
         $btn2->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';');
         $btn2->appendChild($dom->createTextNode($this->getTextOfLanguage('button_cancel')));
                 
@@ -4306,7 +4308,7 @@ $subqueryMap = '.$referece.';
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'button');
         $btn2->setAttribute('class', ElementClass::BUTTON_PRIMARY);
-        $btn2->setAttribute('id', 'back_to_list');
+        $btn2->setAttribute('id', self::BACK_TO_LIST);
         $btn2->setAttribute('onclick', 'window.location=\'<?php echo $currentModule->getRedirectUrl();?>\';');
         $btn2->appendChild($dom->createTextNode($this->getTextOfLanguage('button_cancel')));
 
@@ -4359,7 +4361,7 @@ $subqueryMap = '.$referece.';
      
         $btn3 = $dom->createElement('button');
         $btn3->setAttribute('type', 'submit');
-        $btn3->setAttribute('class', 'btn btn-success');
+        $btn3->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $btn3->setAttribute('name', 'user_action');
         $btn3->setAttribute('id', 'approve_data');
         $btn3->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
@@ -4368,7 +4370,7 @@ $subqueryMap = '.$referece.';
 
         $btn4 = $dom->createElement('button');
         $btn4->setAttribute('type', 'submit');
-        $btn4->setAttribute('class', 'btn btn-warning');
+        $btn4->setAttribute('class', ElementClass::BUTTON_WARNING);
         $btn4->setAttribute('name', 'user_action');
         $btn4->setAttribute('id', 'reject_data');
         $btn4->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
@@ -4376,7 +4378,7 @@ $subqueryMap = '.$referece.';
         $btn42 = clone $btn4;
 
         $btn1 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_update'), null, 'update_data', 'currentModule->getRedirectUrl(UserAction::UPDATE, '.AppBuilderBase::getStringOf($primaryKeyName).', $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.')');
-        $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, 'back_to_list', self::REDIRECT_TO_ITSELF);
+        $btn2 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_back_to_list'), null, self::BACK_TO_LIST, self::REDIRECT_TO_ITSELF);
         
         $td2->appendChild($dom->createTextNode(self::N_TAB5));
         $td2->appendChild($dom->createTextNode(self::PHP_OPEN_TAG));
@@ -4461,7 +4463,7 @@ $subqueryMap = '.$referece.';
 
         $btn1 = $dom->createElement('button');
         $btn1->setAttribute('type', 'submit');
-        $btn1->setAttribute('class', 'btn btn-success');
+        $btn1->setAttribute('class', ElementClass::BUTTON_SUCCESS);
         $btn1->setAttribute('name', 'user_action');
         $btn1->setAttribute('id', 'approve_data');
         $btn1->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::APPROVE;'.self::PHP_CLOSE_TAG);
@@ -4471,7 +4473,7 @@ $subqueryMap = '.$referece.';
 
         $btn2 = $dom->createElement('button');
         $btn2->setAttribute('type', 'submit');
-        $btn2->setAttribute('class', 'btn btn-warning');
+        $btn2->setAttribute('class', ElementClass::BUTTON_WARNING);
         $btn2->setAttribute('name', 'user_action');
         $btn2->setAttribute('id', 'reject_data');
         $btn2->setAttribute('value', self::PHP_OPEN_TAG.'echo UserAction::REJECT;'.self::PHP_CLOSE_TAG);
@@ -4479,14 +4481,14 @@ $subqueryMap = '.$referece.';
 
         $btn22 = clone $btn2;
 
-        $btn3 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, 'back_to_list', self::REDIRECT_TO_ITSELF);
+        $btn3 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, self::BACK_TO_LIST, self::REDIRECT_TO_ITSELF);
         $btn32 = clone $btn3;
-        $btn4 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, 'back_to_list', self::REDIRECT_TO_ITSELF);
+        $btn4 = $this->createCancelButton($dom, $this->getTextOfLanguage('button_cancel'), null, self::BACK_TO_LIST, self::REDIRECT_TO_ITSELF);
         
         $pkInputApprove = $dom->createElement('input');
         $pkInputApprove->setAttribute("type", "hidden");
-        $pkInputApprove->setAttribute('id', 'primary_key_value');
         $pkInputApprove->setAttribute('name', $primaryKeyName);
+        $pkInputApprove->setAttribute('id', 'primary_key_value');
         $pkInputApprove->setAttribute('value', self::PHP_OPEN_TAG.'echo $'.$objectName.self::CALL_GET.$upperPrimaryKeyName.self::BRACKETS.';'.self::PHP_CLOSE_TAG);
 
         $pkInputApprove2 = clone $pkInputApprove;

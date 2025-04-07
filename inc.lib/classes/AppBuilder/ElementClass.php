@@ -17,4 +17,6 @@ class ElementClass
 
     /** @var string Constant for a primary button CSS class. */
     const BUTTON_PRIMARY = 'btn btn-primary';
+    
+    const BUTTON_WARNING = 'btn btn-warning';
 }
