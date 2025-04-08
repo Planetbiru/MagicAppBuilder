@@ -7454,7 +7454,7 @@ function displayDirContent(dirs, subDirUl, reset) {
  */
 function initCodeMirror() {
     modeInput = document.getElementById('filename');
-    CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
+    CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
     fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
     {
         lineNumbers: true,           // Show line numbers in the editor

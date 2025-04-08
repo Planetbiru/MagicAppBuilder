@@ -10,6 +10,18 @@ $builderName = $builderConfig->getApplication()->getName();
 $adminLevelId = isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : "";
 
 $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " . $builderName : $builderName;
+
+function basenameRequestUri($uri)
+{
+  if(substr($uri, strlen($uri) - 1, 1) == "/")
+  {
+    return $uri;
+  }
+  else
+  {
+    return str_replace("\\", "/", dirname($uri));
+  }
+}
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -24,6 +36,7 @@ $pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " .
   <meta name="application-name" content="<?php echo $activeApplicationName; ?>">
   <meta name="builder-name" content="<?php echo $builderName; ?>">
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>">
+  <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']);?>">
   <title><?php echo $pageTitle; ?></title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />

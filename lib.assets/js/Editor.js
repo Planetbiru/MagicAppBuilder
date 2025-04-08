@@ -216,7 +216,7 @@ let initEditor = function () {
       return true;
     }
   });
-
+  let baseAssetUrl = document.querySelector('meta[name="base-asset-url"]').getAttribute('content');
   CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js";
 
   cmEditorModule = CodeMirror.fromTextArea(
