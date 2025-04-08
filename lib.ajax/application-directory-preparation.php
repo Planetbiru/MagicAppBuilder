@@ -5,7 +5,6 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\ScriptGenerator;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
-use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -29,7 +28,7 @@ if($applicationId != null)
         $applicationDirectory = $application->getBaseApplicationDirectory();
         $appConfig = AppBuilder::loadOrCreateConfig($application->getApplicationId(), $appBaseConfigPath, $configTemplatePath); 
         $scriptGenerator = new ScriptGenerator();
-        $scriptGenerator->prepareApplication($builderConfig, $appConfig->getApplication(), $applicationDirectory, false);
+        $scriptGenerator->prepareApplication($builderConfig, $appConfig->getApplication(), $applicationDirectory, false, "3.8", $application);
     }
     catch(Exception $e)
     {
