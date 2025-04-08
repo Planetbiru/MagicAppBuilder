@@ -26,6 +26,7 @@ $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
 $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
+$composerOnline = false;
 
 
 if (ComposerUtil::checkInternetConnection()) {

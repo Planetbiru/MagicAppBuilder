@@ -13,6 +13,8 @@ use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+$async = false;
+
 $phpIni = new SecretObject($builderConfig->getPhpIni());
 // Set max_execution_time
 ini_set('max_execution_time', $phpIni->getMaxExecutionTime() != null ? intval($phpIni->getMaxExecutionTime()) : 600);
@@ -201,6 +203,8 @@ $newApp->setGlobalVariableDatabase('database');
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
+$now = date("Y-m-d H:i:s");
+
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 $entityApplication->setApplicationId($newAppId);
 $entityApplication->setName($applicationName);
@@ -246,25 +250,30 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
-$pathPreparation = '"'.__DIR__ . "/application-preparation.php".'"';
 
-$command = "php $pathPreparation $newAppId > /dev/null 2>&1 &";
+if($async)
+{
+    $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';
+    $param1 = http_build_query($_COOKIE);
+    $param2 = $newAppId;
+    $param3 = $onlineInstallation ? 'true' : 'false';
+    $param4 = $magicObjectVersion;
+    $encoded = base64_encode(json_encode(array($param1, $param2, $param3, $param4)));
+    $command = "php $pathPreparation $encoded > 2>&1";
+    error_log($command);
+    exec($command);
+}
+else
+{
+    $scriptGenerator = new ScriptGenerator();
+    $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
+}
 
-$scriptGenerator = new ScriptGenerator();
-$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 
-
-
-$now = date("Y-m-d H:i:s");
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
-    $entityApplication = new EntityApplication(null, $databaseBuilder);
-    $entityApplication->setApplicationId($newAppId);
-    $entityApplication->setApplicationStatus("finish");
-    $entityApplication->update();
-
     $admin = new Admin(null, $databaseBuilder);
     $admin
         ->setAdminId($adminId)

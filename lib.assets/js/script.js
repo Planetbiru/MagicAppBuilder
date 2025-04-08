@@ -236,12 +236,15 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
-      $('.waiting-screen-message').text('Status: '+data.applicationStatus);
-      if(data.status != 'success')
+      if(data.applicationStatus != 'finish')
       {
         setTimeout(function(){
           setCheckingStatus(id);
         }, 1000);
+      }
+      else
+      {
+        hideWaitingScreen();
       }
     },
     error: function(err)
@@ -815,7 +818,7 @@ let initAll = function () {
           composer_online: composer_online
         },
         success: function (data) {
-          hideWaitingScreen();
+          //hideWaitingScreen();
           loadAllResource();
           decreaseAjaxPending();
         },

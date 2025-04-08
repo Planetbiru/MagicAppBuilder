@@ -1100,19 +1100,20 @@ class ScriptGenerator //NOSONAR
             file_put_contents($destination, $content);
         });
 
+        $this->updateApplicationStatus($entityApplication, "finish");
         return $this;
     }
     
     /**
      * Update applicatiion status
      *
-     * @param MagicObject $entity
-     * @param string $status
-     * @return self
+     * @param MagicObject $entity Application entity
+     * @param string $status Application status
+     * @return self Returns the current instance for method chaining.
      */
     private function updateApplicationStatus($entity, $status)
     {
-        if(isset($entityApplication) && $entityApplication instanceof MagicObject)
+        if(isset($entity) && $entity instanceof MagicObject)
         {
             try
             {
