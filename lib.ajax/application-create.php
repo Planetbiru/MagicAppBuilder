@@ -13,6 +13,8 @@ use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+$async = false;
+
 $phpIni = new SecretObject($builderConfig->getPhpIni());
 // Set max_execution_time
 ini_set('max_execution_time', $phpIni->getMaxExecutionTime() != null ? intval($phpIni->getMaxExecutionTime()) : 600);
@@ -201,9 +203,38 @@ $newApp->setGlobalVariableDatabase('database');
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
+$now = date("Y-m-d H:i:s");
+
+$entityApplication = new EntityApplication(null, $databaseBuilder);
+$entityApplication->setApplicationId($newAppId);
+$entityApplication->setName($applicationName);
+$entityApplication->setDescription($applicationDescription);
+$entityApplication->setProjectDirectory($projectDirectory);
+$entityApplication->setBaseApplicationDirectory($applicationDirectory);
+$entityApplication->setArchitecture($applicationArchitecture);
+$entityApplication->setAuthor($author);
+$entityApplication->setAdminId($adminId);
+$entityApplication->setWorkspaceId($workspaceId);
+$entityApplication->setAdminCreate($adminId);
+$entityApplication->setAdminEdit($adminId);   
+$entityApplication->setTimeCreate($now);
+$entityApplication->setTimeEdit($now);
+$entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
+$entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+$entityApplication->setActive(true);
+
+try
+{
+    $entityApplication->setApplicationStatus("created");
+    $entityApplication->insert();
+}
+catch(Exception $e)
+{
+    // Do nothing    
+}
+
 PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
-$scriptGenerator = new ScriptGenerator();
 
 $app = new SecretObject();
 $newApp->loadYamlFile($path2, false, true, true);
@@ -219,33 +250,29 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
-$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion);
+if($async)
+{
+    $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';
+    $param1 = http_build_query($_COOKIE);
+    $param2 = $newAppId;
+    $param3 = $onlineInstallation ? 'true' : 'false';
+    $param4 = $magicObjectVersion;
+    $encoded = base64_encode(json_encode(array($param1, $param2, $param3, $param4)));
+    $command = "php $pathPreparation $encoded > 2>&1";
+    error_log($command);
+    exec($command);
+}
+else
+{
+    $scriptGenerator = new ScriptGenerator();
+    $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
+}
 
 
-
-$now = date("Y-m-d H:i:s");
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
-    $entityApplication->setApplicationId($newAppId);
-    $entityApplication->setName($applicationName);
-    $entityApplication->setDescription($applicationDescription);
-    $entityApplication->setProjectDirectory($projectDirectory);
-    $entityApplication->setBaseApplicationDirectory($applicationDirectory);
-    $entityApplication->setArchitecture($applicationArchitecture);
-    $entityApplication->setAuthor($author);
-    $entityApplication->setAdminId($adminId);
-    $entityApplication->setWorkspaceId($workspaceId);
-    $entityApplication->setAdminCreate($adminId);
-    $entityApplication->setAdminEdit($adminId);   
-    $entityApplication->setTimeCreate($now);
-    $entityApplication->setTimeEdit($now);
-    $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
-    $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
-    $entityApplication->setActive(true);
-    $entityApplication->save();
-
     $admin = new Admin(null, $databaseBuilder);
     $admin
         ->setAdminId($adminId)

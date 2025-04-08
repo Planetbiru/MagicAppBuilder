@@ -216,7 +216,6 @@ let initEditor = function () {
       return true;
     }
   });
-
   CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js";
 
   cmEditorModule = CodeMirror.fromTextArea(

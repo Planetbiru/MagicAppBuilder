@@ -104,6 +104,15 @@ class EntityApplication extends MagicObject
 	 * @var string
 	 */
 	protected $gitRemoteUrl;
+	
+	/**
+	 * Application Status
+	 * 
+	 * @Column(name="application_status", type="varchar(40)", nullable=true)
+	 * @Label(content="Application Status")
+	 * @var string
+	 */
+	protected $applicationStatus;
 
 	/**
 	 * Author
@@ -187,5 +196,6 @@ class EntityApplication extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
+
 
 }

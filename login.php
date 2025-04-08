@@ -37,6 +37,6 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     }
     else
     {
-        header("Location: ./");
+        header("Location: ./index.php");
     }
 }

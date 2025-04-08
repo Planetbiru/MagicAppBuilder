@@ -227,6 +227,34 @@ function hideWaitingScreen()
   document.querySelector('.waiting-screen').style.display = 'none';
 }
 
+function setCheckingStatus(id)
+{
+  $.ajax({
+    type: 'GET', 
+    data: {applicationId: id},
+    url: 'lib.ajax/application-status.php',
+    dataType: 'json',
+    success: function(data)
+    {
+      if(data.applicationStatus != 'finish')
+      {
+        setTimeout(function(){
+          setCheckingStatus(id);
+        }, 1000);
+        
+      }
+      else
+      {
+        hideWaitingScreen();
+      }
+    },
+    error: function(err)
+    {
+      console.log(err);
+    }
+  })
+}
+
 // Add event listener
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
@@ -770,6 +798,9 @@ let initAll = function () {
     if (name != "" && id != "" && directory != "" && author != "") {
       showWaitingScreen();
       increaseAjaxPending();
+      
+      setCheckingStatus(id);
+      
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
@@ -788,7 +819,7 @@ let initAll = function () {
           composer_online: composer_online
         },
         success: function (data) {
-          hideWaitingScreen();
+          //hideWaitingScreen();
           loadAllResource();
           decreaseAjaxPending();
         },
@@ -7423,7 +7454,7 @@ function displayDirContent(dirs, subDirUl, reset) {
  */
 function initCodeMirror() {
     modeInput = document.getElementById('filename');
-    CodeMirror.modeURL = "../lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
+    CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
     fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
     {
         lineNumbers: true,           // Show line numbers in the editor
