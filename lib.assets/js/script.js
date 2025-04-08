@@ -242,8 +242,7 @@ let initAll = function () {
       [
         {
           'caption': 'Yes',  
-          'fn': () => {
-            
+          'fn': () => {            
             increaseAjaxPending();
             $.ajax({
               type: "POST",
