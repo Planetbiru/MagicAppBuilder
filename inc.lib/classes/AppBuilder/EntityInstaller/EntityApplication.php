@@ -197,4 +197,5 @@ class EntityApplication extends MagicObject
 	 */
 	protected $active;
 
+
 }

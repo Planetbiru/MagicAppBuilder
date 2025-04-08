@@ -250,7 +250,6 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
-
 if($async)
 {
     $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';

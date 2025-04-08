@@ -28,7 +28,6 @@ $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
 $composerOnline = false;
 
-
 if (ComposerUtil::checkInternetConnection()) {
     // Online
     try

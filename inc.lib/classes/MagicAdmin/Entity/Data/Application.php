@@ -197,4 +197,5 @@ class Application extends MagicObject
 	 */
 	protected $active;
 
+	
 }

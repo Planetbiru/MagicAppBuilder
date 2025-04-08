@@ -241,6 +241,7 @@ function setCheckingStatus(id)
         setTimeout(function(){
           setCheckingStatus(id);
         }, 1000);
+        
       }
       else
       {

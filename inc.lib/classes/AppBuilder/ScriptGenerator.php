@@ -1105,7 +1105,7 @@ class ScriptGenerator //NOSONAR
     }
     
     /**
-     * Update applicatiion status
+     * Update applicatiion status.
      *
      * @param MagicObject $entity Application entity
      * @param string $status Application status

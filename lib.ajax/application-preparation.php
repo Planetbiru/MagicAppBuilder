@@ -8,10 +8,8 @@ use MagicObject\SecretObject;
 $array = json_decode(base64_decode($_SERVER['argv'][1]));
 
 parse_str($array[0], $_COOKIE);
-error_log("RUN HERE");
-require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-error_log(print_r($_COOKIE, true));
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $newAppId = $array[1];
 $onlineInstallation = $array[2] == 'true';
