@@ -2809,7 +2809,7 @@ function loadApplicationList() {
       $('meta[name="application-id"]').attr('content', applicationId);
       $('meta[name="application-name"]').attr('content', applicationName);
       let builderName = $('meta[name="builder-name"]').attr('content');
-      document.title = applicationName + " | " + builderName;
+      document.title = applicationName != '' ? applicationName + " | " + builderName : builderName;
     }
   });
 }
