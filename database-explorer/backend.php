@@ -6,7 +6,7 @@ use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Util\Database\PicoDatabaseUtil;
 
-require_once dirname(__DIR__) . "/inc.app/sqlite-detector.php";
+require_once dirname(__DIR__) . "/inc.app/platform-check.php";
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))

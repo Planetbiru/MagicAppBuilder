@@ -209,6 +209,24 @@ jQuery(function () {
   });
 });
 
+/**
+ * Show waiting screen
+ */
+function showWaitingScreen()
+{
+  document.body.style.overflow = 'hidden';
+  document.querySelector('.waiting-screen').style.display = 'block';
+}
+
+/**
+ * Hide waiting screen
+ */
+function hideWaitingScreen()
+{
+  document.body.style.overflow = 'auto';
+  document.querySelector('.waiting-screen').style.display = 'none';
+}
+
 // Add event listener
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
@@ -224,8 +242,7 @@ let initAll = function () {
       [
         {
           'caption': 'Yes',  
-          'fn': () => {
-            
+          'fn': () => {            
             increaseAjaxPending();
             $.ajax({
               type: "POST",
@@ -751,6 +768,7 @@ let initAll = function () {
     });
 
     if (name != "" && id != "" && directory != "" && author != "") {
+      showWaitingScreen();
       increaseAjaxPending();
       $.ajax({
         method: "POST",
@@ -770,6 +788,7 @@ let initAll = function () {
           composer_online: composer_online
         },
         success: function (data) {
+          hideWaitingScreen();
           loadAllResource();
           decreaseAjaxPending();
         },

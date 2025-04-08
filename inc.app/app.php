@@ -59,6 +59,8 @@ languages:
         code: id
 
 dateFormatDetail: 'j F Y H:i:s'
+phpIni:
+    maxExecutionTime: 600
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

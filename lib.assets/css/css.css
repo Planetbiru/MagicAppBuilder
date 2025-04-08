@@ -551,26 +551,26 @@ h3.entity-table-name {
   background-color: #FDF3F3;
 }
 
-.animation-wave,
-.animation-wave > span {
+.animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;
   height: 12px;
   line-height: 1;
-  padding: 0 10px;
 }
-.animation-wave > span,
-.animation-wave > span > span {
+
+.animation-wave > span {
   vertical-align: top;
-  padding: 0 8px;
 }
-.animation-wave::before, .animation-wave::after,
-.animation-wave > span::before,
-.animation-wave > span::after,
-.animation-wave > span::before,
-.animation-wave > span::after,
-.animation-wave > span > span::before,
-.animation-wave > span > span::after {
+
+.animation-wave {
+  padding: 0px 10px;
+}
+
+.animation-wave > span {
+  padding: 0px 8px;
+}
+
+.animation-wave::before, .animation-wave::after, .animation-wave > span::before, .animation-wave > span::after {
   content: "";
   width: 6px;
   height: 6px;
@@ -580,39 +580,46 @@ h3.entity-table-name {
   animation-iteration-count: infinite;
   animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
-.animation-wave::before,
-.animation-wave > span::before,
-.animation-wave > span::before,
-.animation-wave > span > span::before {
+
+.animation-wave::before, .animation-wave > span::before {
   left: 0;
 }
-.animation-wave::after,
-.animation-wave > span::after,
-.animation-wave > span::after,
-.animation-wave > span > span::after {
+
+.animation-wave::after, .animation-wave > span::after {
   right: 0;
 }
-.animation-wave::before,
-.animation-wave > span::before {
+
+.animation-wave::before {
   animation-delay: 0;
   background-color: #007ac8;
 }
-.animation-wave > span::before,
-.animation-wave > span > span::before {
+
+.animation-wave > span::before {
   animation-delay: 0.25s;
   background-color: green;
 }
-.animation-wave > span::after,
-.animation-wave > span > span::after {
+
+.animation-wave > span::after {
   animation-delay: 0.5s;
   background-color: #ffe100;
 }
-.animation-wave::after,
-.animation-wave > span::after {
+
+.animation-wave::after {
   animation-delay: 0.75s;
   background-color: #FF0000;
 }
 
+@keyframes anim-wave {
+  0% {
+    top: 1px;
+  }
+  50% {
+    top: 7px;
+  }
+  100% {
+    top: 1px;
+  }
+}
 .form-control.invalid-input {
   border-color: #FF0000;
 }
@@ -1317,4 +1324,40 @@ ul {
 .context-menu [data-operation=reset]::before, .context-menu [data-operation=refresh-dir]::before {
   content: "\f021"; /* Font Awesome icon for refresh (reset) */
   color: #2196F3; /* Blue for reset */
+}
+
+.waiting-screen {
+  display: none;
+}
+
+.back-screen {
+  background-color: rgba(0, 0, 0, 0.2);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  left: 0;
+  top: 0;
+}
+
+.waiting-screen-inner {
+  position: absolute;
+  z-index: 1;
+  width: 200px;
+  height: 50px;
+  left: calc(50% - 100px);
+  top: calc(50% - 25px);
+  background-color: #FFFFFF;
+  border: 4px solid rgba(0, 0, 0, 0.33);
+  border-radius: 10px;
+  box-sizing: border-box;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.waiting-screen-inner span.animation-wave {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  margin-top: 14px;
 }/*# sourceMappingURL=css.css.map */

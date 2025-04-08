@@ -13,6 +13,10 @@ use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+$phpIni = new SecretObject($builderConfig->getPhpIni());
+// Set max_execution_time
+ini_set('max_execution_time', $phpIni->getMaxExecutionTime() != null ? intval($phpIni->getMaxExecutionTime()) : 600);
+
 $inputPost = new InputPost();
 $newAppId = trim($inputPost->getId());
 
@@ -65,7 +69,7 @@ $applicationName = trim($inputPost->getName());
 $applicationArchitecture = trim($inputPost->getArchitecture());
 $applicationDirectory = trim($baseApplicationDirectory);
 $applicationDescription = trim($inputPost->getDescription());
-$onlineInstallation = stripos($inputPost->getInstallationMethod(), 'online') !== false;
+$onlineInstallation = $inputPost->getComposerOnline() == 'true' || $inputPost->getComposerOnline() == 1;
 $projectDirectory = $dir2;
 
 $application->setId($newAppId);
@@ -120,6 +124,12 @@ $application->setComposer($composer);
 $application->setMagicApp(array(
     'version' => trim($inputPost->getMagicAppVersion())
 ));
+
+// For offline installation
+$composerPath = dirname(__DIR__) . "/inc.lib/vendor/planetbiru/magic-app/composer.json";
+$composerJson = json_decode(file_get_contents($composerPath), true);
+$magicObjectVersion = $composerJson['require']['planetbiru/magic-object'];
+$magicObjectVersion = str_replace("^", '', $magicObjectVersion);
 
 $newApp->setApplication($application);
 
@@ -200,7 +210,6 @@ $newApp->loadYamlFile($path2, false, true, true);
 
 $appConf = $newApp->getApplication();
 $baseDir = $appConf->getBaseApplicationDirectory();
-$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation);
 
 $dir3 = $baseDir."/inc.cfg";
 if(!file_exists($dir3))
@@ -209,6 +218,10 @@ if(!file_exists($dir3))
 }
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
+
+$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion);
+
+
 
 $now = date("Y-m-d H:i:s");
 
