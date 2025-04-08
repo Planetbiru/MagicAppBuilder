@@ -9,7 +9,7 @@ $activeApplicationName = isset($activeApplication) ? $activeApplication->getName
 $builderName = $builderConfig->getApplication()->getName();
 $adminLevelId = isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : "";
 
-$pageTitle = isset($activeApplication) ? $activeApplication->getName() . " | " . $builderName : $builderName;
+$pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? $activeApplication->getName() . " | " . $builderName : $builderName;
 
 function basenameRequestUri($uri)
 {
