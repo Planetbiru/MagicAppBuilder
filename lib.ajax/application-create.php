@@ -201,9 +201,36 @@ $newApp->setGlobalVariableDatabase('database');
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
+$entityApplication = new EntityApplication(null, $databaseBuilder);
+$entityApplication->setApplicationId($newAppId);
+$entityApplication->setName($applicationName);
+$entityApplication->setDescription($applicationDescription);
+$entityApplication->setProjectDirectory($projectDirectory);
+$entityApplication->setBaseApplicationDirectory($applicationDirectory);
+$entityApplication->setArchitecture($applicationArchitecture);
+$entityApplication->setAuthor($author);
+$entityApplication->setAdminId($adminId);
+$entityApplication->setWorkspaceId($workspaceId);
+$entityApplication->setAdminCreate($adminId);
+$entityApplication->setAdminEdit($adminId);   
+$entityApplication->setTimeCreate($now);
+$entityApplication->setTimeEdit($now);
+$entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
+$entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+$entityApplication->setActive(true);
+
+try
+{
+    $entityApplication->setApplicationStatus("created");
+    $entityApplication->insert();
+}
+catch(Exception $e)
+{
+    // Do nothing    
+}
+
 PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
-$scriptGenerator = new ScriptGenerator();
 
 $app = new SecretObject();
 $newApp->loadYamlFile($path2, false, true, true);
@@ -219,7 +246,12 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
-$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion);
+$pathPreparation = '"'.__DIR__ . "/application-preparation.php".'"';
+
+$command = "php $pathPreparation $newAppId > /dev/null 2>&1 &";
+
+$scriptGenerator = new ScriptGenerator();
+$scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 
 
 
@@ -228,23 +260,10 @@ $now = date("Y-m-d H:i:s");
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
+    $entityApplication = new EntityApplication(null, $databaseBuilder);
     $entityApplication->setApplicationId($newAppId);
-    $entityApplication->setName($applicationName);
-    $entityApplication->setDescription($applicationDescription);
-    $entityApplication->setProjectDirectory($projectDirectory);
-    $entityApplication->setBaseApplicationDirectory($applicationDirectory);
-    $entityApplication->setArchitecture($applicationArchitecture);
-    $entityApplication->setAuthor($author);
-    $entityApplication->setAdminId($adminId);
-    $entityApplication->setWorkspaceId($workspaceId);
-    $entityApplication->setAdminCreate($adminId);
-    $entityApplication->setAdminEdit($adminId);   
-    $entityApplication->setTimeCreate($now);
-    $entityApplication->setTimeEdit($now);
-    $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
-    $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
-    $entityApplication->setActive(true);
-    $entityApplication->save();
+    $entityApplication->setApplicationStatus("finish");
+    $entityApplication->update();
 
     $admin = new Admin(null, $databaseBuilder);
     $admin

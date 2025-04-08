@@ -12,6 +12,7 @@ use AppBuilder\AppSecretObject;
 use AppBuilder\AppSection;
 use AppBuilder\EntityApvInfo;
 use AppBuilder\EntityInfo;
+use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\MagicObject;
@@ -1022,10 +1023,12 @@ class ScriptGenerator //NOSONAR
      * @param string $baseDir The base directory for the application.
      * @param bool $onlineInstallation Determines whether Composer should be run in online mode.
      * @param string $magicObjectVersion MagicObject version for offline installation.
+     * @param MagicObject $entityApplication Entity application
      * @return self Returns the current instance for method chaining.
      */
-    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation, $magicObjectVersion)
+    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication)
     {
+        $this->updateApplicationStatus($entityApplication, "installing-composer");
         $composer = new MagicObject($appConf->getComposer());
         $magicApp = new MagicObject($appConf->getMagicApp());
         $composer->setMagicObjectVersion($magicObjectVersion);
@@ -1047,18 +1050,7 @@ class ScriptGenerator //NOSONAR
             $this->prepareDir($baseAppBuilder);
         }
         
-        // Copy inc.resources/*
-        // Not recursive, only copy the files in the directory
-        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
-        $destinationDir = $appConf->getBaseApplicationDirectory();
-        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf) {
-            $content = file_get_contents($source);
-            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
-            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
-            $content = str_replace('MagicAdmin', $baseApplicationNamespace, $content);
-            file_put_contents($destination, $content);
-        });
-
+        $this->updateApplicationStatus($entityApplication, "copying-app-files");
         // Copy inc.resources/inc.app/*
         // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/inc.app";
@@ -1071,6 +1063,7 @@ class ScriptGenerator //NOSONAR
             file_put_contents($destination, $content);
         });
 
+        $this->updateApplicationStatus($entityApplication, "copying-theme-files");
         // Copy inc.resources/lib.themes/*
         // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources/lib.themes";
@@ -1082,6 +1075,7 @@ class ScriptGenerator //NOSONAR
             file_put_contents($destination, $content);
         });
         
+        $this->updateApplicationStatus($entityApplication, "copying-entity-files");
         // Copy inc.lib/classes/MagicAppTemplate/*
         // Recursive copy, including subdirectories and files
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.lib/classes/MagicAppTemplate";
@@ -1092,7 +1086,44 @@ class ScriptGenerator //NOSONAR
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             file_put_contents($destination, $content);
         });
+        
+        $this->updateApplicationStatus($entityApplication, "copying-standard-module");
+        // Copy inc.resources/*
+        // Not recursive, only copy the files in the directory
+        $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
+        $destinationDir = $appConf->getBaseApplicationDirectory();
+        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf) {
+            $content = file_get_contents($source);
+            $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
+            $content = str_replace('MagicAdmin', $baseApplicationNamespace, $content);
+            file_put_contents($destination, $content);
+        });
 
+        return $this;
+    }
+    
+    /**
+     * Update applicatiion status
+     *
+     * @param MagicObject $entity
+     * @param string $status
+     * @return self
+     */
+    private function updateApplicationStatus($entity, $status)
+    {
+        if(isset($entityApplication) && $entityApplication instanceof MagicObject)
+        {
+            try
+            {
+                $entity->setApplicationStatus($status);
+                $entity->update();
+            }
+            catch(Exception $e)
+            {
+                // Do nothing
+            }
+        }
         return $this;
     }
     

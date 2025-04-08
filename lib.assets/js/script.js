@@ -227,6 +227,30 @@ function hideWaitingScreen()
   document.querySelector('.waiting-screen').style.display = 'none';
 }
 
+function setCheckingStatus(id)
+{
+  $.ajax({
+    type: 'GET', 
+    data: {applicationId: id},
+    url: 'lib.ajax/application-status.php',
+    dataType: 'json',
+    success: function(data)
+    {
+      $('.waiting-screen-message').text('Status: '+data.applicationStatus);
+      if(data.status != 'success')
+      {
+        setTimeout(function(){
+          setCheckingStatus(id);
+        }, 1000);
+      }
+    },
+    error: function(err)
+    {
+      console.log(err);
+    }
+  })
+}
+
 // Add event listener
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
@@ -770,6 +794,9 @@ let initAll = function () {
     if (name != "" && id != "" && directory != "" && author != "") {
       showWaitingScreen();
       increaseAjaxPending();
+      
+      setCheckingStatus(id);
+      
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
