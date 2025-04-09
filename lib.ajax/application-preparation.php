@@ -9,7 +9,11 @@ $array = json_decode(base64_decode($_SERVER['argv'][1]));
 
 parse_str($array[0], $_COOKIE);
 
+error_log("Application preparation started");
+
 require_once dirname(__DIR__) . "/inc.app/auth.php";
+
+error_log("Application preparation started 2");
 
 $newAppId = $array[1];
 $onlineInstallation = $array[2] == 'true';
@@ -18,6 +22,7 @@ $magicObjectVersion = $array[3];
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
+    error_log("Application preparation started 3");
     $entityApplication = new EntityApplication(null, $databaseBuilder);
     $entityApplication->findOneByApplicationId($newAppId);
 
@@ -37,8 +42,10 @@ try
 
     $baseDir = $appConf->getBaseApplicationDirectory();
 
+    error_log("Application preparation started 4");
     $scriptGenerator = new ScriptGenerator();
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
+    error_log("Application preparation started 5");
 
 }
 catch(Exception $e)

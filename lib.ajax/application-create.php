@@ -9,9 +9,80 @@ use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Database\PicoDatabaseType;
-use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
+
+/**
+ * Sends an HTTP response to the client, optionally asynchronously.
+ *
+ * This function is responsible for sending the appropriate headers, status codes, and content to the client. 
+ * It can handle both synchronous and asynchronous responses based on the value of the `$async` parameter. 
+ * If asynchronous mode is enabled, the function will immediately return control to the client while the server continues to process in the background.
+ *
+ * @param string|null $response The content to send as the body of the response, typically in JSON or HTML format. If null, no body will be sent.
+ * @param string|null $contentType The MIME type for the content (e.g., 'application/json'). If null, the default type will be used.
+ * @param array|null $headers An associative array of headers to be sent with the response. Each header should be in the format 'Header-Name' => 'Header-Value'.
+ * @param int|null $httpStatus The HTTP status code (e.g., 200 for OK, 404 for Not Found). If null, the status code will not be set.
+ * @param bool $async Indicates whether the response should be sent asynchronously. If true, the response is sent in the background and the script continues execution.
+ */
+function sendResponse($response, $contentType, $headers, $httpStatus, $async)
+{
+    // If the response should be asynchronous
+    if ($async) {
+        // Ensure the client does not wait for the request to finish processing
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);  // Ignore if the user closes the connection
+        }
+
+        // Start output buffering to send the response at a later time
+        ob_start();
+
+        // Output the response content if it is provided
+        if ($response != null) {
+            echo $response;
+        }
+    }
+
+    // Set the HTTP status code if provided
+    if ($httpStatus) {
+        http_response_code($httpStatus);  // Set the status code for the response
+    }
+
+    // Send custom headers if provided
+    if ($headers !== null) {
+        foreach ($headers as $key => $value) {
+            header("$key: $value");  // Send each header
+        }
+    }
+
+    // Set the content-type header if specified
+    if (isset($contentType)) {
+        header("Content-type: " . trim($contentType));  // Set the content type (e.g., 'application/json')
+    }
+
+    // If response content is provided, set the Content-Length header
+    if ($response != null) {
+        header("Content-length: " . strlen($response));  // Indicate the length of the response content
+    }
+
+    // Close the connection immediately (for asynchronous responses)
+    header("Connection: close");
+
+    // If asynchronous, end output buffering and flush the response to the client
+    if ($async) {
+        ob_end_flush();  // End the output buffering and flush it to the client
+        ob_flush();      // Ensure all output is sent to the client
+        flush();         // Send all buffered output to the client
+
+        // If FastCGI is available, call fastcgi_finish_request() to terminate the request early
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();  // Finish the request and process asynchronously
+        }
+    } else {
+        // If not asynchronous, just send the response normally
+        echo $response;
+    }
+}
 
 $async = false;
 
@@ -232,10 +303,16 @@ catch(Exception $e)
 {
     // Do nothing    
 }
+error_log("BEFORE SEND RESPONSE");
+// params:
+// 1. response body
+// 2. mime type
+// 3. headers
+// 4. http status code
+// 5. is async
+sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
-PicoResponse::sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
-
-
+error_log("AFTER SEND RESPONSE");
 $app = new SecretObject();
 $newApp->loadYamlFile($path2, false, true, true);
 
@@ -250,6 +327,7 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
+error_log("BEFORE PREPARE APPLICATION");
 if($async)
 {
     $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';
@@ -258,15 +336,30 @@ if($async)
     $param3 = $onlineInstallation ? 'true' : 'false';
     $param4 = $magicObjectVersion;
     $encoded = base64_encode(json_encode(array($param1, $param2, $param3, $param4)));
-    $command = "php $pathPreparation $encoded > 2>&1";
-    error_log($command);
-    exec($command);
+  
+    if(PHP_OS == 'WINNT')
+    {
+        $pathPreparation = str_replace("/", "\\", $pathPreparation);
+        $command = "php $pathPreparation $encoded > NUL 2>&1";
+        error_log($command);
+        shell_exec($command);
+    }
+    else
+    {
+        $command = "php $pathPreparation $encoded > /dev/null 2>&1";
+        error_log($command);
+        exec($command);
+    }
+    
+    
+    
 }
 else
 {
     $scriptGenerator = new ScriptGenerator();
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 }
+error_log("AFTER PREPARE APPLICATION");
 
 
 
@@ -279,6 +372,7 @@ try
         ->setWorkspaceId($workspaceId)
         ->setApplicationId($newAppId)
         ->update();
+        error_log("AFTER FINISHING APPLICATION");
 }
 catch(Exception $e)
 {

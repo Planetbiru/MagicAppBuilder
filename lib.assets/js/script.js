@@ -236,6 +236,7 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
+      console.log(data.applicationStatus)
       if(data.applicationStatus != 'finish')
       {
         setTimeout(function(){
@@ -246,6 +247,7 @@ function setCheckingStatus(id)
       else
       {
         hideWaitingScreen();
+        loadAllResource();
       }
     },
     error: function(err)
@@ -820,8 +822,9 @@ let initAll = function () {
         },
         success: function (data) {
           //hideWaitingScreen();
-          loadAllResource();
+          //loadAllResource();
           decreaseAjaxPending();
+          console.log(data);
         },
         error: function (e1, e2) {
           decreaseAjaxPending();
