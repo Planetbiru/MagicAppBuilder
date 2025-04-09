@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animasi Menyalin File</title>
+</head>
+<style>
+
+    .anim-container {
+        
+        align-items: center;
+        display: inline-block;
+        width: 240px;
+        height: 56px;
+        position: relative;
+    }
+
+    .anim-folder {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        z-index: 2;
+    }
+    .anim-folder1 {
+        top: 18px;
+        left: 0;
+    }
+    .anim-folder2 {
+        top: 18px;
+        left: 200px;
+    }
+
+    .anim-folder-icon {
+        font-size: 32px;
+    }
+    
+    .anim-file1, .anim-file2, .anim-file3, .anim-file4{
+        position: absolute;
+        font-size: 20px;
+        top: 15px;
+        left: 10px;
+        animation: moveFile1 1s infinite;
+    }
+
+    .anim-file1 {
+        animation-delay: 0s;
+    }
+
+    .anim-file2 {
+        animation-delay: 0.25s;
+    }
+
+    .anim-file3 {
+        animation-delay: 0.5s;
+    }
+
+    .anim-file4 {
+        animation-delay: 0.75s;
+    }
+
+    @keyframes moveFile1 {
+        0% {
+            transform: translateX(0) translateY(0px);
+            opacity: 1;
+        }
+        10% {
+            transform: translateX(0px) translateY(-16px);
+        }
+        40% {
+            transform: translateX(200px) translateY(-16px);
+            opacity: 1;
+        }
+        79.99% {
+            transform: translateX(200px) translateY(0px);
+            opacity: 1;
+        }
+        89.99% {
+            transform: translateX(200px) translateY(0px);
+            opacity: 1;
+        }
+        90% {
+            opacity: 0;
+        }
+        90.01% {
+            transform: translateX(0) translateY(0px);
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+    
+    
+
+
+</style>
+<body>
+  <div class="anim-container">
+    <div class="anim-file1">📄</div>
+    <div class="anim-file2">📄</div>
+    <div class="anim-file3">📄</div>
+    <div class="anim-file4">📄</div>
+    <div class="anim-folder anim-folder1">
+        <div class="anim-folder-icon">📁</div>
+    </div>
+    <div class="anim-folder anim-folder2">
+      <div class="anim-folder-icon">📁</div>
+    </div>
+  </div>
+</body>
+</html>

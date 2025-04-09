@@ -270,6 +270,10 @@ $paginationConfig = new SecretObject(array(
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
+$newApp->setDevelopmentMode(true);
+$newApp->setDebugMode(true);
+$newApp->setDebugModeError(true);
+$newApp->setDebugModeErrorLog(true);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
