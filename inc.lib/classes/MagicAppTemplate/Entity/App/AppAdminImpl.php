@@ -84,6 +84,16 @@ class AppAdminImpl extends MagicObject
 	 * @var AppAdminLevelImpl
 	 */
 	protected $languageId;
+	
+	/**
+	 * Language
+	 * 
+	 * @NotNull
+	 * @JoinColumn(name="language_id", referenceColumnName="language_id")
+	 * @Label(content="Language")
+	 * @var AppLanguageImpl
+	 */
+	protected $language;
 
 	/**
 	 * Blocked

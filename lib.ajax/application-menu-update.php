@@ -28,7 +28,7 @@ if($applicationId != null)
             }
             file_put_contents($menuPath, "");
         }
-        $data = json_decode($inputPost->getData(), true);
+        $data = array('menu'=>json_decode($inputPost->getData(), true));
         $yaml = PicoYamlUtil::dump($data, 0, 2, 0);
         file_put_contents($menuPath, $yaml);
         ResponseUtil::sendJSON(new stdClass);

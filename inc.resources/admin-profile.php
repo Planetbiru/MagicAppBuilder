@@ -20,9 +20,8 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\AdminProfile;
-use MagicAdmin\Entity\Data\AdminMin;
-
+use MagicAppTemplate\Entity\App\AppAdminMinImpl;
+use MagicAppTemplate\Entity\App\AppAdminProfileImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -43,7 +42,7 @@ $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$adminProfile = new AdminProfile(null, $database);
+	$adminProfile = new AppAdminProfileImpl(null, $database);
 	$adminProfile->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminProfile->setProfileName($inputPost->getProfileName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminProfile->setProfileValue($inputPost->getProfileValue(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -69,7 +68,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminProfileId, $inputPost->getAdminProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminProfile = new AdminProfile(null, $database);
+	$adminProfile = new AppAdminProfileImpl(null, $database);
 	$updater = $adminProfile->where($specification)
 		->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setProfileName($inputPost->getProfileName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -96,7 +95,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$adminProfile = new AdminProfile(null, $database);
+			$adminProfile = new AppAdminProfileImpl(null, $database);
 			try
 			{
 				$adminProfile->where(PicoSpecification::getInstance()
@@ -125,7 +124,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$adminProfile = new AdminProfile(null, $database);
+			$adminProfile = new AppAdminProfileImpl(null, $database);
 			try
 			{
 				$adminProfile->where(PicoSpecification::getInstance()
@@ -160,7 +159,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminProfileId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$adminProfile = new AdminProfile(null, $database);
+				$adminProfile = new AppAdminProfileImpl(null, $database);
 				$adminProfile->where($specification)
 					->delete();
 			}
@@ -175,7 +174,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -188,7 +187,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="admin_id" id="admin_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -241,12 +240,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminProfileId, $inputGet->getAdminProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminProfile = new AdminProfile(null, $database);
+	$adminProfile = new AppAdminProfileImpl(null, $database);
 	try{
 		$adminProfile->findOne($specification);
 		if($adminProfile->issetAdminProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -259,7 +258,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="admin_id" id="admin_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -331,12 +330,12 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminProfileId, $inputGet->getAdminProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminProfile = new AdminProfile(null, $database);
+	$adminProfile = new AppAdminProfileImpl(null, $database);
 	try{
 		$subqueryMap = array(
 		"adminId" => array(
 			"columnName" => "admin_id",
-			"entityName" => "AdminMin",
+			"entityName" => "AppAdminMinImpl",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "admin",
@@ -346,7 +345,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$adminProfile->findOne($specification, null, $subqueryMap);
 		if($adminProfile->issetAdminProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -440,7 +439,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"adminId" => PicoSpecification::filter("adminId", "fulltext")
@@ -463,12 +462,12 @@ $specification->addAnd($dataFilter);
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new AdminProfile(null, $database);
+$dataLoader = new AppAdminProfileImpl(null, $database);
 
 $subqueryMap = array(
 "adminId" => array(
 	"columnName" => "admin_id",
-	"entityName" => "AdminMin",
+	"entityName" => "AppAdminMinImpl",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "admin",
@@ -489,7 +488,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="admin_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 

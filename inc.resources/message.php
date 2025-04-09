@@ -20,9 +20,9 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\Message;
-use MagicAdmin\Entity\Data\AdminMin;
-use MagicAdmin\Entity\Data\MessageFolderMin;
+use MagicAppTemplate\Entity\App\AppAdminMinImpl;
+use MagicAppTemplate\Entity\App\AppMessageFolderMinImpl;
+use MagicAppTemplate\Entity\App\AppMessageImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -43,7 +43,7 @@ $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$message = new Message(null, $database);
+	$message = new AppMessageImpl(null, $database);
 	$message->setSubject($inputPost->getSubject(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$message->setContent($inputPost->getContent(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
 	$message->setSenderId($currentUser->getAdminId());
@@ -71,7 +71,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$message = new Message(null, $database);
+			$message = new AppMessageImpl(null, $database);
 			try
 			{
 				$message->where(PicoSpecification::getInstance()
@@ -100,7 +100,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$message = new Message(null, $database);
+			$message = new AppMessageImpl(null, $database);
 			try
 			{
 				$message->where(PicoSpecification::getInstance()
@@ -135,7 +135,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$message = new Message(null, $database);
+				$message = new AppMessageImpl(null, $database);
 				$message->where($specification)
 					->delete();
 			}
@@ -150,7 +150,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
@@ -262,7 +262,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="receiver_id" id="receiver_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false))
@@ -310,12 +310,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageId, $inputGet->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$message = new Message(null, $database);
+	$message = new AppMessageImpl(null, $database);
 	try{
 		$message->findOne($specification);
 		if($message->issetMessageId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
@@ -443,7 +443,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="sender_id" id="sender_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -460,7 +460,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="receiver_id" id="receiver_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -477,7 +477,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="message_folder_id" id="message_folder_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new MessageFolderMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppMessageFolderMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -555,12 +555,12 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageId, $inputGet->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$message = new Message(null, $database);
+	$message = new AppMessageImpl(null, $database);
 	try{
 		$subqueryMap = array(
 		"senderId" => array(
 			"columnName" => "sender_id",
-			"entityName" => "AdminMin",
+			"entityName" => "AppAdminMinImpl",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "sender",
@@ -568,7 +568,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"receiverId" => array(
 			"columnName" => "receiver_id",
-			"entityName" => "AdminMin",
+			"entityName" => "AppAdminMinImpl",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "receiver",
@@ -576,7 +576,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"messageFolderId" => array(
 			"columnName" => "message_folder_id",
-			"entityName" => "MessageFolderMin",
+			"entityName" => "AppMessageFolderMinImpl",
 			"tableName" => "message_folder",
 			"primaryKey" => "message_folder_id",
 			"objectName" => "message_folder",
@@ -586,7 +586,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$message->findOne($specification, null, $subqueryMap);
 		if($message->issetMessageId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -685,7 +685,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Message(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"subject" => PicoSpecification::filter("subject", "fulltext"),
@@ -721,12 +721,12 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new Message(null, $database);
+$dataLoader = new AppMessageImpl(null, $database);
 
 $subqueryMap = array(
 "senderId" => array(
 	"columnName" => "sender_id",
-	"entityName" => "AdminMin",
+	"entityName" => "AppAdminMinImpl",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "sender",
@@ -734,7 +734,7 @@ $subqueryMap = array(
 ), 
 "receiverId" => array(
 	"columnName" => "receiver_id",
-	"entityName" => "AdminMin",
+	"entityName" => "AppAdminMinImpl",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "receiver",
@@ -742,7 +742,7 @@ $subqueryMap = array(
 ), 
 "messageFolderId" => array(
 	"columnName" => "message_folder_id",
-	"entityName" => "MessageFolderMin",
+	"entityName" => "AppMessageFolderMinImpl",
 	"tableName" => "message_folder",
 	"primaryKey" => "message_folder_id",
 	"objectName" => "message_folder",
@@ -770,7 +770,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="sender_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -788,7 +788,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="receiver_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -806,7 +806,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="message_folder_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new MessageFolderMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppMessageFolderMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 

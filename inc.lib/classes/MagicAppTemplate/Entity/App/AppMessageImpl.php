@@ -63,7 +63,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Admin Group 1
 	 * 
-	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_group_1")
+	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 1")
 	 * @var AppAdminImpl
 	 */
@@ -72,7 +72,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Admin Group 2
 	 * 
-	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_group_2")
+	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 2")
 	 * @var AppAdminImpl
 	 */
@@ -81,11 +81,29 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Admin Group 3
 	 * 
-	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_group_3")
+	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_id")
 	 * @Label(content="Admin Group 3")
 	 * @var AppAdminImpl
 	 */
 	protected $adminGroup3;
+	
+	/**
+	 * Message Folder ID
+	 * 
+	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Message Folder ID")
+	 * @var string
+	 */
+	protected $messageFolderId;
+
+	/**
+	 * Message Folder
+	 * 
+	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id")
+	 * @Label(content="Message Folder")
+	 * @var AmmMesageFolderMinImpl
+	 */
+	protected $messageFolder;
 	
 	/**
 	 * Icon

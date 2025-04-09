@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\EntityInstaller\EntityAdmin;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/app.php";
@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 
-$currentUser = new EntityAdmin(null, $databaseBuilder);
+$currentUser = new AppAdminImpl(null, $databaseBuilder);
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
@@ -30,10 +30,6 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     {
         require_once __DIR__ . "/inc.app/login-form.php";
         exit();
-    }
-    else if($currentUser->getAdminLevelId() != 'superuser')
-    {
-        header("Location: ./profile.php");
     }
     else
     {

@@ -228,6 +228,10 @@ class AppUserPermission
         {
             $userAction = $inputGet->getUserAction();
         }
+        if($this->appConfig->getRole() != null && $this->appConfig->getRole()->getBypassRole())
+        {
+            return true;
+        }
         if(!$this->currentModule->getAppModule()->issetModuleId())
         {
             try

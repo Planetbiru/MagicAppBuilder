@@ -60,6 +60,7 @@ catch(Exception $e)
         $currentUser->setUsername("superuser");
         $currentUser->setPassword(sha1(sha1("superuser")));
         $currentUser->setName("Super User");
+        $currentUser->setLanguageId("en");
         $currentUser->setActive(true);
     }
     else
@@ -126,7 +127,7 @@ $appConfig->setAssets('lib.themes/default/assets/');
 
 $appMenuData = new SecretObject();
 
-$appMenuPath = __DIR__ . "/menu.yml";
+$appMenuPath = dirname(__DIR__) . "/inc.cfg/menu.yml";
 if(file_exists($appMenuPath))
 {
     $appMenuData->loadYamlFile($appMenuPath, false, true, true);

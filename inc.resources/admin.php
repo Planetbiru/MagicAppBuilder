@@ -20,57 +20,14 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\Admin;
-use MagicAdmin\Entity\Data\AdminLevelMin;
-use MagicAdmin\Entity\Data\AdminWorkspace;
-use MagicAdmin\Entity\Data\ApplicationMin;
-use MagicAdmin\Entity\Data\WorkspaceMin;
-
+use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
+use MagicAppTemplate\Entity\App\AppLanguageImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
-
-/**
- * Sets or creates an admin workspace relationship in the database.
- * 
- * This function checks if an existing admin workspace entry exists for the provided
- * admin ID and workspace ID. If it doesn't exist, a new entry is created with the provided
- * information, including the current admin ID, timestamps, and IP address.
- *
- * @param object $database The database connection object to interact with the database.
- * @param int $adminId The ID of the admin user.
- * @param int $workspaceId The ID of the workspace to associate with the admin.
- * @param int $currentAdminId The ID of the current admin performing the action, used for tracking who created/edited the record.
- * 
- * @return void
- * 
- * @throws Exception If there is an issue with finding or inserting the admin workspace record.
- */
-function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
-{
-	$adminWorkspace = new AdminWorkspace(null, $database);
-	try
-	{
-		$adminWorkspace->findOneByAdminIdAndWorkspaceId($adminId, $workspaceId);
-	}
-	catch(Exception $e)
-	{
-		$now = date("Y-m-d H:i:s");
-		$adminWorkspace = new AdminWorkspace(null, $database);
-		$adminWorkspace->setAdminId($adminId);
-		$adminWorkspace->setWorkspaceId($workspaceId);
-		$adminWorkspace->setAdminCreate($currentAdminId);
-		$adminWorkspace->setAdminEdit($currentAdminId);
-		$adminWorkspace->setTimeCreate($now);
-		$adminWorkspace->setTimeEdit($now);
-		$adminWorkspace->setIpCreate($_SERVER['REMOTE_ADDR']);
-		$adminWorkspace->setIpEdit($_SERVER['REMOTE_ADDR']);
-		$adminWorkspace->setActive(true);
-		$adminWorkspace->insert();
-	}
-}
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", $appLanguage->getAdministrator());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
@@ -87,7 +44,7 @@ $dataFilter = PicoSpecification::getInstance()
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	$admin->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$hashPassword = sha1(sha1($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true)));
@@ -111,12 +68,6 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	{
 		$admin->insert();
 		$newId = $admin->getAdminId();
-
-		if($admin->getWorkspaceId() != "")
-		{
-			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $currentUser->getAdminId());
-		}
-
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
 	}
 	catch(Exception $e)
@@ -128,7 +79,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -165,7 +116,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
         {
             try
             {
-                $adminTest = new Admin(null, $database);
+                $adminTest = new AppAdminImpl(null, $database);
                 $testSpecs = PicoSpecification::getInstance()
                     ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->username, $username))
                     ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $newId))
@@ -181,10 +132,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
             }
         }
 
-		if($admin->getWorkspaceId() != "")
-		{
-			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $currentUser->getAdminId());
-		}
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
 	}
 	catch(Exception $e)
@@ -198,7 +145,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$admin = new Admin(null, $database);
+			$admin = new AppAdminImpl(null, $database);
 			try
 			{
 				$admin->where(PicoSpecification::getInstance()
@@ -227,7 +174,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$admin = new Admin(null, $database);
+			$admin = new AppAdminImpl(null, $database);
 			try
 			{
 				$admin->where(PicoSpecification::getInstance()
@@ -262,7 +209,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$admin = new Admin(null, $database);
+				$admin = new AppAdminImpl(null, $database);
 				$admin->where($specification)
 					->delete();
 			}
@@ -277,7 +224,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -308,7 +255,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="admin_level_id" id="admin_level_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminLevelMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -349,38 +296,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
+						<td><?php echo $appEntityLanguage->getLanguage();?></td>
 						<td>
-							<select class="form-control" name="workspace_id" id="workspace_id">
+							<select class="form-control" name="language_id" id="language_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new WorkspaceMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name)
+								Field::of()->languageId, Field::of()->name)
 								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
-						<td>
-							<select class="form-control" name="language_id" id="language_id">
-							<?php
-                            $languages = $appConfig->getLanguages();
-                            foreach($languages as $language)
-                            {
-                                if($language->getCode() != null && $language->getName() != null)
-                                {
-                                    ?>
-									<option value="<?php echo $language->getCode();?>"><?php echo $language->getName();?></option>
-                                    <?php
-                                }
-                            }
-                            ?>
 							</select>
 						</td>
 					</tr>
@@ -419,12 +347,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $inputGet->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	try{
 		$admin->findOne($specification);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -455,7 +383,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="admin_level_id" id="admin_level_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminLevelMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
@@ -496,55 +424,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name, $admin->getApplicationId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td>
-							<select class="form-control" name="workspace_id" id="workspace_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new WorkspaceMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name, $admin->getWorkspaceId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
+						<td><?php echo $appEntityLanguage->getLanguage();?></td>
 						<td>
 							<select class="form-control" name="language_id" id="language_id">
-							<?php
-                            $languages = $appConfig->getLanguages();
-                            foreach($languages as $language)
-                            {
-                                if($language->getCode() != null && $language->getName() != null)
-                                {
-                                    ?>
-									<option value="<?php echo $language->getCode();?>"<?php echo $language->getCode() == $admin->getLanguageId() ? ' selected' : '';?>><?php echo $language->getName();?></option>
-                                    <?php
-                                }
-                            }
-                            ?>
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->languageId, Field::of()->name, $admin->getLanguageId())
+								; ?>
 							</select>
 						</td>
 					</tr>
@@ -602,33 +494,25 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $inputGet->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	try{
 		$subqueryMap = array(
 		"adminLevelId" => array(
 			"columnName" => "admin_level_id",
-			"entityName" => "AdminLevelMin",
+			"entityName" => "AppAdminLevelMinImpl",
 			"tableName" => "admin_level",
 			"primaryKey" => "admin_level_id",
 			"objectName" => "admin_level",
 			"propertyName" => "name"
 		), 
-		"applicationId" => array(
-			"columnName" => "application_id",
-			"entityName" => "ApplicationMin",
-			"tableName" => "application",
-			"primaryKey" => "application_id",
-			"objectName" => "application",
+		"languageId" => array(
+			"columnName" => "language_id",
+			"entityName" => "AppLanguageImpl",
+			"tableName" => "language",
+			"primaryKey" => "language_id",
+			"objectName" => "language",
 			"propertyName" => "name"
 		), 
-		"workspaceId" => array(
-			"columnName" => "workspace_id",
-			"entityName" => "WorkspaceMin",
-			"tableName" => "workspace",
-			"primaryKey" => "workspace_id",
-			"objectName" => "workspace",
-			"propertyName" => "name"
-		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
 			"entityName" => "AdminCreate",
@@ -649,7 +533,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$admin->findOne($specification, null, $subqueryMap);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			$mapForGender = array(
@@ -700,16 +584,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $admin->getPhone();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td><?php echo $admin->issetApplication() ? $admin->getApplication()->getName() : "";?></td>
+						<td><?php echo $appEntityLanguage->getLanguage();?></td>
+						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td><?php echo $admin->issetWorkspace() ? $admin->getWorkspace()->getName() : "";?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguageId();?></td>
-						<td><?php echo $admin->getLanguageId();?></td>
+						<td><?php echo $appEntityLanguage->getLanguage();?></td>
+						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>
@@ -790,7 +670,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 $mapForGender = array(
 	"M" => array("value" => "M", "label" => "Man", "default" => "false"),
 	"W" => array("value" => "W", "label" => "Woman", "default" => "false")
@@ -832,31 +712,15 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new Admin(null, $database);
+$dataLoader = new AppAdminImpl(null, $database);
 
 $subqueryMap = array(
 "adminLevelId" => array(
 	"columnName" => "admin_level_id",
-	"entityName" => "AdminLevelMin",
+	"entityName" => "AppAdminLevelMinImpl",
 	"tableName" => "admin_level",
 	"primaryKey" => "admin_level_id",
 	"objectName" => "admin_level",
-	"propertyName" => "name"
-), 
-"applicationId" => array(
-	"columnName" => "application_id",
-	"entityName" => "ApplicationMin",
-	"tableName" => "application",
-	"primaryKey" => "application_id",
-	"objectName" => "application",
-	"propertyName" => "name"
-), 
-"workspaceId" => array(
-	"columnName" => "workspace_id",
-	"entityName" => "WorkspaceMin",
-	"tableName" => "workspace",
-	"primaryKey" => "workspace_id",
-	"objectName" => "workspace",
 	"propertyName" => "name"
 )
 );
@@ -888,7 +752,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 							<select class="form-control" name="admin_level_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminLevelMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 

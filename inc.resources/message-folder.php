@@ -15,13 +15,14 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
+use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\MessageFolder;
-
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\Entity\App\AppAdminMinImpl;
+use MagicAppTemplate\Entity\App\AppMessageFolderImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -38,12 +39,15 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-$dataFilter = null;
+
+$dataFilter = PicoSpecification::getInstance();
+$dataFilter->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentUser->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$messageFolder = new MessageFolder(null, $database);
+	$messageFolder = new AppMessageFolderImpl(null, $database);
 	$messageFolder->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$messageFolder->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$messageFolder->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$messageFolder->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$messageFolder->setAdminCreate($currentAction->getUserId());
@@ -67,9 +71,10 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageFolderId, $inputPost->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$messageFolder = new MessageFolder(null, $database);
+	$messageFolder = new AppMessageFolderImpl(null, $database);
 	$updater = $messageFolder->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -93,7 +98,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$messageFolder = new MessageFolder(null, $database);
+			$messageFolder = new AppMessageFolderImpl(null, $database);
 			try
 			{
 				$messageFolder->where(PicoSpecification::getInstance()
@@ -122,7 +127,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$messageFolder = new MessageFolder(null, $database);
+			$messageFolder = new AppMessageFolderImpl(null, $database);
 			try
 			{
 				$messageFolder->where(PicoSpecification::getInstance()
@@ -157,7 +162,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageFolderId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$messageFolder = new MessageFolder(null, $database);
+				$messageFolder = new AppMessageFolderImpl(null, $database);
 				$messageFolder->where($specification)
 					->delete();
 			}
@@ -188,7 +193,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageFolderId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$messageFolder = new MessageFolder(null, $database);
+				$messageFolder = new AppMessageFolderImpl(null, $database);
 				$messageFolder->where($specification)
 					->setSortOrder($sortOrder)
 					->update();
@@ -204,7 +209,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new MessageFolder(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageFolderImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -215,13 +220,30 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="name" id="name"/>
+							<input type="text" class="form-control" name="name" id="name" value="" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAdmin();?></td>
+						<td>
+							<select class="form-control" name="admin_id" id="admin_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->adminId, Field::of()->name)
+								; ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
+							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -237,8 +259,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+							<button type="submit" class="btn btn-success" name="user_action" id="create_new_data" value="create"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
 						</td>
 					</tr>
 				</tbody>
@@ -253,12 +275,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageFolderId, $inputGet->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$messageFolder = new MessageFolder(null, $database);
+	$messageFolder = new AppMessageFolderImpl(null, $database);
 	try{
 		$messageFolder->findOne($specification);
 		if($messageFolder->issetMessageFolderId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new MessageFolder(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageFolderImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -269,13 +291,30 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
-							<input class="form-control" type="text" name="name" id="name" value="<?php echo $messageFolder->getName();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="name" id="name" value="<?php echo $messageFolder->getName();?>" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAdmin();?></td>
+						<td>
+							<select class="form-control" name="admin_id" id="admin_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->adminId, Field::of()->name, $messageFolder->getAdminId())
+								; ?>
+							</select>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
-							<input class="form-control" type="number" step="1" name="sort_order" id="sort_order" value="<?php echo $messageFolder->getSortOrder();?>" autocomplete="off"/>
+							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="<?php echo $messageFolder->getSortOrder();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -291,9 +330,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="update"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="message_folder_id" value="<?php echo $messageFolder->getMessageFolderId();?>"/>
+							<button type="submit" class="btn btn-success" name="user_action" id="update_data" value="update"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+							<input type="hidden" name="message_folder_id" id="primary_key_value" value="<?php echo $messageFolder->getMessageFolderId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -326,13 +365,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageFolderId, $inputGet->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$messageFolder = new MessageFolder(null, $database);
+	$messageFolder = new AppMessageFolderImpl(null, $database);
 	try{
-		$subqueryMap = null;
+		$subqueryMap = array(
+		"adminId" => array(
+			"columnName" => "admin_id",
+			"entityName" => "AppAminMinImpl",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "admin",
+			"propertyName" => "name"
+		)
+		);
 		$messageFolder->findOne($specification, null, $subqueryMap);
 		if($messageFolder->issetMessageFolderId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new MessageFolder(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageFolderImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -354,6 +402,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td><?php echo $messageFolder->getName();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAdmin();?></td>
+						<td><?php echo $messageFolder->issetAdmin() ? $messageFolder->getAdmin()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -395,11 +447,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td></td>
 						<td>
 							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->message_folder_id, $messageFolder->getMessageFolderId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->message_folder_id, $messageFolder->getMessageFolderId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
-							<input type="hidden" name="message_folder_id" value="<?php echo $messageFolder->getMessageFolderId();?>"/>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
+							<input type="hidden" name="message_folder_id" id="primary_key_value" value="<?php echo $messageFolder->getMessageFolderId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -430,13 +482,14 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new MessageFolder(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppMessageFolderImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	
+	"name" => PicoSpecification::filter("name", "fulltext")
 );
 $sortOrderMap = array(
 	"name" => "name",
+	"adminId" => "adminId",
 	"sortOrder" => "sortOrder",
 	"active" => "active"
 );
@@ -457,9 +510,18 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new MessageFolder(null, $database);
+$dataLoader = new AppMessageFolderImpl(null, $database);
 
-$subqueryMap = null;
+$subqueryMap = array(
+"adminId" => array(
+	"columnName" => "admin_id",
+	"entityName" => "AdminMin",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "admin",
+	"propertyName" => "name"
+)
+);
 
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
@@ -470,12 +532,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
-					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
+					<span class="filter-label"><?php echo $appEntityLanguage->getName();?></span>
+					<span class="filter-control">
+						<input type="text" class="form-control" name="name" value="<?php echo $inputGet->getName();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -524,6 +593,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
+								<td data-col-name="admin_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdmin();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
@@ -558,6 +628,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="name"><?php echo $messageFolder->getName();?></td>
+								<td data-col-name="admin_id"><?php echo $messageFolder->issetAdmin() ? $messageFolder->getAdmin()->getName() : "";?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $messageFolder->getSortOrder();?></td>
 								<td data-col-name="active"><?php echo $messageFolder->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
@@ -569,16 +640,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</table>
 				</div>
 				<div class="button-wrapper">
-					<div class="form-control-container button-area">
+					<div class="button-area">
 						<?php if($userPermission->isAllowedUpdate()){ ?>
-						<button type="submit" class="btn btn-success" name="user_action" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
-						<button type="submit" class="btn btn-warning" name="user_action" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
+						<button type="submit" class="btn btn-success" name="user_action" id="activate_selected" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
+						<button type="submit" class="btn btn-warning" name="user_action" id="deactivate_selected" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
-						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedSortOrder()){ ?>
-						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
+						<button type="submit" class="btn btn-primary" name="user_action" id="save_current_order" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

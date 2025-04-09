@@ -5,14 +5,14 @@ namespace MagicAppTemplate\Entity\App;
 use MagicObject\MagicObject;
 
 /**
- * AppModuleImpl 
+ * AppModuleMinImpl 
  * 
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
  * @Table(name="module")
  * @package MagicAppTemplate\Entity\App
  */
-class AppModuleImpl extends MagicObject
+class AppModuleMinImpl extends MagicObject
 {
 	/**
 	 * Module ID
@@ -24,16 +24,6 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $moduleId;
-	
-	/**
-	 * Module Code
-	 * 
-	 * @NotNull
-	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
-	 * @Label(content="Module Code")
-	 * @var string
-	 */
-	protected $moduleCode;
 
 	/**
 	 * Module Group ID
@@ -44,16 +34,6 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $moduleGroupId;
-	
-	/**
-	 * Module Group
-	 * 
-	 * @NotNull
-	 * @JoinColumn(name="module_group_id", referenceColumnName="module_group_id")
-	 * @Label(content="Module Group")
-	 * @var AppModuleGroupImpl
-	 */
-	protected $moduleGroup;
 
 	/**
 	 * Name

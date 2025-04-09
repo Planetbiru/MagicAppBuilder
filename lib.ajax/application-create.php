@@ -274,6 +274,9 @@ $newApp->setDevelopmentMode(true);
 $newApp->setDebugMode(true);
 $newApp->setDebugModeError(true);
 $newApp->setDebugModeErrorLog(true);
+$newApp->setRole(new SecretObject(array(
+    'bypassRole' => true,
+)));
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);

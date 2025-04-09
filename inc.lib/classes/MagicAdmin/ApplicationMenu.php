@@ -1,6 +1,6 @@
 <?php
 
-namespace MagicAppTemplate;
+namespace MagicAdmin;
 
 use Exception;
 use MagicApp\Field;

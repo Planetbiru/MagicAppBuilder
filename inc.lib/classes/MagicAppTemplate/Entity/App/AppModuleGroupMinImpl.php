@@ -5,71 +5,41 @@ namespace MagicAppTemplate\Entity\App;
 use MagicObject\MagicObject;
 
 /**
- * AppModuleImpl 
+ * AppModuleGroupMinImpl 
  * 
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
- * @Table(name="module")
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
+ * @Table(name="module_group")
  * @package MagicAppTemplate\Entity\App
  */
-class AppModuleImpl extends MagicObject
+class AppModuleGroupMinImpl extends MagicObject
 {
-	/**
-	 * Module ID
-	 * 
-	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Module ID")
-	 * @var string
-	 */
-	protected $moduleId;
-	
-	/**
-	 * Module Code
-	 * 
-	 * @NotNull
-	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
-	 * @Label(content="Module Code")
-	 * @var string
-	 */
-	protected $moduleCode;
-
 	/**
 	 * Module Group ID
 	 * 
-	 * @NotNull
-	 * @Column(name="module_group_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @Column(name="module_group_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module Group ID")
 	 * @var string
 	 */
 	protected $moduleGroupId;
-	
-	/**
-	 * Module Group
-	 * 
-	 * @NotNull
-	 * @JoinColumn(name="module_group_id", referenceColumnName="module_group_id")
-	 * @Label(content="Module Group")
-	 * @var AppModuleGroupImpl
-	 */
-	protected $moduleGroup;
 
 	/**
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, default_value="NULL", nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
 	protected $name;
-
+	
 	/**
 	 * URL
 	 * 
 	 * @NotNull
-	 * @Column(name="url", type="longtext", nullable=true)
+	 * @Column(name="url", type="varchar(255)", length=255, default_value="NULL", nullable=true)
 	 * @Label(content="URL")
 	 * @var string
 	 */
@@ -94,26 +64,7 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $icon;
-	
-	/**
-	 * Menu
-	 * 
-	 * @NotNull
-	 * @Column(name="menu", type="tinyint(1)", length=1, default_value="0", nullable=true)
-	 * @Label(content="Menu")
-	 * @var bool
-	 */
-	protected $menu;
 
-	/**
-	 * Special Access
-	 * 
-	 * @NotNull
-	 * @Column(name="special_access", type="tinyint(1)", length=1, default_value="0", nullable=true)
-	 * @Label(content="Special Access")
-	 * @var bool
-	 */
-	protected $specialAccess;
 
 	/**
 	 * Sort Order
@@ -144,6 +95,4 @@ class AppModuleImpl extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
-	
-	
 }

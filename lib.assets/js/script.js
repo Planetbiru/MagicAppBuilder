@@ -1563,7 +1563,7 @@ let initAll = function () {
     let newMenu = $('#new_menu').val();
     let existingMenu = serializeMenu();
     for (let i in existingMenu) {
-      if (existingMenu[i].label.toLowerCase() == newMenu.toLowerCase()) {
+      if (existingMenu[i].title.toLowerCase() == newMenu.toLowerCase()) {
         invalidName = true;
       }
     }
@@ -3418,14 +3418,14 @@ function serializeMenu() {
   const menuItems = document.querySelectorAll('.sortable-menu-item');
   menuItems.forEach(menuItem => {
     const menuData = {
-      label: menuItem.querySelector('a.app-menu-text').textContent,
-      submenus: []
+      title: menuItem.querySelector('a.app-menu-text').textContent,
+      submenu: []
     };
     const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
     submenuItems.forEach(submenuItem => {
       menuData.submenus.push({
-        label: submenuItem.querySelector('a.app-menu-text').textContent,
-        link: submenuItem.querySelector('a.app-menu-text').getAttribute('href')
+        title: submenuItem.querySelector('a.app-menu-text').textContent,
+        href: submenuItem.querySelector('a.app-menu-text').getAttribute('href')
       });
     });
     menu.push(menuData);
@@ -5075,10 +5075,10 @@ function loadMenu() {
     success: function (data) {
       decreaseAjaxPending();
       $('select[name="module_menu"]').empty();
-      for (let i in data) {
-        if (data.hasOwnProperty(i)) {
+      for (let i in data.menu) {
+        if (data.menu.hasOwnProperty(i)) {
           $('select[name="module_menu"]')[0].append(
-            new Option(data[i].label, data[i].label)
+            new Option(data.menu[i].title, data.menu[i].title)
           );
         }
       }

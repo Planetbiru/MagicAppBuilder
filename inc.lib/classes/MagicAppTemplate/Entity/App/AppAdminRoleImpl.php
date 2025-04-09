@@ -65,6 +65,16 @@ class AppAdminRoleImpl extends MagicObject
     protected $module;
 
     /**
+	 * Module Code
+	 * 
+	 * @NotNull
+	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Label(content="Module Code")
+	 * @var string
+	 */
+	protected $moduleCode;
+
+    /**
      * Allowed show list
      *
      * @Column(name="allowed_list", type="tinyint(1)", length=1, default_value="0", nullable=true)
