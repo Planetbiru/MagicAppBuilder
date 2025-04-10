@@ -14,55 +14,13 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\Admin;
-use MagicAdmin\Entity\Data\AdminWorkspace;
-
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
-
-/**
- * Sets or creates an admin workspace relationship in the database.
- * 
- * This function checks if an existing admin workspace entry exists for the provided
- * admin ID and workspace ID. If it doesn't exist, a new entry is created with the provided
- * information, including the current admin ID, timestamps, and IP address.
- *
- * @param object $database The database connection object to interact with the database.
- * @param int $adminId The ID of the admin user.
- * @param int $workspaceId The ID of the workspace to associate with the admin.
- * @param int $currentAdminId The ID of the current admin performing the action, used for tracking who created/edited the record.
- * 
- * @return void
- * 
- * @throws Exception If there is an issue with finding or inserting the admin workspace record.
- */
-function setAdminWorkspace($database, $adminId, $workspaceId, $currentAdminId)
-{
-	$adminWorkspace = new AdminWorkspace(null, $database);
-	try
-	{
-		$adminWorkspace->findOneByAdminIdAndWorkspaceId($adminId, $workspaceId);
-	}
-	catch(Exception $e)
-	{
-		$now = date("Y-m-d H:i:s");
-		$adminWorkspace = new AdminWorkspace(null, $database);
-		$adminWorkspace->setAdminId($adminId);
-		$adminWorkspace->setWorkspaceId($workspaceId);
-		$adminWorkspace->setAdminCreate($currentAdminId);
-		$adminWorkspace->setAdminEdit($currentAdminId);
-		$adminWorkspace->setTimeCreate($now);
-		$adminWorkspace->setTimeEdit($now);
-		$adminWorkspace->setIpCreate($_SERVER['REMOTE_ADDR']);
-		$adminWorkspace->setIpEdit($_SERVER['REMOTE_ADDR']);
-		$adminWorkspace->setActive(true);
-		$adminWorkspace->insert();
-	}
-}
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
@@ -80,7 +38,7 @@ $dataFilter = PicoSpecification::getInstance()
 if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $currentUser->getAdminId());
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -111,7 +69,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
         {
             try
             {
-                $adminTest = new Admin(null, $database);
+                $adminTest = new AppAdminImpl(null, $database);
                 $testSpecs = PicoSpecification::getInstance()
                     ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->username, $username))
                     ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $adminId))
@@ -143,12 +101,12 @@ if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstance();
 	$specification->addAnd($dataFilter);
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	try{
 		$admin->findOne($specification);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -243,7 +201,7 @@ else
 {
 	$specification = PicoSpecification::getInstance();
 	$specification->addAnd($dataFilter);
-	$admin = new Admin(null, $database);
+	$admin = new AppAdminImpl(null, $database);
 	try{
 		$subqueryMap = array(
 		"adminLevelId" => array(
@@ -290,7 +248,7 @@ else
 		$admin->findOne($specification, null, $subqueryMap);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			$mapForGender = array(
