@@ -18,8 +18,8 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\Notification;
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\Entity\App\AppNotificationImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -51,7 +51,7 @@ if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notificationId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$notification = new Notification(null, $database);
+				$notification = new AppNotificationImpl(null, $database);
 				$notification->where($specification)
 					->delete();
 			}
@@ -66,7 +66,7 @@ if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppNotificationImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -133,12 +133,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->notificationId, $inputGet->getNotificationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$notification = new Notification(null, $database);
+	$notification = new AppNotificationImpl(null, $database);
 	try{
 		$notification->findOne($specification);
 		if($notification->issetNotificationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppNotificationImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -224,7 +224,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->notificationId, $inputGet->getNotificationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$notification = new Notification(null, $database);
+	$notification = new AppNotificationImpl(null, $database);
 	try{
 		$subqueryMap = array(
 		"receiverId" => array(
@@ -239,7 +239,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$notification->findOne($specification, null, $subqueryMap);
 		if($notification->issetNotificationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppNotificationImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -333,7 +333,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppNotificationImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	
@@ -364,7 +364,7 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new Notification(null, $database);
+$dataLoader = new AppNotificationImpl(null, $database);
 
 $subqueryMap = array(
 "receiverId" => array(

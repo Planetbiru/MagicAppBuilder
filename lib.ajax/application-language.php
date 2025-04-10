@@ -13,7 +13,7 @@ if($inputPost->getAction() == "update")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
+        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
         
         $languages = $inputPost->getLanguages();
         $currentLanguages = array();
@@ -40,8 +40,17 @@ if($inputPost->getAction() == "update")
                     $currentLanguages[$idx]->setActive(true);
                 }
             }
+            $appConfigBuilder->setLanguages($currentLanguages);
+            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
+            
+            // Update the application.yml file
+            $appConfigPath = $activeApplication->getBaseApplicationDirectory()."/inc.cfg/application.yml";
+            $appConfig = new SecretObject();
+            $appConfig->loadYamlFile($appConfigPath, false, true, true);
             $appConfig->setLanguages($currentLanguages);
-            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+            $yml = $appConfig->dumpYaml();
+            file_put_contents($appConfigPath, $yml);
+            
         }
         ResponseUtil::sendJSON($currentLanguages);
     }
@@ -57,8 +66,8 @@ else if($inputPost->getAction() == "get")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
-        $currentLanguages = $appConfig->getLanguages();
+        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
+        $currentLanguages = $appConfigBuilder->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
             $currentLanguages = array();
@@ -78,9 +87,9 @@ else if($inputPost->getAction() == "default")
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfig = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
+        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
 
-        $currentLanguages = $appConfig->getLanguages();
+        $currentLanguages = $appConfigBuilder->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
             $currentLanguages = array();
@@ -93,8 +102,8 @@ else if($inputPost->getAction() == "default")
                 $currentLanguages[$idx]->setActive(true);
             }
         }
-        $appConfig->setLanguages($currentLanguages);
-        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfig);
+        $appConfigBuilder->setLanguages($currentLanguages);
+        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
         ResponseUtil::sendJSON($currentLanguages);
     }
     catch(Exception $e)

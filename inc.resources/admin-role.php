@@ -139,7 +139,69 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 	} catch (PDOException $e) {
 		$database->rollBack();
 	}
+	
+	$currentModule->redirectToItself();
+}
 
+if($inputGet->getUserAction() == 'generate')
+{
+	// Generate admin role
+	// for all active modules
+	// for the selected admin level
+	// and set the database connection
+	// to the instance
+	$adminRole = new AppAdminRoleImpl(null, $database);
+	$moduleFinder = new AppModuleImpl(null, $database);
+	$specification1 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true));
+	$adminLevelId = $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC);
+	if($adminLevelId != "")
+	{
+		try
+		{
+			// Find all modules
+			// that are active
+			$pageData = $moduleFinder->findAll($specification1);
+			foreach($pageData->getResult() as $module)
+			{
+				$moduleId = $module->getModuleId();
+				$moduleCode = $module->getModuleCode();
+				$specification2 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $moduleId))
+				->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));
+				$adminRole = new AppAdminRoleImpl(null, $database);
+				try
+				{
+					// Check if the admin role already exists
+					$adminRole->findOne($specification2);
+				}
+				catch(Exception $e)
+				{
+					// Not found
+					// Create a new admin role
+					// and set the database connection
+					$adminRole = new AppAdminRoleImpl(null, $database);
+					$adminRole->setModuleId($moduleId)
+					->setAdminLevelId($adminLevelId)
+					->setModuleCode($moduleCode)
+					->setAllowedList(1)
+					->setAllowedDetail(0)
+					->setAllowedCreate(0)
+					->setAllowedUpdate(0)
+					->setAllowedDelete(0)
+					->setAllowedApprove(0)
+					->setAllowedSortOrder(0)
+					->setAllowedExport(0)
+					->setActive(1)
+					->insert();
+				}
+			}
+		}
+		catch(Exception $e)
+		{
+			// Do nothing
+		}
+	}
+	header("Location: " . $currentModule->getSelf() . "?admin_level_id=" . $adminLevelId);
+	exit();
 }
 
 
@@ -193,60 +255,6 @@ $subqueryMap = array(
 )
 );
 
-if($inputGet->getUserAction() == 'generate')
-{
-	$moduleFinder = new AppModuleImpl(null, $database);
-	$specification1 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true));
-	$adminLevelId = $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC);
-	if($adminLevelId != "")
-	{
-		try
-		{
-			// Find all modules
-			// that are active
-			$pageData = $moduleFinder->findAll($specification1);
-			foreach($pageData->getResult() as $module)
-			{
-				$moduleId = $module->getModuleId();
-				$moduleCode = $module->getModuleCode();
-				$specification2 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $moduleId))
-				->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));
-				$adminRole = new AppAdminRoleImpl(null, $database);
-				try
-				{
-					// Check if the admin role already exists
-					$adminRole->findOne($specification2);
-				}
-				catch(Exception $e)
-				{
-					// Not found
-					// Create a new admin role
-					// and set the database connection
-					$adminRole = new AppAdminRoleImpl(null, $database);
-					$adminRole->setModuleId($moduleId)
-					->setAdminLevelId($adminLevelId)
-					->setModuleCode($moduleCode)
-					->setAllowedList(1)
-					->setAllowedDetail(0)
-					->setAllowedCreate(0)
-					->setAllowedUpdate(0)
-					->setAllowedDelete(0)
-					->setAllowedApprove(0)
-					->setAllowedSortOrder(0)
-					->setAllowedExport(0)
-					->setActive(1)
-					->insert();
-				}
-			}
-		}
-		catch(Exception $e)
-		{
-			// Do nothing
-		}
-	}
-	header("Location: " . $currentModule->getSelf() . "?admin_level_id=" . $adminLevelId);
-	exit();
-}
 
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
