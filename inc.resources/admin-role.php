@@ -244,7 +244,7 @@ if($inputGet->getUserAction() == 'generate')
 			// Do nothing
 		}
 	}
-	
+	header("Location: " . $currentModule->getSelf() . "?admin_level_id=" . $adminLevelId);
 	exit();
 }
 
