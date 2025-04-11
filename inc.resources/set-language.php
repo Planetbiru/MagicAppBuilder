@@ -9,8 +9,24 @@ $inputGet = new InputGet();
 
 if($inputGet->getLanguageId())
 {
-    $currentUser->setLanguageId($inputGet->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-    $currentUser->update();
+    $languageId = $inputGet->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
+    {
+        $sessions->languageId = $languageId;
+    }
+    else
+    { 
+        try
+        {
+            $currentUser->setLanguageId($languageId);
+            $currentUser->update();    
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        }
+    }
+    
 }
 
 if(isset($_SERVER['HTTP_REFERER']))

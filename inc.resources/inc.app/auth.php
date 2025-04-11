@@ -60,7 +60,12 @@ catch(Exception $e)
         $currentUser->setUsername("superuser");
         $currentUser->setPassword(sha1(sha1("superuser")));
         $currentUser->setName("Super User");
-        $currentUser->setLanguageId("en");
+        $languageId = $sessions->languageId;
+        if(!isset($languageId) || empty($languageId))
+        {
+            $languageId = 'en';
+        }
+        $currentUser->setLanguageId($languageId);
         $currentUser->setActive(true);
     }
     else

@@ -111,9 +111,12 @@ class ApplicationMenu
                 }
 
                 // Create and append the icon inside the <a> tag
-                $icon = $dom->createElement('i', '');
-                $icon->setAttribute('class', $item['icon']);
-                $a->appendChild($icon);  // Append the icon element to the anchor tag
+                if(isset($item['icon']) && $item['icon'] != '') {
+                    $icon = $dom->createElement('i', '');
+                    $icon->setAttribute('class', $item['icon']);
+                    $a->appendChild($icon);  // Append the icon element to the anchor tag
+                }
+
 
                 // Add a space after the icon
                 $space = $dom->createTextNode(' '); // Space between icon and title
@@ -177,9 +180,12 @@ class ApplicationMenu
                         }
 
                         // Create and append the icon for submenu items
-                        $subIcon = $dom->createElement('i', '');
-                        $subIcon->setAttribute('class', $subItem['icon']);
-                        $subA->appendChild($subIcon);  // Append the icon to the submenu anchor tag
+                        if(isset($subItem['icon']) && $subItem['icon'] != '') {
+                            // Create the icon element for submenu items
+                            $subIcon = $dom->createElement('i', '');
+                            $subIcon->setAttribute('class', $subItem['icon']);
+                            $subA->appendChild($subIcon);  // Append the icon to the submenu anchor tag
+                        }
 
                         // Add a space after the icon for submenu items
                         $subSpace = $dom->createTextNode(' '); // Space between icon and title

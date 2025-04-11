@@ -83,7 +83,7 @@ function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-role", $appLanguage->getAdminRole());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-role", $appLanguage->getAdministratorRole());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 

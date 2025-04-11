@@ -1378,13 +1378,15 @@ ul {
   z-index: 2;
 }
 
+.anim-folder1, .anim-folder2 {
+  top: 20px;
+}
+
 .anim-folder1 {
-  top: 18px;
   left: 0;
 }
 
 .anim-folder2 {
-  top: 18px;
   left: 200px;
 }
 

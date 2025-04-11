@@ -274,9 +274,7 @@ $newApp->setDevelopmentMode(true);
 $newApp->setDebugMode(true);
 $newApp->setDebugModeError(true);
 $newApp->setDebugModeErrorLog(true);
-$newApp->setRole(new SecretObject(array(
-    'bypassRole' => true,
-)));
+$newApp->setBypassRole(true);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
@@ -339,41 +337,48 @@ file_put_contents($path4, "
 menu:
   - 
     title: Home
+    icon: fa fa-home
     submenu:
       - 
         title: Home
         href: index.php
+        icon: fa fa-home
   - 
     title: Reference
+    icon: fa fa-book
     submenu: [ ]
   - 
     title: Master
+    icon: fa fa-cog
     submenu: [ ]
   - 
     title: Settings
+    icon: fa fa-cog
     submenu:
       - 
         title: Admin
         href: admin.php
+        icon: fa fa-user
       - 
         title: Admin Level
         href: admin-level.php
+        icon: fa fa-user
       - 
         title: Admin Role
         href: admin-role.php
+        icon: fa fa-user
       - 
         title: Module
         href: module.php
+        icon: fa fa-cog
       - 
         title: Module Group
         href: module-group.php
+        icon: fa fa-cog
       - 
         title: Message Folder
         href: message-folder.php
-      - 
-        title: Language
-        href: language.php
-
+        icon: fa fa-folder
 
 ");
 if($async)
@@ -398,9 +403,6 @@ if($async)
         error_log($command);
         exec($command);
     }
-    
-    
-    
 }
 else
 {

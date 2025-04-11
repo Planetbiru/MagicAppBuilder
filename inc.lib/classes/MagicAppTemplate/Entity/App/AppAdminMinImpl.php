@@ -106,10 +106,10 @@ class AppAdminMinImpl extends MagicObject
 	protected $phone;
 
 	/**
-	 * Vatidation Code
+	 * Validation Code
 	 * 
-	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Vatidation Code")
+	 * @Column(name="validation_code", type="text", nullable=true)
+	 * @Label(content="Validation Code")
 	 * @var string
 	 */
 	protected $vatidationCode;
