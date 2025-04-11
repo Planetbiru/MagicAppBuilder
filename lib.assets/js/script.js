@@ -3419,13 +3419,15 @@ function serializeMenu() {
   menuItems.forEach(menuItem => {
     const menuData = {
       title: menuItem.querySelector('a.app-menu-text').textContent,
+      icon: menuItem.querySelector('a.app-menu-text').dataset.icon,
       submenu: []
     };
     const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
     submenuItems.forEach(submenuItem => {
-      menuData.submenus.push({
+      menuData.submenu.push({
         title: submenuItem.querySelector('a.app-menu-text').textContent,
-        href: submenuItem.querySelector('a.app-menu-text').getAttribute('href')
+        href: submenuItem.querySelector('a.app-menu-text').getAttribute('href'),
+        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon
       });
     });
     menu.push(menuData);

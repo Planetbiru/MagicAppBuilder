@@ -85,10 +85,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
             }
         }
 
-		if($admin->getWorkspaceId() != "")
-		{
-			setAdminWorkspace($database, $adminId, $admin->getWorkspaceId(), $currentUser->getAdminId());
-		}
+		
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $adminId);
 	}
 	catch(Exception $e)
@@ -211,22 +208,6 @@ else
 			"primaryKey" => "admin_level_id",
 			"objectName" => "admin_level",
 			"propertyName" => "name"
-		), 
-		"applicationId" => array(
-			"columnName" => "application_id",
-			"entityName" => "ApplicationMin",
-			"tableName" => "application",
-			"primaryKey" => "application_id",
-			"objectName" => "application",
-			"propertyName" => "name"
-		), 
-		"workspaceId" => array(
-			"columnName" => "workspace_id",
-			"entityName" => "WorkspaceMin",
-			"tableName" => "workspace",
-			"primaryKey" => "workspace_id",
-			"objectName" => "workspace",
-			"propertyName" => "name"
 		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
@@ -297,14 +278,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td><?php echo $admin->getPhone();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td><?php echo $admin->issetApplication() ? $admin->getApplication()->getName() : "";?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td><?php echo $admin->issetWorkspace() ? $admin->getWorkspace()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLanguageId();?></td>

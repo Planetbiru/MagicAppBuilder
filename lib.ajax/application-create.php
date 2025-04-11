@@ -310,7 +310,7 @@ catch(Exception $e)
 {
     // Do nothing    
 }
-error_log("BEFORE SEND RESPONSE");
+
 // params:
 // 1. response body
 // 2. mime type
@@ -319,7 +319,6 @@ error_log("BEFORE SEND RESPONSE");
 // 5. is async
 sendResponse("{}", PicoMime::APPLICATION_JSON, null, PicoHttpStatus::HTTP_OK, true);
 
-error_log("AFTER SEND RESPONSE");
 $app = new SecretObject();
 $newApp->loadYamlFile($path2, false, true, true);
 
@@ -334,7 +333,49 @@ if(!file_exists($dir3))
 $path3 = $dir3."/application.yml";
 file_put_contents($path3, $configYaml);
 
-error_log("BEFORE PREPARE APPLICATION");
+$path4 = $dir3."/menu.yml";
+
+file_put_contents($path4, "
+menu:
+  - 
+    title: Home
+    submenu:
+      - 
+        title: Home
+        href: index.php
+  - 
+    title: Reference
+    submenu: [ ]
+  - 
+    title: Master
+    submenu: [ ]
+  - 
+    title: Settings
+    submenu:
+      - 
+        title: Admin
+        href: admin.php
+      - 
+        title: Admin Level
+        href: admin-level.php
+      - 
+        title: Admin Role
+        href: admin-role.php
+      - 
+        title: Module
+        href: module.php
+      - 
+        title: Module Group
+        href: module-group.php
+      - 
+        title: Message Folder
+        href: message-folder.php
+      - 
+        title: Language
+        href: language.php
+
+
+");
 if($async)
 {
     $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';

@@ -1,7 +1,5 @@
 <?php
 
-use MagicApp\AppMenu;
-
 $themeAssetsPath = $appConfig->getAssets();
 
 $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->getApplication()->getName(), " | ");
@@ -82,14 +80,14 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageDropdown">
                             <?php
-                            $languages = $appConfig->getLanguages();
-                            foreach($languages as $language)
+                            $appLanguageList = $appConfig->getLanguages();
+                            foreach($appLanguageList as $appLanguageItem)
                             {
-                                if($language->getCode() != null && $language->getName() != null)
+                                if($appLanguageItem->getCode() != null && $appLanguageItem->getName() != null)
                                 {
                                     ?>
-                                    <a class="dropdown-item" href="set-language.php?language_id=<?php echo $language->getCode();?>"><img src="<?php echo $themeAssetsPath;?>css/flag/<?php echo $language->getCode();?>.svg" class="language-flag" alt="<?php echo $language->getCode();?>">
-                                    <?php echo $language->getName();?></a>
+                                    <a class="dropdown-item" href="set-language.php?language_id=<?php echo $appLanguageItem->getCode();?>"><img src="<?php echo $themeAssetsPath;?>css/flag/<?php echo $appLanguageItem->getCode();?>.svg" class="language-flag" alt="<?php echo $appLanguageItem->getCode();?>">
+                                    <?php echo $appLanguageItem->getName();?></a>
                                     <?php
                                 }
                             }
