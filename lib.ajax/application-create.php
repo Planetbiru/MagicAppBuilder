@@ -370,9 +370,7 @@ menu:
       - 
         title: Message Folder
         href: message-folder.php
-      - 
-        title: Language
-        href: language.php
+
 
 
 ");
