@@ -85,6 +85,7 @@ try
             <div id="collapse0" class="collapse collapsed" aria-labelledby="heading0" data-parent="#accordion">
                 <div class="card-body">
                     <?php
+                        
                         $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
                         $path = basename($application->getBaseApplicationDirectory());
                         if(file_exists($menuPath))

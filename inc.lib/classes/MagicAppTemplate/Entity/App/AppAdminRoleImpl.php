@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_role")
- * @package MagicAppTemplate\Entity\App
+ * @package Music\Entity\App
  */
 class AppAdminRoleImpl extends MagicObject
 {
@@ -20,10 +20,10 @@ class AppAdminRoleImpl extends MagicObject
      * @Id
      * @GeneratedValue(strategy=GenerationType.UUID)
      * @Column(name="admin_role_id", type="varchar(40)", length=40, nullable=false)
-     * @Label(content="Admin ID")
+     * @Label(content="Admin Role ID")
      * @var string
      */
-    protected $adminRoleld;
+    protected $adminRoleId;
 
     /**
      * Admin Level ID

@@ -175,22 +175,20 @@ function initSortData()
 }
 
 /**
- * Initializes the "Check All" functionality for tables with checkboxes.
- * - Selects or deselects all checkboxes in a table when the master checkbox is toggled.
+ * Initializes the "Check All" functionality for checkboxes.
+ * - Selects or deselects all checkboxes when the master checkbox is toggled.
  */
 function initCheckAll() {
-  // Find all tables
-  document.querySelectorAll("table").forEach(function(table) {
-    // Check if there's an element with the class "check-master" in the table
-    const masterCheckbox = table.querySelector(".check-master");
+  const masterCheckbox = document.querySelectorAll(".check-master");  
+  masterCheckbox.forEach(function(masterCheckbox) {
     
     if (masterCheckbox) {
       masterCheckbox.addEventListener("change", function() {
         const checked = masterCheckbox.checked;
-        const selector = masterCheckbox.getAttribute('data-selector');
+        const selector = masterCheckbox.dataset.selector;
         
-        // Find all checkboxes in the table matching the selector
-        table.querySelectorAll(".check-slave" + selector).forEach(function(slaveCheckbox) {
+        // Find all checkboxes matching the selector
+        document.querySelectorAll(".check-slave" + selector).forEach(function(slaveCheckbox) {
           slaveCheckbox.checked = checked;
         });
       });
