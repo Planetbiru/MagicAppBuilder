@@ -24,6 +24,16 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $moduleId;
+	
+	/**
+	 * Module Code
+	 * 
+	 * @NotNull
+	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Label(content="Module Code")
+	 * @var string
+	 */
+	protected $moduleCode;
 
 	/**
 	 * Module Group ID
@@ -90,7 +100,7 @@ class AppModuleImpl extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="menu", type="tinyint(1)", length=1, default_value="0", nullable=true)
-	 * @Label(content="menu")
+	 * @Label(content="Menu")
 	 * @var bool
 	 */
 	protected $menu;

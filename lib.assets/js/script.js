@@ -236,6 +236,7 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
+      console.log(data.applicationStatus)
       if(data.applicationStatus != 'finish')
       {
         setTimeout(function(){
@@ -246,6 +247,7 @@ function setCheckingStatus(id)
       else
       {
         hideWaitingScreen();
+        loadAllResource();
       }
     },
     error: function(err)
@@ -784,7 +786,7 @@ let initAll = function () {
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
-    let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
+    let magic_app_version = modal.find('[name="magic_app_version"]').val();
     let composer_online = modal.find('[name="installation_method"]').val().toLowerCase().indexOf('online') === 0;
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
@@ -820,8 +822,9 @@ let initAll = function () {
         },
         success: function (data) {
           //hideWaitingScreen();
-          loadAllResource();
+          //loadAllResource();
           decreaseAjaxPending();
+          console.log(data);
         },
         error: function (e1, e2) {
           decreaseAjaxPending();
@@ -1468,8 +1471,8 @@ let initAll = function () {
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
+    $('#modal-application-setting').modal('show');
     increaseAjaxPending();
     resetCheckWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
     resetCheckWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
@@ -1491,6 +1494,48 @@ let initAll = function () {
         updateBtn[0].disabled = false;
       }
     });
+  });
+  
+  $(document).on('click', '.button-application-option', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-application-option .application-option').empty();
+    $('#modal-application-option').modal('show');
+    increaseAjaxPending();
+
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-option.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        $('#modal-application-option').attr('data-application-id', applicationId);
+        $('#modal-application-option .application-option').empty().append(data);
+        updateBtn[0].disabled = false;
+      }
+    });
+  });
+  $(document).on("click", ".button-save-application-option", function (e) {
+    e.preventDefault();
+    let form = $(this).closest(".modal").find('form');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-option.php',
+      data: { 
+        action: 'save', 
+        developmentMode: form.find('[name="development_mode"]:checked').val(), 
+        bypassRole: form.find('[name="bypass_role"]:checked').val(), 
+        accessLocalhostOnly: form.find('[name="access_localhost_only"]:checked').val(),
+        applicationId: form.closest('.modal').attr('data-application-id') 
+      },
+      success: function (data) {
+        let modal = form.closest('.modal');
+        modal.modal('hide');
+      }
+    })
   });
 
   $(document).on('click', '.button-application-database', function (e) {
@@ -1560,7 +1605,7 @@ let initAll = function () {
     let newMenu = $('#new_menu').val();
     let existingMenu = serializeMenu();
     for (let i in existingMenu) {
-      if (existingMenu[i].label.toLowerCase() == newMenu.toLowerCase()) {
+      if (existingMenu[i].title.toLowerCase() == newMenu.toLowerCase()) {
         invalidName = true;
       }
     }
@@ -3415,14 +3460,16 @@ function serializeMenu() {
   const menuItems = document.querySelectorAll('.sortable-menu-item');
   menuItems.forEach(menuItem => {
     const menuData = {
-      label: menuItem.querySelector('a.app-menu-text').textContent,
-      submenus: []
+      title: menuItem.querySelector('a.app-menu-text').textContent,
+      icon: menuItem.querySelector('a.app-menu-text').dataset.icon,
+      submenu: []
     };
     const submenuItems = menuItem.querySelectorAll('.sortable-submenu-item');
     submenuItems.forEach(submenuItem => {
-      menuData.submenus.push({
-        label: submenuItem.querySelector('a.app-menu-text').textContent,
-        link: submenuItem.querySelector('a.app-menu-text').getAttribute('href')
+      menuData.submenu.push({
+        title: submenuItem.querySelector('a.app-menu-text').textContent,
+        href: submenuItem.querySelector('a.app-menu-text').getAttribute('href'),
+        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon
       });
     });
     menu.push(menuData);
@@ -5072,10 +5119,10 @@ function loadMenu() {
     success: function (data) {
       decreaseAjaxPending();
       $('select[name="module_menu"]').empty();
-      for (let i in data) {
-        if (data.hasOwnProperty(i)) {
+      for (let i in data.menu) {
+        if (data.menu.hasOwnProperty(i)) {
           $('select[name="module_menu"]')[0].append(
-            new Option(data[i].label, data[i].label)
+            new Option(data.menu[i].title, data.menu[i].title)
           );
         }
       }

@@ -60,8 +60,11 @@ try
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-database">
                 <i class="fas fa-database"></i> Database
             </a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-application-option">
+                <i class="fas fa-ellipsis-v"></i> Option
+            </a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-open">
-                <i class="fas fa-code"></i> VS Code
+                <i class="fas fa-code"></i> Code
             </a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-icons">
                 <i class="fas fa-icons"></i> Icon

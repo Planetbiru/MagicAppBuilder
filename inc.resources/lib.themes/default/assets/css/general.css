@@ -153,16 +153,19 @@ body.sidebar-hidden .content {
 }
 
 .two-side-responsive-table,
-table.responsive-two-cols {
+table.responsive-two-cols,
+table.responsive-three-cols {
   width: 100%;
   border-collapse: collapse;
 }
 .two-side-responsive-table > tbody > tr > td,
-table.responsive-two-cols > tbody > tr > td {
+table.responsive-two-cols > tbody > tr > td,
+table.responsive-three-cols > tbody > tr > td {
   padding: 0.24rem 0;
 }
 .two-side-responsive-table > tbody > tr > td:nth-child(1),
-table.responsive-two-cols > tbody > tr > td:nth-child(1) {
+table.responsive-two-cols > tbody > tr > td:nth-child(1),
+table.responsive-three-cols > tbody > tr > td:nth-child(1) {
   width: 240px;
 }
 

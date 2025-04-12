@@ -1,13 +1,16 @@
 application:
   id: your-application
   name: Your Application Name
-  application_base_namespace: YourApplication
-  application_base_directory: /var/www/html/your-application
-  entity_base_namespace: YourApplication\Data\Entity
-  entity_base_directory: /var/www/html/your-application/inc.lib/classes
-  entity_base_namespace: YourApplication\\Data\Entity
+  base_application_namespace: YourApplication
+  base_application_directory: /var/www/html/your-application
+  base_entity_namespace: YourApplication\Data\Entity
+  base_entity_directory: /var/www/html/your-application/inc.lib/classes
+  base_entity_namespace: YourApplication\Entity
+  base_entity_data_namespace: YourApplication\Entity\Data
+  base_entity_app_namespace: YourApplication\Entity\App
   base_include_directory: inc.app
   base_asset_directory: lib.assets
+  base_language_directory: /var/www/html/your-application/inc.lang
   composer:
     base_directory: inc.lib
     psr0: true
@@ -29,23 +32,30 @@ database:
   salt:
   
 entity_info:
-  active: active
-  draft: draft
-  waiting_for: waiting_for
+  name: name
   admin_create: admin_create
   admin_edit: admin_edit
   admin_ask_edit: admin_ask_edit
+  admin_delete: admin_delete
+  admin_restore: admin_restore
   time_create: time_create
   time_edit: time_edit
   time_ask_edit: time_ask_edit
+  time_delete: time_delete
+  time_restore: time_restore
   ip_create: ip_create
   ip_edit: ip_edit
   ip_ask_edit: ip_ask_edit
+  ip_delete: ip_delete
+  ip_restore: ip_restore
+  restored: restored
   sort_order: sort_order
+  active: active
+  draft: draft
+  waiting_for: waiting_for
   approval_id: approval_id
   approval_note: approval_note
   approval_status: approval_status
-  name: name
 entity_apv_info:
   approval_status: approval_status
 current_action:

@@ -706,9 +706,9 @@ class ScriptGenerator //NOSONAR
     /**
      * Retrieves a list of existing menu items from the provided menu structure.
      *
-     * @param array $menus An array of menu objects, each potentially containing submenus.
+     * @param array $menus An array of menu objects, each potentially containing submenu.
      * @return array An array of strings representing the existing menu items, 
-     *               formatted as "submenuLink-submenuLabel".
+     *               formatted as "submenuLink-submenuTitle".
      */
     private function getExistingMenu($menus)
     {
@@ -718,12 +718,12 @@ class ScriptGenerator //NOSONAR
         {
             if(isset($menu) && is_object($menu))
             {
-                $submenus = $menu->getSubmenus();
-                if(is_array($submenus))
+                $submenu = $menu->getSubmenu();
+                if(is_array($submenu))
                 {
-                    foreach($submenus as $submenu)
+                    foreach($submenu as $submenu)
                     {
-                        $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getLabel());
+                        $existingMenus[] = trim($submenu->getLink())."-".trim($submenu->getTitle());
                     }
                 }
             }
@@ -736,7 +736,7 @@ class ScriptGenerator //NOSONAR
      *
      * This method checks if the menu configuration file exists. If it does not, it creates
      * the file and loads the current menu structure from a YAML file. The provided module
-     * information is then added as a submenu item under the specified menu label if it
+     * information is then added as a submenu item under the specified menu title if it
      * does not already exist.
      *
      * @param SecretObject $appConf Configuration object containing application settings.
@@ -758,27 +758,28 @@ class ScriptGenerator //NOSONAR
 
         $target = trim($request->getTarget(), "/\\");
         $moduleMenu = trim($request->getModuleMenu());
-        $label = trim($request->getModuleName());
-        $link = trim($target."/".$request->getModuleFile());
+        $title = trim($request->getModuleName());
+        $href = ltrim(trim($target."/".$request->getModuleFile()), "/");
 
-        $menuToCheck = $label."-".$link;
-        if(!in_array($menuToCheck, $existingMenus))
+        $menuToCheck = $title."-".$href;
+        if(!in_array($menuToCheck, $existingMenus) && $menus->getMenu() != null)
         {
-            $menuArray = $menus->valueArray();
+            $menuArray = json_decode((string) $menus, true)['menu'];
+            
             foreach($menuArray as $index=>$menu)
             {
-                if(isset($menu['label']) && trim(strtolower($menu['label'])) == trim(strtolower($moduleMenu)))
+                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)))
                 {
-                    if(!isset($menuArray[$index]['submenus']))
+                    if(!isset($menuArray[$index]['submenu']))
                     {
-                        $menuArray[$index]['submenus'] = [];
+                        $menuArray[$index]['submenu'] = [];
                     }
 
-                    $hash = $label.$link;
+                    $hash = $title.$href;
                     $skip = false;
-                    foreach($menuArray[$index]['submenus'] as $sub)
+                    foreach($menuArray[$index]['submenu'] as $sub)
                     {
-                        if($sub['label'].$sub['link'] == $hash)
+                        if($sub['title'].$sub['href'] == $hash)
                         {
                             $skip = true;
                             break;
@@ -786,11 +787,12 @@ class ScriptGenerator //NOSONAR
                     }
                     if(!$skip)
                     {
-                        $menuArray[$index]['submenus'][] = array("label"=>$label, "link"=>$link);
+                        $menuArray[$index]['submenu'][] = array("title"=>$title, "href"=>$href);
                     }
                 }
             }
-            $yaml = PicoYamlUtil::dump($menuArray, 0, 2, 0);
+            
+            $yaml = PicoYamlUtil::dump(array('menu'=>$menuArray), 0, 2, 0);
             file_put_contents($menuPath, $yaml);
         }
     }
@@ -1058,6 +1060,7 @@ class ScriptGenerator //NOSONAR
         $this->copyDirectory($sourceDir, $destinationDir, true, array('php'), function($source, $destination) use ($appConf) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
+            $content = str_replace('/inc.resources', '', $content);
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             $content = str_replace('dirname(dirname(__DIR__))', 'dirname(__DIR__)', $content);
             file_put_contents($destination, $content);

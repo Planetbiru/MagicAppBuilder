@@ -29,22 +29,50 @@ try
 {
     $appSessionUsername = $sessions->username;
     $appSessionPassword = $sessions->userPassword;
-    $appSpecsLogin = PicoSpecification::getInstance()
-        ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
+    {
+        $appSpecsLogin = PicoSpecification::getInstance()
         ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
-        ->addAnd(PicoSpecification::getInstance()
-            ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
-            ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
-        )
-    ;
+        ;
+    }
+    else
+    {
+        $appSpecsLogin = PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+            ->addAnd(PicoSpecification::getInstance()
+                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
+                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+            )
+        ;
+    }
+    
     $currentUser->findOne($appSpecsLogin);
 }
 
 catch(Exception $e)
 {
-    require_once __DIR__ . "/login-form.php";
-    exit();
+    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
+    {
+        $currentUser = new AppAdminImpl(null, $database);
+        $currentUser->setAdminId("superuser");
+        $currentUser->setUsername("superuser");
+        $currentUser->setPassword(sha1(sha1("superuser")));
+        $currentUser->setName("Super User");
+        $languageId = $sessions->languageId;
+        if(!isset($languageId) || empty($languageId))
+        {
+            $languageId = 'en';
+        }
+        $currentUser->setLanguageId($languageId);
+        $currentUser->setActive(true);
+    }
+    else
+    {
+        require_once __DIR__ . "/login-form.php";
+        exit();
+    }
 }
 
 $currentAction = new SetterGetter();
@@ -104,7 +132,7 @@ $appConfig->setAssets('lib.themes/default/assets/');
 
 $appMenuData = new SecretObject();
 
-$appMenuPath = __DIR__ . "/menu.yml";
+$appMenuPath = dirname(__DIR__) . "/inc.cfg/menu.yml";
 if(file_exists($appMenuPath))
 {
     $appMenuData->loadYamlFile($appMenuPath, false, true, true);

@@ -34,6 +34,11 @@ if($applicationId != null)
 
         $menus = new SecretObject();
         $menus->loadYamlFile($menuPath, false, true, true);
+        if($menus == null || $menus->getMenu() == null || !is_array($menus->getMenu()))
+        {
+            $menus->setMenu(array());
+        }
+        
 
         // Create a new DOMDocument instance
         $dom = new DOMDocument();
@@ -43,7 +48,7 @@ if($applicationId != null)
         $sortableMenu = $dom->createElement('ul');
         $sortableMenu->setAttribute('class', 'sortable-menu');
         // Add menu items to the <ul>
-        foreach ($menus as $menu) {
+        foreach ($menus->getMenu() as $menu) {
             
             if(isset($menu) && $menu instanceof SecretObject)
             {
@@ -68,9 +73,10 @@ if($applicationId != null)
                 }
 
                 // Create the menu link
-                $link = $dom->createElement('a', htmlspecialchars($menu->getLabel()));
+                $link = $dom->createElement('a', htmlspecialchars($menu->getTitle()));
                 $link->setAttribute('class', 'app-menu app-menu-text');
                 $link->setAttribute('href', '#');
+                $link->setAttribute('data-icon', $menu->getIcon());
                 $menuItem->appendChild($link);
                 $menuItem->appendChild($dom->createTextNode(' '));
 
@@ -85,9 +91,12 @@ if($applicationId != null)
                 $submenu->setAttribute('class', 'sortable-submenu');
 
                 // Check if there are submenus and add them
-                $submenus = $menu->getSubmenus();
+                $submenus = $menu->getSubmenu();
                 if (is_array($submenus)) {
                     foreach ($submenus as $submenuItem) {
+                        if(!isset($submenuItem) || !($submenuItem instanceof SecretObject)) {
+                            continue; // Skip if not a valid SecretObject
+                        }
                         // Create <li> for each submenu item
                         $submenuLi = $dom->createElement('li');
                         $submenuLi->setAttribute('class', 'sortable-submenu-item');
@@ -103,9 +112,10 @@ if($applicationId != null)
                         }
 
                         // Create the submenu link
-                        $submenuLink = $dom->createElement('a', htmlspecialchars($submenuItem->getLabel()));
+                        $submenuLink = $dom->createElement('a', htmlspecialchars($submenuItem->getTitle()));
                         $submenuLink->setAttribute('class', 'app-submenu app-menu-text');
-                        $submenuLink->setAttribute('href', htmlspecialchars($submenuItem->getLink()));
+                        $submenuLink->setAttribute('href', htmlspecialchars($submenuItem->getHref()));
+                        $submenuLink->setAttribute('data-icon', $submenuItem->getIcon());
                         $submenuLi->appendChild($submenuLink);
                         $submenuLi->appendChild($dom->createTextNode(' '));
 

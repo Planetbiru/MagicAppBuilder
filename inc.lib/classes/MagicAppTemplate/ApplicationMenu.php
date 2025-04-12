@@ -2,10 +2,10 @@
 
 namespace MagicAppTemplate;
 
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
 use Exception;
 use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -89,6 +89,10 @@ class ApplicationMenu
 
                 // Get the localized title of the menu item
                 $item['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $item['title'])));
+                if(!isset($item['href']))
+                {
+                    $item['href'] = '#'.strtolower(str_replace(' ', '-', $item['title']));
+                }
 
                 // Create the <a> tag for the main menu item
                 $a = $dom->createElement('a', ''); // Create an empty anchor tag
@@ -107,9 +111,12 @@ class ApplicationMenu
                 }
 
                 // Create and append the icon inside the <a> tag
-                $icon = $dom->createElement('i', '');
-                $icon->setAttribute('class', $item['icon']);
-                $a->appendChild($icon);  // Append the icon element to the anchor tag
+                if(isset($item['icon']) && $item['icon'] != '') {
+                    $icon = $dom->createElement('i', '');
+                    $icon->setAttribute('class', $item['icon']);
+                    $a->appendChild($icon);  // Append the icon element to the anchor tag
+                }
+
 
                 // Add a space after the icon
                 $space = $dom->createTextNode(' '); // Space between icon and title
@@ -173,9 +180,12 @@ class ApplicationMenu
                         }
 
                         // Create and append the icon for submenu items
-                        $subIcon = $dom->createElement('i', '');
-                        $subIcon->setAttribute('class', $subItem['icon']);
-                        $subA->appendChild($subIcon);  // Append the icon to the submenu anchor tag
+                        if(isset($subItem['icon']) && $subItem['icon'] != '') {
+                            // Create the icon element for submenu items
+                            $subIcon = $dom->createElement('i', '');
+                            $subIcon->setAttribute('class', $subItem['icon']);
+                            $subA->appendChild($subIcon);  // Append the icon to the submenu anchor tag
+                        }
 
                         // Add a space after the icon for submenu items
                         $subSpace = $dom->createTextNode(' '); // Space between icon and title

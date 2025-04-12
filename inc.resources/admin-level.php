@@ -20,8 +20,7 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\AdminLevel;
-
+use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -42,7 +41,7 @@ $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$adminLevel = new AdminLevel(null, $database);
+	$adminLevel = new AppAdminLevelImpl(null, $database);
 	$adminLevel->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminLevel->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminLevel->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
@@ -68,7 +67,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminLevelId, $inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminLevel = new AdminLevel(null, $database);
+	$adminLevel = new AppAdminLevelImpl(null, $database);
 	$updater = $adminLevel->where($specification)
 		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -84,7 +83,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 
 		// update primary key value
 		$newId = $inputPost->getAppBuilderNewPkAdminLevelId();
-		$adminLevel = new AdminLevel(null, $database);
+		$adminLevel = new AppAdminLevelImpl(null, $database);
 		$adminLevel->where($specification)->setAdminLevelId($newId)->update();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_level_id, $newId);
 	}
@@ -99,7 +98,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$adminLevel = new AdminLevel(null, $database);
+			$adminLevel = new AppAdminLevelImpl(null, $database);
 			try
 			{
 				$adminLevel->where(PicoSpecification::getInstance()
@@ -128,7 +127,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$adminLevel = new AdminLevel(null, $database);
+			$adminLevel = new AppAdminLevelImpl(null, $database);
 			try
 			{
 				$adminLevel->where(PicoSpecification::getInstance()
@@ -163,7 +162,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$adminLevel = new AdminLevel(null, $database);
+				$adminLevel = new AppAdminLevelImpl(null, $database);
 				$adminLevel->where($specification)
 					->delete();
 			}
@@ -194,7 +193,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$adminLevel = new AdminLevel(null, $database);
+				$adminLevel = new AppAdminLevelImpl(null, $database);
 				$adminLevel->where($specification)
 					->setSortOrder($sortOrder)
 					->update();
@@ -210,7 +209,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminLevel(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminLevelImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -265,12 +264,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminLevelId, $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminLevel = new AdminLevel(null, $database);
+	$adminLevel = new AppAdminLevelImpl(null, $database);
 	try{
 		$adminLevel->findOne($specification);
 		if($adminLevel->issetAdminLevelId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminLevel(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminLevelImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -344,13 +343,13 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminLevelId, $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$adminLevel = new AdminLevel(null, $database);
+	$adminLevel = new AppAdminLevelImpl(null, $database);
 	try{
 		$subqueryMap = null;
 		$adminLevel->findOne($specification, null, $subqueryMap);
 		if($adminLevel->issetAdminLevelId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminLevel(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminLevelImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -452,7 +451,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminLevel(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppAdminLevelImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext")
@@ -480,7 +479,7 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new AdminLevel(null, $database);
+$dataLoader = new AppAdminLevelImpl(null, $database);
 
 $subqueryMap = null;
 

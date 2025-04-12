@@ -4,6 +4,7 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
+use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -19,11 +20,10 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
-use MagicAdmin\Entity\Data\Module;
-use MagicAdmin\Entity\Data\AdminMin;
-use MagicAdmin\Entity\Data\ApplicationMin;
-
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -40,16 +40,22 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
+
 $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$module = new Module(null, $database);
-	$module->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$module->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$module->setFileName($inputPost->getFileName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$module->setDirectoryName($inputPost->getDirectoryName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$module->setReferenceValue($inputPost->getReferenceValue(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module = new AppModuleImpl(null, $database);
+	$module->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setMenu($inputPost->getMenu(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$module->setSpecialAccess($inputPost->getSpecialAccess(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$module->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$module->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$module->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$module->setAdminCreate($currentAction->getUserId());
 	$module->setTimeCreate($currentAction->getTime());
 	$module->setIpCreate($currentAction->getIp());
@@ -71,13 +77,18 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleId, $inputPost->getModuleId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$module = new Module(null, $database);
+	$module = new AppModuleImpl(null, $database);
 	$updater = $module->where($specification)
-		->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setFileName($inputPost->getFileName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setDirectoryName($inputPost->getDirectoryName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setReferenceValue($inputPost->getReferenceValue(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setMenu($inputPost->getMenu(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setSpecialAccess($inputPost->getSpecialAccess(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
+		->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
@@ -99,7 +110,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$module = new Module(null, $database);
+			$module = new AppModuleImpl(null, $database);
 			try
 			{
 				$module->where(PicoSpecification::getInstance()
@@ -128,18 +139,31 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$module = new Module(null, $database);
+			$module = new AppModuleImpl(null, $database);
 			try
 			{
-				$module->where(PicoSpecification::getInstance()
+				// Find active module
+				$module->findOne(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
 					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
+				);
+			
+				$module->setAdminEdit($currentAction->getUserId())
 				->setTimeEdit($currentAction->getTime())
 				->setIpEdit($currentAction->getIp())
 				->setActive(false)
+				->update();
+				
+				// Update module code at admin role
+				$adminRole = new AppAdminRoleImpl(null, $database);
+				$adminRole->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
+				)
+				->setModuleCode($module->getModuleCode())
+				->setAdminEdit($currentAction->getUserId())
+				->setTimeEdit($currentAction->getTime())
+				->setIpEdit($currentAction->getIp())
 				->update();
 			}
 			catch(Exception $e)
@@ -163,7 +187,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$module = new Module(null, $database);
+				$module = new AppModuleImpl(null, $database);
 				$module->where($specification)
 					->delete();
 			}
@@ -176,9 +200,41 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	}
 	$currentModule->redirectToItself();
 }
+else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
+{
+	if($inputPost->getNewOrder() != null && $inputPost->countableNewOrder())
+	{
+		foreach($inputPost->getNewOrder() as $dataItem)
+		{
+			try
+			{
+				if(is_string($dataItem))
+				{
+					$dataItem = new SetterGetter(json_decode($dataItem));
+				}
+				$rowId = $dataItem->getPrimaryKey();
+				$sortOrder = intval($dataItem->getSortOrder());
+				$specification = PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
+					->addAnd($dataFilter)
+					;
+				$module = new AppModuleImpl(null, $database);
+				$module->where($specification)
+					->setSortOrder($sortOrder)
+					->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+				error_log($e->getMessage());
+			}
+		}
+	}
+	$currentModule->redirectToItself();
+}
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Module(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -187,55 +243,74 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdmin();?></td>
+						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
 						<td>
-							<select class="form-control" name="admin_id" id="admin_id">
+							<select class="form-control" name="module_group_id" id="module_group_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppModuleGroupMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name)
+								Field::of()->moduleGroupId, Field::of()->name)
 								; ?>
 							</select>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
+						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name)
-								; ?>
-							</select>
+							<input type="text" class="form-control" name="name" id="name" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getFileName();?></td>
+						<td><?php echo $appEntityLanguage->getUrl();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="file_name" id="file_name"/>
+							<input type="text" class="form-control" name="url" id="url" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getDirectoryName();?></td>
+						<td><?php echo $appEntityLanguage->getTarget();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="directory_name" id="directory_name"/>
+							<input type="text" class="form-control" name="target" id="target" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getReferenceValue();?></td>
+						<td><?php echo $appEntityLanguage->getIcon();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="reference_value" id="reference_value"/>
+							<input type="text" class="form-control" name="icon" id="icon" value="" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getMenu();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="menu" id="menu" value="1"/> <?php echo $appEntityLanguage->getMenu();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSpecialAccess();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="special_access" id="special_access" value="1"/> <?php echo $appEntityLanguage->getSpecialAccess();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td>
+							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1"/> <?php echo $appEntityLanguage->getDefaultData();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getActive();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1"/> <?php echo $appEntityLanguage->getActive();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -245,8 +320,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+							<button type="submit" class="btn btn-success" name="user_action" id="create_new_data" value="create"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
 						</td>
 					</tr>
 				</tbody>
@@ -261,12 +336,12 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleId, $inputGet->getModuleId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$module = new Module(null, $database);
+	$module = new AppModuleImpl(null, $database);
 	try{
 		$module->findOne($specification);
 		if($module->issetModuleId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Module(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -275,55 +350,74 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdmin();?></td>
+						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
 						<td>
-							<select class="form-control" name="admin_id" id="admin_id">
+							<select class="form-control" name="module_group_id" id="module_group_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppModuleGroupMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $module->getAdminId())
+								Field::of()->moduleGroupId, Field::of()->name, $module->getModuleGroupId())
 								; ?>
 							</select>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
+						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
-							<select class="form-control" name="application_id" id="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name, $module->getApplicationId())
-								; ?>
-							</select>
+							<input type="text" class="form-control" name="name" id="name" value="<?php echo $module->getName();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getFileName();?></td>
+						<td><?php echo $appEntityLanguage->getUrl();?></td>
 						<td>
-							<input class="form-control" type="text" name="file_name" id="file_name" value="<?php echo $module->getFileName();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="url" id="url" value="<?php echo $module->getUrl();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getDirectoryName();?></td>
+						<td><?php echo $appEntityLanguage->getTarget();?></td>
 						<td>
-							<input class="form-control" type="text" name="directory_name" id="directory_name" value="<?php echo $module->getDirectoryName();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="target" id="target" value="<?php echo $module->getTarget();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getReferenceValue();?></td>
+						<td><?php echo $appEntityLanguage->getIcon();?></td>
 						<td>
-							<input class="form-control" type="text" name="reference_value" id="reference_value" value="<?php echo $module->getReferenceValue();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="icon" id="icon" value="<?php echo $module->getIcon();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getMenu();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="menu" id="menu" value="1" <?php echo $module->createCheckedMenu();?>/> <?php echo $appEntityLanguage->getMenu();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSpecialAccess();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="special_access" id="special_access" value="1" <?php echo $module->createCheckedSpecialAccess();?>/> <?php echo $appEntityLanguage->getSpecialAccess();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td>
+							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="<?php echo $module->getSortOrder();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1" <?php echo $module->createCheckedDefaultData();?>/> <?php echo $appEntityLanguage->getDefaultData();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getActive();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1" <?php echo $module->createCheckedActive();?>/> <?php echo $appEntityLanguage->getActive();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -333,9 +427,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="update"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="module_id" value="<?php echo $module->getModuleId();?>"/>
+							<button type="submit" class="btn btn-success" name="user_action" id="update_data" value="update"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+							<input type="hidden" name="module_id" id="primary_key_value" value="<?php echo $module->getModuleId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -368,30 +462,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleId, $inputGet->getModuleId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$module = new Module(null, $database);
+	$module = new AppModuleImpl(null, $database);
 	try{
 		$subqueryMap = array(
-		"adminId" => array(
-			"columnName" => "admin_id",
-			"entityName" => "AdminMin",
-			"tableName" => "admin",
-			"primaryKey" => "admin_id",
-			"objectName" => "admin",
-			"propertyName" => "name"
-		), 
-		"applicationId" => array(
-			"columnName" => "application_id",
-			"entityName" => "ApplicationMin",
-			"tableName" => "application",
-			"primaryKey" => "application_id",
-			"objectName" => "application",
+		"moduleGroupId" => array(
+			"columnName" => "module_group_id",
+			"entityName" => "AppModuleGroupMinImpl",
+			"tableName" => "module_group",
+			"primaryKey" => "module_group_id",
+			"objectName" => "module_group",
 			"propertyName" => "name"
 		)
 		);
 		$module->findOne($specification, null, $subqueryMap);
 		if($module->issetModuleId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Module(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -411,48 +497,44 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdmin();?></td>
-						<td><?php echo $module->issetAdmin() ? $module->getAdmin()->getName() : "";?></td>
+						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
+						<td><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getApplication();?></td>
-						<td><?php echo $module->issetApplication() ? $module->getApplication()->getName() : "";?></td>
+						<td><?php echo $appEntityLanguage->getName();?></td>
+						<td><?php echo $module->getName();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getFileName();?></td>
-						<td><?php echo $module->getFileName();?></td>
+						<td><?php echo $appEntityLanguage->getUrl();?></td>
+						<td><?php echo $module->getUrl();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getDirectoryName();?></td>
-						<td><?php echo $module->getDirectoryName();?></td>
+						<td><?php echo $appEntityLanguage->getTarget();?></td>
+						<td><?php echo $module->getTarget();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getReferenceValue();?></td>
-						<td><?php echo $module->getReferenceValue();?></td>
+						<td><?php echo $appEntityLanguage->getIcon();?></td>
+						<td><?php echo $module->getIcon();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $module->getTimeCreate();?></td>
+						<td><?php echo $appEntityLanguage->getMenu();?></td>
+						<td><?php echo $module->optionMenu($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
-						<td><?php echo $module->getTimeEdit();?></td>
+						<td><?php echo $appEntityLanguage->getSpecialAccess();?></td>
+						<td><?php echo $module->optionSpecialAccess($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $module->getAdminCreate();?></td>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td><?php echo $module->getSortOrder();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $module->getAdminEdit();?></td>
+						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
+						<td><?php echo $module->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
-						<td><?php echo $module->getIpCreate();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIpEdit();?></td>
-						<td><?php echo $module->getIpEdit();?></td>
+						<td><?php echo $appEntityLanguage->getActive();?></td>
+						<td><?php echo $module->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -462,11 +544,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td></td>
 						<td>
 							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->module_id, $module->getModuleId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->module_id, $module->getModuleId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
-							<input type="hidden" name="module_id" value="<?php echo $module->getModuleId();?>"/>
+							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
+							<input type="hidden" name="module_id" id="primary_key_value" value="<?php echo $module->getModuleId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -497,18 +579,23 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Module(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"adminId" => PicoSpecification::filter("adminId", "fulltext"),
-	"applicationId" => PicoSpecification::filter("applicationId", "fulltext")
+	"moduleGroupId" => PicoSpecification::filter("moduleGroupId", "fulltext"),
+	"name" => PicoSpecification::filter("name", "fulltext")
 );
 $sortOrderMap = array(
-	"adminId" => "adminId",
-	"applicationId" => "applicationId",
-	"fileName" => "fileName",
-	"directoryName" => "directoryName",
-	"referenceValue" => "referenceValue"
+	"moduleGroupId" => "moduleGroupId",
+	"name" => "name",
+	"url" => "url",
+	"target" => "target",
+	"icon" => "icon",
+	"menu" => "menu",
+	"specialAccess" => "specialAccess",
+	"sortOrder" => "sortOrder",
+	"defaultData" => "defaultData",
+	"active" => "active"
 );
 
 // You can define your own specifications
@@ -519,26 +606,27 @@ $specification->addAnd($dataFilter);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "moduleGroup.sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	),
+	array(
+		"sortBy" => "sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new Module(null, $database);
+$dataLoader = new AppModuleImpl(null, $database);
 
 $subqueryMap = array(
-"adminId" => array(
-	"columnName" => "admin_id",
-	"entityName" => "AdminMin",
-	"tableName" => "admin",
-	"primaryKey" => "admin_id",
-	"objectName" => "admin",
-	"propertyName" => "name"
-), 
-"applicationId" => array(
-	"columnName" => "application_id",
-	"entityName" => "ApplicationMin",
-	"tableName" => "application",
-	"primaryKey" => "application_id",
-	"objectName" => "application",
+"moduleGroupId" => array(
+	"columnName" => "module_group_id",
+	"entityName" => "AppModuleGroupMinImpl",
+	"tableName" => "module_group",
+	"primaryKey" => "module_group_id",
+	"objectName" => "module_group",
 	"propertyName" => "name"
 )
 );
@@ -552,48 +640,37 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAdmin();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getModuleGroup();?></span>
 					<span class="filter-control">
-							<select class="form-control" name="admin_id">
+							<select class="form-control" name="module_group_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AdminMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppModuleGroupMinImpl(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->active, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $inputGet->getAdminId())
+								Field::of()->moduleGroupId, Field::of()->name, $inputGet->getModuleGroupId())
 								; ?>
 							</select>
 					</span>
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getApplication();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getName();?></span>
 					<span class="filter-control">
-							<select class="form-control" name="application_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->applicationId, Field::of()->name, $inputGet->getApplicationId())
-								; ?>
-							</select>
+						<input type="text" class="form-control" name="name" value="<?php echo $inputGet->getName();?>" autocomplete="off"/>
 					</span>
 				</span>
 				
 				<span class="filter-group">
-					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
+					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -622,6 +699,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-header"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="module_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-module-id"/>
@@ -638,15 +718,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="admin_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdmin();?></a></td>
-								<td data-col-name="application_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplication();?></a></td>
-								<td data-col-name="file_name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFileName();?></a></td>
-								<td data-col-name="directory_name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDirectoryName();?></a></td>
-								<td data-col-name="reference_value" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getReferenceValue();?></a></td>
+								<td data-col-name="module_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleGroup();?></a></td>
+								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
+								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
+								<td data-col-name="target" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTarget();?></a></td>
+								<td data-col-name="icon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIcon();?></a></td>
+								<td data-col-name="menu" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getMenu();?></a></td>
+								<td data-col-name="special_access" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSpecialAccess();?></a></td>
+								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
+								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
+								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
 					
-						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
+						<tbody class="data-table-manual-sort" data-offset="<?php echo $pageData->getDataOffset();?>">
 							<?php 
 							$dataIndex = 0;
 							while($module = $pageData->fetch())
@@ -654,7 +739,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 							?>
 		
-							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+							<tr data-primary-key="<?php echo $module->getModuleId();?>" data-sort-order="<?php echo $module->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>" data-active="<?php echo $module->optionActive('true', 'false');?>">
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-body data-sort-handler"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="module_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-module-id" name="checked_row_id[]" value="<?php echo $module->getModuleId();?>"/>
@@ -671,11 +759,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="admin_id"><?php echo $module->issetAdmin() ? $module->getAdmin()->getName() : "";?></td>
-								<td data-col-name="application_id"><?php echo $module->issetApplication() ? $module->getApplication()->getName() : "";?></td>
-								<td data-col-name="file_name"><?php echo $module->getFileName();?></td>
-								<td data-col-name="directory_name"><?php echo $module->getDirectoryName();?></td>
-								<td data-col-name="reference_value"><?php echo $module->getReferenceValue();?></td>
+								<td data-col-name="module_group_id"><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
+								<td data-col-name="name"><?php echo $module->getName();?></td>
+								<td data-col-name="url"><?php echo $module->getUrl();?></td>
+								<td data-col-name="target"><?php echo $module->getTarget();?></td>
+								<td data-col-name="icon"><?php echo $module->getIcon();?></td>
+								<td data-col-name="menu"><?php echo $module->optionMenu($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="special_access"><?php echo $module->optionSpecialAccess($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $module->getSortOrder();?></td>
+								<td data-col-name="default_data"><?php echo $module->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="active"><?php echo $module->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
@@ -685,9 +778,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</table>
 				</div>
 				<div class="button-wrapper">
-					<div class="form-control-container button-area">
+					<div class="button-area">
+						<?php if($userPermission->isAllowedUpdate()){ ?>
+						<button type="submit" class="btn btn-success" name="user_action" id="activate_selected" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
+						<button type="submit" class="btn btn-warning" name="user_action" id="deactivate_selected" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
+						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
-						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<?php } ?>
+						<?php if($userPermission->isAllowedSortOrder()){ ?>
+						<button type="submit" class="btn btn-primary" name="user_action" id="save_current_order" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

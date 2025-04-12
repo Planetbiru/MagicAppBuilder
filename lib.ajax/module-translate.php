@@ -34,16 +34,43 @@ function fixValue($original)
         'Button Save Current Order' => 'Save Current Order',
         'Button Activate' => 'Activate',
         'Button Deactivate' => 'Deactivate',
+        'Button Generate' => 'Generate',
+        'Button Print' => 'Print',
+        'Button Send' => 'Send',
+        'Button Send Email' => 'Send Email',
+        'Button Approve' => 'Approve',
+        'Button Reject' => 'Reject',
+        'Button Cancel Approval' => 'Cancel Approval',
+        'Button Cancel Approval Tiny' => 'Cancel Approval',
         'Numero' => 'Numero',
         'Warning Delete Confirmation' => 'Delete Confirmation',
         'Label Option Select One' => 'Option Select One',
         'Message Noneditable Data Waiting Approval' => 'Data Waiting Approval',
+        'Message Select Filter' => 'Select Filter',
+        'Message Waiting For Create' => 'This is new data and is waiting for approval',
+        'Message Waiting For Update' => 'This data is waiting for approval before modification',
+        'Message Waiting For Delete' => 'This data is waiting for approval before deletion',
+        'Message Waiting For Activate' => 'This data is waiting for approval to be activated',
+        'Message Waiting For Deactivate' => 'This data is waiting for approval to be deactivated',
+        'Message Waiting For Sort Order' => 'This data is waiting for approval to be sorted',  
+        'Short Waiting For Create' => 'Create',
+        'Short Waiting For Update' => 'Update',
+        'Short Waiting For Delete' => 'Delete',
+        'Short Waiting For Activate' => 'Activate',
+        'Short Waiting For Deactivate' => 'Deactivate',
+        'Short Waiting For Sort Order' => 'Sort',
+        'Button Show All' => 'Show All',
+        'Button Show Waiting Approval' => 'Show Waiting Approval',
+        'Button Show Waiting Approval Only' => 'Show Waiting Approval Only',
         'Button Show Require Approval' => 'Show Require Approval',
         'Button Export' => 'Export',
+        'Button Show Require Approval' => 'Show Require Approval',
         'Button Approve Tiny' => 'Approve',
+        'Button Approve' => 'Approve',
         'Message No Data Require Approval' => 'No Data Require Approval',
         'Option Select One' => 'Select One',
         'Option Select All' => 'Select All',
+        'Option Select None' => 'Select None',
     );
     return str_replace(
         array_keys($labels), 
@@ -89,7 +116,51 @@ $inputPost = new InputPost();
 
 if($inputPost->getUserAction() == 'get')
 {
-    $allKeys = array();
+    $allKeys = array(
+        'short_waiting_for_create',
+        'short_waiting_for_update',
+        'short_waiting_for_delete',
+        'short_waiting_for_activate',
+        'short_waiting_for_deactivate',
+        'short_waiting_for_sort_order',
+        'message_data_not_found',
+        'message_waiting_for_create',
+        'message_waiting_for_update',
+        'message_waiting_for_delete',
+        'message_waiting_for_activate',
+        'message_waiting_for_deactivate',
+        'message_waiting_for_sort_order',
+        'yes',
+        'no',
+        'button_approve',
+        'button_reject',
+        'button_save',
+        'button_cancel',
+        'button_update',
+        'button_back_to_list',
+        'button_search',
+        'button_add',
+        'button_delete',
+        'button_save_current_order',
+        'button_activate',
+        'button_deactivate',
+        'button_generate',
+        'button_print',
+        'button_send',
+        'button_send_email',
+        'button_export',
+        'button_show_require_approval',
+        'numero',
+        'warning_delete_confirmation',
+        'label_option_select_one',
+        'message_noneditable_data_waiting_approval',
+        'message_select_filter',
+        'profile',
+        'setting',
+        'login',
+        'logout',
+    );
+
     $response = array();
     try
     {
@@ -126,7 +197,7 @@ if($inputPost->getUserAction() == 'get')
                 $langs->loadData(PicoIniUtil::parseIniFile($pathTrans));
             }
             
-            $keys = array_keys($parsed);
+            $keys = array_merge(array_keys($parsed));
             
             if(!$langs->empty())
             {

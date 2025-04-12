@@ -166,7 +166,7 @@ class AppUserPermission
      */
     public function loadPermission()
     {
-        if($this->appConfig->issetRole() && $this->appConfig->getRole()->getBypassRole())
+        if($this->appConfig->getBypassRole())
         {
             $this->allowedList =  true;
             $this->allowedDetail =  true;
@@ -220,6 +220,7 @@ class AppUserPermission
     public function allowedAccess($inputGet, $inputPost)
     {
         $userAction = null;
+        
         if(isset($inputPost) && $inputPost->getUserAction() != null)
         {
             $userAction = $inputPost->getUserAction();
@@ -228,7 +229,7 @@ class AppUserPermission
         {
             $userAction = $inputGet->getUserAction();
         }
-        if(!$this->currentModule->getAppModule()->issetModuleId())
+        if(!$this->appConfig->getBypassRole() && !$this->currentModule->getAppModule()->issetModuleId())
         {
             try
             {
