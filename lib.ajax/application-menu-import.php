@@ -15,6 +15,8 @@ $inputPost = new InputPost();
 $inputGet = new InputGet();
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
+$now = date("Y-m-d H:i:s");
+
 if($applicationId != null)
 {
     $menuAppConfig = new SecretObject();
@@ -77,8 +79,8 @@ if($applicationId != null)
                     $menuCreator->setIcon($menu->getIcon());
                     $menuCreator->setUrl($menu->getHref());
                     $menuCreator->setSortOrder($menuIndex + 1);
-                    $menuCreator->setTimeCreate(date('Y-m-d H:i:s'));
-                    $menuCreator->setTimeEdit(date('Y-m-d H:i:s'));
+                    $menuCreator->setTimeCreate($now);
+                    $menuCreator->setTimeEdit($now);
                     $menuCreator->setAdminCreate('superuser');
                     $menuCreator->setAdminEdit('superuser');
                     $menuCreator->setIpCreate($_SERVER['REMOTE_ADDR']);
@@ -125,8 +127,8 @@ if($applicationId != null)
                             $submenuCreator->setIcon($submenuItem->getIcon());
                             $submenuCreator->setUrl($submenuItem->getHref());
                             $submenuCreator->setSortOrder($submenuIndex + 1);
-                            $submenuCreator->setTimeCreate(date('Y-m-d H:i:s'));
-                            $submenuCreator->setTimeEdit(date('Y-m-d H:i:s'));
+                            $submenuCreator->setTimeCreate($now);
+                            $submenuCreator->setTimeEdit($now);
                             $submenuCreator->setAdminCreate('superuser');
                             $submenuCreator->setAdminEdit('superuser');
                             $submenuCreator->setIpCreate($_SERVER['REMOTE_ADDR']);
