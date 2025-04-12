@@ -322,7 +322,7 @@ class PicoDatabase // NOSONAR
      * connection is to an RDMS and the flag is set.
      *
      * @param bool $withDatabase Flag to select the database when connected (default is true).
-     * @return bool True if the connection is successful, false if it fails.
+     * @return bool true if the connection is successful, false if it fails.
      */
     public function connect($withDatabase = true)
     {
@@ -347,7 +347,7 @@ class PicoDatabase // NOSONAR
      * Establishes a connection to an SQLite database using the specified file path in the credentials.
      * Throws an exception if the database path is not set or is empty.
      *
-     * @return bool True if the connection is successful, false if it fails.
+     * @return bool true if the connection is successful, false if it fails.
      * @throws InvalidDatabaseConfiguration If the database path is empty.
      * @throws PDOException If the connection fails with an error.
      */
@@ -384,7 +384,7 @@ class PicoDatabase // NOSONAR
      *
      * @param bool $withDatabase Flag to specify whether to select a database upon connection (default is true).
      *                            If true, the database is selected; otherwise, only the connection is made.
-     * @return bool True if the connection is successfully established, false otherwise.
+     * @return bool true if the connection is successfully established, false otherwise.
      * @throws InvalidDatabaseConfiguration If the database username is missing from the configuration.
      * @throws PDOException If an error occurs during the connection process.
      */

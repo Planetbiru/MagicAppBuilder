@@ -112,7 +112,7 @@ class PicoTableUtil
      * Validate the class name of a DOMElement.
      *
      * @param string $className The class name to validate.
-     * @return bool True if the class name is valid, false otherwise.
+     * @return bool true if the class name is valid, false otherwise.
      */
     public static function isValidClassName($className)
     {

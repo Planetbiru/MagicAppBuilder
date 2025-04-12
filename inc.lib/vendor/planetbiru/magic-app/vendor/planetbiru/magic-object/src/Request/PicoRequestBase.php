@@ -504,7 +504,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     /**
      * Check if the request is a GET request.
      *
-     * @return bool True if the request method is GET, false otherwise.
+     * @return bool true if the request method is GET, false otherwise.
      */
     public function isGet()
     {
@@ -514,7 +514,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     /**
      * Check if the request is a POST request.
      *
-     * @return bool True if the request method is POST, false otherwise.
+     * @return bool true if the request method is POST, false otherwise.
      */
     public function isPost()
     {
@@ -524,7 +524,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     /**
      * Check if the request is an AJAX request.
      *
-     * @return bool True if the request is an AJAX request, false otherwise.
+     * @return bool true if the request is an AJAX request, false otherwise.
      */
     public function isAjax()
     {
@@ -745,7 +745,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is snake case.
      *
-     * @return bool True if the naming strategy is snake case, false otherwise.
+     * @return bool true if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
@@ -766,7 +766,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * This method returns true if the JSON naming strategy is not snake case,
      * indicating that camel case is used instead.
      *
-     * @return bool True if the naming strategy is camel case, false otherwise.
+     * @return bool true if the naming strategy is camel case, false otherwise.
      */
     protected function isCamel()
     {
@@ -779,7 +779,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * This method determines if the prettification option is enabled in the JSON configuration,
      * indicating whether the output should be formatted for readability.
      *
-     * @return bool True if the prettify option is enabled, false otherwise.
+     * @return bool true if the prettify option is enabled, false otherwise.
      */
     private function isPretty()
     {
@@ -795,7 +795,7 @@ class PicoRequestBase extends stdClass // NOSONAR
      * This method checks whether the current request has no values set,
      * indicating that it is considered empty.
      *
-     * @return bool True if the request is empty, false otherwise.
+     * @return bool true if the request is empty, false otherwise.
      */
     public function isEmpty()
     {

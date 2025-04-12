@@ -437,7 +437,7 @@ class Spicy // NOSONAR
      * Recognized words: 'true', 'on', 'yes', 'y'.
      * 
      * @param string $value The value to check.
-     * @return bool True if the value matches a "true" word.
+     * @return bool true if the value matches a "true" word.
      */
     private function isTrueWord($value)
     {
@@ -451,7 +451,7 @@ class Spicy // NOSONAR
      * Recognized words: 'false', 'off', 'no', 'n'.
      * 
      * @param string $value The value to check.
-     * @return bool True if the value matches a "false" word.
+     * @return bool true if the value matches a "false" word.
      */
     private function isFalseWord($value)
     {
@@ -465,7 +465,7 @@ class Spicy // NOSONAR
      * Recognized words: 'null', '~'.
      * 
      * @param string $value The value to check.
-     * @return bool True if the value matches a "null" word.
+     * @return bool true if the value matches a "null" word.
      */
     private function isNullWord($value)
     {
@@ -479,7 +479,7 @@ class Spicy // NOSONAR
      * This method checks if the value represents a "true", "false", or "null" word.
      * 
      * @param string $value The value to check.
-     * @return bool True if the value is a recognized YAML translation word.
+     * @return bool true if the value is a recognized YAML translation word.
      */
     private function isTranslationWord($value)
     {

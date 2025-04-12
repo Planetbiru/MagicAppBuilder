@@ -26,7 +26,7 @@ class PicoIniUtil
      *
      * @param array $array The array to write to the INI file.
      * @param string $path The file path where the INI file will be saved.
-     * @return bool True on success, false on failure.
+     * @return bool true on success, false on failure.
      */
     public static function writeIniFile($array, $path)
     {
@@ -190,7 +190,7 @@ class PicoIniUtil
      * Check if the line is invalid (empty or a comment).
      *
      * @param string $line The line to check.
-     * @return bool True if the line is invalid, false otherwise.
+     * @return bool true if the line is invalid, false otherwise.
      */
     public static function matchValue($matches)
     {
@@ -203,7 +203,7 @@ class PicoIniUtil
      * A line is considered invalid if it is empty or starts with a comment character (# or ;).
      *
      * @param string $line The line to check.
-     * @return bool True if the line is invalid, false otherwise.
+     * @return bool true if the line is invalid, false otherwise.
      */
     public static function invalidLine($line)
     {

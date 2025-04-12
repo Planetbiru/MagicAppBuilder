@@ -104,7 +104,7 @@ class LatLngBounds
     /**
      * Check if the bounding box is empty.
      *
-     * @return bool True if the bounding box is empty, false otherwise.
+     * @return bool true if the bounding box is empty, false otherwise.
      */
     public function isEmpty()
     {
@@ -184,7 +184,7 @@ class LatLngBounds
      * Check if this LatLngBounds is equal to another LatLngBounds object.
      *
      * @param LatLngBounds $latLngBounds The LatLngBounds object to compare.
-     * @return bool True if they are equal, false otherwise.
+     * @return bool true if they are equal, false otherwise.
      */
     public function equals($latLngBounds)
     {
@@ -198,7 +198,7 @@ class LatLngBounds
      * Check if this LatLngBounds intersects with another LatLngBounds.
      *
      * @param LatLngBounds $latLngBounds The LatLngBounds to check for intersection.
-     * @return bool True if they intersect, false otherwise.
+     * @return bool true if they intersect, false otherwise.
      */
     public function intersects($latLngBounds)
     {
@@ -223,7 +223,7 @@ class LatLngBounds
      * Check if this LatLngBounds contains a specific LatLng point.
      *
      * @param LatLng $latLng The LatLng point to check for containment.
-     * @return bool True if the point is contained, false otherwise.
+     * @return bool true if the point is contained, false otherwise.
      */
     public function contains($latLng)
     {

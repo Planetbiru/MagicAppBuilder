@@ -372,7 +372,7 @@ class ImageResize
      * @param string $position Position of the watermark (top-left, top-right, bottom-left, bottom-right, center).
      * @param int $marginX Horizontal margin from the edge.
      * @param int $marginY Vertical margin from the edge.
-     * @return bool True on success, false on failure.
+     * @return bool true on success, false on failure.
      */
     public function addWatermark($sourcePath, $watermarkPath, $outputPath, $opacity = 50, $position = 'bottom-right', $marginX = 10, $marginY = 10) {
         // Load the source image

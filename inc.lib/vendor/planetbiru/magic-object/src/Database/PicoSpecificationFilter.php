@@ -95,7 +95,7 @@ class PicoSpecificationFilter
      * This method determines whether the data type contains 
      * an array-like structure based on the presence of square brackets (`[]`).
      *
-     * @return bool True if the data type represents an array, false otherwise.
+     * @return bool true if the data type represents an array, false otherwise.
      */
     public function isArray()
     {
@@ -172,7 +172,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is a number.
      *
-     * @return bool True if the data type is a number, false otherwise.
+     * @return bool true if the data type is a number, false otherwise.
      */
     public function isNumber()
     {
@@ -182,7 +182,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is a string.
      *
-     * @return bool True if the data type is a string, false otherwise.
+     * @return bool true if the data type is a string, false otherwise.
      */
     public function isString()
     {
@@ -192,7 +192,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is a boolean.
      *
-     * @return bool True if the data type is a boolean, false otherwise.
+     * @return bool true if the data type is a boolean, false otherwise.
      */
     public function isBoolean()
     {
@@ -202,7 +202,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is an array of numbers.
      *
-     * @return bool True if the data type is an array of numbers, false otherwise.
+     * @return bool true if the data type is an array of numbers, false otherwise.
      */
     public function isArrayNumber()
     {
@@ -212,7 +212,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is an array of strings.
      *
-     * @return bool True if the data type is an array of strings, false otherwise.
+     * @return bool true if the data type is an array of strings, false otherwise.
      */
     public function isArrayString()
     {
@@ -222,7 +222,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is an array of booleans.
      *
-     * @return bool True if the data type is an array of booleans, false otherwise.
+     * @return bool true if the data type is an array of booleans, false otherwise.
      */
     public function isArrayBoolean()
     {
@@ -232,7 +232,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type is full text.
      *
-     * @return bool True if the data type is full text, false otherwise.
+     * @return bool true if the data type is full text, false otherwise.
      */
     public function isFulltext()
     {

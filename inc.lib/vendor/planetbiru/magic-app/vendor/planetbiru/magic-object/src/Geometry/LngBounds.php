@@ -78,7 +78,7 @@ class LngBounds
     /**
      * Check if the bounds are empty.
      *
-     * @return bool True if the bounds are empty, false otherwise.
+     * @return bool true if the bounds are empty, false otherwise.
      */
     public function isEmpty()
     {
@@ -89,7 +89,7 @@ class LngBounds
      * Check if this LngBounds intersects with another LngBounds.
      *
      * @param LngBounds $lngBounds The LngBounds to check for intersection.
-     * @return bool True if they intersect, false otherwise.
+     * @return bool true if they intersect, false otherwise.
      */
     public function intersects($lngBounds) // NOSONAR
     {
@@ -117,7 +117,7 @@ class LngBounds
      * Check if this LngBounds is equal to another LngBounds.
      *
      * @param LngBounds $lngBounds The LngBounds object to compare.
-     * @return bool True if they are equal, false otherwise.
+     * @return bool true if they are equal, false otherwise.
      */
     public function equals($lngBounds)
     {
@@ -132,7 +132,7 @@ class LngBounds
      * Check if a given longitude is contained within the bounds.
      *
      * @param float $lng The longitude to check.
-     * @return bool True if the longitude is contained, false otherwise.
+     * @return bool true if the longitude is contained, false otherwise.
      */
     public function contains($lng)
     {

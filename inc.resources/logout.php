@@ -1,6 +1,9 @@
 <?php
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+use MagicObject\Session\PicoSession;
+
+require_once __DIR__ . "/inc.app/app.php";
+$sessions = new PicoSession();
+$sessions->startSession();
 $sessions->destroy();
 header("Location: ./");

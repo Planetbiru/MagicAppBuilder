@@ -74,11 +74,46 @@ function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
                 return 0;
             }
         }
-
         return $cmp;
     });
 }
 
+/**
+ * Clean up admin role from the database.
+ * 
+ * This function deletes admin roles that do not have an admin level or module.
+ *
+ * @param PicoDatabase $database The database connection.
+ * @throws Exception If an error occurs during the operation.
+ * @return int The number of deleted admin roles.
+ */
+function cleanUpRole($database)
+{
+	$deleted = 0;
+	$adminRole = new AppAdminRoleImpl(null, $database);
+	try
+	{
+		// Find all admin roles without filter
+		$pageData = $adminRole->findAll();
+		foreach($pageData->getResult() as $adminRole)
+		{
+			if(!$adminRole->issetAdminLevel() || !$adminRole->issetModule())
+			{
+				// Delete the admin role if it does not have an admin level or module
+				$adminRole->delete();
+				
+				// Increment the deleted count
+				$deleted++;
+			}
+		}
+	}
+	catch(Exception $e)
+	{
+		// Do nothing
+	}
+	// Return the number of deleted admin roles
+	return $deleted;
+}
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
@@ -134,9 +169,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->update();
 			
 		}
-
 		$database->commit();
-		
 	} catch (PDOException $e) {
 		$database->rollBack();
 	}
@@ -144,8 +177,13 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 	$currentModule->redirectToItself();
 }
 
+
+
 if($inputGet->getUserAction() == 'generate')
 {
+	// Clean up admin role
+	cleanUpRole($database);
+	
 	// Generate admin role
 	// for all active modules
 	// for the selected admin level
@@ -282,7 +320,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
+					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonShow();?></button>
 				</span>
 				
 				<span class="filter-group">

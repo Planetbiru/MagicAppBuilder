@@ -281,7 +281,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if a given string is null or empty.
      *
      * @param string $string The string to check
-     * @return bool True if the string is null or empty, false otherwise
+     * @return bool true if the string is null or empty, false otherwise
      */
     public static function nullOrEmpty($string)
     {
@@ -292,7 +292,7 @@ class PicoDatabasePersistence // NOSONAR
      * Check if a given string is not null and not empty.
      *
      * @param string $string The string to check
-     * @return bool True if the string is not null and not empty, false otherwise
+     * @return bool true if the string is not null and not empty, false otherwise
      */
     public static function notNullAndNotEmpty($string)
     {
@@ -651,7 +651,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param PDOStatement $stmt PDO statement to check.
      * @param string|null $databaseType Optional database type, for specific behavior (e.g., SQLite).
-     * @return bool True if rows match, false otherwise.
+     * @return bool true if rows match, false otherwise.
      */
     public function matchRow($stmt, $databaseType = null)
     {
@@ -998,7 +998,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $columnName The name of the column to check.
      * @param array $primaryKeys An array of primary key column names.
-     * @return bool True if the column is a primary key, false otherwise.
+     * @return bool true if the column is a primary key, false otherwise.
      */
     public function isPrimaryKeys($columnName, $primaryKeys)
     {
@@ -1229,7 +1229,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string $strategy The generation strategy for the property.
      * @param string $propertyName The name of the property to check.
-     * @return bool True if a generated value is required, false otherwise.
+     * @return bool true if a generated value is required, false otherwise.
      */
     private function isRequireGenerateValue($strategy, $propertyName)
     {
@@ -1957,7 +1957,7 @@ class PicoDatabasePersistence // NOSONAR
      *
      * @param string[] $primaryKeys Array of primary key names
      * @param array $propertyValues Property values to check
-     * @return bool True if primary keys are valid, false otherwise
+     * @return bool true if primary keys are valid, false otherwise
      */
     private function isValidPrimaryKeyValues($primaryKeys, $propertyValues)
     {
@@ -2271,7 +2271,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable Pageable object (optional)
      * @param PicoSortable|string|null $sortable Sortable object or field name (optional)
      * @param PicoTableInfo $info Table information
-     * @return bool True if JOIN is required, otherwise false
+     * @return bool true if JOIN is required, otherwise false
      */
     protected function isRequireJoin($specification, $pageable, $sortable, $info)
     {
@@ -2292,7 +2292,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable Pageable object (optional)
      * @param PicoSortable|string|null $sortable Sortable object or field name (optional)
      * @param PicoTableInfo $info Table information
-     * @return bool True if JOIN is required, otherwise false
+     * @return bool true if JOIN is required, otherwise false
      */
     private function isRequireJoinFromPageableAndSortable($pageable, $sortable, $info)
     {
@@ -2323,7 +2323,7 @@ class PicoDatabasePersistence // NOSONAR
      * Determine if JOIN is required based on specification
      *
      * @param PicoSpecification $specification Specification object
-     * @return bool True if JOIN is required, otherwise false
+     * @return bool true if JOIN is required, otherwise false
      */
     private function isRequireJoinFromSpecification($specification)
     {
@@ -2854,18 +2854,32 @@ class PicoDatabasePersistence // NOSONAR
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
         $sqlQuery = $queryBuilder
             ->newQuery()
-            ->select($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE ? "count(*)" : $agg)
+            ->select($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE ? $agg : "count(*)")
             ->from($info->getTableName())
             ->where($where);
-
+        $count = 0;
         try {
             $stmt = $this->database->executeQuery($sqlQuery);
             if ($stmt) {
-                return $this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE 
-                    ? $stmt->fetchColumn() 
-                    : $stmt->rowCount();
+                if($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+                {
+                    $data = $stmt->fetchColumn();
+                    if($data === false)
+                    {
+                        // SQLite database
+                        $count = 0;
+                    }
+                    else
+                    {
+                        $count = 1;
+                    }
+                } 
+                else
+                {
+                    $count = $stmt->rowCount();
+                }
             }
-            throw new PDOException("Unknown error");
+            return $count;
         } catch (Exception $e) {
             throw new EmptyResultException($e->getMessage());
         }
@@ -3246,7 +3260,7 @@ class PicoDatabasePersistence // NOSONAR
      * This method checks if the provided filter is not null, not empty, and not a whitespace string.
      *
      * @param string $filter The filter string to validate.
-     * @return bool True if the filter is valid; otherwise, false.
+     * @return bool true if the filter is valid; otherwise, false.
      */
     private function isValidFilter($filter)
     {
@@ -3260,7 +3274,7 @@ class PicoDatabasePersistence // NOSONAR
      * a valid, non-empty string.
      *
      * @param string $value The value to check.
-     * @return bool True if the value is valid; otherwise, false.
+     * @return bool true if the value is valid; otherwise, false.
      */
     private function notNullAndNotEmptyAndNotSpace($value)
     {
@@ -3368,7 +3382,7 @@ class PicoDatabasePersistence // NOSONAR
      * if it should return `true`; otherwise, it returns `false`.
      *
      * @param mixed $value The input value to convert.
-     * @return bool True if the value is equivalent to `1`; otherwise, false.
+     * @return bool true if the value is equivalent to `1`; otherwise, false.
      */
     private function boolval($value)
     {
@@ -3483,7 +3497,7 @@ class PicoDatabasePersistence // NOSONAR
      * This method checks specific string representations of null or default datetime values.
      *
      * @param string $value The value to check.
-     * @return bool True if the value represents a null datetime; otherwise, false.
+     * @return bool true if the value represents a null datetime; otherwise, false.
      */
     private function isDateTimeNull($value)
     {
@@ -3987,7 +4001,7 @@ class PicoDatabasePersistence // NOSONAR
      * This method verifies whether the provided value is set and is an array.
      *
      * @param mixed $value The value to be checked.
-     * @return bool True if the value is an array, false otherwise.
+     * @return bool true if the value is an array, false otherwise.
      */
     public static function isArray($value)
     {
@@ -4001,7 +4015,7 @@ class PicoDatabasePersistence // NOSONAR
      * returning true if it contains a non-empty value, and false otherwise.
      *
      * @param mixed $input The input value to check.
-     * @return bool True if the input is not empty, false otherwise.
+     * @return bool true if the input is not empty, false otherwise.
      */
     public static function isNotEmpty($input)
     {

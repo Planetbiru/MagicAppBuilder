@@ -2,10 +2,12 @@
 
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Request\InputPost;
+use MagicObject\Session\PicoSession;
 
-require_once dirname(__DIR__) . "/inc.app/app.php";
-require_once dirname(__DIR__) . "/inc.app/database-builder.php";
-require_once dirname(__DIR__) . "/inc.app/sessions.php";
+require_once __DIR__ . "/inc.app/app.php";
+
+$sessions = new PicoSession();
+$sessions->startSession();
 
 $inputPost = new InputPost();
 
@@ -35,4 +37,9 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     {
         header("Location: ./index.php");
     }
+}
+else
+{
+    require_once __DIR__ . "/inc.app/login-form.php";
+    exit();
 }

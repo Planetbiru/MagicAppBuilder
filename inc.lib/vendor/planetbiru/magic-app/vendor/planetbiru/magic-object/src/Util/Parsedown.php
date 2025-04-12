@@ -350,7 +350,7 @@ class Parsedown // NOSONAR
      * Check if the specified block type can be continued.
      *
      * @param string $type The type of the block to check.
-     * @return bool True if the block type can be continued, false otherwise.
+     * @return bool true if the block type can be continued, false otherwise.
      */
     protected function isBlockContinuable($type)
     {
@@ -363,7 +363,7 @@ class Parsedown // NOSONAR
      * This method checks if a method exists for completing a block of the specified type.
      *
      * @param string $type The block type to check.
-     * @return bool True if the block type can be completed, false otherwise.
+     * @return bool true if the block type can be completed, false otherwise.
      */
     protected function isBlockCompletable($type)
     {
@@ -1831,7 +1831,7 @@ class Parsedown // NOSONAR
      *
      * @param string $string The string to be checked.
      * @param string $needle The substring to check for.
-     * @return bool True if the string starts with the needle, false otherwise.
+     * @return bool true if the string starts with the needle, false otherwise.
      */
     protected static function striAtStart($string, $needle)
     {

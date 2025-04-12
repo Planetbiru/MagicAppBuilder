@@ -1647,3 +1647,13 @@ ul {
 .card-body .nav .nav-item .nav{
 	margin-left: 20px;
 }
+
+li.menu-exists a::after{
+	content: '\2713'; /* Unicode character for check mark */
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	color: green;
+	font-size: 16px;
+	margin-left: 10px;
+}
