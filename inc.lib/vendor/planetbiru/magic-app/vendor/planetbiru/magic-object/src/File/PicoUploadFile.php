@@ -104,7 +104,7 @@ class PicoUploadFile
      * Check if an uploaded file exists for the given parameter name.
      *
      * @param string $name The parameter name.
-     * @return bool True if the file exists; otherwise, false.
+     * @return bool true if the file exists; otherwise, false.
      */
     public function __isset($name)
     {

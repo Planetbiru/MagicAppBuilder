@@ -288,7 +288,7 @@ class PicoEntityLanguage
      * Check if a property is set or not.
      *
      * @param string $name Name of the property to check.
-     * @return bool True if the property is set, false otherwise.
+     * @return bool true if the property is set, false otherwise.
      */
     public function __isset($name)
     {

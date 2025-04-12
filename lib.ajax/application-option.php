@@ -84,40 +84,12 @@ try
 
             <div id="collapse0" class="collapse collapsed" aria-labelledby="heading0" data-parent="#accordion">
                 <div class="card-body">
+                    <div class="menu-container">
                     <?php
-                        
-                        $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
-                        $path = basename($application->getBaseApplicationDirectory());
-                        if(file_exists($menuPath))
-                        {
-                            $menu = new SecretObject();
-                            $menu->loadYamlFile($menuPath, false, true, true);
-                            
-                            // Render the menu
-                            $ul = '<ul class="nav flex-column">';
-                            foreach ($menu->getMenu() as $item) {
-                                $li = '<li class="nav-item">';
-                                $li .= '<a class="nav-link" href="#"><i class="'.$item->getIcon().'"></i> ' . htmlspecialchars($item->getTitle()) . '</a>';
-                                if ($item->issetSubmenu() && is_array($item->getSubmenu())) {
-                                    $li .= '<ul class="nav flex-column">';
-                                    foreach ($item->getSubmenu() as $subItem) {
-                                        $li .= '<li class="nav-item">';
-                                        $li .= '<a class="nav-link" href="../'. $path . '/' . htmlspecialchars($subItem->getHref()) . '" target="_blank"><i class="' . htmlspecialchars($subItem->getIcon()) . '"></i> ' . htmlspecialchars($subItem->getTitle()) . '</a>';
-                                        $li .= '</li>';
-                                    }
-                                    $li .= '</ul>';
-                                }
-                                $li .= '</li>';
-                                $ul .= $li;
-                            }
-                            $ul .= '</ul>';
-                            echo $ul;
-                        }
-                        else
-                        {
-                            echo "<div class='alert alert-danger'>Menu file not found</div>";
-                        }
+                        include_once __DIR__ . "/application-menu-import.php";
                     ?>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="import-menu">Import Menu</button>
                 </div>
             </div>
         </div>

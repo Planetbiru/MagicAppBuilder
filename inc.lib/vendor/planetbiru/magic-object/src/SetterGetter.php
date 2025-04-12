@@ -382,7 +382,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON naming strategy is snake case.
      *
-     * @return bool True if the naming strategy is snake case, false otherwise.
+     * @return bool true if the naming strategy is snake case, false otherwise.
      */
     private function isSnake()
     {
@@ -400,7 +400,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON naming strategy is camel case.
      *
-     * @return bool True if the naming strategy is camel case, false otherwise.
+     * @return bool true if the naming strategy is camel case, false otherwise.
      */
     protected function isCamel()
     {
@@ -410,7 +410,7 @@ class SetterGetter extends stdClass
     /**
      * Check if the JSON should be prettified.
      *
-     * @return bool True if prettification is enabled, false otherwise.
+     * @return bool true if prettification is enabled, false otherwise.
      */
     private function isPretty()
     {

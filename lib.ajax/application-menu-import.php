@@ -11,18 +11,13 @@ use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$inputPost = new InputGet();
+$inputPost = new InputPost();
+$inputGet = new InputGet();
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-
-
-if(!isset($applicationId) || empty($applicationId))
-{
-    $applicationId = $activeApplication->getApplicationId();
-}
 
 if($applicationId != null)
 {
-    $appConfig = new SecretObject();
+    $menuAppConfig = new SecretObject();
     $application = new EntityApplication(null, $databaseBuilder);
     try
     {
@@ -32,7 +27,7 @@ if($applicationId != null)
         $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
         if(file_exists($appConfigPath))
         {
-            $appConfig->loadYamlFile($appConfigPath, false, true, true);
+            $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);
         }
         if(!file_exists($menuPath))
         {
@@ -44,7 +39,7 @@ if($applicationId != null)
         }
         
         // Database connection for the application
-        $database = new PicoDatabase(new SecretObject($appConfig->getDatabase()));
+        $database = new PicoDatabase(new SecretObject($menuAppConfig->getDatabase()));
         try
         {
             $database->connect();
@@ -125,6 +120,7 @@ if($applicationId != null)
                             
                             $submenuCreator = new AppModuleMinImpl(null, $database);
                             $submenuCreator->setName($submenuItem->getTitle());
+                            $submenuCreator->setMenu(true);
                             $submenuCreator->setModuleGroupId($moduleGroupId);
                             $submenuCreator->setIcon($submenuItem->getIcon());
                             $submenuCreator->setUrl($submenuItem->getHref());
@@ -146,5 +142,139 @@ if($applicationId != null)
     catch(Exception $e)
     {
         // Do noting
+    }
+}
+if(!isset($applicationId) || empty($applicationId))
+{
+    $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+}
+
+if($applicationId != null)
+{
+    $menuAppConfig = new SecretObject();
+    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+    if(file_exists($appConfigPath))
+    {
+        $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);
+    }
+    if(!file_exists($menuPath))
+    {
+        if(!file_exists(basename($menuPath)))
+        {
+            mkdir(dirname($menuPath), 0755, true);
+        }
+        file_put_contents($menuPath, "");
+    }
+    
+    // Database connection for the application
+    $database = new PicoDatabase(new SecretObject($menuAppConfig->getDatabase()));
+    try
+    {
+        $database->connect();
+    }
+    catch(Exception $e)
+    {
+        error_log($e->getMessage());
+    }
+
+    $application = new EntityApplication(null, $databaseBuilder);
+    try
+    {
+        $application->findOneByApplicationId($applicationId);
+        
+        $moduleGroupFinder = new AppModuleGroupMinImpl(null, $database);
+        $moduleFinder = new AppModuleMinImpl(null, $database);
+
+        $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
+        $path = basename($application->getBaseApplicationDirectory());
+        if(file_exists($menuPath))
+        {
+            $menu = new SecretObject();
+            $menu->loadYamlFile($menuPath, false, true, true);
+            
+            // Render the menu
+            $doc = new DOMDocument('1.0', 'UTF-8');
+            $doc->formatOutput = true;
+
+            // Buat elemen <ul class="nav flex-column">
+            $ul = $doc->createElement('ul');
+            $ul->setAttribute('class', 'nav flex-column');
+            
+            if ($menu->getMenu() != null) {
+                foreach ($menu->getMenu() as $item) {
+                    $isMenuExists = $moduleGroupFinder->existsByName($item->getTitle());
+                    // <li class="nav-item">
+                    $li = $doc->createElement('li');
+                    $li->setAttribute('class', 'nav-item');
+                    if ($isMenuExists) {
+                        $li->setAttribute('class', 'nav-item menu-exists');
+                    }
+
+                    // <a class="nav-link" href="#"><i class="..."></i> Title</a>
+                    $a = $doc->createElement('a');
+                    $a->setAttribute('class', 'nav-link');
+                    $a->setAttribute('href', '#');
+
+                    // <i class="..."></i>
+                    $icon = $doc->createElement('i');
+                    $icon->setAttribute('class', $item->getIcon());
+                    $a->appendChild($icon);
+
+                    // Spasi dan judul
+                    $a->appendChild($doc->createTextNode(' ' . htmlspecialchars($item->getTitle())));
+
+                    $li->appendChild($a);
+
+                    // Jika ada submenu
+                    if ($item->issetSubmenu() && is_array($item->getSubmenu())) {
+                        $subUl = $doc->createElement('ul');
+                        $subUl->setAttribute('class', 'nav flex-column');
+
+                        foreach ($item->getSubmenu() as $subItem) {
+                            $isSubmenuExists = $moduleFinder->existsByNameAndUrl($subItem->getTitle(), $subItem->getHref());
+                            $subLi = $doc->createElement('li');
+                            $subLi->setAttribute('class', 'nav-item');
+                            if ($isSubmenuExists) {
+                                $subLi->setAttribute('class', 'nav-item menu-exists');
+                            }
+
+                            $subA = $doc->createElement('a');
+                            $subA->setAttribute('class', 'nav-link');
+                            $subA->setAttribute('href', '../' . $path . '/' . htmlspecialchars($subItem->getHref()));
+                            $subA->setAttribute('target', '_blank');
+
+                            $subIcon = $doc->createElement('i');
+                            $subIcon->setAttribute('class', htmlspecialchars($subItem->getIcon()));
+                            $subA->appendChild($subIcon);
+
+                            $subA->appendChild($doc->createTextNode(' ' . htmlspecialchars($subItem->getTitle())));
+                            $subLi->appendChild($subA);
+                            $subUl->appendChild($subLi);
+                        }
+
+                        $li->appendChild($subUl);
+                    }
+
+                    $ul->appendChild($li);
+                }           
+
+                // Tambahkan <ul> ke DOM dan tampilkan
+                $doc->appendChild($ul);
+                echo $doc->saveHTML();
+            }
+            else
+            {
+                echo "<div class='alert alert-danger'>Menu file is empty</div>";
+            }
+        }
+        else
+        {
+            echo "<div class='alert alert-danger'>Menu file not found</div>";
+        }
+    }
+    catch(Exception $e)
+    {
+        // Do nothing
+        echo "<div class='alert alert-danger'>".$e->getMessage()."</div>";
     }
 }

@@ -1273,7 +1273,7 @@ class MagicObject extends stdClass // NOSONAR
      * This method checks if the specified property is set (exists and has a value). It returns true if the property exists and has a value, and false otherwise.
      *
      * @param string $propertyName The name of the property to check.
-     * @return bool True if the property is set, false otherwise.
+     * @return bool true if the property is set, false otherwise.
      */
     public function hasValue($propertyName)
     {
@@ -1333,7 +1333,7 @@ class MagicObject extends stdClass // NOSONAR
      * using `isset()`. It checks if the property exists and is set (even if its value is null).
      *
      * @param string $propertyName The name of the property to check.
-     * @return bool True if the property is set (including null), false otherwise.
+     * @return bool true if the property is set (including null), false otherwise.
      */
     public function __isset($propertyName)
     {
@@ -1560,7 +1560,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is snake case
      *
-     * @return bool True if the naming strategy is snake case; otherwise, false
+     * @return bool true if the naming strategy is snake case; otherwise, false
      */
     protected function _snakeJson()
     {
@@ -1576,7 +1576,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the YAML naming strategy is snake case
      *
-     * @return bool True if the naming strategy is snake case; otherwise, false
+     * @return bool true if the naming strategy is snake case; otherwise, false
      */
     protected function _snakeYaml()
     {
@@ -1592,7 +1592,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is upper camel case
      *
-     * @return bool True if the naming strategy is upper camel case; otherwise, false
+     * @return bool true if the naming strategy is upper camel case; otherwise, false
      */
     protected function _upperCamel()
     {
@@ -1608,7 +1608,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON naming strategy is camel case
      *
-     * @return bool True if the naming strategy is camel case; otherwise, false
+     * @return bool true if the naming strategy is camel case; otherwise, false
      */
     protected function _camel()
     {
@@ -1618,7 +1618,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Check if the JSON output should be prettified
      *
-     * @return bool True if JSON output is set to be prettified; otherwise, false
+     * @return bool true if JSON output is set to be prettified; otherwise, false
      */
     protected function _pretty()
     {
@@ -1646,7 +1646,7 @@ class MagicObject extends stdClass // NOSONAR
      * Check if a value is not null and not empty
      *
      * @param mixed $value The value to check
-     * @return bool True if the value is not null and not empty; otherwise, false
+     * @return bool true if the value is not null and not empty; otherwise, false
      */
     private function _isNotNullAndNotEmpty($value)
     {
@@ -2312,7 +2312,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the deletion.
-     * @return bool True on success; otherwise, false.
+     * @return bool true on success; otherwise, false.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
     private function deleteOneBy($method, $params)
@@ -2341,7 +2341,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the search.
-     * @return bool True if the record exists; otherwise, false.
+     * @return bool true if the record exists; otherwise, false.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
     private function existsBy($method, $params)

@@ -61,7 +61,7 @@ class PicoSqlite extends PicoDatabase
      * Connect to the database.
      *
      * @param bool $withDatabase Flag to select the database when connected.
-     * @return bool True if the connection is successful, false if it fails.
+     * @return bool true if the connection is successful, false if it fails.
      */
     public function connect($withDatabase = true)
     {
@@ -81,7 +81,7 @@ class PicoSqlite extends PicoDatabase
      * Check if a table exists in the database.
      *
      * @param string $tableName The name of the table to check.
-     * @return bool True if the table exists, false otherwise.
+     * @return bool true if the table exists, false otherwise.
      */
     public function tableExists($tableName)
     {

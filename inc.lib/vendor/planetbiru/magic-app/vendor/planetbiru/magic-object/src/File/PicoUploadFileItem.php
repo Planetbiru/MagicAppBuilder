@@ -44,7 +44,7 @@ class PicoUploadFileItem
      * Copies the uploaded file to a specified destination path.
      *
      * @param string $path The target path where the file will be copied.
-     * @return bool True on success; otherwise, false.
+     * @return bool true on success; otherwise, false.
      * @throws FileNotFoundException if the temporary file is not found.
      */
     public function copyTo($path)
@@ -60,7 +60,7 @@ class PicoUploadFileItem
      * Moves the uploaded file to a specified destination path.
      *
      * @param string $path The target path where the file will be moved.
-     * @return bool True on success; otherwise, false.
+     * @return bool true on success; otherwise, false.
      * @throws FileNotFoundException if the temporary file is not found.
      */
     public function moveTo($path)

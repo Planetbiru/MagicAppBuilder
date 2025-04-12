@@ -111,7 +111,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     /**
      * Check if the database type is MySQL or MariaDB.
      *
-     * @return bool True if the database type is MySQL or MariaDB, false otherwise.
+     * @return bool true if the database type is MySQL or MariaDB, false otherwise.
      */
     public function isMySql()
     {
@@ -122,7 +122,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     /**
      * Check if the database type is PostgreSQL.
      *
-     * @return bool True if the database type is PostgreSQL, false otherwise.
+     * @return bool true if the database type is PostgreSQL, false otherwise.
      */
     public function isPgSql()
     {
@@ -132,7 +132,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
      * Check if the database type is SQLite.
      *
-     * @return bool True if the database type is SQLite, false otherwise.
+     * @return bool true if the database type is SQLite, false otherwise.
      */
     public function isSqlite()
     {
@@ -142,7 +142,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
      * Check if the database type is SQL Server.
      *
-     * @return bool True if the database type is SQLite, false otherwise.
+     * @return bool true if the database type is SQLite, false otherwise.
      */
     public function isSqlServer()
     {

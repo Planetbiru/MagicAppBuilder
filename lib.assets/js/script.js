@@ -1537,7 +1537,21 @@ let initAll = function () {
       }
     })
   });
+  $(document).on('click', '#import-menu', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-menu-import.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        modal.find('.menu-container').empty().append(data);
+      }
+    });
 
+  });
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');

@@ -53,7 +53,7 @@ try
 
 catch(Exception $e)
 {
-    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
+    if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
     {
         $currentUser = new AppAdminImpl(null, $database);
         $currentUser->setAdminId("superuser");

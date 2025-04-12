@@ -605,7 +605,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      *
      * @param PicoDatabase $database The database instance to check.
      * @param string $tableName The name of the table to check.
-     * @return bool True if the table exists, false otherwise.
+     * @return bool true if the table exists, false otherwise.
      * @throws InvalidParameterException If the table name is null or empty.
      */
     public function tableExists($database, $tableName)

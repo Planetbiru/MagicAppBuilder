@@ -236,19 +236,19 @@ class ApplicationMenu
 
         $menuList = array();
         $menuList['menu'] = array();
-        foreach($moduleGroups as $moduleGoup)
+        foreach($moduleGroups as $moduleGroup)
         {
             $menu = array(
-                'title' => $moduleGoup->getName(),
-                'icon' => $moduleGoup->getIcon(),
-                'href' => $moduleGoup->getUrl(),
-                'target' => $moduleGoup->getTarget(),
+                'title' => $moduleGroup->getName(),
+                'icon' => $moduleGroup->getIcon(),
+                'href' => $moduleGroup->getUrl(),
+                'target' => $moduleGroup->getTarget(),
                 'submenu' => array()
             );
             $submenus = array();
-            if($moduleGoup->getModules() != null)
+            if($moduleGroup->getModules() != null)
             {
-                foreach($moduleGoup->getModules() as $module)
+                foreach($moduleGroup->getModules() as $module)
                 {
                     $submenus[] = array(
                         'title' => $module->getName(),
@@ -278,46 +278,60 @@ class ApplicationMenu
         // Step 1 - for module with valid group module
         foreach($modules as $module)
         {
-            $moduleGroup = $module->getGroupModule();
+            $moduleGroup = $module->getModuleGroup();
+            if($moduleGroup == null || $moduleGroup->getModuleGroupId() == null)
+            {
+                $moduleGroup = new MagicObject();
+            }
             $moduleGroupId = $module->getModuleGroupId();
-            if(isset($moduleGroup) && $moduleGroup->getGroupModuleId() != null)
+            if(isset($moduleGroup) && $moduleGroup->getModuleGroupId() != null)
             {
                 if(!isset($modulesWithGroup[$moduleGroupId]))
                 {
                     $modulesWithGroup[$moduleGroupId] = new MagicObject();
-                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId();
+                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId($moduleGroupId);
+                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroup->getName());
+                    $modulesWithGroup[$moduleGroupId]->setHref('#');
+                    $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->isAllowedAccess($module, $adminRoles))
+                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
                 {
-                    $modulesWithGroup[$moduleGroupId]->appendModules();
+                    $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
             }
         }
         // Step 2 - for module without valid group module
         foreach($modules as $module)
         {
-            $moduleGroup = $module->getGroupModule();
+            $moduleGroup = $module->getModuleGroup();
+            if($moduleGroup == null || $moduleGroup->getModuleGroupId() == null)
+            {
+                $moduleGroup = new MagicObject();
+            }
             $moduleGroupId = $module->getModuleGroupId();
-            if(!isset($moduleGroup) || $moduleGroup->getGroupModuleId() == null)
+            if(!isset($moduleGroup) || $moduleGroup->getModuleGroupId() == null)
             {
                 if(!isset($modulesWithGroup[$moduleGroupId]))
                 {
                     $modulesWithGroup[$moduleGroupId] = new MagicObject();
-                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId();
+                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId($moduleGroupId);
+                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroup->getName());
+                    $modulesWithGroup[$moduleGroupId]->setHref('#');
+                    $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->isAllowedAccess($module, $adminRoles))
+                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
                 {
-                    $modulesWithGroup[$moduleGroupId]->appendModules();
+                    $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
             }
         }
-        
+                
         // Clean up empty group
         foreach($modulesWithGroup as $index=>$group)
         {
-            if($group->issetModules())
+            if(!$group->issetModules())
             {
                 unset($modulesWithGroup[$index]);
             }

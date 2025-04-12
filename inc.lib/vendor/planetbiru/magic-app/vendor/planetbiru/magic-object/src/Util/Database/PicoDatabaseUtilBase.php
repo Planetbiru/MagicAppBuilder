@@ -356,7 +356,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * @param SecretObject $tableInfo Information about the table, including mapping and constraints.
      * @param int $maxRecord The maximum number of records to process in a single batch.
      * @param callable $callbackFunction A callback function to handle the generated SQL statements.
-     * @return bool True on success, false on failure.
+     * @return bool true on success, false on failure.
      */
     public function importDataTable($databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget, $tableInfo, $maxRecord, $callbackFunction)
     {
@@ -817,7 +817,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * one of the native values: "true", "false", or "null".
      *
      * @param string $defaultValue The value to check.
-     * @return bool True if the value is "true", "false", or "null", false otherwise.
+     * @return bool true if the value is "true", "false", or "null", false otherwise.
      */
     public static function isNativeValue($defaultValue)
     {
@@ -831,7 +831,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * indicating it is a boolean type (e.g., bool, boolean).
      *
      * @param string $type The type to check.
-     * @return bool True if the type contains "bool", false otherwise.
+     * @return bool true if the type contains "bool", false otherwise.
      */
     public static function isTypeBoolean($type)
     {
@@ -845,7 +845,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * "char", or "text", indicating it is a text-based type (e.g., enum, varchar, char, text).
      *
      * @param string $type The type to check.
-     * @return bool True if the type contains "enum", "varchar", "char", or "text", false otherwise.
+     * @return bool true if the type contains "enum", "varchar", "char", or "text", false otherwise.
      */
     public static function isTypeText($type)
     {
@@ -859,7 +859,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * indicating it is an integer type (e.g., int, integer).
      *
      * @param string $type The type to check.
-     * @return bool True if the type contains "int", false otherwise.
+     * @return bool true if the type contains "int", false otherwise.
      */
     public static function isTypeInteger($type)
     {
@@ -873,7 +873,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * "decimal", "float", "double", or "real", indicating it is a floating-point type.
      *
      * @param string $type The type to check.
-     * @return bool True if the type contains "decimal", "float", "double", or "real", false otherwise.
+     * @return bool true if the type contains "decimal", "float", "double", or "real", false otherwise.
      */
     public static function isTypeFloat($type)
     {
@@ -886,7 +886,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * This function checks if the provided `$value` is set and is an array.
      *
      * @param mixed $value The value to check.
-     * @return bool True if the value is an array, false otherwise.
+     * @return bool true if the value is an array, false otherwise.
      */
     public static function isArray($value)
     {
@@ -899,7 +899,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * This method verifies that the input is an array and contains at least one element.
      *
      * @param array $array The array to be checked.
-     * @return bool True if the array is not empty; otherwise, false.
+     * @return bool true if the array is not empty; otherwise, false.
      */
     public function isNotEmpty($array)
     {

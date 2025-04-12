@@ -83,7 +83,7 @@ class PicoSpecification // NOSONAR
     /**
      * Checks if a real join table is required based on the specifications.
      *
-     * @return bool True if a join is required, false otherwise.
+     * @return bool true if a join is required, false otherwise.
      */
     public function isRequireJoin()
     {
@@ -264,7 +264,7 @@ class PicoSpecification // NOSONAR
     /**
      * Checks if the specifications collection is empty.
      *
-     * @return bool True if there are no specifications, false otherwise.
+     * @return bool true if there are no specifications, false otherwise.
      */
     public function isEmpty()
     {
@@ -275,7 +275,7 @@ class PicoSpecification // NOSONAR
      * Check if the given input is an array.
      *
      * @param mixed $array The input to check.
-     * @return bool True if the input is an array, false otherwise.
+     * @return bool true if the input is an array, false otherwise.
      */
     public static function isArray($array)
     {
@@ -286,7 +286,7 @@ class PicoSpecification // NOSONAR
      * Checks if the given value is considered empty.
      *
      * @param mixed $value The value to check.
-     * @return bool True if the value is empty, false otherwise.
+     * @return bool true if the value is empty, false otherwise.
      */
     public static function isValueEmpty($value)
     {
@@ -402,7 +402,7 @@ class PicoSpecification // NOSONAR
      * Checks if the specification is not null and not empty.
      *
      * @param mixed $specification The specification to check.
-     * @return bool True if the specification is valid, false otherwise.
+     * @return bool true if the specification is valid, false otherwise.
      */
     private function hasValue($specification)
     {
@@ -666,7 +666,7 @@ class PicoSpecification // NOSONAR
     /**
      * Checks if a real join table is required based on the specifications.
      *
-     * @return bool True if a join is required, false otherwise.
+     * @return bool true if a join is required, false otherwise.
      */ 
     public function getRequireJoin()
     {
