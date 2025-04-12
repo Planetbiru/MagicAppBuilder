@@ -30,3 +30,11 @@ else
     require_once __DIR__ . "/500.php";
     exit();
 }
+if($appConfig->getAccessLocalhostOnly())
+{
+    $allowedIps = ['127.0.0.1', '::1'];
+    if (!in_array($_SERVER['REMOTE_ADDR'], $allowedIps)) {
+        require_once __DIR__ . "/403.php";
+        exit;
+    }
+}

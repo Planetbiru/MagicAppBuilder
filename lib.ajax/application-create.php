@@ -270,11 +270,22 @@ $paginationConfig = new SecretObject(array(
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
+
+// Get application menu from YAML file instead of database
 $newApp->setDevelopmentMode(true);
 $newApp->setDebugMode(true);
 $newApp->setDebugModeError(true);
 $newApp->setDebugModeErrorLog(true);
+
+// Use dummy user instead of database
 $newApp->setBypassRole(true);
+
+// Set access localhost only
+// This is for testing purpose only, 
+// should be set to false in production, 
+// online installation, 
+// and when `bypassRole` set to false`
+$newApp->setAccessLocalhostOnly(true);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);

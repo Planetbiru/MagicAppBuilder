@@ -170,6 +170,9 @@ button {
 .config-table td .btn {
   margin-bottom: 8px;
 }
+.config-table td label {
+  margin-bottom: 0px;
+}
 .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 200px;
 }
@@ -1448,4 +1451,7 @@ ul {
   100% {
     opacity: 1;
   }
+}
+.card-body .nav .nav-item .nav {
+  margin-left: 20px;
 }/*# sourceMappingURL=css.css.map */

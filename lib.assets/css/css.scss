@@ -224,6 +224,9 @@ button {
 		.btn{
 			margin-bottom: 8px;
 		}
+		label{
+			margin-bottom: 0px;
+		}
 	}
 
 	tbody {
@@ -1639,4 +1642,8 @@ ul {
 	100% {
 		opacity: 1;
 	}
+}
+
+.card-body .nav .nav-item .nav{
+	margin-left: 20px;
 }

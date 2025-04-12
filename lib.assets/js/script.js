@@ -1471,8 +1471,8 @@ let initAll = function () {
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
+    $('#modal-application-setting').modal('show');
     increaseAjaxPending();
     resetCheckWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
     resetCheckWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
@@ -1494,6 +1494,48 @@ let initAll = function () {
         updateBtn[0].disabled = false;
       }
     });
+  });
+  
+  $(document).on('click', '.button-application-option', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-application-option .application-option').empty();
+    $('#modal-application-option').modal('show');
+    increaseAjaxPending();
+
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-option.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        $('#modal-application-option').attr('data-application-id', applicationId);
+        $('#modal-application-option .application-option').empty().append(data);
+        updateBtn[0].disabled = false;
+      }
+    });
+  });
+  $(document).on("click", ".button-save-application-option", function (e) {
+    e.preventDefault();
+    let form = $(this).closest(".modal").find('form');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-option.php',
+      data: { 
+        action: 'save', 
+        developmentMode: form.find('[name="development_mode"]:checked').val(), 
+        bypassRole: form.find('[name="bypass_role"]:checked').val(), 
+        accessLocalhostOnly: form.find('[name="access_localhost_only"]:checked').val(),
+        applicationId: form.closest('.modal').attr('data-application-id') 
+      },
+      success: function (data) {
+        let modal = form.closest('.modal');
+        modal.modal('hide');
+      }
+    })
   });
 
   $(document).on('click', '.button-application-database', function (e) {
