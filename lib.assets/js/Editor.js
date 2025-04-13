@@ -419,6 +419,9 @@ function hilightLine1() {
   transEd1.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
+  
+  let translationStatus = entityTranslationData[lineNumber].propertyName;
+  $('.entity-translation-status').text(translationStatus);
 }
 
 /**
@@ -435,6 +438,9 @@ function hilightLine2() {
   transEd1.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
+  
+  let translationStatus = entityTranslationData[lineNumber].propertyName;
+  $('.entity-translation-status').text(translationStatus);
 }
 
 /**
@@ -451,6 +457,8 @@ function hilightLine3() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
+  let translationStatus = moduleTranslationData[lineNumber].propertyName;
+  $('.module-translation-status').text(translationStatus);
 }
 
 /**
@@ -467,4 +475,6 @@ function hilightLine4() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
+  let translationStatus = moduleTranslationData[lineNumber].propertyName;
+  $('.module-translation-status').text(translationStatus);
 }
