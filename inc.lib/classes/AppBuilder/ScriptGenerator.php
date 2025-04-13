@@ -760,25 +760,29 @@ class ScriptGenerator //NOSONAR
         $moduleMenu = trim($request->getModuleMenu());
         $title = trim($request->getModuleName());
         $href = ltrim(trim($target."/".$request->getModuleFile()), "/");
-
+        $submenuHashes = [];
         $menuToCheck = $title."-".$href;
         if(!in_array($menuToCheck, $existingMenus) && $menus->getMenu() != null)
         {
             $menuArray = json_decode((string) $menus, true)['menu'];
-            $existingHash = array();
+            
             foreach($menuArray as $index=>$menu)
             {
-                if(!isset($menu['href']))
+                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)))
                 {
-                    $menuArray[$index]['href'] = '';
-                    $menu['href'] = '';
+                    if(!isset($menuArray[$index]['submenu']))
+                    {
+                        $menuArray[$index]['submenu'] = [];
+                    }
+
+                    $hash = $title.$href;
+                    $submenuHashes[] = $hash;
                 }
-                $existingHash[] = $menu['title'].'|'.$menu['href'];
             }
             
             foreach($menuArray as $index=>$menu)
             {
-                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)) && !in_array($title.'|'.$href, $existingHash))
+                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)))
                 {
                     if(!isset($menuArray[$index]['submenu']))
                     {
@@ -789,7 +793,7 @@ class ScriptGenerator //NOSONAR
                     $skip = false;
                     foreach($menuArray[$index]['submenu'] as $sub)
                     {
-                        if($sub['title'].$sub['href'] == $hash)
+                        if($sub['title'].$sub['href'] == $hash || in_array($hash, $submenuHashes))
                         {
                             $skip = true;
                             break;
