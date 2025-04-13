@@ -3592,6 +3592,9 @@ function reloadTranslate(translateFor) {
   }
 }
 
+let entityTranslationData = [];
+let moduleTranslationData = [];
+
 /**
  * Translates the specified entity and updates the UI with the results.
  *
@@ -3620,6 +3623,8 @@ function translateEntity(clbk) {
       data: { userAction: 'get', entityName: entityName, targetLanguage: targetLanguage, filter: filter },
       success: function (data) {
         decreaseAjaxPending();
+        entityTranslationData = data;
+        $('.entity-translation-status').text('');
         let textOut1 = [];
         let textOut2 = [];
         let propertyNames = [];
@@ -3678,6 +3683,8 @@ function translateModule() {
     data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter: filter },
     success: function (data) {
       decreaseAjaxPending();
+      moduleTranslationData = data;
+      $('.module-translation-status').text('');
       let textOut1 = [];
       let textOut2 = [];
       let propertyNames = [];

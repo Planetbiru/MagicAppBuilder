@@ -73,15 +73,6 @@ class AppUserActivityImpl extends MagicObject
 	protected $timeCreate;
 
 	/**
-	 * Admin Create
-	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-	 * @Label(content="Admin Create")
-	 * @var string
-	 */
-	protected $adminCreate;
-
-	/**
 	 * IP Create
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)

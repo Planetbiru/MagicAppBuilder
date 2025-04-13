@@ -368,7 +368,7 @@ menu:
     submenu: [ ]
   - 
     title: Master
-    icon: fa fa-cog
+    icon: fa fa-folder
     submenu: [ ]
   - 
     title: Settings
