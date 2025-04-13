@@ -342,6 +342,10 @@ thead .data-sort-header {
 .table-row td.data-sort {
   padding: 0.24rem 0 0.24rem 0.2rem;
 }
+.table-row td.data-number {
+  text-align: right;
+  padding-right: 4px;
+}
 .table-row .data-selector {
   padding-left: 0.5rem;
 }

@@ -422,6 +422,10 @@ thead .data-sort-header {
     &.data-sort {
       padding: 0.24rem 0 0.24rem 0.2rem;
     }
+    &.data-number{
+      text-align: right;
+      padding-right: 4px;
+    }
   }
 
   .data-selector {
