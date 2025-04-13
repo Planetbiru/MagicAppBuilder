@@ -159,14 +159,6 @@ if($applicationId != null)
     {
         $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);
     }
-    if(!file_exists($menuPath))
-    {
-        if(!file_exists(basename($menuPath)))
-        {
-            mkdir(dirname($menuPath), 0755, true);
-        }
-        file_put_contents($menuPath, "");
-    }
     
     // Database connection for the application
     $database = new PicoDatabase(new SecretObject($menuAppConfig->getDatabase()));
