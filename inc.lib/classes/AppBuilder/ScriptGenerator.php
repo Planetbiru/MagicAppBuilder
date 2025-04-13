@@ -765,10 +765,15 @@ class ScriptGenerator //NOSONAR
         if(!in_array($menuToCheck, $existingMenus) && $menus->getMenu() != null)
         {
             $menuArray = json_decode((string) $menus, true)['menu'];
+            $existingHash = array();
+            foreach($menuArray as $index=>$menu)
+            {
+                $existingHash[] = $menu['title'].'|'.$menu['href'];
+            }
             
             foreach($menuArray as $index=>$menu)
             {
-                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)))
+                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)) && !in_array($title.'|'.$href, $existingHash))
                 {
                     if(!isset($menuArray[$index]['submenu']))
                     {
