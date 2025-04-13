@@ -19,10 +19,9 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
-use MagicAppTemplate\Entity\App\AppLanguageImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -54,8 +53,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$admin->setLanguageId($currentUser->getLanguageId());
 	$admin->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setAdminCreate($currentAction->getUserId());
@@ -88,9 +86,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -296,23 +291,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td>
-							<select class="form-control" name="language_id" id="language_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->languageId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getBloked();?></td>
 						<td>
 							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1"/> <?php echo $appEntityLanguage->getBloked();?></label>
@@ -421,23 +399,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getPhone();?></td>
 						<td>
 							<input class="form-control" type="tel" name="phone" id="phone" value="<?php echo $admin->getPhone();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td>
-							<select class="form-control" name="language_id" id="language_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->languageId, Field::of()->name, $admin->getLanguageId())
-								; ?>
-							</select>
 						</td>
 					</tr>
 					<tr>
@@ -585,11 +546,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
+						<td><?php echo $admin->getLanguageId();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>

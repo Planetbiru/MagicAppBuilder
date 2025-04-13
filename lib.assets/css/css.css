@@ -72,11 +72,6 @@ body {
   display: none;
 }
 
-.accordion .btn {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
 form {
   margin: 0;
   padding: 0;
@@ -94,10 +89,6 @@ input {
 }
 
 select {
-  margin: 0;
-}
-
-textarea {
   margin: 0;
 }
 
@@ -387,6 +378,10 @@ li.file-syntax-error a {
   color: #DD0000;
 }
 
+.accordion .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 .accordion .card-header button.btn {
   display: block;
   width: 100%;
@@ -563,14 +558,11 @@ h3.entity-table-name {
 
 .animation-wave > span {
   vertical-align: top;
+  padding: 0px 8px;
 }
 
 .animation-wave {
   padding: 0px 10px;
-}
-
-.animation-wave > span {
-  padding: 0px 8px;
 }
 
 .animation-wave::before, .animation-wave::after, .animation-wave > span::before, .animation-wave > span::after {
@@ -1192,6 +1184,7 @@ li[data-type=dir][data-loading=true]::after {
 }
 
 textarea {
+  margin: 0;
   width: 100%;
   box-sizing: border-box;
   padding: 20px;
@@ -1228,7 +1221,6 @@ textarea:focus-visible {
 
 /* Context Menu Styles */
 .context-menu {
-  display: none;
   position: absolute;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -1236,6 +1228,10 @@ textarea:focus-visible {
   z-index: 9999;
   padding: 5px;
   width: 180px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add transition for hover effect */
 }
 
 .context-menu ul {
@@ -1259,13 +1255,6 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-}
-
-.context-menu {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Add transition for hover effect */
 }
 
 /* Styling for icons using pseudo-elements */

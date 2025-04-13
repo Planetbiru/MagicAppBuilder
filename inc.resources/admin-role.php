@@ -25,6 +25,8 @@ use MagicAppTemplate\Entity\App\AppModuleImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
+$attributeChecked = ' checked="checked"';
+
 /**
  * Sorts the modules by group and module order.
  *
@@ -406,7 +408,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_list">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_list" name="allowed_list[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedList(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedList($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -415,7 +417,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_detail">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_detail" name="allowed_detail[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDetail(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedDetail($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -424,7 +426,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_create">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_create" name="allowed_create[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedCreate(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedCreate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -433,7 +435,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_update">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_update" name="allowed_update[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedUpdate(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedUpdate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -442,7 +444,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_delete">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_delete" name="allowed_delete[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDelete(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedDelete($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -451,7 +453,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_approve">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_approve" name="allowed_approve[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedApprove(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedApprove($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -460,7 +462,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_sort_order">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_sort_order" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedSortOrder(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedSortOrder($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -469,7 +471,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_export">
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_export" name="allowed_export[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedExport(' checked="checked"', "");?>> 
+											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>

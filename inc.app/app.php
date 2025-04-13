@@ -61,6 +61,7 @@ languages:
 dateFormatDetail: 'j F Y H:i:s'
 phpIni:
     maxExecutionTime: 600
+    memoryLimit: 256M
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

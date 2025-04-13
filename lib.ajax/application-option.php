@@ -14,6 +14,8 @@ $constSelected = ' selected';
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
+$attributeChecked = ' checked="checked"';
+
 if($inputPost->getAction() == 'save')
 {
     $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
@@ -127,15 +129,15 @@ try
                         <tbody>
                             <tr>
                                 <td>Development Mode</td>
-                                <td><label for="development_mode"><input type="checkbox" name="development_mode" id="development_mode" value="1" <?php echo $appConfig->getDevelopmentMode() ? ' checked' : '';?>> Yes</label></td>
+                                <td><label for="development_mode"><input type="checkbox" name="development_mode" id="development_mode" value="1" <?php echo $appConfig->getDevelopmentMode() ? $attributeChecked : '';?>> Yes</label></td>
                             </tr>
                             <tr>
                                 <td>Bypass Role</td>
-                                <td><label for="bypass_role"><input type="checkbox" name="bypass_role" id="bypass_role" value="1" <?php echo $appConfig->getBypassRole() ? ' checked' : '';?>> Yes</label></td>
+                                <td><label for="bypass_role"><input type="checkbox" name="bypass_role" id="bypass_role" value="1" <?php echo $appConfig->getBypassRole() ? $attributeChecked : '';?>> Yes</label></td>
                             </tr>
                             <tr>
                                 <td>Access Localhost Only</td>
-                                <td><label for="access_localhost_only"><input type="checkbox" name="access_localhost_only" id="access_localhost_only" value="1" <?php echo $appConfig->getAccessLocalhostOnly() ? ' checked' : '';?>> Yes</label></td>
+                                <td><label for="access_localhost_only"><input type="checkbox" name="access_localhost_only" id="access_localhost_only" value="1" <?php echo $appConfig->getAccessLocalhostOnly() ? $attributeChecked : '';?>> Yes</label></td>
                             </tr>
                         </tbody>
                     </table>

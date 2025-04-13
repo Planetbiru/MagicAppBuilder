@@ -98,7 +98,6 @@ function initSortTable() {
   const tables = document.querySelectorAll("table.table-sort-by-column");
   
   tables.forEach(function (thisTable) {
-    let self = thisTable.getAttribute("data-self-name");
     let originalURL = document.location.toString();
     let arr0 = originalURL.split("#");
     originalURL = arr0[0];
