@@ -768,6 +768,11 @@ class ScriptGenerator //NOSONAR
             $existingHash = array();
             foreach($menuArray as $index=>$menu)
             {
+                if(!isset($menu['href']))
+                {
+                    $menuArray[$index]['href'] = '';
+                    $menu['href'] = '';
+                }
                 $existingHash[] = $menu['title'].'|'.$menu['href'];
             }
             
