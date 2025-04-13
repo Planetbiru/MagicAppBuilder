@@ -32,6 +32,12 @@ $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-l
 $userPermission = new AppUserPermissionExtended($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
+if(!$userPermission->allowedAccess($inputGet, $inputPost))
+{
+	require_once $appInclude->appForbiddenPage(__DIR__);
+	exit();
+}
+
 $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
