@@ -90,6 +90,14 @@ $phpIni = new SecretObject($builderConfig->getPhpIni());
 // Set max_execution_time
 ini_set('max_execution_time', $phpIni->getMaxExecutionTime() != null ? intval($phpIni->getMaxExecutionTime()) : 600);
 
+// Set memory_limit
+// Check if memory_limit is set and is not empty
+if($phpIni->getMemoryLimit() != null && $phpIni->getMemoryLimit() != "")
+{
+    // Set the memory limit to the value specified in the configuration
+    ini_set('memory_limit', $phpIni->getMemoryLimit());
+}
+
 $inputPost = new InputPost();
 $newAppId = trim($inputPost->getId());
 
@@ -420,7 +428,6 @@ else
     $scriptGenerator = new ScriptGenerator();
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 }
-error_log("AFTER PREPARE APPLICATION");
 
 
 
@@ -433,7 +440,6 @@ try
         ->setWorkspaceId($workspaceId)
         ->setApplicationId($newAppId)
         ->update();
-        error_log("AFTER FINISHING APPLICATION");
 }
 catch(Exception $e)
 {

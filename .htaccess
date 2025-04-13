@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteRule ^inc\.resource(/|$) - [F,L]
+RewriteRule ^inc\.app(/|$)      - [F,L]
+RewriteRule ^inc\.lib(/|$)      - [F,L]
+RewriteRule ^inc\.lang(/|$)     - [F,L]
+RewriteRule ^inc\.cfg(/|$)      - [F,L]
