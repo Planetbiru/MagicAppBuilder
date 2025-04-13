@@ -1552,6 +1552,47 @@ let initAll = function () {
     });
 
   });
+  
+  $(document).on('click', '#create-user', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      }
+    });
+
+  });
+  
+  $(document).on('click', '#reset-user-password', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { action: 'reset-password', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      }
+    });
+  });
+  
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');

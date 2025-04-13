@@ -1,7 +1,6 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
-use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -72,7 +71,7 @@ try
         }
     }
 
-?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
+?><form name="formdatabase" id="formdatabase" method="post" action="" class="">
     <div class="collapsible-card">
         <div id="accordion" class="accordion">
         <div class="card">
@@ -108,7 +107,13 @@ try
 
             <div id="collapse1" class="collapse collapsed" aria-labelledby="heading1" data-parent="#accordion">
                 <div class="card-body">
-
+                <div class="user-container">
+                    <?php
+                        include_once __DIR__ . "/application-user.php";
+                    ?>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="create-user">Create User</button>
+                    <button type="button" class="btn btn-primary" id="reset-user-password">Reset Password</button>
                     
                 </div>
             </div>

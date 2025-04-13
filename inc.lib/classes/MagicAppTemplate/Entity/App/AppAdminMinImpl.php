@@ -122,6 +122,15 @@ class AppAdminMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $lastResetPassword;
+	
+	/**
+	 * Bloked
+	 * 
+	 * @Column(name="bloked", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Bloked")
+	 * @var bool
+	 */
+	protected $bloked;
 
 	/**
 	 * Time Create
@@ -186,14 +195,5 @@ class AppAdminMinImpl extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
-
-	/**
-	 * Bloked
-	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Bloked")
-	 * @var bool
-	 */
-	protected $bloked;
 
 }
