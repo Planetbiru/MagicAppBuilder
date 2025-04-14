@@ -34,7 +34,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-app',
             'aliases' => array(),
-            'reference' => '2f9a38dc75748060a0a09f0ec4c6d4f1981a06ed',
+            'reference' => '899c48321d9dcab2d71bcf75c5bd04f2f127df5c',
             'dev_requirement' => false,
         ),
         'planetbiru/magic-object' => array(

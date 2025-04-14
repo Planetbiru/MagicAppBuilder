@@ -2,6 +2,7 @@
 
 namespace MagicApp;
 
+use Exception;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
@@ -44,14 +45,21 @@ class AppFormBuilder
     public function createSelectOption($entity, $specification, $sortable, $primaryKey, $valueKey, $currentValue = null, $additionalOutput = null)
     {
         $selectOption = new AppFormSelect();
-        $pageData = $entity->findAll($specification, null, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-        
-        while ($row = $pageData->fetch()) {
-            $value = $row->get($primaryKey);
-            $label = $row->get($valueKey);
-            $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
-            $attrs = $this->createAttributes($additionalOutput, $row);
-            $selectOption->add($label, $value, $selected, $attrs, $row);
+        try
+        {
+            $pageData = $entity->findAll($specification, null, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+            
+            while ($row = $pageData->fetch()) {
+                $value = $row->get($primaryKey);
+                $label = $row->get($valueKey);
+                $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
+                $attrs = $this->createAttributes($additionalOutput, $row);
+                $selectOption->add($label, $value, $selected, $attrs, $row);
+            }
+        }
+        catch (Exception $e)
+        {
+            // Handle exception if needed
         }
         
         return $selectOption;
@@ -76,16 +84,22 @@ class AppFormBuilder
     public function createJsonData($entity, $specification, $sortable, $primaryKey, $valueKey, $currentValue = null, $additionalOutput = null)
     {
         $selectOption = new AppJsonLabelValue();
-        $pageData = $entity->findAll($specification, null, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-        
-        while ($row = $pageData->fetch()) {
-            $value = $row->get($primaryKey);
-            $label = $row->get($valueKey);
-            $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
-            $attrs = $this->createAttributes($additionalOutput, $row);
-            $selectOption->add($label, $value, $selected, $attrs, $row);
+        try
+        {
+            $pageData = $entity->findAll($specification, null, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+            
+            while ($row = $pageData->fetch()) {
+                $value = $row->get($primaryKey);
+                $label = $row->get($valueKey);
+                $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
+                $attrs = $this->createAttributes($additionalOutput, $row);
+                $selectOption->add($label, $value, $selected, $attrs, $row);
+            }
         }
-        
+        catch (Exception $e)
+        {
+            // Handle exception if needed
+        }
         return $selectOption;
     }
 
