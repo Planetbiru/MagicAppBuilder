@@ -121,6 +121,26 @@ class ScriptGenerator //NOSONAR
         && $value->getReferenceFilter()->getEntity() != null 
         && $value->getReferenceFilter()->getEntity()->getEntityName() != null;
     }
+    
+    /**
+     * Add use statement for upload file.
+     *
+     * @param array $uses Array of existing use statements.
+     * @param AppField $fields Field object to check.
+     * @return array Updated array of use statements.
+     */
+    public function addUseFromFieldType($uses, $fields)
+    {
+        foreach($fields as $field)
+        {
+            if(AppBuilderBase::isInputFile($field->getDataType()) && !in_array("use MagicObject\\File\\PicoUploadFile;", $uses))
+            {
+                $uses[] = "use MagicObject\\File\\PicoUploadFile;";
+                break;
+            }
+        }
+        return $uses;
+    }
 
     /**
      * Add use statement from approval entity.
@@ -390,7 +410,8 @@ class ScriptGenerator //NOSONAR
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
         
-        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures);   
+        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures);
+        $uses = $this->addUseFromFieldType($uses, $request->getFields());   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         if(!$appFeatures->isBackendOnly())

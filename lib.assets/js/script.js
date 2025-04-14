@@ -5723,7 +5723,7 @@ function generateSelectType(field, args) {
   args.data_type = args.data_type || "text";
   let dataType = args.data_type;
   let matchByType = {
-    int: [
+    "int": [
       "bit",
       "varbit",
       "smallint",
@@ -5736,13 +5736,13 @@ function generateSelectType(field, args) {
       "bool",
       "boolean",
     ],
-    float: [
+    "float": [
       "numeric",
       "double",
       "real",
       "money"
     ],
-    text: [
+    "text": [
       "char",
       "character",
       "varchar",
@@ -5774,11 +5774,39 @@ function generateSelectType(field, args) {
       "character varying",
       "text"
     ],
-    date: [
+    "date": [
       "date"
     ],
-    time: [
+    "time": [
       "time"
+    ],
+    "file": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "image": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "audio": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "video": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
     ],
   };
 
@@ -5797,6 +5825,10 @@ function generateSelectType(field, args) {
         <option value="month" title="&lt;input type=&#39;month&#39;&gt;">month</option>
         <option value="week" title="&lt;input type=&#39;week&#39;&gt;">week</option>
         <option value="color" title="&lt;input type=&#39;color&#39;&gt;">color</option>
+        <option value="file" title="&lt;input type=&#39;file&#39;&gt;">file</option>
+        <option value="image" title="&lt;input type=&#39;file&#39;&gt;">image</option>
+        <option value="audio" title="&lt;input type=&#39;file&#39;&gt;">audio</option>
+        <option value="video" title="&lt;input type=&#39;file&#39;&gt;">video</option>
     </select>
   `);
 
