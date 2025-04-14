@@ -4,6 +4,7 @@ use MagicApp\AppLanguage;
 use MagicApp\AppUserActivityLogger;
 use MagicApp\Field;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicAppTemplate\Entity\App\AppUserActivityImpl;
@@ -20,7 +21,7 @@ require_once __DIR__ . "/app.php";
 
 $appModule = new AppModuleImpl(null, $database);
 $appUserRole = new AppAdminRoleImpl(null, $database);
-$currentUser = new AppAdminRoleImpl(null, $database);
+$currentUser = new AppAdminImpl(null, $database);
 
 $sessions = new PicoSession();
 $sessions->startSession();
@@ -47,18 +48,25 @@ else
     {
         $appSessionUsername = $sessions->username;
         $appSessionPassword = $sessions->userPassword;
-        $appSpecsLogin = PicoSpecification::getInstance()
-            ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
-            ->addAnd(PicoSpecification::getInstance()
-                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
-                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
-            )
-        ;
-        $currentUser->findOne($appSpecsLogin);   
+        if(empty($appSessionUsername) || empty($appSessionPassword))
+        {
+            require_once __DIR__ . "/login-form.php";
+            exit();
+        }
+        else
+        {
+            $appSpecsLogin = PicoSpecification::getInstance()
+                ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+                ->addAnd(PicoSpecification::getInstance()
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+                )
+            ;
+            $currentUser->findOne($appSpecsLogin); 
+        }  
     }
-
     catch(Exception $e)
     {
         require_once __DIR__ . "/login-form.php";
