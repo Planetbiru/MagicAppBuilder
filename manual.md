@@ -111,43 +111,43 @@ This context menu appears when you right-click on a directory.
 -   Choose this option to create a new file inside the selected directory. You will be prompted to enter the name of the new file.
     
 
-3.  **Create New Directory**
+2.  **Create New Directory**
     
 
 -   Choose this option to create a new directory inside the selected directory. You will be prompted to name the new directory.
     
 
-5.  **Upload File**
+3.  **Upload File**
     
 
 -   Choose this option to upload a file from your device to the selected directory. You can choose one or more files to upload.
     
 
-7.  **Expand Directory**
+4.  **Expand Directory**
     
 
 -   Choose this option to show or hide subdirectories inside the selected directory. Directories with subdirectories will expand and display their contents.
     
 
-9.  **Reload Directory**
+5.  **Reload Directory**
     
 
 -   Choose this option to reload the content of the selected directory, ensuring the latest content is displayed.
     
 
-11.  **Rename Directory**
+6.  **Rename Directory**
     
 
 -   Choose this option to rename the selected directory. You will be prompted to enter a new name for the directory.
     
 
-13.  **Download Directory**
+7.  **Download Directory**
     
 
 -   Choose this option to download the entire directory and its contents to your device.
     
 
-15.  **Delete Directory**
+8.  **Delete Directory**
     
 
 -   Choose this option to delete the selected directory along with all of its contents.
@@ -163,25 +163,25 @@ This context menu appears when you right-click on the root directory (main direc
 -   Choose this option to create a new file inside the root directory. You will be prompted to enter the name of the new file.
     
 
-3.  **Create New Directory**
+2.  **Create New Directory**
     
 
 -   Choose this option to create a new directory inside the root directory. You will be prompted to name the new directory.
     
 
-5.  **Upload File**
+3.  **Upload File**
     
 
 -   Choose this option to upload a file to the root directory. You can select multiple files at once.
     
 
-7.  **Reset Content**
+4.  **Reset Content**
     
 
 -   Choose this option to delete all content in the root directory and restore it to its original state. All files and subdirectories will be removed.
     
 
-9.  **Download All**
+5.  **Download All**
     
 
 -   Choose this option to download all the contents of the root directory to your device.
@@ -197,19 +197,19 @@ This context menu appears when you right-click on a file.
 -   Choose this option to open the selected file. If it is a text file, you will be able to view and edit its contents within the File Manager. For other file types such as images or PDFs, the file will be opened in preview mode.
     
 
-3.  **Rename File**
+2.  **Rename File**
     
 
 -   Choose this option to rename the selected file. You will be prompted to enter a new name for the file.
     
 
-5.  **Download File**
+3.  **Download File**
     
 
 -   Choose this option to download the file to your device. You will receive the file in its original format as it exists on the server.
     
 
-7.  **Delete File**
+4.  **Delete File**
     
 
 -   Choose this option to delete the selected file. You will be asked to confirm before the file is permanently deleted.
