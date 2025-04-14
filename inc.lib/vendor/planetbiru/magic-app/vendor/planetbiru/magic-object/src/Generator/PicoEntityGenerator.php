@@ -672,7 +672,7 @@ use MagicObject\MagicObject;
  * 
  * @package '.$this->baseNamespace.'
  * @Entity
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify='.$prettify.')
  * @Table(name="'.$tableName.'")
  */
 class ' . $className . ' extends MagicObject

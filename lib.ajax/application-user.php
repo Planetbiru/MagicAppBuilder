@@ -241,6 +241,25 @@ if($applicationId != null)
                 $userFinder->setAdminLevelId($adminLevelId);
                 $userFinder->insert();
             }
+            else
+            {
+                foreach($pageData->getResult() as $admin)
+                {
+                    // Update user with superuser level
+                    if($admin->getAdminLevelId() == null || $admin->getAdminLevelId() == "")
+                    {
+                        
+                        $adminLevelId = "superuser";
+                    }
+                    else
+                    {
+                        // Set the admin level to superuser
+                        $adminLevelId = $admin->getAdminLevelId();
+                    }
+                    $admin->setAdminLevelId($adminLevelId);
+                    $admin->update();
+                }
+            }
         }
         catch(Exception $e)
         {

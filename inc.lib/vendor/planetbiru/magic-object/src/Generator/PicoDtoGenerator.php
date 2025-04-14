@@ -287,7 +287,7 @@ use MagicObject\\SetterGetter;
  * ' . $classNameDto . ' is a Data Transfer Object used to transfer ' . $entityName . ' via API or to serialize into files or databases.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md
  *
- * @JSON(property-naming-strategy=SNAKE_CASE, prettify='.$prettify.')
+ * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify='.$prettify.')
  */
 class ' . $classNameDto . ' extends SetterGetter
 {

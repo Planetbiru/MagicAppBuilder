@@ -14,7 +14,7 @@ use MagicObject\MagicObject;
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package MagicAdmin\Entity\Data
+ * @package MagicAppTemplate\Entity\App
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
@@ -68,6 +68,15 @@ class AppAdminImpl extends MagicObject
 	 * @var string
 	 */
 	protected $adminLevelId;
+	
+	/**
+	 * Admin Level ID
+	 * 
+	 * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+	 * @Label(content="Admin Level")
+	 * @var AppAdminLevelMinImpl
+	 */
+	protected $adminLevel;
 
 	/**
 	 * Gender

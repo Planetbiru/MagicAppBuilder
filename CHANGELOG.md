@@ -83,3 +83,9 @@ Improvements:
 -   **Performance Optimization**: Optimized certain functions and processes to improve the overall performance of the app.
     
 -   **Documentation Updates**: The documentation has been updated to reflect the changes in the application preparation process and new directory structure.
+
+**MagicAppBuilder version 0.36.0 marks the first public release.**
+
+Everyone can now start using MagicAppBuilder to build fully functional monolithic applications with support for MySQL, MariaDB, PostgreSQL, and SQLite databases. While this version is not yet considered 100% stable, it is safe and reliable enough for development and testing purposes. It lays a solid foundation for future updates and encourages developers to explore and contribute as the project continues to grow.
+
+With its modular structure, theme integration, and improved development workflow, MagicAppBuilder is designed to simplify the application-building process for developers of all levels. Whether you're creating internal tools, admin panels, or full-scale business applications, MagicAppBuilder provides a flexible and extensible foundation that can grow with your project needs.
