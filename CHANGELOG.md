@@ -84,6 +84,22 @@ Improvements:
     
 -   **Documentation Updates**: The documentation has been updated to reflect the changes in the application preparation process and new directory structure.
 
+
+### 5. **New Input Types Support**
+
+-   **File Input Enhancements**: MagicAppBuilder version 0.36 introduces support for new input types:
+    
+    -   **File**, **Image**, **Audio**, and **Video** inputs.
+        
+    -   Supports both **single** and **multiple** file uploads.
+        
+-   **Direct Upload**: Files are now uploaded directly to a specified directory, improving file management and reducing complexity.
+    
+-   **Custom Upload Path**: Users can easily configure and change the target directory for uploaded files through the application settings or input configuration.
+    
+
+These new input types provide greater flexibility in form handling and media integration across your application.
+
 **MagicAppBuilder version 0.36.0 marks the first public release.**
 
 Everyone can now start using MagicAppBuilder to build fully functional monolithic applications with support for MySQL, MariaDB, PostgreSQL, and SQLite databases. While this version is not yet considered 100% stable, it is safe and reliable enough for development and testing purposes. It lays a solid foundation for future updates and encourages developers to explore and contribute as the project continues to grow.
