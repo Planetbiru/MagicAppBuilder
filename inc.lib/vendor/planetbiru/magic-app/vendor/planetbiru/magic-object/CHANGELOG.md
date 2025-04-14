@@ -394,6 +394,7 @@ With the addition of this formatting function, users can easily format object pr
        
        **Example Usage:**  
         ```php
+        $object = new MagicObject();
         $name = $object->trimName();
         ```
     -  **upper**: A function to retrieves the property value and transform it to uppercase.  
@@ -401,19 +402,35 @@ With the addition of this formatting function, users can easily format object pr
        **Example Usage:**  
        
         ```php
+        $object = new MagicObject();
         $code = $object->upperCode();
         ```
     -  **lower**: A function to retrieves the property value and transform it to lowercase.  
        
        **Example Usage:**  
         ```php
+        $object = new MagicObject();
         $username = $object->lowerUsername();
         ```
     -  **dms**: A function to retrieves the property value and convert it to DMS (Degrees, Minutes, Seconds) format.  
        
        **Example Usage:**  
         ```php
+        $object = new MagicObject();
         $dms = $object->dmsDuration(true, ":", 2, true, 2, true);
+        ```
+        
+        **move**: A function to move uploaded file via callback function.
+        
+        **Example Usage**
+        ```php
+        $inputFiles = new PicoUploadFile();
+        $inputFiles->moveMyVideo(function($file){
+            foreach($file->getAll() as $fileItem)
+            {
+                $fileItem->moveTo("upload/".$fileItem->getName());
+            }
+        });
         ```
 
 - **Update documentation**

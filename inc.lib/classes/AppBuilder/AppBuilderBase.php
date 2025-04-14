@@ -239,20 +239,20 @@ class AppBuilderBase //NOSONAR
             if($this->isInputFile($field->getDataType()))
             {
                 $upperFieldName = ucfirst(PicoStringUtil::camelize($field->getFieldName()));
-                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($file) use ($'.$objectName.', $appConfig)'." {\r\n".
+                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($fileUpload) use ($'.$objectName.', $appConfig)'." {\r\n".
                 self::TAB1.self::TAB1.'$pathToSaves = [];'."\r\n".
-                self::TAB1.self::TAB1.'foreach($file->getAll() as $fileItem)'."\r\n".
+                self::TAB1.self::TAB1.'foreach($fileUpload->getAll() as $fileItem)'."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'if($fileItem->isExists())'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = substr(bin2hex(random_bytes(20)), 0, 20).".".$fileItem->getExtension();'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = $fileItem->getRandomName(40);'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetPath = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getAbsolutePath()."/".$targetName;'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSave = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getRelativePath()."/".$targetName;'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$fileItem->moveTo($targetPath);'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSaves[] = $pathToSave;'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
                 self::TAB1.self::TAB1.'}'."\r\n".
-                self::TAB1.self::TAB1.'if($file->isMultiple())'."\r\n".
+                self::TAB1.self::TAB1.'if($fileUpload->isMultiple())'."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.self::CALL_SET.$upperFieldName.'($pathToSaves);'."\r\n".
                 self::TAB1.self::TAB1.'}'."\r\n".

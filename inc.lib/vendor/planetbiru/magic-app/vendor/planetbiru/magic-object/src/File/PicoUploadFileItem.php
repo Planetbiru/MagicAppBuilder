@@ -41,6 +41,16 @@ class PicoUploadFileItem
     }
     
     /**
+     * Checks if the uploaded file is a multiple file upload.
+     *
+     * @return bool true if the file is a multiple upload; otherwise, false.
+     */
+    public function isExists()
+    {
+        return isset($this->value['tmp_name']) && is_file($this->value['tmp_name']);
+    }
+    
+    /**
      * Copies the uploaded file to a specified destination path.
      *
      * @param string $path The target path where the file will be copied.
@@ -58,6 +68,8 @@ class PicoUploadFileItem
     
     /**
      * Moves the uploaded file to a specified destination path.
+     * 
+     * This method attempts to create the target directory if it does not exist.
      *
      * @param string $path The target path where the file will be moved.
      * @return bool true on success; otherwise, false.
@@ -65,6 +77,9 @@ class PicoUploadFileItem
      */
     public function moveTo($path)
     {
+        if(!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
         if (isset($this->value['tmp_name'])) {
             return move_uploaded_file($this->value['tmp_name'], $path);
         } else {
@@ -90,6 +105,37 @@ class PicoUploadFileItem
     public function getName()
     {
         return isset($this->value['name']) ? $this->value['name'] : null;
+    }
+    
+    /**
+     * Generates a random file name with the specified length.
+     *
+     * @param int $length The desired length of the random file name.
+     * @return string The generated random file name with the same extension as the original file.
+     */
+    public function getRandomName($length)
+    {
+        $randomName = substr(bin2hex(random_bytes($length)), 0, $length);
+        $name = $this->getName();
+        if ($name) {
+            $extension = pathinfo($name, PATHINFO_EXTENSION);
+            return $randomName . '.' . $extension;
+        }
+        return $randomName;
+    }
+    
+    /**
+     * Gets the file extension of the uploaded file.
+     *
+     * @return string|null The file extension or null if not set.
+     */
+    public function getExtension()
+    {
+        $name = $this->getName();
+        if ($name) {
+            return pathinfo($name, PATHINFO_EXTENSION);
+        }
+        return null;
     }
     
     /**
