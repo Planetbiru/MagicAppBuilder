@@ -10,7 +10,7 @@ use MagicObject\MagicObject;
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_role")
- * @package Music\Entity\App
+ * @package MagicAppTemplate\Entity\App
  */
 class AppAdminRoleImpl extends MagicObject
 {

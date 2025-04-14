@@ -183,7 +183,7 @@ class AppUserPermission
             {
                 if($this->entity != null)
                 {
-                    $this->entity->findOneByModuleNameAndUserLevelIdAndActive($this->currentModule->getModuleName(), $this->adminLevelId, true);       
+                    $this->entity->findOneByModuleCodeAndAdminLevelIdAndActive($this->currentModule->getModuleName(), $this->adminLevelId, true);       
                     $this->allowedList = $this->entity->getAllowedList();
                     $this->allowedDetail = $this->entity->getAllowedDetail();
                     $this->allowedCreate = $this->entity->getAllowedCreate();
