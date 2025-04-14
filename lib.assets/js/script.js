@@ -1585,13 +1585,36 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'reset-password', applicationId: applicationId, adminId: adminIds },
+      data: { action: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
       }
     });
   });
+  
+  $(document).on('click', '#set-user-role', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { action: 'set-user-role', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      }
+    });
+  });
+  
   
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
@@ -3523,8 +3546,9 @@ function serializeMenu() {
     submenuItems.forEach(submenuItem => {
       menuData.submenu.push({
         title: submenuItem.querySelector('a.app-menu-text').textContent,
+        code: submenuItem.querySelector('a.app-menu-text').dataset.code,
         href: submenuItem.querySelector('a.app-menu-text').getAttribute('href'),
-        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon
+        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon,
       });
     });
     menu.push(menuData);
@@ -4619,6 +4643,7 @@ function updateTableName(
   $('[name="module_file"]').val(moduleFileName);
   $('[name="module_code"]').val(moduleCode);
   $('[name="module_name"]').val(moduleName);
+  $('[name="module_icon"]').val('fa fa-file-text-o');
 }
 
 /**
@@ -4846,6 +4871,7 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
+    moduleIcon: $('[name="module_icon"]').val(),
     moduleAsMenu: $('[name="module_as_menu"]').val(),
     moduleMenu: $('[name="module_menu"]').val(),
     target: $('#current_module_location').val(),

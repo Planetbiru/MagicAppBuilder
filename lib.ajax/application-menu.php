@@ -34,6 +34,7 @@ if($applicationId != null)
 
         $menus = new SecretObject();
         $menus->loadYamlFile($menuPath, false, true, true);
+        
         if($menus == null || $menus->getMenu() == null || !is_array($menus->getMenu()))
         {
             $menus->setMenu(array());
@@ -114,8 +115,9 @@ if($applicationId != null)
                         // Create the submenu link
                         $submenuLink = $dom->createElement('a', htmlspecialchars($submenuItem->getTitle()));
                         $submenuLink->setAttribute('class', 'app-submenu app-menu-text');
-                        $submenuLink->setAttribute('href', htmlspecialchars($submenuItem->getHref()));
+                        $submenuLink->setAttribute('href', $submenuItem->getHref());
                         $submenuLink->setAttribute('data-icon', $submenuItem->getIcon());
+                        $submenuLink->setAttribute('data-code', $submenuItem->getCode());
                         $submenuLi->appendChild($submenuLink);
                         $submenuLi->appendChild($dom->createTextNode(' '));
 

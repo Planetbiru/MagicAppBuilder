@@ -1639,7 +1639,7 @@ ul {
 	margin-left: 20px;
 }
 
-li.menu-exists a::after{
+li.menu-exists > a::after{
 	content: '\2713'; /* Unicode character for check mark */
 	display: inline-block;
 	width: 20px;

@@ -16,7 +16,7 @@ use MagicObject\MagicObject;
  * 
  * @package MagicAdmin\Entity\Data
  * @Entity
- * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
  */
 class AppAdminMinImpl extends MagicObject
@@ -124,13 +124,14 @@ class AppAdminMinImpl extends MagicObject
 	protected $lastResetPassword;
 	
 	/**
-	 * Bloked
+	 * Blocked
 	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Bloked")
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @DefaultColumn(value="false")
+	 * @Label(content="Blocked")
 	 * @var bool
 	 */
-	protected $bloked;
+	protected $blocked;
 
 	/**
 	 * Time Create

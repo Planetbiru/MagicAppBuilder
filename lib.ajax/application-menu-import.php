@@ -49,7 +49,6 @@ if($applicationId != null)
         catch(Exception $e)
         {
             error_log($e->getMessage());
-            exit();
         }
 
         $menus = new SecretObject();
@@ -120,11 +119,18 @@ if($applicationId != null)
                                 // Do nothing
                             }
                             
+                            $moduleCode = $submenuItem->getCode();
+                            if($moduleCode == null || $moduleCode == "")
+                            {
+                                $moduleCode = basename($submenuItem->getHref(), ".php");
+                            }
+                            
                             $submenuCreator = new AppModuleMinImpl(null, $database);
                             $submenuCreator->setName($submenuItem->getTitle());
                             $submenuCreator->setMenu(true);
                             $submenuCreator->setModuleGroupId($moduleGroupId);
                             $submenuCreator->setIcon($submenuItem->getIcon());
+                            $submenuCreator->setModuleCode($moduleCode);
                             $submenuCreator->setUrl($submenuItem->getHref());
                             $submenuCreator->setSortOrder($submenuIndex + 1);
                             $submenuCreator->setTimeCreate($now);

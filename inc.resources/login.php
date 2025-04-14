@@ -11,7 +11,7 @@ $sessions->startSession();
 
 $inputPost = new InputPost();
 
-$currentUser = new AppAdminImpl(null, $databaseBuilder);
+$currentUser = new AppAdminImpl(null, $database);
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
