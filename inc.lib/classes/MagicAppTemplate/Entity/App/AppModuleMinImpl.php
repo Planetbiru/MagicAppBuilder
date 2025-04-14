@@ -44,6 +44,16 @@ class AppModuleMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $name;
+	
+	/**
+	 * Module Code
+	 * 
+	 * @NotNull
+	 * @Column(name="module_code", type="varchar(255)", length=255, nullable=true)
+	 * @Label(content="Module Code")
+	 * @var string
+	 */
+	protected $moduleCode;
 
 	/**
 	 * URL

@@ -801,7 +801,12 @@ class ScriptGenerator //NOSONAR
                     }
                     if(!$skip)
                     {
-                        $menuArray[$index]['submenu'][] = array("title"=>$title, "href"=>$href);
+                        $menuArray[$index]['submenu'][] = array(
+                            "title" => $title, 
+                            "code" => $request->getModuleCode(),
+                            "href" => $href,
+                            "icon" => $request->getModuleIcon(),
+                        );
                     }
                 }
             }

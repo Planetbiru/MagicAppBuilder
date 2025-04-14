@@ -352,7 +352,7 @@ class ApplicationMenu
         {
             foreach($adminRoles as $adminRole)
             {
-                if($adminRole->getModuleId() == $module->getModule() && 
+                if($adminRole->getModuleId() == $module->getModuleId() && 
                     (
                            $adminRole->isAllowedList()
                         || $adminRole->isAllowedDetail()
