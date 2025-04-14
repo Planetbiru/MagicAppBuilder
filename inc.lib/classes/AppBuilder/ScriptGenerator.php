@@ -131,13 +131,9 @@ class ScriptGenerator //NOSONAR
      */
     public function addUseFromFieldType($uses, $fields)
     {
-        foreach($fields as $field)
+        if(AppBuilderBase::hasInputFile($fields) && !in_array("use MagicObject\\File\\PicoUploadFile;", $uses))
         {
-            if(AppBuilderBase::isInputFile($field->getDataType()) && !in_array("use MagicObject\\File\\PicoUploadFile;", $uses))
-            {
-                $uses[] = "use MagicObject\\File\\PicoUploadFile;";
-                break;
-            }
+            $uses[] = "use MagicObject\\File\\PicoUploadFile;";
         }
         return $uses;
     }
