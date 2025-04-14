@@ -79,7 +79,193 @@ This tab allows users to create localization files for modules, enabling **multi
 
 This tab allows users to create localization files for entities, enabling **multi-language support** in applications.
 
-### **12. Logout**
+### **12. File Manager**
+
+File Manager allows you to manage files and directories with a variety of easy-to-use features. You can preview images, open and edit text files, and perform various operations on files and directories such as uploading, deleting, and downloading. Below is a complete guide to utilizing the various features within this File Manager.
+
+#### **Main Features**
+
+**1. Image Preview**
+
+You can preview images directly within the File Manager. Simply click on the image, and a preview will appear, allowing you to view it without opening any other applications.
+
+**2. Open Text Files**
+
+Text files such as .txt or other text-based files can be opened directly in the File Manager. Just click on the text file, and its contents will appear in the editor window within the File Manager.
+
+**3. Edit Text Files**
+
+Once a text file is opened, you can edit it directly. Simply modify the content of the file and save it, and the changes will be applied to the original file in the directory.
+
+#### **File Manager Context Menu**
+
+The context menu (right-click) allows you to access various functions related to files or directories. This menu is divided into several categories based on different contexts: **Directory**, **Root Directory**, and **File**.
+
+**Directory Context Menu**
+
+This context menu appears when you right-click on a directory.
+
+1.  **Create New File**
+    
+
+-   Choose this option to create a new file inside the selected directory. You will be prompted to enter the name of the new file.
+    
+
+3.  **Create New Directory**
+    
+
+-   Choose this option to create a new directory inside the selected directory. You will be prompted to name the new directory.
+    
+
+5.  **Upload File**
+    
+
+-   Choose this option to upload a file from your device to the selected directory. You can choose one or more files to upload.
+    
+
+7.  **Expand Directory**
+    
+
+-   Choose this option to show or hide subdirectories inside the selected directory. Directories with subdirectories will expand and display their contents.
+    
+
+9.  **Reload Directory**
+    
+
+-   Choose this option to reload the content of the selected directory, ensuring the latest content is displayed.
+    
+
+11.  **Rename Directory**
+    
+
+-   Choose this option to rename the selected directory. You will be prompted to enter a new name for the directory.
+    
+
+13.  **Download Directory**
+    
+
+-   Choose this option to download the entire directory and its contents to your device.
+    
+
+15.  **Delete Directory**
+    
+
+-   Choose this option to delete the selected directory along with all of its contents.
+    
+
+**Root Directory Context Menu**
+
+This context menu appears when you right-click on the root directory (main directory).
+
+1.  **Create New File**
+    
+
+-   Choose this option to create a new file inside the root directory. You will be prompted to enter the name of the new file.
+    
+
+3.  **Create New Directory**
+    
+
+-   Choose this option to create a new directory inside the root directory. You will be prompted to name the new directory.
+    
+
+5.  **Upload File**
+    
+
+-   Choose this option to upload a file to the root directory. You can select multiple files at once.
+    
+
+7.  **Reset Content**
+    
+
+-   Choose this option to delete all content in the root directory and restore it to its original state. All files and subdirectories will be removed.
+    
+
+9.  **Download All**
+    
+
+-   Choose this option to download all the contents of the root directory to your device.
+    
+
+**File Context Menu**
+
+This context menu appears when you right-click on a file.
+
+1.  **Open File**
+    
+
+-   Choose this option to open the selected file. If it is a text file, you will be able to view and edit its contents within the File Manager. For other file types such as images or PDFs, the file will be opened in preview mode.
+    
+
+3.  **Rename File**
+    
+
+-   Choose this option to rename the selected file. You will be prompted to enter a new name for the file.
+    
+
+5.  **Download File**
+    
+
+-   Choose this option to download the file to your device. You will receive the file in its original format as it exists on the server.
+    
+
+7.  **Delete File**
+    
+
+-   Choose this option to delete the selected file. You will be asked to confirm before the file is permanently deleted.
+    
+
+#### **How to Use the File Manager**
+
+**1. Navigating Directories**
+
+-   Click on a directory to open and view its contents.
+    
+-   Use the context menu to create new files, create new directories, upload files, or perform other operations.
+    
+
+**2. Uploading Files**
+
+-   Select the directory where you want to upload the file.
+    
+-   Right-click on the directory and choose "Upload File".
+    
+-   Select the file(s) you wish to upload from your device.
+    
+
+**3. Creating a New Directory**
+
+-   Right-click on the directory where you want to create a new subdirectory.
+    
+-   Choose the "Create New Directory" option and name your new directory.
+    
+
+**4. Renaming a File or Directory**
+
+-   Right-click on the file or directory you want to rename.
+    
+-   Choose the "Rename" option and enter a new name.
+    
+
+**5. Downloading a File or Directory**
+
+-   Right-click on the file or directory you want to download.
+    
+-   Choose "Download" for files or "Download Directory" for directories.
+    
+
+**6. Deleting a File or Directory**
+
+-   Right-click on the file or directory you want to delete.
+    
+-   Choose the "Delete" option and confirm the deletion.
+    
+
+#### **Conclusion**
+
+This File Manager is designed to simplify the management of files and directories. With features like image previews, text file opening and editing, and easy-to-access file management operations, you can quickly and efficiently manage your files and directories. Use the context menu for various operations such as uploading files, renaming, deleting, and much more.
+
+### **13. Logout**
 
 A link to log out of the administrator session.
 
