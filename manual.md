@@ -885,7 +885,9 @@ This section contains 3 options:
 3.  **Access Localhost Only**
     
 
-**Development Mode** determines the data source for the application menu.
+#### Development Mode
+
+This option determines the data source for the application menu.
 
 -   If checked (“Yes”), the application will display the menu based on the data in `/inc.cfg/menu.yml`.
     
