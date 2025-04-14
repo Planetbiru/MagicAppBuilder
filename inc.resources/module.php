@@ -3,8 +3,6 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicObject\MagicObject;
-use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -24,6 +22,8 @@ use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicObject\MagicObject;
+use MagicObject\SetterGetter;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -46,8 +46,9 @@ $dataFilter = null;
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$module = new AppModuleImpl(null, $database);
-	$module->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$module->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setModuleCode($inputPost->getModuleCode(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$module->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$module->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$module->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$module->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -79,8 +80,9 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification->addAnd($dataFilter);
 	$module = new AppModuleImpl(null, $database);
 	$updater = $module->where($specification)
-		->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setModuleCode($inputPost->getModuleCode(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setModuleGroupId($inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -243,6 +245,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getName();?></td>
+						<td>
+							<input type="text" class="form-control" name="name" id="name" value="" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
+						<td>
+							<input type="text" class="form-control" name="module_code" id="mmodule_code value="" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
 						<td>
 							<select class="form-control" name="module_group_id" id="module_group_id">
@@ -257,12 +271,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->moduleGroupId, Field::of()->name)
 								; ?>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input type="text" class="form-control" name="name" id="name" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -349,6 +357,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
+						tr>
+						<td><?php echo $appEntityLanguage->getName();?></td>
+						<td>
+							<input type="text" class="form-control" name="name" id="name" value="<?php echo $module->getName();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
+						<td>
+							<input type="text" class="form-control" name="nmodule_code id="nmodule_code value="<?php echo $module->getModuleCode();?>" autocomplete="off"/>
+						</td>
+					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
 						<td>
@@ -364,12 +384,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								Field::of()->moduleGroupId, Field::of()->name, $module->getModuleGroupId())
 								; ?>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input type="text" class="form-control" name="name" id="name" value="<?php echo $module->getName();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -496,13 +510,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
-						<td><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
-					</tr>
-					<tr>
+						<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td><?php echo $module->getName();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
+						<td><?php echo $module->getModuleCode();?></td>
+					</tr>
+				<tr>
+						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
+						<td><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
@@ -586,8 +604,9 @@ $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext")
 );
 $sortOrderMap = array(
-	"moduleGroupId" => "moduleGroupId",
 	"name" => "name",
+	"moduleCode" => "moduleCode",
+	"moduleGroupId" => "moduleGroupId",
 	"url" => "url",
 	"target" => "target",
 	"icon" => "icon",
@@ -718,8 +737,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="module_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleGroup();?></a></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
+								<td data-col-name="module_code" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleCode();?></a></td>
+								<td data-col-name="module_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleGroup();?></a></td>
 								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
 								<td data-col-name="target" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTarget();?></a></td>
 								<td data-col-name="icon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIcon();?></a></td>
@@ -759,8 +779,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="module_group_id"><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 								<td data-col-name="name"><?php echo $module->getName();?></td>
+								<td data-col-name="module_code"><?php echo $module->getModuleCode();?></td>
+								<td data-col-name="module_group_id"><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 								<td data-col-name="url"><?php echo $module->getUrl();?></td>
 								<td data-col-name="target"><?php echo $module->getTarget();?></td>
 								<td data-col-name="icon"><?php echo $module->getIcon();?></td>

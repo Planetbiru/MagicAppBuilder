@@ -38,13 +38,27 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == UserAction::CREATE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
+        
+        $inputFile = 0;
         foreach($appFields as $field)
         {
-            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
-            if($line != null)
+            if($this->isInputFile($field->getDataType()))
             {
-                $lines[] = $line;
+                $inputFile++;
             }
+            else
+            {
+                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
+                if($line != null)
+                {
+                    $lines[] = $line;
+                }
+            }
+        }
+        if($inputFile > 0)
+        {
+            $linesUpload = $this->createFileUploader($appFields, $objectName);
+            $lines = array_merge($lines, $linesUpload);
         }
         
         // set draft
@@ -149,13 +163,26 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1. parent::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName, $objectName);
 
+        $inputFile = 0;
         foreach($appFields as $field)
         {
-            $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true).";";
-            if($line != null)
+            if($this->isInputFile($field->getDataType()))
             {
-                $lines[] = $line;
+                $inputFile++;
             }
+            else
+            {
+                $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true).";";
+                if($line != null)
+                {
+                    $lines[] = $line;
+                }
+            }
+        }
+        if($inputFile > 0)
+        {
+            $linesUpload = $this->createFileUploader($appFields, $objectApprovalName, 1);
+            $lines = array_merge($lines, $linesUpload);
         }
         $upperAdminEdit = PicoStringUtil::upperCamelize($this->entityInfo->getAdminEdit());
         $upperTimeEdit = PicoStringUtil::upperCamelize($this->entityInfo->getTimeEdit());

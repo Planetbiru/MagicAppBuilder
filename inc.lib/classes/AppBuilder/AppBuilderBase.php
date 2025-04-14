@@ -219,6 +219,79 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
+     * Check if the field is an input file type.
+     * 
+     * Checks if the given data type corresponds to an input file type.
+     *
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param string $objectName Name of the object.
+     * @param int $indent Indentation level for the generated code.
+     * @return array Generated lines of code for file uploaders.
+     */
+    public function createFileUploader($appFields, $objectName, $indent = 0)
+    {
+        $lines = array();
+        $lines[] = '';
+        $line = self::TAB1.'$inputFiles = new PicoUploadFile();';
+        $lines[] = $line;
+        foreach($appFields as $field)
+        {
+            if($this->isInputFile($field->getDataType()))
+            {
+                $upperFieldName = ucfirst(PicoStringUtil::camelize($field->getFieldName()));
+                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($file) use ($'.$objectName.')'." {\r\n".
+                self::TAB1.self::TAB1.'$pathToSaves = [];'."\r\n".
+                self::TAB1.self::TAB1.'foreach($file->getAll() as $fileItem)'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'if($fileItem->isExists())'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = substr(bin2hex(random_bytes(20)), 0, 20).".".$fileItem->getExtension();'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetPath = "upload/".$targetName;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$sourcePath = $fileItem->getTmpName();'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'if(!file_exists(dirname($targetPath)))'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'mkdir(dirname($targetPath), 0755, true);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'move_uploaded_file($sourcePath, $targetPath);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSaves[] = $targetPath;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'if($file->isMultiple())'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.'->set'.$upperFieldName.'($pathToSaves);'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'else if(isset($pathToSaves[0]))'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.'->set'.$upperFieldName.'($pathToSaves[0]);'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'else '."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'// Do something when no file is uploaded'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.'});';
+                $lines[] = $line;
+            }
+        }
+        $lines[] = '';
+        
+        if($indent > 0)
+        {
+            $lines2 = explode("\r\n", implode("\r\n", $lines));
+            foreach($lines2 as $key => $line)
+            {
+                if(strlen($line) > 0)
+                {
+                    $lines2[$key] = str_repeat(self::TAB1, $indent).$line;
+                }
+            }
+            $lines = $lines2;
+        }
+        
+        return $lines;
+    }
+    
+    
+    /**
      * Get input filter for a specific field.
      *
      * Retrieves the input filter associated with the given field name.
@@ -2672,7 +2745,7 @@ $subqueryMap = '.$referece.';
                 $filterGroup->setAttribute('class', 'filter-group');
 
                 $input = $dom->createElement('input');
-                $this->setInputTypeAttribute($input, $field->getDataType());
+                $this->setInputTypeAttribute($input, $field->getDataType(), true);
 
                 if($multipleFilter)
                 {
@@ -2685,17 +2758,36 @@ $subqueryMap = '.$referece.';
                 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
+                $dataType = $field->getDataType();
                 if($multipleFilter)
                 {
-                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG); // NOSONAR
-                    $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                    if($dataType == 'password' || self::isInputFile($dataType))
+                    {
+                        // do nothing
+                        $input->setAttribute('multiple', 'multiple');
+                    }
+                    else
+                    {
+                        $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG); // NOSONAR
+                        $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                    }
                 }
                 else
                 {
-                    $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                    if($dataType == 'password' || self::isInputFile($dataType))
+                    {
+                        // do nothing
+                    }
+                    else
+                    {
+                        $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                    }
                 }
-                $input->setAttribute('autocomplete', 'off'); 
-                if($multipleFilter)
+                if(!self::isInputFile($dataType))
+                {
+                    $input->setAttribute('autocomplete', 'off'); 
+                }
+                if($multipleFilter &&  !($dataType == 'password' || self::isInputFile($dataType)))
                 {
                     $input->setAttribute('data-multi-input', 'true');
                 }
@@ -3285,6 +3377,17 @@ $subqueryMap = '.$referece.';
         }
         return $format;
     }
+    
+    /**
+     * Checks if the given data type is an input file type.
+     *
+     * @param string $dataType The data type to check.
+     * @return bool true if the data type is an input file type, false otherwise.
+     */
+    public static function isInputFile($dataType)
+    {
+        return $dataType == 'file' || $dataType == 'image' || $dataType == 'audio' || $dataType == 'video';
+    }
 
     
     /**
@@ -3316,6 +3419,7 @@ $subqueryMap = '.$referece.';
             }
 
             $input = $this->addAttributeId($input, $id); 
+            $dataType = $field->getDataType();
 
             if($multipleData)
             {
@@ -3326,12 +3430,15 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('value', '');
             }
 
-            $input->setAttribute('autocomplete', 'off'); 
+            if(!self::isInputFile($dataType))
+            {
+                $input->setAttribute('autocomplete', 'off'); 
+            }
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData)
+            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
             {
                 $input->setAttribute('data-multi-input', 'true');
             }
@@ -3451,24 +3558,42 @@ $subqueryMap = '.$referece.';
             }
 
             $input = $this->addAttributeId($input, $id);  
+            $dataType = $field->getDataType();
             
             if($multipleData)
             {
-                $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
-                $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$upperFieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                if($dataType == 'password' || self::isInputFile($dataType))
+                {
+                    // do nothing
+                    $input->setAttribute('multiple', 'multiple');
+                }
+                else
+                {
+                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+                    $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$upperFieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                }
             }
             else
             {
-                $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+                if($dataType == 'password' || self::isInputFile($dataType))
+                {
+                    // do nothing
+                }
+                else
+                {
+                    $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+                }
             }
 
-            
-            $input->setAttribute('autocomplete', 'off');
+            if(!self::isInputFile($dataType))
+            {
+                $input->setAttribute('autocomplete', 'off');
+            }
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData)
+            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
             {
                 $input->setAttribute('data-multi-input', 'true');
             }
@@ -4178,9 +4303,10 @@ $subqueryMap = '.$referece.';
      *
      * @param DOMElement $input The input element to modify.
      * @param string $dataType The data type for the input (e.g., int, float).
+     * @param bool $asInputFilter Indicates if the input is for an input filter.
      * @return DOMElement The modified input element.
      */
-    private function setInputTypeAttribute($input, $dataType)
+    private function setInputTypeAttribute($input, $dataType, $asInputFilter = false) // NOSONAR
     {
         $classes = array();
         $classes[] = 'form-control';    
@@ -4193,6 +4319,19 @@ $subqueryMap = '.$referece.';
         {
             $input->setAttribute('type', 'number');
             $input->setAttribute('step', 'any');
+        }
+        else if(self::isInputFile($dataType))
+        {
+            if($asInputFilter)
+            {
+                // Set the type to 'text' for input filters
+                $input->setAttribute('type', 'text');
+            }
+            else
+            {
+                // Set the type to 'file' for file inputs
+                $input->setAttribute('type', 'file');
+            }
         }
         else
         {
