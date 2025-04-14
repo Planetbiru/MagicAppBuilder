@@ -71,6 +71,30 @@ class PicoUploadFile
             $key = isset($this->map[$camel]) ? $this->map[$camel] : null;
             return isset($this->values[$key]) ? $this->values[$key] : new PicoUploadFileContainer();
         }
+        else if(strncasecmp($method, "move", 4) === 0) {
+            $var = substr($method, 4);
+            $camel = PicoStringUtil::camelize($var);
+            if(isset($this->map[$camel]))
+            {
+                $key = isset($this->map[$camel]) ? $this->map[$camel] : null;
+                if(isset($this->values[$key]) && isset($arguments[0]) && is_callable($arguments[0]))
+                {
+                    call_user_func($arguments[0], $this->values[$key]);
+                }
+            }
+        }
+        else if(strncasecmp($method, "has", 3) === 0) {
+            $var = substr($method, 3);
+            $camel = PicoStringUtil::camelize($var);
+            $key = isset($this->map[$camel]) ? $this->map[$camel] : null;
+            return isset($this->values[$key]);
+        }
+        else if(strncasecmp($method, "is", 2) === 0) {
+            $var = substr($method, 2);
+            $camel = PicoStringUtil::camelize($var);
+            $key = isset($this->map[$camel]) ? $this->map[$camel] : null;
+            return isset($this->values[$key]);
+        }
     }
     
     /**

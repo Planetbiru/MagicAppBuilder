@@ -117,7 +117,7 @@ class AppBuilder extends AppBuilderBase
      * @param callable|null $callbackFailed Optional callback function to be executed on failed update.
      * @return string The generated code for the update section.
      */
-    public function createUpdateSection($mainEntity, $appFields, $callbackSuccess, $callbackFailed)
+    public function createUpdateSection($mainEntity, $appFields, $callbackSuccess, $callbackFailed) // NOSONAR
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();

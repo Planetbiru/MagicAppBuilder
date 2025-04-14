@@ -239,30 +239,26 @@ class AppBuilderBase //NOSONAR
             if($this->isInputFile($field->getDataType()))
             {
                 $upperFieldName = ucfirst(PicoStringUtil::camelize($field->getFieldName()));
-                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($file) use ($'.$objectName.')'." {\r\n".
+                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($fileUpload) use ($'.$objectName.', $appConfig)'." {\r\n".
                 self::TAB1.self::TAB1.'$pathToSaves = [];'."\r\n".
-                self::TAB1.self::TAB1.'foreach($file->getAll() as $fileItem)'."\r\n".
+                self::TAB1.self::TAB1.'foreach($fileUpload->getAll() as $fileItem)'."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'if($fileItem->isExists())'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = substr(bin2hex(random_bytes(20)), 0, 20).".".$fileItem->getExtension();'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetPath = "upload/".$targetName;'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$sourcePath = $fileItem->getTmpName();'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'if(!file_exists(dirname($targetPath)))'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.self::TAB1.'mkdir(dirname($targetPath), 0755, true);'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'move_uploaded_file($sourcePath, $targetPath);'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSaves[] = $targetPath;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = $fileItem->getRandomName(40);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetPath = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getAbsolutePath()."/".$targetName;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSave = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getRelativePath()."/".$targetName;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$fileItem->moveTo($targetPath);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSaves[] = $pathToSave;'."\r\n".
                 self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
                 self::TAB1.self::TAB1.'}'."\r\n".
-                self::TAB1.self::TAB1.'if($file->isMultiple())'."\r\n".
+                self::TAB1.self::TAB1.'if($fileUpload->isMultiple())'."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.'->set'.$upperFieldName.'($pathToSaves);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.self::CALL_SET.$upperFieldName.'($pathToSaves);'."\r\n".
                 self::TAB1.self::TAB1.'}'."\r\n".
                 self::TAB1.self::TAB1.'else if(isset($pathToSaves[0]))'."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
-                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.'->set'.$upperFieldName.'($pathToSaves[0]);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.self::CALL_SET.$upperFieldName.'($pathToSaves[0]);'."\r\n".
                 self::TAB1.self::TAB1.'}'."\r\n".
                 self::TAB1.self::TAB1.'else '."\r\n".
                 self::TAB1.self::TAB1.'{'."\r\n".
@@ -676,6 +672,10 @@ class AppBuilderBase //NOSONAR
         $dom = new DOMDocument();
         
         $form = $this->createElementForm($dom, 'createform');
+        if(AppBuilderBase::hasInputFile($fields))
+        {
+            $form->setAttribute('enctype', 'multipart/form-data');
+        }
         
         $table1 = $this->createInsertFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName);
 
@@ -728,6 +728,10 @@ class AppBuilderBase //NOSONAR
         $dom = new DOMDocument();
         
         $form = $this->createElementForm($dom, 'updateform');
+        if(AppBuilderBase::hasInputFile($fields))
+        {
+            $form->setAttribute('enctype', 'multipart/form-data');
+        }
         
         $table1 = $this->createUpdateFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName);      
 
@@ -3387,6 +3391,24 @@ $subqueryMap = '.$referece.';
     public static function isInputFile($dataType)
     {
         return $dataType == 'file' || $dataType == 'image' || $dataType == 'audio' || $dataType == 'video';
+    }
+    
+    /**
+     * Checks if any of the given fields are input file types.
+     *
+     * @param AppField[] $fields The fields to check.
+     * @return bool true if any field is an input file type, false otherwise.
+     */
+    public static function hasInputFile($fields)
+    {
+        foreach($fields as $field)
+        {
+            if(self::isInputFile($field->getDataType()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     
