@@ -54,7 +54,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setLanguageId($currentUser->getLanguageId());
-	$admin->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$admin->setBlocked($inputPost->getBlocked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setAdminCreate($currentAction->getUserId());
 	$admin->setTimeCreate($currentAction->getTime());
@@ -86,7 +86,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setBlocked($inputPost->getBlocked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
@@ -291,9 +291,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1"/> <?php echo $appEntityLanguage->getBloked();?></label>
+							<label><input class="form-check-input" type="checkbox" name="blocked" id="blocked" value="1"/> <?php echo $appEntityLanguage->getBlocked();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -402,9 +402,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1" <?php echo $admin->createCheckedBloked();?>/> <?php echo $appEntityLanguage->getBloked();?></label>
+							<label><input class="form-check-input" type="checkbox" name="blocked" id="blocked" value="1" <?php echo $admin->createCheckedBlocked();?>/> <?php echo $appEntityLanguage->getBlocked();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -553,8 +553,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $admin->getLastResetPassword();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td><?php echo $admin->optionBloked($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
+						<td><?php echo $admin->optionBlocked($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
@@ -645,7 +645,7 @@ $sortOrderMap = array(
 	"gender" => "gender",
 	"email" => "email",
 	"languageId" => "languageId",
-	"bloked" => "bloked",
+	"blocked" => "blocked",
 	"active" => "active"
 );
 
@@ -790,7 +790,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="gender" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGender();?></a></td>
 								<td data-col-name="email" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getEmail();?></a></td>
 								<td data-col-name="language_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLanguageId();?></a></td>
-								<td data-col-name="bloked" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBloked();?></a></td>
+								<td data-col-name="blocked" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBlocked();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -826,7 +826,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="gender"><?php echo isset($mapForGender) && isset($mapForGender[$admin->getGender()]) && isset($mapForGender[$admin->getGender()]["label"]) ? $mapForGender[$admin->getGender()]["label"] : "";?></td>
 								<td data-col-name="email"><?php echo $admin->getEmail();?></td>
 								<td data-col-name="language_id"><?php echo $admin->getLanguageId();?></td>
-								<td data-col-name="bloked"><?php echo $admin->optionBloked($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="blocked"><?php echo $admin->optionBlocked($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="active"><?php echo $admin->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 

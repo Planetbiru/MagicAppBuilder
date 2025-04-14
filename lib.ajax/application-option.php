@@ -114,7 +114,7 @@ try
                     </div>
                     <button type="button" class="btn btn-primary" id="create-user">Create User</button>
                     <button type="button" class="btn btn-primary" id="reset-user-password">Reset Password</button>
-                    
+                    <button type="button" class="btn btn-primary" id="set-user-role">Set Superuser Role</button>
                 </div>
             </div>
         </div>

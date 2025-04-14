@@ -1585,13 +1585,36 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'reset-password', applicationId: applicationId, adminId: adminIds },
+      data: { action: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
       }
     });
   });
+  
+  $(document).on('click', '#set-user-role', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { action: 'set-user-role', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      }
+    });
+  });
+  
   
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
