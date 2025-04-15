@@ -170,23 +170,20 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->setAllowedSortOrder($allowedSortOrder)
 			->setAllowedExport($allowedExport)
 			->update();
-			
 		}
+		$database->commit();
 		
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
 		// Update the menu cache for the specified admin level ID
 		$applicationMenu->updateMenuCache($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC));
 		
-		$database->commit();
 	} catch (PDOException $e) {
 		$database->rollBack();
 	}
 	
 	$currentModule->redirectToItself();
 }
-
-
 
 if($inputGet->getUserAction() == 'generate')
 {

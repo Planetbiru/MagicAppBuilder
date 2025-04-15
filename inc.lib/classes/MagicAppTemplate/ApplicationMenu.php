@@ -14,6 +14,13 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 
+/**
+ * Class ApplicationMenu
+ *
+ * This class is responsible for generating the sidebar menu for the application.
+ * It retrieves the menu structure from the database or JSON file, depending on the environment.
+ * The menu is built using DOMDocument to create a structured HTML representation.
+ */
 class ApplicationMenu
 {
     /**
@@ -280,7 +287,6 @@ class ApplicationMenu
             // but this is for future use if needed
             return $menuData;
         }
-        
     }
     
     /**
@@ -298,6 +304,7 @@ class ApplicationMenu
         {
             $cache->findOneByAdminLevelId($adminLevelId);
             $cache->setData($dataToStore);
+            $cache->setTimeEdit(date('Y-m-d H:i:s'));
             $cache->update(); // Update the menu data in the cache
         }
         catch(Exception $e)
@@ -305,6 +312,7 @@ class ApplicationMenu
             $cache = new AppMenuCacheImpl(null, $this->database);
             $cache->setAdminLevelId($this->currentUser->getAdminLevelId());
             $cache->setData($dataToStore);
+            $cache->setTimeCreate(date('Y-m-d H:i:s'));
             $cache->insert(); // Store the menu data in the cache
         } 
         return $menuData;
@@ -397,7 +405,7 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
@@ -423,7 +431,7 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
@@ -546,8 +554,6 @@ class ApplicationMenu
         {
             $menuData = $this->getMenuFromDatabase();
         }
-
-        
         return self::generateSidebar($menuData, $this->currentHref, $this->appLanguage);
     }
     

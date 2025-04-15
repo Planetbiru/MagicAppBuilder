@@ -102,7 +102,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		$newId = $inputPost->getModuleId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
 		// Update the application menu cache for all users
 		$applicationMenu->updateMenuCache();
 		

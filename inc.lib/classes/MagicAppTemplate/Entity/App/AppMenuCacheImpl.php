@@ -49,5 +49,23 @@ class AppMenuCacheImpl extends MagicObject
 	 * @var string
 	 */
 	protected $data;
+	
+	/**
+	 * Time Create
+	 * 
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Time Create")
+	 * @var string
+	 */
+	protected $timeCreate;
+
+	/**
+	 * Time Edit
+	 * 
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Time Edit")
+	 * @var string
+	 */
+	protected $timeEdit;
 
 }

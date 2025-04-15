@@ -134,6 +134,7 @@ class ScriptGenerator //NOSONAR
         if(AppBuilderBase::hasInputFile($fields) && !in_array("use MagicObject\\File\\PicoUploadFile;", $uses))
         {
             $uses[] = "use MagicObject\\File\\PicoUploadFile;";
+            $uses[] = "use MagicObject\\File\\PicoFileRendered;";
         }
         return $uses;
     }

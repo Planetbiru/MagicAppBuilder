@@ -2,6 +2,7 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\Field;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
@@ -143,6 +144,10 @@ function generateRole($adminLevelId, $database)
 					->insert();
 				}
 			}
+            // Update the application menu cache
+            $applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+            // Update the menu cache for the specified admin level ID
+            $applicationMenu->updateMenuCache($adminLevelId);
 		}
 		catch(Exception $e)
 		{
