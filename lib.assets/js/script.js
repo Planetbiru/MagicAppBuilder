@@ -227,6 +227,10 @@ function hideWaitingScreen()
   document.querySelector('.waiting-screen').style.display = 'none';
 }
 
+/**
+ * Check application status
+ * @param {string} id - application ID 
+ */
 function setCheckingStatus(id)
 {
   $.ajax({
@@ -236,7 +240,6 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
-      console.log(data.applicationStatus)
       if(data.applicationStatus != 'finish')
       {
         setTimeout(function(){
@@ -257,7 +260,9 @@ function setCheckingStatus(id)
   })
 }
 
-// Add event listener
+/**
+ * Initialize all event handlers and elements
+ */
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
