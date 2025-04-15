@@ -76,16 +76,7 @@ Improvements:
     -   **Enhanced UI Customization**: The integration with themes gives developers the ability to easily customize the visual appearance of the app without modifying the core code.
         
 
-### 4. **Other Improvements**
-
--   **Bug Fixes**: Several bug fixes and minor improvements have been applied to ensure smoother operation.
-    
--   **Performance Optimization**: Optimized certain functions and processes to improve the overall performance of the app.
-    
--   **Documentation Updates**: The documentation has been updated to reflect the changes in the application preparation process and new directory structure.
-
-
-### 5. **New Input Types Support**
+### 4. **New Input Types Support**
 
 -   **File Input Enhancements**: MagicAppBuilder version 0.36 introduces support for new input types:
     
@@ -98,7 +89,7 @@ Improvements:
 -   **Custom Upload Path**: Users can easily configure and change the target directory for uploaded files through the application settings or input configuration.
     
 
-### 6. **Menu Caching System**
+### 5. **Menu Caching System**
 
 -   **Menu Cache Added**: MagicAppBuilder version 0.36 introduces a menu caching system to enhance performance and efficiency.
     
@@ -107,6 +98,15 @@ Improvements:
 -   **Faster Menu Access**: Cached menus are ready to use immediately, reducing database queries and improving application performance—especially in complex systems with multiple user roles.
 
 These new input types provide greater flexibility in form handling and media integration across your application.
+
+### 6. **Other Improvements**
+
+-   **Bug Fixes**: Several bug fixes and minor improvements have been applied to ensure smoother operation.
+    
+-   **Performance Optimization**: Optimized certain functions and processes to improve the overall performance of the app.
+    
+-   **Documentation Updates**: The documentation has been updated to reflect the changes in the application preparation process and new directory structure.
+
 
 **MagicAppBuilder version 0.36.0 marks the first public release.**
 
