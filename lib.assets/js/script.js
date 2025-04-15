@@ -1211,6 +1211,9 @@ let initAll = function () {
         decreaseAjaxPending();
         resetFileManager();
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -1228,6 +1231,9 @@ let initAll = function () {
         decreaseAjaxPending();
         resetFileManager();
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -3674,6 +3680,9 @@ function translateEntity(clbk) {
         transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
         lastLine1 = -1; //NOSONAR
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   }
@@ -3734,6 +3743,10 @@ function translateModule() {
       transEd4.removeLineClass(lastLine2, 'background', 'highlight-line');
       lastLine2 = -1; //NOSONAR
     },
+    error: function (data) {
+      decreaseAjaxPending();
+      $('.module-translation-status').text('Error: ' + data.responseText);
+    }
   });
 }
 
