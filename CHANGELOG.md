@@ -99,7 +99,18 @@ Improvements:
 
 These new input types provide greater flexibility in form handling and media integration across your application.
 
-### 6. **Other Improvements**
+
+### 6. **Special Access for Admin Levels**
+
+-   **Special Access Mechanism**: MagicAppBuilder now introduces a **special access mechanism** tied to admin levels.
+    
+-   **Bypass Role Restrictions**: Admins whose admin level has been granted special access can bypass standard role-based permissions for specific modules.
+    
+-   **Failsafe Access to Critical Modules**: This ensures that critical modules, such as user access management, remain accessible—**even if no individual admin roles explicitly include them**. It prevents lockouts and maintains application operability.
+    
+-   **Safer Permission Management**: This enhancement provides a safety net, ensuring that key administrative modules remain accessible by designated admin levels regardless of potentially misconfigured role settings.
+
+### 7. **Other Improvements**
 
 -   **Bug Fixes**: Several bug fixes and minor improvements have been applied to ensure smoother operation.
     

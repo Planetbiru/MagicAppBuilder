@@ -177,6 +177,23 @@ class AppUserPermission
             $this->allowedSortOrder =  true;
             $this->allowedExport =  true;
         }
+        else if(
+            $this->currentModule != null
+            && $this->currentModule->getAppModule() != null 
+            && $this->currentModule->getAppModule()->getSpecialAccess() 
+            && $this->getCurrentUser() != null
+            && $this->getCurrentUser()->getAdminLevel() != null
+            && $this->getCurrentUser()->getAdminLevel()->getSpecialAccess())
+        {
+            $this->allowedList =  true;
+            $this->allowedDetail =  true;
+            $this->allowedCreate =  true;
+            $this->allowedUpdate =  true;
+            $this->allowedDelete =  true;
+            $this->allowedApprove =  true;
+            $this->allowedSortOrder =  true;
+            $this->allowedExport =  true;
+        }
         else
         {
             try
@@ -293,7 +310,13 @@ class AppUserPermission
      */
     public function isAllowedTo($userAction) // NOSONAR
     {
-        if($this->currentModule->getAppModule()->getSpecialAccess() && $this->getCurrentUser()->getUserLevel()->getSpecialAccess())
+        if(
+            $this->currentModule != null
+            && $this->currentModule->getAppModule() != null 
+            && $this->currentModule->getAppModule()->getSpecialAccess() 
+            && $this->getCurrentUser() != null
+            && $this->getCurrentUser()->getAdminLevel() != null
+            && $this->getCurrentUser()->getAdminLevel()->getSpecialAccess())
         {
             $this->allowedList =  true;
             $this->allowedDetail =  true;

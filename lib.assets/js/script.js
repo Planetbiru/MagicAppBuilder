@@ -3569,6 +3569,7 @@ function serializeMenu() {
         code: submenuItem.querySelector('a.app-menu-text').dataset.code,
         href: submenuItem.querySelector('a.app-menu-text').getAttribute('href'),
         icon: submenuItem.querySelector('a.app-menu-text').dataset.icon,
+        specialAccess: submenuItem.querySelector('a.app-menu-text').dataset.specialAccess,
       });
     });
     menu.push(menuData);
