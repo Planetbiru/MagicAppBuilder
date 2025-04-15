@@ -65,7 +65,7 @@ Improvements:
 
 ### 3. **Integration with Themes**
 
--   **Theme Integration**: MagicAppBuilder now has built-in support for managing themes directly within the framework:
+-   **Theme Integration**: MagicAppBuilder version 0.36 has built-in support for managing themes directly within the framework:
     
     -   **Flexible Theme System**: Easily switch between different themes by simply updating the configuration.
         
@@ -102,7 +102,7 @@ These new input types provide greater flexibility in form handling and media int
 
 ### 6. **Special Access for Admin Levels**
 
--   **Special Access Mechanism**: MagicAppBuilder now introduces a **special access mechanism** tied to admin levels.
+-   **Special Access Mechanism**: MagicAppBuilder version 0.36 introduces a **special access mechanism** tied to admin levels.
     
 -   **Bypass Role Restrictions**: Admins whose admin level has been granted special access can bypass standard role-based permissions for specific modules.
     
