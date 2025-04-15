@@ -1,15 +1,17 @@
 <?php
 
-namespace MagicAppTemplate;
+namespace MyApplication;
 
 use Exception;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
+use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 
 class ApplicationMenu
@@ -232,7 +234,77 @@ class ApplicationMenu
      */
 	public function getMenuFromDatabase()
 	{
-		$moduleGroups = $this->getModuleGrouped();
+        $menuData = array();
+        try
+        {
+            $cache = new AppMenuCacheImpl(null, $this->database);
+            // Find the menu cache by admin level ID
+            $cache->findOneByAdminLevelId($this->currentUser->getAdminLevelId());
+            
+            $menuData = json_decode($cache->getData(), true);
+            if(empty($menuData))
+            {
+                throw new NoRecordFoundException('Menu data not found in cache.');
+            }
+        }
+        catch(Exception $e)
+        {
+            $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+        }
+		return $menuData;
+	}
+    
+    /**
+     * Updates the menu cache for a specific admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to update the cache for.
+     * @return array The updated menu data.
+     */
+    public function updateMenuCache($adminLevelId)
+    {
+        $menuData = $this->getMenuByAdminLevelId($adminLevelId);
+        $dataToStore = json_encode($menuData);
+        $cache = new AppMenuCacheImpl(null, $this->database);
+        try
+        {
+            $cache->findOneByAdminLevelId($adminLevelId);
+            $cache->setData($dataToStore);
+            $cache->update(); // Update the menu data in the cache
+        }
+        catch(Exception $e)
+        {
+            $cache = new AppMenuCacheImpl(null, $this->database);
+            $cache->setAdminLevelId($this->currentUser->getAdminLevelId());
+            $cache->setData($dataToStore);
+            $cache->insert(); // Store the menu data in the cache
+        } 
+        return $menuData;
+    }
+    
+    /**
+     * Deletes the menu cache for a specific admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to delete the cache for.
+     * @return self The current instance of the class.
+     */
+    public function deleteMenuCache($adminLevelId)
+    {
+        $cache = new AppMenuCacheImpl(null, $this->database);
+        try
+        {
+            $cache->where(PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId)))
+            ->delete();   
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        } 
+        return $this;
+    }
+    
+    public function getMenuByAdminLevelId($adminLevelId)
+    {
+        $moduleGroups = $this->getModuleGrouped($adminLevelId);
 
         $menuList = array();
         $menuList['menu'] = array();
@@ -262,17 +334,18 @@ class ApplicationMenu
             $menuList['menu'][] = $menu;
         }
         return $menuList;
-	}
+    }
     
     /**
      * Retrieves the modules grouped by module group.
      *
+     * @param string $adminLevelId The admin level ID to filter the modules.
      * @return MagicObject[] Array of grouped modules.
      */
-    public function getModuleGrouped() // NOSONAR
+    public function getModuleGrouped($adminLevelId) // NOSONAR
     {
         $modules = $this->loadModule();
-        $adminRoles = $this->loadAminRole();
+        $adminRoles = $this->loadAminRole($adminLevelId);
         $modulesWithGroup = array();
         
         // Step 1 - for module with valid group module
@@ -404,14 +477,15 @@ class ApplicationMenu
     /**
      * Loads the admin roles from the database.
      *
+     * @param string $adminLevelId The admin level ID to filter the roles.
      * @return AppAdminRoleImpl[] Array of admin roles.
      */
-    public function loadAminRole()
+    public function loadAminRole($adminLevelId)
     {
         $adminRoles = [];
 		$adminRole = new AppAdminRoleImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $this->currentUser->getAdminLevelId()))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
         ;
 
@@ -443,6 +517,8 @@ class ApplicationMenu
         {
             $menuData = $this->getMenuFromDatabase();
         }
+
+        
         return self::generateSidebar($menuData, $this->currentHref, $this->appLanguage);
     }
     
