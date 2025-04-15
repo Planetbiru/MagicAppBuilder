@@ -270,7 +270,7 @@ class ApplicationMenu
      */
     public function updateMenuCache($adminLevelId = null)
     {
-        if(isset($adminLevelId) && empty($adminLevelId))
+        if(isset($adminLevelId) && !empty($adminLevelId))
         {
             return $this->updateMenuCacheByAdminLevelId($adminLevelId);
         }
