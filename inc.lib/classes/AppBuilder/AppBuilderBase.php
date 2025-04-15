@@ -3212,9 +3212,18 @@ $subqueryMap = '.$referece.';
         }
         else
         {      
-            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName, 4);
         }
-        return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
+        
+        if(stripos($result, " = ") === false)
+        {
+            return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);    
+        }
+        else
+        {
+            return $dom->createTextNode(self::PHP_OPEN_TAG.$result."".self::PHP_CLOSE_TAG);
+        }
+        
     }
 
     /**
@@ -3244,6 +3253,7 @@ $subqueryMap = '.$referece.';
         
         if($field->getElementType() == InputType::CHECKBOX)
         {
+            // Element type is checkbox
             $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val;
@@ -3256,6 +3266,8 @@ $subqueryMap = '.$referece.';
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
             )
         {
+            // Element type is select with reference data of type entity
+            // and the entity, object name, and property name are not null
             $objName = $field->getReferenceData()->getEntity()->getObjectName();
             $propName = $field->getReferenceData()->getEntity()->getPropertyName();
             $upperObjName = PicoStringUtil::upperCamelize($objName);
@@ -3275,6 +3287,8 @@ $subqueryMap = '.$referece.';
             && $field->getReferenceData()->getMap() != null
             )
         {
+            // Element type is select with reference data of type map
+            // and the map is not null
             $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
             $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
             $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
@@ -3291,8 +3305,10 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
-            $result2 = $this->getDetailValueString($field, $objectApprovalName, $upperFieldName);
+            // Element type is not checkbox or select with reference data of type entity or map
+            // Use the getDetailValueString method to get the value string
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName, 4);
+            $result2 = $this->getDetailValueString($field, $objectApprovalName, $upperFieldName, 4);
         }
         
         $value = $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
@@ -3325,14 +3341,16 @@ $subqueryMap = '.$referece.';
      * @param AppField $field The field object containing element and data format information.
      * @param string $objectName The name of the object being processed.
      * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
      * @return string The formatted detail value string.
      */
-    public function getDetailValueString($field, $objectName, $upperFieldName)
+    public function getDetailValueString($field, $objectName, $upperFieldName, $indent = 0)
     {
+        
         $result = '';
         if(($field->getElementType() == 'text' || $field->getElementType() == 'select') && $field->getDataFormat() != null)
         {
-            // text and select
+            // Check if the field has a data format defined
             
             if($field->getDataFormat()->getFormatType() == 'dateFormat')
             {
@@ -3352,20 +3370,171 @@ $subqueryMap = '.$referece.';
                 $val = "->format".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getStringFormat(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
+        }
+        else
+        {
+            if($field->getElementType() == 'text')
+            {
+                if($field->getDataType() == 'image')
+                {
+                    // Image Format
+                    $result = $this->renderImage($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'audio')
+                {
+                    // Audio Format
+                    $result = $this->renderAudio($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'video')
+                {
+                    // Video Format
+                    $result = $this->renderVideo($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'file')
+                {
+                    // File Format
+                    $result = $this->renderFile($objectName, $upperFieldName, $indent);
+                }
+                else
+                {
+                    $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
+                    $result = self::VAR.$objectName.$val;
+                }
+            }
             else
             {
                 $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
                 $result = self::VAR.$objectName.$val;
             }
         }
-        else
-        {
-            $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
-            $result = self::VAR.$objectName.$val;
-        }
         return $result;
     }
-
+    
+    /**
+     * Renders an image element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated image element as a string.
+     */
+    public function renderImage($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderImage($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$value'.$upperFieldName.'."\" alt=\"".$value'.$upperFieldName.'."\" /> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$data'.$upperFieldName.'."\" alt=\"".$data'.$upperFieldName.'."\" /> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders an audio element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated audio element as a string.
+     */
+    public function renderAudio($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderAudio($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<audio controls><source src=\"".$value'.$upperFieldName.'."\" type=\"audio/mpeg\"></audio> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<audio controls><source src=\"".$data'.$upperFieldName.'."\" type=\"audio/mpeg\"></audio> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders a video element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated video element as a string.
+     */
+    public function renderVideo($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderVideo($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<video controls><source src=\"".$value'.$upperFieldName.'."\" type=\"video/mp4\"></video> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<video controls><source src=\"".$data'.$upperFieldName.'."\" type=\"video/mp4\"></video> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders a anchor element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated anchor element as a string.
+     */
+    public function renderFile($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderFile($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<a href=\"".$value'.$upperFieldName.'."\" download>".$value'.$upperFieldName.'."</a> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<a href=\"".$data'.$upperFieldName.'."\" download>".$data'.$upperFieldName.'."</a> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    } 
+    
     /**
      * Fixes the format of a string based on the given type.
      *

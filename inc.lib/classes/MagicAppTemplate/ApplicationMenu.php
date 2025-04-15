@@ -397,7 +397,7 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
@@ -423,7 +423,7 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->appConfig->getBypassRole() || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
