@@ -236,6 +236,7 @@ if($applicationId != null)
                 $userFinder = new AppAdminImpl(null, $database);
                 $userFinder->setUsername($userName);
                 $userFinder->setPassword($userPassword);
+                $userFinder->setSpecialAccess(true);
                 $userFinder->setName($userFullName);
                 $userFinder->setLanguageId($userLanguageId);
                 $userFinder->setActive($userActive);

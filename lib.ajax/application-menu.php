@@ -118,6 +118,7 @@ if($applicationId != null)
                         $submenuLink->setAttribute('href', $submenuItem->getHref());
                         $submenuLink->setAttribute('data-icon', $submenuItem->getIcon());
                         $submenuLink->setAttribute('data-code', $submenuItem->getCode());
+                        $submenuLink->setAttribute('data-special-acces', $submenuItem->getSpecialAccess);
                         $submenuLi->appendChild($submenuLink);
                         $submenuLi->appendChild($dom->createTextNode(' '));
 

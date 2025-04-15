@@ -369,6 +369,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							<tr>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="module_id" class="order-controll"><?php echo $appEntityLanguage->getModule();?></td>
+								<td data-col-name="module_group_id" class="order-controll"><?php echo $appEntityLanguage->getModuleGroup();?></td>
 								<td data-col-name="allowed_list" class="order-controll"><label for="allowed_list"><input id="allowed_list" type="checkbox" class="checkbox check-master" data-selector=".allowed_list"> <?php echo $appEntityLanguage->getList();?></label></td>
 								<td data-col-name="allowed_detail" class="order-controll"><label for="allowed_detail"><input id="allowed_detail" type="checkbox" class="checkbox check-master" data-selector=".allowed_detail"> <?php echo $appEntityLanguage->getDetail();?></label></td>
 								<td data-col-name="allowed_create" class="order-controll"><label for="allowed_create"><input id="allowed_create" type="checkbox" class="checkbox check-master" data-selector=".allowed_create"> <?php echo $appEntityLanguage->getCreate();?></label></td>
@@ -409,6 +410,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Module Name -->
 								<td data-col-name="module_id">
 									<?php echo $adminRole->issetModule() ? $adminRole->getModule()->getName() : "";?>
+								</td>
+								
+								<!-- Module Group -->
+								<td data-col-name="module_group_id">
+									<?php echo $adminRole->issetModule() && $adminRole->getModule()->issetModuleGroup() ? $adminRole->getModule()->getModuleGroup()->getName() : "";?>
 								</td>
 
 								<!-- Allowed List (checkbox) -->

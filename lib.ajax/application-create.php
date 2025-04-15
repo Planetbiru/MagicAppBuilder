@@ -378,22 +378,27 @@ menu:
         title: Admin
         href: admin.php
         icon: fa fa-user
+        specialAccess: true
       - 
         title: Admin Level
         href: admin-level.php
         icon: fa fa-user
+        specialAccess: true
       - 
         title: Admin Role
         href: admin-role.php
         icon: fa fa-user
+        specialAccess: true
       - 
         title: Module
         href: module.php
         icon: fa fa-cog
+        specialAccess: true
       - 
         title: Module Group
         href: module-group.php
         icon: fa fa-cog
+        specialAccess: true
       - 
         title: Message Folder
         href: message-folder.php

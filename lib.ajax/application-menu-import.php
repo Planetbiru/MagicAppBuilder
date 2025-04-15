@@ -129,6 +129,7 @@ if($applicationId != null)
                             $submenuCreator->setName($submenuItem->getTitle());
                             $submenuCreator->setMenu(true);
                             $submenuCreator->setModuleGroupId($moduleGroupId);
+                            $submenuCreator->setSpecialAccess($submenuItem->getSpecialAccess());
                             $submenuCreator->setIcon($submenuItem->getIcon());
                             $submenuCreator->setModuleCode($moduleCode);
                             $submenuCreator->setUrl($submenuItem->getHref());

@@ -4,6 +4,7 @@ namespace MagicAppTemplate;
 
 use Exception;
 use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -339,6 +340,12 @@ class ApplicationMenu
         return $this;
     }
     
+    /**
+     * Retrieves the menu structure for a specific admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to filter the menu.
+     * @return array The menu list for the specified admin level ID.
+     */
     public function getMenuByAdminLevelId($adminLevelId)
     {
         $moduleGroups = $this->getModuleGrouped($adminLevelId);
@@ -381,8 +388,20 @@ class ApplicationMenu
      */
     public function getModuleGrouped($adminLevelId) // NOSONAR
     {
-        $modules = $this->loadModule();
+        $specialAcess = false;
+        try
+        {
+            $adminLevel = new AppAdminLevelImpl(null, $this->database);
+            $adminLevel->findOneByAdminLevelId($adminLevelId);
+            $specialAcess = $adminLevel->getSpecialAccess();
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        }
+        
         $adminRoles = $this->loadAminRole($adminLevelId);
+        $modules = $this->loadModule();
         $modulesWithGroup = array();
         
         // Step 1 - for module with valid group module
@@ -405,7 +424,9 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) 
+                || ($specialAcess && $module->isSpecialAccess()) 
+                || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
@@ -431,7 +452,9 @@ class ApplicationMenu
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) || $this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) 
+                || ($specialAcess && $module->isSpecialAccess()) 
+                || $this->isAllowedAccess($module, $adminRoles))
                 {
                     $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
