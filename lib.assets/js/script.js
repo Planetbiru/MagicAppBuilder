@@ -1566,6 +1566,9 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
 
@@ -1589,6 +1592,9 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1611,6 +1617,9 @@ let initAll = function () {
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });

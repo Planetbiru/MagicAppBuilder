@@ -98,6 +98,14 @@ Improvements:
 -   **Custom Upload Path**: Users can easily configure and change the target directory for uploaded files through the application settings or input configuration.
     
 
+### 6. **Menu Caching System**
+
+-   **Menu Cache Added**: MagicAppBuilder version 0.36 introduces a menu caching system to enhance performance and efficiency.
+    
+-   **Role-Based Menu Caching**: Menus generated based on the admin level (via admin roles) are now cached in the database as JSON. This eliminates the need to repeatedly check admin roles based on the admin level ID during each request.
+    
+-   **Faster Menu Access**: Cached menus are ready to use immediately, reducing database queries and improving application performance—especially in complex systems with multiple user roles.
+
 These new input types provide greater flexibility in form handling and media integration across your application.
 
 **MagicAppBuilder version 0.36.0 marks the first public release.**

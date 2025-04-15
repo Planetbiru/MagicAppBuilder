@@ -19,6 +19,7 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -99,6 +100,12 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$updater->update();
 		$newId = $inputPost->getModuleId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+		
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
+		
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_id, $newId);
 	}
 	catch(Exception $e)
