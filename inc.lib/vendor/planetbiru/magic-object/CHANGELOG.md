@@ -432,7 +432,9 @@ With the addition of this formatting function, users can easily format object pr
             }
         });
         ```
-
+- **Add PicoFileRenderer Class**
+  MagicObject add utility class to render various file types (images, audio, video, files, links, text) into corresponding HTML elements from plain strings or JSON-encoded arrays.
+  
 - **Update documentation**
   The documentation has been updated to reflect the new magic methods added in this version, ensuring clarity on how to use them in your code.
   
