@@ -128,6 +128,7 @@ $inputPost = new InputPost();
 if($inputPost->getUserAction() == 'get')
 {
     $allKeys = array(
+        'all',
         'numero',
         'short_waiting_for_create',
         'short_waiting_for_update',

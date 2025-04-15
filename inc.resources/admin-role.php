@@ -373,6 +373,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_approve" class="order-controll"><label for="allowed_approve"><input id="allowed_approve" type="checkbox" class="checkbox check-master" data-selector=".allowed_approve"> <?php echo $appEntityLanguage->getApprove();?></label></td>
 								<td data-col-name="allowed_sort_order" class="order-controll"><label for="allowed_sort_order"><input id="allowed_sort_order" type="checkbox" class="checkbox check-master" data-selector=".allowed_sort_order"> <?php echo $appEntityLanguage->getSortOrder();?></label></td>
 								<td data-col-name="allowed_export" class="order-controll"><label for="allowed_export"><input id="allowed_export" type="checkbox" class="checkbox check-master" data-selector=".allowed_export"> <?php echo $appEntityLanguage->getExport();?></label></td>
+								<td data-col-name="allowed_all" class="order-controll"><label for="allowed_all"><input id="allowed_all" type="checkbox" class="checkbox check-master" data-selector=".allowed_all"> <?php echo $appEntityLanguage->getAll();?></label></td>
 							</tr>
 						</thead>
 					
@@ -392,6 +393,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 								
 								$id = $adminRole->getAdminRoleId();
+								
+								$moduleClass = "module-".str_replace(".", "-", $adminRole->getModuleCode())."-".$adminRole->getAdminRoleId();
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
@@ -407,7 +410,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed List (checkbox) -->
 								<td data-col-name="allowed_list">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_list" name="allowed_list[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_list <?php echo $moduleClass;?>" name="allowed_list[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedList($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -416,7 +419,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Detail (checkbox) -->
 								<td data-col-name="allowed_detail">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_detail" name="allowed_detail[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_detail <?php echo $moduleClass;?>" name="allowed_detail[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedDetail($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -425,7 +428,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Create (checkbox) -->
 								<td data-col-name="allowed_create">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_create" name="allowed_create[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_create <?php echo $moduleClass;?>" name="allowed_create[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedCreate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -434,7 +437,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Update (checkbox) -->
 								<td data-col-name="allowed_update">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_update" name="allowed_update[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_update <?php echo $moduleClass;?>" name="allowed_update[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedUpdate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -443,7 +446,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Delete (checkbox) -->
 								<td data-col-name="allowed_delete">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_delete" name="allowed_delete[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_delete <?php echo $moduleClass;?>" name="allowed_delete[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedDelete($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -452,7 +455,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Approve (checkbox) -->
 								<td data-col-name="allowed_approve">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_approve" name="allowed_approve[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_approve <?php echo $moduleClass;?>" name="allowed_approve[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedApprove($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -461,7 +464,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Sort Order (checkbox) -->
 								<td data-col-name="allowed_sort_order">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_sort_order" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_sort_order <?php echo $moduleClass;?>" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedSortOrder($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
@@ -470,9 +473,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Export (checkbox) -->
 								<td data-col-name="allowed_export">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_export" name="allowed_export[<?php echo $id;?>]" value="1" 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_export <?php echo $moduleClass;?>" name="allowed_export[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
+									</label>
+								</td>
+								
+								<!-- Allowed All (checkbox) -->
+								<td data-col-name="allowed_all">
+									<label>
+										<input type="checkbox" class="checkbox check-master check-slave allowed_all" data-selector=".<?php echo $moduleClass;?>">
+										<?php echo $appLanguage->getAll();?>
 									</label>
 								</td>
 							</tr>
