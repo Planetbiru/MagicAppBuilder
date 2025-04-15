@@ -19,6 +19,7 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -171,6 +172,12 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->update();
 			
 		}
+		
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+		// Update the menu cache for the specified admin level ID
+		$applicationMenu->updateMenuCache($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC));
+		
 		$database->commit();
 	} catch (PDOException $e) {
 		$database->rollBack();
@@ -499,6 +506,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<div class="button-area">
 						<?php if($userPermission->isAllowedUpdate()){ ?>
 						<button type="submit" class="btn btn-success" name="user_action" id="update" value="update"><?php echo $appLanguage->getButtonUpdate();?></button>
+						<input type="hidden" name="admin_level_id" value="<?php echo $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
 						<?php } ?>
 					</div>
 				</div>

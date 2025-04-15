@@ -1,6 +1,6 @@
 <?php
 
-namespace MyApplication;
+namespace MagicAppTemplate;
 
 use Exception;
 use MagicApp\Field;
@@ -257,10 +257,39 @@ class ApplicationMenu
     /**
      * Updates the menu cache for a specific admin level ID.
      *
+     * @param string|null $adminLevelId The admin level ID to update the cache for. If null, updates all admin levels.
+     * @return array The updated menu data.
+     */
+    public function updateMenuCache($adminLevelId = null)
+    {
+        if(isset($adminLevelId) && empty($adminLevelId))
+        {
+            return $this->updateMenuCacheByAdminLevelId($adminLevelId);
+        }
+        else
+        {
+            // Update all menu caches for all admin levels
+            $adminLevelFinder = new AppAdminRoleImpl(null, $this->database);
+            $pageData = $adminLevelFinder->findAll();
+            $menuData = array();
+            foreach($pageData->getResult() as $adminLevel)
+            {
+                $menuData = $this->updateMenuCacheByAdminLevelId($adminLevel->getAdminLevelId());
+            }
+            // Applocation will not use this menuData when update all menu cache
+            // but this is for future use if needed
+            return $menuData;
+        }
+        
+    }
+    
+    /**
+     * Updates the menu cache for a specific admin level ID by admin level ID.
+     *
      * @param string $adminLevelId The admin level ID to update the cache for.
      * @return array The updated menu data.
      */
-    public function updateMenuCache($adminLevelId)
+    public function updateMenuCacheByAdminLevelId($adminLevelId)
     {
         $menuData = $this->getMenuByAdminLevelId($adminLevelId);
         $dataToStore = json_encode($menuData);
