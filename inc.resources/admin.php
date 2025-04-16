@@ -38,7 +38,8 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-$dataFilter = PicoSpecification::getInstance()
+$dataFilter = null;
+$dataFilterDanger = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $currentUser->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
@@ -80,7 +81,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$admin = new AppAdminImpl(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -92,6 +92,13 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
 	$updater->setIpEdit($currentAction->getIp());
+	
+	if($inputPost->getAdminId() == $currentUser->getAdminId())
+	{
+		$updater->setBlocked(false);
+		$updater->setActive(true);
+	}
+	
 	try
 	{
 		$updater->update();
@@ -175,7 +182,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				$admin->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 				)
 				->setAdminEdit($currentAction->getUserId())
 				->setTimeEdit($currentAction->getTime())
@@ -202,7 +209,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			{
 				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 					;
 				$admin = new AppAdminImpl(null, $database);
 				$admin->where($specification)
@@ -465,15 +472,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "admin_level_id",
 			"objectName" => "admin_level",
 			"propertyName" => "name"
-		), 
-		"languageId" => array(
-			"columnName" => "language_id",
-			"entityName" => "AppLanguageImpl",
-			"tableName" => "language",
-			"primaryKey" => "language_id",
-			"objectName" => "language",
-			"propertyName" => "name"
-		), 
+		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
 			"entityName" => "AdminCreate",
@@ -653,7 +652,6 @@ $sortOrderMap = array(
 // Pay attention to security issues
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 $specification->addAnd($dataFilter);
-
 
 // You can define your own sortable
 // Pay attention to security issues
