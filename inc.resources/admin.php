@@ -81,7 +81,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$admin = new AppAdminImpl(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -97,6 +96,10 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$updater->setBlocked(false);
 		$updater->setActive(true);
+	}
+	else
+	{
+		$updater->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	}
 	
 	try
