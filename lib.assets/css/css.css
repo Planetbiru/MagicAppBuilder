@@ -1457,4 +1457,8 @@ li.menu-exists > a::after {
 
 .module-translation-status, .entity-translation-status {
   margin-left: 5px;
+}
+
+.language-manager .btn, .path-manager .btn, .config-table .path-manager .btn, .config-table .language-manager .btn {
+  margin: 0;
 }/*# sourceMappingURL=css.css.map */

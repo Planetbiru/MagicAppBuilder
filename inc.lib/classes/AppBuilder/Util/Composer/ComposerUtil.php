@@ -111,13 +111,61 @@ class ComposerUtil
         }
         return false;
     }
+    
+    /**
+     * Check if the server has internet access, specifically for Packagist.org.
+     * Tries using cURL first, then falls back to stream context if cURL is unavailable.
+     *
+     * @param string $url URL to check connectivity.
+     * @param int $timeout Timeout in seconds.
+     * @return bool True if the server can access the internet; false otherwise.
+     */
+    public static function checkInternetConnection($url = 'https://packagist.org', $timeout = 5) // NOSONAR
+    {
+        // 1. Use cURL if available
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_NOBODY => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_TIMEOUT => $timeout,
+                CURLOPT_SSL_VERIFYPEER => true,
+            ]);
 
-    public static function checkInternetConnection($host = 'packagist.org', $port = 443, $timeout = 5) {
-        $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
-        if ($connection) {
-            fclose($connection);
-            return true; 
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            return $httpCode === 200;
         }
+
+        // 2. Fallback: Use stream context
+
+        $options = [
+            'http' => [
+                'method' => 'HEAD',
+                'timeout' => $timeout,
+                'ignore_errors' => true, // Allow to read response headers even on HTTP errors
+            ]
+        ];
+        $context = stream_context_create($options);
+
+        $headers = @get_headers($url, 1, $context);
+        if ($headers === false) {
+            return false;
+        }
+
+        // Extract HTTP status code
+        if (is_array($headers) && isset($headers[0])) {
+            preg_match('/HTTP\/\d+\.\d+\s+(\d+)/', $headers[0], $matches);
+            $httpCode = isset($matches[1]) ? (int)$matches[1] : 0;
+
+            return $httpCode === 200;
+        }
+
         return false;
     }
+
+
 }

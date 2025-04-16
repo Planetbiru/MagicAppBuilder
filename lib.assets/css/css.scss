@@ -1652,3 +1652,9 @@ li.menu-exists > a::after{
 .module-translation-status, .entity-translation-status {
 	margin-left: 5px;
 }
+
+.language-manager, .path-manager, .config-table .path-manager, .config-table .language-manager{
+	.btn{
+		margin: 0;
+	}
+}

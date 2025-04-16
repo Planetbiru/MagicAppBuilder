@@ -29,7 +29,7 @@ $languageId = 'en';
 
 if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
 {
-    $currentUser = new AppAdminRoleImpl(null, $database);
+    $currentUser = new AppAdminImpl(null, $database);
     $currentUser->setAdminId("superuser");
     $currentUser->setUsername("superuser");
     $currentUser->setPassword(sha1(sha1("superuser")));

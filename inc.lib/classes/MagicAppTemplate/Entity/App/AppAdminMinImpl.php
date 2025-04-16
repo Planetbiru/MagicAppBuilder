@@ -104,6 +104,15 @@ class AppAdminMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $phone;
+	
+	/**
+	 * Language ID
+	 * 
+	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Language ID")
+	 * @var string
+	 */
+	protected $languageId;
 
 	/**
 	 * Validation Code
