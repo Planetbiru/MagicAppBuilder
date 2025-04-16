@@ -1295,6 +1295,47 @@ class MagicObject extends stdClass // NOSONAR
         $var = PicoStringUtil::camelize($propertyName);
         return isset($this->{$var}) ? $this->{$var} : $defaultValue;
     }
+    
+    /**
+     * Retrieves a value from a nested object based on the provided keys.
+     * This function allows you to access nested properties of an object by passing the keys
+     * in a dot-notation-like fashion, where each key corresponds to a level in the object hierarchy.
+     * 
+     * The method will return the value at the deepest level if all the keys exist. If any key does not
+     * exist or the value at any level is not set, the function will return `null`.
+     * 
+     * @param string ...$keys The keys used to retrieve the value at various levels of the object.
+     * Each key corresponds to a property in the object, and the keys are automatically camelized.
+     * 
+     * @return mixed|null The value found at the specified keys in the object, or `null` if any key is not found.
+     */
+    public function retrieve(...$keys)
+    {
+        // Start from the current object
+        $currentData = $this;
+        
+        // Loop through all provided keys
+        foreach ($keys as $key) {
+            // Convert key to camelCase format for consistency
+            if($key === null)
+            {
+                break;
+            }
+            $key = PicoStringUtil::camelize($key);
+
+            // Check if the current data object has the given key and the value is not null
+            if (isset($currentData) && $currentData instanceof self && $currentData->hasValue($key)) {
+                // If the key exists, get the value at this level
+                $currentData = $currentData->get($key);
+            } else {
+                // If any key is not found, return null
+                return null;
+            }
+        }
+
+        // Return the final value at the deepest level
+        return $currentData;
+    }
 
     /**
      * Set property value (magic setter).
@@ -1392,6 +1433,60 @@ class MagicObject extends stdClass // NOSONAR
                 $this->set($property, $value);
             }
         }
+        return $this;
+    }
+    
+    /**
+     * Merges the current object with another MagicObject.
+     *
+     * This method allows you to combine the properties of another object into the current one.
+     * It is particularly useful for updating or extending an object with new values while preserving
+     * existing nested structures.
+     *
+     * Behavior:
+     * - If a property from the incoming object does not exist in the current object, it will be added.
+     * - If a property exists:
+     *   - If both values are instances of MagicObject, a recursive merge is performed.
+     *   - Otherwise, the existing value will be overwritten with the incoming one.
+     *
+     * All property names will be automatically camelized before processing.
+     *
+     * @param self $other The MagicObject instance to merge with the current object.
+     * @return self Returns the current object instance for method chaining.
+     */
+    public function mergeWith($other)
+    {
+        // Ensure $other is a MagicObject and not empty
+        if (isset($other) || $other instanceof self && !$other->empty()) {
+            // Get an array of values from the other object
+            $values = $other->valueArray();
+            $keys = array_keys($values);
+            
+            // Loop through each key-value pair
+            foreach ($keys as $key) {
+                // Normalize the key to camelCase
+                $value1 = $this->get($key);
+                $value2 = $other->get($key);
+
+                // If the property does not exist, simply add it
+                if (!$this->hasValue($key)) {
+                    $this->set($key, $value2);
+                } else {
+                    // If it exists, get the current value
+
+                    // If both current and new values are MagicObject, merge recursively
+                    if ($value1 instanceof self && $value2 instanceof self) {
+                        $value1->mergeWith($value2);
+                        $this->set($key, $value1);
+                    } else {
+                        // Otherwise, override the value
+                        $this->set($key, $value2);
+                    }
+                }
+            }
+        }
+
+        // Return the current object for chaining
         return $this;
     }
 
