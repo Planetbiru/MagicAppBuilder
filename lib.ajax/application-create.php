@@ -362,6 +362,7 @@ menu:
         title: Home
         href: index.php
         icon: fa fa-home
+        specialAccess: true
   - 
     title: Reference
     icon: fa fa-book
@@ -403,6 +404,7 @@ menu:
         title: Message Folder
         href: message-folder.php
         icon: fa fa-folder
+        specialAccess: false
 
 ");
 if($async)

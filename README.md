@@ -1,46 +1,48 @@
-# MagicAppBuilder: Codeless Programming Platform
+# MagicAppBuilder: Low-Code Programming Platform
 
 ## History and Introduction
 
-Imagine a large application consisting of dozens of CRUD (Create, Read, Update, Delete) modules. Each module has the following mechanism:
+Imagine a large application consisting of dozens of CRUD (Create, Read, Update, Delete) modules. Each module includes the following features:
 
-1. Creation of new data
-2. Modification of existing data
-3. Deletion of existing data
-4. Approval required for creating, modifying, or deleting data
-5. A rule that the user who approves the creation, modification, or deletion of data must be different from the user who creates, modifies, or deletes the data
-6. Data export functionality to Microsoft Excel and CSV formats
-7. Support for multiple languages
+1.  Creation of new data
+2.  Modification of existing data
+3.  Deletion of existing data
+4.  Approval required for creating, modifying, or deleting data
+5.  A rule that the user who approves the creation, modification, or deletion of data must be different from the user who performs the action
+6.  Data export functionality to Microsoft Excel and CSV formats
+7.  Support for multiple languages
 
-This project must be created in a very fast time, even less than 3 months.
+This project must be completed within a very short time—less than 3 months.
 
-In this situation, the project owner definitely needs a tool to create applications very quickly but without errors.
+In this situation, the project owner definitely needs a tool that can build applications very quickly, without compromising on accuracy.
 
-MagicAppBuilder is the answer to all this.
+**MagicAppBuilder is the answer.**
 
-Of course. Because with MagicAppBuilder, a CRUD module that has the features mentioned above can be created in **less than 30 minutes**. Yes, you didn't read it wrong and I didn't write it wrong. 30 minutes is the time needed for developers to select columns from a module. Is the input in the form of inline text, textarea, select or checkbox and what filter is appropriate for that column. Of course, there is still plenty of time left and enough to edit the program code manually if necessary.
+Why? Because with MagicAppBuilder, a CRUD module that includes all the features mentioned above can be created in **less than 10 minutes**. Yes, you read that correctly—and no, I didn’t write it wrong. **Ten minutes** is all it takes for a developer to select columns for a module: define whether each input is inline text, a textarea, a select box, or a checkbox, and choose the appropriate filter for each column.
 
-If a module can be created in 30 minutes, then in one day, a developer can create at least 16 new CRUD modules. Within 2 weeks, a developer can create 160 standard CRUD modules with the features above.
+There is still plenty of time left afterward to manually fine-tune or edit the program code if needed.
 
-Of course, an application cannot contain only simple CRUD modules. But at least, a simple CRUD module won't take much time to create. Available time can be maximized for other tasks such as data processing, report creation and application testing.
+If a single module can be created in 10 minutes, then in one day, a developer can build at least **20 new CRUD modules**. Within **two weeks**, a developer can produce **200 standard CRUD modules**, each equipped with the features above.
 
-MagicAppBuilder uses MagicObject as its library. MagicObjects is very useful for creating entities from a table without having to type code. Just select the table and specify the name of the entity to be created. Entities will be created automatically by MagicAppBuilder according to the names and column types of a table.
+Of course, an application isn't made up entirely of simple CRUD modules. However, at the very least, building a simple CRUD module shouldn't consume too much time. The saved time can be better spent on more complex tasks such as data processing, report generation, and application testing.
+
+**MagicAppBuilder** uses **MagicObject** as its underlying library. MagicObject is extremely useful for generating entity classes from database tables—without writing code manually. Simply select a table and specify the name of the entity to generate. MagicAppBuilder will automatically create the entity class, based on the table's columns and data types.
+
 
 ## System Requirements
 
 - **Web Server:** Apache Server
 - **PHP Runtime Version:** 5.6 or above
-- **Database:** SQLite and MariaDB or MySQL
+- **Database:** SQLite and MariaDB, MySQL or PostgreSQL
 
 ## Dependency
 
 - **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
 - **MagicObject:** A library for creating entities from database tables.
-- **Symfony/Yaml:** A library for serializing and deserializing YAML strings and files.
 
 ## Advantages of MagicAppBuilder
 
-In just under 30 minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
+In just under 10 minutes, you can implement a powerful PHP-based data management system that includes a comprehensive set of features essential for managing and manipulating data in a modern application. This system is designed to handle various CRUD (Create, Read, Update, Delete) operations, data validation, and dynamic data presentation. Below is an overview of the key features of the system, which is flexible enough to support both monolithic and microservices-based architectures.
 
 ## Key Features Overview
 
