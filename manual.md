@@ -1,6 +1,6 @@
 # MagicAppBuilder Usage Guide
 
-MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. 
+MagicAppBuilder is a low-code programming platform that enables users to rapidly create applications with minimal manual coding. It allows users to design and manage both the front-end and back-end of their software, empowering developers to build robust applications quickly while reducing the complexity of traditional coding tasks.
 
 ## User Interface
 
