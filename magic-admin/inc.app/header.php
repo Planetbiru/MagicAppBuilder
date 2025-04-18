@@ -26,16 +26,6 @@ use MagicObject\SecretObject;
 
 </head>
 
-<?php
-
-// Sample JSON data (can be replaced with your own)
-$menuLoader = new SecretObject();
-$jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
-
-// Call the function to generate the sidebar
-
-?>
-
 <body>
     <script src="js/color-mode.min.js"></script>
     <!-- Sidebar -->
@@ -43,6 +33,11 @@ $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="./"><?php echo $appLanguage->getDashboard();?></a></h4>
         <?php
+        // Sample JSON data (can be replaced with your own)
+        $menuLoader = new SecretObject();
+        $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
+
+        // Call the function to generate the sidebar
         echo AdminPage::generateSidebar($jsonData, basename($_SERVER['PHP_SELF']), $appLanguage);
         ?>
     </div>
@@ -90,14 +85,14 @@ $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageDropdown">
                             <?php
-                            $languages = $appConfig->getLanguages();
-                            foreach($languages as $language)
+                            $appLanguageItems = $appConfig->getLanguages();
+                            foreach($appLanguageItems as $appLanguageItem)
                             {
-                                if($language->getCode() != null && $language->getName() != null)
+                                if($appLanguageItem->getCode() != null && $appLanguageItem->getName() != null)
                                 {
                                     ?>
-                                    <a class="dropdown-item" href="set-language.php?language_id=<?php echo $language->getCode();?>"><img src="css/flag/<?php echo $language->getCode();?>.svg" class="language-flag" alt="<?php echo $language->getCode();?>">
-                                    <?php echo $language->getName();?></a>
+                                    <a class="dropdown-item<?php echo $currentUser->getLanguageId() == $appLanguageItem->getCode() ? ' item-selected':'';?>" href="set-language.php?language_id=<?php echo $appLanguageItem->getCode();?>"><img src="css/flag/<?php echo $appLanguageItem->getCode();?>.svg" class="language-flag" alt="<?php echo $appLanguageItem->getCode();?>">
+                                    <?php echo $appLanguageItem->getName();?></a>
                                     <?php
                                 }
                             }
