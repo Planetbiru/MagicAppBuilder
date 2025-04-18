@@ -73,3 +73,8 @@ $appLanguage = new AppLanguage(
         PicoIniUtil::writeIniFile($output, $inputSource);
     }
 );
+
+if($entityAdmin->getAdminLevelId() == 'superuser')
+{
+    $appConfig->setBypassRole(true);
+}

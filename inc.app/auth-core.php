@@ -17,32 +17,29 @@ $userLoggedIn = false;
 
 $appBaseConfigPath = "";
 $configTemplatePath = "";
-if(isset($databaseBuilder))
+$entityAdmin = new EntityAdmin(null, $databaseBuilder);
+if(isset($databaseBuilder) && isset($sessions->username) && isset($sessions->userPassword))
 {
-    $entityAdmin = new EntityAdmin(null, $databaseBuilder);
-    if(isset($sessions->username) && isset($sessions->userPassword))
+    try
     {
-        try
+        $entityAdmin->findOneByUsernameAndPassword($sessions->username, sha1($sessions->userPassword));
+        if($entityAdmin->issetWorkspace())
         {
-            $entityAdmin->findOneByUsernameAndPassword($sessions->username, sha1($sessions->userPassword));
-            if($entityAdmin->issetWorkspace())
-            {
-                $activeWorkspace = $entityAdmin->getWorkspace();
-            }
-            if($entityAdmin->issetApplication())
-            {
-                $activeApplication = $entityAdmin->getApplication();
-            }
-            $userLoggedIn = true;
+            $activeWorkspace = $entityAdmin->getWorkspace();
+        }
+        if($entityAdmin->issetApplication())
+        {
+            $activeApplication = $entityAdmin->getApplication();
+        }
+        $userLoggedIn = true;
 
-            $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
-            $configTemplatePath = dirname(__DIR__)."/inc.cfg/application-template.yml";
-        }
-        catch(Exception $e)
-        {
-            $userLoggedIn = false;
-            error_log($e->getMessage());
-        }
+        $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
+        $configTemplatePath = dirname(__DIR__)."/inc.cfg/application-template.yml";
+    }
+    catch(Exception $e)
+    {
+        $userLoggedIn = false;
+        error_log($e->getMessage());
     }
 }
 
@@ -55,6 +52,7 @@ if(file_exists($yml))
     $app = $appConfig->getApplication();
     $databaseConfig = new SecretObject($appConfig->getDatabase());
 }
+
 if(!isset($app))
 {
     $app = new SecretObject();
