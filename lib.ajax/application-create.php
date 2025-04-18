@@ -405,6 +405,11 @@ menu:
         href: message-folder.php
         icon: fa fa-folder
         specialAccess: false
+      - 
+        title: User Activity
+        href: user-activity.php
+        icon: fa fa-user
+        specialAccess: false
 
 ");
 if($async)
@@ -435,8 +440,6 @@ else
     $scriptGenerator = new ScriptGenerator();
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 }
-
-
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 try

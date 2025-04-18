@@ -44,7 +44,7 @@ class EntityTooltipCache extends MagicObject
 	/**
 	 * Expire
 	 * 
-	 * @Column(name="expire", type="timestamp", length=19, nullable=true)
+	 * @Column(name="expire", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Expire")
 	 * @var string
 	 */

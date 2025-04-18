@@ -144,7 +144,7 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -162,7 +162,7 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Time Read
 	 * 
-	 * @Column(name="time_read", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_read", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Read")
 	 * @var string
 	 */
