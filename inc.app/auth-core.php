@@ -41,6 +41,7 @@ if(isset($databaseBuilder))
         catch(Exception $e)
         {
             $userLoggedIn = false;
+            error_log($e->getMessage());
         }
     }
 }
