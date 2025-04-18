@@ -19,10 +19,9 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
-use MagicAppTemplate\Entity\App\AppLanguageImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -39,7 +38,8 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-$dataFilter = PicoSpecification::getInstance()
+$dataFilter = null;
+$dataFilterDanger = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $currentUser->getAdminId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
@@ -54,9 +54,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$admin->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$admin->setLanguageId($currentUser->getLanguageId());
+	$admin->setBlocked($inputPost->getBlocked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$admin->setAdminCreate($currentAction->getUserId());
 	$admin->setTimeCreate($currentAction->getTime());
@@ -82,21 +81,27 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$admin = new AppAdminImpl(null, $database);
 	$updater = $admin->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setApplicationId($inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setWorkspaceId($inputPost->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setLanguageId($inputPost->getLanguageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setBloked($inputPost->getBloked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setBlocked($inputPost->getBlocked(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
 	$updater->setIpEdit($currentAction->getIp());
+	
+	if($inputPost->getAdminId() == $currentUser->getAdminId())
+	{
+		$updater->setBlocked(false);
+		$updater->setActive(true);
+	}
+	else
+	{
+		$updater->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	}
+	
 	try
 	{
 		$updater->update();
@@ -180,7 +185,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				$admin->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 				)
 				->setAdminEdit($currentAction->getUserId())
 				->setTimeEdit($currentAction->getTime())
@@ -207,7 +212,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			{
 				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $rowId))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 					;
 				$admin = new AppAdminImpl(null, $database);
 				$admin->where($specification)
@@ -296,26 +301,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
 						<td>
-							<select class="form-control" name="language_id" id="language_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->languageId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1"/> <?php echo $appEntityLanguage->getBloked();?></label>
+							<label><input class="form-check-input" type="checkbox" name="blocked" id="blocked" value="1"/> <?php echo $appEntityLanguage->getBlocked();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -424,26 +412,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
 						<td>
-							<select class="form-control" name="language_id" id="language_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppLanguageImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->languageId, Field::of()->name, $admin->getLanguageId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="bloked" id="bloked" value="1" <?php echo $admin->createCheckedBloked();?>/> <?php echo $appEntityLanguage->getBloked();?></label>
+							<label><input class="form-check-input" type="checkbox" name="blocked" id="blocked" value="1" <?php echo $admin->createCheckedBlocked();?>/> <?php echo $appEntityLanguage->getBlocked();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -504,15 +475,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "admin_level_id",
 			"objectName" => "admin_level",
 			"propertyName" => "name"
-		), 
-		"languageId" => array(
-			"columnName" => "language_id",
-			"entityName" => "AppLanguageImpl",
-			"tableName" => "language",
-			"primaryKey" => "language_id",
-			"objectName" => "language",
-			"propertyName" => "name"
-		), 
+		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
 			"entityName" => "AdminCreate",
@@ -585,19 +548,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLanguage();?></td>
-						<td><?php echo $admin->issetLanguage() ? $admin->getLanguage()->getName() : "";?></td>
+						<td><?php echo $admin->getLanguageId();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLastResetPassword();?></td>
 						<td><?php echo $admin->getLastResetPassword();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getBloked();?></td>
-						<td><?php echo $admin->optionBloked($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><?php echo $appEntityLanguage->getBlocked();?></td>
+						<td><?php echo $admin->optionBlocked($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
@@ -688,7 +647,7 @@ $sortOrderMap = array(
 	"gender" => "gender",
 	"email" => "email",
 	"languageId" => "languageId",
-	"bloked" => "bloked",
+	"blocked" => "blocked",
 	"active" => "active"
 );
 
@@ -696,7 +655,6 @@ $sortOrderMap = array(
 // Pay attention to security issues
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 $specification->addAnd($dataFilter);
-
 
 // You can define your own sortable
 // Pay attention to security issues
@@ -833,7 +791,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="gender" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGender();?></a></td>
 								<td data-col-name="email" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getEmail();?></a></td>
 								<td data-col-name="language_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLanguageId();?></a></td>
-								<td data-col-name="bloked" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBloked();?></a></td>
+								<td data-col-name="blocked" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBlocked();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -869,7 +827,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="gender"><?php echo isset($mapForGender) && isset($mapForGender[$admin->getGender()]) && isset($mapForGender[$admin->getGender()]["label"]) ? $mapForGender[$admin->getGender()]["label"] : "";?></td>
 								<td data-col-name="email"><?php echo $admin->getEmail();?></td>
 								<td data-col-name="language_id"><?php echo $admin->getLanguageId();?></td>
-								<td data-col-name="bloked"><?php echo $admin->optionBloked($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="blocked"><?php echo $admin->optionBlocked($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="active"><?php echo $admin->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 

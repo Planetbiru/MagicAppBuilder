@@ -76,7 +76,7 @@ class LatLng
      * Check if this LatLng is equal to another LatLng object within a certain margin of error.
      *
      * @param LatLng $latLng The LatLng object to compare.
-     * @return bool True if they are equal, false otherwise.
+     * @return bool true if they are equal, false otherwise.
      */
     public function equals($latLng)
     {

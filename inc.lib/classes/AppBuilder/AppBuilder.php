@@ -7,6 +7,7 @@ use MagicObject\Util\PicoStringUtil;
 
 class AppBuilder extends AppBuilderBase
 {
+    
     /**
      * Creates the INSERT section without approval and trash.
      *
@@ -32,13 +33,27 @@ class AppBuilder extends AppBuilderBase
         $lines[] = "if(".parent::VAR."inputPost->getUserAction() == UserAction::CREATE)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
+        
+        $inputFile = 0;
         foreach($appFields as $field)
         {
-            $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
-            if($line != null)
+            if($this->isInputFile($field->getDataType()))
             {
-                $lines[] = $line;
+                $inputFile++;
             }
+            else
+            {
+                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
+                if($line != null)
+                {
+                    $lines[] = $line;
+                }
+            }
+        }
+        if($inputFile > 0)
+        {
+            $linesUpload = $this->createFileUploader($appFields, $objectName);
+            $lines = array_merge($lines, $linesUpload);
         }
 
         $upperAdminCreate = PicoStringUtil::upperCamelize($this->entityInfo->getAdminCreate());
@@ -102,7 +117,7 @@ class AppBuilder extends AppBuilderBase
      * @param callable|null $callbackFailed Optional callback function to be executed on failed update.
      * @return string The generated code for the update section.
      */
-    public function createUpdateSection($mainEntity, $appFields, $callbackSuccess, $callbackFailed)
+    public function createUpdateSection($mainEntity, $appFields, $callbackSuccess, $callbackFailed) // NOSONAR
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
@@ -120,22 +135,36 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
         $lines[] = parent::TAB1.'$updater = '.parent::VAR.$objectName.'->where($specification)';
         
+        $inputFile = 0;
         foreach($appFields as $field)
         {
-            if($primaryKeyName == $field->getFieldName())
+            if($this->isInputFile($field->getDataType()))
             {
-                $updatePk = true;
+                $inputFile++;
             }
-            $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter());
-            if($line != null)
+            else
             {
-                $lines[] = $line;
+                if($primaryKeyName == $field->getFieldName())
+                {
+                    $updatePk = true;
+                }
+                $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter());
+                if($line != null)
+                {
+                    $lines[] = $line;
+                }
             }
         }
         $upperAdminEdit = PicoStringUtil::upperCamelize($this->entityInfo->getAdminEdit());
         $upperTimeEdit = PicoStringUtil::upperCamelize($this->entityInfo->getTimeEdit());
         $upperIpEdit = PicoStringUtil::upperCamelize($this->entityInfo->getIpEdit());
         $lines[] = parent::TAB1.';';
+        
+        if($inputFile > 0)
+        {
+            $linesUpload = $this->createFileUploader($appFields, 'updater');
+            $lines = array_merge($lines, $linesUpload);
+        }
 
         $lines[] = parent::TAB1.parent::VAR.'updater'.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
         $lines[] = parent::TAB1.parent::VAR.'updater'.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";

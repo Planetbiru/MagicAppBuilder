@@ -87,7 +87,7 @@ class PicoDownloadFile
     /**
      * Checks if the file exists.
      *
-     * @return bool True if the file exists, false otherwise.
+     * @return bool true if the file exists, false otherwise.
      */
     private function fileExists()
     {
@@ -137,7 +137,7 @@ class PicoDownloadFile
      * @param int $start The start byte.
      * @param int $end The end byte.
      * @param int $fileSize The total size of the file.
-     * @return bool True if the range is invalid.
+     * @return bool true if the range is invalid.
      */
     private function isInvalidRange($start, $end, $fileSize)
     {

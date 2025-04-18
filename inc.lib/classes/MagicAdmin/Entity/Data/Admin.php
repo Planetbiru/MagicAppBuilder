@@ -178,10 +178,10 @@ class Admin extends MagicObject
 	protected $workspace;
 
 	/**
-	 * Vatidation Code
+	 * Validation Code
 	 * 
-	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Vatidation Code")
+	 * @Column(name="validation_code", type="text", nullable=true)
+	 * @Label(content="Validation Code")
 	 * @var string
 	 */
 	protected $vatidationCode;
@@ -196,14 +196,14 @@ class Admin extends MagicObject
 	protected $lastResetPassword;
 	
 	/**
-	 * Bloked
+	 * Blocked
 	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
 	 * @DefaultColumn(value="false")
-	 * @Label(content="Bloked")
+	 * @Label(content="Blocked")
 	 * @var bool
 	 */
-	protected $bloked;
+	protected $blocked;
 
 	/**
 	 * Time Create
@@ -276,16 +276,6 @@ class Admin extends MagicObject
 	 * @var string
 	 */
 	protected $ipEdit;
-
-	/**
-	 * Blocked
-	 * 
-	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
-	 * @DefaultColumn(value="true")
-	 * @Label(content="Blocked")
-	 * @var bool
-	 */
-	protected $blocked;
 	
 	/**
 	 * Active

@@ -1,12 +1,12 @@
 <?php
 
-use MagicAppTemplate\Entity\App\AppAdminImpl;
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicApp\AppLanguage;
 use MagicApp\AppUserActivityLogger;
 use MagicApp\Field;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicAppTemplate\Entity\App\AppUserActivityImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -25,51 +25,54 @@ $currentUser = new AppAdminImpl(null, $database);
 
 $sessions = new PicoSession();
 $sessions->startSession();
-try
-{
-    $appSessionUsername = $sessions->username;
-    $appSessionPassword = $sessions->userPassword;
-    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
-    {
-        $appSpecsLogin = PicoSpecification::getInstance()
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
-        ;
-    }
-    else
-    {
-        $appSpecsLogin = PicoSpecification::getInstance()
-            ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
-            ->addAnd(PicoSpecification::getInstance()
-                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
-                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
-            )
-        ;
-    }
-    
-    $currentUser->findOne($appSpecsLogin);
-}
+$languageId = 'en';
 
-catch(Exception $e)
+if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
 {
-    if($appConfig->getDevelopmentMode() === true || $appConfig->getDevelopmentMode() === "true")
+    $currentUser = new AppAdminImpl(null, $database);
+    $currentUser->setAdminId("superuser");
+    $currentUser->setUsername("superuser");
+    $currentUser->setPassword(sha1(sha1("superuser")));
+    $currentUser->setName("Super User");
+    $languageId = $sessions->languageId;        
+    if(!isset($languageId) || empty($languageId))
     {
-        $currentUser = new AppAdminImpl(null, $database);
-        $currentUser->setAdminId("superuser");
-        $currentUser->setUsername("superuser");
-        $currentUser->setPassword(sha1(sha1("superuser")));
-        $currentUser->setName("Super User");
-        $currentUser->setLanguageId("en");
-        $currentUser->setActive(true);
+        $languageId = 'en';
     }
-    else
+    $currentUser->setLanguageId($languageId);
+    $currentUser->setActive(true);
+}
+else 
+{
+    try
+    {
+        $appSessionUsername = $sessions->username;
+        $appSessionPassword = $sessions->userPassword;
+        if(empty($appSessionUsername) || empty($appSessionPassword))
+        {
+            require_once __DIR__ . "/login-form.php";
+            exit();
+        }
+        else
+        {
+            $appSpecsLogin = PicoSpecification::getInstance()
+                ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+                ->addAnd(PicoSpecification::getInstance()
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+                )
+            ;
+            $currentUser->findOne($appSpecsLogin); 
+        }  
+    }
+    catch(Exception $e)
     {
         require_once __DIR__ . "/login-form.php";
         exit();
     }
 }
-
 $currentAction = new SetterGetter();
 $currentAction->setTime(date('Y-m-d H:i:s'));
 $currentAction->setIp($_SERVER['REMOTE_ADDR']);
@@ -98,6 +101,7 @@ if($appConfig->getLanguages() == null)
 {
     $appConfig->setLanguages([new SecretObject()]);
 }
+
 $appLanguage = new AppLanguage(
     $appConfig->getApplication(),
     $currentUser->getLanguageId(),

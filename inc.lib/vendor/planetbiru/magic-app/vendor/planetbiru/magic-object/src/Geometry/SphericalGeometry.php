@@ -120,7 +120,7 @@ class SphericalGeometry
      *
      * @param object $point A point object with x() and y() methods for longitude and latitude.
      * @param object $polygon A polygon object with an exteriorRing() method.
-     * @return bool True if the point is inside the polygon, false otherwise.
+     * @return bool true if the point is inside the polygon, false otherwise.
      */
     public static function containsLocation($point, $polygon) {
         $vertices_x = array();    // x-coordinates of the vertices of the polygon

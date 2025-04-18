@@ -19,8 +19,8 @@ use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
-use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
+use MagicAdmin\AppUserPermissionExtended;
 use MagicAdmin\Entity\Data\Admin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
 use MagicAdmin\Entity\Data\WorkspaceMin;
@@ -31,7 +31,7 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-workspace", $appLanguage->getAdministratorWorkspace());
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+$userPermission = new AppUserPermissionExtended($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))

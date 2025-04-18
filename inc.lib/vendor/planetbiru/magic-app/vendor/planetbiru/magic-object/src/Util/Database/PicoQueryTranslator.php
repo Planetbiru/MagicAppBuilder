@@ -592,7 +592,7 @@ class PicoQueryTranslator // NOSONAR
      *
      * @param string $type The data type of the column (e.g., 'TINYINT').
      * @param int $length The length of the column (e.g., 1).
-     * @return bool True if the type is 'TINYINT' and length is 1, otherwise false.
+     * @return bool true if the type is 'TINYINT' and length is 1, otherwise false.
      */
     public function isTinyInt1($type, $length) {
         return strtoupper($type) === 'TINYINT' && $length == 1;
@@ -602,7 +602,7 @@ class PicoQueryTranslator // NOSONAR
      * Checks if the column type is an integer (e.g., TINYINT, SMALLINT, INT, BIGINT).
      *
      * @param string $type The column data type (e.g., 'INT', 'BIGINT').
-     * @return bool True if the column type is an integer type, otherwise false.
+     * @return bool true if the column type is an integer type, otherwise false.
      */
     public function isInteger($type) {
         $type = strtoupper($type);
@@ -619,7 +619,7 @@ class PicoQueryTranslator // NOSONAR
      *
      * @param bool $autoIncrement Whether the column is set to auto-increment.
      * @param string $targetType The target database type (e.g., 'mysql', 'mariadb').
-     * @return bool True if the column is auto-incremented in MySQL or MariaDB, otherwise false.
+     * @return bool true if the column is auto-incremented in MySQL or MariaDB, otherwise false.
      */
     public function isAutoIncrement($autoIncrement, $targetType) {
         return $this->isMySQL($targetType) && $autoIncrement;
@@ -629,7 +629,7 @@ class PicoQueryTranslator // NOSONAR
      * Checks if a value is not empty (not null or an empty string).
      *
      * @param string $value The value to check.
-     * @return bool True if the value is not empty, otherwise false.
+     * @return bool true if the value is not empty, otherwise false.
      */
     public function isNotEmpty($value) {
         return $value !== null && $value !== '';
@@ -640,7 +640,7 @@ class PicoQueryTranslator // NOSONAR
      *
      * @param bool $primaryKey Whether the column is a primary key.
      * @param string $defaultValue The default value of the column.
-     * @return bool True if the column has a default value, otherwise false.
+     * @return bool true if the column has a default value, otherwise false.
      */
     public function hasDefaultValue($primaryKey, $defaultValue) {
         return !$primaryKey && $defaultValue !== null && $defaultValue !== '';

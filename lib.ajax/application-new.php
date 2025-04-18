@@ -60,10 +60,11 @@ if (ComposerUtil::checkInternetConnection()) {
             $magicAppList = ComposerUtil::getMagicAppVersionList();
             $needUpdate = true;
         }
-        if($needUpdate)
+        $dataToSave = json_encode($magicAppList);
+        if($needUpdate && strlen($dataToSave) > 8)
         {
             $cache->setGeneralCacheId("magic-app-version");
-            $cache->setContent(json_encode($magicAppList));
+            $cache->setContent($dataToSave);
             $cache->setExpire(date("Y-m-d H:i:s", strtotime("6 hours")));
             $cache->save();
         }

@@ -251,7 +251,7 @@ class ExtendedReflectionClass extends ReflectionClass {
      * Checks if the class has a specific use statement or alias.
      *
      * @param string $class The name of the class to check.
-     * @return bool True if the class or its alias is found in the use statements, false otherwise.
+     * @return bool true if the class or its alias is found in the use statements, false otherwise.
      */
 	public function hasUseStatement($class) {
 

@@ -2,6 +2,12 @@
 
 namespace MagicAppTemplate;
 
+/**
+ * AdminPage class for generating a sidebar menu in an admin panel.
+ *
+ * This class provides a method to generate an HTML sidebar menu based on a JSON structure and the current active link.
+ * It is designed to be used in an admin panel context, where a sidebar navigation is required.
+ */
 class AdminPage
 {
     /**

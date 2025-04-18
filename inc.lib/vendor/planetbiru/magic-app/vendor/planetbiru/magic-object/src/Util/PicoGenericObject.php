@@ -162,7 +162,7 @@ class PicoGenericObject extends stdClass
      * ```
      *
      * @param string $name Name of the property.
-     * @return bool True if the property is set, false otherwise.
+     * @return bool true if the property is set, false otherwise.
      */
     public function __isset($name)
     {

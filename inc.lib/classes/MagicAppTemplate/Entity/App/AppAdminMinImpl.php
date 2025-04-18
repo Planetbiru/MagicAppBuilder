@@ -14,9 +14,9 @@ use MagicObject\MagicObject;
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package MagicAdmin\Entity\Data
+ * @package MagicAppTemplate\Entity\App
  * @Entity
- * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
  */
 class AppAdminMinImpl extends MagicObject
@@ -104,12 +104,21 @@ class AppAdminMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $phone;
+	
+	/**
+	 * Language ID
+	 * 
+	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Language ID")
+	 * @var string
+	 */
+	protected $languageId;
 
 	/**
-	 * Vatidation Code
+	 * Validation Code
 	 * 
-	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Vatidation Code")
+	 * @Column(name="validation_code", type="text", nullable=true)
+	 * @Label(content="Validation Code")
 	 * @var string
 	 */
 	protected $vatidationCode;
@@ -122,6 +131,16 @@ class AppAdminMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $lastResetPassword;
+	
+	/**
+	 * Blocked
+	 * 
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @DefaultColumn(value="false")
+	 * @Label(content="Blocked")
+	 * @var bool
+	 */
+	protected $blocked;
 
 	/**
 	 * Time Create
@@ -186,14 +205,5 @@ class AppAdminMinImpl extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
-
-	/**
-	 * Bloked
-	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Bloked")
-	 * @var bool
-	 */
-	protected $bloked;
 
 }

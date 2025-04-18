@@ -219,6 +219,75 @@ class AppBuilderBase //NOSONAR
     }
     
     /**
+     * Check if the field is an input file type.
+     * 
+     * Checks if the given data type corresponds to an input file type.
+     *
+     * @param AppField[] $appFields Array of AppField objects representing the form fields.
+     * @param string $objectName Name of the object.
+     * @param int $indent Indentation level for the generated code.
+     * @return array Generated lines of code for file uploaders.
+     */
+    public function createFileUploader($appFields, $objectName, $indent = 0)
+    {
+        $lines = array();
+        $lines[] = '';
+        $line = self::TAB1.'$inputFiles = new PicoUploadFile();';
+        $lines[] = $line;
+        foreach($appFields as $field)
+        {
+            if($this->isInputFile($field->getDataType()))
+            {
+                $upperFieldName = ucfirst(PicoStringUtil::camelize($field->getFieldName()));
+                $line = self::TAB1.'$inputFiles->move'.$upperFieldName.'(function($fileUpload) use ($'.$objectName.', $appConfig)'." {\r\n".
+                self::TAB1.self::TAB1.'$pathToSaves = [];'."\r\n".
+                self::TAB1.self::TAB1.'foreach($fileUpload->getAll() as $fileItem)'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'if($fileItem->isExists())'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetName = $fileItem->getRandomName(40);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$targetPath = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getAbsolutePath()."/".$targetName;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSave = $appConfig->getUpload() == null ? "lib.upload/".$targetName : $appConfig->getUpload()->getRelativePath()."/".$targetName;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$fileItem->moveTo($targetPath);'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.self::TAB1.'$pathToSaves[] = $pathToSave;'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'if($fileUpload->isMultiple())'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.self::CALL_SET.$upperFieldName.'($pathToSaves);'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'else if(isset($pathToSaves[0]))'."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'$'.$objectName.self::CALL_SET.$upperFieldName.'($pathToSaves[0]);'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.self::TAB1.'else '."\r\n".
+                self::TAB1.self::TAB1.'{'."\r\n".
+                self::TAB1.self::TAB1.self::TAB1.'// Do something when no file is uploaded'."\r\n".
+                self::TAB1.self::TAB1.'}'."\r\n".
+                self::TAB1.'});';
+                $lines[] = $line;
+            }
+        }
+        $lines[] = '';
+        
+        if($indent > 0)
+        {
+            $lines2 = explode("\r\n", implode("\r\n", $lines));
+            foreach($lines2 as $key => $line)
+            {
+                if(strlen($line) > 0)
+                {
+                    $lines2[$key] = str_repeat(self::TAB1, $indent).$line;
+                }
+            }
+            $lines = $lines2;
+        }
+        
+        return $lines;
+    }
+    
+    
+    /**
      * Get input filter for a specific field.
      *
      * Retrieves the input filter associated with the given field name.
@@ -603,6 +672,10 @@ class AppBuilderBase //NOSONAR
         $dom = new DOMDocument();
         
         $form = $this->createElementForm($dom, 'createform');
+        if(AppBuilderBase::hasInputFile($fields))
+        {
+            $form->setAttribute('enctype', 'multipart/form-data');
+        }
         
         $table1 = $this->createInsertFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName);
 
@@ -655,6 +728,10 @@ class AppBuilderBase //NOSONAR
         $dom = new DOMDocument();
         
         $form = $this->createElementForm($dom, 'updateform');
+        if(AppBuilderBase::hasInputFile($fields))
+        {
+            $form->setAttribute('enctype', 'multipart/form-data');
+        }
         
         $table1 = $this->createUpdateFormTable($dom, $mainEntity, $objectName, $fields, $primaryKeyName);      
 
@@ -2672,7 +2749,7 @@ $subqueryMap = '.$referece.';
                 $filterGroup->setAttribute('class', 'filter-group');
 
                 $input = $dom->createElement('input');
-                $this->setInputTypeAttribute($input, $field->getDataType());
+                $this->setInputTypeAttribute($input, $field->getDataType(), true);
 
                 if($multipleFilter)
                 {
@@ -2685,17 +2762,36 @@ $subqueryMap = '.$referece.';
                 
                 
                 $fieldName = PicoStringUtil::upperCamelize($field->getFieldName());
+                $dataType = $field->getDataType();
                 if($multipleFilter)
                 {
-                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG); // NOSONAR
-                    $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                    if($dataType == 'password' || self::isInputFile($dataType))
+                    {
+                        // do nothing
+                        $input->setAttribute('multiple', 'multiple');
+                    }
+                    else
+                    {
+                        $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG); // NOSONAR
+                        $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                    }
                 }
                 else
                 {
-                    $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                    if($dataType == 'password' || self::isInputFile($dataType))
+                    {
+                        // do nothing
+                    }
+                    else
+                    {
+                        $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                    }
                 }
-                $input->setAttribute('autocomplete', 'off'); 
-                if($multipleFilter)
+                if(!self::isInputFile($dataType))
+                {
+                    $input->setAttribute('autocomplete', 'off'); 
+                }
+                if($multipleFilter &&  !($dataType == 'password' || self::isInputFile($dataType)))
                 {
                     $input->setAttribute('data-multi-input', 'true');
                 }
@@ -3116,9 +3212,18 @@ $subqueryMap = '.$referece.';
         }
         else
         {      
-            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName, 4);
         }
-        return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
+        
+        if(stripos($result, " = ") === false)
+        {
+            return $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);    
+        }
+        else
+        {
+            return $dom->createTextNode(self::PHP_OPEN_TAG.$result."".self::PHP_CLOSE_TAG);
+        }
+        
     }
 
     /**
@@ -3148,6 +3253,7 @@ $subqueryMap = '.$referece.';
         
         if($field->getElementType() == InputType::CHECKBOX)
         {
+            // Element type is checkbox
             $val = "->option".$upperFieldName."(".$yes.", ".$no.")";
             $result = self::VAR.$objectName.$val;
             $result2 = self::VAR.$objectApprovalName.$val;
@@ -3160,6 +3266,8 @@ $subqueryMap = '.$referece.';
             && $field->getReferenceData()->getEntity()->getPropertyName() != null
             )
         {
+            // Element type is select with reference data of type entity
+            // and the entity, object name, and property name are not null
             $objName = $field->getReferenceData()->getEntity()->getObjectName();
             $propName = $field->getReferenceData()->getEntity()->getPropertyName();
             $upperObjName = PicoStringUtil::upperCamelize($objName);
@@ -3179,6 +3287,8 @@ $subqueryMap = '.$referece.';
             && $field->getReferenceData()->getMap() != null
             )
         {
+            // Element type is select with reference data of type map
+            // and the map is not null
             $v1 = 'isset('.self::MAP_FOR.$upperFieldName.')';
             $v2 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.'])';
             $v3 = 'isset($mapFor'.$upperFieldName.'[$'.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.']["label"])';
@@ -3195,8 +3305,10 @@ $subqueryMap = '.$referece.';
         }
         else
         {
-            $result = $this->getDetailValueString($field, $objectName, $upperFieldName);
-            $result2 = $this->getDetailValueString($field, $objectApprovalName, $upperFieldName);
+            // Element type is not checkbox or select with reference data of type entity or map
+            // Use the getDetailValueString method to get the value string
+            $result = $this->getDetailValueString($field, $objectName, $upperFieldName, 4);
+            $result2 = $this->getDetailValueString($field, $objectApprovalName, $upperFieldName, 4);
         }
         
         $value = $dom->createTextNode(self::PHP_OPEN_TAG.self::ECHO.$result.";".self::PHP_CLOSE_TAG);
@@ -3229,14 +3341,16 @@ $subqueryMap = '.$referece.';
      * @param AppField $field The field object containing element and data format information.
      * @param string $objectName The name of the object being processed.
      * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
      * @return string The formatted detail value string.
      */
-    public function getDetailValueString($field, $objectName, $upperFieldName)
+    public function getDetailValueString($field, $objectName, $upperFieldName, $indent = 0)
     {
+        
         $result = '';
         if(($field->getElementType() == 'text' || $field->getElementType() == 'select') && $field->getDataFormat() != null)
         {
-            // text and select
+            // Check if the field has a data format defined
             
             if($field->getDataFormat()->getFormatType() == 'dateFormat')
             {
@@ -3256,20 +3370,171 @@ $subqueryMap = '.$referece.';
                 $val = "->format".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getStringFormat(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
+        }
+        else
+        {
+            if($field->getElementType() == 'text')
+            {
+                if($field->getDataType() == 'image')
+                {
+                    // Image Format
+                    $result = $this->renderImage($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'audio')
+                {
+                    // Audio Format
+                    $result = $this->renderAudio($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'video')
+                {
+                    // Video Format
+                    $result = $this->renderVideo($objectName, $upperFieldName, $indent);
+                }
+                else if($field->getDataType() == 'file')
+                {
+                    // File Format
+                    $result = $this->renderFile($objectName, $upperFieldName, $indent);
+                }
+                else
+                {
+                    $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
+                    $result = self::VAR.$objectName.$val;
+                }
+            }
             else
             {
                 $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
                 $result = self::VAR.$objectName.$val;
             }
         }
-        else
-        {
-            $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
-            $result = self::VAR.$objectName.$val;
-        }
         return $result;
     }
-
+    
+    /**
+     * Renders an image element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated image element as a string.
+     */
+    public function renderImage($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderImage($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$value'.$upperFieldName.'."\" alt=\"".$value'.$upperFieldName.'."\" /> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$data'.$upperFieldName.'."\" alt=\"".$data'.$upperFieldName.'."\" /> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders an audio element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated audio element as a string.
+     */
+    public function renderAudio($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderAudio($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<audio controls><source src=\"".$value'.$upperFieldName.'."\" type=\"audio/mpeg\"></audio> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<audio controls><source src=\"".$data'.$upperFieldName.'."\" type=\"audio/mpeg\"></audio> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders a video element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated video element as a string.
+     */
+    public function renderVideo($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderVideo($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<video controls><source src=\"".$value'.$upperFieldName.'."\" type=\"video/mp4\"></video> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<video controls><source src=\"".$data'.$upperFieldName.'."\" type=\"video/mp4\"></video> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    }
+    
+    /**
+     * Renders a anchor element for the specified object and field name.
+     *
+     * @param string $objectName The name of the object.
+     * @param string $upperFieldName The field name in UpperCamelCase format.
+     * @param int $indent The indentation level for the generated code.
+     * @return string The generated anchor element as a string.
+     */
+    public function renderFile($objectName, $upperFieldName, $indent = 0, $useLibrary = true)
+    {
+        if($useLibrary)
+        {
+            return 'PicoFileRenderer::renderFile($'.$objectName.'->get'.$upperFieldName.'())';
+        }
+        $result = [];
+        $result[] = '';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<a href=\"".$value'.$upperFieldName.'."\" download>".$value'.$upperFieldName.'."</a> ";';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<a href=\"".$data'.$upperFieldName.'."\" download>".$data'.$upperFieldName.'."</a> ";';
+        $result[] = self::TAB1.self::TAB1.'}';
+        $result[] = self::TAB1.'}';
+        $result[] = '';
+        
+        return $this->addIndent(implode("\n", $result), $indent);
+    } 
+    
     /**
      * Fixes the format of a string based on the given type.
      *
@@ -3284,6 +3549,35 @@ $subqueryMap = '.$referece.';
             $format = sprintf("'%s'", $format);
         }
         return $format;
+    }
+    
+    /**
+     * Checks if the given data type is an input file type.
+     *
+     * @param string $dataType The data type to check.
+     * @return bool true if the data type is an input file type, false otherwise.
+     */
+    public static function isInputFile($dataType)
+    {
+        return $dataType == 'file' || $dataType == 'image' || $dataType == 'audio' || $dataType == 'video';
+    }
+    
+    /**
+     * Checks if any of the given fields are input file types.
+     *
+     * @param AppField[] $fields The fields to check.
+     * @return bool true if any field is an input file type, false otherwise.
+     */
+    public static function hasInputFile($fields)
+    {
+        foreach($fields as $field)
+        {
+            if(self::isInputFile($field->getDataType()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     
@@ -3316,6 +3610,7 @@ $subqueryMap = '.$referece.';
             }
 
             $input = $this->addAttributeId($input, $id); 
+            $dataType = $field->getDataType();
 
             if($multipleData)
             {
@@ -3326,12 +3621,15 @@ $subqueryMap = '.$referece.';
                 $input->setAttribute('value', '');
             }
 
-            $input->setAttribute('autocomplete', 'off'); 
+            if(!self::isInputFile($dataType))
+            {
+                $input->setAttribute('autocomplete', 'off'); 
+            }
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData)
+            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
             {
                 $input->setAttribute('data-multi-input', 'true');
             }
@@ -3451,24 +3749,42 @@ $subqueryMap = '.$referece.';
             }
 
             $input = $this->addAttributeId($input, $id);  
+            $dataType = $field->getDataType();
             
             if($multipleData)
             {
-                $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
-                $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$upperFieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                if($dataType == 'password' || self::isInputFile($dataType))
+                {
+                    // do nothing
+                    $input->setAttribute('multiple', 'multiple');
+                }
+                else
+                {
+                    $input->setAttribute('placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getTypeHere();'.self::PHP_CLOSE_TAG);
+                    $input->setAttribute('data-initial-value', self::PHP_OPEN_TAG.AppBuilderBase::ECHO.'htmlspecialchars(json_encode('.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$upperFieldName.self::BRACKETS."));".AppBuilderBase::PHP_CLOSE_TAG);
+                }
             }
             else
             {
-                $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+                if($dataType == 'password' || self::isInputFile($dataType))
+                {
+                    // do nothing
+                }
+                else
+                {
+                    $input->setAttribute('value', $this->createPhpOutputValue(self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS));
+                }
             }
 
-            
-            $input->setAttribute('autocomplete', 'off');
+            if(!self::isInputFile($dataType))
+            {
+                $input->setAttribute('autocomplete', 'off');
+            }
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData)
+            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
             {
                 $input->setAttribute('data-multi-input', 'true');
             }
@@ -4178,9 +4494,10 @@ $subqueryMap = '.$referece.';
      *
      * @param DOMElement $input The input element to modify.
      * @param string $dataType The data type for the input (e.g., int, float).
+     * @param bool $asInputFilter Indicates if the input is for an input filter.
      * @return DOMElement The modified input element.
      */
-    private function setInputTypeAttribute($input, $dataType)
+    private function setInputTypeAttribute($input, $dataType, $asInputFilter = false) // NOSONAR
     {
         $classes = array();
         $classes[] = 'form-control';    
@@ -4193,6 +4510,19 @@ $subqueryMap = '.$referece.';
         {
             $input->setAttribute('type', 'number');
             $input->setAttribute('step', 'any');
+        }
+        else if(self::isInputFile($dataType))
+        {
+            if($asInputFilter)
+            {
+                // Set the type to 'text' for input filters
+                $input->setAttribute('type', 'text');
+            }
+            else
+            {
+                // Set the type to 'file' for file inputs
+                $input->setAttribute('type', 'file');
+            }
         }
         else
         {

@@ -82,7 +82,7 @@ class PicoTableParser {
      * Checks if a field is a primary key.
      *
      * @param string $field The field definition.
-     * @return bool True if the field is a primary key, otherwise false.
+     * @return bool true if the field is a primary key, otherwise false.
      */
     private function isPrimaryKey($field) {
         $f = strtoupper(trim(preg_replace('/\s+/', ' ', $field))); // NOSONAR
@@ -93,7 +93,7 @@ class PicoTableParser {
      * Checks if a field is auto-incremented.
      *
      * @param string $line The field definition.
-     * @return bool True if the field is auto-incremented, otherwise false.
+     * @return bool true if the field is auto-incremented, otherwise false.
      */
     private function isAutoIncrement($line) {
         $f = strtoupper(trim(preg_replace('/\s+/', ' ', $line)));
@@ -239,7 +239,7 @@ class PicoTableParser {
      * Validates if a type is one of the known types.
      *
      * @param string $type The data type to validate.
-     * @return bool True if the type is valid, otherwise false.
+     * @return bool true if the type is valid, otherwise false.
      */
     private function isValidType($type) {
         return $this->inArray($this->typeList, $type);

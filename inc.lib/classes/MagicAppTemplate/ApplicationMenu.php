@@ -4,14 +4,24 @@ namespace MagicAppTemplate;
 
 use Exception;
 use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
+use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 
+/**
+ * Class ApplicationMenu
+ *
+ * This class is responsible for generating the sidebar menu for the application.
+ * It retrieves the menu structure from the database or JSON file, depending on the environment.
+ * The menu is built using DOMDocument to create a structured HTML representation.
+ */
 class ApplicationMenu
 {
     /**
@@ -232,23 +242,129 @@ class ApplicationMenu
      */
 	public function getMenuFromDatabase()
 	{
-		$moduleGroups = $this->getModuleGrouped();
+        $menuData = array();
+        try
+        {
+            $cache = new AppMenuCacheImpl(null, $this->database);
+            // Find the menu cache by admin level ID
+            $cache->findOneByAdminLevelId($this->currentUser->getAdminLevelId());
+            
+            $menuData = json_decode($cache->getData(), true);
+            if(empty($menuData))
+            {
+                throw new NoRecordFoundException('Menu data not found in cache.');
+            }
+        }
+        catch(Exception $e)
+        {
+            $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+        }
+		return $menuData;
+	}
+    
+    /**
+     * Updates the menu cache for a specific admin level ID.
+     *
+     * @param string|null $adminLevelId The admin level ID to update the cache for. If null, updates all admin levels.
+     * @return array The updated menu data.
+     */
+    public function updateMenuCache($adminLevelId = null)
+    {
+        if(isset($adminLevelId) && !empty($adminLevelId))
+        {
+            return $this->updateMenuCacheByAdminLevelId($adminLevelId);
+        }
+        else
+        {
+            // Update all menu caches for all admin levels
+            $adminLevelFinder = new AppAdminRoleImpl(null, $this->database);
+            $pageData = $adminLevelFinder->findAll();
+            $menuData = array();
+            foreach($pageData->getResult() as $adminLevel)
+            {
+                $menuData = $this->updateMenuCacheByAdminLevelId($adminLevel->getAdminLevelId());
+            }
+            // Applocation will not use this menuData when update all menu cache
+            // but this is for future use if needed
+            return $menuData;
+        }
+    }
+    
+    /**
+     * Updates the menu cache for a specific admin level ID by admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to update the cache for.
+     * @return array The updated menu data.
+     */
+    public function updateMenuCacheByAdminLevelId($adminLevelId)
+    {
+        $menuData = $this->getMenuByAdminLevelId($adminLevelId);
+        $dataToStore = json_encode($menuData);
+        $cache = new AppMenuCacheImpl(null, $this->database);
+        try
+        {
+            $cache->findOneByAdminLevelId($adminLevelId);
+            $cache->setData($dataToStore);
+            $cache->setTimeEdit(date('Y-m-d H:i:s'));
+            $cache->update(); // Update the menu data in the cache
+        }
+        catch(Exception $e)
+        {
+            $cache = new AppMenuCacheImpl(null, $this->database);
+            $cache->setAdminLevelId($this->currentUser->getAdminLevelId());
+            $cache->setData($dataToStore);
+            $cache->setTimeCreate(date('Y-m-d H:i:s'));
+            $cache->insert(); // Store the menu data in the cache
+        } 
+        return $menuData;
+    }
+    
+    /**
+     * Deletes the menu cache for a specific admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to delete the cache for.
+     * @return self The current instance of the class.
+     */
+    public function deleteMenuCache($adminLevelId)
+    {
+        $cache = new AppMenuCacheImpl(null, $this->database);
+        try
+        {
+            $cache->where(PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId)))
+            ->delete();   
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        } 
+        return $this;
+    }
+    
+    /**
+     * Retrieves the menu structure for a specific admin level ID.
+     *
+     * @param string $adminLevelId The admin level ID to filter the menu.
+     * @return array The menu list for the specified admin level ID.
+     */
+    public function getMenuByAdminLevelId($adminLevelId)
+    {
+        $moduleGroups = $this->getModuleGrouped($adminLevelId);
 
         $menuList = array();
         $menuList['menu'] = array();
-        foreach($moduleGroups as $moduleGoup)
+        foreach($moduleGroups as $moduleGroup)
         {
             $menu = array(
-                'title' => $moduleGoup->getName(),
-                'icon' => $moduleGoup->getIcon(),
-                'href' => $moduleGoup->getUrl(),
-                'target' => $moduleGoup->getTarget(),
+                'title' => $moduleGroup->getName(),
+                'icon' => $moduleGroup->getIcon(),
+                'href' => $moduleGroup->getUrl(),
+                'target' => $moduleGroup->getTarget(),
                 'submenu' => array()
             );
             $submenus = array();
-            if($moduleGoup->getModules() != null)
+            if($moduleGroup->getModules() != null)
             {
-                foreach($moduleGoup->getModules() as $module)
+                foreach($moduleGroup->getModules() as $module)
                 {
                     $submenus[] = array(
                         'title' => $module->getName(),
@@ -262,62 +378,93 @@ class ApplicationMenu
             $menuList['menu'][] = $menu;
         }
         return $menuList;
-	}
+    }
     
     /**
      * Retrieves the modules grouped by module group.
      *
+     * @param string $adminLevelId The admin level ID to filter the modules.
      * @return MagicObject[] Array of grouped modules.
      */
-    public function getModuleGrouped() // NOSONAR
+    public function getModuleGrouped($adminLevelId) // NOSONAR
     {
+        $specialAcess = false;
+        try
+        {
+            $adminLevel = new AppAdminLevelImpl(null, $this->database);
+            $adminLevel->findOneByAdminLevelId($adminLevelId);
+            $specialAcess = $adminLevel->getSpecialAccess();
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        }
+        
+        $adminRoles = $this->loadAminRole($adminLevelId);
         $modules = $this->loadModule();
-        $adminRoles = $this->loadAminRole();
         $modulesWithGroup = array();
         
         // Step 1 - for module with valid group module
         foreach($modules as $module)
         {
-            $moduleGroup = $module->getGroupModule();
+            $moduleGroup = $module->getModuleGroup();
+            if($moduleGroup == null || $moduleGroup->getModuleGroupId() == null)
+            {
+                $moduleGroup = new MagicObject();
+            }
             $moduleGroupId = $module->getModuleGroupId();
-            if(isset($moduleGroup) && $moduleGroup->getGroupModuleId() != null)
+            if(isset($moduleGroup) && $moduleGroup->getModuleGroupId() != null)
             {
                 if(!isset($modulesWithGroup[$moduleGroupId]))
                 {
                     $modulesWithGroup[$moduleGroupId] = new MagicObject();
-                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId();
+                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId($moduleGroupId);
+                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroup->getName());
+                    $modulesWithGroup[$moduleGroupId]->setHref('#');
+                    $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) 
+                || ($specialAcess && $module->isSpecialAccess()) 
+                || $this->isAllowedAccess($module, $adminRoles))
                 {
-                    $modulesWithGroup[$moduleGroupId]->appendModules();
+                    $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
             }
         }
         // Step 2 - for module without valid group module
         foreach($modules as $module)
         {
-            $moduleGroup = $module->getGroupModule();
+            $moduleGroup = $module->getModuleGroup();
+            if($moduleGroup == null || $moduleGroup->getModuleGroupId() == null)
+            {
+                $moduleGroup = new MagicObject();
+            }
             $moduleGroupId = $module->getModuleGroupId();
-            if(!isset($moduleGroup) || $moduleGroup->getGroupModuleId() == null)
+            if(!isset($moduleGroup) || $moduleGroup->getModuleGroupId() == null)
             {
                 if(!isset($modulesWithGroup[$moduleGroupId]))
                 {
                     $modulesWithGroup[$moduleGroupId] = new MagicObject();
-                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId();
+                    $modulesWithGroup[$moduleGroupId]->setModuleGroupId($moduleGroupId);
+                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroup->getName());
+                    $modulesWithGroup[$moduleGroupId]->setHref('#');
+                    $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
                 }
-                if($this->isAllowedAccess($module, $adminRoles))
+                if((isset($this->appConfig) && $this->appConfig->getBypassRole()) 
+                || ($specialAcess && $module->isSpecialAccess()) 
+                || $this->isAllowedAccess($module, $adminRoles))
                 {
-                    $modulesWithGroup[$moduleGroupId]->appendModules();
+                    $modulesWithGroup[$moduleGroupId]->appendModules($module);
                 }   
             }
         }
-        
+                
         // Clean up empty group
         foreach($modulesWithGroup as $index=>$group)
         {
-            if($group->issetModules())
+            if(!$group->issetModules())
             {
                 unset($modulesWithGroup[$index]);
             }
@@ -338,7 +485,7 @@ class ApplicationMenu
         {
             foreach($adminRoles as $adminRole)
             {
-                if($adminRole->getModuleId() == $module->getModule() && 
+                if($adminRole->getModuleId() == $module->getModuleId() && 
                     (
                            $adminRole->isAllowedList()
                         || $adminRole->isAllowedDetail()
@@ -390,14 +537,15 @@ class ApplicationMenu
     /**
      * Loads the admin roles from the database.
      *
+     * @param string $adminLevelId The admin level ID to filter the roles.
      * @return AppAdminRoleImpl[] Array of admin roles.
      */
-    public function loadAminRole()
+    public function loadAminRole($adminLevelId)
     {
         $adminRoles = [];
 		$adminRole = new AppAdminRoleImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
-            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $this->currentUser->getAdminLevelId()))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
         ;
 

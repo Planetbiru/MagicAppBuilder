@@ -38,7 +38,7 @@ class PicoUploadFileContainer
     /**
      * Checks if multiple files were uploaded.
      *
-     * @return bool True if multiple files were uploaded; otherwise, false.
+     * @return bool true if multiple files were uploaded; otherwise, false.
      */
     public function isMultiple()
     {
@@ -49,7 +49,7 @@ class PicoUploadFileContainer
      * Checks if a specific file exists in the upload.
      *
      * @param int $index The index of the uploaded file.
-     * @return bool True if the file exists; otherwise, false.
+     * @return bool true if the file exists; otherwise, false.
      */
     public function isExists($index)
     {

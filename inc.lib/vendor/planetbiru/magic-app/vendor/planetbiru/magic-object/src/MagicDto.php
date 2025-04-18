@@ -379,7 +379,7 @@ class MagicDto extends stdClass // NOSONAR
      * Checks if the given variable is a self-instance.
      *
      * @param mixed $objectTest The object to test against.
-     * @return bool True if it's a self-instance, otherwise false.
+     * @return bool true if it's a self-instance, otherwise false.
      */
     private function isSelfInstance($objectTest)
     {
@@ -390,7 +390,7 @@ class MagicDto extends stdClass // NOSONAR
      * Checks if the given object is an instance of MagicObject or its derivatives.
      *
      * @param mixed $objectTest The object to test.
-     * @return bool True if it is a MagicObject instance, otherwise false.
+     * @return bool true if it is a MagicObject instance, otherwise false.
      */
     private function isMagicObjectInstance($objectTest)
     {
@@ -404,7 +404,7 @@ class MagicDto extends stdClass // NOSONAR
      * Checks if the given object is an instance of DateTime or its derivatives.
      *
      * @param mixed $objectTest The object to test.
-     * @return bool True if it is a MagicObject instance, otherwise false.
+     * @return bool true if it is a MagicObject instance, otherwise false.
      */
     private function isDateTimeInstance($objectTest)
     {
@@ -593,7 +593,7 @@ class MagicDto extends stdClass // NOSONAR
      * This method checks the class parameters to determine if JSON output
      * formatting should be applied to enhance readability.
      *
-     * @return bool True if JSON output is set to be prettified; otherwise, false.
+     * @return bool true if JSON output is set to be prettified; otherwise, false.
      */
     protected function _prettyJson()
     {
@@ -609,7 +609,7 @@ class MagicDto extends stdClass // NOSONAR
      * This method checks the class parameters to determine if XML output
      * formatting should be applied to enhance readability.
      *
-     * @return bool True if XML output is set to be prettified; otherwise, false.
+     * @return bool true if XML output is set to be prettified; otherwise, false.
      */
     protected function _prettyXml()
     {

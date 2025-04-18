@@ -754,5 +754,5 @@ $formattedData = $object->formatData("%7.3f");
 -   **Example**:
 
 ```php
-`$formattedData = $object->dmsData(";");`
+$formattedData = $object->dmsData(";");
 ```

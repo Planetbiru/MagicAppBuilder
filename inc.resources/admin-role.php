@@ -19,11 +19,14 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
+
+$attributeChecked = ' checked="checked"';
 
 /**
  * Sorts the modules by group and module order.
@@ -74,16 +77,51 @@ function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
                 return 0;
             }
         }
-
         return $cmp;
     });
 }
 
+/**
+ * Clean up admin role from the database.
+ * 
+ * This function deletes admin roles that do not have an admin level or module.
+ *
+ * @param PicoDatabase $database The database connection.
+ * @throws Exception If an error occurs during the operation.
+ * @return int The number of deleted admin roles.
+ */
+function cleanUpRole($database)
+{
+	$deleted = 0;
+	$adminRole = new AppAdminRoleImpl(null, $database);
+	try
+	{
+		// Find all admin roles without filter
+		$pageData = $adminRole->findAll();
+		foreach($pageData->getResult() as $adminRole)
+		{
+			if(!$adminRole->issetAdminLevel() || !$adminRole->issetModule())
+			{
+				// Delete the admin role if it does not have an admin level or module
+				$adminRole->delete();
+				
+				// Increment the deleted count
+				$deleted++;
+			}
+		}
+	}
+	catch(Exception $e)
+	{
+		// Do nothing
+	}
+	// Return the number of deleted admin roles
+	return $deleted;
+}
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-role", $appLanguage->getAdminRole());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin-role", $appLanguage->getAdministratorRole());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -97,10 +135,11 @@ $dataFilter = null;
 
 
 if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_role_id']) && is_array($_POST['admin_role_id'])) {
-	$database->statTransaction();
+	
+	$database->startTransaction();
+
 	try {
 		// Mulai transaksi untuk memastikan data konsisten
-		$pdo->beginTransaction();
 
 		foreach ($_POST['admin_role_id'] as $index => $adminRoleId) {
 			// Cek dan ambil nilai dari setiap checkbox
@@ -131,10 +170,13 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->setAllowedSortOrder($allowedSortOrder)
 			->setAllowedExport($allowedExport)
 			->update();
-			
 		}
-
 		$database->commit();
+		
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the menu cache for the specified admin level ID
+		$applicationMenu->updateMenuCache($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC));
 		
 	} catch (PDOException $e) {
 		$database->rollBack();
@@ -145,6 +187,9 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 
 if($inputGet->getUserAction() == 'generate')
 {
+	// Clean up admin role
+	cleanUpRole($database);
+	
 	// Generate admin role
 	// for all active modules
 	// for the selected admin level
@@ -281,7 +326,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
+					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonShow();?></button>
 				</span>
 				
 				<span class="filter-group">
@@ -308,6 +353,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				    ;
 					
 					$sortedModule = $pageData->getResult();
+					sortModulesByGroupAndModuleOrder($sortedModule);
 					
 					
 			?>
@@ -322,15 +368,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<thead>
 							<tr>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="module_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModule();?></a></td>
-								<td data-col-name="allowed_list" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedList();?></a></td>
-								<td data-col-name="allowed_detail" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedDetail();?></a></td>
-								<td data-col-name="allowed_create" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedCreate();?></a></td>
-								<td data-col-name="allowed_update" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedUpdate();?></a></td>
-								<td data-col-name="allowed_delete" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedDelete();?></a></td>
-								<td data-col-name="allowed_approve" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedApprove();?></a></td>
-								<td data-col-name="allowed_sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedSortOrder();?></a></td>
-								<td data-col-name="allowed_export" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowedExport();?></a></td>
+								<td data-col-name="module_id" class="order-controll"><?php echo $appEntityLanguage->getModule();?></td>
+								<td data-col-name="module_group_id" class="order-controll"><?php echo $appEntityLanguage->getModuleGroup();?></td>
+								<td data-col-name="allowed_list" class="order-controll"><label for="allowed_list"><input id="allowed_list" type="checkbox" class="checkbox check-master" data-selector=".allowed_list"> <?php echo $appEntityLanguage->getList();?></label></td>
+								<td data-col-name="allowed_detail" class="order-controll"><label for="allowed_detail"><input id="allowed_detail" type="checkbox" class="checkbox check-master" data-selector=".allowed_detail"> <?php echo $appEntityLanguage->getDetail();?></label></td>
+								<td data-col-name="allowed_create" class="order-controll"><label for="allowed_create"><input id="allowed_create" type="checkbox" class="checkbox check-master" data-selector=".allowed_create"> <?php echo $appEntityLanguage->getCreate();?></label></td>
+								<td data-col-name="allowed_update" class="order-controll"><label for="allowed_update"><input id="allowed_update" type="checkbox" class="checkbox check-master" data-selector=".allowed_update"> <?php echo $appEntityLanguage->getUpdate();?></label></td>
+								<td data-col-name="allowed_delete" class="order-controll"><label for="allowed_delete"><input id="allowed_delete" type="checkbox" class="checkbox check-master" data-selector=".allowed_delete"> <?php echo $appEntityLanguage->getDelete();?></label></td>
+								<td data-col-name="allowed_approve" class="order-controll"><label for="allowed_approve"><input id="allowed_approve" type="checkbox" class="checkbox check-master" data-selector=".allowed_approve"> <?php echo $appEntityLanguage->getApprove();?></label></td>
+								<td data-col-name="allowed_sort_order" class="order-controll"><label for="allowed_sort_order"><input id="allowed_sort_order" type="checkbox" class="checkbox check-master" data-selector=".allowed_sort_order"> <?php echo $appEntityLanguage->getSortOrder();?></label></td>
+								<td data-col-name="allowed_export" class="order-controll"><label for="allowed_export"><input id="allowed_export" type="checkbox" class="checkbox check-master" data-selector=".allowed_export"> <?php echo $appEntityLanguage->getExport();?></label></td>
+								<td data-col-name="allowed_all" class="order-controll"><label for="allowed_all"><input id="allowed_all" type="checkbox" class="checkbox check-master" data-selector=".allowed_all"> <?php echo $appEntityLanguage->getAll();?></label></td>
 							</tr>
 						</thead>
 					
@@ -350,6 +398,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 								
 								$id = $adminRole->getAdminRoleId();
+								
+								$moduleClass = "module-".str_replace(".", "-", $adminRole->getModuleCode())."-".$adminRole->getAdminRoleId();
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
@@ -361,12 +411,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="module_id">
 									<?php echo $adminRole->issetModule() ? $adminRole->getModule()->getName() : "";?>
 								</td>
+								
+								<!-- Module Group -->
+								<td data-col-name="module_group_id">
+									<?php echo $adminRole->issetModule() && $adminRole->getModule()->issetModuleGroup() ? $adminRole->getModule()->getModuleGroup()->getName() : "";?>
+								</td>
 
 								<!-- Allowed List (checkbox) -->
 								<td data-col-name="allowed_list">
 									<label>
-										<input type="checkbox" name="allowed_list[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedList(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_list <?php echo $moduleClass;?>" name="allowed_list[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedList($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -374,8 +429,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Detail (checkbox) -->
 								<td data-col-name="allowed_detail">
 									<label>
-										<input type="checkbox" name="allowed_detail[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDetail(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_detail <?php echo $moduleClass;?>" name="allowed_detail[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedDetail($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -383,8 +438,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Create (checkbox) -->
 								<td data-col-name="allowed_create">
 									<label>
-										<input type="checkbox" name="allowed_create[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedCreate(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_create <?php echo $moduleClass;?>" name="allowed_create[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedCreate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -392,8 +447,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Update (checkbox) -->
 								<td data-col-name="allowed_update">
 									<label>
-										<input type="checkbox" name="allowed_update[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedUpdate(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_update <?php echo $moduleClass;?>" name="allowed_update[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedUpdate($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -401,8 +456,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Delete (checkbox) -->
 								<td data-col-name="allowed_delete">
 									<label>
-										<input type="checkbox" name="allowed_delete[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDelete(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_delete <?php echo $moduleClass;?>" name="allowed_delete[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedDelete($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -410,8 +465,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Approve (checkbox) -->
 								<td data-col-name="allowed_approve">
 									<label>
-										<input type="checkbox" name="allowed_approve[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedApprove(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_approve <?php echo $moduleClass;?>" name="allowed_approve[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedApprove($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -419,8 +474,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Sort Order (checkbox) -->
 								<td data-col-name="allowed_sort_order">
 									<label>
-										<input type="checkbox" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedSortOrder(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_sort_order <?php echo $moduleClass;?>" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedSortOrder($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -428,9 +483,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Export (checkbox) -->
 								<td data-col-name="allowed_export">
 									<label>
-										<input type="checkbox" name="allowed_export[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedExport(' checked="checked"', "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_export <?php echo $moduleClass;?>" name="allowed_export[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
+									</label>
+								</td>
+								
+								<!-- Allowed All (checkbox) -->
+								<td data-col-name="allowed_all">
+									<label>
+										<input type="checkbox" class="checkbox check-master check-slave allowed_all" data-selector=".<?php echo $moduleClass;?>">
+										<?php echo $appLanguage->getAll();?>
 									</label>
 								</td>
 							</tr>
@@ -446,6 +509,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<div class="button-area">
 						<?php if($userPermission->isAllowedUpdate()){ ?>
 						<button type="submit" class="btn btn-success" name="user_action" id="update" value="update"><?php echo $appLanguage->getButtonUpdate();?></button>
+						<input type="hidden" name="admin_level_id" value="<?php echo $inputGet->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
 						<?php } ?>
 					</div>
 				</div>

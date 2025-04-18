@@ -120,7 +120,7 @@ class PicoAnnotationParser
      * Checks if the given value is null or empty.
      *
      * @param string $value The value to check.
-     * @return bool True if the value is null or empty, otherwise false.
+     * @return bool true if the value is null or empty, otherwise false.
      */
     private function isNullOrEmpty($value)
     {
@@ -468,7 +468,7 @@ class PicoAnnotationParser
      *
      * @param array $keys The array of valid keys.
      * @param string $val The value to check.
-     * @return bool True if the value matches the criteria, otherwise false.
+     * @return bool true if the value matches the criteria, otherwise false.
      */
     private function matchArgs($keys, $val)
     {

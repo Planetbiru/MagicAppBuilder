@@ -40,7 +40,7 @@ class PicoPredicate // NOSONAR
     /**
      * Check if a real join table is required.
      *
-     * @return bool True if a join is required, false otherwise.
+     * @return bool true if a join is required, false otherwise.
      */
     public function isRequireJoin()
     {

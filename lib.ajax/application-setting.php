@@ -84,17 +84,24 @@ $nameInIndonesian = array(
     "admin_edit" => "admin_ubah",
     "admin_ask_edit" => "admin_minta_ubah",
     "admin_delete" => "admin_hapus",
+    "admin_approve" => "admin_persetujuan",
+    "admin_restore" => "admin_pemulihan",
     "time_create" => "waktu_buat",
     "time_edit" => "waktu_ubah",
     "time_ask_edit" => "waktu_minta_ubah",
-    "time_delete" => "waktu_delete",
+    "time_delete" => "waktu_hapus",
+    "time_approve" => "waktu_persetujuan",
+    "time_restore" => "waktu_pemulihan",
     "ip_create" => "ip_buat",
     "ip_edit" => "ip_ubah",
     "ip_ask_edit" => "ip_minta_ubah",
     "ip_delete" => "ip_hapus",
+    "ip_approve" => "ip_persetujuan",
+    "ip_restore" => "ip_pemulihan",
     "approval_id" => "approval_id",
     "approval_note" => "approval_note",
-    "approval_status" => "approval_status"
+    "approval_status" => "approval_status",
+    "restored" => "dipulihkan",
 );
 
 ?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">

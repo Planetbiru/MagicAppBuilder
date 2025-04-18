@@ -20,6 +20,7 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppModuleGroupImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -88,6 +89,12 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$updater->update();
 		$newId = $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+		
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
+		
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_group_id, $newId);
 	}
 	catch(Exception $e)

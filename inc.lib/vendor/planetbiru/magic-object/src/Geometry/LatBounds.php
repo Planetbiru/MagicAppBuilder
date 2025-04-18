@@ -70,7 +70,7 @@ class LatBounds
     /**
      * Check if the latitude bounds are empty (i.e., invalid).
      *
-     * @return bool True if the bounds are empty, false otherwise.
+     * @return bool true if the bounds are empty, false otherwise.
      */
     public function isEmpty()
     {
@@ -81,7 +81,7 @@ class LatBounds
      * Determine if this LatBounds intersects with another LatBounds.
      *
      * @param LatBounds $latBounds The other LatBounds to check for intersection.
-     * @return bool True if there is an intersection, false otherwise.
+     * @return bool true if there is an intersection, false otherwise.
      */
     public function intersects($latBounds)
     {
@@ -94,7 +94,7 @@ class LatBounds
      * Check if this LatBounds is equal to another LatBounds within a certain margin of error.
      *
      * @param LatBounds $latBounds The other LatBounds to compare.
-     * @return bool True if they are equal, false otherwise.
+     * @return bool true if they are equal, false otherwise.
      */
     public function equals($latBounds)
     {
@@ -109,7 +109,7 @@ class LatBounds
      * Check if a given latitude is contained within the bounds.
      *
      * @param float $lat The latitude to check.
-     * @return bool True if the latitude is contained, false otherwise.
+     * @return bool true if the latitude is contained, false otherwise.
      */
     public function contains($lat)
     {

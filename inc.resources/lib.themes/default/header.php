@@ -5,7 +5,7 @@ $themeAssetsPath = $appConfig->getAssets();
 $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->getApplication()->getName(), " | ");
 
 ?><!DOCTYPE html>
-<html lang="id">
+<html lang="<?php echo $currentUser->getLanguageId();?>">
 
 <head>
     <meta charset="UTF-8">

@@ -16,7 +16,7 @@ use MagicObject\MagicObject;
  * 
  * @package MagicAdmin\Entity\Data
  * @Entity
- * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin_level")
  */
 class AdminLevelMin extends MagicObject

@@ -90,6 +90,14 @@ $phpIni = new SecretObject($builderConfig->getPhpIni());
 // Set max_execution_time
 ini_set('max_execution_time', $phpIni->getMaxExecutionTime() != null ? intval($phpIni->getMaxExecutionTime()) : 600);
 
+// Set memory_limit
+// Check if memory_limit is set and is not empty
+if($phpIni->getMemoryLimit() != null && $phpIni->getMemoryLimit() != "")
+{
+    // Set the memory limit to the value specified in the configuration
+    ini_set('memory_limit', $phpIni->getMemoryLimit());
+}
+
 $inputPost = new InputPost();
 $newAppId = trim($inputPost->getId());
 
@@ -270,13 +278,22 @@ $paginationConfig = new SecretObject(array(
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
+
+// Get application menu from YAML file instead of database
 $newApp->setDevelopmentMode(true);
 $newApp->setDebugMode(true);
 $newApp->setDebugModeError(true);
 $newApp->setDebugModeErrorLog(true);
-$newApp->setRole(new SecretObject(array(
-    'bypassRole' => true,
-)));
+
+// Use dummy user instead of database
+$newApp->setBypassRole(true);
+
+// Set access localhost only
+// This is for testing purpose only, 
+// should be set to false in production, 
+// online installation, 
+// and when `bypassRole` set to false`
+$newApp->setAccessLocalhostOnly(true);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
@@ -339,39 +356,55 @@ file_put_contents($path4, "
 menu:
   - 
     title: Home
+    icon: fa fa-home
     submenu:
       - 
         title: Home
         href: index.php
+        icon: fa fa-home
+        specialAccess: true
   - 
     title: Reference
+    icon: fa fa-book
     submenu: [ ]
   - 
     title: Master
+    icon: fa fa-folder
     submenu: [ ]
   - 
     title: Settings
+    icon: fa fa-cog
     submenu:
       - 
         title: Admin
         href: admin.php
+        icon: fa fa-user
+        specialAccess: true
       - 
         title: Admin Level
         href: admin-level.php
+        icon: fa fa-user
+        specialAccess: true
       - 
         title: Admin Role
         href: admin-role.php
+        icon: fa fa-user
+        specialAccess: true
       - 
         title: Module
         href: module.php
+        icon: fa fa-cog
+        specialAccess: true
       - 
         title: Module Group
         href: module-group.php
+        icon: fa fa-cog
+        specialAccess: true
       - 
         title: Message Folder
         href: message-folder.php
-
-
+        icon: fa fa-folder
+        specialAccess: false
 
 ");
 if($async)
@@ -396,16 +429,12 @@ if($async)
         error_log($command);
         exec($command);
     }
-    
-    
-    
 }
 else
 {
     $scriptGenerator = new ScriptGenerator();
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 }
-error_log("AFTER PREPARE APPLICATION");
 
 
 
@@ -418,7 +447,6 @@ try
         ->setWorkspaceId($workspaceId)
         ->setApplicationId($newAppId)
         ->update();
-        error_log("AFTER FINISHING APPLICATION");
 }
 catch(Exception $e)
 {

@@ -67,7 +67,7 @@ class PicoSqlParser
      * 
      * @param array $haystack Array to search in.
      * @param mixed $needle Element to search for.
-     * @return bool True if the element is found, false otherwise.
+     * @return bool true if the element is found, false otherwise.
      */
     private function inArray($haystack, $needle)
     {

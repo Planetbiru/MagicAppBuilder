@@ -26,12 +26,6 @@ $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
-if(!$userPermission->allowedAccess($inputGet, $inputPost))
-{
-	require_once $appInclude->appForbiddenPage(__DIR__);
-	exit();
-}
-
 $dataFilter = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentUser->getAdminId()));
 

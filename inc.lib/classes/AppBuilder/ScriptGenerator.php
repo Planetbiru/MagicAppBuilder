@@ -121,6 +121,23 @@ class ScriptGenerator //NOSONAR
         && $value->getReferenceFilter()->getEntity() != null 
         && $value->getReferenceFilter()->getEntity()->getEntityName() != null;
     }
+    
+    /**
+     * Add use statement for upload file.
+     *
+     * @param array $uses Array of existing use statements.
+     * @param AppField $fields Field object to check.
+     * @return array Updated array of use statements.
+     */
+    public function addUseFromFieldType($uses, $fields)
+    {
+        if(AppBuilderBase::hasInputFile($fields) && !in_array("use MagicObject\\File\\PicoUploadFile;", $uses))
+        {
+            $uses[] = "use MagicObject\\File\\PicoUploadFile;";
+            $uses[] = "use MagicObject\\File\\PicoFileRendered;";
+        }
+        return $uses;
+    }
 
     /**
      * Add use statement from approval entity.
@@ -390,7 +407,8 @@ class ScriptGenerator //NOSONAR
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
         
-        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures);   
+        $uses = $this->createUse($appConf, $entityMainName, $approvalRequired, $sortOrder, $appFeatures);
+        $uses = $this->addUseFromFieldType($uses, $request->getFields());   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
         if(!$appFeatures->isBackendOnly())
@@ -760,7 +778,7 @@ class ScriptGenerator //NOSONAR
         $moduleMenu = trim($request->getModuleMenu());
         $title = trim($request->getModuleName());
         $href = ltrim(trim($target."/".$request->getModuleFile()), "/");
-
+        $submenuHashes = [];
         $menuToCheck = $title."-".$href;
         if(!in_array($menuToCheck, $existingMenus) && $menus->getMenu() != null)
         {
@@ -776,10 +794,24 @@ class ScriptGenerator //NOSONAR
                     }
 
                     $hash = $title.$href;
+                    $submenuHashes[] = $hash;
+                }
+            }
+            
+            foreach($menuArray as $index=>$menu)
+            {
+                if(isset($menu['title']) && trim(strtolower($menu['title'])) == trim(strtolower($moduleMenu)))
+                {
+                    if(!isset($menuArray[$index]['submenu']))
+                    {
+                        $menuArray[$index]['submenu'] = [];
+                    }
+
+                    $hash = $title.$href;
                     $skip = false;
                     foreach($menuArray[$index]['submenu'] as $sub)
                     {
-                        if($sub['title'].$sub['href'] == $hash)
+                        if($sub['title'].$sub['href'] == $hash || in_array($hash, $submenuHashes))
                         {
                             $skip = true;
                             break;
@@ -787,7 +819,12 @@ class ScriptGenerator //NOSONAR
                     }
                     if(!$skip)
                     {
-                        $menuArray[$index]['submenu'][] = array("title"=>$title, "href"=>$href);
+                        $menuArray[$index]['submenu'][] = array(
+                            "title" => $title, 
+                            "code" => $request->getModuleCode(),
+                            "href" => $href,
+                            "icon" => $request->getModuleIcon(),
+                        );
                     }
                 }
             }

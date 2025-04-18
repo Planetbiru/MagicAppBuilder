@@ -16,7 +16,7 @@ use MagicObject\MagicObject;
  * 
  * @package MagicAdmin\Entity\Data
  * @Entity
- * @JSON(propertyNamingStrategy=SNAKE_CASE, prettify=false)
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="admin")
  */
 class AdminMin extends MagicObject
@@ -124,10 +124,10 @@ class AdminMin extends MagicObject
 	protected $workspaceId;
 
 	/**
-	 * Vatidation Code
+	 * Validation Code
 	 * 
-	 * @Column(name="vatidation_code", type="text", nullable=true)
-	 * @Label(content="Vatidation Code")
+	 * @Column(name="validation_code", type="text", nullable=true)
+	 * @Label(content="Validation Code")
 	 * @var string
 	 */
 	protected $vatidationCode;
@@ -140,6 +140,16 @@ class AdminMin extends MagicObject
 	 * @var string
 	 */
 	protected $lastResetPassword;
+	
+	/**
+	 * Blocked
+	 * 
+	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @DefaultColumn(value="false")
+	 * @Label(content="Blocked")
+	 * @var bool
+	 */
+	protected $blocked;
 
 	/**
 	 * Time Create
@@ -204,14 +214,5 @@ class AdminMin extends MagicObject
 	 * @var bool
 	 */
 	protected $active;
-
-	/**
-	 * Bloked
-	 * 
-	 * @Column(name="bloked", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Bloked")
-	 * @var bool
-	 */
-	protected $bloked;
 
 }

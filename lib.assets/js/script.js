@@ -227,6 +227,10 @@ function hideWaitingScreen()
   document.querySelector('.waiting-screen').style.display = 'none';
 }
 
+/**
+ * Check application status
+ * @param {string} id - application ID 
+ */
 function setCheckingStatus(id)
 {
   $.ajax({
@@ -236,7 +240,6 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
-      console.log(data.applicationStatus)
       if(data.applicationStatus != 'finish')
       {
         setTimeout(function(){
@@ -257,7 +260,9 @@ function setCheckingStatus(id)
   })
 }
 
-// Add event listener
+/**
+ * Initialize all event handlers and elements
+ */
 let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
@@ -786,7 +791,7 @@ let initAll = function () {
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
-    let magic_app_version = modal.find('[name="magic_app_version"]').val().trim();
+    let magic_app_version = modal.find('[name="magic_app_version"]').val();
     let composer_online = modal.find('[name="installation_method"]').val().toLowerCase().indexOf('online') === 0;
     let paths = [];
     $('#modal-create-application table.path-manager tbody tr').each(function () {
@@ -1211,6 +1216,9 @@ let initAll = function () {
         decreaseAjaxPending();
         resetFileManager();
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -1228,6 +1236,9 @@ let initAll = function () {
         decreaseAjaxPending();
         resetFileManager();
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -1471,8 +1482,8 @@ let initAll = function () {
     let updateBtn = $('#modal-application-setting .button-save-application-config');
     updateBtn[0].disabled = true;
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-application-setting').modal('show');
     $('#modal-application-setting .application-setting').empty();
+    $('#modal-application-setting').modal('show');
     increaseAjaxPending();
     resetCheckWriretableDirectory($('#modal-application-setting [name="application_base_directory"]'));
     resetCheckWriretableDirectory($('#modal-application-setting [name="database_database_file_path"]'));
@@ -1495,7 +1506,136 @@ let initAll = function () {
       }
     });
   });
+  
+  $(document).on('click', '.button-application-option', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-application-option .application-option').empty();
+    $('#modal-application-option').modal('show');
+    increaseAjaxPending();
 
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-option.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        $('#modal-application-option').attr('data-application-id', applicationId);
+        $('#modal-application-option .application-option').empty().append(data);
+        updateBtn[0].disabled = false;
+      }
+    });
+  });
+  $(document).on("click", ".button-save-application-option", function (e) {
+    e.preventDefault();
+    let form = $(this).closest(".modal").find('form');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-option.php',
+      data: { 
+        action: 'save', 
+        developmentMode: form.find('[name="development_mode"]:checked').val(), 
+        bypassRole: form.find('[name="bypass_role"]:checked').val(), 
+        accessLocalhostOnly: form.find('[name="access_localhost_only"]:checked').val(),
+        applicationId: form.closest('.modal').attr('data-application-id') 
+      },
+      success: function (data) {
+        let modal = form.closest('.modal');
+        modal.modal('hide');
+      }
+    })
+  });
+  $(document).on('click', '#import-menu', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-menu-import.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        modal.find('.menu-container').empty().append(data);
+      }
+    });
+
+  });
+  
+  $(document).on('click', '#create-user', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+
+  });
+  
+  $(document).on('click', '#reset-user-password', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { action: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
+  
+  $(document).on('click', '#set-user-role', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { action: 'set-user-role', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
+  
+  
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
@@ -3426,8 +3566,10 @@ function serializeMenu() {
     submenuItems.forEach(submenuItem => {
       menuData.submenu.push({
         title: submenuItem.querySelector('a.app-menu-text').textContent,
+        code: submenuItem.querySelector('a.app-menu-text').dataset.code,
         href: submenuItem.querySelector('a.app-menu-text').getAttribute('href'),
-        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon
+        icon: submenuItem.querySelector('a.app-menu-text').dataset.icon,
+        specialAccess: submenuItem.querySelector('a.app-menu-text').dataset.specialAccess,
       });
     });
     menu.push(menuData);
@@ -3495,6 +3637,9 @@ function reloadTranslate(translateFor) {
   }
 }
 
+let entityTranslationData = [];
+let moduleTranslationData = [];
+
 /**
  * Translates the specified entity and updates the UI with the results.
  *
@@ -3523,6 +3668,8 @@ function translateEntity(clbk) {
       data: { userAction: 'get', entityName: entityName, targetLanguage: targetLanguage, filter: filter },
       success: function (data) {
         decreaseAjaxPending();
+        entityTranslationData = data;
+        $('.entity-translation-status').text('');
         let textOut1 = [];
         let textOut2 = [];
         let propertyNames = [];
@@ -3539,6 +3686,9 @@ function translateEntity(clbk) {
         transEd1.removeLineClass(lastLine1, 'background', 'highlight-line');
         transEd2.removeLineClass(lastLine1, 'background', 'highlight-line');
         lastLine1 = -1; //NOSONAR
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   }
@@ -3581,6 +3731,8 @@ function translateModule() {
     data: { userAction: 'get', modules: modules, translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage, filter: filter },
     success: function (data) {
       decreaseAjaxPending();
+      moduleTranslationData = data;
+      $('.module-translation-status').text('');
       let textOut1 = [];
       let textOut2 = [];
       let propertyNames = [];
@@ -3597,6 +3749,10 @@ function translateModule() {
       transEd4.removeLineClass(lastLine2, 'background', 'highlight-line');
       lastLine2 = -1; //NOSONAR
     },
+    error: function (data) {
+      decreaseAjaxPending();
+      $('.module-translation-status').text('Error: ' + data.responseText);
+    }
   });
 }
 
@@ -4515,6 +4671,7 @@ function updateTableName(
   $('[name="module_file"]').val(moduleFileName);
   $('[name="module_code"]').val(moduleCode);
   $('[name="module_name"]').val(moduleName);
+  $('[name="module_icon"]').val('fa fa-file-text-o');
 }
 
 /**
@@ -4742,6 +4899,7 @@ function generateScript(selector) {
     moduleCode: $('[name="module_code"]').val(),
     moduleName: $('[name="module_name"]').val(),
     moduleFile: $('[name="module_file"]').val(),
+    moduleIcon: $('[name="module_icon"]').val(),
     moduleAsMenu: $('[name="module_as_menu"]').val(),
     moduleMenu: $('[name="module_menu"]').val(),
     target: $('#current_module_location').val(),
@@ -5593,7 +5751,7 @@ function generateSelectType(field, args) {
   args.data_type = args.data_type || "text";
   let dataType = args.data_type;
   let matchByType = {
-    int: [
+    "int": [
       "bit",
       "varbit",
       "smallint",
@@ -5606,13 +5764,13 @@ function generateSelectType(field, args) {
       "bool",
       "boolean",
     ],
-    float: [
+    "float": [
       "numeric",
       "double",
       "real",
       "money"
     ],
-    text: [
+    "text": [
       "char",
       "character",
       "varchar",
@@ -5644,11 +5802,39 @@ function generateSelectType(field, args) {
       "character varying",
       "text"
     ],
-    date: [
+    "date": [
       "date"
     ],
-    time: [
+    "time": [
       "time"
+    ],
+    "file": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "image": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "audio": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
+    ],
+    "video": [
+      "char",
+      "character",
+      "varchar",
+      "character varying",
+      "text"
     ],
   };
 
@@ -5667,6 +5853,10 @@ function generateSelectType(field, args) {
         <option value="month" title="&lt;input type=&#39;month&#39;&gt;">month</option>
         <option value="week" title="&lt;input type=&#39;week&#39;&gt;">week</option>
         <option value="color" title="&lt;input type=&#39;color&#39;&gt;">color</option>
+        <option value="file" title="&lt;input type=&#39;file&#39;&gt;">file</option>
+        <option value="image" title="&lt;input type=&#39;file&#39;&gt;">image</option>
+        <option value="audio" title="&lt;input type=&#39;file&#39;&gt;">audio</option>
+        <option value="video" title="&lt;input type=&#39;file&#39;&gt;">video</option>
     </select>
   `);
 

@@ -1,6 +1,6 @@
 # MagicAppBuilder Usage Guide
 
-MagicAppBuilder is a powerful tool for creating applications quickly, allowing users to design and manage both the front-end and back-end of their software with minimal coding. 
+MagicAppBuilder is a low-code programming platform that enables users to rapidly create applications with minimal manual coding. It allows users to design and manage both the front-end and back-end of their software, empowering developers to build robust applications quickly while reducing the complexity of traditional coding tasks.
 
 ## User Interface
 
@@ -79,7 +79,193 @@ This tab allows users to create localization files for modules, enabling **multi
 
 This tab allows users to create localization files for entities, enabling **multi-language support** in applications.
 
-### **12. Logout**
+### **12. File Manager**
+
+File Manager allows you to manage files and directories with a variety of easy-to-use features. You can preview images, open and edit text files, and perform various operations on files and directories such as uploading, deleting, and downloading. Below is a complete guide to utilizing the various features within this File Manager.
+
+#### **Main Features**
+
+**1. Image Preview**
+
+You can preview images directly within the File Manager. Simply click on the image, and a preview will appear, allowing you to view it without opening any other applications.
+
+**2. Open Text Files**
+
+Text files such as .txt or other text-based files can be opened directly in the File Manager. Just click on the text file, and its contents will appear in the editor window within the File Manager.
+
+**3. Edit Text Files**
+
+Once a text file is opened, you can edit it directly. Simply modify the content of the file and save it, and the changes will be applied to the original file in the directory.
+
+#### **File Manager Context Menu**
+
+The context menu (right-click) allows you to access various functions related to files or directories. This menu is divided into several categories based on different contexts: **Directory**, **Root Directory**, and **File**.
+
+**Directory Context Menu**
+
+This context menu appears when you right-click on a directory.
+
+1.  **Create New File**
+    
+
+-   Choose this option to create a new file inside the selected directory. You will be prompted to enter the name of the new file.
+    
+
+2.  **Create New Directory**
+    
+
+-   Choose this option to create a new directory inside the selected directory. You will be prompted to name the new directory.
+    
+
+3.  **Upload File**
+    
+
+-   Choose this option to upload a file from your device to the selected directory. You can choose one or more files to upload.
+    
+
+4.  **Expand Directory**
+    
+
+-   Choose this option to show or hide subdirectories inside the selected directory. Directories with subdirectories will expand and display their contents.
+    
+
+5.  **Reload Directory**
+    
+
+-   Choose this option to reload the content of the selected directory, ensuring the latest content is displayed.
+    
+
+6.  **Rename Directory**
+    
+
+-   Choose this option to rename the selected directory. You will be prompted to enter a new name for the directory.
+    
+
+7.  **Download Directory**
+    
+
+-   Choose this option to download the entire directory and its contents to your device.
+    
+
+8.  **Delete Directory**
+    
+
+-   Choose this option to delete the selected directory along with all of its contents.
+    
+
+**Root Directory Context Menu**
+
+This context menu appears when you right-click on the root directory (main directory).
+
+1.  **Create New File**
+    
+
+-   Choose this option to create a new file inside the root directory. You will be prompted to enter the name of the new file.
+    
+
+2.  **Create New Directory**
+    
+
+-   Choose this option to create a new directory inside the root directory. You will be prompted to name the new directory.
+    
+
+3.  **Upload File**
+    
+
+-   Choose this option to upload a file to the root directory. You can select multiple files at once.
+    
+
+4.  **Reset Content**
+    
+
+-   Choose this option to delete all content in the root directory and restore it to its original state. All files and subdirectories will be removed.
+    
+
+5.  **Download All**
+    
+
+-   Choose this option to download all the contents of the root directory to your device.
+    
+
+**File Context Menu**
+
+This context menu appears when you right-click on a file.
+
+1.  **Open File**
+    
+
+-   Choose this option to open the selected file. If it is a text file, you will be able to view and edit its contents within the File Manager. For other file types such as images or PDFs, the file will be opened in preview mode.
+    
+
+2.  **Rename File**
+    
+
+-   Choose this option to rename the selected file. You will be prompted to enter a new name for the file.
+    
+
+3.  **Download File**
+    
+
+-   Choose this option to download the file to your device. You will receive the file in its original format as it exists on the server.
+    
+
+4.  **Delete File**
+    
+
+-   Choose this option to delete the selected file. You will be asked to confirm before the file is permanently deleted.
+    
+
+#### **How to Use the File Manager**
+
+**1. Navigating Directories**
+
+-   Click on a directory to open and view its contents.
+    
+-   Use the context menu to create new files, create new directories, upload files, or perform other operations.
+    
+
+**2. Uploading Files**
+
+-   Select the directory where you want to upload the file.
+    
+-   Right-click on the directory and choose "Upload File".
+    
+-   Select the file(s) you wish to upload from your device.
+    
+
+**3. Creating a New Directory**
+
+-   Right-click on the directory where you want to create a new subdirectory.
+    
+-   Choose the "Create New Directory" option and name your new directory.
+    
+
+**4. Renaming a File or Directory**
+
+-   Right-click on the file or directory you want to rename.
+    
+-   Choose the "Rename" option and enter a new name.
+    
+
+**5. Downloading a File or Directory**
+
+-   Right-click on the file or directory you want to download.
+    
+-   Choose "Download" for files or "Download Directory" for directories.
+    
+
+**6. Deleting a File or Directory**
+
+-   Right-click on the file or directory you want to delete.
+    
+-   Choose the "Delete" option and confirm the deletion.
+    
+
+#### **Conclusion**
+
+This File Manager is designed to simplify the management of files and directories. With features like image previews, text file opening and editing, and easy-to-access file management operations, you can quickly and efficiently manage your files and directories. Use the context menu for various operations such as uploading files, renaming, deleting, and much more.
+
+### **13. Logout**
 
 A link to log out of the administrator session.
 
@@ -830,3 +1016,85 @@ MagicAppBuilder also generates a `manifest.json` file containing the following i
     "display": "standalone"
 }
 ```
+
+## Step 15: Change the Application Option
+
+**Application Option** is used to configure application access. By default, the application displays a menu sourced from the file `/inc.cfg/menu.yml`, which is automatically generated by **MagicAppBuilder**. This file can be modified by the user.
+
+At this point, the application does not have any registered users in the database. Users can access all modules **without logging in** and **without any permission requirements**. Also, the application can **only be accessed from localhost**.  
+**Application Option** allows users to configure all of the above settings.
+
+When a user clicks the **“Option”** button on the application card, the **Application Option** appears as a dialog containing 3 accordion sections:
+
+1.  Application Menu
+    
+2.  Application User
+    
+3.  Application Mode
+    
+
+### Application Menu
+
+In this accordion section, users can import all menus from the `/inc.cfg/menu.yml` file into the database as module groups and modules.  
+To import the menu, click the **“Import Menu”** button. MagicAppBuilder will import all menu data from the YAML file into the database. Successfully imported menu items and submenus will be marked with a checkmark on the right side of the menu.
+
+The menu import process can be repeated whenever there are updates in the `/inc.cfg/menu.yml` file. Users can also clear existing data in the module group and module before re-importing the menu.
+
+
+### Application User
+
+In this section, users can create application user accounts in the database. The created user account will have the following properties:
+
+-   **Name**: Super User
+    
+-   **Username**: superuser
+    
+-   **Password**: superuser
+    
+
+To create the user account, click the **“Create User”** button. If the account does not exist, MagicAppBuilder will create it with the **“superuser”** role. If the **“superuser”** role itself doesn’t yet exist, MagicAppBuilder will create it first before creating the user account.
+
+Users can reset the password by checking the user account shown in this accordion and then clicking the **“Reset Password”** button. The password will be reset to match the username.
+
+In addition to resetting passwords, users can also assign the **Superuser** role to a selected account. **Be cautious** when granting the Superuser role, as it allows the user to access **all features in all modules without restriction**.
+
+To assign the Superuser role, check the user account and click the **“Set Superuser Role”** button. MagicAppBuilder will assign Superuser access to all modules in the application database.
+
+### Application Mode
+
+This section contains 3 options:
+
+1.  **Development Mode**
+    
+2.  **Bypass Role**
+    
+3.  **Access Localhost Only**
+    
+
+#### Development Mode
+
+This option determines the data source for the application menu.
+
+-   If checked (“Yes”), the application will display the menu based on the data in `/inc.cfg/menu.yml`.
+    
+-   If unchecked, the application will display the menu from the database (module group and module).
+
+#### Bypass Role
+
+This option determines whether users must **log in** to access the application modules.
+
+-   If Bypass Role is **checked**, users can access the application **without logging in**, and there are **no access restrictions**.
+    
+-   If unchecked, the application will require users to **log in** with valid user credentials. It will then check whether the user has permission to access specific modules.
+
+#### Access Localhost Only
+
+This option **prevents the application from being accessed from other devices**. It is **highly recommended** to enable this option when **Bypass Role** is active.  
+If Bypass Role is checked, **Access Localhost Only must also be checked** to prevent unauthorized access from other machines.
+
+In certain situations, users may temporarily allow access from other devices, but it should be **disabled again as soon as it's no longer needed**.
+
+**What are the risks if Bypass Role is enabled but Access Localhost Only is not?**
+
+Accessing the application from another device cannot alter the source code but **can delete application data**, including application modules. This could seriously disrupt the application development process.
+

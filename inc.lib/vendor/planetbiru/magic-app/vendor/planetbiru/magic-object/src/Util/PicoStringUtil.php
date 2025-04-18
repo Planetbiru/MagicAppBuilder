@@ -185,7 +185,7 @@ class PicoStringUtil
      * @param string $haystack The string to check.
      * @param string $value The substring to look for at the start.
      * @param bool $caseSensitive Optional. Flag to indicate if the comparison is case-sensitive (default is false).
-     * @return bool True if the string starts with the substring, false otherwise.
+     * @return bool true if the string starts with the substring, false otherwise.
      */
     public static function startsWith($haystack, $value, $caseSensitive = false)
     {
@@ -208,7 +208,7 @@ class PicoStringUtil
      * @param string $haystack The string to check.
      * @param string $value The substring to look for at the end.
      * @param bool $caseSensitive Optional. Flag to indicate if the comparison is case-sensitive (default is false).
-     * @return bool True if the string ends with the substring, false otherwise.
+     * @return bool true if the string ends with the substring, false otherwise.
      */
     public static function endsWith($haystack, $value, $caseSensitive = false)
     {
@@ -292,7 +292,7 @@ class PicoStringUtil
      * Determines if the given string is neither null nor empty.
      *
      * @param string $value The string to check.
-     * @return bool True if the string is not null and not empty, false otherwise.
+     * @return bool true if the string is not null and not empty, false otherwise.
      */
     public static function isNotNullAndNotEmpty($value)
     {
@@ -305,7 +305,7 @@ class PicoStringUtil
      * Determines if the given string is either null or empty.
      *
      * @param string $value The string to check.
-     * @return bool True if the string is null or empty, false otherwise.
+     * @return bool true if the string is null or empty, false otherwise.
      */
     public static function isNullOrEmpty($value)
     {

@@ -159,7 +159,7 @@ class PicoPasswordUtil{
      * if the password is invalid.
      *
      * @param string $password Password to be validated.
-     * @return bool True if the password is valid.
+     * @return bool true if the password is valid.
      * @throws InvalidInputFormatException If the password is invalid.
      */
     public function validate($password)

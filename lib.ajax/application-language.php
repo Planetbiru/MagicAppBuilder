@@ -50,7 +50,6 @@ if($inputPost->getAction() == "update")
             $appConfig->setLanguages($currentLanguages);
             $yml = $appConfig->dumpYaml();
             file_put_contents($appConfigPath, $yml);
-            
         }
         ResponseUtil::sendJSON($currentLanguages);
     }

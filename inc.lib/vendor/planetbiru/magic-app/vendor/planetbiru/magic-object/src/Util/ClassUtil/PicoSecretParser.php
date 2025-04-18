@@ -83,7 +83,7 @@ class PicoSecretParser
      * This method determines whether the provided array has string keys, indicating it is associative.
      *
      * @param array $array The array to check.
-     * @return bool True if the array has string keys, false otherwise.
+     * @return bool true if the array has string keys, false otherwise.
      */
     private static function hasStringKeys($array) {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
@@ -162,7 +162,7 @@ class PicoSecretParser
      * Check if the given value is an object.
      *
      * @param mixed $value The value to check.
-     * @return bool True if the value is an object, false otherwise.
+     * @return bool true if the value is an object, false otherwise.
      */
     private static function isObject($value)
     {
