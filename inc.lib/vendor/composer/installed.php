@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => 'bb31f456654baa16a7777c4b290a15622904c49f',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => 'bb31f456654baa16a7777c4b290a15622904c49f',
             'dev_requirement' => false,
         ),
         'meyfa/php-svg' => array(
@@ -43,7 +43,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-object',
             'aliases' => array(),
-            'reference' => 'a9b4bd3e74a76476c5f8a8019ed9829536d631a8',
+            'reference' => '619efe9ce0672657060423d4b2895eeb6500b7dd',
             'dev_requirement' => false,
         ),
     ),
