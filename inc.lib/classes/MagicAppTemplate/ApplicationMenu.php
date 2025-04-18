@@ -2,6 +2,7 @@
 
 namespace MagicAppTemplate;
 
+use DOMDocument;
 use Exception;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
@@ -79,7 +80,7 @@ class ApplicationMenu
     public static function generateSidebar($jsonData, $currentHref, $appLanguage) // NOSONAR
     {
         // Create a new DOMDocument instance to build the sidebar HTML structure
-        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true; // To format the output for better readability
 
         // Create the root <ul> element for the sidebar menu
@@ -330,8 +331,7 @@ class ApplicationMenu
         $cache = new AppMenuCacheImpl(null, $this->database);
         try
         {
-            $cache->where(PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId)))
-            ->delete();   
+            $cache->where(PicoSpecification::getInstance()->addAnd([Field::of()->adminLevelId, $adminLevelId]))->delete();   
         }
         catch(Exception $e)
         {
@@ -560,24 +560,32 @@ class ApplicationMenu
         }
         return $adminRoles;
     }
+
+    /**
+     * Get menu data
+     *
+     * @return array Menu data
+     */
+    public function getMenuData()
+    {
+        if($this->appConfig->getDevelopmentMode())
+        {
+            return $this->jsonData;
+        }
+        else
+        {
+            return $this->getMenuFromDatabase();
+        }
+    }
     
     /**
-     * Renders the complete menu (either from JSON or database depending on the environment).
+     * Renders the complete menu (either from Yaml file or database depending on the environment).
      *
      * @return string The rendered HTML menu.
      */
     public function renderMenu()
-    {
-        $menuData = null;
-        if($this->appConfig->getDevelopmentMode())
-        {
-            $menuData = $this->jsonData;
-        }
-        else
-        {
-            $menuData = $this->getMenuFromDatabase();
-        }
-        return self::generateSidebar($menuData, $this->currentHref, $this->appLanguage);
+    {        
+        return self::generateSidebar($this->getMenuData(), $this->currentHref, $this->appLanguage);
     }
     
     /**
