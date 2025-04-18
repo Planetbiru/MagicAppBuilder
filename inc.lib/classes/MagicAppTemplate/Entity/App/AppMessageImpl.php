@@ -25,6 +25,16 @@ class AppMessageImpl extends MagicObject
 	protected $messageId;
 
 	/**
+	 * Message Direction
+	 * 
+	 * @Column(name="message_direction", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Message Direction")
+	 * @var string
+	 */
+	protected $messageDirection;
+
+
+	/**
 	 * Admin Group
 	 * 
 	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
