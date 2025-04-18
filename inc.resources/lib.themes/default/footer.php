@@ -13,7 +13,7 @@ use MagicAppTemplate\AppFeedImpl;
         const notifications = <?php echo AppFeedImpl::getNotifications($database, $currentUser, 5); ?>;
 
         // Message data from the server in JSON format
-        const messages = <?php echo AppFeedImpl::getMessages($database, $currentUser, 5); ?>;
+        const messages = <?php echo AppFeedImpl::getMessages($database, $currentUser, 5, "message.php"); ?>;
 
     </script>
 </body>

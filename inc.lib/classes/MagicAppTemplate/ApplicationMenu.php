@@ -301,12 +301,13 @@ class ApplicationMenu
     {
         $menuData = $this->getMenuByAdminLevelId($adminLevelId);
         $dataToStore = json_encode($menuData);
+        $now = date('Y-m-d H:i:s');
         $cache = new AppMenuCacheImpl(null, $this->database);
         try
         {
             $cache->findOneByAdminLevelId($adminLevelId);
             $cache->setData($dataToStore);
-            $cache->setTimeEdit(date('Y-m-d H:i:s'));
+            $cache->setTimeEdit($now);
             $cache->update(); // Update the menu data in the cache
         }
         catch(Exception $e)
@@ -314,7 +315,8 @@ class ApplicationMenu
             $cache = new AppMenuCacheImpl(null, $this->database);
             $cache->setAdminLevelId($this->currentUser->getAdminLevelId());
             $cache->setData($dataToStore);
-            $cache->setTimeCreate(date('Y-m-d H:i:s'));
+            $cache->setTimeCreate($now);
+            $cache->setTimeEdit($now);
             $cache->insert(); // Store the menu data in the cache
         } 
         return $menuData;

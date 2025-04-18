@@ -13,7 +13,7 @@ use AppBuilder\AppFeed;
         const notifications = <?php echo AppFeed::getNotifications($databaseBuilder, $entityAdmin, 5); ?>;
 
         // Message data from the server in JSON format
-        const messages = <?php echo AppFeed::getMessages($databaseBuilder, $entityAdmin, 5); ?>;
+        const messages = <?php echo AppFeed::getMessages($databaseBuilder, $entityAdmin, 5, "message.php"); ?>;
 
     </script>
 </body>
