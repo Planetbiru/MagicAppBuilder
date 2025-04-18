@@ -25,6 +25,15 @@ class AppNotificationImpl extends MagicObject
 	protected $notificationId;
 
 	/**
+	 * Notification Type
+	 * 
+	 * @Column(name="notification_type", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Notification Type")
+	 * @var string
+	 */
+	protected $notificationType;
+
+	/**
 	 * Admin Group
 	 * 
 	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
