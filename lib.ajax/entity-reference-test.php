@@ -254,7 +254,7 @@ function getTableList($databaseConfig, $database) // NOSONAR
                 }
     
                 // Check if the column is a primary key
-                if (isset($data['column_key']) && $data['column_key'] == 'PRI' && !in_array($data['column_name'], $tables[$tableName]['primary_key'])) 
+                if (isset($data['column_key']) && $data['column_key'] == 'PRI' && !in_array($data['column_name'], $tables[$tableName]['primaryKeys'])) 
                 {
                     $tables[$tableName]['primaryKeys'][] = $data['column_name'];
                 }
