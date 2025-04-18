@@ -111,7 +111,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id")
 	 * @Label(content="Message Folder")
-	 * @var AmmMesageFolderMinImpl
+	 * @var AppMessageFolderMinImpl
 	 */
 	protected $messageFolder;
 	
