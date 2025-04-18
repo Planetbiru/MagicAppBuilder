@@ -98,9 +98,10 @@ class AppFeedImpl extends PicoObjectToString
      * @param PicoDatabase $databaseBuilder The database connection object used to query the messages.
      * @param EntityAdmin $entityAdmin The admin entity whose messages are being fetched.
      * @param int $limit The maximum number of messages to retrieve.
+     * @param string $path The URL path to open the message
      * @return self An instance of the class containing the fetched messages.
      */
-    public static function getMessages($databaseBuilder, $entityAdmin, $limit)
+    public static function getMessages($databaseBuilder, $entityAdmin, $limit, $path)
     {
         $instance = new self();
         $finder = new AppMessageImpl(null, $databaseBuilder);
@@ -120,7 +121,7 @@ class AppFeedImpl extends PicoObjectToString
             {
                 $data = new AppFeedDataImpl(
                     $record->getMessageId(),
-                    "message.php?user_action=detail&message_id=" . $record->getMessageId(),
+                    $path."?user_action=detail&message_id=" . $record->getMessageId(),
                     $record->getSubject(),
                     $record->getTimeCreate(),
                     strtotime($record->getTimeCreate())
@@ -140,15 +141,15 @@ class AppFeedImpl extends PicoObjectToString
      *
      * This method adds a new `AppFeedDataImpl` object to the feed's data array.
      *
-     * @param AppFeedDataImpl $AppFeedDataImpl The feed data item to be added to the feed.
+     * @param AppFeedDataImpl $data The feed data item to be added to the feed.
      * @return self The current instance, allowing for method chaining.
      */
-    public function appendData($AppFeedDataImpl)
+    public function appendData($data)
     {
         if (!isset($this->data)) {
             $this->data = [];
         }
-        $this->data[] = $AppFeedDataImpl;
+        $this->data[] = $data;
 
         return $this;
     }

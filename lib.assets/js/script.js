@@ -2401,6 +2401,10 @@ function validateReference() {
         $('.table-list').append(ul3);
       }
       
+    },
+    error: function(e1, e2)
+    {
+      console.error(e1);
     }
   });
 }

@@ -122,7 +122,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -131,7 +131,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -332,7 +332,7 @@ class Producer extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -341,7 +341,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -350,7 +350,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -551,7 +551,7 @@ class Artist extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -560,7 +560,7 @@ class Artist extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -569,7 +569,7 @@ class Artist extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
