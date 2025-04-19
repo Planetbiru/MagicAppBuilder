@@ -25,6 +25,16 @@ class AppMessageImpl extends MagicObject
 	protected $messageId;
 
 	/**
+	 * Message Direction
+	 * 
+	 * @Column(name="message_direction", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Message Direction")
+	 * @var string
+	 */
+	protected $messageDirection;
+
+
+	/**
 	 * Admin Group
 	 * 
 	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
@@ -101,7 +111,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id")
 	 * @Label(content="Message Folder")
-	 * @var AmmMesageFolderMinImpl
+	 * @var AppMessageFolderMinImpl
 	 */
 	protected $messageFolder;
 	
@@ -153,7 +163,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -171,7 +181,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Time Read
 	 * 
-	 * @Column(name="time_read", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_read", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Read")
 	 * @var string
 	 */

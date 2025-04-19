@@ -86,7 +86,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                                 if($appLanguageItem->getCode() != null && $appLanguageItem->getName() != null)
                                 {
                                     ?>
-                                    <a class="dropdown-item" href="set-language.php?language_id=<?php echo $appLanguageItem->getCode();?>"><img src="<?php echo $themeAssetsPath;?>css/flag/<?php echo $appLanguageItem->getCode();?>.svg" class="language-flag" alt="<?php echo $appLanguageItem->getCode();?>">
+                                    <a class="dropdown-item<?php echo $currentUser->getLanguageId() == $appLanguageItem->getCode() ? ' item-selected':'';?>" href="set-language.php?language_id=<?php echo $appLanguageItem->getCode();?>"><img src="<?php echo $themeAssetsPath;?>css/flag/<?php echo $appLanguageItem->getCode();?>.svg" class="language-flag" alt="<?php echo $appLanguageItem->getCode();?>">
                                     <?php echo $appLanguageItem->getName();?></a>
                                     <?php
                                 }

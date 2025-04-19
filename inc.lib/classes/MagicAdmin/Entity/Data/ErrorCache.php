@@ -54,7 +54,7 @@ class ErrorCache extends MagicObject
 	/**
 	 * Modification Time
 	 * 
-	 * @Column(name="modification_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="modification_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Modification Time")
 	 * @var string
 	 */
@@ -90,7 +90,7 @@ class ErrorCache extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -99,7 +99,7 @@ class ErrorCache extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */

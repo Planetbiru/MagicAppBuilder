@@ -85,7 +85,7 @@ class EntityNotification extends MagicObject
 	 * Time Create
 	 * 
 	 * @NotNull
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=false, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=false, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -105,7 +105,7 @@ class EntityNotification extends MagicObject
 	 * Time Open
 	 * 
 	 * @NotNull
-	 * @Column(name="time_open", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_open", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Open")
 	 * @var string
 	 */

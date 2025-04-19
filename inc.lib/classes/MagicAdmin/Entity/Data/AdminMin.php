@@ -135,7 +135,7 @@ class AdminMin extends MagicObject
 	/**
 	 * Last Reset Password
 	 * 
-	 * @Column(name="last_reset_password", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_reset_password", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Reset Password")
 	 * @var string
 	 */
@@ -154,7 +154,7 @@ class AdminMin extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -163,7 +163,7 @@ class AdminMin extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */

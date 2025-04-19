@@ -1,6 +1,7 @@
 <?php
 
-use AppBuilder\ScriptGenerator;
+use AppBuilder\ScriptGeneratorMicroservices;
+use AppBuilder\ScriptGeneratorMonolith;
 use AppBuilder\Util\Composer\ComposerUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
@@ -67,9 +68,19 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
     file_put_contents($path, json_encode(json_decode((string) $request), JSON_PRETTY_PRINT));
     $fileGenerated = 0;
 
-    if ($request->issetFields()) {
-        $scriptGenerator = new ScriptGenerator();
-        $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);
+    if ($appConfig->getApplication() != null && $request->issetFields()) {
+        $applicationConf = $appConfig->getApplication();
+        
+        if($applicationConf->getArchitecture() == 'microservices')
+        {
+            $scriptGenerator = new ScriptGeneratorMicroservices();
+            $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);
+        } 
+        else
+        {
+            $scriptGenerator = new ScriptGeneratorMonolith();
+            $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);    
+        }       
     }
 }
 

@@ -47,4 +47,5 @@ echo PicoResponseBody::getInstance()
     ->switchCaseTo("camelCase")
     ->setResponseCode("000")
     ->setResponseText("Success")
+    ->prettify(true)
     ;
