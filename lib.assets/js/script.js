@@ -2268,6 +2268,10 @@ let initAll = function () {
     validateReference();
   });
 
+  $(document).on('change', 'select[name="module_menu"]', function(e1){
+    
+  });
+
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
   window.localStorage.setItem('workspace-id', val1);

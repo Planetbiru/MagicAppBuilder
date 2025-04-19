@@ -1128,6 +1128,11 @@
                     return false;
                 }
                 actions[$(e.currentTarget).data('action')].apply(picker, arguments);
+                let fmt = options.format.toLowerCase();
+                if(fmt == 'yyyy-mm-dd')
+                {
+                    notifyEvent({type: 'dp.enter'});
+                }
                 return false;
             },
 
@@ -1251,6 +1256,7 @@
                             }
                             if (allModifiersPressed) {
                                 handler = options.keyBinds[index];
+                                notifyEvent({type: 'dp.enter'})
                                 break;
                             }
                         }
