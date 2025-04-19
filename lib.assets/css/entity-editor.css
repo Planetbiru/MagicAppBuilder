@@ -161,6 +161,12 @@ body {
   overflow: auto;
   margin-top: 5px;
 }
+.entity-editor .editor-form .table-container table > tbody > tr:hover > td {
+  background-color: #f3f3f3;
+}
+.entity-editor .editor-form .table-container table > tbody > tr:hover > td input[type=text], .entity-editor .editor-form .table-container table > tbody > tr:hover > td select {
+  background-color: transparent !important;
+}
 .entity-editor .editor-form table {
   width: 100%;
   border-collapse: collapse;
