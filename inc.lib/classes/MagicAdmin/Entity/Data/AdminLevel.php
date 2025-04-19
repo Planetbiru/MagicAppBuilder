@@ -42,6 +42,15 @@ class AdminLevel extends MagicObject
 	protected $name;
 
 	/**
+	 * Description
+	 * 
+	 * @Column(name="description", type="text", nullable=true)
+	 * @Label(content="Description")
+	 * @var string
+	 */
+	protected $description;
+
+	/**
 	 * Sort Order
 	 * 
 	 * @Column(name="sort_order", type="int", nullable=true)
@@ -78,6 +87,15 @@ class AdminLevel extends MagicObject
 	protected $adminCreate;
 
 	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @Label(content="Creator")
+	 * @var AdminMin
+	 */
+	protected $creator;
+
+	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
@@ -85,6 +103,15 @@ class AdminLevel extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
+
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @Label(content="Editor")
+	 * @var AdminMin
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create
