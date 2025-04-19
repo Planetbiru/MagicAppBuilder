@@ -884,8 +884,69 @@ $formattedData = $object->formatData("%7.3f");
 -   **Example**:
 
 ```php
-`$formattedData = $object->dmsData(";");`
+$formattedData = $object->dmsData(";");
 ```
+
+### 42. **retrieve**
+
+-   **Description**: Enables access to deeply nested properties within objects. This feature accepts multiple keys as arguments, allowing efficient traversal of complex nested structures.
+
+-   **Example**:
+
+
+```php
+$object = new  MagicObject();
+$yaml = '
+  prop1:
+    prop2:
+      prop3: Test
+';
+$object->loadYamlString($yaml, false, true, true);
+echo  $object->retrieve('prop1', 'prop2', 'prop3');
+```
+
+In this example:
+-   The method will first check `prop1`, then move to `prop2`, and finally `prop3`.
+-   If any of these keys do not exist, it will return `null`.    
+
+### 43. **mergeWith**
+
+-   **Description**: Merges properties from another `MagicObject` instance into the current one. If a property does not exist, it will be added. If it does:
+    
+    -   When both values are `MagicObject` instances, they will be merged recursively.
+        
+    -   Otherwise, the existing value will be overwritten.
+        
+-   **Example**:
+
+```php
+$obj1 = new MagicObject();
+$obj1->loadYamlString('
+user:
+  name: ALice
+client:
+  address: Jakarta
+', false, true, true);
+
+$obj2 = new MagicObject();
+$obj2->loadYamlString('
+user:
+  email: alice@example.com
+client:
+  name: Ana
+', false, true, true);
+
+$obj1->mergeWith($obj2);
+
+echo $obj1;
+// {"user":{"name":"ALice","email":"alice@example.com"},"client":{"address":"Jakarta","name":"Ana"}}
+```
+
+
+In this example:
+-   Properties in `$obj2` are merged into `$obj1`.
+-   Nested `MagicObject` instances are merged recursively.    
+-   Non-object values with the same key are replaced.
 
 ## Extends MagicObject
 
@@ -3445,7 +3506,7 @@ class Album extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -3454,7 +3515,7 @@ class Album extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -5161,7 +5222,7 @@ class EntitySong extends MagicObject
 	/**
 	 * File Upload Time
 	 * 
-	 * @Column(name="file_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="file_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="File Upload Time")
 	 * @var string
 	 */
@@ -5170,7 +5231,7 @@ class EntitySong extends MagicObject
 	/**
 	 * First Upload Time
 	 * 
-	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="first_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="First Upload Time")
 	 * @var string
 	 */
@@ -5179,7 +5240,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time
 	 * 
-	 * @Column(name="last_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time")
 	 * @var string
 	 */
@@ -5197,7 +5258,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Midi
 	 * 
-	 * @Column(name="last_upload_time_midi", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_midi", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Midi")
 	 * @var string
 	 */
@@ -5215,7 +5276,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Xml
 	 * 
-	 * @Column(name="last_upload_time_xml", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_xml", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Xml")
 	 * @var string
 	 */
@@ -5233,7 +5294,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Pdf
 	 * 
-	 * @Column(name="last_upload_time_pdf", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_pdf", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Pdf")
 	 * @var string
 	 */
@@ -5384,7 +5445,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Image
 	 * 
-	 * @Column(name="last_upload_time_image", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_image", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Image")
 	 * @var string
 	 */
@@ -5393,7 +5454,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -5402,7 +5463,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -5567,7 +5628,7 @@ class Album extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -5576,7 +5637,7 @@ class Album extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -5786,7 +5847,7 @@ class Producer extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -5795,7 +5856,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -5804,7 +5865,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -6014,7 +6075,7 @@ class Artist extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -6023,7 +6084,7 @@ class Artist extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -6032,7 +6093,7 @@ class Artist extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -6135,7 +6196,7 @@ class Genre extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -6144,7 +6205,7 @@ class Genre extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -6388,7 +6449,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -6397,7 +6458,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -6598,7 +6659,7 @@ class Producer extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -6607,7 +6668,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -6616,7 +6677,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -7075,7 +7136,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -7084,7 +7145,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -7285,7 +7346,7 @@ class Producer extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -7294,7 +7355,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -7303,7 +7364,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -9155,7 +9216,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -9164,7 +9225,7 @@ class EntityAlbum extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -9365,7 +9426,7 @@ class Producer extends MagicObject
 	/**
 	 * Image Update
 	 * 
-	 * @Column(name="image_update", type="timestamp", length=19, nullable=true)
+	 * @Column(name="image_update", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Image Update")
 	 * @var string
 	 */
@@ -9374,7 +9435,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -9383,7 +9444,7 @@ class Producer extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -9675,7 +9736,7 @@ class EntitySong extends MagicObject
 	/**
 	 * File Upload Time
 	 * 
-	 * @Column(name="file_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="file_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="File Upload Time")
 	 * @var string
 	 */
@@ -9684,7 +9745,7 @@ class EntitySong extends MagicObject
 	/**
 	 * First Upload Time
 	 * 
-	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="first_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="First Upload Time")
 	 * @var string
 	 */
@@ -9693,7 +9754,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time
 	 * 
-	 * @Column(name="last_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time")
 	 * @var string
 	 */
@@ -9711,7 +9772,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Midi
 	 * 
-	 * @Column(name="last_upload_time_midi", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_midi", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Midi")
 	 * @var string
 	 */
@@ -9729,7 +9790,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Xml
 	 * 
-	 * @Column(name="last_upload_time_xml", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_xml", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Xml")
 	 * @var string
 	 */
@@ -9747,7 +9808,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Pdf
 	 * 
-	 * @Column(name="last_upload_time_pdf", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_pdf", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Pdf")
 	 * @var string
 	 */
@@ -9898,7 +9959,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Last Upload Time Image
 	 * 
-	 * @Column(name="last_upload_time_image", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_image", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Image")
 	 * @var string
 	 */
@@ -9907,7 +9968,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -9916,7 +9977,7 @@ class EntitySong extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -11674,7 +11735,7 @@ class Song extends MagicObject
 	/**
 	 * File Upload Time
 	 * 
-	 * @Column(name="file_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="file_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="File Upload Time")
 	 * @var string
 	 */
@@ -11683,7 +11744,7 @@ class Song extends MagicObject
 	/**
 	 * First Upload Time
 	 * 
-	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="first_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="First Upload Time")
 	 * @var string
 	 */
@@ -11692,7 +11753,7 @@ class Song extends MagicObject
 	/**
 	 * Last Upload Time
 	 * 
-	 * @Column(name="last_upload_time", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time")
 	 * @var string
 	 */
@@ -11710,7 +11771,7 @@ class Song extends MagicObject
 	/**
 	 * Last Upload Time Midi
 	 * 
-	 * @Column(name="last_upload_time_midi", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_midi", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Midi")
 	 * @var string
 	 */
@@ -11728,7 +11789,7 @@ class Song extends MagicObject
 	/**
 	 * Last Upload Time Xml
 	 * 
-	 * @Column(name="last_upload_time_xml", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_xml", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Xml")
 	 * @var string
 	 */
@@ -11746,7 +11807,7 @@ class Song extends MagicObject
 	/**
 	 * Last Upload Time Pdf
 	 * 
-	 * @Column(name="last_upload_time_pdf", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_pdf", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Pdf")
 	 * @var string
 	 */
@@ -11890,7 +11951,7 @@ class Song extends MagicObject
 	/**
 	 * Last Upload Time Image
 	 * 
-	 * @Column(name="last_upload_time_image", type="timestamp", length=19, nullable=true)
+	 * @Column(name="last_upload_time_image", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Last Upload Time Image")
 	 * @var string
 	 */
@@ -11899,7 +11960,7 @@ class Song extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -11908,7 +11969,7 @@ class Song extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -12086,7 +12147,7 @@ class UserType extends MagicObject
 	/**
 	 * Time Create
 	 * 
-	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
 	 * @Label(content="Time Create")
 	 * @var string
 	 */
@@ -12095,7 +12156,7 @@ class UserType extends MagicObject
 	/**
 	 * Time Edit
 	 * 
-	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
 	 * @Label(content="Time Edit")
 	 * @var string
 	 */
@@ -12829,7 +12890,7 @@ class Album extends MagicObject
     /**
      * Time Create
      * 
-     * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+     * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
      * @Label(content="Time Create")
      * @var string
      */
@@ -12838,7 +12899,7 @@ class Album extends MagicObject
     /**
      * Time Edit
      * 
-     * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+     * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
      * @Label(content="Time Edit")
      * @var string
      */

@@ -31,7 +31,7 @@ class PicoSession
      *
      * @var bool
      */
-    private $_sessionState = self::SESSION_NOT_STARTED; // NOSONAR
+    protected $_sessionState = self::SESSION_NOT_STARTED; // NOSONAR
 
     /**
      * The instance of the object.
@@ -41,7 +41,7 @@ class PicoSession
      *
      * @var self
      */
-    private static $_instance; // NOSONAR
+    protected static $_instance; // NOSONAR
 
 
     /**
