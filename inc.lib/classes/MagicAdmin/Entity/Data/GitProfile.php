@@ -27,7 +27,7 @@ class GitProfile extends MagicObject
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
+	 * @Column(name="git_profile_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Git Profile ID")
 	 * @var string
 	 */
