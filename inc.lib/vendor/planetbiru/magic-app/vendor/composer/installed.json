@@ -7,18 +7,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "fafeee69316ef0a46a692b77fc68a3ecd6b4a9fb"
+                "reference": "8ab01816a5e2eee3e01e71ca07b3c488dd2353ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/fafeee69316ef0a46a692b77fc68a3ecd6b4a9fb",
-                "reference": "fafeee69316ef0a46a692b77fc68a3ecd6b4a9fb",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/8ab01816a5e2eee3e01e71ca07b3c488dd2353ef",
+                "reference": "8ab01816a5e2eee3e01e71ca07b3c488dd2353ef",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
-            "time": "2025-04-19T01:53:54+00:00",
+            "time": "2025-04-19T16:21:04+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {

@@ -10,19 +10,13 @@ use stdClass;
 /**
  * Class PicoObjectToString
  *
- * This class provides functionality to convert an object into a JSON or XML string representation. 
- * It is part of a low-code programming platform that allows easy serialization of objects into different formats.
- * The `__toString()` method is overridden to return a JSON-encoded string or XML string representation of the object, 
- * based on the desired output format. The class also provides a flexible mechanism for controlling the format of the object 
- * (camelCase or snake_case) and supports both JSON and XML serialization.
- * 
+ * This class provides functionality to convert an object into a JSON string representation. 
+ * It overrides the `__toString()` method to return a JSON-encoded string of the object. 
  * The `toArray()` method is used to convert the object into an associative array, 
  * excluding any properties with a `null` value and ignoring the `__caseFormat` property. 
  * If any properties are objects themselves, they are recursively converted into arrays 
- * (by calling their `toArray()` method) before being included in the final JSON or XML string.
- * 
- * This class is part of a low-code programming platform that simplifies the process of building and serializing 
- * objects into standard formats. It helps developers create solutions rapidly with minimal coding effort.
+ * (by calling their `toArray()` method) before being included in the final JSON string.
+ * Additionally, this class supports converting property names between camelCase and snake_case.
  * 
  * @package MagicApp\AppDto\MocroServices
  */
@@ -331,33 +325,15 @@ class PicoObjectToString
         }
         return $key; // Default, if no case format set
     }
-    
-    /**
-     * Convert to a JSON string
-     *
-     * @return string The JSON representation of the data as a string.
-     */
-    public function toJson()
-    {
-        // Convert the object into an array using the toArray() method
-        $data = $this->toArray();
-        if ($this->__prettify) {
-            return json_encode($data, JSON_PRETTY_PRINT);
-        } else {
-            return json_encode($data);
-        }
-    }
 
     /**
-     * Converts to an XML string.
+     * Converts an array or JSON data to an XML string.
      *
+     * @param mixed $data The data to be converted to XML. It can be an associative array or an object.
      * @return string The XML representation of the data as a string.
      */
-    public function toXml()
+    public function toXml($data)
     {
-        // Convert the object into an array using the toArray() method
-        $data = $this->toArray();
-        
         $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?><{$this->__root}/>");
         $this->arrayToXml($data, $xml);
         $xmlString = $xml->asXML();
@@ -427,13 +403,20 @@ class PicoObjectToString
      */
     public function __toString()
     {
+        // Convert the object into an array using the toArray() method
+        $data = $this->toArray();
+
         // Check the output format
         if (stripos($this->__outputFormat, 'xml') !== false) {
             // Convert to XML format if 'xml' is found in the output format
-            return $this->toXml();
+            return $this->toXml($data);
         } else {
             // Convert to JSON format with optional pretty-printing
-            return $this->toJson();
+            if ($this->__prettify) {
+                return json_encode($data, JSON_PRETTY_PRINT);
+            } else {
+                return json_encode($data);
+            }
         }
     }
 

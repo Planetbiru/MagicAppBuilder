@@ -1,5 +1,7 @@
 <?php
 
+namespace MagicObject\File;
+
 /**
  * Class PicoFileRenderer
  *
