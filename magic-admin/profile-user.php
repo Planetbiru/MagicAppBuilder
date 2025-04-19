@@ -437,9 +437,9 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 						<td></td>
 						<td>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->admin_id, $admin->getAdminId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<button type="button" class="btn btn-primary" onclick="window.location='git-profile.php';"><?php echo $appLanguage->getGitProfile();?></button>
                             <button type="button" class="btn btn-primary" onclick="window.location='../';"><?php echo $appLanguage->getButtonHome();?></button>
                             <button type="button" class="btn btn-warning" onclick="window.location='logout.php';"><?php echo $appLanguage->getButtonLogout();?></button>
-
 						</td>
 					</tr>
 				</tbody>
