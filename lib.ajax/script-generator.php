@@ -75,12 +75,15 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
         {
             $scriptGenerator = new ScriptGeneratorMicroservices();
             $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);
+            $scriptGenerator->updateMenu($appConfig->getApplication(), $request);
         } 
         else
         {
             $scriptGenerator = new ScriptGeneratorMonolith();
             $fileGenerated = $scriptGenerator->generate($database, $request, $builderConfig, $appConfig, $entityInfo, $entityApvInfo, $composerOnline);    
+            $scriptGenerator->updateMenu($appConfig->getApplication(), $request);
         }       
+        
     }
 }
 

@@ -445,7 +445,7 @@ class ScriptGenerator //NOSONAR
      *
      * @throws Exception If there is an error reading or writing the menu configuration file.
      */
-    protected function updateMenu($appConf, $request) // NOSONAR
+    public function updateMenuOld($appConf, $request) // NOSONAR
     {
         $menuPath = $appConf->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         $this->prepareFile($menuPath);
@@ -510,9 +510,80 @@ class ScriptGenerator //NOSONAR
             }
             
             $yaml = PicoYamlUtil::dump(array('menu'=>$menuArray), 0, 2, 0);
+            error_log($menuPath);
+            error_log($yaml);
             file_put_contents($menuPath, $yaml);
         }
     }
+
+    /**
+     * Updates the menu configuration by adding a new module to the appropriate section.
+     *
+     * This method checks if the menu configuration file exists. If it does not, it creates
+     * the file and loads the current menu structure from a YAML file. The provided module
+     * information is then added as a submenu item under the specified menu title if it
+     * does not already exist.
+     *
+     * @param SecretObject $appConf Configuration object containing application settings.
+     * @param InputPost $request Request object containing the target, module menu, 
+     *        module name, and module file information.
+     *
+     * @return void
+     *
+     * @throws Exception If there is an error reading or writing the menu configuration file.
+     */
+    public function updateMenu($appConf, $request) // NOSONAR
+    {
+        $menuPath = $appConf->getBaseApplicationDirectory() . "/inc.cfg/menu.yml";
+        $this->prepareFile($menuPath);
+
+        $menus = new SecretObject();
+        $menus->loadYamlFile($menuPath, false, true, true);
+
+        $target = trim($request->getTarget(), "/\\");
+        $moduleMenu = trim($request->getModuleMenu());
+        $title = trim($request->getModuleName());
+        $href = ltrim(trim($target . "/" . $request->getModuleFile()), "/");
+        $menuArray = json_decode((string) $menus, true)['menu'] ?? [];
+
+        $submenuKey = $title . $href;
+
+        // Cek apakah submenu sudah ada di menu manapun
+        foreach ($menuArray as $menu) {
+            if (isset($menu['submenu']) && is_array($menu['submenu'])) {
+                foreach ($menu['submenu'] as $submenu) {
+                    $existingKey = ($submenu['title'] ?? '') . ($submenu['href'] ?? '');
+                    if ($existingKey === $submenuKey) {
+                        return; // Sudah ada, tidak perlu ditambahkan lagi
+                    }
+                }
+            }
+        }
+
+        // Tambahkan submenu ke menu yang sesuai
+        foreach ($menuArray as $index => $menu) {
+            if (isset($menu['title']) && strcasecmp($menu['title'], $moduleMenu) === 0) {
+                if (!isset($menuArray[$index]['submenu']) || !is_array($menuArray[$index]['submenu'])) {
+                    $menuArray[$index]['submenu'] = [];
+                }
+
+                $menuArray[$index]['submenu'][] = [
+                    "title" => $title,
+                    "code"  => $request->getModuleCode(),
+                    "href"  => $href,
+                    "icon"  => $request->getModuleIcon(),
+                ];
+                break;
+            }
+        }
+
+        $yaml = PicoYamlUtil::dump(['menu' => $menuArray], 0, 2, 0);
+        error_log($menuPath);
+        error_log($yaml);
+        file_put_contents($menuPath, $yaml);
+    }
+
+
     
     /**
      * Initializes callback functions based on the application type.

@@ -1149,7 +1149,7 @@ let initAll = function () {
     modal.find('[name="application_namespace"]').val('');
     modal.find('[name="application_author"]').val('');
     modal.find('[name="magic_app_version"]').empty();
-    modal.find('[name="installation_method"]').val('');  
+    modal.find('[name="installation_method"]').val('');
     increaseAjaxPending();
     resetCheckWriretableDirectory(modal.find('[name="application_directory"]'));
     $.ajax({

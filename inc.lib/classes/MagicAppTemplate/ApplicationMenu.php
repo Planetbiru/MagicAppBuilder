@@ -313,7 +313,7 @@ class ApplicationMenu
         catch(Exception $e)
         {
             $cache = new AppMenuCacheImpl(null, $this->database);
-            $cache->setAdminLevelId($this->currentUser->getAdminLevelId());
+            $cache->setAdminLevelId($adminLevelId);
             $cache->setData($dataToStore);
             $cache->setTimeCreate($now);
             $cache->setTimeEdit($now);
