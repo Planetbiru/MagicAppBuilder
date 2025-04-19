@@ -1658,3 +1658,13 @@ li.menu-exists > a::after{
 		margin: 0;
 	}
 }
+
+.nav{
+.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas
+{
+	&::before, &::after{
+		width: 20px;
+		text-align: center;
+	}
+}
+}
