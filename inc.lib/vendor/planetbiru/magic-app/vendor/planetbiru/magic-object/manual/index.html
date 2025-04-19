@@ -797,7 +797,72 @@ echo $someObject."\r\n\r\n";</code></pre>
 <p><strong>Example</strong>:</p>
 </li>
 </ul>
-<pre><code class="language-php">`$formattedData = $object-&gt;dmsData(";");`</code></pre>
+<pre><code class="language-php">$formattedData = $object-&gt;dmsData(";");</code></pre>
+<h3>42. <strong>retrieve</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Enables access to deeply nested properties within objects. This feature accepts multiple keys as arguments, allowing efficient traversal of complex nested structures.</p>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$object = new  MagicObject();
+$yaml = '
+  prop1:
+    prop2:
+      prop3: Test
+';
+$object-&gt;loadYamlString($yaml, false, true, true);
+echo  $object-&gt;retrieve('prop1', 'prop2', 'prop3');</code></pre>
+<p>In this example:</p>
+<ul>
+<li>The method will first check <code>prop1</code>, then move to <code>prop2</code>, and finally <code>prop3</code>.</li>
+<li>If any of these keys do not exist, it will return <code>null</code>.    </li>
+</ul>
+<h3>43. <strong>mergeWith</strong></h3>
+<ul>
+<li>
+<p><strong>Description</strong>: Merges properties from another <code>MagicObject</code> instance into the current one. If a property does not exist, it will be added. If it does:</p>
+<ul>
+<li>
+<p>When both values are <code>MagicObject</code> instances, they will be merged recursively.</p>
+</li>
+<li>
+<p>Otherwise, the existing value will be overwritten.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Example</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-php">$obj1 = new MagicObject();
+$obj1-&gt;loadYamlString('
+user:
+  name: ALice
+client:
+  address: Jakarta
+', false, true, true);
+
+$obj2 = new MagicObject();
+$obj2-&gt;loadYamlString('
+user:
+  email: alice@example.com
+client:
+  name: Ana
+', false, true, true);
+
+$obj1-&gt;mergeWith($obj2);
+
+echo $obj1;
+// {"user":{"name":"ALice","email":"alice@example.com"},"client":{"address":"Jakarta","name":"Ana"}}</code></pre>
+<p>In this example:</p>
+<ul>
+<li>Properties in <code>$obj2</code> are merged into <code>$obj1</code>.</li>
+<li>Nested <code>MagicObject</code> instances are merged recursively.    </li>
+<li>Non-object values with the same key are replaced.</li>
+</ul>
 </article>
 
 <article class="article" id="part5">

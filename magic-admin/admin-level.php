@@ -39,6 +39,8 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 }
 
 $dataFilter = null;
+$dataFilterDanger = PicoSpecification::getInstance()
+->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminLevelId, $currentUser->getAdminLevelId()));
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
@@ -78,6 +80,10 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
 	$updater->setIpEdit($currentAction->getIp());
+	if($currentUser->getAdminLevelId() == $inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS))
+	{
+		$updater->setActive(true);
+	}
 	try
 	{
 		$updater->update();
@@ -134,7 +140,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				$adminLevel->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 				)
 				->setAdminEdit($currentAction->getUserId())
 				->setTimeEdit($currentAction->getTime())
@@ -161,7 +167,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			{
 				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 					;
 				$adminLevel = new AdminLevel(null, $database);
 				$adminLevel->where($specification)

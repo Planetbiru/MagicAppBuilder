@@ -863,24 +863,20 @@ class PicoDatabasePersistence // NOSONAR
     private function getSet($info, $queryBuilder)
     {
         $sets = array();
-        $primaryKeys = $this->getPrimaryKeys($info);
         $nullCols = $this->getNullCols($info);
         $nonUpdatableCols = $this->getNonUpdatableCols($info);
         foreach($info->getColumns() as $property=>$column)
         {
             $columnName = $column[self::KEY_NAME];
-            if(!$this->isPrimaryKeys($columnName, $primaryKeys))
+            $value = $this->object->get($property);
+            $value = $this->fixInput($value, $column);
+            if(($this->flagIncludeNull || $value !== null) 
+                && !in_array($columnName, $nullCols) 
+                && !in_array($columnName, $nonUpdatableCols)
+                )
             {
-                $value = $this->object->get($property);
-                $value = $this->fixInput($value, $column);
-                if(($this->flagIncludeNull || $value !== null) 
-                    && !in_array($columnName, $nullCols) 
-                    && !in_array($columnName, $nonUpdatableCols)
-                    )
-                {
-                    $value = $queryBuilder->escapeValue($value);
-                    $sets[] = $columnName . " = " . $value;
-                }
+                $value = $queryBuilder->escapeValue($value);
+                $sets[] = $columnName . " = " . $value;
             }
         }
         foreach($nullCols as $columnName)

@@ -241,24 +241,53 @@ class PicoEntityGenerator
     }
 
     /**
-     * Get the length of the column based on its definition.
+     * Get the length of a column based on its data type definition.
      *
-     * @param string $str Column definition containing length
+     * Special handling for date/time types:
+     * - datetime(6) or timestamp(6) => 26
+     * - datetime(3) or timestamp(3) => 23
+     * - datetime or timestamp       => 26 (default to microseconds precision)
+     * - date                        => 10 (e.g., YYYY-MM-DD)
+     * - time                        => 8  (e.g., HH:MM:SS)
+     *
+     * For other types (e.g., varchar(255)), it extracts the numeric length.
+     *
+     * @param string $dataType Column definition containing type and optional length/precision
      * @return int Length of the column
      */
-    protected function getDataLength($str)
+    protected function getDataLength($dataType)
     {
-        $str2 = preg_replace('~\D~', '', $str);
-        $length = empty($str2) ? 0 : (int)$str2;
+        $length = 0;
 
-        if (stripos($str, "datetime") !== false || stripos($str, "timestamp") !== false) {
-            $length += 20;
-            if ($length == 20) {
-                $length = 19;
+        // Normalize data type to lowercase for consistent comparison
+        $dataTypeLower = strtolower($dataType);
+
+        // Handle datetime and timestamp types with optional precision
+        if (preg_match('/(datetime|timestamp)(\((\d+)\))?/i', $dataType, $matches)) {
+            if (isset($matches[3])) {
+                $precision = (int)$matches[3];
+                $length = $precision === 3 ? 23 : 26;
+            } else {
+                $length = 26;
             }
         }
+        // Handle date type
+        elseif (strpos($dataTypeLower, 'date') === 0) {
+            $length = 10; // YYYY-MM-DD
+        }
+        // Handle time type
+        elseif (strpos($dataTypeLower, 'time') === 0) {
+            $length = 8; // HH:MM:SS
+        }
+        // Handle other types like varchar(255)
+        else {
+            $numeric = preg_replace('~\D~', '', $dataType);
+            $length = empty($numeric) ? 0 : (int)$numeric;
+        }
+
         return $length;
     }
+
 
     /**
      * Get a mapping of database types to PHP types for MySQL, PostgreSQL, and SQLite.

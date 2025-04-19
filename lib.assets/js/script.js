@@ -826,10 +826,7 @@ let initAll = function () {
           composer_online: composer_online
         },
         success: function (data) {
-          //hideWaitingScreen();
-          //loadAllResource();
           decreaseAjaxPending();
-          console.log(data);
         },
         error: function (e1, e2) {
           decreaseAjaxPending();
