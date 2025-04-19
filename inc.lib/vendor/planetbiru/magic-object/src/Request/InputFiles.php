@@ -12,7 +12,7 @@ use MagicObject\File\PicoUploadFile;
  *
  * @package MagicObject\Request
  */
-class InptFiles extends PicoUploadFile
+class InputFiles extends PicoUploadFile
 {
     
 }
