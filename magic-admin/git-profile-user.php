@@ -580,6 +580,7 @@ require_once __DIR__ ."/inc.app/simple-header.php";
                 <span class="filter-group">
                     <button type="button" class="btn btn-primary" onclick="window.location='profile.php';"><?php echo $appLanguage->getAdminProfile();?></button>
                     <button type="button" class="btn btn-primary" onclick="window.location='../';"><?php echo $appLanguage->getButtonHome();?></button>
+                    <button type="button" class="btn btn-warning" onclick="window.location='logout.php';"><?php echo $appLanguage->getButtonLogout();?></button>
                 </span>
 			</form>
 		</div>
