@@ -45,6 +45,8 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                     $applicationArchitecture = $app->getArchitecture();
                     $applicationDescription = $app->getDescription();
 
+                    $url = "http://".$_SERVER['SERVER_NAME']."/".$applicationId."/";
+
                     $application = new EntityApplication(null, $databaseBuilder);
 
                     try
@@ -58,6 +60,7 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                         $application->setDescription($applicationDescription);
                         $application->setProjectDirectory($projectDirectory);
                         $application->setBaseApplicationDirectory($applicationDirectory);
+                        $application->setUrl($url);
                         $application->setArchitecture($applicationArchitecture);
                         $application->setAuthor($author);
                         $application->setAdminId($adminId);

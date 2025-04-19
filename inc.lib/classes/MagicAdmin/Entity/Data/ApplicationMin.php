@@ -88,6 +88,33 @@ class ApplicationMin extends MagicObject
 	protected $baseApplicationDirectory;
 
 	/**
+	 * URL
+	 * 
+	 * @Column(name="url", type="text", nullable=true)
+	 * @Label(content="URL")
+	 * @var string
+	 */
+	protected $url;
+
+	/**
+	 * Git Remote URL
+	 * 
+	 * @Column(name="git_remote_url", type="text", nullable=true)
+	 * @Label(content="Git Remote URL")
+	 * @var string
+	 */
+	protected $gitRemoteUrl;
+	
+	/**
+	 * Application Status
+	 * 
+	 * @Column(name="application_status", type="varchar(40)", nullable=true)
+	 * @Label(content="Application Status")
+	 * @var string
+	 */
+	protected $applicationStatus;
+
+	/**
 	 * Author
 	 * 
 	 * @Column(name="author", type="varchar(100)", length=100, nullable=true)
