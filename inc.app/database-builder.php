@@ -117,6 +117,9 @@ if($databaseConfigured)
                     error_log($e->getMessage());
                 }
 
+                // Create adminId manually
+                $adminId = $databaseBuilder->generateNewId();
+
                 $now = date('Y-m-d H:i:s');
                 $password = 'administrator';
                 $userLevelId = "superuser";
@@ -127,7 +130,10 @@ if($databaseConfigured)
                 $userLevel = new EntityAdminLevel(null, $databaseBuilder);
                 $userLevel->setAdminLevelId($userLevelId);
                 $userLevel->setName("Super User");
+                $userLevel->setDescription("Administrator with unlimited access");
                 $userLevel->setSortOrder(1);
+                $userLevel->setAdminCreate($adminId);
+                $userLevel->setAdminEdit($adminId);
                 $userLevel->setTimeCreate($now);
                 $userLevel->setTimeEdit($now);
                 $userLevel->setIpCreate($ipAddress);
@@ -139,6 +145,8 @@ if($databaseConfigured)
                 $userLevel->setAdminLevelId("user");
                 $userLevel->setName("User");
                 $userLevel->setSortOrder(2);
+                $userLevel->setAdminCreate($adminId);
+                $userLevel->setAdminEdit($adminId);
                 $userLevel->setTimeCreate($now);
                 $userLevel->setTimeEdit($now);
                 $userLevel->setIpCreate($ipAddress);
@@ -147,25 +155,22 @@ if($databaseConfigured)
                 $userLevel->insert();
                         
                 $admin = new EntityAdmin(null, $databaseBuilder);
+                $admin->setAdminId($adminId);
                 $admin->setUsername("administrator");
                 $admin->setName("Administrator");
+                $userLevel->setDescription("Administrator with limited access");
                 $admin->setPassword($hash);    
                 $admin->setLastResetPassword($now);
                 $admin->setAdminLevelId($userLevelId);
                 $admin->setLanguageId("en");
+                $admin->setAdminCreate($adminId);
+                $admin->setAdminEdit($adminId);
                 $admin->setTimeCreate($now);
                 $admin->setTimeEdit($now);
                 $admin->setIpCreate($ipAddress);
                 $admin->setIpEdit($ipAddress);
                 $admin->setActive(true);
                 $admin->insert();
-                            
-                $userUpdate = new EntityAdmin(null, $databaseBuilder);
-                $userUpdate
-                    ->setAdminId($admin->getAdminId())
-                    ->setAdminCreate($admin->getAdminId())
-                    ->setAdminEdit($admin->getAdminId())
-                    ->update();
             }
             catch(Exception $e)
             {

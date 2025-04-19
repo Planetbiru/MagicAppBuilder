@@ -47,6 +47,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$adminLevel = new AdminLevel(null, $database);
 	$adminLevel->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminLevel->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$adminLevel->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$adminLevel->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$adminLevel->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$adminLevel->setAdminCreate($currentAction->getUserId());
@@ -74,6 +75,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater = $adminLevel->where($specification)
 		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -237,6 +239,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getDescription();?></td>
+						<td>
+							<textarea class="form-control" name="description" id="description" spellcheck="false"></textarea>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
@@ -294,6 +302,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
 							<input class="form-control" type="text" name="name" id="name" value="<?php echo $adminLevel->getName();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getDescription();?></td>
+						<td>
+							<textarea class="form-control" name="description" id="description" spellcheck="false"><?php echo $adminLevel->getDescription();?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -384,6 +398,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $adminLevel->getName();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getDescription();?></td>
+						<td><?php echo $adminLevel->getDescription();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td><?php echo $adminLevel->getSortOrder();?></td>
 					</tr>
@@ -397,11 +415,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $adminLevel->getAdminCreate();?></td>
+						<td><?php echo $adminLevel->issetCreator() ? $adminLevel->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $adminLevel->getAdminEdit();?></td>
+						<td><?php echo $adminLevel->issetEditor() ? $adminLevel->getEditor()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>

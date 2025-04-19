@@ -99,6 +99,7 @@ $workspaceList = array();
 
 try
 {
+
     $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
     $currentWorkspaceId = isset($entityAdmin) && $entityAdmin->issetWorkspaceId() ? $entityAdmin->getWorkspaceId() : null;
     $pageData = $workspaceFinder->findDescByAdminIdAndActive($adminId, true);

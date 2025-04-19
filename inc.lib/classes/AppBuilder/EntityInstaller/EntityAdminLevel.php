@@ -42,6 +42,15 @@ class EntityAdminLevel extends MagicObject
 	protected $name;
 
 	/**
+	 * Description
+	 * 
+	 * @Column(name="description", type="text", nullable=true)
+	 * @Label(content="Description")
+	 * @var string
+	 */
+	protected $description;
+
+	/**
 	 * Sort Order
 	 * 
 	 * @Column(name="sort_order", type="int", nullable=true)
