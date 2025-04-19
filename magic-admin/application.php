@@ -59,6 +59,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 		->setAuthor($inputPost->getAuthor(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setProjectDirectory(FileDirUtil::normalizePath($inputPost->getProjectDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)))
 		->setBaseApplicationDirectory(FileDirUtil::normalizePath($inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_DEFAULT, false, false, true)))
+		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_URL, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -191,105 +192,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 	}
 	$currentModule->redirectToItself();
 }
-if($inputGet->getUserAction() == UserAction::CREATE)
-{
-$appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-insert">
-	<div class="jambi-wrapper">
-		<form name="createform" id="createform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="name" id="name"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDescription();?></td>
-						<td>
-							<textarea class="form-control" name="description" id="description" spellcheck="false"></textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getArchitecture();?></td>
-						<td>
-							<select class="form-control" name="architecture" id="architecture">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="monolith">Monolith</option>
-								<option value="microservices">Microservices</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getWorkspace();?></td>
-						<td>
-							<select class="form-control" name="workspace_id" id="workspace_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new WorkspaceMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAuthor();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="author" id="author"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="project_directory" id="project_directory"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="base_application_directory" id="base_application_directory"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1"/> <?php echo $appEntityLanguage->getActive();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-}
-else if($inputGet->getUserAction() == UserAction::UPDATE)
+if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->applicationId, $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
@@ -361,6 +264,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
 						<td>
 							<input class="form-control" type="text" name="base_application_directory" id="base_application_directory" value="<?php echo $application->getBaseApplicationDirectory();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUrl();?></td>
+						<td>
+							<input class="form-control" type="url" name="url" id="url" value="<?php echo $application->getUrl();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -497,6 +406,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
 						<td><?php echo $application->getBaseApplicationDirectory();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUrl();?></td>
+						<td><?php echo $application->getUrl();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -743,12 +656,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
 				</span>
 				<?php } ?>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
-				</span>
-				<?php } ?>
+
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
