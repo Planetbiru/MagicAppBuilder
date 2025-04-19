@@ -439,3 +439,85 @@ With the addition of this formatting function, users can easily format object pr
   The documentation has been updated to reflect the new magic methods added in this version, ensuring clarity on how to use them in your code.
   
 This version introduces essential new functions for better handling of data transformations such as trimming, converting to uppercase or lowercase, and formatting data into DMS (Degrees, Minutes, Seconds). These enhancements streamline property value manipulation and provide additional flexibility when interacting with data.
+
+# MagicObject version 3.10
+
+## What's New
+
+### **New Feature: `retrieve()` Method**
+
+We’re excited to introduce the **`retrieve()`** method in MagicObject 3.10, designed to make it easier to access deeply nested properties within your objects. This new feature allows you to pass multiple keys as arguments, making it incredibly efficient to traverse complex nested structures.
+
+#### **How it Works:**
+
+-   The `retrieve()` method takes one or more keys (in camelCase format) as parameters.
+-   It will traverse through the object, fetching values based on the provided keys.
+-   If a key is missing at any level, the method will return `null`.
+-   This is especially useful when dealing with objects that contain deep nested data.
+
+#### **Example:**
+
+```php
+$object = new  MagicObject();
+$yaml = '
+  prop1:
+    prop2:
+      prop3: Test
+';
+$object->loadYamlString($yaml, false, true, true);
+echo  $object->retrieve('prop1', 'prop2', 'prop3');
+```
+
+In this example:
+-   The method will first check `prop1`, then move to `prop2`, and finally `prop3`.
+-   If any of these keys do not exist, it will return `null`.    
+
+### **New Feature: `mergeWith()` Method**
+
+We’ve also added a powerful new method called **`mergeWith()`**, which allows you to merge two `MagicObject` instances with ease.
+
+#### What it Does:
+
+-   Combines properties from another object into the current one.
+-   If a property doesn’t exist in the current object, it will be added.
+-   If the property already exists:
+    -   If both values are `MagicObject` instances, they will be **merged recursively**.
+    -   Otherwise, the value will be **overwritten**.
+
+#### Example:
+
+```php
+$obj1 = new  MagicObject();
+$obj1->loadYamlString('
+user:
+  name: ALice
+client:
+  address: Jakarta
+', false, true, true);
+
+$obj2 = new  MagicObject();
+$obj2->loadYamlString('
+user:
+  email: alice@example.com
+client:
+  name: Ana
+', false, true, true);
+$obj1->mergeWith($obj2);
+
+echo  $obj1;
+
+// {"user":{"name":"ALice","email":"alice@example.com"},"client":{"address":"Jakarta","name":"Ana"}}
+```
+
+This method simplifies combining nested objects and ensures consistency in structured data merging.
+
+### **Bug Fixes & Performance Improvements**
+
+-   Various small bug fixes related to edge cases.
+-   Optimizations made to improve performance when accessing deeply nested data within MagicObject.
+    
+
+### **Other Changes**
+
+-   Internal code refactoring for improved readability and maintainability.
+-   Enhanced flexibility in property name handling, especially for camelCase formatting.

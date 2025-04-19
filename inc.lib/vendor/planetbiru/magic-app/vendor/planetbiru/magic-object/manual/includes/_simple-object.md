@@ -756,3 +756,64 @@ $formattedData = $object->formatData("%7.3f");
 ```php
 $formattedData = $object->dmsData(";");
 ```
+
+### 42. **retrieve**
+
+-   **Description**: Enables access to deeply nested properties within objects. This feature accepts multiple keys as arguments, allowing efficient traversal of complex nested structures.
+
+-   **Example**:
+
+
+```php
+$object = new  MagicObject();
+$yaml = '
+  prop1:
+    prop2:
+      prop3: Test
+';
+$object->loadYamlString($yaml, false, true, true);
+echo  $object->retrieve('prop1', 'prop2', 'prop3');
+```
+
+In this example:
+-   The method will first check `prop1`, then move to `prop2`, and finally `prop3`.
+-   If any of these keys do not exist, it will return `null`.    
+
+### 43. **mergeWith**
+
+-   **Description**: Merges properties from another `MagicObject` instance into the current one. If a property does not exist, it will be added. If it does:
+    
+    -   When both values are `MagicObject` instances, they will be merged recursively.
+        
+    -   Otherwise, the existing value will be overwritten.
+        
+-   **Example**:
+
+```php
+$obj1 = new MagicObject();
+$obj1->loadYamlString('
+user:
+  name: ALice
+client:
+  address: Jakarta
+', false, true, true);
+
+$obj2 = new MagicObject();
+$obj2->loadYamlString('
+user:
+  email: alice@example.com
+client:
+  name: Ana
+', false, true, true);
+
+$obj1->mergeWith($obj2);
+
+echo $obj1;
+// {"user":{"name":"ALice","email":"alice@example.com"},"client":{"address":"Jakarta","name":"Ana"}}
+```
+
+
+In this example:
+-   Properties in `$obj2` are merged into `$obj1`.
+-   Nested `MagicObject` instances are merged recursively.    
+-   Non-object values with the same key are replaced.
