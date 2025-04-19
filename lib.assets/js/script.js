@@ -827,7 +827,6 @@ let initAll = function () {
         },
         success: function (data) {
           decreaseAjaxPending();
-          console.log(data);
         },
         error: function (e1, e2) {
           decreaseAjaxPending();

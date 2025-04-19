@@ -86,7 +86,6 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$updater->setActive(true);
 	}
-
 	try
 	{
 		$updater->update();
