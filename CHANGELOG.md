@@ -124,3 +124,57 @@ These new input types provide greater flexibility in form handling and media int
 Everyone can now start using MagicAppBuilder to build fully functional monolithic applications with support for MySQL, MariaDB, PostgreSQL, and SQLite databases. While this version is not yet considered 100% stable, it is safe and reliable enough for development and testing purposes. It lays a solid foundation for future updates and encourages developers to explore and contribute as the project continues to grow.
 
 With its modular structure, theme integration, and improved development workflow, MagicAppBuilder is designed to simplify the application-building process for developers of all levels. Whether you're creating internal tools, admin panels, or full-scale business applications, MagicAppBuilder provides a flexible and extensible foundation that can grow with your project needs.
+
+
+#  MagicAppBuilder Version 0.36.1
+
+## What's New
+
+MagicAppBuilder v0.36.1 is a patch release focused on improving stability, fixing reported issues from version 0.36.0, and optimizing performance. Based on early user feedback, this version delivers a more reliable and responsive development experience.
+
+###  **Bug Fixes**
+
+-   **Media Input Rendering Fixes**  
+    Fixed issues with displaying `image`, `audio`, `video`, and `file` input types. Media elements now render correctly on detail and form views.
+    
+-   **Autoloading Errors in New Directory Structure**  
+    Resolved autoloading problems in the `inc.lib/classes/{{AppNamespace}}` directory that caused class detection issues in some setups.
+    
+-   **Custom Upload Path Issue**  
+    Fixed an issue where custom file upload paths were not being saved or used properly. Upload paths are now correctly stored and applied.
+    
+-   **Special Access Permission Bypass**  
+    Admin levels with **special access** were occasionally still affected by role restrictions. This has been corrected—admins with special access can now properly bypass standard role checks as intended.
+    
+-   **Theme Switching Bug**  
+    Fixed a bug where changing the theme didn't update the UI immediately. Theme switching now works seamlessly upon configuration changes.
+    
+-   **Composer Script Compatibility**  
+    Composer scripts were throwing errors on some systems. These scripts have been improved for better compatibility across different environments (Windows/Linux).
+    
+###  Performance Improvements
+
+-   **Optimized Menu Caching**  
+    Menu generation based on admin roles is now faster and more efficient, reducing loading time in systems with complex role structures.
+    
+-   **Reduced Database Overhead**  
+    Frequently accessed functions now use internal caching to minimize unnecessary database queries.
+    
+-   **Faster Form Rendering**  
+    Form rendering has been optimized by skipping redundant parsing of static elements.
+    
+
+###  Documentation Updates
+
+-   Updated documentation to reflect:
+    
+    -   The revised directory structure.
+        
+    -   The special access mechanism for admin levels.
+        
+    -   Media input usage and configuration.
+        
+    -   Theme switching guide and customization.
+        
+
+MagicAppBuilder version 0.36.1 is a **recommended upgrade** for all users of version 0.36.0. It offers a more stable and performant foundation for continued development. This release marks a step forward in reliability and user experience as the project evolves toward full production readiness.

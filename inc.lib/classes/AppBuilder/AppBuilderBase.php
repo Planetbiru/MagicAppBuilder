@@ -2784,7 +2784,9 @@ $subqueryMap = '.$referece.';
                     }
                     else
                     {
-                        $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName.self::BRACKETS.";".AppBuilderBase::PHP_CLOSE_TAG);
+                        $fieldFilter = $field->getInputFilter();
+                        $scalar = $field->getMultipleData() ? 'false' : 'true';
+                        $input->setAttribute('value', AppBuilderBase::PHP_OPEN_TAG.AppBuilderBase::ECHO.AppBuilderBase::VAR."inputGet".AppBuilderBase::CALL_GET.$fieldName."(PicoFilterConstant::" . $fieldFilter . ", false, false, false, $scalar);".AppBuilderBase::PHP_CLOSE_TAG);
                     }
                 }
                 if(!self::isInputFile($dataType))
@@ -3223,7 +3225,6 @@ $subqueryMap = '.$referece.';
         {
             return $dom->createTextNode(self::PHP_OPEN_TAG.$result."".self::PHP_CLOSE_TAG);
         }
-        
     }
 
     /**
@@ -3344,9 +3345,8 @@ $subqueryMap = '.$referece.';
      * @param int $indent The indentation level for the generated code.
      * @return string The formatted detail value string.
      */
-    public function getDetailValueString($field, $objectName, $upperFieldName, $indent = 0)
-    {
-        
+    public function getDetailValueString($field, $objectName, $upperFieldName, $indent = 0) // NOSONAR
+    {   
         $result = '';
         if(($field->getElementType() == 'text' || $field->getElementType() == 'select') && $field->getDataFormat() != null)
         {
@@ -3397,12 +3397,14 @@ $subqueryMap = '.$referece.';
                 }
                 else
                 {
+                    // Plain Text Format
                     $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
                     $result = self::VAR.$objectName.$val;
                 }
             }
             else
             {
+                // Plain Text Format
                 $val = self::CALL_GET.$upperFieldName.self::BRACKETS;
                 $result = self::VAR.$objectName.$val;
             }
