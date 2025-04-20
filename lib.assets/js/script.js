@@ -490,9 +490,26 @@ let initAll = function () {
   });
 
   $(document).on("change", ".input-element-type", function (e) {
-    let checkedValue = $(this).attr("value");
+    let checkedValue = $(this).val();  // Get the value of the selected radio button
+    let name = $(this).attr('name');  // Get the name of the radio button group
+    
+    // Remove 'checked' attribute from all radio buttons with the same 'name' in the same row
+    $(this).closest('tr').find('input[type="radio"][name="'+name+'"]').each(function() {
+        // Remove the checked status from all radio buttons
+        this.checked = false;
+        // Optionally, you can remove the 'checked' attribute from HTML if needed
+        $(this).removeAttr('checked');
+        $(this).attr('data-checked', 'false');
+    });
+
+    // Mark the selected element by directly setting `checked`
+    $(this)[0].checked = true;  // Set the selected element to checked
+    $(this).attr('data-checked', 'true');
+    $(this).attr('checked', 'checked');
+    // Call an additional function to process further data
     prepareReferenceData(checkedValue, $(this));
-  });
+});
+
 
   $(document).on("click", ".reference_button_data", function (e) {
     e.preventDefault();
@@ -972,17 +989,87 @@ let initAll = function () {
     saveQuery();
   });
 
-  $("tbody.data-table-manual-sort").each(function (e) {
+  $("tbody.data-table-manual-sort").each(function () {
     let dataToSort = $(this)[0];
+  
+    // Initialize Sortable for the table
     Sortable.create(dataToSort, {
       animation: 150,
       scroll: true,
       handle: ".data-sort-handler",
-      onEnd: function () {
-        // do nothing
+  
+      onStart: function (e1) {
+        if (e1.item) {
+          // Process checkboxes first
+          let checkboxes = e1.item.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(function (input) {
+            const isChecked = input.checked;
+            input.setAttribute('data-checked', isChecked ? 'true' : 'false');
+            if (isChecked) {
+              input.setAttribute('checked', 'checked');
+            } else {
+              input.removeAttribute('checked');
+            }
+          });
+  
+          // Process radios by group (name)
+          let radioInputs = e1.item.querySelectorAll('input[type="radio"]');
+          let radioNames = [...new Set([...radioInputs].map(r => r.name))]; // get unique names
+  
+          radioNames.forEach(function (name) {
+            let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
+            group.forEach(function (input) {
+              const isChecked = input.checked || input.getAttribute('checked');
+              input.setAttribute('data-checked', isChecked ? 'true' : 'false');
+              if (isChecked) {
+                input.setAttribute('checked', 'checked');
+              } else {
+                input.removeAttribute('checked');
+              }
+            });
+          });
+        }
+      },
+  
+      onEnd: function (e1) {
+        let checkboxes = e1.item.querySelectorAll('input[type="checkbox"]');
+        let radios = e1.item.querySelectorAll('input[type="radio"]');
+  
+        setTimeout(function () {
+          // Restore checkbox state
+          checkboxes.forEach(function (input) {
+            const isChecked = input.getAttribute('data-checked') === 'true';
+            input.checked = isChecked;
+            if (isChecked) {
+              input.setAttribute('checked', 'checked');
+            } else {
+              input.removeAttribute('checked');
+            }
+            input.removeAttribute('data-checked');
+          });
+  
+          // Restore radio state by group
+          let radioNames = [...new Set([...radios].map(r => r.name))]; // unique names
+  
+          radioNames.forEach(function (name) {
+            let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
+            group.forEach(function (input) {
+              const isChecked = input.getAttribute('data-checked') === 'true';
+              input.checked = isChecked;
+              if (isChecked) {
+                input.setAttribute('checked', 'checked');
+              } else {
+                input.removeAttribute('checked');
+              }
+              input.removeAttribute('data-checked');
+            });
+          });
+        }, 155);
       },
     });
   });
+
+  
 
   $(document).on('click', '.add_subfix', function (e) {
     let entityName = $('.rd-entity-name').val();
@@ -5372,6 +5459,7 @@ function restoreForm(data)  //NOSONAR
           tr.find('.include-key')[0].checked = isTrue(data.fields[i].isKey);
           tr.find('.include-required')[0].checked = isTrue(data.fields[i].isInputRequired);
           tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].checked = true;
+          tr.find('.input-element-type[value="' + data.fields[i].elementType + '"]')[0].setAttribute('checked', 'checked');
 
           if(isTrue(data.fields[i].includeDetail))
           {
