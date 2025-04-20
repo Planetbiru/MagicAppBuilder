@@ -322,7 +322,6 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         
         // Do not update referenced entities automatically
         $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, false);
-        $this->updateMenu($appConf, $request);
         return $fileGenerated;
     }   
 }

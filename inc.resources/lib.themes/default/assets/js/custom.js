@@ -7,43 +7,25 @@ function initDateTimePicker() {
   let debugDatetimePicker = false;
   
   // Change input type from date to text and add class for date-picker
-  $('input[type="date"]').each(function (index, element) {
+  $('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]').each(function (index, element) { 
     let obj = $(this);
-    obj.attr('type', 'text');
-    obj.addClass('date-picker');
-    let html = obj[0].outerHTML;
-    let html2 =
-      '<div class="input-datetime-wrapper date">\r\n' +
-      html + '\r\n' +
-      '</div>\r\n';
-    obj.replaceWith(html2);
+    let type = obj.attr('type');
+    let map = {'date':'date', 'time':'time', 'datetime':'date-time', 'datetime-local':'date-time'};
+    let cls = map[type];
+    if(obj.attr("data-multiple-input") === undefined)
+    {
+      obj.attr('type', 'text');
+      obj.addClass(`${cls}-picker`);
+      let html = obj[0].outerHTML;
+      let html2 =
+        `<div class="input-datetime-wrapper ${cls}">
+        ${html}
+        </div>`;
+      obj.replaceWith(html2);
+    }
   });
 
-  // Change input type from time to text and add class for time-picker
-  $('input[type="time"]').each(function (index, element) {
-    let obj = $(this);
-    obj.attr('type', 'text');
-    obj.addClass('time-picker');
-    let html = obj[0].outerHTML;
-    let html2 =
-      '<div class="input-datetime-wrapper time">\r\n' +
-      html + '\r\n' +
-      '</div>\r\n';
-    obj.replaceWith(html2);
-  });
-
-  // Change input type from datetime-local to text and add class for date-time-picker
-  $('input[type="datetime-local"]').each(function (index, element) {
-    let obj = $(this);
-    obj.attr('type', 'text');
-    obj.addClass('date-time-picker');
-    let html = obj[0].outerHTML;
-    let html2 =
-      '<div class="input-datetime-wrapper date-time">\r\n' +
-      html + '\r\n' +
-      '</div>\r\n';
-    obj.replaceWith(html2);
-  });
+  
 
   // Initialize date-picker if there are inputs with the class 'date-picker'
   if ($('.date-picker').length) {
@@ -88,6 +70,7 @@ function initDateTimePicker() {
     });
   }
 }
+
 
 /**
  * Initializes table sorting functionality based on query parameters.
@@ -194,6 +177,133 @@ function initCheckAll() {
     }
   });
 }
+
+
+/**
+ * Initializes the multiple input feature for input fields with the "data-multiple-input" attribute.
+ * This function:
+ * - Sets up a **PicoTagEditor** for each applicable input field.
+ * - Configures **date/time pickers** for input fields of type `date`, `time`, `datetime`, and `datetime-local`.
+ */
+function initMultipleInput() {
+  
+  let debugDatetimePicker = false;
+
+  // Select all input elements that have the "data-multiple-input" attribute
+  $('input[data-multi-input]').each(function (index, element) {
+      let obj = $(this);
+      /**
+       * Determines if the input field is a date/time-related input type.
+       * This is used to apply specific configurations.
+       * 
+       * @type {boolean}
+       */
+      let isDateType = obj.is('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]');
+
+      /**
+       * Configuration options for the PicoTagEditor instance.
+       * - `maxHeight`: Limits the maximum height of the tag editor container.
+       * - `trimInput`: Trims input values before adding them as tags (for date inputs).
+       * - `debug`: Enables or disables debug mode.
+       * - `minWidth`: Ensures a minimum width when used with date/time pickers.
+       */
+      let options = { maxHeight: 120, trimInput: isDateType, clearOnHide: true, debug: false };
+      if (isDateType) {
+          // Ensure the tag container is wider than the date-time picker.
+          options.minWidth = 260;
+      }
+
+      /**
+       * Initializes PicoTagEditor for the current input element.
+       *
+       * @param {HTMLElement} elem - The transformed input element.
+       * @param {HTMLElement} container - The tag editor container.
+       * @param {Object} editor - The PicoTagEditor instance.
+       */
+      let te = new PicoTagEditor(element, options, function (elem, container, editor) /*NOSONAR*/ {
+          if (!isDateType) {
+              return; // No need to initialize a date/time picker for non-date inputs.
+          }
+
+          let inpuElement = $(elem);
+
+          /**
+           * Maps input types to corresponding date/time picker classes.
+           */
+          let typeMap = { 'date': 'date', 'time': 'time', 'datetime': 'date-time', 'datetime-local': 'date-time' };
+          let cls = typeMap[inpuElement.attr('type')] || '';
+          
+          // Change the input type to text (required for the date/time picker)
+          inpuElement.attr('type', 'text').addClass(`${cls}-picker-multiple pico-tag-edit`);
+
+          // Wrap the input element inside a div for better styling
+          inpuElement.wrap(`<div class="input-datetime-wrapper ${cls}"></div>`);
+
+          // Find the new input element inside the container
+          inpuElement = $(container).find('.pico-tag-edit');
+
+          // Store a reference to the input element in the editor
+          editor.inputElement = inpuElement[0];
+
+          // Retrieve the appropriate DateTimePicker options
+          let dpOptions = getDatePickerOptions(inpuElement, debugDatetimePicker);
+          if (dpOptions) {
+              // Initialize the DateTimePicker with the retrieved options
+              inpuElement.datetimepicker(dpOptions)
+                  .on('dp.change', () => inpuElement.datetimepicker('hide')) // Hide on change
+                  .on('dp.enter', () => { // Handle "Enter" key event
+                      let val = inpuElement.val();
+                      if (val.trim() !== '') {
+                          editor.addTag(val); // Add entered value as a tag
+                          inpuElement.val(''); // Clear input field
+                          if (!editor.settings.debug) {
+                              editor.waitingForHide(1500);
+                          }
+                      }
+                  });
+          }
+
+      });
+  });
+}
+
+/**
+* Retrieves DateTimePicker configuration options based on the input element's class.
+* 
+* @param {jQuery} inpuElement - The input element wrapped in jQuery.
+* @param {boolean} debug - Whether to enable debug mode for the DateTimePicker.
+* @returns {object|null} DateTimePicker options or null if the element does not require DateTimePicker.
+*/
+function getDatePickerOptions(inpuElement, debug) {
+  let options = {};
+
+  if (inpuElement.hasClass('date-picker-multiple')) {
+      // Options for date picker
+      options = {
+          minDate: inpuElement.data('mindate') || false,
+          maxDate: inpuElement.data('maxdate') || false,
+          format: 'YYYY-MM-DD',
+          debug
+      };
+  } else if (inpuElement.hasClass('time-picker-multiple')) {
+      // Options for time picker
+      options = { format: 'HH:mm:ss', debug };
+  } else if (inpuElement.hasClass('date-time-picker-multiple')) {
+      // Options for date-time picker
+      options = {
+          minDate: inpuElement.data('mindate') || false,
+          maxDate: inpuElement.data('maxdate') || false,
+          format: 'YYYY-MM-DD HH:mm:ss',
+          useCurrent: 'day',
+          debug
+      };
+  }
+
+  // Return options if valid, otherwise return null
+  return Object.keys(options).length ? options : null;
+}
+
+
 
 /**
  * Initializes AJAX support for form submissions.
@@ -436,6 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMessages(messages);
   initCheckAll();
   initAjaxSupport();
+  initMultipleInput();
   initDateTimePicker();
   initMultipleSelect();
   initSortTable();

@@ -1,0 +1,124 @@
+// Variabel warna untuk Light Mode
+$light-primary: #3076c2;
+$light-hover: #0069d9;
+$light-remove-hover: #FF6347;
+$light-border: #dbdbdb;
+$light-bg: rgb(255, 255, 255);
+$light-text: #000;
+
+// Variabel warna untuk Dark Mode
+$dark-primary: #0050a6;
+$dark-hover: #005cbf;
+$dark-remove-hover: #ff7f50;
+$dark-border: #555;
+$dark-bg: #464646;
+$dark-text: #ddd;
+
+
+.pico-tag-editor {
+    text-align: left;
+    vertical-align: top;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+
+    .tags-container{
+        width: 100%;
+    }
+
+    &[data-focus="true"] .tags-container {
+        position: absolute;
+        border: 1px solid;
+        box-sizing: border-box;
+        padding: 0.5rem;
+        overflow: auto;
+        z-index: 1;
+    }
+
+    &[data-focus="false"] .tags-container {
+        display: none;
+    }
+    
+}
+.filter-section{
+    .pico-tag-editor {
+        width: 212px;
+    }
+    .pico-tag-editor {
+        .form-control.pico-tag-edit.date-picker-multiple, .input-datetime-wrapper.date, .input-datetime-wrapper.time, .input-datetime-wrapper.datetime
+        {
+            width: 212px;
+            max-width: 212px;
+        }
+    }
+}
+table td .pico-tag-editor
+{
+    width: 100%;
+}
+.pico-tag {
+    padding: 5px 8px 7px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+    line-height: 1;
+    span {
+        margin-left: 6px;
+        margin-top: 2px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+    }
+}
+
+/* Default (Light Mode) */
+.light-mode{
+    .pico-tag-editor {
+
+        &[data-focus="true"] .tags-container {
+            background-color: $light-bg;
+            border-color: $light-border;
+        }
+    }
+
+    .pico-tag {
+        background-color: $light-primary;
+        color: white;
+
+        &:hover {
+            background-color: $light-hover;
+        }
+
+        span:hover {
+            color: $light-remove-hover;
+        }
+    }
+}
+
+/* Dark Mode */
+.dark-mode {
+    .pico-tag-editor {
+
+        &[data-focus="true"] .tags-container {
+            background-color: $dark-bg;
+            border-color: $dark-border;
+        }
+    }
+
+    .pico-tag {
+        background-color: $dark-primary;
+        color: white;
+
+        &:hover {
+            background-color: $dark-hover;
+        }
+
+        span:hover {
+            color: $dark-remove-hover;
+        }
+    }
+    
+}
+

@@ -38,6 +38,15 @@ try
         {
             $app = new SecretObject();
         }
+
+        if($application->getUrl() != null && stripos($application->getUrl(), "://") !== false)
+        {
+            $applicationUrl = '<a href="'.$application->getUrl().'" target="_blank">'.$app->getId().'</a>'; 
+        }
+        else
+        {
+            $applicationUrl = $app->getId();
+        }
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
     <div 
@@ -49,7 +58,7 @@ try
     >
         <div class="card-body">
             <h5 class="card-title"><?php echo htmlspecialchars($app->getName()); ?></h5>
-            <h6 class="card-subtitle mb-2 text-muted"><?php echo $app->getId(); ?></h6>
+            <h6 class="card-subtitle mb-2 text-muted"><?php echo $applicationUrl; ?></h6>
             <p class="card-text"><?php echo $app->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-setting">
                 <i class="fas fa-cog"></i> Setting

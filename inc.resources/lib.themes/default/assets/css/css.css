@@ -941,4 +941,87 @@ select[multiple].form-control {
 }
 .dark-mode .note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar {
   border-top: 1px solid #979797;
+}
+
+.pico-tag-editor {
+  text-align: left;
+  vertical-align: top;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+}
+.pico-tag-editor .tags-container {
+  width: 100%;
+}
+.pico-tag-editor[data-focus=true] .tags-container {
+  position: absolute;
+  border: 1px solid;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  overflow: auto;
+  z-index: 1;
+}
+.pico-tag-editor[data-focus=false] .tags-container {
+  display: none;
+}
+
+.filter-section .pico-tag-editor {
+  width: 212px;
+}
+.filter-section .pico-tag-editor .form-control.pico-tag-edit.date-picker-multiple, .filter-section .pico-tag-editor .input-datetime-wrapper.date, .filter-section .pico-tag-editor .input-datetime-wrapper.time, .filter-section .pico-tag-editor .input-datetime-wrapper.datetime {
+  width: 212px;
+  max-width: 212px;
+}
+
+table td .pico-tag-editor {
+  width: 100%;
+}
+
+.pico-tag {
+  padding: 5px 8px 7px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.pico-tag span {
+  margin-left: 6px;
+  margin-top: 2px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Default (Light Mode) */
+.light-mode .pico-tag-editor[data-focus=true] .tags-container {
+  background-color: rgb(255, 255, 255);
+  border-color: #dbdbdb;
+}
+.light-mode .pico-tag {
+  background-color: #3076c2;
+  color: white;
+}
+.light-mode .pico-tag:hover {
+  background-color: #0069d9;
+}
+.light-mode .pico-tag span:hover {
+  color: #FF6347;
+}
+
+/* Dark Mode */
+.dark-mode .pico-tag-editor[data-focus=true] .tags-container {
+  background-color: #464646;
+  border-color: #555;
+}
+.dark-mode .pico-tag {
+  background-color: #0050a6;
+  color: white;
+}
+.dark-mode .pico-tag:hover {
+  background-color: #005cbf;
+}
+.dark-mode .pico-tag span:hover {
+  color: #ff7f50;
 }/*# sourceMappingURL=css.css.map */

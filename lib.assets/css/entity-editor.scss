@@ -196,6 +196,13 @@ body {
             max-height: 180px;
             overflow: auto;
             margin-top: 5px;
+
+            table > tbody > tr:hover > td{
+                background-color: #f3f3f3;
+                input[type="text"], select{
+                    background-color: transparent !important;
+                }
+            }
         }
 
         table {

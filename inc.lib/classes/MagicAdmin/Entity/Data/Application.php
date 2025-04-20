@@ -95,6 +95,15 @@ class Application extends MagicObject
 	 * @var string
 	 */
 	protected $baseApplicationDirectory;
+
+	/**
+	 * URL
+	 * 
+	 * @Column(name="url", type="text", nullable=true)
+	 * @Label(content="URL")
+	 * @var string
+	 */
+	protected $url;
 	
 	/**
 	 * Git Remote URL
