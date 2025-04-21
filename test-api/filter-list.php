@@ -81,20 +81,38 @@ $data->addFilter(
 $data->addElement([
     'tag' => 'button',
     'textNode'=>'Search',
-    'attribute' => [
-        'type' => 'submit',
-        'id'=>'search',
-        'class' => 'btn btn-success'
+    'attributes' => [
+        [
+            'name'=>'type', 
+            'value' => 'submit'
+        ],
+        [
+            'name'=>'id', 
+            'value' => 'search'
+        ],
+        [
+            'name'=>'class', 
+            'value' => 'btn btn-success'
+        ]
     ]
 ]);
 
 $data->addElement([
     'tag' => 'button',
     'textNode'=>'Add',
-    'attribute' => [
-        'type' => 'button',
-        'id'=>'add',
-        'class' => 'btn btn-primary'
+    'attributes' => [
+        [
+            'name'=>'type', 
+            'value' => 'submit'
+        ],
+        [
+            'name'=>'id', 
+            'value' => 'add'
+        ],
+        [
+            'name'=>'class', 
+            'value' => 'btn btn-primary'
+        ]
     ]
 ]);
 

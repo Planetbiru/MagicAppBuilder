@@ -23,9 +23,10 @@ class PicoUserFormFilterList extends PicoObjectToString
     protected $filters;
 
     /**
-     * An array of elements to be displayed in the filter list.
+     * An array of HTML elements to be displayed in the filter list.
+     * Each element is either a `PicoHtmlElement` object or can be converted into one.
      *
-     * @var array
+     * @var PicoHtmlElement[]
      */
     protected $elements;
     
@@ -40,6 +41,8 @@ class PicoUserFormFilterList extends PicoObjectToString
     public function __construct($filter = null)
     {
         $this->filters = [];
+        $this->elements = [];
+
         if (isset($filter)) {
             $this->filters[] = $filter;
         }
@@ -60,14 +63,27 @@ class PicoUserFormFilterList extends PicoObjectToString
     }
 
     /**
-     * Undocumented function
+     * Adds an HTML element to the list of visual elements for the filter list UI.
      *
-     * @param array $element
+     * The input can either be a `PicoHtmlElement` object or an associative array
+     * with the appropriate keys (`tag`, `textNode`, `attributes`, `link`) that 
+     * will be used to construct a `PicoHtmlElement` instance.
+     *
+     * @param PicoHtmlElement|array $element The element to add.
      * @return self Returns the current instance for method chaining.
      */
     public function addElement($element)
     {
-        $this->elements[] = $element;
+        if (!isset($this->elements)) {
+            $this->elements = [];
+        }
+
+        if (isset($element) && is_array($element)) {
+            $this->elements[] = new PicoHtmlElement($element);
+        } else {
+            $this->elements[] = $element;
+        }
+
         return $this;
     }
 }
