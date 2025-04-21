@@ -3631,7 +3631,7 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
+            if($multipleData)
             {
                 $input->setAttribute('data-multi-input', 'true');
             }
@@ -3786,7 +3786,7 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('required', 'required');
             }
-            if($multipleData && !($dataType == 'password' || self::isInputFile($dataType)))
+            if($multipleData)
             {
                 $input->setAttribute('data-multi-input', 'true');
             }

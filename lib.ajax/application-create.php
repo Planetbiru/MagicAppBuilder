@@ -300,12 +300,15 @@ file_put_contents($path2, $configYaml);
 
 $now = date("Y-m-d H:i:s");
 
+$url = "http://".$_SERVER['SERVER_NAME']."/".$newAppId."/";
+
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 $entityApplication->setApplicationId($newAppId);
 $entityApplication->setName($applicationName);
 $entityApplication->setDescription($applicationDescription);
 $entityApplication->setProjectDirectory($projectDirectory);
 $entityApplication->setBaseApplicationDirectory($applicationDirectory);
+$entityApplication->setUrl($url);
 $entityApplication->setArchitecture($applicationArchitecture);
 $entityApplication->setAuthor($author);
 $entityApplication->setAdminId($adminId);
