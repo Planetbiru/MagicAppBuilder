@@ -457,8 +457,11 @@ function hilightLine3() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
-  let translationStatus = moduleTranslationData[lineNumber].propertyName;
-  $('.module-translation-status').text(translationStatus);
+  let translationStatus = moduleTranslationData?.[lineNumber]?.propertyName;
+  if (translationStatus) {
+    $('.module-translation-status').text(translationStatus);
+  }
+
 }
 
 /**
@@ -475,6 +478,8 @@ function hilightLine4() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
-  let translationStatus = moduleTranslationData[lineNumber].propertyName;
-  $('.module-translation-status').text(translationStatus);
+  let translationStatus = moduleTranslationData?.[lineNumber]?.propertyName;
+  if (translationStatus) {
+    $('.module-translation-status').text(translationStatus);
+  }
 }

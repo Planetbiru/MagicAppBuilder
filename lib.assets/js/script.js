@@ -1393,12 +1393,11 @@ let initAll = function () {
       url: "lib.ajax/application-language.php",
       data: { action: 'get' },
       success: function (data) {
+        decreaseAjaxPending();
         while ($('#modal-update-language table.language-manager > tbody > tr').length > 1) {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
-          decreaseAjaxPending();
-
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
@@ -1426,6 +1425,7 @@ let initAll = function () {
     let select = $('.target-language');
     if (languages.length > 0) {
       increaseAjaxPending();
+      
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
@@ -1447,6 +1447,9 @@ let initAll = function () {
           }
           $('#modal-update-language table.language-manager tbody tr input[type="text"]').val('');
         },
+        error: function (xhr, status, error) {
+          decreaseAjaxPending();
+        }
       });
     }
     $('#modal-update-language').modal('hide');
@@ -1477,6 +1480,9 @@ let initAll = function () {
                 getEntityQuery(ents, merged, createNew);
                 modal.modal('hide');
               },
+              error: function (xhr, status, error) {
+                decreaseAjaxPending();
+              }
             });
           },  
           'class': 'btn-primary'  
@@ -1512,6 +1518,9 @@ let initAll = function () {
           }
         }
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -1557,6 +1566,9 @@ let initAll = function () {
         decreaseAjaxPending();
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1587,6 +1599,9 @@ let initAll = function () {
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
         updateBtn[0].disabled = false;
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1610,6 +1625,9 @@ let initAll = function () {
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
         updateBtn[0].disabled = false;
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1629,7 +1647,7 @@ let initAll = function () {
       success: function (data) {
         let modal = form.closest('.modal');
         modal.modal('hide');
-      }
+      },
     })
   });
   $(document).on('click', '#import-menu', function (e) {
@@ -1765,6 +1783,9 @@ let initAll = function () {
         decreaseAjaxPending();
         modal.modal('hide');
         loadMenu();
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1881,6 +1902,9 @@ let initAll = function () {
         $('meta[name="application-id"]').attr('content', applicationId);
         window.localStorage.setItem('application-id', applicationId);
         resetCheckActiveApplication();
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -4482,6 +4506,9 @@ function getEntityQuery(entity, merged, createNew) {
       }, 1);
       $("#button_save_entity_query").removeAttr("disabled");
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4516,6 +4543,9 @@ function getEntityFile(entity, clbk) {
         clbk();
       }
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4551,6 +4581,9 @@ function getModuleFile(module, clbk) {
         clbk();
       }
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4603,6 +4636,9 @@ function updateEntityRelationshipDiagram() {
       $(".entity-container-relationship .entity-list").empty().append(data);
       updateErd();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4632,6 +4668,9 @@ function updateEntityFile(clbk) {
       clearTtransEd3();
       clearTtransEd4();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4654,6 +4693,9 @@ function updateModuleFile() {
       $(".module-container .module-list-file").empty().append(data);
       clearModuleFile();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
   increaseAjaxPending();
   $.ajax({
@@ -4666,6 +4708,9 @@ function updateModuleFile() {
       clearTtransEd1();
       clearTtransEd2();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4690,6 +4735,9 @@ function saveReference(fieldName, key, value) {
     success: function (data) {
       decreaseAjaxPending();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4716,6 +4764,9 @@ function loadReference(fieldName, key, clbk) {
       decreaseAjaxPending();
       clbk(data);
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
