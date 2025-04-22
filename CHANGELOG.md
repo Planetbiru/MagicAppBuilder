@@ -125,3 +125,36 @@ Everyone can now start using MagicAppBuilder to build fully functional monolithi
 
 With its modular structure, theme integration, and improved development workflow, MagicAppBuilder is designed to simplify the application-building process for developers of all levels. Whether you're creating internal tools, admin panels, or full-scale business applications, MagicAppBuilder provides a flexible and extensible foundation that can grow with your project needs.
 
+
+# MagicAppBuilder Version 0.36.1
+
+## What's New
+
+### Add Application URL
+
+Added support for storing and displaying the **application URL**, making integration and documentation easier.
+
+### Add HTML Element on Micro Services Application Architecture
+
+Users can now add **custom HTML elements** within microservices-based applications, providing more flexibility for UI customization.
+
+## Bug Fixes
+
+1.  **Admin role**  
+    Fixed an issue where **admin role permissions** were not applied correctly, leading to improper access control.
+    
+2.  **File renderer**  
+    Resolved a bug where **files could not be rendered or previewed properly** in the UI.
+    
+3.  **Loading indication on first language addition**  
+    Fixed missing or incorrect **loading indicators** when adding the first language to a project.
+    
+4.  **Multiple file input**  
+    Addressed a problem where **multiple file uploads** weren't being handled or detected as expected.
+    
+5.  **Add HTML element**  
+    Fixed a bug that caused an error when trying to add an HTML element through the visual builder.
+    
+## Code Smell Fixes
+
+Improved code quality by cleaning up **redundant or inefficient code**, leading to better performance and maintainability.
