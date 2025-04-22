@@ -149,8 +149,8 @@ Users can now add **custom HTML elements** within microservices-based applicatio
 3.  **Loading indication on first language addition**  
     Fixed missing or incorrect **loading indicators** when adding the first language to a project.
     
-4.  **Multiple file input**  
-    Addressed a problem where **multiple file uploads** weren't being handled or detected as expected.
+4.  **Multiple input**  
+    Fixed an issue where **multiple select dropdowns and tag editors** did not render correctly for multiple input fields.
     
 5.  **Add HTML element**  
     Fixed a bug that caused an error when trying to add an HTML element through the visual builder.
