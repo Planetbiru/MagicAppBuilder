@@ -181,11 +181,13 @@ try
                                 $allQueries[] = "-- SQL for $entityName begin";
                                 $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                                 $allQueries[] = "-- SQL for $entityName end\r\n";
-                            }
-                            $tableInfo = $entity->tableInfo();
+
+                                $tableInfo = $entity->tableInfo();
                             
-                            $allEntities[] = $tableInfo->getTableName();
-                            $allTables[] = $tableName;
+                                $allEntities[] = $className;
+                                $allTables[] = $tableInfo->getTableName();
+                            }
+                            
                         }
                     }
                 }
