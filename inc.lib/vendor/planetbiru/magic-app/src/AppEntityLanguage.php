@@ -45,7 +45,7 @@ class AppEntityLanguage extends PicoEntityLanguage
     private $baseClassName;
 
     /**
-     * Base language directory path
+     * Base language directory
      *
      * @var string
      */
@@ -60,10 +60,12 @@ class AppEntityLanguage extends PicoEntityLanguage
      * @param MagicObject $entity The entity whose language needs to be loaded
      * @param SecretObject $appConfig The application configuration
      * @param string $currentLanguage The current language code
+     * @param string $baseLanguageDirectory Base language directory
      */
-    public function __construct($entity, $appConfig, $currentLanguage)
+    public function __construct($entity, $appConfig, $currentLanguage, $baseLanguageDirectory)
     {
         parent::__construct($entity);
+        $this->baseLanguageDirectory = $baseLanguageDirectory;
         $labels = $this->getDefaultLabel();
         $langs = $this->loadEntityLanguage($entity, $appConfig, $currentLanguage);
         $values = $langs->valueArray();
@@ -89,7 +91,7 @@ class AppEntityLanguage extends PicoEntityLanguage
         {
             $app = new SecretObject();
         }
-        $baseNamespace = $app->getEntityBaseNamespace();
+        $baseNamespace = $app->getBaseEntityNamespace();
         if(isset($baseNamespace))
         {
             $fullClassName = get_class($entity);
@@ -98,8 +100,6 @@ class AppEntityLanguage extends PicoEntityLanguage
             
             $this->appConfig = $appConfig;
             $this->currentLanguage = $currentLanguage;
-
-            $this->baseLanguageDirectory = $app->getBaseLanguageDirectory();
             
             // Construct the language file path
             $languageFilePath = $this->baseLanguageDirectory . "/" . $currentLanguage . "/Entity/" . $this->fullClassName . ".ini";

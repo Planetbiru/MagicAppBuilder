@@ -6,7 +6,6 @@ use Exception;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppMessageImpl;
 use MagicAppTemplate\Entity\App\AppNotificationImpl;
-use MagicAppTemplate\PicoObjectToString;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -58,22 +57,21 @@ class AppFeedImpl extends PicoObjectToString
         try
         {
             $specification = PicoSpecification::getInstance()
-                ->add([Field::of()->receiverId, $entityAdmin->getAdminId()])
-                ->add([Field::of()->isOpen, false]);
+                ->add([Field::of()->adminId, $entityAdmin->getAdminId()])
+                ->add([Field::of()->read, false]);
             $sortable = PicoSortable::getInstance()
                 ->add([Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC]);
             $page = new PicoPage(1, $limit);
             $pagable = new PicoPageable($page, $sortable);
             $pageData = $finder->findAll($specification, $pagable, $sortable);
-
             $instance->setTotalData($pageData->getTotalResult());
             foreach ($pageData->getResult() as $record)
             {
                 $instance->appendData(
                     new AppFeedDataImpl(
                         $record->getNotificationId(),
-                        $record->getUrl(),
-                        $record->getTitle(),
+                        $record->getLink(),
+                        $record->getSubject(),
                         $record->getTimeCreate(),
                         strtotime($record->getTimeCreate())
                     )
@@ -109,7 +107,8 @@ class AppFeedImpl extends PicoObjectToString
         {
             $specification = PicoSpecification::getInstance()
                 ->add([Field::of()->receiverId, $entityAdmin->getAdminId()])
-                ->add([Field::of()->isOpen, false]);
+                ->add([Field::of()->messageDirection, 'in'])
+                ->add([Field::of()->read, false]);
             $sortable = PicoSortable::getInstance()
                 ->add([Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC]);
             $page = new PicoPage(1, $limit);

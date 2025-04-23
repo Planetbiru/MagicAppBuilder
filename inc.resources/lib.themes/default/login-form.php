@@ -6,7 +6,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <title>Login to MagicAppBuilder</title>
-    <link rel="stylesheet" type="text/css" href="lib.themes/default/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">
     <style>
         .container.login-form-container
         {

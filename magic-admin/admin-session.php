@@ -13,7 +13,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
@@ -174,7 +174,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminSession(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AdminSession(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -250,7 +250,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$adminSession->findOne($specification);
 		if($adminSession->issetAdminSessionId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminSession(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AdminSession(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -363,7 +363,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$adminSession->findOne($specification, null, $subqueryMap);
 		if($adminSession->issetAdminSessionId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AdminSession(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AdminSession(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -453,7 +453,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AdminSession(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AdminSession(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"adminId" => PicoSpecification::filter("adminId", "fulltext"),

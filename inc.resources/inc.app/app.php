@@ -38,3 +38,4 @@ if($appConfig->getAccessLocalhostOnly())
         exit;
     }
 }
+$appCurrentTheme = $appConfig->getApplication()->getActiveTheme();

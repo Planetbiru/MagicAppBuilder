@@ -741,7 +741,7 @@ class ScriptGenerator //NOSONAR
         $uses[] = "use MagicObject\\Request\\InputPost;";
         if(!$appFeatures->isBackendOnly() || $appFeatures->isExportToExcel() || $appFeatures->isExportToCsv())
         {
-            $uses[] = "use MagicApp\\AppEntityLanguage;";
+            $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppEntityLanguageImpl;";
         }
         $uses[] = "use MagicApp\\AppFormBuilder;";
         $uses[] = "use MagicApp\\Field;";
@@ -752,8 +752,8 @@ class ScriptGenerator //NOSONAR
             $uses[] = "use MagicApp\\WaitingFor;";
         }
         $uses[] = "use MagicApp\\UserAction;";
-        $uses[] = "use MagicApp\\AppUserPermission;";
         $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppIncludeImpl;";
+        $uses[] = "use ".$appConf->getBaseApplicationNamespace()."\\AppUserPermissionImpl;";
         $uses[] = "use ".$appConf->getBaseEntityDataNamespace()."\\$entityMainName;";
         return $uses;
     }

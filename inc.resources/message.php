@@ -13,13 +13,13 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
+use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageFolderMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageImpl;
@@ -33,13 +33,18 @@ $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "message
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
-if(!$userPermission->allowedAccess($inputGet, $inputPost))
-{
-	require_once $appInclude->appForbiddenPage(__DIR__);
-	exit();
-}
-
-$dataFilter = null;
+$dataFilter = PicoSpecification::getInstance()
+->addOr(
+	PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->receiverId, $currentUser->getAdminId()))
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageDirection, 'in'))
+)
+->addOr(
+	PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->senderId, $currentUser->getAdminId()))
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageDirection, 'out'))
+)
+;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
@@ -56,7 +61,13 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$message->setIpEdit($currentAction->getIp());
 	try
 	{
+		$message->setMessageDirection('in');
 		$message->insert();
+
+		$message->setMessageId($message->currentDatabase()->generateNewId());
+		$message->setMessageDirection('out');
+		$message->insert();
+
 		$newId = $message->getMessageId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_id, $newId);
 	}
@@ -65,53 +76,23 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 		$currentModule->redirectToItself();
 	}
 }
-else if($inputPost->getUserAction() == UserAction::ACTIVATE)
+else if($inputPost->getUserAction() == 'unread')
 {
 	if($inputPost->countableCheckedRowId())
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$message = new AppMessageImpl(null, $database);
 			try
 			{
-				$message->where(PicoSpecification::getInstance()
+				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, true))
 					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(true)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-				error_log($e->getMessage());
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
-		{
-			$message = new AppMessageImpl(null, $database);
-			try
-			{
-				$message->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
-					->addAnd($dataFilter)
-				)
-				->setAdminEdit($currentAction->getUserId())
-				->setTimeEdit($currentAction->getTime())
-				->setIpEdit($currentAction->getIp())
-				->setActive(false)
+					;
+				$message = new AppMessageImpl(null, $database);
+				$message->where($specification)
+				->setRead(false)
+				->setTimeRead(null)
+				->setIpRead(null)
 				->update();
 			}
 			catch(Exception $e)
@@ -150,15 +131,15 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
-<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
-<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote-bs4.min.css">
-<script type="text/javascript" src="../lib.assets/popper/popper.min.js"></script>
-<script type="text/javascript" src="../lib.assets/bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote.js"></script>
-<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote-bs4.min.js"></script>
+
+<link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote.css">
+<link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote-bs4.min.css">
+<script type="text/javascript" src="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote.js"></script>
+<script type="text/javascript" src="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote-bs4.min.js"></script>
+
 <style>
 	.note-hint-popover {
 		position: absolute;
@@ -306,24 +287,34 @@ require_once $appInclude->mainAppHeader(__DIR__);
 <?php 
 require_once $appInclude->mainAppFooter(__DIR__);
 }
-else if($inputGet->getUserAction() == UserAction::UPDATE)
+else if($inputGet->getUserAction() == 'reply')
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->messageId, $inputGet->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-	$specification->addAnd($dataFilter);
-	$message = new AppMessageImpl(null, $database);
-	try{
-		$message->findOne($specification);
-		if($message->issetMessageId())
-		{
-$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
+	$messageId = $inputGet->getMessageId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+
+	$specification = PicoSpecification::getInstance()
+	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->messageId, $messageId))
+	->addAnd($dataFilter)
+	;
+
+$appEntityLanguage = new AppEntityLanguageImpl(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
+try
+{
+	$message = new AppMessageImpl(null, $database);
+	$message->findOne($specification);
+
+	$receiver = $message->equalsMessageDirection('in') ? $message->getSenderId() : $message->getReceiverId();
+	$subject = 'Re: '.$message->getSubject();
+	$subject = preg_replace('/^(Re:\s*)+/i', '', $subject);
+	$subject = 'Re: '.$subject;
+
 ?>
-<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote.css">
-<link rel="stylesheet" href="../lib.assets/summernote/0.8.20/summernote-bs4.min.css">
-<script type="text/javascript" src="../lib.assets/popper/popper.min.js"></script>
-<script type="text/javascript" src="../lib.assets/bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote.js"></script>
-<script type="text/javascript" src="../lib.assets/summernote/0.8.20/summernote-bs4.min.js"></script>
+
+<link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote.css">
+<link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote-bs4.min.css">
+<script type="text/javascript" src="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote.js"></script>
+<script type="text/javascript" src="<?php echo $themeAssetsPath;?>vendors/summernote/0.8.20/summernote-bs4.min.js"></script>
+
 <style>
 	.note-hint-popover {
 		position: absolute;
@@ -417,100 +408,41 @@ require_once $appInclude->mainAppHeader(__DIR__);
 
 
 </script>
-<div class="page page-jambi page-update">
+<div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
-		<form name="updateform" id="updateform" action="" method="post">
+		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getReceiver();?></td>
+						<td>
+							<select class="form-control" name="receiver_id" id="receiver_id" required>
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false))
+									->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->adminId, $currentUser->getAdminId())), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->adminId, Field::of()->name, $receiver)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSubject();?></td>
 						<td>
-							<input class="form-control" type="text" name="subject" id="subject" value="<?php echo $message->getSubject();?>" autocomplete="off"/>
+							<input autocomplete="off" class="form-control" type="text" name="subject" id="subject" value="<?php echo $subject;?>" required/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getContent();?></td>
 						<td>
-							<textarea class="form-control" name="content" id="content" spellcheck="false">
-&lt;p&gt;&nbsp;&lt;/p&gt;
-&lt;p&gt;Original message&lt;/p&gt;
-&lt;blockquote&gt;<?php echo $message->getContent();?>&lt;/blockquote&gt;
-</textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSender();?></td>
-						<td>
-							<select class="form-control" name="sender_id" id="sender_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $message->getSenderId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getReceiver();?></td>
-						<td>
-							<select class="form-control" name="receiver_id" id="receiver_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $message->getReceiverId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getMessageFolder();?></td>
-						<td>
-							<select class="form-control" name="message_folder_id" id="message_folder_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppMessageFolderMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->messageFolderId, Field::of()->name, $message->getMessageFolderId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsCopy();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_copy" id="is_copy" value="1" <?php echo $message->createCheckedIsCopy();?>/> <?php echo $appEntityLanguage->getIsCopy();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsOpen();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_open" id="is_open" value="1" <?php echo $message->createCheckedIsOpen();?>/> <?php echo $appEntityLanguage->getIsOpen();?></label>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTimeOpen();?></td>
-						<td>
-							<input class="form-control" type="datetime-local" name="time_open" id="time_open" value="<?php echo $message->getTimeOpen();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIsDelete();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="is_delete" id="is_delete" value="1" <?php echo $message->createCheckedIsDelete();?>/> <?php echo $appEntityLanguage->getIsDelete();?></label>
+							<textarea class="form-control" name="content" id="content" spellcheck="false"><?php 
+							echo '<p>&nbsp;</p><blockquote>'.$message->getContent().'</blockquote>'
+							?></textarea>
 						</td>
 					</tr>
 				</tbody>
@@ -520,9 +452,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="update"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="message_id" value="<?php echo $message->getMessageId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -531,25 +462,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	</div>
 </div>
 <?php 
-		}
-		else
-		{
-			// Do somtething here when data is not found
-			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
-			<?php 
-		}
+}
+catch(Exception $e)
+{
+	?>
+	<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+	<?php
+}
 require_once $appInclude->mainAppFooter(__DIR__);
-	}
-	catch(Exception $e)
-	{
-require_once $appInclude->mainAppHeader(__DIR__);
-		// Do somtething here when exception
-		?>
-		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
-		<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-	}
 }
 else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
@@ -586,7 +506,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$message->findOne($specification, null, $subqueryMap);
 		if($message->issetMessageId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -659,6 +579,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 				</tbody>
 			</table>
+			<?php
+			if(!$message->isRead())
+			{
+				$message->setRead(true);
+				$message->setTimeRead(date('Y-m-d H:i:s'));
+				$message->setIpRead($_SERVER['REMOTE_ADDR']);
+				$message->update();
+			}
+			?>
 		</form>
 	</div>
 </div>
@@ -685,7 +614,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppMessageImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"subject" => PicoSpecification::filter("subject", "fulltext"),
@@ -822,12 +751,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
 					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
-				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
@@ -854,31 +781,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="message_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-message-id"/>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td class="data-controll data-editor">
-									<span class="fa fa-edit"></span>
-								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-controll data-viewer">
-									<span class="fa fa-folder"></span>
+									<span class="fa fa-envelope"></span>
 								</td>
-								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="subject" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSubject();?></a></td>
-								<td data-col-name="content" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getContent();?></a></td>
 								<td data-col-name="sender_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSender();?></a></td>
 								<td data-col-name="receiver_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getReceiver();?></a></td>
 								<td data-col-name="message_folder_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getMessageFolder();?></a></td>
-								<td data-col-name="is_copy" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIsCopy();?></a></td>
-								<td data-col-name="is_open" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIsOpen();?></a></td>
-								<td data-col-name="time_open" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTimeOpen();?></a></td>
-								<td data-col-name="is_delete" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIsDelete();?></a></td>
 							</tr>
 						</thead>
 					
@@ -891,31 +804,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="message_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-message-id" name="checked_row_id[]" value="<?php echo $message->getMessageId();?>"/>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
 								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->message_id, $message->getMessageId());?>"><span class="fa fa-edit"></span></a>
+									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->message_id, $message->getMessageId());?>"><span class="fa <?php echo $message->isRead() ? 'fa-envelope-open':'fa-envelope';?>"></span></a>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedDetail()){ ?>
-								<td>
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->message_id, $message->getMessageId());?>"><span class="fa fa-folder"></span></a>
-								</td>
-								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="subject"><?php echo $message->getSubject();?></td>
-								<td data-col-name="content"><?php echo $message->getContent();?></td>
 								<td data-col-name="sender_id"><?php echo $message->issetSender() ? $message->getSender()->getName() : "";?></td>
 								<td data-col-name="receiver_id"><?php echo $message->issetReceiver() ? $message->getReceiver()->getName() : "";?></td>
 								<td data-col-name="message_folder_id"><?php echo $message->issetMessageFolder() ? $message->getMessageFolder()->getName() : "";?></td>
-								<td data-col-name="is_copy"><?php echo $message->optionIsCopy($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="is_open"><?php echo $message->optionIsOpen($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="time_open"><?php echo $message->getTimeOpen();?></td>
-								<td data-col-name="is_delete"><?php echo $message->optionIsDelete($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
@@ -926,9 +825,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</div>
 				<div class="button-wrapper">
 					<div class="form-control-container button-area">
-						<?php if($userPermission->isAllowedDelete()){ ?>
+						<button type="submit" class="btn btn-primary" name="user_action" value="unread"><?php echo $appLanguage->getButtonUnread();?></button>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
-						<?php } ?>
 					</div>
 				</div>
 			</form>

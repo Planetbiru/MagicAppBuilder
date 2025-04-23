@@ -13,7 +13,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -173,7 +173,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Setting(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Setting(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -221,7 +221,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$setting->findOne($specification);
 		if($setting->issetSettingId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Setting(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Setting(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -289,7 +289,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$setting->findOne($specification, null, $subqueryMap);
 		if($setting->issetSettingId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Setting(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Setting(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -359,7 +359,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Setting(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Setting(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"settingId" => PicoSpecification::filter("settingId", "fulltext")

@@ -26,7 +26,6 @@ if($inputGet->getLanguageId())
             // Handle exception if needed
         }
     }
-    
 }
 
 if(isset($_SERVER['HTTP_REFERER']))

@@ -43,58 +43,22 @@ class AppNotificationImpl extends MagicObject
 	protected $adminGroup;
 
 	/**
-	 * Admin Group 1 ID
+	 * Admin ID
 	 * 
-	 * @Column(name="admin_group_1", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 1 ID")
+	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin ID")
 	 * @var string
 	 */
-	protected $adminGroup1Id;
+	protected $adminId;
 	
 	/**
-	 * Admin Group 2 ID
+	 * Admin
 	 * 
-	 * @Column(name="admin_group_2", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 2 ID")
-	 * @var string
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
+	 * @var AppAdminMinImpl
 	 */
-	protected $adminGroup2Id;
-	
-	/**
-	 * Admin Group 3 ID
-	 * 
-	 * @Column(name="admin_group_3", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 3 ID")
-	 * @var string
-	 */
-	protected $adminGroup3Id;
-	
-	/**
-	 * Admin Group 1
-	 * 
-	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 1")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup1;
-	
-	/**
-	 * Admin Group 2
-	 * 
-	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 2")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup2;
-	
-	/**
-	 * Admin Group 3
-	 * 
-	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 3")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup3;
+	protected $admin;
 	
 	/**
 	 * Icon
@@ -112,7 +76,7 @@ class AppNotificationImpl extends MagicObject
 	 * @Label(content="Subject")
 	 * @var string
 	 */
-	protected $subjek;
+	protected $subject;
 
 	/**
 	 * Content
