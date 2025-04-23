@@ -20,7 +20,7 @@ try
     
     // Directory to store temporary files
     if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
 
     // Array to store temporary PNG image paths

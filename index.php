@@ -46,7 +46,7 @@ function basenameRequestUri($uri)
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/script.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/Editor.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/Editor.js"></script>
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>

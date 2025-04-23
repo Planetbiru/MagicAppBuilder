@@ -1018,7 +1018,8 @@ let initAll = function () {
   
           radioNames.forEach(function (name) {
             let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
-            group.forEach(function (input) {
+            group.forEach(function (input) // NOSONAR
+            {
               const isChecked = input.checked || input.getAttribute('checked');
               input.setAttribute('data-checked', isChecked ? 'true' : 'false');
               if (isChecked) {
@@ -1037,7 +1038,8 @@ let initAll = function () {
   
         setTimeout(function () {
           // Restore checkbox state
-          checkboxes.forEach(function (input) {
+          checkboxes.forEach(function (input) // NOSONAR
+          {
             const isChecked = input.getAttribute('data-checked') === 'true';
             input.checked = isChecked;
             if (isChecked) {
@@ -1049,9 +1051,10 @@ let initAll = function () {
           });
   
           // Restore radio state by group
-          let radioNames = [...new Set([...radios].map(r => r.name))]; // unique names
+          let radioNames = [...new Set([...radios].map(r => r.name))]; // NOSONAR
   
-          radioNames.forEach(function (name) {
+          radioNames.forEach(function (name) // NOSONAR
+          {
             let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
             group.forEach(function (input) {
               const isChecked = input.getAttribute('data-checked') === 'true';
@@ -1393,12 +1396,11 @@ let initAll = function () {
       url: "lib.ajax/application-language.php",
       data: { action: 'get' },
       success: function (data) {
+        decreaseAjaxPending();
         while ($('#modal-update-language table.language-manager > tbody > tr').length > 1) {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
         for (let d in data) {
-          decreaseAjaxPending();
-
           if (d > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
@@ -1426,6 +1428,7 @@ let initAll = function () {
     let select = $('.target-language');
     if (languages.length > 0) {
       increaseAjaxPending();
+      
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
@@ -1447,6 +1450,9 @@ let initAll = function () {
           }
           $('#modal-update-language table.language-manager tbody tr input[type="text"]').val('');
         },
+        error: function (xhr, status, error) {
+          decreaseAjaxPending();
+        }
       });
     }
     $('#modal-update-language').modal('hide');
@@ -1477,6 +1483,9 @@ let initAll = function () {
                 getEntityQuery(ents, merged, createNew);
                 modal.modal('hide');
               },
+              error: function (xhr, status, error) {
+                decreaseAjaxPending();
+              }
             });
           },  
           'class': 'btn-primary'  
@@ -1512,6 +1521,9 @@ let initAll = function () {
           }
         }
       },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
     });
   });
 
@@ -1557,6 +1569,9 @@ let initAll = function () {
         decreaseAjaxPending();
         $('.entity-detail').empty();
         $('.entity-detail').append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1587,6 +1602,9 @@ let initAll = function () {
           $('#modal-application-setting .application-setting').find('[name="database_password"]').val('');
         }, 2000);
         updateBtn[0].disabled = false;
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1610,6 +1628,9 @@ let initAll = function () {
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
         updateBtn[0].disabled = false;
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1629,7 +1650,7 @@ let initAll = function () {
       success: function (data) {
         let modal = form.closest('.modal');
         modal.modal('hide');
-      }
+      },
     })
   });
   $(document).on('click', '#import-menu', function (e) {
@@ -1765,6 +1786,9 @@ let initAll = function () {
         decreaseAjaxPending();
         modal.modal('hide');
         loadMenu();
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -1881,6 +1905,9 @@ let initAll = function () {
         $('meta[name="application-id"]').attr('content', applicationId);
         window.localStorage.setItem('application-id', applicationId);
         resetCheckActiveApplication();
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
       }
     });
   });
@@ -2229,13 +2256,9 @@ let initAll = function () {
     let tr = $(this).closest('tr');
     let dataType = tr.find('.input-field-data-type').val();
     let fieldName = tr.attr('data-field-name');
-    let currentFormat = {};
     let currentFormatStr = $(this).siblings('.input-format-data').val();
-    try
-    {
-      currentFormat = JSON.parse(currentFormatStr);
-    }
-    catch(e)
+    let currentFormat = parseJsonData(currentFormatStr);
+    if(currentFormat === null)
     {
       currentFormat = {};
     }
@@ -4482,6 +4505,9 @@ function getEntityQuery(entity, merged, createNew) {
       }, 1);
       $("#button_save_entity_query").removeAttr("disabled");
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4516,6 +4542,9 @@ function getEntityFile(entity, clbk) {
         clbk();
       }
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4551,6 +4580,9 @@ function getModuleFile(module, clbk) {
         clbk();
       }
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4603,6 +4635,9 @@ function updateEntityRelationshipDiagram() {
       $(".entity-container-relationship .entity-list").empty().append(data);
       updateErd();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4632,6 +4667,9 @@ function updateEntityFile(clbk) {
       clearTtransEd3();
       clearTtransEd4();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4654,6 +4692,9 @@ function updateModuleFile() {
       $(".module-container .module-list-file").empty().append(data);
       clearModuleFile();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
   increaseAjaxPending();
   $.ajax({
@@ -4666,6 +4707,9 @@ function updateModuleFile() {
       clearTtransEd1();
       clearTtransEd2();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4690,6 +4734,9 @@ function saveReference(fieldName, key, value) {
     success: function (data) {
       decreaseAjaxPending();
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4716,6 +4763,9 @@ function loadReference(fieldName, key, clbk) {
       decreaseAjaxPending();
       clbk(data);
     },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -4878,14 +4928,7 @@ function generateScript(selector) {
       let dataFormat = {};
       if(dataFormatStr.indexOf('{') != -1 && dataFormatStr.indexOf('}') != -1)
       {
-        try
-        {
-          dataFormat = JSON.parse(dataFormatStr);
-        }
-        catch(e)
-        {
-          dataFormat = {};
-        }
+        dataFormat = JSON.parse(dataFormatStr);
       }
       let inputFilter = $(this).find("select.input-data-filter").val();
 
@@ -5091,6 +5134,25 @@ function getSortableModule() {
   return result;
 }
 
+
+/**
+ * Safely parses a JSON string into a JavaScript object.
+ *
+ * This function attempts to parse the provided JSON string. If the parsing
+ * is successful, it returns the resulting object. If an error occurs during
+ * parsing (e.g., invalid JSON), it catches the error and returns `null`.
+ *
+ * @param {string} text - The JSON string to be parsed.
+ * @returns {Object|null} - The parsed JavaScript object if successful, or `null` if parsing fails.
+ */
+function safeJsonParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Parses a JSON string and returns the corresponding JavaScript object.
  *
@@ -5104,45 +5166,12 @@ function getSortableModule() {
  *                        if parsing fails.
  */
 function parseJsonData(text) {
-  if (typeof text !== "string") {
+  if (typeof text !== "string") 
+  {
     return null;
   }
-  try {
-    let json = JSON.parse(text);
-    if (typeof json === "object") {
-      return json;
-    }
-  } catch (error) {
-    // do nothing
-  }
-  return null;
-}
-
-/**
- * Parses a JSON string into an object.
- *
- * This function attempts to parse the provided text as JSON.
- * If the parsing is successful and the result is an object,
- * it returns the object. If the input is not a string or
- * parsing fails, it returns null.
- *
- * @param {string} text - The JSON string to be parsed.
- * @returns {Object|null} The parsed JSON object, or null if parsing fails.
- */
-function parseJsonData(text)  //NOSONAR
-{
-  if (typeof text !== "string") {
-    return null;
-  }
-  try {
-    let json = JSON.parse(text);
-    if (typeof json === "object") {
-      return json;
-    }
-  } catch (error) {
-    // do nothing
-  }
-  return null;
+  const json = safeJsonParse(text);
+  return typeof json === "object" && json !== null ? json : null;
 }
 
 /**
@@ -6889,7 +6918,7 @@ let selectedItem = null; // To store the selected file or directory
 let contentModified = true;
    
 let currentMode = null;
-let modeInput = null;
+
 
 
 /**
@@ -6962,7 +6991,7 @@ function initFileManager()
         // Find the closest li element
         const target = event.target.closest("li");
         
-        if (target && target.dataset.type) 
+        if (target?.dataset?.type)
         {
           // Store the selected item for future use
           selectedItem = event.target;
@@ -7401,18 +7430,14 @@ function renameFile(name, dataType) {
             {
               displayDirContent(response.dirs, subDirUl, true);
             }
+            else if(dirToLoad == '/')
+            {
+              resetFileManager();
+            }
             else
             {
-              if(dirToLoad == '/')
-              {
-                resetFileManager();
-              }
-              else
-              {
-                loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
-              }
+              loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
             }
-          
         })
         .catch(error => {
           // Handle any errors
@@ -7469,7 +7494,6 @@ function deleteFile(name, dataType) {
           let subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
           increaseAjaxPending();
 
-          // 
           fetch('lib.ajax/file-manager-delete.php', {
             method: 'POST', 
             headers: {
@@ -7603,11 +7627,10 @@ function resetFileManager()
  * @returns {string} - The file extension, or an empty string if no extension is found.
  */
 function getFileExtension(filename) {
-    // Use a regular expression to match the file extension
-    const match = filename.match(/\.(\w+)$/);  // Looks for a dot followed by one or more word characters
+  const regex = /\.(\w+)$/;
+  const match = regex.exec(filename);
 
-    // If a match is found, return the file extension, otherwise return an empty string
-    return match ? match[1] : '';
+  return match ? match[1] : '';
 }
 
 /**
@@ -7729,41 +7752,7 @@ function displayDirContent(dirs, subDirUl, reset) {
     }); 
 }
 
-/**
- * Initializes the CodeMirror editor for the file manager.
- * 
- * This function sets up the CodeMirror editor with various configurations such as line numbers,
- * line wrapping, bracket matching, and indentation settings. It also adjusts the editor's size 
- * based on the window's size, ensuring the editor fits within the available space in the UI.
- * 
- * - CodeMirror's mode URL is configured to load the correct syntax mode files.
- * - The editor is initialized with the content of the textarea with ID 'code'.
- * - A resize event listener is added to dynamically adjust the editor's size when the window is resized.
- */
-function initCodeMirror() {
-    modeInput = document.getElementById('filename');
-    CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
-    fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
-    {
-        lineNumbers: true,           // Show line numbers in the editor
-        lineWrapping: true,          // Enable line wrapping to prevent horizontal scrolling
-        matchBrackets: true,         // Highlight matching brackets
-        indentUnit: 4,               // Set the indentation unit to 4 spaces
-        indentWithTabs: true         // Use tabs for indentation
-    });
 
-    // Adjust editor size when window is resized
-    window.addEventListener('resize', function(e){
-        let w = document.querySelector('#file-content').offsetWidth - 16;  // Adjust width
-        let h = document.innerHeight - 160;  // Adjust height based on window height
-        fileManagerEditor.setSize(w, h);  // Apply the new size to the editor
-    });
-    
-    // Initial editor size adjustment
-    let w = document.querySelector('#file-content').offsetWidth - 16;
-    let h = document.innerHeight - 160;
-    fileManagerEditor.setSize(w, h);
-}
 
 /**
  * Function to send file name and content to the server using a POST request.

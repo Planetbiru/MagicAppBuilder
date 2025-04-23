@@ -11,6 +11,7 @@ let currentTab = "";
 let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
+let modeInput = null;
 
 let fileManagerEditor = null;
 
@@ -457,8 +458,11 @@ function hilightLine3() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
-  let translationStatus = moduleTranslationData[lineNumber].propertyName;
-  $('.module-translation-status').text(translationStatus);
+  let translationStatus = moduleTranslationData?.[lineNumber]?.propertyName;
+  if (translationStatus) {
+    $('.module-translation-status').text(translationStatus);
+  }
+
 }
 
 /**
@@ -475,6 +479,44 @@ function hilightLine4() {
   transEd3.addLineClass(lineNumber, 'background', 'highlight-line');
 
   lastLine1 = lineNumber;
-  let translationStatus = moduleTranslationData[lineNumber].propertyName;
-  $('.module-translation-status').text(translationStatus);
+  let translationStatus = moduleTranslationData?.[lineNumber]?.propertyName;
+  if (translationStatus) {
+    $('.module-translation-status').text(translationStatus);
+  }
+}
+
+/**
+ * Initializes the CodeMirror editor for the file manager.
+ * 
+ * This function sets up the CodeMirror editor with various configurations such as line numbers,
+ * line wrapping, bracket matching, and indentation settings. It also adjusts the editor's size 
+ * based on the window's size, ensuring the editor fits within the available space in the UI.
+ * 
+ * - CodeMirror's mode URL is configured to load the correct syntax mode files.
+ * - The editor is initialized with the content of the textarea with ID 'code'.
+ * - A resize event listener is added to dynamically adjust the editor's size when the window is resized.
+ */
+function initCodeMirror() {
+  modeInput = document.getElementById('filename');
+  CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
+  fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"), 
+  {
+      lineNumbers: true,           // Show line numbers in the editor
+      lineWrapping: true,          // Enable line wrapping to prevent horizontal scrolling
+      matchBrackets: true,         // Highlight matching brackets
+      indentUnit: 4,               // Set the indentation unit to 4 spaces
+      indentWithTabs: true         // Use tabs for indentation
+  });
+
+  // Adjust editor size when window is resized
+  window.addEventListener('resize', function(e){
+      let w = document.querySelector('#file-content').offsetWidth - 16;  // Adjust width
+      let h = document.innerHeight - 160;  // Adjust height based on window height
+      fileManagerEditor.setSize(w, h);  // Apply the new size to the editor
+  });
+  
+  // Initial editor size adjustment
+  let w = document.querySelector('#file-content').offsetWidth - 16;
+  let h = document.innerHeight - 160;
+  fileManagerEditor.setSize(w, h);
 }

@@ -20,7 +20,7 @@ $inputPost = new InputPost();
 
 header("Content-type: text/plain");
 
-$dashedLine = "-- --------------------------------------------------------------";
+$dashedLine = "-- -----------------------------------------------------------------";
 
 function implodeWithAnd($array) {
     if (count($array) > 1) {
@@ -39,6 +39,9 @@ try
         $baseEntity = str_replace("\\\\", "\\", $baseEntity);
         $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));  
         $allQueries = array();
+        
+        $allEntities = array();
+        $allTables = array();
 
         $dbType = "";
         if($database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL)
@@ -63,17 +66,17 @@ try
             $description = "Queries for table creation and modification";
         }
         $allQueries[] = $dashedLine;
-        $allQueries[] = "-- Application Name : $applicationName";
-        $allQueries[] = "-- Description      : $description";
-        $allQueries[] = "-- Generator        : MagicAppBuilder";
-        $allQueries[] = "-- Database Type    : ".$dbType;
+        $allQueries[] = "-- Application Name   : $applicationName";
+        $allQueries[] = "-- Description        : $description";
+        $allQueries[] = "-- Generator          : MagicAppBuilder";
+        $allQueries[] = "-- Database Type      : ".$dbType;
         if($database->getDatabaseConnection() != null)
         {
-            $allQueries[] = "-- Database Driver  : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+            $allQueries[] = "-- Database Driver    : ".$database->getDatabaseConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
         }
-        $allQueries[] = "-- Time Generated   : ".date('j F Y H:i:s');
-        $allQueries[] = "-- Time Zone        : ".date('P'); 
-        $allQueries[] = "-- Line Endings     : CRLF";
+        $allQueries[] = "-- Time Generated     : ".date('j F Y H:i:s');
+        $allQueries[] = "-- Time Zone          : ".date('P'); 
+        $allQueries[] = "-- Line Endings       : CRLF";
         $allQueries[] = $dashedLine;
         $allQueries[] = "";
 
@@ -91,6 +94,7 @@ try
                     $className = "\\".$baseEntity."\\".$entityName;
                     $entityName = trim($entityName);
                     $path = $baseDir."/".$entityName.".php";
+                    
                     if(file_exists($path))
                     {
                         $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
@@ -130,6 +134,9 @@ try
                         $allQueries[] = "-- SQL for $entityName begin";
                         $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                         $allQueries[] = "-- SQL for $entityName end\r\n";
+                        
+                        $allEntities[] = $className;
+                        $allTables[] = $tableName;
                     }           
                 }
             }
@@ -174,15 +181,28 @@ try
                                 $allQueries[] = "-- SQL for $entityName begin";
                                 $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                                 $allQueries[] = "-- SQL for $entityName end\r\n";
+
+                                $tableInfo = $entity->tableInfo();
+                            
+                                $allEntities[] = $className;
+                                $allTables[] = $tableInfo->getTableName();
                             }
+                            
                         }
                     }
                 }
             }
-        }
+        }        
+        
         $allQueries[] = $dashedLine;
         $allQueries[] = "-- End of Query";
         $allQueries[] = $dashedLine;
+        
+        $numberOfEntities = count(array_unique($allEntities));
+        $numberOfTables = count(array_unique($allTables));
+        $allQueries[] = "-- Number of Entities : ".$numberOfEntities;
+        $allQueries[] = "-- Number of Tables   : ".$numberOfTables;      
+        
         $sqlQuery = implode("\r\n", $allQueries);
 
         $lines = explode("\r\n", $sqlQuery);
@@ -192,8 +212,8 @@ try
         $md5 = hash('md5', $sqlQuery);
         $sha1 = hash('sha1', $sqlQuery);
         echo $sqlQuery;
-        echo "\r\n-- MD5 Hash         :  ".$md5;
-        echo "\r\n-- SHA1 Hash        :  ".$sha1;
+        echo "\r\n-- MD5 Hash           : ".$md5;
+        echo "\r\n-- SHA1 Hash          : ".$sha1;
     }
     else
     {
