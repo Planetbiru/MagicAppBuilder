@@ -1,8 +1,8 @@
 <?php
 
-use MagicApp\AppLanguage;
 use MagicApp\AppUserActivityLogger;
 use MagicApp\Field;
+use MagicAppTemplate\AppLanguageImpl;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
@@ -102,7 +102,7 @@ if($appConfig->getLanguages() == null)
     $appConfig->setLanguages([new SecretObject()]);
 }
 
-$appLanguage = new AppLanguage(
+$appLanguage = new AppLanguageImpl(
     $appConfig->getApplication(),
     $currentUser->getLanguageId(),
     function($var, $value)

@@ -9,7 +9,7 @@ use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoInputFieldUpdate;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputDetail;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 

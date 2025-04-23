@@ -1,3 +1,3 @@
 <?php
-
-require_once dirname(dirname(__DIR__)) . "/inc.resources/lib.themes/default/footer.php";
+$themeAssetsPath = "lib.themes/$appCurrentTheme/assets/";
+require_once dirname(__DIR__) . "/lib.themes/$appCurrentTheme/footer.php";

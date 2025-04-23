@@ -12,12 +12,12 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
@@ -251,7 +251,7 @@ if($inputGet->getUserAction() == 'generate')
 
 
 
-$appEntityLanguage = new AppEntityLanguage(new AppAdminRoleImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminRoleImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"adminLevelId" => PicoSpecification::filter("adminLevelId", "fulltext")

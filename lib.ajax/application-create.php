@@ -206,6 +206,11 @@ $application->setMagicApp(array(
     'version' => trim($inputPost->getMagicAppVersion())
 ));
 
+$application->setActiveTheme('default');
+$application->setHeaderFile('header.php');
+$application->setFooterFile('footer.php');
+$application->setForbiddenPage('403.php');
+
 // For offline installation
 $composerPath = dirname(__DIR__) . "/inc.lib/vendor/planetbiru/magic-app/composer.json";
 $composerJson = json_decode(file_get_contents($composerPath), true);
@@ -278,6 +283,7 @@ $paginationConfig = new SecretObject(array(
 $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
+
 
 // Get application menu from YAML file instead of database
 $newApp->setDevelopmentMode(true);

@@ -41,6 +41,13 @@ class AppInclude
     private $currentModule;
 
     /**
+     * Base application directory
+     *
+     * @var string
+     */
+    private $baseApplicationDirectory;
+
+    /**
      * AppInclude constructor.
      *
      * Initializes the AppInclude object with the application configuration
@@ -49,10 +56,12 @@ class AppInclude
      *
      * @param SecretObject $appConfig The application configuration object.
      * @param PicoModule $currentModule The current module being used.
+     * @param string $baseApplicationDirectory Base application directory
      */
-    public function __construct($appConfig, $currentModule)
+    public function __construct($appConfig, $currentModule, $baseApplicationDirectory)
     {
         $this->appConfig = $appConfig;
+        $this->baseApplicationDirectory = $baseApplicationDirectory;
         $this->app = $this->appConfig->getApplication();
         if (!isset($this->app)) {
             $this->app = new SecretObject();
@@ -71,9 +80,9 @@ class AppInclude
      */
     public function mainAppHeader($dir)
     {
-        $path = $this->app->getBaseApplicationDirectory() . "/" .
+        $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
-                $this->app->getIncludeHeaderFile();
+                $this->app->getHeaderFile();
 
         if (PicoStringUtil::endsWith($path, ".php") && file_exists($path)) {
             return $path;
@@ -93,9 +102,9 @@ class AppInclude
      */
     public function mainAppFooter($dir)
     {
-        $path = $this->app->getBaseApplicationDirectory() . "/" .
+        $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
-                $this->app->getIncludeFooterFile();
+                $this->app->getFooterFile();
 
         if (PicoStringUtil::endsWith($path, ".php") && file_exists($path)) {
             return $path;
@@ -115,7 +124,7 @@ class AppInclude
      */
     public function appForbiddenPage($dir)
     {
-        $path = $this->app->getBaseApplicationDirectory() . "/" .
+        $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
                 $this->app->getForbiddenPage() . "/403.php";
 
@@ -137,7 +146,7 @@ class AppInclude
      */
     public function appNotFoundPage($dir)
     {
-        $path = $this->app->getBaseApplicationDirectory() . "/" .
+        $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
                 $this->app->getForbiddenPage() . "/404.php";
 

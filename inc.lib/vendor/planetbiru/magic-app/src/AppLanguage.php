@@ -30,6 +30,13 @@ class AppLanguage extends PicoLanguage
     private $currentLanguage;
 
     /**
+     * Base language directory
+     *
+     * @var string
+     */
+    private $baseLanguageDirectory;
+
+    /**
      * Callback function for handling missing properties.
      *
      * @var callable|null
@@ -41,12 +48,14 @@ class AppLanguage extends PicoLanguage
      *
      * @param SecretObject|null $appConfig The application configuration object.
      * @param string|null $currentLanguage The current language to load.
+     * @param string $baseLanguageDirectory Base language directory
      * @param callable|null $callback A callback function for missing properties.
      */
-    public function __construct($appConfig = null, $currentLanguage = null, $callback = null)
+    public function __construct($appConfig = null, $currentLanguage = null, $baseLanguageDirectory = null, $callback = null)
     {
         $this->appConfig = $appConfig;
         $this->currentLanguage = $currentLanguage;
+        $this->baseLanguageDirectory = $baseLanguageDirectory;
         $this->loadData($this->loadLanguageData());
 
         if (isset($callback) && is_callable($callback)) {
@@ -61,7 +70,7 @@ class AppLanguage extends PicoLanguage
      */
     private function loadLanguageData()
     {
-        $langFile = $this->appConfig->getBaseLanguageDirectory() . "/" . $this->currentLanguage . "/app.ini";
+        $langFile = $this->baseLanguageDirectory . "/" . $this->currentLanguage . "/app.ini";
         if(file_exists($langFile))
         {
             $data = PicoIniUtil::parseIniFile($langFile);   

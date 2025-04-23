@@ -13,12 +13,12 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
@@ -229,7 +229,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -340,7 +340,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$admin->findOne($specification);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -496,7 +496,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$admin->findOne($specification, null, $subqueryMap);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			$mapForGender = array(
@@ -629,7 +629,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminImpl(), $appConfig, $currentUser->getLanguageId());
 $mapForGender = array(
 	"M" => array("value" => "M", "label" => "Man", "default" => "false"),
 	"W" => array("value" => "W", "label" => "Woman", "default" => "false")

@@ -15,7 +15,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
@@ -201,7 +201,7 @@ if($inputGet->getUserAction() == UserAction::UPDATE)
 		$application->findOne($specification);
 		if($application->issetApplicationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Application(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -357,7 +357,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$application->findOne($specification, null, $subqueryMap);
 		if($application->issetApplicationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Application(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			$mapForArchitecture = array(
@@ -486,7 +486,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Application(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Application(), $appConfig, $currentUser->getLanguageId());
 $mapForArchitecture = array(
 	"monolith" => array("value" => "monolith", "label" => "Monolith", "default" => "false"),
 	"microservices" => array("value" => "microservices", "label" => "Microservices", "default" => "false")

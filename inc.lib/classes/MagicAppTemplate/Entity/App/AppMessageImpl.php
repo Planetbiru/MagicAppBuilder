@@ -33,69 +33,41 @@ class AppMessageImpl extends MagicObject
 	 */
 	protected $messageDirection;
 
+	/**
+	 * Sender ID
+	 * 
+	 * @Column(name="sender_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Sender ID")
+	 * @var string
+	 */
+	protected $senderId;
 
 	/**
-	 * Admin Group
+	 * Sender
 	 * 
-	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group")
+	 * @JoinColumn(name="sender_id", referenceColumnName="admin_id")
+	 * @Label(content="Sender")
+	 * @var AppAdminMinImpl
+	 */
+	protected $sender;
+	
+	/**
+	 * Receiver ID
+	 * 
+	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Receiver ID")
 	 * @var string
 	 */
-	protected $adminGroup;
+	protected $receiverId;
 
 	/**
-	 * Admin Group 1 ID
+	 * Receiver
 	 * 
-	 * @Column(name="admin_group_1", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 1 ID")
-	 * @var string
+	 * @JoinColumn(name="receiver_id", referenceColumnName="admin_id")
+	 * @Label(content="Receiver")
+	 * @var AppAdminMinImpl
 	 */
-	protected $adminGroup1Id;
-	
-	/**
-	 * Admin Group 2 ID
-	 * 
-	 * @Column(name="admin_group_2", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 2 ID")
-	 * @var string
-	 */
-	protected $adminGroup2Id;
-	
-	/**
-	 * Admin Group 3 ID
-	 * 
-	 * @Column(name="admin_group_3", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Group 3 ID")
-	 * @var string
-	 */
-	protected $adminGroup3Id;
-	
-	/**
-	 * Admin Group 1
-	 * 
-	 * @JoinColumn(name="admin_group_1", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 1")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup1;
-	
-	/**
-	 * Admin Group 2
-	 * 
-	 * @JoinColumn(name="admin_group_2", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 2")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup2;
-	
-	/**
-	 * Admin Group 3
-	 * 
-	 * @JoinColumn(name="admin_group_3", referenceColumnName="admin_id")
-	 * @Label(content="Admin Group 3")
-	 * @var AppAdminImpl
-	 */
-	protected $adminGroup3;
+	protected $receiver;
 	
 	/**
 	 * Message Folder ID

@@ -1,6 +1,6 @@
 <?php
 
-use MagicApp\AppLanguage;
+use MagicAdmin\AppLanguageImpl;
 use MagicApp\Entity\AppModule;
 use MagicApp\Entity\AppUser;
 use MagicApp\Entity\AppUserRole;
@@ -48,7 +48,7 @@ if($appConfig->getLanguages() == null)
 {
     $appConfig->setLanguages([new SecretObject()]);
 }
-$appLanguage = new AppLanguage(
+$appLanguage = new AppLanguageImpl(
     $appConfig->getApplication(),
     $entityAdmin->getLanguageId(),
     function($var, $value)

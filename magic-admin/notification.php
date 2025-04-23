@@ -13,7 +13,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -66,7 +66,7 @@ if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Notification(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -138,7 +138,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$notification->findOne($specification);
 		if($notification->issetNotificationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Notification(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -239,7 +239,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$notification->findOne($specification, null, $subqueryMap);
 		if($notification->issetNotificationId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Notification(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -333,7 +333,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new Notification(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Notification(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	
