@@ -13,7 +13,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
@@ -181,7 +181,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new GitProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -258,7 +258,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$gitProfile->findOne($specification);
 		if($gitProfile->issetGitProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new GitProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -380,7 +380,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$gitProfile->findOne($specification, null, $subqueryMap);
 		if($gitProfile->issetGitProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new GitProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			$mapForPlatform = array(
@@ -498,7 +498,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new GitProfile(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
 $mapForPlatform = array(
 	"github" => array("value" => "github", "label" => "Github", "group" => "", "selected" => false),
 	"gitlab" => array("value" => "gitlab", "label" => "Gitlab", "group" => "", "selected" => false),

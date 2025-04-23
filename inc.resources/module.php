@@ -12,12 +12,12 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
@@ -243,7 +243,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -356,7 +356,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$module->findOne($specification);
 		if($module->issetModuleId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -498,7 +498,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$module->findOne($specification, null, $subqueryMap);
 		if($module->issetModuleId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -604,7 +604,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"moduleGroupId" => PicoSpecification::filter("moduleGroupId", "fulltext"),
@@ -748,12 +748,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="module_code" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleCode();?></a></td>
 								<td data-col-name="module_group_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleGroup();?></a></td>
 								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
-								<td data-col-name="target" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTarget();?></a></td>
 								<td data-col-name="icon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIcon();?></a></td>
 								<td data-col-name="menu" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getMenu();?></a></td>
 								<td data-col-name="special_access" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSpecialAccess();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
-								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -790,12 +788,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="module_code"><?php echo $module->getModuleCode();?></td>
 								<td data-col-name="module_group_id"><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 								<td data-col-name="url"><?php echo $module->getUrl();?></td>
-								<td data-col-name="target"><?php echo $module->getTarget();?></td>
 								<td data-col-name="icon"><?php echo $module->getIcon();?></td>
 								<td data-col-name="menu"><?php echo $module->optionMenu($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="special_access"><?php echo $module->optionSpecialAccess($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $module->getSortOrder();?></td>
-								<td data-col-name="default_data"><?php echo $module->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="active"><?php echo $module->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 

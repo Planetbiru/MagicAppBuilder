@@ -13,13 +13,13 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
+use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminProfileImpl;
 
@@ -174,7 +174,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -245,7 +245,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		$adminProfile->findOne($specification);
 		if($adminProfile->issetAdminProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
@@ -345,7 +345,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$adminProfile->findOne($specification, null, $subqueryMap);
 		if($adminProfile->issetAdminProfileId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -439,7 +439,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppAdminProfileImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"adminId" => PicoSpecification::filter("adminId", "fulltext")

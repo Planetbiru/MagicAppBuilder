@@ -126,9 +126,13 @@ Everyone can now start using MagicAppBuilder to build fully functional monolithi
 With its modular structure, theme integration, and improved development workflow, MagicAppBuilder is designed to simplify the application-building process for developers of all levels. Whether you're creating internal tools, admin panels, or full-scale business applications, MagicAppBuilder provides a flexible and extensible foundation that can grow with your project needs.
 
 
-# MagicAppBuilder Version 0.36.1
+# MagicAppBuilder Version 0.37
 
 ## What's New
+
+### Removed Absolute Paths in Configuration for Production Environment
+
+Absolute paths for the application's root directory, language directory, and others are no longer used by the application itself. These absolute paths are now only utilized by MagicAppBuilder during the build process. This change reduces the potential for configuration errors in production environments and simplifies the deployment process.
 
 ### Add Application URL
 
@@ -137,6 +141,14 @@ Added support for storing and displaying the **application URL**, making integra
 ### Add HTML Element on Micro Services Application Architecture
 
 Users can now add **custom HTML elements** within microservices-based applications, providing more flexibility for UI customization.
+
+### Add WYSIWYG HTML Editor
+
+WYSIWYG HTML Editor usefull to compose message to another user.
+
+### Unused Files Removal for Faster Builds
+
+Unnecessary or temporary files are now automatically excluded during the build process, resulting in faster application generation times and a cleaner output structure.
 
 ## Bug Fixes
 

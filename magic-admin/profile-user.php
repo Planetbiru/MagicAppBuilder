@@ -8,7 +8,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
@@ -146,7 +146,7 @@ if($inputGet->getUserAction() == UserAction::UPDATE)
 		$admin->findOne($specification);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Admin(), $appConfig, $currentUser->getLanguageId());
 require_once __DIR__ ."/inc.app/simple-header.php";
 ?>
 <div class="page page-jambi page-update">
@@ -327,7 +327,7 @@ else
 		$admin->findOne($specification, null, $subqueryMap);
 		if($admin->issetAdminId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new Admin(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Admin(), $appConfig, $currentUser->getLanguageId());
 require_once __DIR__ ."/inc.app/simple-header.php";
 			// Define map here
 			$mapForGender = array(

@@ -13,12 +13,12 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppEntityLanguage;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppUserActivityImpl;
@@ -86,7 +86,7 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 		$userActivity->findOne($specification, null, $subqueryMap);
 		if($userActivity->issetUserActivityId())
 		{
-$appEntityLanguage = new AppEntityLanguage(new AppUserActivityImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppUserActivityImpl(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -184,7 +184,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new AppUserActivityImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new AppUserActivityImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"adminId" => PicoSpecification::filter("adminId", "fulltext")
@@ -257,12 +257,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
-				</span>
-				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
@@ -294,11 +288,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-user-activity-id"/>
 								</td>
 								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td class="data-controll data-editor">
-									<span class="fa fa-edit"></span>
-								</td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-controll data-viewer">
 									<span class="fa fa-folder"></span>
@@ -327,11 +316,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="user_activity_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-user-activity-id" name="checked_row_id[]" value="<?php echo $userActivity->getUserActivityId();?>"/>
-								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->user_activity_id, $userActivity->getUserActivityId());?>"><span class="fa fa-edit"></span></a>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>

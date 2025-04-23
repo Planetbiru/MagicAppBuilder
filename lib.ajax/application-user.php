@@ -6,7 +6,9 @@ use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppMessageImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppNotificationImpl;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -63,7 +65,6 @@ function setSuperuserRole($adminLevelId, $database)
         $pageData = $adminRole->findByAdminLevelId($adminLevelId);
         foreach($pageData->getResult() as $adminRole)
         {
-           
             // Set the admin role to superuser
             $adminRole->setAllowedList(true);
             $adminRole->setAllowedCreate(true);
@@ -246,6 +247,56 @@ if($applicationId != null)
                 $userFinder->setIpUpdate($ip);
                 $userFinder->setAdminLevelId($adminLevelId);
                 $userFinder->insert();
+
+                // Notification for user
+                $notification = new AppNotificationImpl(null, $database);
+                $notificationId = $notification->currentDatabase()->generateNewId();
+                $notification->setNotificationId($notificationId);
+                $notification->setNotificationType("general");
+                $notification->setAdminGroup("admin");
+                $notification->setAdminId($userFinder->getAdminId());
+                $notification->setIcon("bell");
+                $notification->setSubject("User Account Created");
+                $notification->setContent("Your account has been created");
+                $notification->setLink("notification.php?user_action=detail&notification_id=$notificationId");
+                $notification->setRead(false);
+                $notification->setTimeCreate($now);
+                $notification->setTimeUpdate($now);
+                $notification->setIpCreate($ip);
+                $notification->setIpUpdate($ip);
+                $notification->insert();
+
+                // Notification for dummy user
+                $notification2 = new AppNotificationImpl($notification, $database);
+                $notificationId2 = $notification2->currentDatabase()->generateNewId();
+                $notification2->setNotificationId($notificationId2);
+                $notification2->setAdminId("superuser");
+                $notification2->setLink("notification.php?user_action=detail&notification_id=$notificationId2");
+                $notification2->insert();
+
+                // Message for user
+                $message = new AppMessageImpl(null, $database);
+                $messageId = $message->currentDatabase()->generateNewId();
+                $message->setMessageId($messageId);
+                $message->setMessageDirection('in');
+                $message->setSenderId($userFinder->getAdminId());
+                $message->setReceiverId($userFinder->getAdminId());
+                $message->setSubject("User Account Created");
+                $message->setContent("Your account has been created");
+                $message->setRead(false);
+                $message->setTimeCreate($now);
+                $message->setTimeUpdate($now);
+                $message->setIpCreate($ip);
+                $message->setIpUpdate($ip);
+                $message->insert();
+
+                // Message for dummy user
+                $message2 = new AppMessageImpl($message, $database);
+                $messageId2 = $message->currentDatabase()->generateNewId();
+                $message2->setMessageId($messageId2);
+                $message2->setSenderId("superuser");
+                $message2->setReceiverId("superuser");
+                $message2->insert();
             }
             else
             {
