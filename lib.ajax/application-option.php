@@ -73,7 +73,7 @@ try
 
 ?><form name="formdatabase" id="formdatabase" method="post" action="" class="">
     <div class="collapsible-card">
-        <div id="accordion" class="accordion">
+        <div id="accordion-option" class="accordion">
         <div class="card">
             <div class="card-header" id="heading0">
                 <h5 class="mb-0">
@@ -83,7 +83,7 @@ try
                 </h5>
             </div>
 
-            <div id="collapse0" class="collapse collapsed" aria-labelledby="heading0" data-parent="#accordion">
+            <div id="collapse0" class="collapse collapsed" aria-labelledby="heading0" data-parent="#accordion-option">
                 <div class="card-body">
                     <div class="menu-container">
                     <?php
@@ -105,7 +105,7 @@ try
                 </h5>
             </div>
 
-            <div id="collapse1" class="collapse collapsed" aria-labelledby="heading1" data-parent="#accordion">
+            <div id="collapse1" class="collapse collapsed" aria-labelledby="heading1" data-parent="#accordion-option">
                 <div class="card-body">
                 <div class="user-container">
                     <?php
@@ -127,7 +127,7 @@ try
                 </h5>
             </div>
 
-            <div id="collapse2" class="collapse collapsed" aria-labelledby="heading2" data-parent="#accordion">
+            <div id="collapse2" class="collapse collapsed" aria-labelledby="heading2" data-parent="#accordion-option">
                 <div class="card-body">
 
                     <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
