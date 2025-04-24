@@ -26,6 +26,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <script src="<?php echo $themeAssetsPath;?>vendors/sortable/Sortable.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/PicoTagEditor.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/custom.min.js"></script>
+
 </head>
 
 <body>
@@ -70,7 +71,6 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
                             <a class="dropdown-item" href="profile.php"><?php echo $appLanguage->getProfile();?></a>
-                            <a class="dropdown-item" href="setting.php"><?php echo $appLanguage->getSetting();?></a>
                             <div class="menu-separator"></div>
                             <a class="dropdown-item" href="logout.php"><?php echo $appLanguage->getLogout();?></a>
                         </div>

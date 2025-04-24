@@ -471,11 +471,20 @@ function initNotifications(selector, notifications, link, caption) {
       badge = notifications.totalData;
     }
     notificationMenu.closest('li.nav-item').setAttribute('data-badge', badge);
+
+    if(notifications.data.length > 0)
+    {
+      let div = document.createElement('div');
+      div.classList.add('menu-separator');
+      notificationMenu.appendChild(div);
+    }
+    
   }
   else
   {
     notificationMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
+
   let a = document.createElement('a');
   a.className = 'dropdown-item';
   a.href = link;
@@ -519,11 +528,20 @@ function initMessages(selector, messages, link, caption) {
       badge = messages.totalData;
     }
     messageMenu.closest('li.nav-item').setAttribute('data-badge', badge);
+
+    if(messages.data.length > 0)
+    {
+      let div = document.createElement('div');
+      div.classList.add('menu-separator');
+      messageMenu.appendChild(div);
+    }
+
   }
   else
   {
     messageMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
+  
   let a = document.createElement('a');
   a.className = 'dropdown-item';
   a.href = link;
