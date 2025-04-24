@@ -19,6 +19,6 @@ class AppEntityLanguageImpl extends AppEntityLanguage
      */
     public function __construct($entity, $appConfig, $currentLanguage)
     {
-        parent::__construct($entity, $appConfig, $currentLanguage, dirname(dirname(dirname(__DIR__))));
+        parent::__construct($entity, $appConfig, $currentLanguage, dirname(dirname(dirname(__DIR__)))."/magic-admin/inc.lang");
     }
 }

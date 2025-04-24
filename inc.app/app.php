@@ -24,7 +24,7 @@ if(!file_exists($builderConfigPath))
     }
     $builderConfig->loadYamlString("
 application:
-    entityBaseNamespace: 'MagicAdmin\Entity'
+    baseEntityNamespace: 'MagicAdmin\Entity'
     name: 'MagicAppBuilder'
 dataLimit: 20
 database:

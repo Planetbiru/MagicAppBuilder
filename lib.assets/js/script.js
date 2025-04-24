@@ -228,10 +228,16 @@ function hideWaitingScreen()
 }
 
 /**
- * Check application status
- * @param {string} id - application ID 
+ * Checks the status of an application periodically until it is marked as 'finish'.
+ *
+ * Makes an AJAX request to check the current application status. If the status is not 'finish',
+ * it will recursively call itself every second. Once finished, it calculates the time taken and
+ * displays a toast notification. It also hides the waiting screen and triggers resource loading.
+ *
+ * @param {string} id - The application ID to check.
+ * @param {number} startTime - The timestamp when the check started, used to calculate elapsed time.
  */
-function setCheckingStatus(id)
+function setCheckingStatus(id, startTime)
 {
   $.ajax({
     type: 'GET', 
@@ -240,15 +246,16 @@ function setCheckingStatus(id)
     dataType: 'json',
     success: function(data)
     {
-      if(data.applicationStatus != 'finish')
+      if(data.applicationStatus !== 'finish')
       {
         setTimeout(function(){
-          setCheckingStatus(id);
+          setCheckingStatus(id, startTime);
         }, 1000);
-        
       }
       else
       {
+        let seconds = ((new Date()).getTime() - startTime) / 1000;
+        showToast("Application Ready", `The application was successfully created in ${seconds.toFixed(2)} seconds.`);
         hideWaitingScreen();
         loadAllResource();
       }
@@ -257,8 +264,9 @@ function setCheckingStatus(id)
     {
       console.log(err);
     }
-  })
+  });
 }
+
 
 /**
  * Initialize all event handlers and elements
@@ -823,7 +831,7 @@ let initAll = function () {
       showWaitingScreen();
       increaseAjaxPending();
       
-      setCheckingStatus(id);
+      setCheckingStatus(id, (new Date()).getTime());
       
       $.ajax({
         method: "POST",

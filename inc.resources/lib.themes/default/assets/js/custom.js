@@ -436,11 +436,21 @@ function splitWithTail(str, delimiter, count) {
 
 
 /**
- * Initializes notifications in the dropdown menu.
- * @param {Array} notifications Array of notification objects containing title, time, and link.
+ * Initializes and populates the notifications dropdown menu.
+ *
+ * This function appends a list of notification items to the specified dropdown menu element,
+ * sets a data-badge attribute on the parent navigation item based on the number of notifications,
+ * and adds a final link with a custom caption (e.g., "View All Notifications").
+ *
+ * @param {string} selector - CSS selector targeting the dropdown menu container.
+ * @param {Object} notifications - Object containing notification data.
+ * @param {Array} notifications.data - Array of notification objects.
+ * @param {number} notifications.totalData - Total number of notifications.
+ * @param {string} link - URL for the final dropdown item (e.g., "View All").
+ * @param {string} caption - Text to display for the final dropdown item.
  */
-function initNotifications(notifications) {
-  const notificationMenu = document.querySelector('#notificationMenu');
+function initNotifications(selector, notifications, link, caption) {
+  const notificationMenu = document.querySelector(selector);
   if(typeof notifications.data != 'undefined')
   {
     notifications.data.forEach(notification => {
@@ -466,18 +476,33 @@ function initNotifications(notifications) {
   {
     notificationMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
+  let a = document.createElement('a');
+  a.className = 'dropdown-item';
+  a.href = link;
+  a.innerHTML = caption;
+  notificationMenu.appendChild(a);
 }
 
 /**
- * Initializes messages in the dropdown menu.
- * @param {Array} messages Array of message objects containing title, time, and link.
+ * Initializes and populates the messages dropdown menu.
+ *
+ * This function appends a list of message items to the specified dropdown menu element,
+ * sets a data-badge attribute on the parent navigation item based on the number of messages,
+ * and adds a final link with a custom caption (e.g., "View All Messages").
+ *
+ * @param {string} selector - CSS selector targeting the dropdown menu container.
+ * @param {Object} messages - Object containing message data.
+ * @param {Array} messages.data - Array of message objects.
+ * @param {number} messages.totalData - Total number of messages.
+ * @param {string} link - URL for the final dropdown item (e.g., "View All").
+ * @param {string} caption - Text to display for the final dropdown item.
  */
-function initMessages(messages) {
-  const messageMenu = document.querySelector('#messageMenu');
+function initMessages(selector, messages, link, caption) {
+  const messageMenu = document.querySelector(selector);
   if(typeof messages.data != 'undefined')
   {
     messages.data.forEach(message => {
-      const a = document.createElement('a');
+      let a = document.createElement('a');
       a.className = 'dropdown-item';
       a.href = message.link;
       a.innerHTML = `${message.title} <small class="text-muted">${message.time}</small>`;
@@ -499,7 +524,11 @@ function initMessages(messages) {
   {
     messageMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
-
+  let a = document.createElement('a');
+  a.className = 'dropdown-item';
+  a.href = link;
+  a.innerHTML = caption;
+  messageMenu.appendChild(a);
 }
 
 /**
@@ -542,8 +571,6 @@ function initPage()
 
 document.addEventListener('DOMContentLoaded', () => {
   initPage();
-  initNotifications(notifications);
-  initMessages(messages);
   initCheckAll();
   initAjaxSupport();
   initMultipleInput();

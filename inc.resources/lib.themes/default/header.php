@@ -17,7 +17,6 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
-    <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/fontawesome-free-6.5.2-web/css/all.min.css">
     <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/jquery/jquery-3.2.1.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/popper/popper.min.js"></script>

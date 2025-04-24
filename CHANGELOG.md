@@ -142,6 +142,14 @@ Added support for storing and displaying the **application URL**, making integra
 
 Users can now add **custom HTML elements** within microservices-based applications, providing more flexibility for UI customization.
 
+### Add WYSIWYG HTML Editor
+
+WYSIWYG HTML Editor usefull to compose message to another user.
+
+### Unused Files Removal for Faster Builds
+
+Unnecessary or temporary files are now automatically excluded during the build process, resulting in faster application generation times and a cleaner output structure.
+
 ## Bug Fixes
 
 1.  **Admin role**  

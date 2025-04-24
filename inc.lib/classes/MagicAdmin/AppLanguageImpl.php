@@ -19,6 +19,6 @@ class AppLanguageImpl extends AppLanguage
      */
     public function __construct($appConfig = null, $currentLanguage = null, $callback = null)
     {
-        parent::__construct($appConfig, $currentLanguage, dirname(dirname(dirname(__DIR__))), $callback);
+        parent::__construct($appConfig, $currentLanguage, dirname(dirname(dirname(__DIR__)))."/magic-admin/inc.lang", $callback);
     }
 }
