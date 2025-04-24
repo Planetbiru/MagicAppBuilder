@@ -78,139 +78,137 @@
 
         <form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
           <div class="card">
-            <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordion">
-              <div class="card-body">
-                <h4>Entity</h4>
-                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                    <tr>
-                      <td>Table</td>
-                      <td><select class="form-control" name="source_table" required></select>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>&nbsp;</td>
-                      <td>
-                        <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Master Entity Name</td>
-                      <td><input type="text" class="form-control" name="entity_master_name" id="entity_master_name" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Master Primary Key</td>
-                      <td><input type="text" class="form-control" name="primary_key_master" id="primary_key_master" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Approval Table Name</td>
-                      <td><input type="text" class="form-control" name="table_approval_name" id="table_approval_name" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Approval Primary Key</td>
-                      <td><input type="text" class="form-control" name="primary_key_approval" id="primary_key_approval" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Approval Entity Name</td>
-                      <td><input type="text" class="form-control" name="entity_approval_name" id="entity_approval_name" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Trash Table Name</td>
-                      <td><input type="text" class="form-control" name="table_trash_name" id="table_trash_name" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Trash Primary Key</td>
-                      <td><input type="text" class="form-control" name="primary_key_trash" id="primary_key_trash" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Trash Entity Name</td>
-                      <td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div class="card-body">
+              <h4>Entity</h4>
+              <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                  <tr>
+                    <td>Table</td>
+                    <td><select class="form-control" name="source_table" required></select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                      <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> Reload Table</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Master Entity Name</td>
+                    <td><input type="text" class="form-control" name="entity_master_name" id="entity_master_name" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Master Primary Key</td>
+                    <td><input type="text" class="form-control" name="primary_key_master" id="primary_key_master" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Approval Table Name</td>
+                    <td><input type="text" class="form-control" name="table_approval_name" id="table_approval_name" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Approval Primary Key</td>
+                    <td><input type="text" class="form-control" name="primary_key_approval" id="primary_key_approval" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Approval Entity Name</td>
+                    <td><input type="text" class="form-control" name="entity_approval_name" id="entity_approval_name" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Trash Table Name</td>
+                    <td><input type="text" class="form-control" name="table_trash_name" id="table_trash_name" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Trash Primary Key</td>
+                    <td><input type="text" class="form-control" name="primary_key_trash" id="primary_key_trash" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Trash Entity Name</td>
+                    <td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
+                  </tr>
+                </tbody>
+              </table>
 
-                <h4>Module Option</h4>
-                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                    <tr>
-                      <td>Target</td>
-                      <td>
-                        <select class="form-control" name="current_module_location" id="current_module_location">
-                        </select>  
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>&nbsp;</td>
-                      <td>
-                        <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
-                        <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Update Entity</td>
-                      <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> Yes</label></td>
-                    </tr>
-                  </tbody>
-                </table>
+              <h4>Module Option</h4>
+              <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                  <tr>
+                    <td>Target</td>
+                    <td>
+                      <select class="form-control" name="current_module_location" id="current_module_location">
+                      </select>  
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                      <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
+                      <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Update Entity</td>
+                    <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> Yes</label></td>
+                  </tr>
+                </tbody>
+              </table>
 
-                <h4>Module</h4>
-                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                    <tr>
-                      <td>File Name</td>
-                      <td><input type="text" class="form-control" name="module_file" id="module_file" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Module Code</td>
-                      <td><input type="text" class="form-control" name="module_code" id="module_code" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Module Name</td>
-                      <td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Module Icon</td>
-                      <td><input type="text" class="form-control" name="module_icon" id="module_icon" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                      <td>Load Saved Module</td>
-                      <td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked> Yes</label></td>
-                    </tr>
-                    <tr>
-                      <td>Add To Module List</td>
-                      <td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1"> Yes</label></td>
-                    </tr>
-                    <tr>
-                      <td>Special Access</td>
-                      <td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1"> Yes</label></td>
-                    </tr>
-                    <tr>
-                      <td>Add Menu</td>
-                      <td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate> Yes</label></td>
-                    </tr>
-                    <tr>
-                      <td>Append To</td>
-                      <td><select class="form-control" name="module_menu"></select></td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td>
-                        <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> Reload Menu</button>
-                        <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> Manage Manage</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <h4>Module</h4>
+              <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                  <tr>
+                    <td>File Name</td>
+                    <td><input type="text" class="form-control" name="module_file" id="module_file" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Module Code</td>
+                    <td><input type="text" class="form-control" name="module_code" id="module_code" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Module Name</td>
+                    <td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Module Icon</td>
+                    <td><input type="text" class="form-control" name="module_icon" id="module_icon" autocomplete="off"></td>
+                  </tr>
+                  <tr>
+                    <td>Load Saved Module</td>
+                    <td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked> Yes</label></td>
+                  </tr>
+                  <tr>
+                    <td>Add To Module List</td>
+                    <td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1"> Yes</label></td>
+                  </tr>
+                  <tr>
+                    <td>Special Access</td>
+                    <td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1"> Yes</label></td>
+                  </tr>
+                  <tr>
+                    <td>Add Menu</td>
+                    <td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate> Yes</label></td>
+                  </tr>
+                  <tr>
+                    <td>Append To</td>
+                    <td><select class="form-control" name="module_menu"></select></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> Reload Menu</button>
+                      <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> Manage Manage</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-                <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tbody>
-                    <tr>
-                      <td></td>
-                      <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                  <tr>
+                    <td></td>
+                    <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> Load Column</button></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </form>
