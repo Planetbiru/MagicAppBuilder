@@ -20,13 +20,13 @@ use MagicObject\SecretObject;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 /**
- * Clean up admin role from the database.
- * 
- * This function deletes admin roles that do not have an admin level or module.
+ * Clean up unused admin roles from the database.
  *
- * @param PicoDatabase $database The database connection.
- * @throws Exception If an error occurs during the operation.
- * @return int The number of deleted admin roles.
+ * This function deletes all admin roles that do not have
+ * an associated admin level or module assigned.
+ *
+ * @param PicoDatabase $database The database connection instance.
+ * @return int The total number of admin roles that were deleted.
  */
 function cleanUpRole($database)
 {
@@ -56,6 +56,16 @@ function cleanUpRole($database)
 	return $deleted;
 }
 
+/**
+ * Set all roles under a given admin level as superuser roles.
+ *
+ * This function grants full permissions (CRUD, approve, export, etc.)
+ * to all admin roles under the specified admin level.
+ *
+ * @param string $adminLevelId The ID of the admin level.
+ * @param PicoDatabase $database The database connection instance.
+ * @return void
+ */
 function setSuperuserRole($adminLevelId, $database)
 {
     $adminRole = new AppAdminRoleImpl(null, $database);
@@ -84,6 +94,17 @@ function setSuperuserRole($adminLevelId, $database)
     }
 }
 
+/**
+ * Generate admin roles for all active modules under a given admin level.
+ *
+ * For each active module, this function checks if a corresponding admin role exists.
+ * If it does, it updates the role with full permissions. If not, it creates a new one.
+ * After all roles are processed, it refreshes the application menu cache.
+ *
+ * @param string $adminLevelId The ID of the admin level to generate roles for.
+ * @param PicoDatabase $database The database connection instance.
+ * @return void
+ */
 function generateRole($adminLevelId, $database)
 {
     // Generate admin role
@@ -156,7 +177,6 @@ function generateRole($adminLevelId, $database)
 		}
 	}
 }
-
 
 $inputPost = new InputPost();
 $inputGet = new InputGet();
