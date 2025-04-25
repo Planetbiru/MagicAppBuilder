@@ -1,5 +1,17 @@
+# Disable directory listing for all folders
 Options -Indexes
-<Files .htaccess>
-  Order Allow,Deny
-  Deny from all
-</Files>
+
+<IfModule mod_rewrite.c>
+  # Enable URL rewriting
+  RewriteEngine On
+
+  # Block direct access to sensitive internal folders
+  RewriteRule ^inc\.app(/|$)        - [F,L]  # Block access to /inc.app and its contents
+  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Block access to /inc.cfg and its contents
+  RewriteRule ^inc\.database(/|$)   - [F,L]  # Block access to /inc.database and its contents
+  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Block access to /inc.lang and its contents
+  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Block access to /inc.lib and its contents
+
+  # Block direct access to all PHP files under lib.themes, including all subdirectories
+  RewriteRule ^lib\.themes/.*\.php$ - [F,L]
+</IfModule>
