@@ -113,7 +113,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $declaration[] = AppBuilderBase::VAR."inputPost = new InputPost();";
         $declaration[] = '';
         $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", $appLanguage->get'.$upperModuleName.'());';
-        $declaration[] = '$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
+        $declaration[] = '$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
         $declaration[] = '$appInclude = new AppIncludeImpl($appConfig, $currentModule);';
         $declaration[] = '';
 

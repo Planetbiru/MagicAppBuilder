@@ -558,12 +558,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $module->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
+						<td><?php echo $module->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
+						<td><?php echo $module->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
 						<td><?php echo $module->issetCreator() ? $module->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
 						<td><?php echo $module->issetEditor() ? $module->getEditor()->getName() : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
+						<td><?php echo $module->getIpCreate();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getIpEdit();?></td>
+						<td><?php echo $module->getIpEdit();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getActive();?></td>

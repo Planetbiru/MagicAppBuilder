@@ -301,6 +301,8 @@ $newApp->setBypassRole(true);
 // and when `bypassRole` set to false`
 $newApp->setAccessLocalhostOnly(true);
 
+$newApp->setDateFormatDetail('j F Y H:i:s');
+
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
