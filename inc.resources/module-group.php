@@ -439,6 +439,30 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $moduleGroup->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
+						<td><?php echo $moduleGroup->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
+						<td><?php echo $moduleGroup->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
+						<td><?php echo $moduleGroup->issetCreator() ? $moduleGroup->getCreator()->getName() : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
+						<td><?php echo $moduleGroup->issetEditor() ? $moduleGroup->getEditor()->getName() : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
+						<td><?php echo $moduleGroup->getIpCreate();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getIpEdit();?></td>
+						<td><?php echo $moduleGroup->getIpEdit();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getActive();?></td>
 						<td><?php echo $moduleGroup->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>

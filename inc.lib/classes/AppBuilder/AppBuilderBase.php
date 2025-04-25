@@ -5354,7 +5354,7 @@ $subqueryMap = '.$referece.';
      */
     public function constructEntityLabel($entityName)
     {
-        return self::VAR."appEntityLanguage = new AppEntityLanguage(new $entityName(), ".self::VAR.self::APP_CONFIG.", \$currentUser->getLanguageId());";
+        return self::VAR."appEntityLanguage = new AppEntityLanguageImpl(new $entityName(), ".self::VAR.self::APP_CONFIG.", \$currentUser->getLanguageId());";
     }
     
     /**
