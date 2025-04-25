@@ -4821,7 +4821,7 @@ function updateTableName(
   $('[name="module_file"]').val(moduleFileName);
   $('[name="module_code"]').val(moduleCode);
   $('[name="module_name"]').val(moduleName);
-  $('[name="module_icon"]').val('fa fa-file-text-o');
+  $('[name="module_icon"]').val('fa fa-file');
 }
 
 /**
