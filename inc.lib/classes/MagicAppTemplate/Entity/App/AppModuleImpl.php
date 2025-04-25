@@ -161,6 +161,15 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $adminCreate;
+	
+	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @Label(content="Creator")
+	 * @var AppAdminMinImpl
+	 */
+	protected $creator;
 
 	/**
 	 * Admin Edit
@@ -170,6 +179,15 @@ class AppModuleImpl extends MagicObject
 	 * @var string
 	 */
 	protected $adminEdit;
+	
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @Label(content="Editor")
+	 * @var AppAdminMinImpl
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create
@@ -199,5 +217,5 @@ class AppModuleImpl extends MagicObject
 	 */
 	protected $active;
 	
-	
+
 }

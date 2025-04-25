@@ -50,10 +50,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$messageFolder->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$messageFolder->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$messageFolder->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$messageFolder->setAdminCreate($currentAction->getUserId());
 	$messageFolder->setTimeCreate($currentAction->getTime());
 	$messageFolder->setIpCreate($currentAction->getIp());
-	$messageFolder->setAdminEdit($currentAction->getUserId());
 	$messageFolder->setTimeEdit($currentAction->getTime());
 	$messageFolder->setIpEdit($currentAction->getIp());
 	try
@@ -418,14 +416,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
 						<td><?php echo $messageFolder->getTimeEdit();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $messageFolder->getAdminCreate();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $messageFolder->getAdminEdit();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
