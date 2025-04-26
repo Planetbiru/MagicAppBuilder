@@ -418,6 +418,26 @@ menu:
         specialAccess: false
 
 ");
+$path5 = "$dir3/.htaccess";
+file_put_contents($path5, "Options -Indexes
+<Files .htaccess>
+  Order Allow,Deny
+  Deny from all
+</Files>");
+$dir6 = $baseDir."/inc.database";
+$path6 = "$dir6/.htaccess";
+file_put_contents($path6, "Options -Indexes
+<Files .htaccess>
+  Order Allow,Deny
+  Deny from all
+</Files>");
+$dir7 = $baseDir."/lib.upload";
+mkdir($dir7, 0755, true);
+$path7 = $dir7."/.htaccess";
+file_put_contents($path7, "<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^(.*\.php)$ - [F,L]
+</IfModule>");
 if($async)
 {
     $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';

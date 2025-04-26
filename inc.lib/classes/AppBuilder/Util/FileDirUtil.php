@@ -212,34 +212,41 @@ class FileDirUtil
     public static function getCustomMimeType($file) {
         // Open the file in binary read mode
         $finfo = fopen($file, "rb");
-        
-        // Read the first 4 bytes of the file to check its signature
-        $bin = fread($finfo, 4);
-        
-        // Close the file after reading the data
-        fclose($finfo);
-        $result = 'application/octet-stream';
-        // Check for specific image file signatures (magic bytes)
-        if ($bin === "\xFF\xD8\xFF\xE0" || $bin === "\xFF\xD8\xFF\xE1") {
-            // JPEG image signature
-            $result = 'image/jpeg';
-        } elseif ($bin === "\x89\x50\x4E\x47") {
-            // PNG image signature
-            $result = 'image/png';
-        } elseif ($bin === "GIF8" || $bin === "GIF87a") {
-            // GIF image signature
-            $result = 'image/gif';
-        } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "WEBP") {
-            // WEBP image signature
-            $result = 'image/webp';
-        } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "BMP") {
-            // BMP image signature
-            $result = 'image/bmp';
+        if (!$finfo) {
+            return 'application/octet-stream';
         }
         
-        // Return a default binary stream MIME type if no image signature is found
+        // Read the first 512 bytes of the file
+        $bin = fread($finfo, 512);
+        fclose($finfo);
+
+        $result = 'application/octet-stream';
+
+        // Check magic bytes
+        if (substr($bin, 0, 4) === "\xFF\xD8\xFF\xE0" || substr($bin, 0, 4) === "\xFF\xD8\xFF\xE1") {
+            $result = 'image/jpeg';
+        } elseif (substr($bin, 0, 4) === "\x89\x50\x4E\x47") {
+            $result = 'image/png';
+        } elseif (substr($bin, 0, 3) === "GIF") {
+            $result = 'image/gif';
+        } elseif (substr($bin, 0, 4) === "\x00\x00\x01\x00") {
+            $result = 'image/x-icon'; // ICO format
+        } elseif (substr($bin, 0, 4) === "\x52\x49\x46\x46") {
+            // RIFF format, could be WEBP or BMP
+            $subType = substr($bin, 8, 4);
+            if ($subType === "WEBP") {
+                $result = 'image/webp';
+            } elseif ($subType === "BMP ") {
+                $result = 'image/bmp';
+            }
+        } elseif (strpos($bin, '<svg') !== false || strpos($bin, '<?xml') !== false) {
+            $result = 'image/svg+xml';
+        }
+
         return $result;
     }
+
+
 
     
 }
