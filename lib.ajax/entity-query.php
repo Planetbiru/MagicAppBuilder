@@ -111,6 +111,7 @@ try
                             }
                             $entities[$tableName][] = $entity;
                             $entityNames[$tableName][] = $entityName;
+                            $allEntities[] = $className;
                         }
                     }
                 }
@@ -135,7 +136,7 @@ try
                         $allQueries[] = "\r\n".implode("\r\n", $entityQueries)."\r\n";
                         $allQueries[] = "-- SQL for $entityName end\r\n";
                         
-                        $allEntities[] = $className;
+                        
                         $allTables[] = $tableName;
                     }           
                 }
