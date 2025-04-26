@@ -7091,7 +7091,9 @@ function initFileManager()
 
     // Add functionality for context menu options
     contextMenu.addEventListener("click", function (event) {
-        let target = event.target.closest("li");
+      let target = event.target.closest("li");
+      if(target != null)
+      {
         const clickedOption = target.dataset.operation;
 
         if (clickedOption) {
@@ -7152,6 +7154,7 @@ function initFileManager()
         // Hide the context menu after selection
         contextMenu.style.display = "none";
         }
+      }
     });
     
     document.querySelector('.file-path').addEventListener('change', function(e){ 
