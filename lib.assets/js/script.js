@@ -7839,7 +7839,7 @@ function openFile(file, extension) {
       extension = getFileExtension(file); // Get the file extension if not provided 
     }
     // List of non-text extensions (images, videos, audio, etc.)
-    const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'mp4', 'mp3', 'avi', 'exe', 'pdf'];
+    const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'mp4', 'mp3', 'avi', 'exe', 'pdf'];
 
     // Check if the file extension is not for text files or supported images
     if (!nonTextExtensions.includes(extension.toLowerCase())) {
@@ -7848,7 +7848,7 @@ function openFile(file, extension) {
             changeMode(file, extension); 
         }
         openTextFile(file, extension);
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(extension.toLowerCase())) {
+    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico'].includes(extension.toLowerCase())) {
         setDisplayMode('image');
         // For supported image extensions, use the server-side script to load the image as base64
         increaseAjaxPending();

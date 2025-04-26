@@ -212,45 +212,40 @@ class FileDirUtil
     public static function getCustomMimeType($file) {
         // Open the file in binary read mode
         $finfo = fopen($file, "rb");
+        if (!$finfo) {
+            return 'application/octet-stream';
+        }
         
-        // Read the first 512 bytes of the file (larger to detect SVG text)
+        // Read the first 512 bytes of the file
         $bin = fread($finfo, 512);
-        
-        // Close the file after reading the data
         fclose($finfo);
 
         $result = 'application/octet-stream';
 
-        // Check for specific image file signatures (magic bytes)
+        // Check magic bytes
         if (substr($bin, 0, 4) === "\xFF\xD8\xFF\xE0" || substr($bin, 0, 4) === "\xFF\xD8\xFF\xE1") {
-            // JPEG image signature
             $result = 'image/jpeg';
         } elseif (substr($bin, 0, 4) === "\x89\x50\x4E\x47") {
-            // PNG image signature
             $result = 'image/png';
-        } elseif (substr($bin, 0, 4) === "GIF8" || substr($bin, 0, 6) === "GIF87a") {
-            // GIF image signature
+        } elseif (substr($bin, 0, 3) === "GIF") {
             $result = 'image/gif';
+        } elseif (substr($bin, 0, 4) === "\x00\x00\x01\x00") {
+            $result = 'image/x-icon'; // ICO format
         } elseif (substr($bin, 0, 4) === "\x52\x49\x46\x46") {
-            // Check if it's WEBP
-            $finfo = fopen($file, "rb");
-            fseek($finfo, 8);
-            $subType = fread($finfo, 4);
-            fclose($finfo);
-
+            // RIFF format, could be WEBP or BMP
+            $subType = substr($bin, 8, 4);
             if ($subType === "WEBP") {
                 $result = 'image/webp';
             } elseif ($subType === "BMP ") {
                 $result = 'image/bmp';
             }
         } elseif (strpos($bin, '<svg') !== false || strpos($bin, '<?xml') !== false) {
-            // Check for SVG (XML based vector image)
             $result = 'image/svg+xml';
         }
 
-        // Return detected MIME type
         return $result;
     }
+
 
 
     
