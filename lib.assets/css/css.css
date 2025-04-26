@@ -1141,23 +1141,35 @@ li[data-type=dir], li[data-type=file] {
 
 /* Folder closed state */
 li[data-type=dir] > span::before, li[data-type=dir][data-open=false] > span::before {
-  content: "📁"; /* Unicode character for folder (closed) */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 12px;
+  content: "\f07b"; /* Unicode character for folder (closed) */
   display: inline-block;
   width: 20px;
+  color: #FFC107;
 }
 
 /* Folder open state */
 li[data-type=dir][data-open=true] > span::before {
-  content: "📂"; /* Unicode character for folder (open) */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 12px;
+  content: "\f07c"; /* Unicode character for folder (open) */
   display: inline-block;
   width: 20px;
+  color: #FFC107;
 }
 
 /* File state */
 li[data-type=file] > span::before {
-  content: "📄"; /* Unicode character for document */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 12px;
+  content: "\f15b"; /* Unicode character for document */
   display: inline-block;
   width: 20px;
+  color: #007cff;
 }
 
 li[data-type=dir][data-open=true] > ul {
@@ -1297,7 +1309,7 @@ ul {
 /* Icon for 'new' operation (Purple) */
 .context-menu [data-operation=new-file]::before, .context-menu [data-operation=root-new-file]::before {
   content: "\f15b"; /* Font Awesome icon for file (new) */
-  color: rgb(0, 38, 255); /* Blue for new */
+  color: #007cff; /* Blue for new */
 }
 
 /* Icon for 'new-dir' operation (Yellow) */
