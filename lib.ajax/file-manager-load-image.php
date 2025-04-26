@@ -35,7 +35,7 @@ try {
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         
         // Define a list of valid image extensions
-        $validImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $validImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
 
         // Check if the file extension is one of the valid image formats
         if (in_array(strtolower($extension), $validImageExtensions)) {

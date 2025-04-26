@@ -213,33 +213,45 @@ class FileDirUtil
         // Open the file in binary read mode
         $finfo = fopen($file, "rb");
         
-        // Read the first 4 bytes of the file to check its signature
-        $bin = fread($finfo, 4);
+        // Read the first 512 bytes of the file (larger to detect SVG text)
+        $bin = fread($finfo, 512);
         
         // Close the file after reading the data
         fclose($finfo);
+
         $result = 'application/octet-stream';
+
         // Check for specific image file signatures (magic bytes)
-        if ($bin === "\xFF\xD8\xFF\xE0" || $bin === "\xFF\xD8\xFF\xE1") {
+        if (substr($bin, 0, 4) === "\xFF\xD8\xFF\xE0" || substr($bin, 0, 4) === "\xFF\xD8\xFF\xE1") {
             // JPEG image signature
             $result = 'image/jpeg';
-        } elseif ($bin === "\x89\x50\x4E\x47") {
+        } elseif (substr($bin, 0, 4) === "\x89\x50\x4E\x47") {
             // PNG image signature
             $result = 'image/png';
-        } elseif ($bin === "GIF8" || $bin === "GIF87a") {
+        } elseif (substr($bin, 0, 4) === "GIF8" || substr($bin, 0, 6) === "GIF87a") {
             // GIF image signature
             $result = 'image/gif';
-        } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "WEBP") {
-            // WEBP image signature
-            $result = 'image/webp';
-        } elseif ($bin === "\x52\x49\x46\x46" && substr(fread(fopen($file, "rb"), 4), 0, 4) === "BMP") {
-            // BMP image signature
-            $result = 'image/bmp';
+        } elseif (substr($bin, 0, 4) === "\x52\x49\x46\x46") {
+            // Check if it's WEBP
+            $finfo = fopen($file, "rb");
+            fseek($finfo, 8);
+            $subType = fread($finfo, 4);
+            fclose($finfo);
+
+            if ($subType === "WEBP") {
+                $result = 'image/webp';
+            } elseif ($subType === "BMP ") {
+                $result = 'image/bmp';
+            }
+        } elseif (strpos($bin, '<svg') !== false || strpos($bin, '<?xml') !== false) {
+            // Check for SVG (XML based vector image)
+            $result = 'image/svg+xml';
         }
-        
-        // Return a default binary stream MIME type if no image signature is found
+
+        // Return detected MIME type
         return $result;
     }
+
 
     
 }
