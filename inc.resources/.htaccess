@@ -14,4 +14,7 @@ Options -Indexes
 
   # Block direct access to all PHP files under lib.themes, including all subdirectories
   RewriteRule ^lib\.themes/.*\.php$ - [F,L]
+  
+  # Block direct access to all PHP files under lib.upload, including all subdirectories
+  RewriteRule ^lib\.upload/.*\.php$ - [F,L]
 </IfModule>
