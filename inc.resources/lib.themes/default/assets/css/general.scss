@@ -765,3 +765,11 @@ blockquote {
   border-left: 10px solid #7b7b7b;
 }
 
+.note-editor,
+.note-editor .note-toolbar {
+  position: static !important;
+  overflow: visible !important;
+}
+.tooltip {
+  z-index: 9999 !important;
+}
