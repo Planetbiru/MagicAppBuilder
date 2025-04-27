@@ -170,3 +170,22 @@ Unnecessary or temporary files are now automatically excluded during the build p
 ## Code Smell Fixes
 
 Improved code quality by cleaning up **redundant or inefficient code**, leading to better performance and maintainability.
+
+# MagicObject version 0.38
+
+## What's New
+
+### Added
+- Introduced password history management for admin users.
+  - Added function `passwordExists($database, $adminId, $hashPassword)` to check if a password has been previously used.
+  - Added function `createPasswordHistory($database, $adminId, $hashPassword)` to save newly created passwords into history records.
+- Improved security by preventing reuse of old passwords during password change operations.
+
+### Fixed
+- Minor bug fixes and optimizations.
+
+### Notes
+- These new password history features help enforce better password policies and enhance system security.
+- Make sure to update your database schema to include the `user_password_history` (or equivalent) table if not already present.
+
+
