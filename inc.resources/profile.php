@@ -16,6 +16,8 @@ use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppUserPasswordHistoryImpl;
+use MagicObject\Database\PicoDatabase;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -25,6 +27,65 @@ $inputPost = new InputPost();
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
+
+/**
+ * Checks if a given hashed password has been used previously by the admin.
+ *
+ * This function attempts to find a password history record for the specified admin ID 
+ * and hashed password. It returns true if the password exists in the history, 
+ * indicating it has been used before; otherwise, it returns false.
+ *
+ * @param PicoDatabase $database The database connection instance.
+ * @param string $adminId The ID of the admin user.
+ * @param string $hashPassword The hashed password to check against the history.
+ * 
+ * @return bool Returns true if the password was found in history, false otherwise.
+ */
+function passwordExists($database, $adminId, $hashPassword)
+{
+	try
+	{
+		$passwordHistory = new AppUserPasswordHistoryImpl(null, $database);
+		$passwordHistory->findOneByAdminIdAndPassword($adminId, $hashPassword);
+		return true;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
+
+/**
+ * Creates a new password history record for the given admin user.
+ *
+ * This function saves the provided hashed password along with the current timestamp 
+ * into the password history for the specified admin ID. 
+ * It returns true on success or false if an exception occurs.
+ *
+ * @param PicoDatabase $database The database connection instance.
+ * @param string $adminId The ID of the admin user.
+ * @param string $hashPassword The hashed password to be saved.
+ * 
+ * @return bool Returns true if the password history record was successfully created, false otherwise.
+ */
+function createPasswordHistory($database, $adminId, $hashPassword)
+{
+	try
+	{
+		$passwordHistory = new AppUserPasswordHistoryImpl(null, $database);
+		$passwordHistory->setAdminId($adminId);
+		$passwordHistory->setPassword($hashPassword);
+		$now = date('Y-m-d H:i:s');
+		$passwordHistory->setTimeCreate($now);
+		$passwordHistory->setTimeEdit($now);
+		$passwordHistory->insert();
+		return true;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
 
 $dataFilter = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentUser->getAdminId()));
@@ -43,6 +104,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setAdminEdit($currentAction->getUserId());
 	$updater->setTimeEdit($currentAction->getTime());
 	$updater->setIpEdit($currentAction->getIp());
+	$passwordUsed = false;
 	try
 	{
 		$updater->update();
@@ -52,11 +114,18 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
         if(!empty($plainPassword))
         {
             $hashPassword = sha1(sha1($plainPassword));
-            $updater = $admin->where($specification);
-            $updater->setPassword($hashPassword)->update();
-            $sessions->userPassword = sha1($plainPassword);
-        }
 
+			if(passwordExists($database, $adminId, $hashPassword))
+			{
+				$passwordUsed = true;
+			}
+			else
+			{
+				$updater = $admin->where($specification);
+				$updater->setPassword($hashPassword)->update();
+				$sessions->userPassword = sha1($plainPassword);
+			}
+        }
 
         $username = trim($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true), " \t\r\n ");
         if(!empty($username))
@@ -78,9 +147,14 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
                 $sessions->username = $username;
             }
         }
-
-		
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $adminId);
+		if($passwordUsed)
+		{
+			$currentModule->redirectTo(UserAction::UPDATE, Field::of()->error, "password-has-been-used");
+		}
+		else
+		{
+			$currentModule->redirectTo(UserAction::DETAIL);
+		}
 	}
 	catch(Exception $e)
 	{
@@ -102,6 +176,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
+		<?php
+		if($inputGet->getError() == 'password-has-been-used')
+		{
+			?>
+			<div class="alert alert-danger"><?php echo $appLanguage->getMessagePasswordHasBeenUsed();?></div>
+			<?php
+		}
+		?>
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
