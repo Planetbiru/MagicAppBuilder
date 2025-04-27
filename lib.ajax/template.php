@@ -133,7 +133,7 @@
 </head>
 <body>
     <?php
-    include "body.html";
+    include_once "body.html";
     ?>
 </body>
 </html>

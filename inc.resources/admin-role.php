@@ -49,8 +49,14 @@ function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
 
         // Compare groupSort values
         if ($aGroupSort !== null && $bGroupSort !== null) {
-            if ($aGroupSort < $bGroupSort) return -1;
-            if ($aGroupSort > $bGroupSort) return 1;
+            if ($aGroupSort < $bGroupSort) 
+			{
+				return -1;
+			}
+            if ($aGroupSort > $bGroupSort) 
+			{
+				return 1;
+			}
             $cmp = 0;
         } elseif ($aGroupSort !== null) {
             $cmp = -1;
@@ -66,8 +72,14 @@ function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
             $bSort = isset($b->module) && isset($b->module->sortOrder) ? $b->module->sortOrder : null;
 
             if ($aSort !== null && $bSort !== null) {
-                if ($aSort < $bSort) return -1;
-                if ($aSort > $bSort) return 1;
+                if ($aSort < $bSort) 
+				{
+					return -1;
+				}
+                if ($aSort > $bSort) 
+				{
+					return 1;
+				}
                 return 0;
             } elseif ($aSort !== null) {
                 return -1;
@@ -310,18 +322,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getAdminLevel();?></span>
 					<span class="filter-control">
-							<select class="form-control" name="admin_level_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminLevelId, Field::of()->name, $inputGet->getAdminLevelId())
-								; ?>
-							</select>
+						<select class="form-control" name="admin_level_id" onchange="this.form.submit()">
+							<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+							<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
+							PicoSpecification::getInstance()
+								->addAnd(new PicoPredicate(Field::of()->active, true))
+								->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+							PicoSortable::getInstance()
+								->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+								->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+							Field::of()->adminLevelId, Field::of()->name, $inputGet->getAdminLevelId())
+							; ?>
+						</select>
 					</span>
 				</span>
 				

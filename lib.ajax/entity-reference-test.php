@@ -4,7 +4,6 @@ use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Database\PicoDatabaseType;
-use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
