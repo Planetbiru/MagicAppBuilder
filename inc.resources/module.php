@@ -681,6 +681,11 @@ $subqueryMap = array(
 )
 );
 
+if($inputGet->getModuleGroupId() == '')
+{
+	$userPermission->setAllowedSortOrderFalse();
+}
+
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -692,7 +697,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getModuleGroup();?></span>
 					<span class="filter-control">
-							<select class="form-control" name="module_group_id">
+							<select class="form-control" name="module_group_id" onchange="this.form.submit()">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppModuleGroupMinImpl(null, $database), 
 								PicoSpecification::getInstance()
