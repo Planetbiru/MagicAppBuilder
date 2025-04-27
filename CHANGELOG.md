@@ -171,7 +171,7 @@ Unnecessary or temporary files are now automatically excluded during the build p
 
 Improved code quality by cleaning up **redundant or inefficient code**, leading to better performance and maintainability.
 
-# MagicObject version 0.38
+# MagicObject Version 0.38
 
 ## What's New
 
