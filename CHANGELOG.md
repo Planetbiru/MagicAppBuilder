@@ -181,11 +181,14 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
   - Added function `createPasswordHistory($database, $adminId, $hashPassword)` to save newly created passwords into history records.
 - Improved security by preventing reuse of old passwords during password change operations.
 
+### Changed
+- Updated session variable names to prevent conflicts.
+  - This change allows MagicAppBuilder and applications built with MagicObject to log in simultaneously in the same browser without session collision.
+
 ### Fixed
 - Minor bug fixes and optimizations.
 
 ### Notes
-- These new password history features help enforce better password policies and enhance system security.
+- The new password history features help enforce stronger password policies and enhance system security.
 - Make sure to update your database schema to include the `user_password_history` (or equivalent) table if not already present.
-
-
+- Due to the session variable name changes, ensure any custom session handling code is reviewed and updated if necessary.

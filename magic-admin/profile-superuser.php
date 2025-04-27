@@ -105,7 +105,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
             $hashPassword = sha1(sha1($plainPassword));
             $updater = $admin->where($specification);
             $updater->setPassword($hashPassword)->update();
-            $sessions->userPassword = sha1($plainPassword);
+            $sessions->magicUserPassword = sha1($plainPassword);
         }
 
 
@@ -126,7 +126,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
                 // Not found
                 $updater = $admin->where($specification);
                 $updater->setUsername($username)->update();
-                $sessions->username = $username;
+                $sessions->magicUsername = $username;
             }
         }
 

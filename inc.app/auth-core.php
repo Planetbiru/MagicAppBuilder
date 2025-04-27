@@ -18,11 +18,11 @@ $userLoggedIn = false;
 $appBaseConfigPath = "";
 $configTemplatePath = "";
 $entityAdmin = new EntityAdmin(null, $databaseBuilder);
-if(isset($databaseBuilder) && isset($sessions->username) && isset($sessions->userPassword))
+if(isset($databaseBuilder) && isset($sessions->magicUsername) && isset($sessions->magicUserPassword))
 {
     try
     {
-        $entityAdmin->findOneByUsernameAndPassword($sessions->username, sha1($sessions->userPassword));
+        $entityAdmin->findOneByUsernameAndPassword($sessions->magicUsername, sha1($sessions->magicUserPassword));
         if($entityAdmin->issetWorkspace())
         {
             $activeWorkspace = $entityAdmin->getWorkspace();
