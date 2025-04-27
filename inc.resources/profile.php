@@ -75,9 +75,8 @@ function createPasswordHistory($database, $adminId, $hashPassword)
 		$passwordHistory = new AppUserPasswordHistoryImpl(null, $database);
 		$passwordHistory->setAdminId($adminId);
 		$passwordHistory->setPassword($hashPassword);
-		$now = date('Y-m-d H:i:s');
-		$passwordHistory->setTimeCreate($now);
-		$passwordHistory->setTimeEdit($now);
+		$passwordHistory->setTimeCreate(date('Y-m-d H:i:s'));
+		$passwordHistory->setIpCreate($_SERVER['REMOTE_ADDR']);
 		$passwordHistory->insert();
 		return true;
 	}
@@ -124,6 +123,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 				$updater = $admin->where($specification);
 				$updater->setPassword($hashPassword)->update();
 				$sessions->userPassword = sha1($plainPassword);
+				createPasswordHistory($database, $adminId, $hashPassword);
 			}
         }
 
