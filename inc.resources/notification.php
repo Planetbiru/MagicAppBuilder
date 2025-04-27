@@ -138,7 +138,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $notification->getTimeCreate();?></td>
+						<td><?php echo $notification->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIsOpen();?></td>
