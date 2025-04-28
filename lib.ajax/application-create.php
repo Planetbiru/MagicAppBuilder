@@ -451,13 +451,11 @@ if($async)
     {
         $pathPreparation = str_replace("/", "\\", $pathPreparation);
         $command = "php $pathPreparation $encoded > NUL 2>&1";
-        error_log($command);
         shell_exec($command);
     }
     else
     {
         $command = "php $pathPreparation $encoded > /dev/null 2>&1";
-        error_log($command);
         exec($command);
     }
 }
