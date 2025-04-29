@@ -18,13 +18,12 @@ use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 
 require_once __DIR__ . "/app.php";
+require_once __DIR__ . "/session.php";
 
 $appModule = new AppModuleImpl(null, $database);
 $appUserRole = new AppAdminRoleImpl(null, $database);
 $currentUser = new AppAdminImpl(null, $database);
 
-$sessions = new PicoSession();
-$sessions->startSession();
 $languageId = 'en';
 
 if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
