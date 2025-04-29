@@ -2,12 +2,8 @@
 
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Request\InputPost;
-use MagicObject\Session\PicoSession;
 
-require_once __DIR__ . "/inc.app/app.php";
-
-$sessions = new PicoSession();
-$sessions->startSession();
+require_once __DIR__ . "/inc.app/session.php";
 
 $inputPost = new InputPost();
 

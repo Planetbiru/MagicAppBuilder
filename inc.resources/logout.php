@@ -1,9 +1,6 @@
 <?php
 
-use MagicObject\Session\PicoSession;
-
-require_once __DIR__ . "/inc.app/app.php";
-$sessions = new PicoSession();
+require_once __DIR__ . "/inc.app/session.php";
 
 unset($sessions->username);
 unset($sessions->userPassword);
