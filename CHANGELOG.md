@@ -171,24 +171,48 @@ Unnecessary or temporary files are now automatically excluded during the build p
 
 Improved code quality by cleaning up **redundant or inefficient code**, leading to better performance and maintainability.
 
+
 # MagicObject Version 0.38
 
 ## What's New
 
 ### Added
-- Introduced password history management for admin users.
-  - Added function `passwordExists($database, $adminId, $hashPassword)` to check if a password has been previously used.
-  - Added function `createPasswordHistory($database, $adminId, $hashPassword)` to save newly created passwords into history records.
-- Improved security by preventing reuse of old passwords during password change operations.
+
+-   Introduced password history management for admin users.
+    
+    -   Added function `passwordExists($database, $adminId, $hashPassword)` to check if a password has been previously used.
+        
+    -   Added function `createPasswordHistory($database, $adminId, $hashPassword)` to save newly created passwords into history records.
+        
+-   Improved security by preventing reuse of old passwords during password change operations.
+    
+-   Added application cookie configuration support.
+    
+    -   Added support for configuring cookie attributes such as `path`, `domain`, `secure`, `httponly`, and `samesite`.
+        
+    -   These settings can now be managed through the session configuration interface.
+        
+    -   Enhances control over session security and cross-domain compatibility.
+        
 
 ### Changed
-- Updated session variable names to prevent conflicts.
-  - This change allows MagicAppBuilder and applications built with MagicObject to log in simultaneously in the same browser without session collision.
+
+-   Updated session variable names to prevent conflicts.
+    
+    -   This change allows MagicAppBuilder and applications built with MagicObject to log in simultaneously in the same browser without session collision.
+        
 
 ### Fixed
-- Minor bug fixes and optimizations.
+
+-   Minor bug fixes and optimizations.
+    
 
 ### Notes
-- The new password history features help enforce stronger password policies and enhance system security.
-- Make sure to update your database schema to include the `user_password_history` (or equivalent) table if not already present.
-- Due to the session variable name changes, ensure any custom session handling code is reviewed and updated if necessary.
+
+-   The new password history features help enforce stronger password policies and enhance system security.
+    
+-   Make sure to update your database schema to include the `user_password_history` (or equivalent) table if not already present.
+    
+-   Due to the session variable name changes, ensure any custom session handling code is reviewed and updated if necessary.
+    
+-   The cookie configuration feature allows developers to tailor session behavior to suit various deployment environments and security requirements.

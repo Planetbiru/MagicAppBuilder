@@ -270,7 +270,7 @@ $nameInIndonesian = array(
             <div class="card-header" id="heading2">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
-                    Session
+                    Session and Cookie
                     </button>
                 </h5>
             </div>
@@ -299,7 +299,34 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Session Save Path</td>
-                                <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value=""></td>
+                                <td><input class="form-control" type="text" name="sessions_save_path" id="sessions_save_path" value="<?php echo $cfgSession->getSavePath();?>"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Cookie Path</td>
+                                <td><input class="form-control" type="text" name="sessions_cookie_path" id="sessions_cookie_path" value="<?php echo $cfgSession->getCookiePath();?>"></td>
+                            </tr>
+                            <tr>
+                                <td>Cookie Domain</td>
+                                <td><input class="form-control" type="text" name="sessions_cookie_domain" id="sessions_cookie_domain" value="<?php echo $cfgSession->getCookieDomain();?>"></td>
+                            </tr>
+                            <tr>
+                                <td>Cookie Secure</td>
+                                <td><label for="sessions_cookie_secure"><input type="checkbox" name="sessions_cookie_secure" id="sessions_cookie_secure" value="1"<?php echo $cfgSession->isCookieSecure() ? ' checked':'';?>> Yes</label></td>
+                            </tr>
+                            <tr>
+                                <td>Cookie HTTP Only</td>
+                                <td><label for="sessions_cookie_http_only"><input type="checkbox" name="sessions_cookie_http_only" id="sessions_cookie_http_only" value="1"<?php echo $cfgSession->isCookieSecure() ? ' checked':'';?>> Yes</label></td>
+                            </tr>
+                            <tr>
+                                <td>Cookie Same Site</td>
+                                <td>
+                                    <select class="form-control" name="sessions_cookie_samesite" id="sessions_cookie_samesite">
+                                        <option value="None" <?php echo $cfgSession->getCookieSameSite() == 'None' ? $constSelected : ''; ?>>None</option>
+                                        <option value="Lax" <?php echo $cfgSession->getCookieSameSite() == 'Lax' ? $constSelected : ''; ?>>Lax</option>
+                                        <option value="Strict" <?php echo $cfgSession->getCookieSameSite() == 'Strict' ? $constSelected : ''; ?>>Strict</option>
+                                    </select>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

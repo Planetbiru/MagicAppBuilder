@@ -284,6 +284,19 @@ $newApp->setDatabase($databaseConfig);
 $newApp->setData($paginationConfig);
 $newApp->setGlobalVariableDatabase('database');
 
+$cfgSession = new SecretObject();
+$cfgSession->setName('MAGICSESSION');
+$cfgSession->setMaxLifeTime(86400);
+$cfgSession->setSaveHandler('files');
+$cfgSession->setSavePath('');
+$cfgSession->setCookiePath('/');
+$cfgSession->setCookieDomain('');
+$cfgSession->setCookieSecure(false);
+$cfgSession->setCookieHttpOnly(false);
+$cfgSession->setCookieSameSite('None');
+
+$newApp->setSessions($cfgSession);
+
 
 // Get application menu from YAML file instead of database
 $newApp->setDevelopmentMode(true);

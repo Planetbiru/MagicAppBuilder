@@ -106,6 +106,9 @@ try
             }
         }
     }
+
+    $existingSessions->setCookieSecure($existingSessions->isCookieSecure());
+    $existingSessions->setCookieHttpOnly($existingSessions->isCookieHttpOnly());
 	
 	$appConfig->setDatabase($existingDatabase);
 	$appConfig->setSessions($existingSessions);
