@@ -138,7 +138,6 @@ The following is an example of column mapping into Indonesian.
 | Original Key    | Translated Key   |
 | --------------- | ---------------- |
 | name            | nama             |
-| sort_order      | sort_order       |
 | active          | aktif            |
 | draft           | draft            |
 | waiting_for     | waiting_for      |
@@ -146,17 +145,22 @@ The following is an example of column mapping into Indonesian.
 | admin_edit      | admin_ubah       |
 | admin_ask_edit  | admin_minta_ubah |
 | admin_delete    | admin_hapus      |
+| admin_restore   | admin_pemulihan  |
 | time_create     | waktu_buat       |
 | time_edit       | waktu_ubah       |
 | time_ask_edit   | waktu_minta_ubah |
-| time_delete     | waktu_delete |
+| time_delete     | waktu_delete     |
+| time_restore    | waktu_pemulihan  |
 | ip_create       | ip_buat          |
 | ip_edit         | ip_ubah          |
 | ip_ask_edit     | ip_minta_ubah    |
 | ip_delete       | ip_delete        |
+| ip_restore      | ip_pemulihan     |
+| sort_order      | sort_order       |
 | approval_id     | approval_id      |
 | approval_note   | approval_note    |
 | approval_status | approval_status  |
+| restored        | dipulihkan       |
 
 Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
 
@@ -164,26 +168,30 @@ Here is an explanation of the reserved columns above.
 
 | Original Key    | Description                                                 |
 | --------------- | ----------------------------------------------------------- |
-| name            | A column that will represent a single row as a whole in an entity. |
-| sort_order      | Column used for sorting data. For example, reference data such as song genres may be sorted based on the number of genres produced by a studio. Another example is sorting application user types based on authority level, ensuring that higher-authority users appear at the top when assigning roles. |
-| active          | Column that marks that the data is active or inactive       |
+| name            | Column that will represent a single row as a whole in an entity. |
+| active          | Column that marks that the data is active or inactive. |
 | draft           | Column that marks that the data is new data that has not yet received approval. |
 | waiting_for     | Column that specifies what approvals are required by a row. |
-| admin_create    | Column for user ID who created the data first.              |
-| admin_edit      | Column for user ID who last changed the data.               |
-| admin_ask_edit  | Column for user ID who requested the data change.           |
-| admin_delete    | Column for the user ID of the person who deleted the data.  |
-| time_create     | Column for time when created the data first.                |
-| time_edit       | Column for time when last changed the data.                 |
-| time_ask_edit   | Column for time requested the data change.                  |
-| time_delete     | Column for the timestamp when the data was deleted.         |
-| ip_create       | Column for IP Address from where created the data first.    |
-| ip_edit         | Column for IP Address from where last changed the data.     |
+| admin_create    | Column for user ID who created the data first. |
+| admin_edit      | Column for user ID who last changed the data. |
+| admin_ask_edit  | Column for user ID who requested the data change. |
+| admin_delete    | Column for the user ID of the person who deleted the data. |
+| admin_restore   | Column for the user ID of the person who restored the data. |
+| time_create     | Column for time when created the data first. |
+| time_edit       | Column for time when last changed the data. |
+| time_ask_edit   | Column for time requested the data change. |
+| time_delete     | Column for the timestamp when the data was deleted. |
+| time_restore    | Column for the timestamp when the data was restored. |
+| ip_create       | Column for IP Address from where created the data first. |
+| ip_edit         | Column for IP Address from where last changed the data. |
 | ip_ask_edit     | Column for IP Address from where requested the data change. |
-| ip_delete       | Column for the IP address from where the data was deleted.  |
-| approval_id     | Column for ID of the data in the approval table.            |
-| approval_note   | Column for approval note.                                   |
-| approval_status | Column for approval status.                                 |
+| ip_delete       | Column for the IP address from where the data was deleted. |
+| ip_restore      | Column for the IP address from where the data was restored. |
+| sort_order      | Column used for sorting data. |
+| approval_id     | Column for ID of the data in the approval table. |
+| approval_note   | Column for approval note. |
+| approval_status | Column for approval status. |
+| restored        | Column that marks whether deleted data has been restored. |
 
 
 ## Offline Usage Guide
