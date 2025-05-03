@@ -138,7 +138,6 @@ The following is an example of column mapping into Indonesian.
 | Original Key    | Translated Key   |
 | --------------- | ---------------- |
 | name            | nama             |
-| sort_order      | sort_order       |
 | active          | aktif            |
 | draft           | draft            |
 | waiting_for     | waiting_for      |
@@ -146,17 +145,22 @@ The following is an example of column mapping into Indonesian.
 | admin_edit      | admin_ubah       |
 | admin_ask_edit  | admin_minta_ubah |
 | admin_delete    | admin_hapus      |
+| admin_restore   | admin_pemulihan  |
 | time_create     | waktu_buat       |
 | time_edit       | waktu_ubah       |
 | time_ask_edit   | waktu_minta_ubah |
-| time_delete     | waktu_delete |
+| time_delete     | waktu_delete     |
+| time_restore    | waktu_pemulihan  |
 | ip_create       | ip_buat          |
 | ip_edit         | ip_ubah          |
 | ip_ask_edit     | ip_minta_ubah    |
 | ip_delete       | ip_delete        |
+| ip_restore      | ip_pemulihan     |
+| sort_order      | sort_order       |
 | approval_id     | approval_id      |
 | approval_note   | approval_note    |
 | approval_status | approval_status  |
+| restored        | dipulihkan       |
 
 Developers for applications that use Indonesian as the native language of the application can use the translated columns to create columns from entities or tables.
 
