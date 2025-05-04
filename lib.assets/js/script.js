@@ -7763,7 +7763,35 @@ function displayDirContent(dirs, subDirUl, reset) {
     }); 
 }
 
+/**
+ * Gets the full directory path (excluding the file name) from a given path.
+ *
+ * @param {string} path - The full path string (e.g., "/home/user/docs/file.txt").
+ * @returns {string} The directory path without the trailing slash and without the file name.
+ *
+ * @example
+ * getDirectoryName('/home/user/docs/file.txt'); // Returns: "home/user/docs"
+ * getDirectoryName('/var/log/');               // Returns: "var/log"
+ * getDirectoryName('file.txt');                // Returns: ""
+ * getDirectoryName('/');                       // Returns: ""
+ */
+function getDirectoryName(path) {
+  // Safeguard: ensure input is a valid string
+  if (typeof path !== 'string' || path.trim() === '') {
+    console.warn('Invalid path provided');
+    return '';
+  }
 
+  // Trim and remove trailing slash
+  path = path.trim().replace(/\/+$/, '');
+
+  // Find last slash position
+  const lastSlashIndex = path.lastIndexOf('/');
+  if (lastSlashIndex <= 0) return '';
+
+  // Return the directory path without leading slash
+  return path.substring(0, lastSlashIndex).replace(/^\/+/, '');
+}
 
 /**
  * Function to send file name and content to the server using a POST request.
@@ -7790,32 +7818,61 @@ function saveFile(file, content) {
         decreaseAjaxPending();
         let subDirUl = null;
         let subDirLi = null;
+
+        let path = document.querySelector('.file-path').value;
+        let dir = getDirectoryName(path);
+        if(dir.length > 0)
+        {
+          let dirSelector = `span[data-dir="${dir}"]`;
+          subDirLi = document.querySelector(dirSelector).closest('li'); 
+        }
+
         if(selectedItem != null)
         {
-            subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
-            subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
-            if(subDirUl == null)
-            {
-                subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
-                subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
-            }
-            if(response.dirs)
-            {
-                subDirLi.removeAttribute('data-loading');
-                displayDirContent(response.dirs, subDirUl, true); // Display the directory content
-                if(subDirLi != null)
-                {
-                    subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
-                }
-            }
-            else
-            {
-              let dirUl = document.querySelector('#dir-tree');
-              loadDirContent('', dirUl, null, true);
-            }
+          // When directory is open by context menu
+          subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+          subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
+          if(subDirUl == null)
+          {
+              subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
+              subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
+          }
+          if(response.dirs)
+          {
+              subDirLi.removeAttribute('data-loading');
+              displayDirContent(response.dirs, subDirUl, true); // Display the directory content
+              if(subDirLi != null)
+              {
+                  subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+              }
+          }
+          else
+          {
+            let dirUl = document.querySelector('#dir-tree');
+            loadDirContent('', dirUl, null, true);
+          }
+        }
+        else if(subDirLi != null)
+        {
+          // When directory is open by click
+          if(response.dirs)
+          {
+              subDirLi.removeAttribute('data-loading');
+              displayDirContent(response.dirs, subDirUl, true); // Display the directory content
+              if(subDirLi != null)
+              {
+                  subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+              }
+          }
+          else
+          {
+            let dirUl = document.querySelector('#dir-tree');
+            loadDirContent('', dirUl, null, true);
+          }
         }
         else
         {
+          // DO directory open
           let dirUl = document.querySelector('#dir-tree');
           loadDirContent('', dirUl, null, true);
         }

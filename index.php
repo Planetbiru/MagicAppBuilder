@@ -37,14 +37,14 @@ function basenameRequestUri($uri)
   <meta name="builder-name" content="<?php echo $builderName; ?>">
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>">
   <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']);?>">
-  <title><?php echo $pageTitle; ?></title>
+  <title><?php echo htmlspecialchars($pageTitle); ?></title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="lib.assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/cm/lib/codemirror.min.css">
   <link rel="stylesheet" type="text/css" href="lib.assets/css/css.min.css">
   <script type="text/javascript" src="lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="lib.assets/js/script.js"></script>
+  <script type="text/javascript" src="lib.assets/js/script.min.js"></script>
   <script type="text/javascript" src="lib.assets/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Editor.js"></script>
   <script type="text/javascript" src="lib.assets/cm/lib/codemirror.min.js"></script>
@@ -54,7 +54,7 @@ function basenameRequestUri($uri)
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
 </head>
 
-<body data-admin-level-id="<?php echo $adminLevelId; ?>">
+<body data-admin-level-id="<?php echo htmlspecialchars($adminLevelId); ?>">
 </body>
 
 </html>
