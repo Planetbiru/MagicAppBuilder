@@ -52,6 +52,14 @@ class AppUserActivityLogger
     {
         $inputGet = new InputGet();
         $inputPost = new InputPost();
+        if(isset($_FILES))
+        {
+            $inputFile = json_encode($_FILES);
+        }
+        else
+        {
+            $inputFile = null;
+        }
         $userAction = $inputPost->getUserAction();
 
         if (!isset($userAction) || empty($userAction)) {
@@ -67,6 +75,7 @@ class AppUserActivityLogger
                 $this->entity->setIpCreate($currentAction->getIp());
                 $this->entity->setGetData($inputGet);
                 $this->entity->setPostData($inputPost);
+                $this->entity->setFileData($inputFile);
                 $this->entity->insert();
             } catch (Exception $e) {
                 error_log($e->getMessage());
