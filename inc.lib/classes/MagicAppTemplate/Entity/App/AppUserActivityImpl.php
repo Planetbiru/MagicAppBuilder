@@ -126,4 +126,13 @@ class AppUserActivityImpl extends MagicObject
 	 */
 	protected $postData;
 
+	/**
+	 * File Data
+	 * 
+	 * @Column(name=file_data", type="longtext", nullable=true, updatable=false)
+	 * @Label(content="File Data")
+	 * @var string
+	 */
+	protected $fileData;
+
 }
