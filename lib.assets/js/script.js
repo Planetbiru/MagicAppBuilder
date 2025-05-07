@@ -2168,6 +2168,7 @@ let initAll = function () {
                       { size: 152, name: "apple-icon-152x152.png" },
                       { size: 180, name: "apple-icon-180x180.png" },
                       { size: 192, name: "android-icon-192x192.png" },
+                      { size: 256, name: "favicon.png" },
                       { size: 512, name: "android-icon-512x512.png" }
                   ];
 
