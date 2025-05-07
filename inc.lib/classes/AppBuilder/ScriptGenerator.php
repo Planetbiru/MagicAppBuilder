@@ -1260,7 +1260,7 @@ class ScriptGenerator //NOSONAR
         {
             $phpPath = "php";
         }
-        $cmd = "cd $targetDir"."&&"."$phpPath composer.phar update";
+        $cmd = "cd $targetDir"."&&"."$phpPath composer.phar update --ignore-platform-reqs";
         exec($cmd);
         return $this;
     }
