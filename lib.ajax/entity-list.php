@@ -78,13 +78,14 @@ try {
     }
 
     ksort($liData);
-    foreach ($liData as $items) {
+    foreach ($liData as $tableName=>$items) {
         foreach ($items as $item) {
             $li = $doc->createElement('li');
             $li->setAttribute('class', 'entity-li');
             $a = $doc->createElement('a', strip_tags($item['html']));
             $a->setAttribute('href', '#');
             $a->setAttribute('data-entity-name', $item['name']);
+            $a->setAttribute('data-table-name', $tableName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             if(isset($item['entityName']) && isset($item['className']) && isset($item['path']))
@@ -157,13 +158,14 @@ try {
     }
 
     ksort($liApp);
-    foreach ($liApp as $items) {
+    foreach ($liApp as $tableName=>$items) {
         foreach ($items as $item) {
             $li = $doc->createElement('li');
             $li->setAttribute('class', 'entity-li');
             $a = $doc->createElement('a', strip_tags($item['html']));
             $a->setAttribute('href', '#');
             $a->setAttribute('data-entity-name', $item['name']);
+            $a->setAttribute('data-table-name', $tableName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             

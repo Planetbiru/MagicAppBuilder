@@ -75,6 +75,7 @@ try {
             $a = $dom->createElement('a', $entityName);
             $a->setAttribute('href', '#');
             $a->setAttribute('data-entity-name', $dir . '\\' . $entityName);
+            $a->setAttribute('data-table-name', $tableName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             $a->setAttribute('data-title', $title);
@@ -173,6 +174,7 @@ try {
             $a = $dom->createElement('a', $entityName);
             $a->setAttribute('href', '#');
             $a->setAttribute('data-entity-name', $dir . '\\' . $entityName);
+            $a->setAttribute('data-table-name', $tableName);
             $a->setAttribute('data-toggle', 'tooltip');
             $a->setAttribute('data-placement', 'top');
             $a->setAttribute('data-title', $title);

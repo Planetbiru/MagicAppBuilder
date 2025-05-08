@@ -5,6 +5,8 @@ let currentEntity2Translated = "";
 let lastErrorLine = -1;
 let ajaxPending = 0;
 let referenceResource = '';
+let currentEntityName = '';
+let currentTableName = '';
 
 /**
  * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
@@ -301,7 +303,7 @@ let initAll = function () {
     e.preventDefault();
     $('#modal-entity-generator').modal('show');
     increaseAjaxPending();
-    $('.modal-body .entity-generator').load('lib.ajax/entity-generator-dialog.php', function(){
+    $('.modal-body .entity-generator').load('lib.ajax/entity-generator-dialog.php?entityName='+encodeURIComponent(currentEntityName)+'&tableName='+encodeURIComponent(currentTableName), function(){
       decreaseAjaxPending();
       $('select[name="entity_generator_table_name"]').on('change', function(e2){
         fillEntityGeneratorForm($(this));
@@ -338,8 +340,21 @@ let initAll = function () {
                 decreaseAjaxPending();
                 updateEntityFile(function()// NOSONAR
                 {
-                  let el = $('.entity-li > [data-entity-name="Data\\\\'+entityName+'"]');
-                  getEntityFile(['Data\\'+entityName], function() // NOSONAR
+                  let selector = '';
+                  let fullEntityName = '';
+                  if(entityName.indexOf('App\\') == 0 || entityName.indexOf('Data\\') == 0)
+                  {
+                    selector = '.entity-li > [data-entity-name="'+entityName+'"]';
+                    selector = selector.replace(/\\/g, '\\\\');
+                    fullEntityName = ''+entityName;
+                  }
+                  else
+                  {
+                    selector = '.entity-li > [data-entity-name="Data\\\\'+entityName+'"]';
+                    fullEntityName = 'Data\\'+entityName;
+                  }
+                  let el = $(selector);
+                  getEntityFile([fullEntityName], function() // NOSONAR
                   { 
                     $('.entity-container-file .entity-li').removeClass("selected-file");
                     el.closest('li').addClass("selected-file");
@@ -1035,9 +1050,12 @@ let initAll = function () {
 
   $(document).on("click", ".entity-container-file .entity-li a", function (e) {
     e.preventDefault();
-    let entity = $(this).attr("data-entity-name");
+    let entityName = $(this).attr("data-entity-name");
+    let tableName = $(this).attr("data-table-name");
+    currentEntityName = entityName;
+    currentTableName = tableName;
     let el = $(this);
-    getEntityFile([entity], function () {
+    getEntityFile([entityName], function () {
       $('.entity-container-file .entity-li').removeClass("selected-file");
       el.closest('li').addClass("selected-file");
     });
