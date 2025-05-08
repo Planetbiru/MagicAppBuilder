@@ -267,6 +267,26 @@ function setCheckingStatus(id, startTime)
   });
 }
 
+/**
+ * Populates the entity generator form with values derived from the selected table.
+ *
+ * This function extracts the table name, converts it to an entity name using the 
+ * `upperCamelize` function, and retrieves the primary key(s) from the selected table option.
+ * It then updates the form fields for the entity name and primary key.
+ *
+ * @param {jQuery} table - The jQuery object representing the table dropdown element.
+ */
+function fillEntityGeneratorForm(table)
+{
+  let frm = table.closest('table');
+  let tableName = table.val();
+  let entityName = upperCamelize(tableName);
+  let primaryKeys = table.find('option:selected').attr('data-primary-keys').split(',');
+  let primaryKey = primaryKeys[0];
+  frm.find('[name="entity_generator_entity_name"]').val(entityName);
+  frm.find('[name="entity_generator_primary_key"]').val(primaryKey);
+}
+
 
 /**
  * Initialize all event handlers and elements
@@ -275,6 +295,71 @@ let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
     $(this).closest('table').attr('data-group-source', value);
+  });
+
+  $(document).on('click', '#button_create_entity_file', function(e){
+    e.preventDefault();
+    $('#modal-entity-generator').modal('show');
+    increaseAjaxPending();
+    $('.modal-body .entity-generator').load('lib.ajax/entity-generator-dialog.php', function(){
+      decreaseAjaxPending();
+      $('select[name="entity_generator_table_name"]').on('change', function(e2){
+        fillEntityGeneratorForm($(this));
+      });
+    });
+  });
+
+  $(document).on('click', '.button-add-entity-suffix', function (e) {
+    let entityName = $('[name="entity_generator_entity_name"]').val();
+    if (!entityName.endsWith('Min')) {
+      entityName += 'Min';
+      $('[name="entity_generator_entity_name"]').val(entityName);
+    }
+  });
+
+  $(document).on('click', '.button-create-entity', function (e) {
+    let entityName = $('[name="entity_generator_entity_name"]').val();
+    let tableName = $('[name="entity_generator_table_name"]').val();
+
+    asyncAlert(
+      'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
+      'Entity Generation Confirmation',  
+      [
+        {
+          'caption': 'Yes', 
+          'fn': () => {
+            $('#modal-entity-generator').modal('hide');
+            increaseAjaxPending();
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/entity-generator.php",
+              data: { entityName: entityName, tableName: tableName },
+              success: function (data) {
+                decreaseAjaxPending();
+                updateEntityFile(function()// NOSONAR
+                {
+                  let el = $('.entity-li > [data-entity-name="Data\\\\'+entityName+'"]');
+                  getEntityFile(['Data\\'+entityName], function() // NOSONAR
+                  { 
+                    $('.entity-container-file .entity-li').removeClass("selected-file");
+                    el.closest('li').addClass("selected-file");
+                  });
+                });
+                resetFileManager();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
   });
   
   $(document).on('click', '#button_delete_module_file', function (e) {
@@ -1082,7 +1167,7 @@ let initAll = function () {
 
   
 
-  $(document).on('click', '.add_subfix', function (e) {
+  $(document).on('click', '.add_suffix', function (e) {
     let entityName = $('.rd-entity-name').val();
     if (!entityName.endsWith('Min')) {
       entityName += 'Min';
