@@ -51,7 +51,7 @@ This tab allows users to manually edit the module's code. Users can also delete 
 
 ### **7. Edit Entity**
 
-This tab enables users to manually edit entity code. Users can also delete entity files.
+This tab enables users to manually create new entity and edit existing entity code. Users can also delete entity files.
 
 ### **8. ERD (Entity Relationship Diagram)**
 

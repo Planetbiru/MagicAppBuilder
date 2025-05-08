@@ -194,6 +194,15 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
         
     -   Enhances control over session security and cross-domain compatibility.
         
+-   Added functionality to create entities from a given table name.
+
+    -   This feature allows developers to quickly generate entity classes based on the structure of a database table.
+
+    -   Automatically maps table columns to entity properties.
+
+    -   Supports primary key detection and inclusion in the generated entity.
+    
+    -   Simplifies the process of creating entities, reducing manual effort and potential errors.
 
 ### Changed
 

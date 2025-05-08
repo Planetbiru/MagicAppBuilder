@@ -603,6 +603,7 @@
 <button type="button" class="btn btn-success" id="button_save_entity_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Entity</button>
 <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
 <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
+<button type="button" class="btn btn-primary" id="button_create_entity_file"><i class="fa-solid fa-file"></i> Create Entity</button>
 </div>
 </div>
 </div>
@@ -631,8 +632,8 @@
 <span>Max Column</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
 <span>Margin X</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
 <span>Margin Y</span> <input type="number" class="form-control" name="margin_y" value="0" min="0">
-<span>H Space</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
-<span>V Space</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
+<span>Gap X</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
+<span>Gap Y</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
 <span>Zoom</span> <input type="number" class="form-control" step="0.05" name="zoom" value="1" min="0.5">
 <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> Reload</button>
 <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> SVG</button>
@@ -1228,6 +1229,29 @@
 <button type="button" class="btn btn-secondary" data-dismiss="modal">
 <i class="fas fa-times"></i> Close
 </button>        
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-entity-generator" tabindex="-1" aria-labelledby="entity_generator" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Create Entity</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="entity-generator">
+
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-primary button-add-entity-suffix"><i class="fa-solid fa-plus"></i> Add Entity Suffix</button>
+<button type="button" class="btn btn-success button-create-entity"><i class="fa-solid fa-floppy-disk"></i> OK</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
 </div>
 </div>
 </div>

@@ -267,6 +267,26 @@ function setCheckingStatus(id, startTime)
   });
 }
 
+/**
+ * Populates the entity generator form with values derived from the selected table.
+ *
+ * This function extracts the table name, converts it to an entity name using the 
+ * `upperCamelize` function, and retrieves the primary key(s) from the selected table option.
+ * It then updates the form fields for the entity name and primary key.
+ *
+ * @param {jQuery} table - The jQuery object representing the table dropdown element.
+ */
+function fillEntityGeneratorForm(table)
+{
+  let frm = table.closest('table');
+  let tableName = table.val();
+  let entityName = upperCamelize(tableName);
+  let primaryKeys = table.find('option:selected').attr('data-primary-keys').split(',');
+  let primaryKey = primaryKeys[0];
+  frm.find('[name="entity_generator_entity_name"]').val(entityName);
+  frm.find('[name="entity_generator_primary_key"]').val(primaryKey);
+}
+
 
 /**
  * Initialize all event handlers and elements
@@ -275,6 +295,71 @@ let initAll = function () {
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
     $(this).closest('table').attr('data-group-source', value);
+  });
+
+  $(document).on('click', '#button_create_entity_file', function(e){
+    e.preventDefault();
+    $('#modal-entity-generator').modal('show');
+    increaseAjaxPending();
+    $('.modal-body .entity-generator').load('lib.ajax/entity-generator-dialog.php', function(){
+      decreaseAjaxPending();
+      $('select[name="entity_generator_table_name"]').on('change', function(e2){
+        fillEntityGeneratorForm($(this));
+      });
+    });
+  });
+
+  $(document).on('click', '.button-add-entity-suffix', function (e) {
+    let entityName = $('[name="entity_generator_entity_name"]').val();
+    if (!entityName.endsWith('Min')) {
+      entityName += 'Min';
+      $('[name="entity_generator_entity_name"]').val(entityName);
+    }
+  });
+
+  $(document).on('click', '.button-create-entity', function (e) {
+    let entityName = $('[name="entity_generator_entity_name"]').val();
+    let tableName = $('[name="entity_generator_table_name"]').val();
+
+    asyncAlert(
+      'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
+      'Entity Generation Confirmation',  
+      [
+        {
+          'caption': 'Yes', 
+          'fn': () => {
+            $('#modal-entity-generator').modal('hide');
+            increaseAjaxPending();
+            $.ajax({
+              method: "POST",
+              url: "lib.ajax/entity-generator.php",
+              data: { entityName: entityName, tableName: tableName },
+              success: function (data) {
+                decreaseAjaxPending();
+                updateEntityFile(function()// NOSONAR
+                {
+                  let el = $('.entity-li > [data-entity-name="Data\\\\'+entityName+'"]');
+                  getEntityFile(['Data\\'+entityName], function() // NOSONAR
+                  { 
+                    $('.entity-container-file .entity-li').removeClass("selected-file");
+                    el.closest('li').addClass("selected-file");
+                  });
+                });
+                resetFileManager();
+                updateEntityQuery(true);
+                updateEntityRelationshipDiagram();
+              },
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
   });
   
   $(document).on('click', '#button_delete_module_file', function (e) {
@@ -1082,7 +1167,7 @@ let initAll = function () {
 
   
 
-  $(document).on('click', '.add_subfix', function (e) {
+  $(document).on('click', '.add_suffix', function (e) {
     let entityName = $('.rd-entity-name').val();
     if (!entityName.endsWith('Min')) {
       entityName += 'Min';
@@ -2168,6 +2253,7 @@ let initAll = function () {
                       { size: 152, name: "apple-icon-152x152.png" },
                       { size: 180, name: "apple-icon-180x180.png" },
                       { size: 192, name: "android-icon-192x192.png" },
+                      { size: 256, name: "favicon.png" },
                       { size: 512, name: "android-icon-512x512.png" }
                   ];
 
@@ -7763,7 +7849,35 @@ function displayDirContent(dirs, subDirUl, reset) {
     }); 
 }
 
+/**
+ * Gets the full directory path (excluding the file name) from a given path.
+ *
+ * @param {string} path - The full path string (e.g., "/home/user/docs/file.txt").
+ * @returns {string} The directory path without the trailing slash and without the file name.
+ *
+ * @example
+ * getDirectoryName('/home/user/docs/file.txt'); // Returns: "home/user/docs"
+ * getDirectoryName('/var/log/');               // Returns: "var/log"
+ * getDirectoryName('file.txt');                // Returns: ""
+ * getDirectoryName('/');                       // Returns: ""
+ */
+function getDirectoryName(path) {
+  // Safeguard: ensure input is a valid string
+  if (typeof path !== 'string' || path.trim() === '') {
+    console.warn('Invalid path provided');
+    return '';
+  }
 
+  // Trim and remove trailing slash
+  path = path.trim().replace(/\/+$/, '');
+
+  // Find last slash position
+  const lastSlashIndex = path.lastIndexOf('/');
+  if (lastSlashIndex <= 0) return '';
+
+  // Return the directory path without leading slash
+  return path.substring(0, lastSlashIndex).replace(/^\/+/, '');
+}
 
 /**
  * Function to send file name and content to the server using a POST request.
@@ -7790,32 +7904,61 @@ function saveFile(file, content) {
         decreaseAjaxPending();
         let subDirUl = null;
         let subDirLi = null;
+
+        let path = document.querySelector('.file-path').value;
+        let dir = getDirectoryName(path);
+        if(dir.length > 0)
+        {
+          let dirSelector = `span[data-dir="${dir}"]`;
+          subDirLi = document.querySelector(dirSelector).closest('li'); 
+        }
+
         if(selectedItem != null)
         {
-            subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
-            subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
-            if(subDirUl == null)
-            {
-                subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
-                subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
-            }
-            if(response.dirs)
-            {
-                subDirLi.removeAttribute('data-loading');
-                displayDirContent(response.dirs, subDirUl, true); // Display the directory content
-                if(subDirLi != null)
-                {
-                    subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
-                }
-            }
-            else
-            {
-              let dirUl = document.querySelector('#dir-tree');
-              loadDirContent('', dirUl, null, true);
-            }
+          // When directory is open by context menu
+          subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
+          subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
+          if(subDirUl == null)
+          {
+              subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
+              subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
+          }
+          if(response.dirs)
+          {
+              subDirLi.removeAttribute('data-loading');
+              displayDirContent(response.dirs, subDirUl, true); // Display the directory content
+              if(subDirLi != null)
+              {
+                  subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+              }
+          }
+          else
+          {
+            let dirUl = document.querySelector('#dir-tree');
+            loadDirContent('', dirUl, null, true);
+          }
+        }
+        else if(subDirLi != null)
+        {
+          // When directory is open by click
+          if(response.dirs)
+          {
+              subDirLi.removeAttribute('data-loading');
+              displayDirContent(response.dirs, subDirUl, true); // Display the directory content
+              if(subDirLi != null)
+              {
+                  subDirLi.setAttribute('data-open', 'true'); // Mark the directory as open
+              }
+          }
+          else
+          {
+            let dirUl = document.querySelector('#dir-tree');
+            loadDirContent('', dirUl, null, true);
+          }
         }
         else
         {
+          // DO directory open
           let dirUl = document.querySelector('#dir-tree');
           loadDirContent('', dirUl, null, true);
         }

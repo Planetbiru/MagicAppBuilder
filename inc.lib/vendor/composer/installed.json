@@ -59,19 +59,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "44d306719e5eef462c67970ed211db0ff36e9d9b"
+                "reference": "b0ea180d7266c3a4c76c7c2a6a1dd6abcd2bd8e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/44d306719e5eef462c67970ed211db0ff36e9d9b",
-                "reference": "44d306719e5eef462c67970ed211db0ff36e9d9b",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/b0ea180d7266c3a4c76c7c2a6a1dd6abcd2bd8e9",
+                "reference": "b0ea180d7266c3a4c76c7c2a6a1dd6abcd2bd8e9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "planetbiru/magic-object": "^3.8"
             },
-            "time": "2025-04-23T01:11:14+00:00",
+            "time": "2025-05-05T09:59:05+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {

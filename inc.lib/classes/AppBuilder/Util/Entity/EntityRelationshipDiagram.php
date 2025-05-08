@@ -601,7 +601,13 @@ class EntityRelationshipDiagram //NOSONAR
         {
             $result[] = '## Table `'.$diagram->getTableName().'`';
             $result[] = '';
-            $result[] = '### Description';
+            $result[] = '### CREATE TABLE Statement';
+            $result[] = '';
+            $result[] = '```sql';
+            $result[] = $this->getSQL($diagram);
+            $result[] = '```';
+            $result[] = '';
+            $result[] = '### Table Columns Description';
             $result[] = '';
 
             $result[] = '| '.sprintf('%-40s', 'Field').' | '.sprintf('%-15s', 'Type').' | '.sprintf('%-6s', 'Length').' | '.sprintf('%-8s', 'Nullable').' | '.sprintf('%-5s', 'PK').' | '.sprintf('%-14s', 'Extra').' |';
@@ -618,6 +624,53 @@ class EntityRelationshipDiagram //NOSONAR
         
         return implode("\r\n", $result);
     }
+
+    /**
+     * Generate SQL CREATE TABLE statements for each entity.
+     * 
+     * @param EntityDiagramItem $diagram Diagram
+     *
+     * @return string SQL representation of the entity diagram.
+     */
+    public function getSQL($diagram) // NOSONAR
+    {
+        
+        $tableName = $diagram->getTableName();
+        $columns = $diagram->getColumns();
+        $columnDefs = [];
+        $primaryKeys = [];
+
+        foreach ($columns as $field => $column) {
+            $definition = "`$field` " . strtoupper($column->getDataType());
+
+            $length = $column->getDataLength();
+            if ($length && strpos($column->getDataType(), '(') === false) {
+                $definition .= "($length)";
+            }
+
+            $definition .= $column->getNullable() === 'NO' ? ' NOT NULL' : ' NULL';
+
+            if ($column->getExtra()) {
+                $definition .= ' ' . strtoupper($column->getExtra());
+            }
+
+            $columnDefs[] = $definition;
+
+            if ($column->getPrimaryKey()) {
+                $primaryKeys[] = "`$field`";
+            }
+        }
+
+        if (!empty($primaryKeys)) {
+            $columnDefs[] = 'PRIMARY KEY (' . implode(', ', $primaryKeys) . ')';
+        }
+
+        $sql = "CREATE TABLE `$tableName` (\n    " . implode(",\n    ", $columnDefs) . "\n);";
+        $sqlStatements[] = $sql;
+
+        return implode("\n\n", $sqlStatements);
+    }
+
     
     /**
      * Generate an SVG representation of the Entity-Relationship Diagram (ERD).
