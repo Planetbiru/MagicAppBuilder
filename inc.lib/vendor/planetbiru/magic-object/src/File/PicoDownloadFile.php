@@ -153,8 +153,15 @@ class PicoDownloadFile
      */
     private function sendHeaders($start, $end, $fileSize)
     {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $this->filepath);
+        finfo_close($finfo);
+        if(!isset($mimeType) || $mimeType == '')
+        {
+            $mimeType = 'application/octet-stream';
+        }
         header('HTTP/1.1 206 Partial Content');
-        header("Content-Type: application/octet-stream");
+        header("Content-Type: ".$mimeType);
         header("Content-Description: File Transfer");
         header("Content-Disposition: attachment; filename=\"" . $this->filename . "\"");
         header("Content-Range: bytes $start-$end/$fileSize");

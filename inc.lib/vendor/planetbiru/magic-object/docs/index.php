@@ -1108,7 +1108,12 @@ class PhpDocumentCreator // NOSONAR
 
 }
 
-?><!DOCTYPE html>
+ob_start(); 
+
+$srcDir = dirname(__DIR__) . '/src';
+
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1119,17 +1124,13 @@ class PhpDocumentCreator // NOSONAR
 <body>
 
 <div class="page">
-
 <?php
-
-$srcDir = dirname(__DIR__) . '/src';
 
 if (is_dir($srcDir)) {
     $docCreator = new PhpDocumentCreator();
 
     $files = $docCreator->scanDirectory($srcDir);
-    
-    $structure = $docCreator->scanDirectoryToc($srcDir); // Replace with your directory path
+    $structure = $docCreator->scanDirectoryToc($srcDir);
     ?>
     <div class="sidebar">
     <h3>Table of Content</h3>
@@ -1139,14 +1140,12 @@ if (is_dir($srcDir)) {
     </div>
     <div class="mainbar">
     <?php
-
     $rendered = [];
     foreach ($files as $file) {
-        if(!in_array($file, $rendered))
-        {
+        if (!in_array($file, $rendered)) {
             echo $docCreator->getAllDocblocks($file);
+            $rendered[] = $file;
         }
-        $rendered[] = $file;
     }
     ?>
     </div>
@@ -1162,3 +1161,10 @@ if (is_dir($srcDir)) {
 </script>
 </body>
 </html>
+<?php
+
+$htmlOutput = ob_get_clean();
+
+file_put_contents(__DIR__ . '/doc.html', $htmlOutput);
+
+echo "Documentation has been generated and saved to documentation.html\n";

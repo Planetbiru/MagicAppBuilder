@@ -2850,7 +2850,7 @@ class PicoDatabasePersistence // NOSONAR
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
         $sqlQuery = $queryBuilder
             ->newQuery()
-            ->select($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE ? $agg : "count(*)")
+            ->select($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE ? $agg : "COUNT(*) as total")
             ->from($info->getTableName())
             ->where($where);
         $count = 0;
@@ -2872,7 +2872,7 @@ class PicoDatabasePersistence // NOSONAR
                 } 
                 else
                 {
-                    $count = $stmt->rowCount();
+                    $count = $stmt->fetchColumn();
                 }
             }
             return $count;
@@ -2880,7 +2880,6 @@ class PicoDatabasePersistence // NOSONAR
             throw new EmptyResultException($e->getMessage());
         }
     }
-
     
     /**
      * Delete records based on specified criteria without reading them first
