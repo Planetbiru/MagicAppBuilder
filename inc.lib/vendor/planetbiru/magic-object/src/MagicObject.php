@@ -2672,6 +2672,9 @@ class MagicObject extends stdClass // NOSONAR
      * - **numberFormat**: Format a number with grouped thousands
      *   - Example: `$numberFormat = $object->numberFormatData(6, ".", ",");`
      *
+     * - **toFixed**: Formats the number as a string using fixed-point notation with the specified number of decimal places.
+     *   - Example: `$numberFormat = $object->toFixedData(6);`
+     *
      * - **format**: Format a date value into a specified format.
      *   - Example: `$formattedData = $object->formatData("%7.3f");`
      *
@@ -2991,6 +2994,18 @@ class MagicObject extends stdClass // NOSONAR
             else
             {
                 return $this->get(substr($method, 12));
+            }
+        }
+        else if(strncasecmp($method, "toFixed", 7) === 0)
+        {
+            if(isset($params[0]))
+            {
+                $param0 = $params[0];
+                return number_format($this->get(substr($method, 7)), $param0);
+            }
+            else
+            {
+                return number_format($this->get(substr($method, 7)), 0);
             }
         }
         else if(strncasecmp($method, "format", 6) === 0)

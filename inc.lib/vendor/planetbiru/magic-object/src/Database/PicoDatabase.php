@@ -34,7 +34,7 @@ use stdClass;
  * <?php
  * $db = new PicoDatabase($credentials);
  * $db->connect();
- * $result = $db->fetch("SELECT * FROM users WHERE id = 1");
+ * $result = $db->fetch("SELECT * FROM users WHERE id = ?", 123);
  * ```
  * 
  * @author Kamshory
