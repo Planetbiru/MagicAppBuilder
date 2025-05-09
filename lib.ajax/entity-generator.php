@@ -18,16 +18,39 @@ $inputPost = new InputPost();
 
 try
 {
-	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
-    $baseEntity = $appConfig->getApplication()->getBaseEntityDataNamespace();
-    $baseEntity = str_replace("\\\\", "\\", $baseEntity);
-    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
     $tableName = $inputPost->getTableName();
     $entityName = $inputPost->getEntityName();
+    $baseEntityName = basename($entityName);
+    $entityName = str_replace("\\\\", "\\", $entityName);
+    $entityName = str_replace("/", "\\", $entityName);
+    $arr = explode("\\", $entityName);
+    if(count($arr) > 1)
+    {
+        $dir = implode("\\", array_slice($arr, 0, -1))."\\";
+    }
+    else
+    {
+        $dir = "";
+    }
+
+    
+	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
+    
+    if(stripos($dir, "App\\") !== false)
+    {
+        $baseEntity = $appConfig->getApplication()->getBaseEntityAppNamespace();
+    }
+    else
+    {
+        $baseEntity = $appConfig->getApplication()->getBaseEntityDataNamespace();
+    }
+    $baseEntity = str_replace("\\\\", "\\", $baseEntity);
+    $baseDir = rtrim($baseDirectory, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
+
     $entityInfo = $appConfig->getEntityInfo();
     if(!empty($tableName) && !empty($entityName))
     {
-        $gen = new PicoEntityGenerator($database, $baseDirectory, $tableName, $baseEntity, $entityName);
+        $gen = new PicoEntityGenerator($database, $baseDirectory, $tableName, $baseEntity, $baseEntityName);
         $nonupdatables = AppField::getNonupdatableColumns($entityInfo);
         $gen->generate($nonupdatables);
     }

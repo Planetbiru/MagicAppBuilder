@@ -2,6 +2,8 @@
 
 use AppBuilder\AppDatabase;
 use AppBuilder\Util\ResponseUtil;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
@@ -12,6 +14,10 @@ if(!$database->isConnected())
     exit();
 }
 
+$inputGet = new InputGet();
+$currentTableName = $inputGet->getTableName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$currentEntityName = $inputGet->getEntityName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$primaryKey = "";
 try {
     $databaseType = $database->getDatabaseType();
 
@@ -28,8 +34,14 @@ try {
                             <?php
                             foreach($tables as $table)
                             {
+                                $selected = "";
+                                if($table['table_name'] == $currentTableName)
+                                {
+                                    $selected = " selected";
+                                    $primaryKey = isset($table['primary_key']) && isset($table['primary_key'][0]) ? $table['primary_key'][0] : '';
+                                }
                                 ?>
-                                <option value="<?php echo $table['table_name'];?>" data-primary-keys="<?php echo implode(",", $table['primary_key']);?>"><?php echo $table['table_name'];?></option>
+                                <option value="<?php echo $table['table_name'];?>" data-primary-keys="<?php echo implode(",", $table['primary_key']);?>"<?php echo $selected;?>><?php echo $table['table_name'];?></option>
                                 <?php
                             }
                             ?>
@@ -38,11 +50,11 @@ try {
                 </tr>
                 <tr>
                     <td>Entity Name</td>
-                    <td><input type="text" class="form-control" name="entity_generator_entity_name"></td>
+                    <td><input type="text" class="form-control" name="entity_generator_entity_name" value="<?php echo htmlspecialchars($currentEntityName);?>"></td>
                 </tr>
                 <tr>
                     <td>Primary Key</td>
-                    <td><input type="text" class="form-control" name="entity_generator_primary_key"></td>
+                    <td><input type="text" class="form-control" name="entity_generator_primary_key" value="<?php echo htmlspecialchars($primaryKey);?>"></td>
                 </tr>
             </tbody>
         </table>
@@ -50,4 +62,5 @@ try {
 
 } catch (Exception $e) {
     // Log the error for debugging purposes
-    error_log("Error: " . $e->getMessage());}
+    error_log("Error: " . $e->getMessage());
+}
