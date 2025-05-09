@@ -36,10 +36,11 @@ try {
         // Adding space after checkbox
         $space = $dom->createTextNode(' '); // Adding a space after the checkbox
         
-        $label = $dom->createElement('label', $labelText);
+        $label = $dom->createElement('label');
         
-        $div->appendChild($input);
-        $div->appendChild($space); // Add the space
+        $label->appendChild($input);
+        $label->appendChild($space); // Add the space
+        $label->appendChild($dom->createTextNode($labelText)); 
         $div->appendChild($label);
         
         return $div;
