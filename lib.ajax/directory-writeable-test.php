@@ -58,9 +58,9 @@ else {
             // Check if the directory is writable
             $writeable = is_writable($directory);
             if ($writeable) {
-                $message = "Directory is writable";
+                $message = "Directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable";
+                $message = "Directory is not writable"; // NOSONAR
             }
             $permissions = fileperms($directory); // Get directory permissions
         }
@@ -77,17 +77,17 @@ else {
             $permissions = fileperms($directoryToCheck); // Get parent directory permissions
             $writeable = is_writable($directoryToCheck); // Check if it is writable
             if ($writeable) {
-                $message = "Directory is writable";
+                $message = "Directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable";
+                $message = "Directory is not writable"; // NOSONAR
             }
         } 
         else {
             $writeable = is_writable(dirname($directoryToCheck));
             if ($writeable) {
-                $message = "Directory is writable";
+                $message = "Directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable";
+                $message = "Directory is not writable"; // NOSONAR
             }
         }
     }
