@@ -28,6 +28,15 @@
             'reference' => '1680eca33c0e107439969650904ab08ecfe83603',
             'dev_requirement' => false,
         ),
+        'phpmailer/phpmailer' => array(
+            'pretty_version' => 'v6.10.0',
+            'version' => '6.10.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpmailer/phpmailer',
+            'aliases' => array(),
+            'reference' => 'bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144',
+            'dev_requirement' => false,
+        ),
         'planetbiru/magic-app' => array(
             'pretty_version' => '3.10.0',
             'version' => '3.10.0.0',

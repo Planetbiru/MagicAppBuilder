@@ -11,6 +11,10 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
         array (
             'SVG\\' => 4,
         ),
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
         'M' => 
         array (
             'MagicObject\\' => 12,
@@ -22,6 +26,10 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
         'SVG\\' => 
         array (
             0 => __DIR__ . '/..' . '/meyfa/php-svg/src',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'MagicObject\\' => 
         array (
