@@ -32,29 +32,16 @@
     </style>
 </head>
 <body>
-    <!-- Login Form Section -->
     <div class="container login-form-container d-flex justify-content-center">
         <div class="card login-form-card">
             <div class="card-body">
-                <h5 class="card-title text-center mb-4">Login</h5>
-                <!-- Login Form -->
-                <form action="login.php" method="POST">
+                <h5 class="card-title text-center mb-4">Reset Password</h5>
+                <form action="reset-password.php" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Remember me</label>
-                        </div>
-                        <a href="reset-password.php" class="text-decoration-none">Forgot Password?</a>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Send Link</button>
                 </form>
             </div>
         </div>

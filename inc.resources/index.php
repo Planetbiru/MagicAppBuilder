@@ -16,6 +16,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
     .row > .col {
         margin-top: 20px;
     }
+    .dark-mode .card {
+        background-color: #343a40;
+        color: #fff;
+    }
 </style>
 <div class="row">
     <div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
@@ -100,7 +104,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
     </div>
   </div>
 </div>
-
 
 <script src="<?php echo $themeAssetsPath;?>vendors/chartjs/chart.js"></script>
 
