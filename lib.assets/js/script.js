@@ -7917,7 +7917,8 @@ function saveFile(file, content) {
         body: formData   // The FormData object contains the file name and content
     })
     .then(response => response.json())  // Parse the JSON response
-    .then(response => {
+    .then(response => // NOSONAR
+      {
         // Successfully received response from the server
         decreaseAjaxPending();
         let subDirUl = null;
