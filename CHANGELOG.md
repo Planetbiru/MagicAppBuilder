@@ -204,6 +204,16 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
     
     -   Simplifies the process of creating entities, reducing manual effort and potential errors.
 
+-   Introduced chart template functionality.
+
+    -   Added pre-defined chart templates for common use cases such as bar charts, line charts, pie charts, and more.
+    
+    -   Templates are customizable, allowing developers to modify chart properties such as colors, labels, and data sources.
+    
+    -   Integrated with the existing data visualization module for seamless chart generation.
+    
+    -   Simplifies the process of creating and embedding charts in applications, reducing development time and effort.
+
 ### Changed
 
 -   Updated session variable names to prevent conflicts.
