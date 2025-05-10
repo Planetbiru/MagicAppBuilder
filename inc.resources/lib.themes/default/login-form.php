@@ -36,25 +36,25 @@
     <div class="container login-form-container d-flex justify-content-center">
         <div class="card login-form-card">
             <div class="card-body">
-                <h5 class="card-title text-center mb-4">Login</h5>
+                <h5 class="card-title text-center mb-4"><?php echo $appLanguage->getLogin();?></h5>
                 <!-- Login Form -->
                 <form action="login.php" method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                        <label for="username" class="form-label"><?php echo $appLanguage->getUsername();?></label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="<?php echo $appLanguage->getPlaceholderEnterUsername();?>" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        <label for="password" class="form-label"><?php echo $appLanguage->getPassword();?></label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderEnterPassword();?>" required>
                     </div>
                     <div class="d-flex justify-content-between">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                            <label class="form-check-label" for="rememberMe"><?php echo $appLanguage->getMessageRememberMe();?></label>
                         </div>
-                        <a href="reset-password.php" class="text-decoration-none">Forgot Password?</a>
+                        <a href="reset-password.php" class="text-decoration-none"><?php echo $appLanguage->getForgotPassword();?></a>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonLogin();?></button>
                 </form>
             </div>
         </div>

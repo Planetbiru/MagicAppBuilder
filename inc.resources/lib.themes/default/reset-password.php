@@ -41,15 +41,20 @@
                 {
                     ?>
                     <form action="" method="POST">
-                    <div class="mb-3">
-                        <label for="password" class="form-label"><?php echo $appLanguage->getPassword();?></label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderEnterPassword();?>" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label"><?php echo $appLanguage->getRepeatPassword();?></label>
-                        <input type="password" class="form-control" id="passwordRepeat" name="passwordRepeat" placeholder="<?php echo $appLanguage->getPlaceholderRetypePassword();?>" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSave();?></button>
+                        <div class="mb-3">
+                            <label for="password" class="form-label"><?php echo $appLanguage->getPassword();?></label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderEnterPassword();?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label"><?php echo $appLanguage->getRepeatPassword();?></label>
+                            <input type="password" class="form-control" id="passwordRepeat" name="passwordRepeat" placeholder="<?php echo $appLanguage->getPlaceholderRetypePassword();?>" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="form-check">
+                            </div>
+                            <a href="./" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSave();?></button>
                     </form>
                     <?php
                 }
@@ -64,6 +69,11 @@
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="form-check">
+                            </div>
+                            <a href="./" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSendLink();?></button>
                     </form>

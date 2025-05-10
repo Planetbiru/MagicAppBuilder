@@ -1,7 +1,11 @@
 <?php
 
+use MagicAppTemplate\AppLanguageImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Request\InputPost;
+use MagicObject\Util\File\FileUtil;
+use MagicObject\Util\PicoIniUtil;
+use MagicObject\Util\PicoStringUtil;
 
 require_once __DIR__ . "/inc.app/session.php";
 

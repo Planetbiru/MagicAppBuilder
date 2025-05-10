@@ -212,6 +212,14 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
         
     -   Simplifies the process of creating entities, reducing manual effort and potential errors.
         
+-   Added default language application support.
+    
+    -   Developers can now set a default language for the application.
+        
+    -   This feature ensures that the application uses a predefined language when no specific language is selected by the user and if the user is not logged in yet.
+        
+    -   Enhances the user experience by providing a consistent language fallback mechanism.
+        
 -   Introduced chart template functionality.
     
     -   Added pre-defined chart templates for common use cases such as bar charts, line charts, pie charts, and more.
