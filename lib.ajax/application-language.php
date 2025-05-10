@@ -34,11 +34,13 @@ if($inputPost->getAction() == "update")
                 }
                 $currentLanguages[$idx]->setActive(false);
             }
+            $defaultLanguage = '';
             foreach($currentLanguages as $idx=>$p)
             {
                 if($p->getCode() == $selected)
                 {
                     $currentLanguages[$idx]->setActive(true);
+                    $defaultLanguage = $p->getCode();
                 }
             }
             $appConfigBuilder->setLanguages($currentLanguages);
@@ -49,6 +51,7 @@ if($inputPost->getAction() == "update")
             $appConfig = new SecretObject();
             $appConfig->loadYamlFile($appConfigPath, false, true, true);
             $appConfig->setLanguages($currentLanguages);
+            $appConfig->setDefaultLanguage($defaultLanguage);
             $yml = $appConfig->dumpYaml();
             file_put_contents($appConfigPath, $yml);
         }
