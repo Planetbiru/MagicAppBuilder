@@ -166,7 +166,7 @@ class EntityAdmin extends MagicObject
 	 * @Label(content="Validation Code")
 	 * @var string
 	 */
-	protected $vatidationCode;
+	protected $validationCode;
 
 	/**
 	 * Last Reset Password

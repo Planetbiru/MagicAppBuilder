@@ -35,14 +35,41 @@
     <div class="container login-form-container d-flex justify-content-center">
         <div class="card login-form-card">
             <div class="card-body">
-                <h5 class="card-title text-center mb-4">Reset Password</h5>
-                <form action="reset-password.php" method="POST">
+                <h5 class="card-title text-center mb-4"><?php echo $appLanguage->getResetPassword();?></h5>
+                <?php
+                if($resetPasswordForm)
+                {
+                    ?>
+                    <form action="" method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                        <label for="password" class="form-label"><?php echo $appLanguage->getPassword();?></label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderEnterPassword();?>" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Send Link</button>
-                </form>
+                    <div class="mb-3">
+                        <label for="password" class="form-label"><?php echo $appLanguage->getRepeatPassword();?></label>
+                        <input type="password" class="form-control" id="passwordRepeat" name="passwordRepeat" placeholder="<?php echo $appLanguage->getPlaceholderRetypePassword();?>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSave();?></button>
+                    </form>
+                    <?php
+                }
+                else
+                {
+                    if($inputGet->getError() == 'reset-password-failed')
+                    {
+                        echo '<div class="alert alert-danger" role="alert">' . $appLanguage->getMessageResetPasswordFailed() . '</div>';
+                    }
+                    ?>
+                    <form action="reset-password.php" method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSendLink();?></button>
+                    </form>
+                    <?php
+                }
+                ?>
             </div>
         </div>
     </div>
