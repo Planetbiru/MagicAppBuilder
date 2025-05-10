@@ -44,6 +44,7 @@ function fixValue($original)
         'Button Search' => 'Search',
         'Button Send' => 'Send',
         'Button Send Email' => 'Send Email',
+        'Button Send Link' => 'Send Link',
         'Button Show' => 'Show',
         'Button Show All' => 'Show All',
         'Button Show Require Approval' => 'Show Require Approval',
@@ -68,6 +69,7 @@ function fixValue($original)
         'Message Waiting For Sort Order' => 'This data is waiting for approval to be sorted',
         'Message Waiting For Update' => 'This data is waiting for approval before modification',
         'Message Password Has Been Used' => 'Password has been used. Please create a new one.',
+        'Message Reset Password Failed' => 'Reset password failed',
         'No' => 'No',
         'Numero' => 'No',
         'Option Select All' => 'Select All',
@@ -77,6 +79,10 @@ function fixValue($original)
         'Placeholder Search By' => 'Search By',
         'Placeholder Search By Code' => 'Search By Code',
         'Placeholder Search By Name' => 'Search By Name',
+        'Placeholder Enter Password' => 'Enter Password',
+        'Placeholder Retype Password' => 'Retype Password',
+        'Profile' => 'Profile',
+        'Setting' => 'Setting',
         'Short Waiting For Activate' => 'Activate',
         'Short Waiting For Create' => 'Create',
         'Short Waiting For Deactivate' => 'Deactivate',
@@ -162,6 +168,8 @@ if($inputPost->getUserAction() == 'get')
         'button_add',
         'button_delete',
         'button_save_current_order',
+        'button_send_email',
+        'button_send_link',
         'button_activate',
         'button_deactivate',
         'button_generate',
@@ -180,6 +188,7 @@ if($inputPost->getUserAction() == 'get')
         'message_noneditable_data_waiting_approval',
         'message_select_filter',
         'message_password_has_been_used',
+        'message_reset_password_failed',
         'profile',
         'setting',
         'login',
@@ -193,6 +202,9 @@ if($inputPost->getUserAction() == 'get')
         'placeholder_search',
         'placeholder_search_by',
         'placeholder_search_by_name',
+        'placeholder_search_by_code',
+        'placeholder_enter_password',
+        'placeholder_retype_password'
     );
 
     $response = array();
