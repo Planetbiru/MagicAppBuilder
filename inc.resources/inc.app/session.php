@@ -10,7 +10,6 @@ if(!isset($appSessionsConfig))
 {
     $appSessionsConfig = new SecretObject();
 }
-
 $sessions = new PicoSession($appSessionsConfig);
 
 $appCookieMaxLifetime = $appSessionsConfig->getMaxLifetime();
@@ -39,5 +38,4 @@ $sessions->setSessionCookieParams(
     $appCookieSameSite
 );
 
-$sessions->setSessionCookieParams($appCookieMaxLifetime, $appCookiePath, $appCookieDomain, $appCookieSecure, $appCookieHttpOnly, $appCookieSameSite);
 $sessions->startSession();

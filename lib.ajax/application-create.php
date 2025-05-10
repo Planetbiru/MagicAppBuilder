@@ -316,12 +316,35 @@ $newApp->setAccessLocalhostOnly(true);
 
 $newApp->setDateFormatDetail('j F Y H:i:s');
 
+$url = "http://".$_SERVER['SERVER_NAME']."/".$newAppId."/";
+
+$resetPasswordContainer = new SecretObject();
+$resetPasswordContainer->loadYamlString(
+'
+resetPassword:
+  email:
+    host: smtp.domain.tld
+    port: 587
+    auth: true
+    username: noreply
+    password: password
+    encryption: tls
+    subject: Reset Password
+    from:
+      name: '.$applicationName.'
+      email: noreply@domain.tld
+    baseUrl: '.$url.'
+'    
+);
+
+$newApp->setResetPassword($resetPasswordContainer->getResetPassword());
+
+
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
 $now = date("Y-m-d H:i:s");
 
-$url = "http://".$_SERVER['SERVER_NAME']."/".$newAppId."/";
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 $entityApplication->setApplicationId($newAppId);

@@ -186,6 +186,14 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
         
 -   Improved security by preventing reuse of old passwords during password change operations.
     
+-   Added password reset via email functionality.
+    
+    -   Admin users can request a password reset link to be sent to their registered email address.
+        
+    -   Added support for generating secure reset tokens and emailing HTML-based reset instructions using PHPMailer.        
+        
+    -   Token expiration and validation should be implemented to secure the reset process.
+        
 -   Added application cookie configuration support.
     
     -   Added support for configuring cookie attributes such as `path`, `domain`, `secure`, `httponly`, and `samesite`.
@@ -195,14 +203,25 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
     -   Enhances control over session security and cross-domain compatibility.
         
 -   Added functionality to create entities from a given table name.
-
-    -   This feature allows developers to quickly generate entity classes based on the structure of a database table.
-
-    -   Automatically maps table columns to entity properties.
-
-    -   Supports primary key detection and inclusion in the generated entity.
     
+    -   This feature allows developers to quickly generate entity classes based on the structure of a database table.
+        
+    -   Automatically maps table columns to entity properties.
+        
+    -   Supports primary key detection and inclusion in the generated entity.
+        
     -   Simplifies the process of creating entities, reducing manual effort and potential errors.
+        
+-   Introduced chart template functionality.
+    
+    -   Added pre-defined chart templates for common use cases such as bar charts, line charts, pie charts, and more.
+        
+    -   Templates are customizable, allowing developers to modify chart properties such as colors, labels, and data sources.
+        
+    -   Integrated with the existing data visualization module for seamless chart generation.
+        
+    -   Simplifies the process of creating and embedding charts in applications, reducing development time and effort.
+
 
 ### Changed
 
