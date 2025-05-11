@@ -1141,7 +1141,7 @@ li[data-type=dir], li[data-type=file] {
 
 /* Folder closed state */
 li[data-type=dir] > span::before, li[data-type=dir][data-open=false] > span::before {
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 5 Free"; /* NOSONAR */
   font-weight: 900;
   font-size: 12px;
   content: "\f07b"; /* Unicode character for folder (closed) */
@@ -1152,7 +1152,7 @@ li[data-type=dir] > span::before, li[data-type=dir][data-open=false] > span::bef
 
 /* Folder open state */
 li[data-type=dir][data-open=true] > span::before {
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 5 Free"; /* NOSONAR */
   font-weight: 900;
   font-size: 12px;
   content: "\f07c"; /* Unicode character for folder (open) */
@@ -1163,7 +1163,7 @@ li[data-type=dir][data-open=true] > span::before {
 
 /* File state */
 li[data-type=file] > span::before {
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 5 Free"; /* NOSONAR */
   font-weight: 900;
   font-size: 12px;
   content: "\f15b"; /* Unicode character for document */
@@ -1277,7 +1277,7 @@ ul {
   color: inherit; /* Inherit color from the parent li */
   font-size: 12px;
   vertical-align: top;
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 5 Free"; /* NOSONAR */
   font-weight: 900;
   width: 12px;
 }
@@ -1463,7 +1463,6 @@ li.menu-exists > a::after {
   width: 20px;
   height: 20px;
   color: green;
-  font-size: 16px;
   margin-left: 10px;
 }
 
