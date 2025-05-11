@@ -17,16 +17,15 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
-    <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/jquery/jquery-3.2.1.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/popper/popper.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/bootstrap/js/bootstrap.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/moment/min/moment.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/sortable/Sortable.min.js"></script>
+    <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/PicoTagEditor.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/custom.min.js"></script>
-
 </head>
 
 <body>
@@ -35,9 +34,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <div class="sidebar" id="sidebar">
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
-        <?php
-        echo $appMenu;
-        ?>
+        <?php echo $appMenu;?>
     </div>
 
     <!-- Main Content -->

@@ -25,8 +25,6 @@ function initDateTimePicker() {
     }
   });
 
-  
-
   // Initialize date-picker if there are inputs with the class 'date-picker'
   if ($('.date-picker').length) {
     $('.date-picker').each(function() {
