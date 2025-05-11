@@ -364,7 +364,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
-						tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
 							<input type="text" class="form-control" name="name" id="name" value="<?php echo $module->getName();?>" autocomplete="off"/>
@@ -517,7 +517,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
-						<tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td><?php echo $module->getName();?></td>
 					</tr>
@@ -525,7 +525,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
 						<td><?php echo $module->getModuleCode();?></td>
 					</tr>
-				<tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getModuleGroup();?></td>
 						<td><?php echo $module->issetModuleGroup() ? $module->getModuleGroup()->getName() : "";?></td>
 					</tr>
