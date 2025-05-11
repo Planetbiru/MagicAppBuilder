@@ -59,7 +59,6 @@ function fixValue($original)
         'Label Select None' => 'Select None',
         'Label Select One' => 'Select One',
         'Label Selected' => 'Selected',
-        
         'Message Data Not Found' => 'Data not found',
         'Message No Data Require Approval' => 'No data require approval',
         'Message Noneditable Data Waiting Approval' => 'Data waiting approval',
@@ -202,6 +201,7 @@ if($inputPost->getUserAction() == 'get')
         'profile',
         'setting',
         'login',
+        'login_form',
         'logout',
         'label_select_one',
         'label_selected',
@@ -218,6 +218,7 @@ if($inputPost->getUserAction() == 'get')
         'placeholder_enter_username',
         'placeholder_enter_email',
         'placeholder_enter_password',
+        'reset_password',
         'username',
     );
 
