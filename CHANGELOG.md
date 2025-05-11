@@ -252,3 +252,35 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
 -   Due to the session variable name changes, ensure any custom session handling code is reviewed and updated if necessary.
     
 -   The cookie configuration feature allows developers to tailor session behavior to suit various deployment environments and security requirements.
+
+
+# MagicAppBuilder Version 1.0
+
+## What's New
+
+### Stable Release
+
+MagicAppBuilder version 1.0 marks the first stable release, building upon the features and improvements introduced in version 0.38. This version is ready for production use and includes all the refinements and optimizations necessary for a robust and reliable application development framework.
+
+### Key Features
+
+-   **Password History Management**: Prevents the reuse of old passwords for admin users, enhancing security.
+-   **Password Reset via Email**: Allows admin users to reset their passwords securely using email-based reset links.
+-   **Entity Generator**: Simplifies the creation of entity classes from database tables, reducing manual effort.
+-   **Default Language Support**: Ensures a consistent language fallback mechanism for users who are not logged in.
+-   **Chart Templates**: Provides pre-defined and customizable chart templates for seamless data visualization.
+-   **Application Cookie Configuration**: Offers enhanced control over session security and cross-domain compatibility.
+
+### Improvements
+
+-   **Session Variable Updates**: Prevents conflicts, allowing simultaneous logins for MagicAppBuilder and applications built with MagicObject in the same browser.
+-   **Performance Optimizations**: Further optimized caching, database queries, and application workflows for better performance.
+-   **Bug Fixes**: Addressed all known issues from version 0.x to ensure a smoother and more reliable experience.
+
+### Notes
+
+-   This version is fully backward-compatible with version 0.38.
+-   Developers are encouraged to update their projects to version 1.0 to benefit from the stability and enhancements provided in this release.
+
+**MagicAppBuilder version 1.0 is the culmination of extensive development and testing, providing a solid foundation for building scalable, secure, and feature-rich applications.**
+
