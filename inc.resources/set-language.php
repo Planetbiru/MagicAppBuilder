@@ -15,7 +15,7 @@ if($inputGet->getLanguageId())
         $sessions->languageId = $languageId;
     }
     else
-    { 
+    {
         try
         {
             $currentUser->setLanguageId($languageId);

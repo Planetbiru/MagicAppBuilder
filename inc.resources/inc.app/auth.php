@@ -11,7 +11,6 @@ use MagicAppTemplate\Entity\App\AppUserActivityImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
-use MagicObject\Session\PicoSession;
 use MagicObject\SetterGetter;
 use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;

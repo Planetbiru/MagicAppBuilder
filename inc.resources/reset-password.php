@@ -1,7 +1,6 @@
 <?php
 
 use MagicApp\Field;
-use MagicAppTemplate\AppLanguageImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -10,9 +9,6 @@ use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
-use MagicObject\Util\File\FileUtil;
-use MagicObject\Util\PicoIniUtil;
-use MagicObject\Util\PicoStringUtil;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
