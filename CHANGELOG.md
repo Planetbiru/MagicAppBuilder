@@ -276,6 +276,8 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   **Session Variable Updates**: Prevents conflicts, allowing simultaneous logins for MagicAppBuilder and applications built with MagicObject in the same browser.
 -   **Performance Optimizations**: Further optimized caching, database queries, and application workflows for better performance.
 -   **Bug Fixes**: Addressed all known issues from version 0.x to ensure a smoother and more reliable experience.
+-   **Cookie Configuration Fixes**: Resolved issues with cookie attributes to ensure proper behavior across different environments.
+-   **Server Configuration**: Added server configuration to redirect all requests to `lib.themes` to their respective directories, improving resource management and access control.
 
 ### Notes
 

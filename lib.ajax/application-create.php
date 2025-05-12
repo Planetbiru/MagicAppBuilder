@@ -293,7 +293,7 @@ $cfgSession->setCookiePath('/');
 $cfgSession->setCookieDomain('');
 $cfgSession->setCookieSecure(false);
 $cfgSession->setCookieHttpOnly(false);
-$cfgSession->setCookieSameSite('None');
+$cfgSession->setCookieSameSite('Strict');
 
 $newApp->setSessions($cfgSession);
 

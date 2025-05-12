@@ -6,15 +6,19 @@ Options -Indexes
   RewriteEngine On
 
   # Block direct access to sensitive internal folders
-  RewriteRule ^inc\.app(/|$)        - [F,L]  # Block access to /inc.app and its contents
-  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Block access to /inc.cfg and its contents
-  RewriteRule ^inc\.database(/|$)   - [F,L]  # Block access to /inc.database and its contents
-  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Block access to /inc.lang and its contents
-  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Block access to /inc.lib and its contents
+  RewriteRule ^inc\.app(/|$)        - [F,L]  # Blocks access to /inc.app and its contents
+  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Blocks access to /inc.cfg and its contents
+  RewriteRule ^inc\.database(/|$)   - [F,L]  # Blocks access to /inc.database and its contents
+  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Blocks access to /inc.lang and its contents
+  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Blocks access to /inc.lib and its contents
 
   # Block direct access to all PHP files under lib.themes, including all subdirectories
   RewriteRule ^lib\.themes/.*\.php$ - [F,L]
   
   # Block direct access to all PHP files under lib.upload, including all subdirectories
   RewriteRule ^lib\.upload/.*\.php$ - [F,L]
+
+  # Redirect all requests to lib.themes to their respective directories
+  RewriteRule ^(.*/)?lib\.themes/(.+)$ lib.themes/$2 [NC,L]
+
 </IfModule>
