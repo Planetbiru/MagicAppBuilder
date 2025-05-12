@@ -3374,7 +3374,7 @@ In **MagicObject 2.7**, when you pass a **PDO** connection object to the constru
 
 Version 2.7 of **MagicObject** introduces an important enhancement by allowing PDO connections to be used alongside **PicoDatabase**. This update provides greater flexibility for developers, allowing them to work with traditional PDO connections if they choose, while still benefiting from the advanced features of **MagicObject** for database interactions. This change aligns with the goal of making **MagicObject** more accessible to a wider range of developers, whether they are just starting with **MagicObject** or are looking to transition from an existing PDO-based application.
 
-## Object-Relational Mapping (ORM)
+## ORM
 
 ORM (Object-Relational Mapping) is a class used to access the database. ORM is derived from MagicObject. Some annotations are required to activate all ORM features.
 

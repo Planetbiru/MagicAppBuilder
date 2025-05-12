@@ -521,3 +521,30 @@ This method simplifies combining nested objects and ensures consistency in struc
 
 -   Internal code refactoring for improved readability and maintainability.
 -   Enhanced flexibility in property name handling, especially for camelCase formatting.
+
+
+# MagicObject version 3.11
+
+## What's New
+
+### Added: Matrix Calculation Class
+A new `MatrixCalculator` class has been introduced to perform basic matrix operations such as addition, subtraction, multiplication, and element-wise division.  
+This class is useful for numerical or scientific processing involving 2D arrays of real numbers.
+
+### Added: `toFixed` Magic Method in MagicObject
+A new `toFixed` magic method has been added to the core `MagicObject` class.  
+This allows any numeric property to be formatted as a string with a fixed number of decimal places using dynamic method access.
+
+**Example usage:**
+
+```php
+$object = new MagicObject();
+$object->setData(100.123456);
+echo $object->toFixedData(2)."\r\n"; // Outputs 100.12
+echo $object->toFixedData(4)."\r\n"; // Outputs 100.1235
+```
+
+### Bug Fixes
+
+-  Fixed an issue where countBy() returned 1 even when no records matched the condition.
+   The method now correctly uses fetchColumn() to retrieve the result from SELECT COUNT(*).

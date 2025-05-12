@@ -1,23 +1,21 @@
-<?php
-http_response_code(403);
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" type="image/ico" href="favicon.ico" />
-    <title>403 Forbidden</title>
+    <title>Directory Access Blocked</title>
     <?php
     require_once __DIR__ . "/error-style.php";
     ?>
 </head>
 <body>
     <div class="container">
-        <h1>403</h1>
-        <h2>Forbidden</h2>
-        <p>Sorry, you don’t have permission to access this page.</p>
-        <p><a href="./">Go to Homepage</a></p>
+        <h1>Access Denied</h1>
+        <h2>Directory Access Blocked</h2>
+        <p>This directory does not contain an index file, and directory listing is disabled for security reasons.</p>
+        <p>Please <a href="../">return to the homepage</a> or use the navigation menu.</p>
     </div>
 </body>
 </html>

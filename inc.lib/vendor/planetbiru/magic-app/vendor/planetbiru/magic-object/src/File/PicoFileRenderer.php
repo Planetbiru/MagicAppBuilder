@@ -48,11 +48,11 @@ class PicoFileRenderer
                 foreach ($decoded as $value) {
                     $value = self::decodeJson($value);
                     if (is_string($value)) {
-                        $html .= '<img src="' . htmlspecialchars($value) . '" alt="Image" class="pico-image" />' . "\n";
+                        $html .= '<span class="pico-image-container"><img src="' . htmlspecialchars($value) . '" alt="Image" class="pico-image" /></span>' . "\n";
                     }
                 }
             } else {
-                $html .= '<img src="' . htmlspecialchars($decoded) . '" alt="Image" class="pico-image" />' . "\n";
+                $html .= '<span class="pico-image-container"><img src="' . htmlspecialchars($decoded) . '" alt="Image" class="pico-image" /></span>' . "\n";
             }
         }
 
@@ -75,11 +75,11 @@ class PicoFileRenderer
                 foreach ($decoded as $value) {
                     $value = self::decodeJson($value);
                     if (is_string($value)) {
-                        $html .= '<audio controls class="pico-audio"><source src="' . htmlspecialchars($value) . '" type="audio/mpeg">Your browser does not support the audio tag.</audio>' . "\n";
+                        $html .= '<span class="pico-audio-container"><audio controls class="pico-audio"><source src="' . htmlspecialchars($value) . '" type="audio/mpeg">Your browser does not support the audio tag.</audio></span>' . "\n";
                     }
                 }
             } else {
-                $html .= '<audio controls class="pico-audio"><source src="' . htmlspecialchars($decoded) . '" type="audio/mpeg">Your browser does not support the audio tag.</audio>' . "\n";
+                $html .= '<span class="pico-audio-container"><audio controls class="pico-audio"><source src="' . htmlspecialchars($decoded) . '" type="audio/mpeg">Your browser does not support the audio tag.</audio></span>' . "\n";
             }
         }
 
@@ -102,11 +102,11 @@ class PicoFileRenderer
                 foreach ($decoded as $value) {
                     $value = self::decodeJson($value);
                     if (is_string($value)) {
-                        $html .= '<video controls class="pico-video"><source src="' . htmlspecialchars($value) . '" type="video/mp4">Your browser does not support the video tag.</video>' . "\n";
+                        $html .= '<span class="pico-video-container"><video controls class="pico-video"><source src="' . htmlspecialchars($value) . '" type="video/mp4">Your browser does not support the video tag.</video></span>' . "\n";
                     }
                 }
             } else {
-                $html .= '<video controls class="pico-video"><source src="' . htmlspecialchars($decoded) . '" type="video/mp4">Your browser does not support the video tag.</video>' . "\n";
+                $html .= '<span class="pico-video-container"><video controls class="pico-video"><source src="' . htmlspecialchars($decoded) . '" type="video/mp4">Your browser does not support the video tag.</video></span>' . "\n";
             }
         }
 

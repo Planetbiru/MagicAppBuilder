@@ -6,11 +6,11 @@ Options -Indexes
   RewriteEngine On
 
   # Block direct access to sensitive internal folders
-  RewriteRule ^inc\.app(/|$)        - [F,L]  # Blocks access to /inc.app and its contents
-  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Blocks access to /inc.cfg and its contents
-  RewriteRule ^inc\.database(/|$)   - [F,L]  # Blocks access to /inc.database and its contents
-  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Blocks access to /inc.lang and its contents
-  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Blocks access to /inc.lib and its contents
+  RewriteRule ^inc\.app(/|$)        - [F,L]  # Block access to /inc.app and its contents
+  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Block access to /inc.cfg and its contents
+  RewriteRule ^inc\.database(/|$)   - [F,L]  # Block access to /inc.database and its contents
+  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Block access to /inc.lang and its contents
+  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Block access to /inc.lib and its contents
 
   # Block direct access to all PHP files under lib.themes, including all subdirectories
   RewriteRule ^lib\.themes/.*\.php$ - [F,L]
@@ -18,7 +18,22 @@ Options -Indexes
   # Block direct access to all PHP files under lib.upload, including all subdirectories
   RewriteRule ^lib\.upload/.*\.php$ - [F,L]
 
-  # Redirect all requests to lib.themes to their respective directories
   RewriteRule ^(.*/)?lib\.themes/(.+)$ lib.themes/$2 [NC,L]
+
+  RewriteRule ^(.*/)?favicon\.ico$ favicon.ico [NC,L]
+  RewriteRule ^(.*/)?favicon\.png$ favicon.png [NC,L]
+  RewriteRule ^(.*/)?login\.php$ login.php [NC,L]
+  RewriteRule ^(.*/)?logout\.php$ logout.php [NC,L]
+  RewriteRule ^(.*/)?robots\.txt$ robots.txt [NC,L]
+  
+  # Redirect all non-existent .php files to 404.php
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} \.php$
+  RewriteRule ^.*$ 404.php [L]
+
+  # Redirect access to a directory without index.php to error_page.php
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.php !-f
+  RewriteRule ^.*$ directory-error.php [L]
 
 </IfModule>

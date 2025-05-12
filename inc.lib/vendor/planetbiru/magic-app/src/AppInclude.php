@@ -126,8 +126,7 @@ class AppInclude
     {
         $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
-                $this->app->getForbiddenPage() . "/403.php";
-
+                $this->app->getForbiddenPage();
         if (PicoStringUtil::endsWith($path, ".php") && file_exists($path)) {
             return $path;
         } else {
@@ -148,7 +147,7 @@ class AppInclude
     {
         $path = $this->baseApplicationDirectory . "/" .
                 $this->app->getBaseIncludeDirectory() . "/" .
-                $this->app->getForbiddenPage() . "/404.php";
+                $this->app->getNotFoundPage();
 
         if (PicoStringUtil::endsWith($path, ".php") && file_exists($path)) {
             return $path;

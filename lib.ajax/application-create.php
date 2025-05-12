@@ -210,6 +210,7 @@ $application->setActiveTheme('default');
 $application->setHeaderFile('header.php');
 $application->setFooterFile('footer.php');
 $application->setForbiddenPage('403.php');
+$application->setNotFoundPage('404.php');
 
 // For offline installation
 $composerPath = dirname(__DIR__) . "/inc.lib/vendor/planetbiru/magic-app/composer.json";
