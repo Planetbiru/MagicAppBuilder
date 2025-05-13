@@ -54,7 +54,7 @@ else
         else
         {
             $appSpecsLogin = PicoSpecification::getInstance()
-                ->addAnd(PicoPredicate::getInstance()->like(Field::of()->username, $appSessionUsername))
+                ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($appSessionUsername)))
                 ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
                 ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
                 ->addAnd(PicoSpecification::getInstance()
