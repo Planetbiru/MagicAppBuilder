@@ -17,7 +17,7 @@ http_response_code(403);
         <h1>403</h1>
         <h2>Forbidden</h2>
         <p>Sorry, you don’t have permission to access this page.</p>
-        <p><a href="./">Go to Homepage</a></p>
+        <p><a href="<?php echo htmlspecialchars(str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', dirname(__DIR__))) . '/'); ?>">Go to Homepage</a></p>
     </div>
 </body>
 </html>

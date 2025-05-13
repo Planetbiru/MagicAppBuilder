@@ -264,7 +264,7 @@ composer dump-autoload --ignore-platform-reqs
 
 | Browser                | Icon                                                                                     |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
-| Mozilla Firefox        | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png) |
+| Mozilla Firefox        | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/firefox-browser-icon.png) |
 | Microsoft Edge         | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/edge-browser-icon.png) |
 | Google Chrome          | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/google-chrome-icon.png) |
 | Opera                  | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/opera-icon.png) |

@@ -176,7 +176,7 @@ class AppBuilder extends AppBuilderBase
         if($updatePk)
         {
             $lines[] = ''; 
-            $lines[] = parent::TAB1.parent::TAB1.'// update primary key value';      
+            $lines[] = parent::TAB1.parent::TAB1.'// Update primary key value';      
                 
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = $inputPost->get'.PicoStringUtil::upperCamelize('app_builder_new_pk').$upperPrimaryKeyName.'();';
             $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);

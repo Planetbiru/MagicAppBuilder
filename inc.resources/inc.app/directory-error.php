@@ -15,7 +15,7 @@
         <h1>Access Denied</h1>
         <h2>Directory Access Blocked</h2>
         <p>This directory does not contain an index file, and directory listing is disabled for security reasons.</p>
-        <p>Please <a href="../">return to the homepage</a> or use the navigation menu.</p>
+        <p>Please <a href="<?php echo htmlspecialchars(str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', dirname(__DIR__))) . '/'); ?>">return to the homepage</a> or use the navigation menu.</p>
     </div>
 </body>
 </html>
