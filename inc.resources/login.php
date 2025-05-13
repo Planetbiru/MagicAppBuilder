@@ -5,6 +5,7 @@ use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 
 require_once __DIR__ . "/inc.app/app.php";
 require_once __DIR__ . "/inc.app/session.php";
@@ -18,9 +19,10 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     $userLoggedIn = false;
     try
     {
-        $hashPassword = sha1($inputPost->getPassword());
+        $username = $inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+        $hashPassword = sha1($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
         $appSpecsLogin = PicoSpecification::getInstance()
-            ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($inputPost->getUsername())))
+            ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($username)))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($hashPassword)))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
             ->addAnd(PicoSpecification::getInstance()
