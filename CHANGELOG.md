@@ -279,6 +279,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   **Cookie Configuration Fixes**: Resolved issues with cookie attributes to ensure proper behavior across different environments.
 -   **Server Configuration**: Added server configuration to redirect all requests to `lib.themes` to their respective directories, improving resource management and access control.
 -   **Default Theme Style Improvements**: Enhanced the visual appearance and responsiveness of the default theme, ensuring a better user experience across devices.
+-   **Error Handling Pages**: Added `403.php` and `404.php` files to handle unauthorized and not-found requests, improving user experience and security.
 -   **Browser Support**: Added support for the following browsers:
     -   Mozilla Firefox
     -   Microsoft Edge
@@ -286,6 +287,8 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
     -   Opera
     -   Brave
     -   Vivaldi
+
+    **Note**: Avoid using browsers other than those listed above due to potential compatibility issues with JavaScript, CSS, and HTML.
 
 ### Notes
 

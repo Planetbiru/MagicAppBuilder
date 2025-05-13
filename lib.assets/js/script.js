@@ -2722,10 +2722,10 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
   }
   else if(formatType == 'numberFormat')
   {
-    let numberFormat = currentFormat?.numberFormat ?? {};
-    let decimal = numberFormat.decimal ?? '';
-    let decimalSeparator = numberFormat.decimalSeparator ?? '';
-    let thousandsSeparator = numberFormat.thousandsSeparator ?? '';
+    let numberFormat = currentFormat && currentFormat.numberFormat || {};
+    let decimal = (typeof numberFormat.decimal !== 'undefined') ? numberFormat.decimal : '';
+    let decimalSeparator = (typeof numberFormat.decimalSeparator !== 'undefined') ? numberFormat.decimalSeparator : '';
+    let thousandsSeparator = (typeof numberFormat.thousandsSeparator !== 'undefined') ? numberFormat.thousandsSeparator : '';
 
     $('#input-control-decimal').val(decimal);
     $('#input-control-decimal-separator').val(decimalSeparator);
@@ -3200,13 +3200,25 @@ function loadLanguageList() {
     dataType: 'json',
     success: function (data) {
       decreaseAjaxPending();
-      $('[name="current_module_location"]').empty();
-      for (let i in data) {
-        $('[name="current_module_location"]')[0].append(new Option(data[i].name + ' - ' + data[i].path, data[i].path, data[i].active, data[i].active))
-      }
+
+      let $select = $('[name="current_module_location"]');
+      $select.empty();
+
+      $.each(data, function (i, item) {
+        $('<option>', {
+          text: item.name + ' - ' + item.path,
+          value: item.path,
+          selected: item.active
+        }).appendTo($select);
+      });
+    },
+    error: function () {
+      decreaseAjaxPending();
+      console.error('Gagal memuat daftar bahasa.');
     }
   });
 }
+
 
 /**
  * Loads the list of application languages or paths via an AJAX request.
@@ -3544,8 +3556,8 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
  *
  * @returns {Promise} A promise that resolves with the caption of the button the user clicks.
  */
-async function asyncAlert(message, title, buttons) {
-  const result = await showModal // NOSONAR
+function asyncAlert(message, title, buttons) {
+  const result = showModal // NOSONAR
   (
     message,
     title,
@@ -3576,8 +3588,8 @@ async function asyncAlert(message, title, buttons) {
  * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
  * or the caption of any other clicked button.
  */
-async function getUserInput(message, title, buttons, initialValue) {
-  const result = await asyncPrompt // NOSONAR
+function getUserInput(message, title, buttons, initialValue) {
+  const result = asyncPrompt // NOSONAR
   (
     message,
     title,
@@ -5260,7 +5272,7 @@ function getSortableModule() {
 function safeJsonParse(text) {
   try {
     return JSON.parse(text);
-  } catch {
+  } catch (e){
     return null;
   }
 }
@@ -5421,35 +5433,42 @@ function loadTable() {
     dataType: "json",
     success: function (data) {
       decreaseAjaxPending();
-      $('select[name="source_table"]').empty();
-      $('select[name="source_table"]')[0].append(
-        new Option("- Select Table -", "")
-      );
-      for (let i in data) {
-        if (data.hasOwnProperty(i)) {
-          $('select[name="source_table"]')[0].append(
-            new Option(data[i].table_name, data[i].table_name)
-          );
+
+      const $select = $('select[name="source_table"]');
+      $select.empty();
+
+      $('<option>', {
+        text: '- Select Table -',
+        value: ''
+      }).appendTo($select);
+
+      $.each(data, function (index, item) {
+        $('<option>', {
+          text: item.table_name,
+          value: item.table_name
+        }).appendTo($select);
+      });
+
+      $select.find("option").each(function () {
+        const val = $(this).val();
+        if (
+          val &&
+          data[val] &&
+          Array.isArray(data[val].primary_key) &&
+          data[val].primary_key.length > 0
+        ) {
+          $(this).attr("data-primary-key", data[val].primary_key[0]);
         }
-      }
-      $('select[name="source_table"]')
-        .find("option")
-        .each(function (e3) {
-          let val = $(this).attr("value") || "";
-          if (
-            val != "" &&
-            typeof data[val] != "undefined" &&
-            typeof data[val].primary_key != "undefined" &&
-            typeof data[val].primary_key[0] != "undefined"
-          ) {
-            $(this).attr("data-primary-key", data[val].primary_key[0]);
-          }
-        });
-      let val = $('select[name="source_table"]').attr("data-value");
-      if (val != null && val != "") {
-        $('select[name="source_table"]').val(val);
+      });
+
+      const selectedVal = $select.attr("data-value");
+      if (selectedVal) {
+        $select.val(selectedVal);
       }
     },
+    error: function () {
+      decreaseAjaxPending();
+    }
   });
 }
 
@@ -5462,21 +5481,23 @@ function loadTable() {
 function loadMenu() {
   increaseAjaxPending();
   $.ajax({
-    type: "get",
+    type: "GET",
     url: "lib.ajax/application-menu-json.php",
     dataType: "json",
-    success: function (data) {
+    success: function(data) {
       decreaseAjaxPending();
-      $('select[name="module_menu"]').empty();
-      for (let i in data.menu) {
-        if (data.menu.hasOwnProperty(i)) {
-          $('select[name="module_menu"]')[0].append(
-            new Option(data.menu[i].title, data.menu[i].title)
-          );
-        }
-      }
+
+      let $select = $('select[name="module_menu"]');
+      $select.empty();
+
+      $.each(data.menu, function(index, item) {
+        $('<option>', {
+          text: item.title,
+          value: item.title
+        }).appendTo($select);
+      });
     },
-    error: function(er) {
+    error: function() {
       decreaseAjaxPending();
     }
   });
@@ -6726,7 +6747,7 @@ function getSortableData() {
  */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
-  if (data?.entity?.group) 
+  if (data && data.entity && data.entity.group) 
   {
     selector.attr('data-group-source', data.entity.group.source);
     selector.find(".rd-group-value").val(data.entity.group.value);
@@ -6735,7 +6756,7 @@ function setGroupData(data) {
     selector.find(".rd-group-entity").val(data.entity.group.entity);
     let table = selector.find('table.table-reference');
     let group = data.entity.group;
-    if (group?.map?.length > 0) {
+    if (group && Array.isArray(group.map) && group.map.length > 0) {
       for (let i in group.map) {
         if (i > 0) {
           addRow(table);
@@ -7103,7 +7124,7 @@ function initFileManager()
         // Find the closest li element
         const target = event.target.closest("li");
         
-        if (target?.dataset?.type)
+        if (target && target.dataset && target.dataset.type)
         {
           // Store the selected item for future use
           selectedItem = event.target;
@@ -7803,30 +7824,26 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
     increaseAjaxPending();
 
     // Fetch the directory content from the server using the GET method
-    fetch('lib.ajax/file-manager-load-dir.php?dir=' + encodeURIComponent(dir))
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();  // Parse the JSON response
-        })
-        .then(dirs => {
-            // Decrease the AJAX pending counter (if you have such a function)
+    $.ajax({
+        url: 'lib.ajax/file-manager-load-dir.php',
+        method: 'GET',
+        data: { dir: dir },  
+        dataType: 'json',
+        success: function(dirs) {
             decreaseAjaxPending();
-            if(subdirLi != null)
-            {
+            if (subdirLi != null) {
                 subdirLi.removeAttribute('data-loading');
             }
-            displayDirContent(dirs, subDirUl, reset);  // Display the directory content    
-        })
-        .catch(error => {
-            // Handle any errors
+            displayDirContent(dirs, subDirUl, reset);
+        },
+        error: function(xhr, status, error) {
             decreaseAjaxPending();
-            if(subdirLi != null)
-            {
+            if (subdirLi != null) {
                 subdirLi.removeAttribute('data-loading');
             }
-        });
+            console.error('AJAX Error:', status, error);
+        }
+    });
 }
 
 
