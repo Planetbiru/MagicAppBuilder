@@ -264,12 +264,12 @@ composer dump-autoload --ignore-platform-reqs
 
 | Browser                | Icon                                                                                     |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
-| Mozilla Firefox        | ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=flat&logo=firefox&logoColor=white) |
-| Microsoft Edge         | ![Edge](https://img.shields.io/badge/Edge-0078D7?style=flat&logo=microsoft-edge&logoColor=white) |
-| Google Chrome          | ![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=flat&logo=google-chrome&logoColor=white) |
-| Opera                  | ![Opera](https://img.shields.io/badge/Opera-FF1B2D?style=flat&logo=opera&logoColor=white) |
-| Brave                  | ![Brave](https://img.shields.io/badge/Brave-FB542B?style=flat&logo=brave&logoColor=white) |
-| Vivaldi                | ![Vivaldi](https://img.shields.io/badge/Vivaldi-E2231A?style=flat&logo=vivaldi&logoColor=white) |
+| Mozilla Firefox        | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png) |
+| Microsoft Edge         | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/edge-browser-icon.png) |
+| Google Chrome          | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/google-chrome-icon.png) |
+| Opera                  | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/opera-icon.png) |
+| Brave                  | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png) |
+| Vivaldi                | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/vivaldi-icon.png) |
 
 ## Conclusion
 
