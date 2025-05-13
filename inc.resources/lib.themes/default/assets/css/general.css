@@ -588,6 +588,42 @@ select:focus {
 .dark-mode .content h2 a {
   color: #ffffff;
 }
+.dark-mode .modal-content {
+  background-color: #212529;
+  border: 1px solid #464646;
+}
+.dark-mode .modal-header {
+  border-bottom: 1px solid #464646;
+}
+.dark-mode .modal-header button.close {
+  color: #ffffff;
+}
+.dark-mode .modal-header button.close:hover {
+  color: #ffffff;
+}
+.dark-mode .modal-header h4, .dark-mode .modal-header .h4 {
+  font-size: 1.2rem;
+}
+.dark-mode .modal-footer {
+  border-top: 1px solid #464646;
+}
+.dark-mode .modal-body {
+  background-color: #212529;
+}
+.dark-mode .modal-title {
+  color: #ffffff;
+}
+
+.modal-header {
+  padding: 0.5rem 1rem;
+}
+.modal-header h4, .modal-header .h4 {
+  font-size: 1.2rem;
+}
+
+.modal-footer {
+  padding: 0.5rem 1rem;
+}
 
 .btn-tn {
   font-size: 0.6rem;

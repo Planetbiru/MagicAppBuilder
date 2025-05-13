@@ -1,4 +1,4 @@
-## Object-Relational Mapping (ORM)
+## ORM
 
 ORM (Object-Relational Mapping) is a class used to access the database. ORM is derived from MagicObject. Some annotations are required to activate all ORM features.
 
