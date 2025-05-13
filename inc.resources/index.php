@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
-        label: '# of Votes',
+        label: 'Select data',
         data: [12, 19, 3, 5, 2, 3],
         borderWidth: 1,
         tension: 0.2,
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
-        label: '# of Votes',
+        label: 'Select data',
         data: [12, 19, 3, 5, 2, 3],
         borderWidth: 1
       }]
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
-        label: '# of Votes',
+        label: 'Select data',
         data: [12, 19, 3, 5, 2, 3],
         borderWidth: 1
       }]
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
-        label: '# of Votes',
+        label: 'Select data',
         data: [12, 19, 3, 5, 2, 3],
         borderWidth: 1,
         fill: true,
