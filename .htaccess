@@ -1,35 +1,56 @@
-RewriteEngine On
+<IfModule mod_rewrite.c>
 
-# Block direct access to the inc.resource directory and its contents
-RewriteRule ^inc\.resource(/|$) - [F,L]
+    RewriteEngine On
 
-# Block direct access to the inc.app directory and its contents
-RewriteRule ^inc\.app(/|$)      - [F,L]
+    # Block direct access to the inc.resource directory and its contents
+    RewriteRule ^inc\.resource(/|$) 403.php [L]
 
-# Block direct access to the inc.lib directory and its contents
-RewriteRule ^inc\.lib(/|$)      - [F,L]
+    # Block direct access to the inc.app directory and its contents
+    RewriteRule ^inc\.app(/|$)      403.php [L]
 
-# Block direct access to the inc.lang directory and its contents
-RewriteRule ^inc\.lang(/|$)     - [F,L]
+    # Block direct access to the inc.lib directory and its contents
+    RewriteRule ^inc\.lib(/|$)      403.php [L]
 
-# Block direct access to the inc.cfg directory and its contents
-RewriteRule ^inc\.cfg(/|$)      - [F,L]
+    # Block direct access to the inc.lang directory and its contents
+    RewriteRule ^inc\.lang(/|$)     403.php [L]
 
-# Block direct access to the .cache directory and its contents
-RewriteRule ^\.cache(/|$) - [F,L]
+    # Block direct access to the inc.cfg directory and its contents
+    RewriteRule ^inc\.cfg(/|$)      403.php [L]
 
-# Block direct access to the .tmp directory and its contents
-RewriteRule ^\.tmp(/|$) - [F,L]
+    # Block direct access to the .cache directory and its contents
+    RewriteRule ^\.cache(/|$) 403.php [L]
 
-# Block direct access to .ini files in any directory
-RewriteRule ^.*\.ini$ - [F,L]
+    # Block direct access to the .tmp directory and its contents
+    RewriteRule ^\.tmp(/|$) 403.php [L]
 
-# Block direct access to .yml files in any directory
-RewriteRule ^.*\.yml$ - [F,L]
+    RewriteRule ^(.*/)?favicon\.ico$ favicon.ico [NC,L]
+    RewriteRule ^(.*/)?favicon\.png$ favicon.png [NC,L]
 
-# Block direct access to .htaccess files in any directory
-RewriteRule ^.*\.htaccess$ - [F,L]
+    # Redirect access to .ini files in any directory to 403.php
+    RewriteRule ^.*\.ini$ 403.php [L]
 
-# Block direct access to .database files in any directory
-RewriteRule ^.*\.database$ - [F,L]
+    # Redirect access to .yml files in any directory to 403.php
+    RewriteRule ^.*\.yml$ 403.php [L]
 
+    # Redirect access to .htaccess files in any directory to 403.php
+    RewriteRule ^.*\.htaccess$ 403.php [L]
+
+    # Redirect access to .database files in any directory to 403.php
+    RewriteRule ^.*\.database$ 403.php [L]
+
+    # Redirect access to Dockerfile in any directory to 403.php
+    RewriteRule ^.*Dockerfile$ 403.php [L]
+
+    # Redirect access to .gitignore files in any directory to 403.php
+    RewriteRule ^.*\.gitignore$ 403.php [L]
+
+    # Redirect access to .gitattributes files in any directory to 403.php
+    RewriteRule ^.*\.gitattributes$ 403.php [L]
+
+    # Redirect access to non-existent files to 404.php
+    # This rule must be paced at the end of the file
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ 404.php [L]
+
+</IfModule>

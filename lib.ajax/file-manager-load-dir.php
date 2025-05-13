@@ -27,7 +27,7 @@ try {
 
     // Get the directory tree and output it as a JSON string
     $buffer = json_encode(FileDirUtil::getDirTree($dir, $baseDirectory, 0));
-    header(('Content-length: ' . strlen($buffer)));
+    header('Content-length: ' . strlen($buffer));
     echo $buffer;
 
 } catch (Exception $e) {

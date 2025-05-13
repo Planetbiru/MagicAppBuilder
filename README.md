@@ -260,6 +260,17 @@ composer dump-autoload --ignore-platform-reqs
 | User management        | No        | Yes       |
 | Push notification      | No        | Yes       |
 
+## Browser Support
+
+| Browser                | Icon                                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Mozilla Firefox        | ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=flat&logo=firefox&logoColor=white) |
+| Microsoft Edge         | ![Edge](https://img.shields.io/badge/Edge-0078D7?style=flat&logo=microsoft-edge&logoColor=white) |
+| Google Chrome          | ![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=flat&logo=google-chrome&logoColor=white) |
+| Opera                  | ![Opera](https://img.shields.io/badge/Opera-FF1B2D?style=flat&logo=opera&logoColor=white) |
+| Brave                  | ![Brave](https://img.shields.io/badge/Brave-FB542B?style=flat&logo=brave&logoColor=white) |
+| Vivaldi                | ![Vivaldi](https://img.shields.io/badge/Vivaldi-E2231A?style=flat&logo=vivaldi&logoColor=white) |
+
 ## Conclusion
 
 MagicAppBuilder is a game-changer for developers, enabling them to quickly build data management systems with powerful CRUD functionalities. It automates much of the routine coding required for building applications, drastically reducing development time while maintaining flexibility for further customization. Whether you are creating simple CRUD modules or building complex data-driven systems, MagicAppBuilder accelerates the development process, allowing you to meet project deadlines without compromising on quality.
