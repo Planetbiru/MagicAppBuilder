@@ -875,15 +875,11 @@ let initAll = function () {
     if($(this)[0].checked)
     {
       $('#ajax_support')[0].checked = false;
-      $('#subquery')[0].checked = false;
-
       $('#ajax_support')[0].disabled = true;
-      $('#subquery')[0].disabled = true;
     }
     else
     {
       $('#ajax_support')[0].disabled = false;
-      $('#subquery')[0].disabled = false;
     }
   });
   
@@ -5826,9 +5822,6 @@ function restoreForm(data)  //NOSONAR
       {
         $('#modal-module-features [name="ajax_support"]')[0].checked = false;
         $('#modal-module-features [name="ajax_support"]')[0].disabled = true;
-
-        $('#modal-module-features [name="subquery"]')[0].checked = false;
-        $('#modal-module-features [name="subquery"]')[0].disabled = true;
       }
     }
   }

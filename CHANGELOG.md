@@ -282,6 +282,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   **Default Theme Style Improvements**: Enhanced the visual appearance and responsiveness of the default theme, ensuring a better user experience across devices.
 -   **Error Handling Pages**: Added `403.php` and `404.php` files to handle unauthorized and not-found requests, improving user experience and security.
 -   **Updated Dependencies**: Upgraded to the latest versions of **MagicObject** and **MagicApp** for improved functionality and stability.
+-   **Backend Only with Subquery**: Users can now select the "Subquery" option even when "Backend Only" is enabled, providing more flexibility in query configurations.
 -   **Browser Support**: Added support for the following browsers:
     -   Mozilla Firefox
     -   Microsoft Edge
@@ -294,7 +295,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 
 ### Notes
 
--   This version is fully backward-compatible with version 0.38.
+-   **Partially Backward-Compatible**: While this version retains compatibility with version 0.38 for most features, users who have upgraded to version 1.0 cannot fully revert to version 0.38.
 -   Developers are encouraged to update their projects to version 1.0 to benefit from the stability and enhancements provided in this release.
 
 **MagicAppBuilder version 1.0 is the culmination of extensive development and testing, providing a solid foundation for building scalable, secure, and feature-rich applications.**
