@@ -270,6 +270,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   **Default Language Support**: Ensures a consistent language fallback mechanism for users who are not logged in.
 -   **Chart Templates**: Provides pre-defined and customizable chart templates for seamless data visualization.
 -   **Application Cookie Configuration**: Offers enhanced control over session security and cross-domain compatibility.
+-   **Dockerfile Added**: Introduced a Dockerfile to simplify containerized deployments of MagicAppBuilder.
 
 ### Improvements
 
@@ -280,6 +281,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   **Server Configuration**: Added server configuration to redirect all requests to `lib.themes` to their respective directories, improving resource management and access control.
 -   **Default Theme Style Improvements**: Enhanced the visual appearance and responsiveness of the default theme, ensuring a better user experience across devices.
 -   **Error Handling Pages**: Added `403.php` and `404.php` files to handle unauthorized and not-found requests, improving user experience and security.
+-   **Updated Dependencies**: Upgraded to the latest versions of **MagicObject** and **MagicApp** for improved functionality and stability.
 -   **Browser Support**: Added support for the following browsers:
     -   Mozilla Firefox
     -   Microsoft Edge
