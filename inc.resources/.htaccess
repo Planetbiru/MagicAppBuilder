@@ -35,12 +35,13 @@ Options -Indexes
   RewriteRule ^(.*/)?lib\.themes/(.+)$ lib.themes/$2 [NC,L]
 
   # Allow public access to common assets from any path depth
-  RewriteRule ^(.*/)?favicon\.ico$  favicon.ico [NC,L]
-  RewriteRule ^(.*/)?favicon\.png$  favicon.png [NC,L]
-  RewriteRule ^(.*/)?login\.php$    login.php [NC,L]
-  RewriteRule ^(.*/)?logout\.php$   logout.php [NC,L]
-  RewriteRule ^(.*/)?profile\.php$  profile.php [NC,L]
-  RewriteRule ^(.*/)?robots\.txt$   robots.txt [NC,L]
+  RewriteRule ^(.*/)?favicon\.ico$          favicon.ico [NC,L]
+  RewriteRule ^(.*/)?favicon\.png$          favicon.png [NC,L]
+  RewriteRule ^(.*/)?login\.php$            login.php [NC,L]
+  RewriteRule ^(.*/)?logout\.php$           logout.php [NC,L]
+  RewriteRule ^(.*/)?profile\.php$          profile.php [NC,L]
+  RewriteRule ^(.*/)?reset\-password\.php$  reset-password.php [NC,L]
+  RewriteRule ^(.*/)?robots\.txt$           robots.txt [NC,L]
 
   # Redirect requests to non-existent PHP files to 404.php
   RewriteCond %{REQUEST_FILENAME} !-f
