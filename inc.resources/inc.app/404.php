@@ -17,7 +17,7 @@ http_response_code(404);
         <h1>404</h1>
         <h2>Not Found</h2>
         <p>Oops! The page you are looking for does not exist.</p>
-        <p><a href="./">Go to Homepage</a></p>
+        <p><a href="<?php echo htmlspecialchars(str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', dirname(__DIR__))) . '/'); ?>">Go to Homepage</a></p>
     </div>
 </body>
 </html>

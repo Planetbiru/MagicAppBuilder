@@ -1,39 +1,60 @@
-# Disable directory listing for all folders
+# Disable directory listing globally as a fallback security measure
 Options -Indexes
 
 <IfModule mod_rewrite.c>
   # Enable URL rewriting
   RewriteEngine On
 
-  # Block direct access to sensitive internal folders
-  RewriteRule ^inc\.app(/|$)        - [F,L]  # Block access to /inc.app and its contents
-  RewriteRule ^inc\.cfg(/|$)        - [F,L]  # Block access to /inc.cfg and its contents
-  RewriteRule ^inc\.database(/|$)   - [F,L]  # Block access to /inc.database and its contents
-  RewriteRule ^inc\.lang(/|$)       - [F,L]  # Block access to /inc.lang and its contents
-  RewriteRule ^inc\.lib(/|$)        - [F,L]  # Block access to /inc.lib and its contents
+  # Block access to /inc.app and its contents, except favicon.ico and favicon.png
+  RewriteCond %{REQUEST_URI} !inc\.app/favicon\.(ico|png)$
+  RewriteRule ^inc\.app(/|$)        403.php [L]
 
-  # Block direct access to all PHP files under lib.themes, including all subdirectories
-  RewriteRule ^lib\.themes/.*\.php$ - [F,L]
-  
-  # Block direct access to all PHP files under lib.upload, including all subdirectories
-  RewriteRule ^lib\.upload/.*\.php$ - [F,L]
+  # Block access to /inc.cfg and its contents, except favicon.ico and favicon.png
+  RewriteCond %{REQUEST_URI} !inc\.cfg/favicon\.(ico|png)$
+  RewriteRule ^inc\.cfg(/|$)        403.php [L]
 
+  # Block access to /inc.database and its contents, except favicon.ico and favicon.png
+  RewriteCond %{REQUEST_URI} !inc\.database/favicon\.(ico|png)$
+  RewriteRule ^inc\.database(/|$)   403.php [L]
+
+  # Block access to /inc.lang and its contents, except favicon.ico and favicon.png
+  RewriteCond %{REQUEST_URI} !inc\.lang/favicon\.(ico|png)$
+  RewriteRule ^inc\.lang(/|$)       403.php [L]
+
+  # Block access to /inc.lib and its contents, except favicon.ico and favicon.png
+  RewriteCond %{REQUEST_URI} !inc\.lib/favicon\.(ico|png)$
+  RewriteRule ^inc\.lib(/|$)        403.php [L]
+
+  # Block direct access to PHP files in /lib.themes
+  RewriteRule ^lib\.themes/.*\.php$ 403.php [L]
+
+  # Block direct access to PHP files in /lib.upload
+  RewriteRule ^lib\.upload/.*\.php$ 403.php [L]
+
+  # Allow access to non-PHP assets inside /lib.themes (e.g., images, CSS, JS)
   RewriteRule ^(.*/)?lib\.themes/(.+)$ lib.themes/$2 [NC,L]
 
-  RewriteRule ^(.*/)?favicon\.ico$ favicon.ico [NC,L]
-  RewriteRule ^(.*/)?favicon\.png$ favicon.png [NC,L]
-  RewriteRule ^(.*/)?login\.php$ login.php [NC,L]
-  RewriteRule ^(.*/)?logout\.php$ logout.php [NC,L]
-  RewriteRule ^(.*/)?robots\.txt$ robots.txt [NC,L]
-  
-  # Redirect all non-existent .php files to 404.php
+  # Allow public access to common assets from any path depth
+  RewriteRule ^(.*/)?favicon\.ico$  favicon.ico [NC,L]
+  RewriteRule ^(.*/)?favicon\.png$  favicon.png [NC,L]
+  RewriteRule ^(.*/)?login\.php$    login.php [NC,L]
+  RewriteRule ^(.*/)?logout\.php$   logout.php [NC,L]
+  RewriteRule ^(.*/)?profile\.php$  profile.php [NC,L]
+  RewriteRule ^(.*/)?robots\.txt$   robots.txt [NC,L]
+
+  # Redirect requests to non-existent PHP files to 404.php
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_URI} \.php$
   RewriteRule ^.*$ 404.php [L]
 
-  # Redirect access to a directory without index.php to error_page.php
+  # Redirect directory access to directory-error.php if index.php is missing
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteCond %{REQUEST_FILENAME}/index.php !-f
   RewriteRule ^.*$ directory-error.php [L]
+
+  # Redirect if path is a directory or index.php inside directory doesn't exist
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}/index.php !-f
+  RewriteRule ^.*$ 404.php [L]
 
 </IfModule>

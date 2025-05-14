@@ -1,6 +1,7 @@
 <style>
     body {
         font-family: Arial, sans-serif;
+        font-size: 0.7rem;
         text-align: center;
         padding: 50px;
         background-color: #e1e1e1;
@@ -15,10 +16,10 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     h1 {
-        font-size: 48px;
+        font-size: 1.8rem;
     }
     p {
-        font-size: 18px;
+        font-size: 1rem;
     }
     a {
         text-decoration: none;

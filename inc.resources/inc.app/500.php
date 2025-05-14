@@ -17,7 +17,7 @@ http_response_code(500);
         <h1>500</h1>
         <h2>Internal Server Error</h2>
         <p>Oops! Something went wrong on our end. Please try again later.</p>
-        <p><a href="./">Go to Homepage</a></p>
+        <p><a href="<?php echo htmlspecialchars(str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', dirname(__DIR__))) . '/'); ?>">Go to Homepage</a></p>
     </div>
 </body>
 </html>
