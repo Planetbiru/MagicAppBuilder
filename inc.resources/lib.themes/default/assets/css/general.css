@@ -412,11 +412,18 @@ select:focus {
   width: 20px;
 }
 
-.content h2 a {
+body .content h2 {
+  margin-bottom: 0.5rem;
+}
+body .content h2 a {
   color: #212529;
 }
-.content h2 a:hover {
+body .content h2 a:hover {
   text-decoration: none;
+}
+
+.alert {
+  padding: 0.5rem 1rem;
 }
 
 .menu-separator {

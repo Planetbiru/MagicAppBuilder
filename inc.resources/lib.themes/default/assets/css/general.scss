@@ -504,14 +504,20 @@ select:focus {
   }
 }
 
-.content h2 a {
-  color: $color-dark;
+body .content h2 {
+  margin-bottom: 0.5rem;
+  a {
+    color: $color-dark;
 
-  &:hover {
-    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
+.alert{
+  padding: 0.5rem 1rem;
+}
 
 
 .menu-separator {

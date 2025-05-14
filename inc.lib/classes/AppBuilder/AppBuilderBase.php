@@ -2339,7 +2339,7 @@ $subqueryMap = '.$referece.';
         {
             $buttonApprove->setAttribute('href', self::PHP_OPEN_TAG.'echo $currentModule->getRedirectUrl(UserAction::DETAIL, '.AppBuilderBase::getStringOf($primaryKey).', '.self::VAR.$objectName.self::CALL_GET.$upperPkName.self::BRACKETS.', array(UserAction::NEXT_ACTION => UserAction::APPROVE));'.self::PHP_CLOSE_TAG);
         }
-        $buttonApprove->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonApproveTiny();'.self::PHP_CLOSE_TAG)); 
+        $buttonApprove->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonApprovalTiny();'.self::PHP_CLOSE_TAG)); 
         return $buttonApprove;
     }
 
