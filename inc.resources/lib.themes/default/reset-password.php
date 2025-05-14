@@ -43,7 +43,7 @@
                     <form action="" method="POST">
                         <div class="mb-3">
                             <label for="password" class="form-label"><?php echo $appLanguage->getPassword();?></label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderEnterPassword();?>" required>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="<?php echo $appLanguage->getPlaceholderTypePassword();?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label"><?php echo $appLanguage->getRepeatPassword();?></label>
@@ -52,7 +52,7 @@
                         <div class="d-flex justify-content-between">
                             <div class="form-check">
                             </div>
-                            <a href="./" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
+                            <a href="login.php" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSave();?></button>
                     </form>
@@ -68,12 +68,12 @@
                     <form action="reset-password.php" method="POST">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="<?php echo $appLanguage->getPlaceholderEnterUsername();?>" required>
                         </div>
                         <div class="d-flex justify-content-between">
                             <div class="form-check">
                             </div>
-                            <a href="./" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
+                            <a href="login.php" class="text-decoration-none"><?php echo $appLanguage->getLoginForm();?></a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 mt-3"><?php echo $appLanguage->getButtonSendLink();?></button>
                     </form>
