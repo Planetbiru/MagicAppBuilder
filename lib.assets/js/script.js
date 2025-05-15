@@ -2487,7 +2487,9 @@ let initAll = function () {
   });
 
   $(document).on('change', 'select[name="module_menu"]', function(e1){
-    
+    e1.preventDefault();
+    let moduleMenu = $(this).val();
+    updateCurrentApplivationMenu(moduleMenu);
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -2499,6 +2501,28 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Updates the current application menu by sending an AJAX request to the server. 
+ * @param {string} moduleMenu Current module menu.
+ */
+function updateCurrentApplivationMenu(moduleMenu)
+{
+  let applicationId = $('meta[name="application-id"]').attr('content');
+  let moduleMenuId = moduleMenu;
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    url: 'lib.ajax/application-menu-default.php',
+    data: { applicationId: applicationId, moduleMenuId: moduleMenuId },
+    success: function (data) {
+      decreaseAjaxPending();
+    },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
+  });
+}
 
 /**
  * Validates the class name to ensure it starts with an uppercase letter and 
@@ -5489,7 +5513,8 @@ function loadMenu() {
       $.each(data.menu, function(index, item) {
         $('<option>', {
           text: item.title,
-          value: item.title
+          value: item.title,
+          selected: item.active === true
         }).appendTo($select);
       });
     },
