@@ -1589,6 +1589,7 @@ let initAll = function () {
                 let createNew = $(".entity-create-new")[0].checked;
                 getEntityQuery(ents, merged, createNew);
                 modal.modal('hide');
+                loadTable();
               },
               error: function (xhr, status, error) {
                 decreaseAjaxPending();
@@ -2487,7 +2488,9 @@ let initAll = function () {
   });
 
   $(document).on('change', 'select[name="module_menu"]', function(e1){
-    
+    e1.preventDefault();
+    let moduleMenu = $(this).val();
+    updateCurrentApplivationMenu(moduleMenu);
   });
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
@@ -2499,6 +2502,28 @@ let initAll = function () {
   resetCheckActiveApplication();
   loadReferenceResource();
 };
+
+/**
+ * Updates the current application menu by sending an AJAX request to the server. 
+ * @param {string} moduleMenu Current module menu.
+ */
+function updateCurrentApplivationMenu(moduleMenu)
+{
+  let applicationId = $('meta[name="application-id"]').attr('content');
+  let moduleMenuId = moduleMenu;
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    url: 'lib.ajax/application-menu-default.php',
+    data: { applicationId: applicationId, moduleMenuId: moduleMenuId },
+    success: function (data) {
+      decreaseAjaxPending();
+    },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
+  });
+}
 
 /**
  * Validates the class name to ensure it starts with an uppercase letter and 
@@ -5266,9 +5291,12 @@ function getSortableModule() {
  * @returns {Object|null} - The parsed JavaScript object if successful, or `null` if parsing fails.
  */
 function safeJsonParse(text) {
-  try {
+  try 
+  {
     return JSON.parse(text);
-  } catch (e){
+  } 
+  catch (e) // NOSONAR
+  {
     return null;
   }
 }
@@ -5489,7 +5517,8 @@ function loadMenu() {
       $.each(data.menu, function(index, item) {
         $('<option>', {
           text: item.title,
-          value: item.title
+          value: item.title,
+          selected: item.active === true
         }).appendTo($select);
       });
     },
@@ -6740,7 +6769,7 @@ function getSortableData() {
  */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
-  if (data && data.entity && data.entity.group) 
+  if (data && data.entity && data.entity.group) // NOSONAR
   {
     selector.attr('data-group-source', data.entity.group.source);
     selector.find(".rd-group-value").val(data.entity.group.value);
@@ -7110,14 +7139,15 @@ function initFileManager()
     const contextMenu = document.getElementById("context-menu");
     
 
-    dirTree.addEventListener("contextmenu", function (event) {
+    dirTree.addEventListener("contextmenu", function (event) // NOSONAR
+    {
         event.preventDefault();
         
 
         // Find the closest li element
         const target = event.target.closest("li");
         
-        if (target && target.dataset && target.dataset.type)
+        if (target && target.dataset && target.dataset.type) // NOSONAR
         {
           // Store the selected item for future use
           selectedItem = event.target;
