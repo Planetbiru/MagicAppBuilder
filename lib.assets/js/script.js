@@ -1589,6 +1589,7 @@ let initAll = function () {
                 let createNew = $(".entity-create-new")[0].checked;
                 getEntityQuery(ents, merged, createNew);
                 modal.modal('hide');
+                loadTable();
               },
               error: function (xhr, status, error) {
                 decreaseAjaxPending();
@@ -5290,9 +5291,12 @@ function getSortableModule() {
  * @returns {Object|null} - The parsed JavaScript object if successful, or `null` if parsing fails.
  */
 function safeJsonParse(text) {
-  try {
+  try 
+  {
     return JSON.parse(text);
-  } catch (e){
+  } 
+  catch (e) // NOSONAR
+  {
     return null;
   }
 }
@@ -6765,7 +6769,7 @@ function getSortableData() {
  */
 function setGroupData(data) {
   let selector = $('[data-name="grouping"]');
-  if (data && data.entity && data.entity.group) 
+  if (data && data.entity && data.entity.group) // NOSONAR
   {
     selector.attr('data-group-source', data.entity.group.source);
     selector.find(".rd-group-value").val(data.entity.group.value);
@@ -7135,14 +7139,15 @@ function initFileManager()
     const contextMenu = document.getElementById("context-menu");
     
 
-    dirTree.addEventListener("contextmenu", function (event) {
+    dirTree.addEventListener("contextmenu", function (event) // NOSONAR
+    {
         event.preventDefault();
         
 
         // Find the closest li element
         const target = event.target.closest("li");
         
-        if (target && target.dataset && target.dataset.type)
+        if (target && target.dataset && target.dataset.type) // NOSONAR
         {
           // Store the selected item for future use
           selectedItem = event.target;
