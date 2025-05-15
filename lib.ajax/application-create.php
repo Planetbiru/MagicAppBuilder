@@ -411,14 +411,17 @@ menu:
         href: index.php
         icon: fa fa-home
         specialAccess: true
+    active: false
   - 
     title: Reference
     icon: fa fa-book
     submenu: [ ]
+    active: false
   - 
     title: Master
     icon: fa fa-folder
     submenu: [ ]
+    active: true
   - 
     title: Settings
     icon: fa fa-cog
@@ -453,6 +456,7 @@ menu:
         href: message-folder.php
         icon: fa fa-folder
         specialAccess: false
+    active: false
 
 ");
 $path5 = "$dir3/.htaccess";
