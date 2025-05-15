@@ -5637,9 +5637,10 @@ function restoreForm(data)  //NOSONAR
         let tr = $('.main-table tbody tr[data-field-name="' + data.fields[i].fieldName + '"]');
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
-
-          tr.find('.include-insert')[0].checked = isTrue(data.fields[i].includeInsert);
-          tr.find('.include-edit')[0].checked = isTrue(data.fields[i].includeEdit);
+          let disabledInsert = tr.find('.include-insert')[0].disabled;
+          let disabledEdit = tr.find('.include-edit')[0].disabled;
+          tr.find('.include-insert')[0].checked = isTrue(data.fields[i].includeInsert) && !disabledInsert;
+          tr.find('.include-edit')[0].checked = isTrue(data.fields[i].includeEdit) && !disabledEdit;
           tr.find('.include-detail')[0].checked = isTrue(data.fields[i].includeDetail);
           tr.find('.include-list')[0].checked = isTrue(data.fields[i].includeList);
           tr.find('.include-export')[0].checked = isTrue(data.fields[i].includeExport);
