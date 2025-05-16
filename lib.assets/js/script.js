@@ -404,7 +404,7 @@ let initAll = function () {
   $(document).on('click', '#button-save-module-features', function (e) {
     e.preventDefault();
     asyncAlert(
-      'Do you want to save this configuration?',
+      'Do you want to save this configuration for the current application?',
       'Confirmation',
       [
         {
