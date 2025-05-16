@@ -293,6 +293,10 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 
     **Note**: Avoid using browsers other than those listed above due to potential compatibility issues with JavaScript, CSS, and HTML.
 
+-   **Form Module Feature Fixes**: Resolved issues with the form module feature to ensure smoother operation and better user experience.
+    
+-   **Save and Load Preset Module Feature**: Added functionality to save and load presets for module features. This allows users to reuse the same configuration across different modules without having to manually reconfigure each time.
+
 ### Notes
 
 -   **Partially Backward-Compatible**: While this version retains compatibility with version 0.38 for most features, users who have upgraded to version 1.0 cannot fully revert to version 0.38.
