@@ -289,11 +289,128 @@ function fillEntityGeneratorForm(table)
   frm.find('[name="entity_generator_primary_key"]').val(primaryKey);
 }
 
+/**
+ * Saves the feature form data by collecting checkbox and radio button values
+ */
+function saveFeatureForm()
+{
+  let data = {};
+  $('#modal-module-features').find('input[type="checkbox"]').each(function(){
+    data[$(this).attr('name')] = $(this)[0].checked;
+  });
+  $('#modal-module-features').find('input[type="radio"]').each(function(){
+    if($(this)[0].checked)
+    {
+      data[$(this).attr('name')] = $(this).val();
+    }
+  });
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    url: 'lib.ajax/module-features.php',
+    data: {data: JSON.stringify(data)},
+    dataType: 'json',
+    success: function(data)
+    {
+      decreaseAjaxPending();
+    },
+    error: function(err)
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+/**
+ * Restores the feature form to its default state by making an AJAX request
+ */
+function restoreFeatureForm() {
+  increaseAjaxPending();
+  $.ajax({
+    type: 'GET',
+    url: 'lib.ajax/module-features.php',
+    dataType: 'json',
+    success: function (data) {
+      // Restore checkbox states
+      $('#modal-module-features').find('input[type="checkbox"]').each(function () {
+        const name = $(this).attr('name');
+        if (data.hasOwnProperty(name)) {
+          $(this).prop('checked', data[name]);
+        }
+      });
+
+      // Restore radio button selections
+      $('#modal-module-features').find('input[type="radio"]').each(function () {
+        const name = $(this).attr('name');
+        const value = $(this).val();
+        if (data.hasOwnProperty(name) && data[name] === value) {
+          $(this).prop('checked', true);
+        }
+      });
+      
+      if(data.with_approval)
+      {
+        $('#approval_type1')[0].disabled = false;
+        $('#approval_type2')[0].disabled = false;  
+        $('#approval_position1')[0].disabled = false;
+        $('#approval_position2')[0].disabled = false;
+        $('#approval_by_other_user')[0].disabled = false; 
+      }
+      else
+      {
+        $('#approval_type1')[0].disabled = true;
+        $('#approval_type2')[0].disabled = true;
+        $('#approval_position1')[0].disabled = true;
+        $('#approval_position2')[0].disabled = true;
+        $('#approval_by_other_user')[0].disabled = true;
+      }
+      
+      if(data.export_to_csv)
+      {
+        $('#export_use_temporary')[0].disabled = false; 
+      }
+      else
+      {
+        $('#export_use_temporary')[0].disabled = true;
+      }
+      if(data.backend_only)
+      {
+        $('#ajax_support')[0].disabled = true;
+      }
+      else
+      {
+        $('#ajax_support')[0].disabled = false;
+      }
+      decreaseAjaxPending();
+    },
+    error: function (err) {
+      console.error(err);
+      decreaseAjaxPending();
+    }
+  });
+}
+
 
 /**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+  
+  $(document).on('click', '#button-load-module-features', function (e) {
+    e.preventDefault();
+    restoreFeatureForm();
+  });
+  
+  $(document).on('click', '#button-save-module-features', function (e) {
+    e.preventDefault();
+    saveFeatureForm();
+  });
+  
+  $(document).on('click', '#button-clear-module-features', function (e) {
+    e.preventDefault();
+    resetFeatureForm();
+  });
+  
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
     $(this).closest('table').attr('data-group-source', value);
@@ -1250,6 +1367,7 @@ let initAll = function () {
     }
     else {
       $('#export_use_temporary')[0].disabled = true;
+      $('#export_use_temporary')[0].checked = false;
     }
   });
 
@@ -5794,6 +5912,14 @@ function restoreForm(data)  //NOSONAR
       $('[name="approval_type"][value="' + data.features.approvalType + '"]')[0].checked = true;
       $('[name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
     }
+    else
+    {
+      resetFeatureForm()
+    }
+  }
+  else
+  {
+    resetFeatureForm();
   }
 
 
@@ -5875,6 +6001,36 @@ function restoreForm(data)  //NOSONAR
     }
   }
 
+}
+
+/**
+ * Resets the feature form to its default state.
+ */
+function resetFeatureForm()
+{
+  $('#activate_deactivate')[0].checked = false
+  $('#manualsortorder')[0].checked = false;
+  $('#export_to_excel')[0].checked = false;
+  $('#export_to_csv')[0].checked = false;
+  $('#export_use_temporary')[0].checked = false;
+  $('#export_to_excel')[0].disabled = false;
+  $('#export_use_temporary')[0].disabled = true;
+  $('#user_activity_logger')[0].checked = false;
+  $('#with_approval')[0].checked = false;      
+  $('#approval_by_other_user')[0].disabled = true;
+  $('#approval_type1')[0].disabled = true;
+  $('#approval_type2')[0].disabled = true;
+  $('#approval_position1')[0].disabled = true;
+  $('#approval_position2')[0].disabled = true;
+  $('[name="approval_type"][value="2"]')[0].checked = true;
+  $('[name="approval_position"][value="after-data"]')[0].checked = true;
+  $('#with_approval_note')[0].checked = false;
+  $('#approval_by_other_user')[0].checked = false;
+  $('#with_trash')[0].checked = false;
+  $('#backend_only')[0].checked = false;
+  $('#ajax_support')[0].checked = false;
+  $('#ajax_support')[0].disabled = false;
+  $('#subquery')[0].checked = false;
 }
 
 /**
