@@ -295,7 +295,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 
 -   **Form Module Feature Fixes**: Resolved issues with the form module feature to ensure smoother operation and better user experience.
     
--   **Save and Load Preset Module Feature**: Added functionality to save and load presets for module features. This allows users to reuse the same configuration across different modules without having to manually reconfigure each time.
+-   **Save and Load Module Feature Configuration**: Added functionality to save and load configuration for module features. This allows users to reuse the same configuration across different modules without having to manually reconfigure each time.
 
 ### Notes
 
