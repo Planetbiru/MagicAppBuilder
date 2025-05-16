@@ -403,7 +403,24 @@ let initAll = function () {
   
   $(document).on('click', '#button-save-module-features', function (e) {
     e.preventDefault();
-    saveFeatureForm();
+    asyncAlert(
+      'Do you want to save this configuration?',
+      'Confirmation',
+      [
+        {
+          'caption': 'Yes',
+          'fn': () => {
+            saveFeatureForm();
+          },
+          'class': 'btn-primary'
+        },
+        {
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
+        }
+      ]
+    );
   });
   
   $(document).on('click', '#button-clear-module-features', function (e) {
