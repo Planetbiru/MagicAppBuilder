@@ -189,8 +189,11 @@ class PicoEntityGenerator
         foreach ($arr as $k => $v) {
             $arr[$k] = ucwords($v);
             if ($prettifyLabel) {
-                $arr[$k] = str_replace("Id", "ID", $arr[$k]);
-                $arr[$k] = str_replace("Ip", "IP", $arr[$k]);
+                if (strtolower($v) === 'id') {
+                    $arr[$k] = 'ID';
+                } elseif (strtolower($v) === 'ip') {
+                    $arr[$k] = 'IP';
+                }
             }
         }
         return implode(" ", $arr);

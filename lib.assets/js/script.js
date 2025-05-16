@@ -264,7 +264,7 @@ function setCheckingStatus(id, startTime)
     },
     error: function(err)
     {
-      console.log(err);
+      console.error(err);
     }
   });
 }
@@ -1238,6 +1238,7 @@ let initAll = function () {
     if (chk) {
       $('#export_to_csv')[0].checked = false;
       $('#export_use_temporary')[0].disabled = true;
+      $('#export_use_temporary')[0].checked = false;
     }
   });
 
@@ -1249,6 +1250,26 @@ let initAll = function () {
     }
     else {
       $('#export_use_temporary')[0].disabled = true;
+      $('#export_use_temporary')[0].checked = false;
+    }
+  });
+
+  $(document).on('change', '#with_approval', function (e) {
+    let chk = $(this)[0].checked;
+    if (chk) {
+      $('#approval_by_other_user')[0].disabled = false;
+      $('#approval_type1')[0].disabled = false;
+      $('#approval_type2')[0].disabled = false;
+      $('#approval_position1')[0].disabled = false;
+      $('#approval_position2')[0].disabled = false;
+    }
+    else {
+      $('#approval_by_other_user')[0].checked = false;
+      $('#approval_by_other_user')[0].disabled = true;
+      $('#approval_type1')[0].disabled = true;
+      $('#approval_type2')[0].disabled = true;
+      $('#approval_position1')[0].disabled = true;
+      $('#approval_position2')[0].disabled = true;
     }
   });
 
@@ -3235,7 +3256,7 @@ function loadLanguageList() {
     },
     error: function () {
       decreaseAjaxPending();
-      console.error('Gagal memuat daftar bahasa.');
+      console.error('Failed to load language list.');
     }
   });
 }
@@ -5116,11 +5137,12 @@ function generateScript(selector) {
   let manualSortOrder = $("#manualsortorder")[0].checked && true; //NOSONAR
   let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
   let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
+  let exportUseTemporary = $("#export_use_temporary")[0].checked && true; //NOSONAR
   let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
   let userActivityLogger = $("#user_activity_logger")[0].checked && true; //NOSONAR
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
-  let approvalByAnotherUser = $('[name="approval_by_other_user"]:checked').val(); //NOSONAR
+  let approvalByAnotherUser = $('[name="approval_by_other_user"]')[0].checked && true; //NOSONAR
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let backendOnly = $("#backend_only")[0].checked && true; //NOSONAR
@@ -5155,6 +5177,7 @@ function generateScript(selector) {
     sortOrder: manualSortOrder,
     exportToExcel: exportToExcel,
     exportToCsv: exportToCsv,
+    exportUseTemporary: exportUseTemporary,
     userActivityLogger: userActivityLogger,
     approvalRequired: requireApproval,
     approvalNote: withApprovalNote,
@@ -5637,9 +5660,10 @@ function restoreForm(data)  //NOSONAR
         let tr = $('.main-table tbody tr[data-field-name="' + data.fields[i].fieldName + '"]');
         if (tr.length > 0) {
           tr.appendTo(tr.parent());
-
-          tr.find('.include-insert')[0].checked = isTrue(data.fields[i].includeInsert);
-          tr.find('.include-edit')[0].checked = isTrue(data.fields[i].includeEdit);
+          let disabledInsert = tr.find('.include-insert')[0].disabled;
+          let disabledEdit = tr.find('.include-edit')[0].disabled;
+          tr.find('.include-insert')[0].checked = isTrue(data.fields[i].includeInsert) && !disabledInsert;
+          tr.find('.include-edit')[0].checked = isTrue(data.fields[i].includeEdit) && !disabledEdit;
           tr.find('.include-detail')[0].checked = isTrue(data.fields[i].includeDetail);
           tr.find('.include-list')[0].checked = isTrue(data.fields[i].includeList);
           tr.find('.include-export')[0].checked = isTrue(data.fields[i].includeExport);
@@ -5717,6 +5741,68 @@ function restoreForm(data)  //NOSONAR
         }
       }
     }
+
+    // restore features
+    if(data.features)
+    {
+      $('#activate_deactivate')[0].checked = isTrue(data.features.activateDeactivate);
+      $('#manualsortorder')[0].checked = isTrue(data.features.sortOrder);
+      $('#export_to_excel')[0].checked = isTrue(data.features.exportToExcel);
+      $('#export_to_csv')[0].checked = isTrue(data.features.exportToCsv);
+      $('#export_use_temporary')[0].checked = isTrue(data.features.exportUseTemporary);
+      if(isTrue(data.features.exportToCsv))
+      {
+        $('#export_to_excel')[0].disabled = false;
+        $('#export_use_temporary')[0].disabled = false;
+      }
+      else
+      {
+        $('#export_to_excel')[0].disabled = false;
+        $('#export_use_temporary')[0].disabled = true;
+      }
+      $('#user_activity_logger')[0].checked = isTrue(data.features.userActivityLogger);
+      $('#with_approval')[0].checked = isTrue(data.features.approvalRequired);
+      if(isTrue(data.features.approvalRequired))
+      {
+        $('#approval_by_other_user')[0].disabled = false;
+        $('#approval_type1')[0].disabled = false;
+        $('#approval_type2')[0].disabled = false;
+        $('#approval_position1')[0].disabled = false;
+        $('#approval_position2')[0].disabled = false;
+      }
+      else
+      {
+        $('#approval_by_other_user')[0].disabled = true;
+        $('#approval_type1')[0].disabled = true;
+        $('#approval_type2')[0].disabled = true;
+        $('#approval_position1')[0].disabled = true;
+        $('#approval_position2')[0].disabled = true;
+      }
+      $('#with_approval_note')[0].checked = isTrue(data.features.approvalNote);
+      $('#approval_by_other_user')[0].checked = isTrue(data.features.approvalByAnotherUser);
+      $('#with_trash')[0].checked = isTrue(data.features.trashRequired);
+      $('#subquery')[0].checked = isTrue(data.features.subquery);
+      $('#ajax_support')[0].checked = isTrue(data.features.ajaxSupport);
+      $('#backend_only')[0].checked = isTrue(data.features.backendOnly);
+      if(isTrue(data.features.backendOnly))
+      {
+        $('#ajax_support')[0].disabled = true;
+      }
+      else
+      {
+        $('#ajax_support')[0].disabled = false;
+      }
+      $('[name="approval_type"][value="' + data.features.approvalType + '"]')[0].checked = true;
+      $('[name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
+    }
+    else
+    {
+      resetFeatureForm()
+    }
+  }
+  else
+  {
+    resetFeatureForm();
   }
 
 
@@ -5797,64 +5883,37 @@ function restoreForm(data)  //NOSONAR
       }
     }
   }
-  
-  if (typeof data.features != 'undefined') {
 
-    if ($('#modal-module-features [name="activate_deactivate"]').length) {
-      $('#modal-module-features [name="activate_deactivate"]')[0].checked = isTrue(data.features.activateDeactivate);
-    }
+}
 
-    if ($('#modal-module-features [name="manualsortorder"]').length) {
-      $('#modal-module-features [name="manualsortorder"]')[0].checked = isTrue(data.features.sortOrder);
-    }
-
-    if ($('#modal-module-features [name="export_to_excel"]').length) {
-      $('#modal-module-features [name="export_to_excel"]')[0].checked = isTrue(data.features.exportToExcel);
-    }
-
-    if ($('#modal-module-features [name="export_to_csv"]').length) {
-      $('#modal-module-features [name="export_to_csv"]')[0].checked = isTrue(data.features.exportToCsv);
-    }
-
-    if ($('#modal-module-features [name="with_approval"]').length) {
-      $('#modal-module-features [name="with_approval"]')[0].checked = isTrue(data.features.approvalRequired);
-    }
-
-    if ($('#modal-module-features [name="with_approval_note"]').length) {
-      $('#modal-module-features [name="with_approval_note"]')[0].checked = isTrue(data.features.approvalNote);
-    }
-
-    if ($('#modal-module-features [name="with_trash"]').length) {
-      $('#modal-module-features [name="with_trash"]')[0].checked = isTrue(data.features.trashRequired);
-    }
-
-    if ($('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]').length) {
-      $('#modal-module-features [name="approval_type"][value="' + data.features.approvalType + '"]')[0].checked = true;
-    }
-
-    if ($('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]').length) {
-      $('#modal-module-features [name="approval_position"][value="' + data.features.approvalPosition + '"]')[0].checked = true;
-    }
-
-    if ($('#modal-module-features [name="subquery"]').length) {
-      $('#modal-module-features [name="subquery"]')[0].checked = isTrue(data.features.subquery);
-    }
-
-    if ($('#modal-module-features [name="ajax_support"]').length) {
-      $('#modal-module-features [name="ajax_support"]')[0].checked = isTrue(data.features.ajaxSupport);
-    }
-
-    if ($('#modal-module-features [name="backend_only"]').length) {
-      let backendOnly = isTrue(data.features.backendOnly);
-      $('#modal-module-features [name="backend_only"]')[0].checked = backendOnly;
-      if(backendOnly)
-      {
-        $('#modal-module-features [name="ajax_support"]')[0].checked = false;
-        $('#modal-module-features [name="ajax_support"]')[0].disabled = true;
-      }
-    }
-  }
-
+/**
+ * Resets the feature form to its default state.
+ */
+function resetFeatureForm()
+{
+  $('#activate_deactivate')[0].checked = false
+  $('#manualsortorder')[0].checked = false;
+  $('#export_to_excel')[0].checked = false;
+  $('#export_to_csv')[0].checked = false;
+  $('#export_use_temporary')[0].checked = false;
+  $('#export_to_excel')[0].disabled = false;
+  $('#export_use_temporary')[0].disabled = true;
+  $('#user_activity_logger')[0].checked = false;
+  $('#with_approval')[0].checked = false;      
+  $('#approval_by_other_user')[0].disabled = true;
+  $('#approval_type1')[0].disabled = true;
+  $('#approval_type2')[0].disabled = true;
+  $('#approval_position1')[0].disabled = true;
+  $('#approval_position2')[0].disabled = true;
+  $('[name="approval_type"][value="2"]')[0].checked = true;
+  $('[name="approval_position"][value="after-data"]')[0].checked = true;
+  $('#with_approval_note')[0].checked = false;
+  $('#approval_by_other_user')[0].checked = false;
+  $('#with_trash')[0].checked = false;
+  $('#backend_only')[0].checked = false;
+  $('#ajax_support')[0].checked = false;
+  $('#ajax_support')[0].disabled = false;
+  $('#subquery')[0].checked = false;
 }
 
 /**
