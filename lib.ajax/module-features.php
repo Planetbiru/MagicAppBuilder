@@ -7,9 +7,10 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 $inputPost = new InputPost();
 
 $path = sprintf(
-    "%s/applications/%s/data/features.json",
+    "%s/applications/%s/data/%s/features.json",
     $activeWorkspace->getDirectory(),
-    $activeApplication->getApplicationId()
+    $activeApplication->getApplicationId(),
+    $entityAdmin->getAdminId()
 );
 
 if ($inputPost->getData() != null) {
@@ -26,6 +27,6 @@ else
         echo file_get_contents($path);
     } else {
         header('Content-Type: application/json');
-        echo json_encode(array("error" => "File not found"));
+        echo "{}";
     }
 }

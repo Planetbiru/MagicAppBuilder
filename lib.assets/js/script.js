@@ -331,55 +331,73 @@ function restoreFeatureForm() {
     url: 'lib.ajax/module-features.php',
     dataType: 'json',
     success: function (data) {
-      // Restore checkbox states
-      $('#modal-module-features').find('input[type="checkbox"]').each(function () {
-        const name = $(this).attr('name');
-        if (data.hasOwnProperty(name)) {
-          $(this).prop('checked', data[name]);
-        }
-      });
+      if(typeof data.activate_deactivate == 'undefined')
+      {
+        asyncAlert(
+          'No cononfiguration found for the current application.',  
+          'Configuration Not Found',  
+          [
+            {
+              'caption': 'Close',  
+              'fn': () => {
+              },  
+              'class': 'btn-primary'  
+            }
+          ]
+        );
+      }
+      else
+      {
+        // Restore checkbox states
+        $('#modal-module-features').find('input[type="checkbox"]').each(function () {
+          const name = $(this).attr('name');
+          if (data.hasOwnProperty(name)) {
+            $(this).prop('checked', data[name]);
+          }
+        });
 
-      // Restore radio button selections
-      $('#modal-module-features').find('input[type="radio"]').each(function () {
-        const name = $(this).attr('name');
-        const value = $(this).val();
-        if (data.hasOwnProperty(name) && data[name] === value) {
-          $(this).prop('checked', true);
+        // Restore radio button selections
+        $('#modal-module-features').find('input[type="radio"]').each(function () {
+          const name = $(this).attr('name');
+          const value = $(this).val();
+          if (data.hasOwnProperty(name) && data[name] === value) {
+            $(this).prop('checked', true);
+          }
+        });
+        
+        if(data.with_approval)
+        {
+          $('#approval_type1')[0].disabled = false;
+          $('#approval_type2')[0].disabled = false;  
+          $('#approval_position1')[0].disabled = false;
+          $('#approval_position2')[0].disabled = false;
+          $('#approval_by_other_user')[0].disabled = false; 
         }
-      });
-      
-      if(data.with_approval)
-      {
-        $('#approval_type1')[0].disabled = false;
-        $('#approval_type2')[0].disabled = false;  
-        $('#approval_position1')[0].disabled = false;
-        $('#approval_position2')[0].disabled = false;
-        $('#approval_by_other_user')[0].disabled = false; 
-      }
-      else
-      {
-        $('#approval_type1')[0].disabled = true;
-        $('#approval_type2')[0].disabled = true;
-        $('#approval_position1')[0].disabled = true;
-        $('#approval_position2')[0].disabled = true;
-        $('#approval_by_other_user')[0].disabled = true;
-      }
-      
-      if(data.export_to_csv)
-      {
-        $('#export_use_temporary')[0].disabled = false; 
-      }
-      else
-      {
-        $('#export_use_temporary')[0].disabled = true;
-      }
-      if(data.backend_only)
-      {
-        $('#ajax_support')[0].disabled = true;
-      }
-      else
-      {
-        $('#ajax_support')[0].disabled = false;
+        else
+        {
+          $('#approval_type1')[0].disabled = true;
+          $('#approval_type2')[0].disabled = true;
+          $('#approval_position1')[0].disabled = true;
+          $('#approval_position2')[0].disabled = true;
+          $('#approval_by_other_user')[0].disabled = true;
+        }
+        
+        if(data.export_to_csv)
+        {
+          $('#export_use_temporary')[0].disabled = false; 
+        }
+        else
+        {
+          $('#export_use_temporary')[0].disabled = true;
+        }
+        if(data.backend_only)
+        {
+          $('#ajax_support')[0].disabled = true;
+        }
+        else
+        {
+          $('#ajax_support')[0].disabled = false;
+        }
       }
       decreaseAjaxPending();
     },
