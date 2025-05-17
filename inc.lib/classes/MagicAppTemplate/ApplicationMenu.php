@@ -107,7 +107,7 @@ class ApplicationMenu
 
                 // Create the <a> tag for the main menu item
                 $a = $dom->createElement('a', ''); // Create an empty anchor tag
-                $a->setAttribute('class', 'nav-link'); // Set the class for the anchor tag
+                $a->setAttribute('class', 'nav-link collapsed'); // Set the class for the anchor tag
                 $a->setAttribute('href', $item['href']); // Set the href for the menu item
 
                 // Add target="_blank" if the target attribute is provided in the JSON data
@@ -152,7 +152,17 @@ class ApplicationMenu
                     }
 
                     // Create the <div> for the submenu and add 'collapse' or 'collapse show' class
-                    $collapseClass = $isActive ? 'collapse show' : 'collapse'; // Show submenu if active
+                    if($isActive)
+                    {
+                        $li->setAttribute('class', 'nav-item nav-item-children-active'); // Set active class for the main menu item
+                        $collapseClass = 'collapse show'; // Set submenu to show if any submenu is active
+                        $a->setAttribute('class', 'nav-link');
+                    }
+                    else
+                    {
+                        $collapseClass = 'collapse'; // Set regular class for non-active main menu item
+                    }
+
                     $submenuDiv = $dom->createElement('div');
                     $submenuDiv->setAttribute('id', substr($item['href'], 1)); // Use item href as ID for submenu
                     $submenuDiv->setAttribute('class', $collapseClass); // Set the collapse class for submenu

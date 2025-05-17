@@ -39,3 +39,4 @@ if($appConfig->getAccessLocalhostOnly())
     }
 }
 $appCurrentTheme = $appConfig->getApplication()->getActiveTheme();
+$appConfig->setAssets("lib.themes/".$appCurrentTheme."/assets/");
