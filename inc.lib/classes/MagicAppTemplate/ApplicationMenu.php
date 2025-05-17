@@ -107,7 +107,7 @@ class ApplicationMenu
 
                 // Create the <a> tag for the main menu item
                 $a = $dom->createElement('a', ''); // Create an empty anchor tag
-                $a->setAttribute('class', 'nav-link'); // Set the class for the anchor tag
+                $a->setAttribute('class', 'nav-link collapsed'); // Set the class for the anchor tag
                 $a->setAttribute('href', $item['href']); // Set the href for the menu item
 
                 // Add target="_blank" if the target attribute is provided in the JSON data
