@@ -22,7 +22,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
     }
 </style>
 <div class="row">
-    <div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
+    <div class="col col-xl-3 col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Products</h5>
@@ -33,7 +33,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
         </div>
     </div>
 
-    <div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
+    <div class="col col-xl-3 col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Products</h5>
@@ -44,7 +44,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
         </div>
     </div>
 
-    <div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
+    <div class="col col-xl-3 col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Products</h5>
@@ -55,7 +55,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
         </div>
     </div>
 
-    <div class="col col-xl-3 col-lg-4 col-md-6 col-sm-12">
+    <div class="col col-xl-3 col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Products</h5>
