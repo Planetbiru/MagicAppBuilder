@@ -13,7 +13,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <title><?php echo $appDocumentTitle;?></title>
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/font-awesome/all.min.css">
-    <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/css.css">
+    <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/css.min.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
@@ -32,9 +32,13 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <script src="<?php echo $themeAssetsPath;?>js/color-mode.min.js"></script>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
-        <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
-        <?php echo $appMenu;?>
+        <div class="sidebar-header">
+            <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
+            <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
+        </div>
+        <div class="sidebar-menu">
+            <?php echo $appMenu;?>
+        </div>
     </div>
 
     <!-- Main Content -->
