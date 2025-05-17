@@ -156,6 +156,7 @@ class ApplicationMenu
                     {
                         $li->setAttribute('class', 'nav-item nav-item-children-active'); // Set active class for the main menu item
                         $collapseClass = 'collapse show'; // Set submenu to show if any submenu is active
+                        $a->setAttribute('class', 'nav-link');
                     }
                     else
                     {
