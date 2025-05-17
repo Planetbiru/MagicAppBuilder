@@ -125,8 +125,6 @@ $appLanguage = new AppLanguageImpl(
     }
 );
 
-$appConfig->setAssets('lib.themes/default/assets/');
-
 $appMenuData = new SecretObject();
 
 $appMenuPath = dirname(__DIR__) . "/inc.cfg/menu.yml";
