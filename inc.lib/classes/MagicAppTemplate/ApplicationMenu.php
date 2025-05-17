@@ -154,12 +154,12 @@ class ApplicationMenu
                     // Create the <div> for the submenu and add 'collapse' or 'collapse show' class
                     if($isActive)
                     {
-                        $li->setAttribute('class', 'nav-item nav-item-active'); // Set active class for the main menu item
+                        $li->setAttribute('class', 'nav-item nav-item-children-active'); // Set active class for the main menu item
                         $collapseClass = 'collapse show'; // Set submenu to show if any submenu is active
                     }
                     else
                     {
-                        $li->setAttribute('class', 'collapse'); // Set regular class for non-active main menu item
+                        $collapseClass = 'collapse'; // Set regular class for non-active main menu item
                     }
 
                     $submenuDiv = $dom->createElement('div');
