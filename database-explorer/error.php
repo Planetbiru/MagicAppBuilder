@@ -30,6 +30,7 @@
         h1 {
             color: #dc3545;
             font-size: 1.6rem;
+            font-weight: normal;
         }
 
         p {
