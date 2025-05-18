@@ -1,4 +1,3 @@
-
 # MagicObject Version 2
 
 ## What's New
@@ -548,3 +547,16 @@ echo $object->toFixedData(4)."\r\n"; // Outputs 100.1235
 
 -  Fixed an issue where countBy() returned 1 even when no records matched the condition.
    The method now correctly uses fetchColumn() to retrieve the result from SELECT COUNT(*).
+
+### **Other Changes**
+
+-   Internal code refactoring for improved readability and maintainability.
+-   Enhanced flexibility in property name handling, especially for camelCase formatting.
+
+
+# MagicObject version 3.12
+
+## What's New
+
+- **Removed Exception Throwing for Empty Results in Multi-Record Finders**  
+  In this version, `EmptyResultException` and `NoRecordFoundException` are no longer thrown when methods for finding multiple records return an empty result. Instead, these methods will simply return an empty array or collection. This change improves developer experience by making it easier to handle cases where no records are found, without the need for additional exception handling.

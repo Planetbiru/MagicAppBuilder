@@ -4,7 +4,8 @@ namespace MagicObject\Database;
 use DateTime;
 use Exception;
 use MagicObject\Exceptions\ClassNotFoundException;
-use MagicObject\Exceptions\EmptyResultException;
+use MagicObject\Exceptions\DataRetrievalException;
+use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\Exceptions\EntityException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidFilterException;
@@ -2003,7 +2004,7 @@ class PicoDatabasePersistence // NOSONAR
      * @return object The found record, or null if not found.
      * @throws EntityException If there is an issue with the entity.
      * @throws InvalidFilterException If the provided filter criteria are invalid.
-     * @throws EmptyResultException If no record is found or no primary key is set.
+     * @throws NoRecordFoundException If no record is found or no primary key is set.
      */
     public function find($propertyValues)
     {
@@ -2044,17 +2045,17 @@ class PicoDatabasePersistence // NOSONAR
                 }
                 else
                 {
-                    throw new EmptyResultException(self::MESSAGE_NO_RECORD_FOUND);
+                    throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
                 }
             }
             catch(Exception $e)
             {
-                throw new EmptyResultException($e->getMessage());
+                throw new NoRecordFoundException($e->getMessage());
             }
         }
         else
         {
-            throw new EmptyResultException("No primary key set");
+            throw new NoRecordFoundException("No primary key set");
         }
     }
     
@@ -2422,7 +2423,9 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoSortable|string|null $sortable       Sort order for the results
      * @param array|null $subqueryMap                Optional subquery mappings
      * @return array|null                              The retrieved record or null if not found
-     * @throws EntityException|EmptyResultException    If no results are found
+     * @throws EntityException If there is an issue with the entity
+     * @throws NoRecordFoundException If no record is found
+     * @throws DataRetrievalException If there is an error in data retrieval
      */
     public function findOne($specification, $sortable = null, $subqueryMap = null)
     {
@@ -2446,7 +2449,8 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoSortable|string|null $sortable     Sort order for the results
      * @param array|null $subqueryMap               Optional subquery mappings
      * @return array|null                             The list of records or null if not found
-     * @throws EntityException|EmptyResultException   If no results are found
+     * @throws EntityException If there is an issue with the entity
+     * @throws DataRetrievalException If there is an error in data retrieval
      */
     public function findAll($specification, $pageable = null, $sortable = null, $subqueryMap = null)
     {
@@ -2467,7 +2471,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param mixed $primaryKeyVal    The value of the primary key
      * @param array $subqueryMap      Optional subquery mappings
      * @return array|null             The retrieved record or null if not found
-     * @throws EmptyResultException    If no record is found
+     * @throws NoRecordFoundException If no record is found
      */
     public function findOneWithPrimaryKeyValue($primaryKeyVal, $subqueryMap)
     {
@@ -2515,12 +2519,12 @@ class PicoDatabasePersistence // NOSONAR
             }
             else
             {
-                throw new EmptyResultException(self::MESSAGE_NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new NoRecordFoundException($e->getMessage());
         }
         return $data;
     }
@@ -2534,7 +2538,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoSortable|string|null $sortable   Sort order for the results
      * @param array|null $subqueryMap               Optional subquery mappings
      * @return array|null             The list of records or null if not found
-     * @throws EntityException|EmptyResultException If no results are found
+     * @throws DataRetrievalException If there is an error in data retrieval
      */
     public function findSpecificWithSubquery($selected, $specification, $pageable = null, $sortable = null, $subqueryMap = null)
     {
@@ -2566,14 +2570,10 @@ class PicoDatabasePersistence // NOSONAR
                     $result[] = $data;
                 }
             }
-            else
-            {
-                throw new EmptyResultException(self::MESSAGE_NO_RECORD_FOUND);
-            }
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         return $result;
     }
@@ -2643,7 +2643,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable         Pageable information for pagination
      * @param PicoSortable|string|null $sortable   Sort order for the results
      * @return array|null             The list of records or null if not found
-     * @throws EntityException|EmptyResultException If no results are found
+     * @throws DataRetrievalException If there is an error in data retrieval
      */
     public function findSpecific($selected, $specification, $pageable = null, $sortable = null)
     {
@@ -2664,14 +2664,10 @@ class PicoDatabasePersistence // NOSONAR
                     $result[] = $data;
                 }
             }
-            else
-            {
-                throw new EmptyResultException(self::MESSAGE_NO_RECORD_FOUND);
-            }
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         return $result;
     }
@@ -2782,7 +2778,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param PicoPageable|null $pageable            Pageable information for pagination
      * @param PicoSortable|null $sortable             Sort order for the results
      * @return int                                   The count of records
-     * @throws EntityException|EmptyResultException   If an error occurs
+     * @throws DataRetrievalException If there is an error in data retrieval
      */
     public function countAll($specification = null, $pageable = null, $sortable = null)
     {
@@ -2823,7 +2819,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
     }
     
@@ -2833,7 +2829,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param string $propertyName   The property name to filter by.
      * @param mixed $propertyValue   The value of the property to filter by.
      * @return int                   The count of matched records.
-     * @throws EntityException|InvalidFilterException|PDOException|EmptyResultException If an error occurs.
+     * @throws EntityException|InvalidFilterException|PDOException|DataRetrievalException If an error occurs.
      */
     public function countBy($propertyName, $propertyValue)
     {
@@ -2877,7 +2873,7 @@ class PicoDatabasePersistence // NOSONAR
             }
             return $count;
         } catch (Exception $e) {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
     }
     
@@ -2887,7 +2883,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param string $propertyName   The property name to filter by
      * @param mixed $propertyValue   The value of the property to filter by
      * @return int                   The number of deleted records
-     * @throws EntityException|InvalidFilterException|PDOException|EmptyResultException If an error occurs
+     * @throws EntityException|InvalidFilterException|PDOException|DataRetrievalException If an error occurs
      */
     public function deleteBy($propertyName, $propertyValue)
     {
@@ -2918,7 +2914,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
     }
     
@@ -2934,7 +2930,7 @@ class PicoDatabasePersistence // NOSONAR
      * @return array|null Returns the matching record as an associative array, or null if no record is found.
      * @throws EntityException If there is an issue with the entity operations.
      * @throws InvalidFilterException If the constructed filter is invalid.
-     * @throws EmptyResultException If the query results in an empty set.
+     * @throws DataRetrievalException If there is an error during data retrieval.
      */
     public function findOneBy($propertyName, $propertyValue, $sortable = null)
     {
@@ -2977,7 +2973,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         return $data;   
     }
@@ -3558,7 +3554,7 @@ class PicoDatabasePersistence // NOSONAR
      * This method constructs and executes a query to retrieve all records from the 
      * specified table in the database.
      *
-     * @return mixed The result set containing all records.
+     * @return array The result set containing all records.
      * @throws EntityException If an error occurs during the selection process.
      */
     public function selectAll()
@@ -3601,7 +3597,7 @@ class PicoDatabasePersistence // NOSONAR
      * @return mixed The matching record or null if not found.
      * @throws EntityException If an error occurs during the selection process.
      * @throws InvalidFilterException If the provided filter is invalid.
-     * @throws EmptyResultException If no result is found.
+     * @throws DataRetrievalException If there is an error during data retrieval.
      */
     private function _select($info = null, $queryBuilder = null, $where = null, $specification = null, $pageable = null, $sortable = null)
     {
@@ -3657,7 +3653,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         return $data;
     }
@@ -3677,7 +3673,7 @@ class PicoDatabasePersistence // NOSONAR
      * @return array An array of matching records.
      * @throws EntityException If an error occurs during the selection process.
      * @throws InvalidFilterException If the provided filter is invalid.
-     * @throws EmptyResultException If no results are found.
+     * @throws DataRetrievalException If there is an error during data retrieval.
      */
     private function _selectAll($info = null, $queryBuilder = null, $where = null, $specification = null, $pageable = null, $sortable = null)
     {
@@ -3728,7 +3724,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         catch(Exception $e)
         {
-            throw new EmptyResultException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         return $result;
     }

@@ -471,7 +471,6 @@ try
     $album1->save();
   
     // update
-    // NoRecordFoundException if ID not found
     $album1->update();
   
     // convert to JSON
