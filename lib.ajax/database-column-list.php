@@ -23,6 +23,8 @@ try {
     $databaseType = $database->getDatabaseType();
 
     $excludeColumns = array();
+
+    // Excluce special columns that should not be included in the list
     $excludeColumns[] = $appConfig->entityInfo->getDraft();
     $excludeColumns[] = $appConfig->entityInfo->getWaitingFor();
     $excludeColumns[] = $appConfig->entityInfo->getAdminAskEdit();
@@ -32,6 +34,9 @@ try {
     $excludeColumns[] = $appConfig->entityInfo->getApprovalNote();
     $excludeColumns[] = $appConfig->entityInfo->getApprovalStatus();
 
+    // PDO does not support array binding directly, so we need to convert the array to a string
+    $excludeColumnsString = "'".implode("', '", $excludeColumns)."'";
+
     if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
         // MySQL Query for column details
         $queryBuilder = new PicoDatabaseQueryBuilder($database);
@@ -39,10 +44,9 @@ try {
             ->select("column_name, column_type, data_type, column_key")
             ->from("INFORMATION_SCHEMA.COLUMNS")
             ->where(
-                "TABLE_SCHEMA = ? AND TABLE_NAME = ? AND column_name NOT IN (?)",
+                "TABLE_SCHEMA = ? AND TABLE_NAME = ? AND column_name NOT IN ($excludeColumnsString)",
                 $databaseName,
-                $tableName,
-                $excludeColumns
+                $tableName
             );
         $rs = $database->executeQuery($queryBuilder);
 
@@ -68,11 +72,10 @@ try {
             c.table_catalog = ?
             AND c.table_schema = ? 
             AND c.table_name = ?
-            AND c.column_name NOT IN (?)",
+            AND c.column_name NOT IN ($excludeColumnsString)",
             $databaseName,
             $databaseSchema,
-            $tableName,
-            $excludeColumns
+            $tableName
         );
         $rs = $database->executeQuery($queryBuilder);
 
@@ -106,19 +109,17 @@ try {
     $primaryKeys = array();
     $skipped = array();
     
+    // Add skipped fields that should not be included in insert/edit forms
     $skipped[] = $appConfig->entityInfo->getDraft();
     $skipped[] = $appConfig->entityInfo->getWaitingFor();
     $skipped[] = $appConfig->entityInfo->getApprovalNote();
     $skipped[] = $appConfig->entityInfo->getApprovalId();
     $skipped[] = $appConfig->entityInfo->getAdminCreate();
     $skipped[] = $appConfig->entityInfo->getAdminEdit();
-    $skipped[] = $appConfig->entityInfo->getAdminAskEdit();
     $skipped[] = $appConfig->entityInfo->getTimeCreate();
     $skipped[] = $appConfig->entityInfo->getTimeEdit();
-    $skipped[] = $appConfig->entityInfo->getTimeAskEdit();
     $skipped[] = $appConfig->entityInfo->getIpCreate();
     $skipped[] = $appConfig->entityInfo->getIpEdit();
-    $skipped[] = $appConfig->entityInfo->getIpAskEdit();
     
     foreach ($rows as $i => $data) {
         $cols[] = $data['column_name'];
@@ -142,6 +143,6 @@ try {
     ResponseUtil::sendJSON($json);
 } catch (Exception $e) {
     error_log($e->getMessage());
-    // do nothing
+    // If an error occurs, send an empty JSON response
     ResponseUtil::sendJSON(new stdClass);
 }

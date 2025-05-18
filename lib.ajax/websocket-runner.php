@@ -1,6 +1,7 @@
 <?php
+
 /**
- * WebSocket Server Bootstrapper
+ * WebSocket Server Runner Script
  * 
  * This script checks whether a WebSocket server is already running on a specific host and port.
  * If so, it attempts to terminate it before starting a new instance in the background.
@@ -12,8 +13,6 @@ header('Content-Type: application/json');
 $host = '127.0.0.1';
 $port = 8080;
 $timeout = 1;
-
-
 
 /**
  * Check if WebSocket server is already running by attempting to connect to the host and port.
@@ -36,11 +35,11 @@ function isServerRunning($host, $port, $timeout)
 /**
  * Attempt to stop an existing WebSocket server process listening on the specified port.
  *
- * @param string $host
- * @param int $port
+ * @param string $host Server host
+ * @param int $port Server port
  * @return void
  */
-function stopServer($host, $port)
+function stopServer($host, $port) // NOSONAR
 {
     if (PHP_OS === 'WINNT') {
         // Use netstat to find process ID listening on the port (Windows)
@@ -85,7 +84,7 @@ function broadcastToWebSocketClients($host, $port, $message)
             . "Sec-WebSocket-Version: 13\r\n\r\n";
         fwrite($socket, $headers);
         stream_set_timeout($socket, 2);
-        $response = fread($socket, 2048);
+        $response = fread($socket, 2048); // NOSONAR
 
         // Encode message as WebSocket frame
         $len = strlen($message);
