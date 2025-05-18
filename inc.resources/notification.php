@@ -47,7 +47,7 @@ if($inputPost->getUserAction() == 'unread')
 					;
 				$notification = new AppNotificationImpl(null, $database);
 				$notification->where($specification)
-				->setRead(false)
+				->setIsRead(false)
 				->setTimeRead(null)
 				->setIpRead(null)
 				->update();
@@ -166,9 +166,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</tbody>
 			</table>
 			<?php
-			if(!$notification->isRead())
+			if(!$notification->isIsRead())
 			{
-				$notification->setRead(true);
+				$notification->setIsRead(true);
 				$notification->setTimeRead(date('Y-m-d H:i:s'));
 				$notification->setIpRead($_SERVER['REMOTE_ADDR']);
 				$notification->update();
@@ -282,7 +282,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="title" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSubject();?></a></td>
-								<td data-col-name="read" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getRead();?></a></td>
+								<td data-col-name="is_read" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIsRead();?></a></td>
 							</tr>
 						</thead>
 					
@@ -299,11 +299,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<input type="checkbox" class="checkbox check-slave checkbox-notification-id" name="checked_row_id[]" value="<?php echo $notification->getNotificationId();?>"/>
 								</td>
 								<td>
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->notification_id, $notification->getNotificationId());?>"><span class="fa <?php echo $notification->isRead() ? 'fa-envelope-open':'fa-envelope';?>"></span></a>
+									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->notification_id, $notification->getNotificationId());?>"><span class="fa <?php echo $notification->isIsRead() ? 'fa-envelope-open':'fa-envelope';?>"></span></a>
 								</td>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="title"><?php echo $notification->getSubject();?></td>
-								<td data-col-name="read"><?php echo $notification->optionRead($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="is_read"><?php echo $notification->optionIsRead($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
