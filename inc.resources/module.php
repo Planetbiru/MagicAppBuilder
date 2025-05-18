@@ -139,6 +139,10 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -181,6 +185,10 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -206,6 +214,10 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -238,6 +250,10 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Update the application menu cache for all users
+		$applicationMenu->updateMenuCache();
 	}
 	$currentModule->redirectToItself();
 }

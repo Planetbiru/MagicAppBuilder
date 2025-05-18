@@ -313,6 +313,7 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 -   Updated module translation for improved multilingual support.
 -   Updated error message style for better clarity and consistency.
 -   Preserve the scroll position of the table list in the database manager. The scroll position will be saved and restored to the last position when the page is reloaded, making it easier for users to continue working where they left off.
+-   Menu cache is now updated automatically whenever a module is updated, ensuring users always see the latest menu structure.
 
 ## Bug Fixes
 
