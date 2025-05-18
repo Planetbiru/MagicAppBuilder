@@ -733,6 +733,24 @@ blockquote {
   content: "\f067";
 }
 
+.compare-data.data-different {
+  background-color: #f56e00;
+  color: #FFFFFF;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: -4px;
+  border-radius: 3px;
+}
+
+.compare-data.data-different:empty {
+  background-color: transparent;
+  color: inherit;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: 0px;
+  border: 0;
+}
+
 select[multiple].form-control {
   height: 38px;
 }
