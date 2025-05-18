@@ -18,6 +18,7 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Database\PicoTableInfo;
+use MagicObject\Exceptions\DataRetrievalException;
 use MagicObject\Exceptions\FileNotFoundException;
 use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
@@ -668,7 +669,6 @@ class MagicObject extends stdClass // NOSONAR
      *                          If FALSE, only non-null values will be saved.
      * @return PDOStatement Returns a PDOStatement object for further database interaction.
      * @throws NoDatabaseConnectionException If there is no active database connection.
-     * @throws NoRecordFoundException If no corresponding record is found.
      * @throws PDOException If a database error occurs.
      */
     public function save($includeNull = false)
@@ -695,7 +695,6 @@ class MagicObject extends stdClass // NOSONAR
      *                          If FALSE, only non-null values will be included in the query.
      * @return PicoDatabaseQueryBuilder Returns a PicoDatabaseQueryBuilder object for query construction.
      * @throws NoDatabaseConnectionException If there is no active database connection.
-     * @throws NoRecordFoundException If no corresponding record is found.
      */
     public function saveQuery($includeNull = false)
     {
@@ -713,13 +712,14 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select data from the database.
      *
-     * This method retrieves data from the database. If no data is found, a `NoRecordFoundException` will be thrown. 
+     * This method retrieves data from the database. 
      * The retrieved data is then loaded into the current instance for further use.
      *
      * @return self Returns the current instance for method chaining.
      * @throws NoDatabaseConnectionException If there is no active database connection.
-     * @throws NoRecordFoundException If no records are found in the database.
      * @throws PDOException If a database error occurs.
+     * @throws DataRetrievalException If no data is found in the database.
+     * 
      */
     public function select()
     {
@@ -727,11 +727,11 @@ class MagicObject extends stdClass // NOSONAR
         {
             $persist = new PicoDatabasePersistence($this->_database, $this);
             $data = $persist->select();
-            if($data == null)
+            if(isset($data) && !empty($data))
             {
-                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
+                $this->loadData($data);
             }
-            $this->loadData($data);
+            
             return $this;
         }
         else
@@ -743,12 +743,11 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Select all data from the database.
      *
-     * This method retrieves all data from the database. If no data is found, a `NoRecordFoundException` will be thrown. 
+     * This method retrieves all data from the database.
      * The retrieved data is then loaded into the current instance for further use.
      *
      * @return self Returns the current instance for method chaining.
      * @throws NoDatabaseConnectionException If there is no active database connection.
-     * @throws NoRecordFoundException If no records are found in the database.
      * @throws PDOException If a database error occurs.
      */
     public function selectAll()
@@ -757,11 +756,10 @@ class MagicObject extends stdClass // NOSONAR
         {
             $persist = new PicoDatabasePersistence($this->_database, $this);
             $data = $persist->selectAll();
-            if($data == null)
+            if(isset($data) && !empty($data))
             {
-                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
+                $this->loadData($data);
             }
-            $this->loadData($data);
             return $this;
         }
         else
@@ -1795,7 +1793,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @return PicoPageData The paginated data
-     * @throws NoRecordFoundException if no records are found
+     * @throws DataRetrievalException if there is an error retrieving data
      * @throws NoDatabaseConnectionException if no database connection is established
      */
     public function listAll($specification = null, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null)
@@ -1891,8 +1889,11 @@ class MagicObject extends stdClass // NOSONAR
      * @param array|null $subqueryMap An optional map of subqueries
      * @param int $findOption The find option
      * @return PicoPageData The paginated data
-     * @throws NoRecordFoundException if no records are found
      * @throws NoDatabaseConnectionException if no database connection is established
+     * @throws FindOptionException if an invalid find option is provided
+     * @throws PDOException if there is an error with the database connection or query execution
+     * @throws DataRetrievalException if there is an error retrieving data
+     * @throws Exception for any other exceptions that may occur
      */
     public function findAll($specification = null, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null, $findOption = self::FIND_OPTION_DEFAULT)
     {
@@ -1934,10 +1935,6 @@ class MagicObject extends stdClass // NOSONAR
         {
             throw new FindOptionException($e->getMessage());
         }
-        catch(NoRecordFoundException $e)
-        {
-            throw new NoRecordFoundException($e->getMessage());
-        }
         catch(Exception $e)
         {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
@@ -1948,6 +1945,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find all records without filters, sorted by primary key in ascending order
      *
      * @return PicoPageData The paginated data
+     * @throws DataRetrievalException if there is an error retrieving data
      */
     public function findAllAsc()
     {
@@ -1961,6 +1959,7 @@ class MagicObject extends stdClass // NOSONAR
      * Find all records without filters, sorted by primary key in descending order
      *
      * @return PicoPageData The paginated data
+     * @throws DataRetrievalException if there is an error retrieving data
      */
     public function findAllDesc()
     {
@@ -1981,7 +1980,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param array|null $subqueryMap An optional map of subqueries
      * @param int $findOption The find option
      * @return PicoPageData The paginated data
-     * @throws NoRecordFoundException if no records are found
+     * @throws DataRetrievalException if there is an error retrieving data
      * @throws NoDatabaseConnectionException if no database connection is established
      */
     public function findSpecific($selected, $specification = null, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null, $findOption = self::FIND_OPTION_DEFAULT)
@@ -2024,9 +2023,9 @@ class MagicObject extends stdClass // NOSONAR
         {
             throw new FindOptionException($e->getMessage());
         }
-        catch(NoRecordFoundException $e)
+        catch(DataRetrievalException $e)
         {
-            throw new NoRecordFoundException($e->getMessage());
+            throw new DataRetrievalException($e->getMessage());
         }
         catch(Exception $e)
         {
@@ -2103,7 +2102,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoPageable|null $pageable The pagination information
      * @param PicoSortable|null $sortable The sorting criteria
      * @return int|false The count of records or false on error
-     * @throws NoRecordFoundException if no records are found
+     * @throws DataRetrievalException if there is an error retrieving data
      * @throws NoDatabaseConnectionException if no database connection is established
      */
     public function countAll($specification = null, $pageable = null, $sortable = null)
@@ -2142,7 +2141,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param PicoPageable|string|null $pageable The pagination information
      * @param PicoSortable|string|null $sortable The sorting criteria
      * @return PicoDatabaseQueryBuilder The query builder
-     * @throws NoRecordFoundException if no record is found
+     * @throws DataRetrievalException if there is an error retrieving data
      * @throws NoDatabaseConnectionException if no database connection is established
      */
     public function findAllQuery($specification = null, $pageable = null, $sortable = null)
@@ -2233,7 +2232,6 @@ class MagicObject extends stdClass // NOSONAR
      * @param bool $passive Flag indicating whether the object is passive
      * @param array|null $subqueryMap An optional map of subqueries
      * @return PicoPageData The paginated data
-     * @throws NoRecordFoundException if no records are found
      * @throws NoDatabaseConnectionException if no database connection is established
      */
     private function findBy($method, $params, $pageable = null, $sortable = null, $passive = false, $subqueryMap = null)
@@ -2347,7 +2345,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the search.
      * @param PicoSortable|string|null $sortable Optional sorting criteria.
-     * @return object The found instance.
+     * @return self The found instance.
      * @throws NoRecordFoundException If no record is found.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
@@ -2379,7 +2377,7 @@ class MagicObject extends stdClass // NOSONAR
      * @param string $method The method used for finding.
      * @param mixed $params The parameters to use for the search.
      * @param PicoSortable|string|null $sortable Optional sorting criteria.
-     * @return object The found instance or the current instance if not found.
+     * @return self The found instance or the current instance if not found.
      * @throws NoDatabaseConnectionException If there is no database connection.
      */
     private function findOneIfExistsBy($method, $params, $sortable = null)

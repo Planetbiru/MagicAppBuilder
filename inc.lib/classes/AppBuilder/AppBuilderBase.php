@@ -401,7 +401,7 @@ class AppBuilderBase //NOSONAR
                 $methodSource = PicoStringUtil::upperCamelize($fieldName);
             }
             $methodTarget = PicoStringUtil::upperCamelize($fieldName);
-            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true))";
+            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true))"; // NOSONAR
         } else {
             return self::TAB1 . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "))";
         }
@@ -770,7 +770,7 @@ class AppBuilderBase //NOSONAR
         if($approvalRequired)
         {
             $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
-            $getData[] = self::TAB1.self::TAB1."if(!UserAction::isRequireApproval(".self::VAR.$objectName."->get".$upperWaitingFor.self::BRACKETS."))";
+            $getData[] = self::TAB1.self::TAB1."if(!UserAction::isRequireApproval(".self::VAR.$objectName.self::CALL_GET.$upperWaitingFor.self::BRACKETS."))";
             $getData[] = self::TAB1.self::TAB1.self::CURLY_BRACKET_OPEN;
         }
 
@@ -3424,18 +3424,18 @@ $subqueryMap = '.$referece.';
     {
         if($useLibrary)
         {
-            return 'PicoFileRenderer::renderImage($'.$objectName.'->get'.$upperFieldName.'())';
+            return 'PicoFileRenderer::renderImage($'.$objectName.self::CALL_GET.$upperFieldName.'())';
         }
         
         $result = [];
         $result[] = '';
-        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
-        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
-        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
-        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.self::CALL_GET.$upperFieldName.'();';
+        $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {'; // NOSONAR
+        $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {'; // NOSONAR
+        $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {'; // NOSONAR
         $result[] = self::TAB1.self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$value'.$upperFieldName.'."\" alt=\"".$value'.$upperFieldName.'."\" /> ";';
         $result[] = self::TAB1.self::TAB1.self::TAB1.'}';
-        $result[] = self::TAB1.self::TAB1.'} else {';
+        $result[] = self::TAB1.self::TAB1.'} else {'; // NOSONAR
         $result[] = self::TAB1.self::TAB1.self::TAB1.'echo "<img src=\"".$data'.$upperFieldName.'."\" alt=\"".$data'.$upperFieldName.'."\" /> ";';
         $result[] = self::TAB1.self::TAB1.'}';
         $result[] = self::TAB1.'}';
@@ -3456,11 +3456,11 @@ $subqueryMap = '.$referece.';
     {
         if($useLibrary)
         {
-            return 'PicoFileRenderer::renderAudio($'.$objectName.'->get'.$upperFieldName.'())';
+            return 'PicoFileRenderer::renderAudio($'.$objectName.self::CALL_GET.$upperFieldName.'())';
         }
         $result = [];
         $result[] = '';
-        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.self::CALL_GET.$upperFieldName.'();';
         $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
@@ -3487,11 +3487,11 @@ $subqueryMap = '.$referece.';
     {
         if($useLibrary)
         {
-            return 'PicoFileRenderer::renderVideo($'.$objectName.'->get'.$upperFieldName.'())';
+            return 'PicoFileRenderer::renderVideo($'.$objectName.self::CALL_GET.$upperFieldName.'())';
         }
         $result = [];
         $result[] = '';
-        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.self::CALL_GET.$upperFieldName.'();';
         $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
@@ -3518,11 +3518,11 @@ $subqueryMap = '.$referece.';
     {
         if($useLibrary)
         {
-            return 'PicoFileRenderer::renderFile($'.$objectName.'->get'.$upperFieldName.'())';
+            return 'PicoFileRenderer::renderFile($'.$objectName.self::CALL_GET.$upperFieldName.'())';
         }
         $result = [];
         $result[] = '';
-        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.'->get'.$upperFieldName.'();';
+        $result[] = self::TAB1.self::VAR.'data'.$upperFieldName.' = $'.$objectName.self::CALL_GET.$upperFieldName.'();';
         $result[] = self::TAB1.'if($data'.$upperFieldName.' != null && !empty($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.'if(is_array($data'.$upperFieldName.')) {';
         $result[] = self::TAB1.self::TAB1.self::TAB1.'foreach($data'.$upperFieldName.' as $key => $value'.$upperFieldName.') {';
