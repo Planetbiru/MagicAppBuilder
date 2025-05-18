@@ -189,6 +189,7 @@ if($applicationId != null)
     $application = new EntityApplication(null, $databaseBuilder);
     try
     {
+        
         $application->findOneByApplicationId($applicationId);
         
         $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
@@ -226,6 +227,7 @@ if($applicationId != null)
         $userLanguageId = "en";
         $userActive = true;
         $adminLevel = new AppAdminLevelImpl(null, $database);
+        
         try
         {
             $adminLevel->findOneByAdminLevelId($adminLevelId);
@@ -246,102 +248,102 @@ if($applicationId != null)
             $adminLevel->setAdminUpdate($userId);
             $adminLevel->insert();
         }
-        
+        $userFound = false;
         try
         {
             $userFinder = new AppAdminImpl(null, $database);
             $pageData = $userFinder->findAll();
-            if($pageData->getTotalResult() == 0)
+            $userFound = $pageData->getTotalResult() > 0;
+
+            foreach($pageData->getResult() as $admin)
             {
-                // Create new user with superuser level
-                $userFinder = new AppAdminImpl(null, $database);
-                $userFinder->setUsername($userName);
-                $userFinder->setPassword($userPassword);
-                $userFinder->setSpecialAccess(true);
-                $userFinder->setName($userFullName);
-                $userFinder->setLanguageId($userLanguageId);
-                $userFinder->setActive($userActive);
-                $userFinder->setTimeCreate($now);
-                $userFinder->setTimeUpdate($now);
-                $userFinder->setIpCreate($ip);
-                $userFinder->setIpUpdate($ip);
-                $userFinder->setAdminLevelId($adminLevelId);
-                $userFinder->insert();
-
-                // Notification for user
-                $notification = new AppNotificationImpl(null, $database);
-                $notificationId = $notification->currentDatabase()->generateNewId();
-                $notification->setNotificationId($notificationId);
-                $notification->setNotificationType("general");
-                $notification->setAdminGroup("admin");
-                $notification->setAdminId($userFinder->getAdminId());
-                $notification->setIcon("bell");
-                $notification->setSubject("User Account Created");
-                $notification->setContent("Your account has been created");
-                $notification->setLink("notification.php?user_action=detail&notification_id=$notificationId");
-                $notification->setRead(false);
-                $notification->setTimeCreate($now);
-                $notification->setTimeUpdate($now);
-                $notification->setIpCreate($ip);
-                $notification->setIpUpdate($ip);
-                $notification->insert();
-
-                // Notification for dummy user
-                $notification2 = new AppNotificationImpl($notification, $database);
-                $notificationId2 = $notification2->currentDatabase()->generateNewId();
-                $notification2->setNotificationId($notificationId2);
-                $notification2->setAdminId("superuser");
-                $notification2->setLink("notification.php?user_action=detail&notification_id=$notificationId2");
-                $notification2->insert();
-
-                // Message for user
-                $message = new AppMessageImpl(null, $database);
-                $messageId = $message->currentDatabase()->generateNewId();
-                $message->setMessageId($messageId);
-                $message->setMessageDirection('in');
-                $message->setSenderId($userFinder->getAdminId());
-                $message->setReceiverId($userFinder->getAdminId());
-                $message->setSubject("User Account Created");
-                $message->setContent("Your account has been created");
-                $message->setRead(false);
-                $message->setTimeCreate($now);
-                $message->setTimeUpdate($now);
-                $message->setIpCreate($ip);
-                $message->setIpUpdate($ip);
-                $message->insert();
-
-                // Message for dummy user
-                $message2 = new AppMessageImpl($message, $database);
-                $messageId2 = $message->currentDatabase()->generateNewId();
-                $message2->setMessageId($messageId2);
-                $message2->setSenderId("superuser");
-                $message2->setReceiverId("superuser");
-                $message2->insert();
-            }
-            else
-            {
-                foreach($pageData->getResult() as $admin)
+                // Update user with superuser level
+                if($admin->getAdminLevelId() == null || $admin->getAdminLevelId() == "")
                 {
-                    // Update user with superuser level
-                    if($admin->getAdminLevelId() == null || $admin->getAdminLevelId() == "")
-                    {
-                        
-                        $adminLevelId = "superuser";
-                    }
-                    else
-                    {
-                        // Set the admin level to superuser
-                        $adminLevelId = $admin->getAdminLevelId();
-                    }
-                    $admin->setAdminLevelId($adminLevelId);
-                    $admin->update();
+                    
+                    $adminLevelId = "superuser";
                 }
+                else
+                {
+                    // Set the admin level to superuser
+                    $adminLevelId = $admin->getAdminLevelId();
+                }
+                $admin->setAdminLevelId($adminLevelId);
+                $admin->update();
             }
         }
         catch(Exception $e)
         {
             // Do nothing
         }
+        if(!$userFound)
+        {
+            // Create new user with superuser level
+            $userFinder = new AppAdminImpl(null, $database);
+            $userFinder->setUsername($userName);
+            $userFinder->setPassword($userPassword);
+            $userFinder->setSpecialAccess(true);
+            $userFinder->setName($userFullName);
+            $userFinder->setLanguageId($userLanguageId);
+            $userFinder->setActive($userActive);
+            $userFinder->setTimeCreate($now);
+            $userFinder->setTimeUpdate($now);
+            $userFinder->setIpCreate($ip);
+            $userFinder->setIpUpdate($ip);
+            $userFinder->setAdminLevelId($adminLevelId);
+            $userFinder->insert();
+
+            // Notification for user
+            $notification = new AppNotificationImpl(null, $database);
+            $notificationId = $notification->currentDatabase()->generateNewId();
+            $notification->setNotificationId($notificationId);
+            $notification->setNotificationType("general");
+            $notification->setAdminGroup("admin");
+            $notification->setAdminId($userFinder->getAdminId());
+            $notification->setIcon("bell");
+            $notification->setSubject("User Account Created");
+            $notification->setContent("Your account has been created");
+            $notification->setLink("notification.php?user_action=detail&notification_id=$notificationId");
+            $notification->setIsRead(false);
+            $notification->setTimeCreate($now);
+            $notification->setTimeUpdate($now);
+            $notification->setIpCreate($ip);
+            $notification->setIpUpdate($ip);
+            $notification->insert();
+
+            // Notification for dummy user
+            $notification2 = new AppNotificationImpl($notification, $database);
+            $notificationId2 = $notification2->currentDatabase()->generateNewId();
+            $notification2->setNotificationId($notificationId2);
+            $notification2->setAdminId("superuser");
+            $notification2->setLink("notification.php?user_action=detail&notification_id=$notificationId2");
+            $notification2->insert();
+
+            // Message for user
+            $message = new AppMessageImpl(null, $database);
+            $messageId = $message->currentDatabase()->generateNewId();
+            $message->setMessageId($messageId);
+            $message->setMessageDirection('in');
+            $message->setSenderId($userFinder->getAdminId());
+            $message->setReceiverId($userFinder->getAdminId());
+            $message->setSubject("User Account Created");
+            $message->setContent("Your account has been created");
+            $message->setIsRead(false);
+            $message->setTimeCreate($now);
+            $message->setTimeUpdate($now);
+            $message->setIpCreate($ip);
+            $message->setIpUpdate($ip);
+            $message->insert();
+
+            // Message for dummy user
+            $message2 = new AppMessageImpl($message, $database);
+            $messageId2 = $message->currentDatabase()->generateNewId();
+            $message2->setMessageId($messageId2);
+            $message2->setSenderId("superuser");
+            $message2->setReceiverId("superuser");
+            $message2->insert();
+        }
+
         
         if($inputPost->getAdminId() != null && $inputPost->countableAdminId())
         {

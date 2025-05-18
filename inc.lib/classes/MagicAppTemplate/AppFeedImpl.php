@@ -58,7 +58,7 @@ class AppFeedImpl extends PicoObjectToString
         {
             $specification = PicoSpecification::getInstance()
                 ->add([Field::of()->adminId, $entityAdmin->getAdminId()])
-                ->add([Field::of()->read, false]);
+                ->add([Field::of()->isRead, false]);
             $sortable = PicoSortable::getInstance()
                 ->add([Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC]);
             $page = new PicoPage(1, $limit);
@@ -108,7 +108,7 @@ class AppFeedImpl extends PicoObjectToString
             $specification = PicoSpecification::getInstance()
                 ->add([Field::of()->receiverId, $entityAdmin->getAdminId()])
                 ->add([Field::of()->messageDirection, 'in'])
-                ->add([Field::of()->read, false]);
+                ->add([Field::of()->isRead, false]);
             $sortable = PicoSortable::getInstance()
                 ->add([Field::of()->timeCreate, PicoSort::ORDER_TYPE_DESC]);
             $page = new PicoPage(1, $limit);
