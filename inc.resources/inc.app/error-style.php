@@ -3,14 +3,14 @@
         font-family: Arial, sans-serif;
         font-size: 0.7rem;
         text-align: center;
-        padding: 50px;
+        padding: 16px;
         background-color: #e1e1e1;
         color: #644d4f;
     }
     .container {
         max-width: 600px;
         margin: auto;
-        padding: 20px;
+        padding: 16px;
         background: white;
         border-radius: 6px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
