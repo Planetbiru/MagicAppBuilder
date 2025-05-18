@@ -304,3 +304,19 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 
 **MagicAppBuilder version 1.0 is the culmination of extensive development and testing, providing a solid foundation for building scalable, secure, and feature-rich applications.**
 
+# MagicAppBuilder Version 1.1
+
+## Updates
+
+-   Updated **MagicApp** and **MagicObject** to the latest versions.
+-   Updated and improved docblocks for better code documentation and maintainability.
+-   Updated module translation for improved multilingual support.
+-   Updated error message style for better clarity and consistency.
+-   Preserve the scroll position of the table list in the database manager. The scroll position will be saved and restored to the last position when the page is reloaded, making it easier for users to continue working where they left off.
+-   Menu cache is now updated automatically whenever a module is updated, ensuring users always see the latest menu structure.
+
+## Bug Fixes
+
+-   Various bug fixes to improve stability and reliability.
+
+

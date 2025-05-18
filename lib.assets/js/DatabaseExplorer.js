@@ -2,16 +2,75 @@ let tabsLinkContainer;
 let currentMarginLeft = 0;
 
 // Instantiate the class
-const converter = new SQLConverter();
+let converter = null;
 let editor;
 let entityRenderer;
 let diagramRenderer = {};
 let resizablePanels;
 
+let scrollElement = null;
+const SCROLL_POSITION_KEY = 'scrollPosition.tableList';
+let timeout = setTimeout('', 10000);
+
+/**
+ * Creates a debounced version of the given function that delays its execution
+ * until after a specified wait time has passed since the last invocation.
+ *
+ * @param {Function} func - The function to debounce.
+ * @param {number} delay - The delay in milliseconds.
+ * @returns {Function} - A debounced function.
+ */
+function debounce(func, delay) {
+  let timeout;
+  return function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(func, delay);
+  };
+}
+
+/**
+ * Saves the vertical scroll position of the `.table-list` element to localStorage.
+ */
+function saveScrollPosition() {
+  if (scrollElement) {
+    localStorage.setItem(SCROLL_POSITION_KEY, scrollElement.scrollTop.toString());
+  }
+}
+
+/**
+ * Restores the vertical scroll position of the `.table-list` element
+ * from the value stored in localStorage.
+ */
+function restoreScrollPosition() {
+  scrollElement = document.querySelector('.table-list');
+  if (!scrollElement) return;
+
+  const saved = localStorage.getItem(SCROLL_POSITION_KEY);
+  if (saved !== null) {
+    scrollElement.scrollTop = parseInt(saved, 10);
+  }
+}
+
+/**
+ * Initializes scroll position persistence for the `.table-list` element.
+ * Adds a debounced scroll event listener to save the scroll position
+ * and restores the saved position on page load.
+ */
+function initTableScrollPosition() {
+  scrollElement = document.querySelector('.table-list');
+  if (!scrollElement) return;
+
+  const debouncedSave = debounce(saveScrollPosition, 300); // 300ms debounce
+
+  scrollElement.addEventListener('scroll', debouncedSave);
+  restoreScrollPosition();
+}
+
 /**
  * Initializes the event listeners and sets up the modal dialogs.
  */
 function init() {
+    converter = new SQLConverter();
     let modalQueryTranslator = document.getElementById("queryTranslatorModal");
     let modalEntityEditor = document.getElementById("entityEditorModal");
     let closeModalButton = document.querySelectorAll(".cancel-button");
@@ -25,6 +84,8 @@ function init() {
     let queryGenerated = document.querySelector('.query-generated');
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');
+
+    initTableScrollPosition();
 
     openModalQuertTranslatorButton.onclick = function() {
         modalQueryTranslator.style.display = "block";

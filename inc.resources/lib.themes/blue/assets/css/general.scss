@@ -852,7 +852,7 @@ blockquote {
             &::after
             {
                 content: "\f068"; 
-                font-family: 'Font Awesome 5 Free'; 
+                font-family: 'Font Awesome 5 Free'; /* NOSONAR */
                 font-weight: 900; 
                 position: absolute;
                 top: 0.55rem;
@@ -906,4 +906,14 @@ blockquote {
   padding-right: 0px;
   margin-left: 0px;
   border: 0;
+}
+
+tr[data-active="false"] td{
+    background-color: #f3f3f3;
+}
+.dark-mode tr[data-active="false"] td{
+    background-color: #312e2e;
+}
+.dark-mode tbody tr[data-active="false"] td.data-sort-body, .dark-mode thead tr[data-active="false"] td.data-sort-header {
+  background-color: #6a6a6a;
 }
