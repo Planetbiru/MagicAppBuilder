@@ -106,13 +106,13 @@ class AppNotificationImpl extends MagicObject
 	protected $link;
 
 	/**
-	 * Read
+	 * Is Read
 	 * 
-	 * @Column(name="read", type="int(11)", length=11, nullable=true)
-	 * @Label(content="Read")
+	 * @Column(name="is_read", type="int(11)", length=11, nullable=true)
+	 * @Label(content="Is Read")
 	 * @var int
 	 */
-	protected $read;
+	protected $isRead;
 
 	/**
 	 * Time Create

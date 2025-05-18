@@ -32,7 +32,7 @@ a {
   transition: transform 0.3s ease;
   transform: translateX(0);
   border-right: 1px solid #d1d1d1;
-  background-color: #333333;
+  background-color: #273c48;
   color: #FAFAFA;
 }
 .sidebar .button-transparent {
@@ -51,8 +51,20 @@ a {
 .sidebar .toggle-sidebar * {
   color: #FAFAFA;
 }
+.sidebar .sidebar-header {
+  border-bottom: 1px solid #3b4d5e;
+  height: 61px;
+  padding: 10px 16px;
+  margin-top: -20px;
+  box-sizing: border-box;
+}
+.sidebar #navbar {
+  height: 61px;
+  box-sizing: border-box;
+}
 .sidebar h4 {
   font-size: 1.25rem;
+  padding-top: 6px;
 }
 .sidebar h4 a {
   display: block;
@@ -63,8 +75,13 @@ a {
 .sidebar a {
   color: #FAFAFA;
 }
+.sidebar .sidebar-menu {
+  padding-top: 8px;
+  max-height: calc(100vh - 63px);
+  overflow-y: auto;
+}
 .sidebar .nav-link:hover {
-  background-color: #515151;
+  background-color: #204873;
 }
 
 .sidebar-hidden .sidebar {
@@ -705,7 +722,7 @@ blockquote {
   border-radius: 5px;
 }
 #sidebarMenu > .nav-item .nav-item.active a.nav-link {
-  background-color: #007bff;
+  background-color: #0a71df;
   border-radius: 5px;
   color: #FFFFFF;
 }
@@ -714,6 +731,24 @@ blockquote {
 }
 #sidebarMenu > .nav-item.nav-item-children-active > a.nav-link.collapsed::after {
   content: "\f067";
+}
+
+.compare-data.data-different {
+  background-color: #f56e00;
+  color: #FFFFFF;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: -4px;
+  border-radius: 3px;
+}
+
+.compare-data.data-different:empty {
+  background-color: transparent;
+  color: inherit;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: 0px;
+  border: 0;
 }
 
 select[multiple].form-control {

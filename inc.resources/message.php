@@ -90,7 +90,7 @@ else if($inputPost->getUserAction() == 'unread')
 					;
 				$message = new AppMessageImpl(null, $database);
 				$message->where($specification)
-				->setRead(false)
+				->setIsRead(false)
 				->setTimeRead(null)
 				->setIpRead(null)
 				->update();
@@ -580,9 +580,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</tbody>
 			</table>
 			<?php
-			if(!$message->isRead())
+			if(!$message->isIsRead())
 			{
-				$message->setRead(true);
+				$message->setIsRead(true);
 				$message->setTimeRead(date('Y-m-d H:i:s'));
 				$message->setIpRead($_SERVER['REMOTE_ADDR']);
 				$message->update();
@@ -808,7 +808,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<input type="checkbox" class="checkbox check-slave checkbox-message-id" name="checked_row_id[]" value="<?php echo $message->getMessageId();?>"/>
 								</td>
 								<td>
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->message_id, $message->getMessageId());?>"><span class="fa <?php echo $message->isRead() ? 'fa-envelope-open':'fa-envelope';?>"></span></a>
+									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->message_id, $message->getMessageId());?>"><span class="fa <?php echo $message->isIsRead() ? 'fa-envelope-open':'fa-envelope';?>"></span></a>
 								</td>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="subject"><?php echo $message->getSubject();?></td>
