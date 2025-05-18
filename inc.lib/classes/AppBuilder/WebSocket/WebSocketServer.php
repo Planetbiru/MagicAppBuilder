@@ -352,7 +352,8 @@ class WebSocketServer {
      * @param string $message The received message.
      * @return void
      */
-    protected function onMessage($client, $message) {
+    protected function onMessage($client, $message) // NOSONAR
+    {
         // Default: print the message
         echo "Message received from client: $message\n";
     }
