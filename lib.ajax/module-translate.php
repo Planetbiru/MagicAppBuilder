@@ -237,6 +237,7 @@ if($inputPost->getUserAction() == 'get')
         'placeholder_enter_password',
         'reset_password',
         'username',
+        'show_all'
     );
 
     $response = array();

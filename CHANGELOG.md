@@ -304,3 +304,17 @@ MagicAppBuilder version 1.0 marks the first stable release, building upon the fe
 
 **MagicAppBuilder version 1.0 is the culmination of extensive development and testing, providing a solid foundation for building scalable, secure, and feature-rich applications.**
 
+# MagicAppBuilder Version 1.1
+
+## Updates
+
+-   Updated **MagicApp** and **MagicObject** to the latest versions.
+-   Updated and improved docblocks for better code documentation and maintainability.
+-   Updated module translation for improved multilingual support.
+-   Updated error message style for better clarity and consistency.
+
+## Bug Fixes
+
+-   Various bug fixes to improve stability and reliability.
+
+
