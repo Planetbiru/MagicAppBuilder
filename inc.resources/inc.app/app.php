@@ -1,5 +1,6 @@
 <?php
 
+use MagicAppTemplate\AppIpForwarder;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\SecretObject;
 
@@ -30,6 +31,10 @@ else
     require_once __DIR__ . "/500.php";
     exit();
 }
+
+// Forward IP Address
+AppIpForwarder::apply($appConfig->getIpForwarding());
+
 if($appConfig->getAccessLocalhostOnly())
 {
     $allowedIps = ['127.0.0.1', '::1'];

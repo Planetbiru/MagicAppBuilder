@@ -398,3 +398,27 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 -   **Theme Color for Mobile Browsers**  
     Added support for dynamic `theme-color` meta tags that automatically adjust to dark mode and light mode on mobile browsers, providing a more integrated and visually consistent user experience.
+
+-   **IP Forwarding Support for Proxy Access**  
+    Implemented IP forwarding logic to correctly capture the client’s real IP address when the application is accessed through a proxy.
+
+    **Example:**
+    
+    -  Enable forwarding via Cloudflare proxy:
+
+    ```yaml
+    ipForwarding:
+        enabled: true
+        headers: 
+            - CF-Connecting-IP
+            - X-Forwarded-For
+            - True-Client-IP
+    ```
+
+    -  Disable forwarding:
+
+    ```yaml
+    ipForwarding:
+        enabled: false
+        headers: [ ]
+    ```
