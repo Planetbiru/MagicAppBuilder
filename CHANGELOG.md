@@ -373,11 +373,6 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 ## What's New
 
-## Improvement
-
--   **Menu Cache Efficiency**  
-    The menu caching mechanism has been improved to be more efficient. Updates to the menu cache now consume fewer resources and respond faster, ensuring that menu changes are reflected promptly without unnecessary overhead.
-
 -   **Database Time Zone System Configuration**  
     A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
     
@@ -394,4 +389,10 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
     }
     ```
     
-    This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as UTC+0. The database will use the `database.timeZoneSystem` configuration instead of `database.timeZone`.
+    This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as `UTC+0`. For time zone conversion, the database uses both the `database.timeZoneSystem` and `database.timeZone` configurations.
+
+## Improvements
+
+-   **Menu Cache Efficiency**  
+    The menu caching mechanism has been improved to be more efficient. Updates to the menu cache now consume fewer resources and respond faster, ensuring that menu changes are reflected promptly without unnecessary overhead.
+
