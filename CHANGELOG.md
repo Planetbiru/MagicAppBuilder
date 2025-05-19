@@ -256,67 +256,116 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
 
 # MagicAppBuilder Version 1.0
 
+## Overview
+
+MagicAppBuilder 1.0 marks the first official **stable release**, building on everything introduced in version 0.38 and adding numerous enhancements. It is ready for production use and provides a powerful, scalable, and reliable framework for developing modern web applications.
+
 ## What's New
 
-### Stable Release
+### Stable & Production-Ready
 
-MagicAppBuilder version 1.0 marks the first stable release, building upon the features and improvements introduced in version 0.38. This version is ready for production use and includes all the refinements and optimizations necessary for a robust and reliable application development framework.
+Version 1.0 delivers the stability, features, and performance enhancements required for production deployment, combining improvements from earlier iterations with new capabilities.
 
-### Key Features
+## Key Features
 
--   **Password History Management**: Prevents the reuse of old passwords for admin users, enhancing security.
--   **Password Reset via Email**: Allows admin users to reset their passwords securely using email-based reset links.
--   **Entity Generator**: Simplifies the creation of entity classes from database tables, reducing manual effort.
--   **Default Language Support**: Ensures a consistent language fallback mechanism for users who are not logged in.
--   **Chart Templates**: Provides pre-defined and customizable chart templates for seamless data visualization.
--   **Application Cookie Configuration**: Offers enhanced control over session security and cross-domain compatibility.
--   **Dockerfile Added**: Introduced a Dockerfile to simplify containerized deployments of MagicAppBuilder.
-
-### Improvements
-
--   **Session Variable Updates**: Prevents conflicts, allowing simultaneous logins for MagicAppBuilder and applications built with MagicObject in the same browser.
--   **Performance Optimizations**: Further optimized caching, database queries, and application workflows for better performance.
--   **Bug Fixes**: Addressed all known issues from version 0.x to ensure a smoother and more reliable experience.
--   **Cookie Configuration Fixes**: Resolved issues with cookie attributes to ensure proper behavior across different environments.
--   **Server Configuration**: Added server configuration to redirect all requests to `lib.themes` to their respective directories, improving resource management and access control.
--   **Default Theme Style Improvements**: Enhanced the visual appearance and responsiveness of the default theme, ensuring a better user experience across devices.
--   **Error Handling Pages**: Added `403.php` and `404.php` files to handle unauthorized and not-found requests, improving user experience and security.
--   **Updated Dependencies**: Upgraded to the latest versions of **MagicObject** and **MagicApp** for improved functionality and stability.
--   **Backend Only with Subquery**: Users can now select the "Subquery" option even when "Backend Only" is enabled, providing more flexibility in query configurations.
--   **Browser Support**: Added support for the following browsers:
-    -   Mozilla Firefox
-    -   Microsoft Edge
-    -   Google Chrome
-    -   Opera
-    -   Brave
-    -   Vivaldi
-
-    **Note**: Avoid using browsers other than those listed above due to potential compatibility issues with JavaScript, CSS, and HTML.
-
--   **Form Module Feature Fixes**: Resolved issues with the form module feature to ensure smoother operation and better user experience.
+-   **Password History Management**  
+    Prevents admin users from reusing old passwords, improving account security.
     
--   **Save and Load Module Feature Configuration**: Added functionality to save and load configuration for module features. This allows users to reuse the same configuration across different modules without having to manually reconfigure each time.
+-   **Password Reset via Email**  
+    Enables secure password reset for admins through email-based reset links.
+    
+-   **Entity Generator**  
+    Auto-generates entity classes from database tables to reduce manual work.
+    
+-   **Default Language Support**  
+    Ensures consistent language fallback for users who are not logged in.
+    
+-   **Chart Templates**  
+    Provides customizable and pre-defined templates for data visualization.
+    
+-   **Application Cookie Configuration**  
+    Enhanced cookie management, including cross-domain and secure options.
+    
+-   **Dockerfile Included**  
+    A Dockerfile is now included to simplify container-based deployment.
+    
+-   **Scroll Position Memory in Database Manager**  
+    Automatically saves and restores the table list’s scroll position, helping users continue seamlessly.
+    
+-   **Auto-Update Menu Cache**  
+    Menu cache is now automatically updated when modules change, ensuring the latest structure is always shown.
+    
 
-### Notes
+## Improvements
 
--   **Partially Backward-Compatible**: While this version retains compatibility with version 0.38 for most features, users who have upgraded to version 1.0 cannot fully revert to version 0.38.
--   Developers are encouraged to update their projects to version 1.0 to benefit from the stability and enhancements provided in this release.
-
-**MagicAppBuilder version 1.0 is the culmination of extensive development and testing, providing a solid foundation for building scalable, secure, and feature-rich applications.**
-
-# MagicAppBuilder Version 1.1
-
-## Updates
-
--   Updated **MagicApp** and **MagicObject** to the latest versions.
--   Updated and improved docblocks for better code documentation and maintainability.
--   Updated module translation for improved multilingual support.
--   Updated error message style for better clarity and consistency.
--   Preserve the scroll position of the table list in the database manager. The scroll position will be saved and restored to the last position when the page is reloaded, making it easier for users to continue working where they left off.
--   Menu cache is now updated automatically whenever a module is updated, ensuring users always see the latest menu structure.
+-   **Upgraded MagicApp & MagicObject**  
+    Updated to the latest versions for improved stability and compatibility.
+    
+-   **Enhanced Code Documentation**  
+    Improved docblocks for better developer experience and maintainability.
+    
+-   **Improved Multilingual Support**  
+    Updated module translations for smoother internationalization.
+    
+-   **Refined Error Message Design**  
+    Error messages now offer better visual clarity and consistency.
+    
+-   **Session Management Enhancements**  
+    Prevents conflicts during simultaneous logins between MagicAppBuilder and MagicObject-based apps in the same browser.
+    
+-   **Performance Enhancements**  
+    Optimizations to caching, database queries, and internal workflows for faster performance.
+    
+-   **Cookie Attribute Fixes**  
+    Fixed cookie handling to behave consistently across environments.
+    
+-   **Improved Server Routing**  
+    Requests to `lib.themes` are now properly redirected to enhance asset handling and access control.
+    
+-   **Default Theme Improvements**  
+    Visual and responsive improvements to the default theme for a better cross-device experience.
+    
+-   **New Error Pages**  
+    Added `403.php` and `404.php` pages for clearer handling of unauthorized and not-found requests.
+    
+-   **Backend-Only with Subquery Support**  
+    You can now use the "Subquery" option even when "Backend Only" mode is enabled.
+    
+-   **Expanded Browser Support**  
+    Officially supports:
+    
+    -   Mozilla Firefox
+        
+    -   Microsoft Edge
+        
+    -   Google Chrome
+        
+    -   Opera
+        
+    -   Brave
+        
+    -   Vivaldi
+        
+    
+    _Use of unsupported browsers may lead to compatibility issues with JavaScript, CSS, and HTML._
+    
+-   **Form Module Fixes**  
+    Improved reliability and functionality in the form module feature.
+    
+-   **Save & Load Module Configuration**  
+    Allows saving and reusing module feature configurations across different modules.
 
 ## Bug Fixes
 
--   Various bug fixes to improve stability and reliability.
+-   Numerous fixes from version 0.x to improve system stability and user experience.
 
+## Notes
+
+-   **Partial Backward Compatibility**  
+    While compatible with version 0.38 in most areas, version 1.0 does not fully support downgrading to earlier versions.
+    
+-   **Upgrade Recommended**  
+    Developers are encouraged to migrate their projects to version 1.0 to benefit from the latest features, improvements, and stability.
+
+**MagicAppBuilder 1.0** is the result of extensive development, testing, and community feedback — offering a dependable and feature-rich platform for building secure, modern, and scalable applications.
 
