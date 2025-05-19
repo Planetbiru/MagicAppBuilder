@@ -5,7 +5,7 @@ namespace MagicAppTemplate;
 use DOMDocument;
 use Exception;
 use MagicApp\Field;
-use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
+use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleMinImpl;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -13,7 +13,6 @@ use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 
 /**
@@ -263,11 +262,13 @@ class ApplicationMenu
             $menuData = json_decode($cache->getData(), true);
             if(empty($menuData))
             {
-                throw new NoRecordFoundException('Menu data not found in cache.');
+                // If cache is empty, update the menu cache
+                $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
             }
         }
         catch(Exception $e)
         {
+            // If cache not found, update the menu cache
             $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
         }
 		return $menuData;
@@ -408,7 +409,7 @@ class ApplicationMenu
         $specialAcess = false;
         try
         {
-            $adminLevel = new AppAdminLevelImpl(null, $this->database);
+            $adminLevel = new AppAdminLevelMinImpl(null, $this->database);
             $adminLevel->findOneByAdminLevelId($adminLevelId);
             $specialAcess = $adminLevel->getSpecialAccess();
         }
