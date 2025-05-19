@@ -396,3 +396,5 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 -   **Menu Cache Efficiency**  
     The menu caching mechanism has been improved to be more efficient. Updates to the menu cache now consume fewer resources and respond faster, ensuring that menu changes are reflected promptly without unnecessary overhead.
 
+-   **Theme Color for Mobile Browsers**  
+    Added support for dynamic `theme-color` meta tags that automatically adjust to dark mode and light mode on mobile browsers, providing a more integrated and visually consistent user experience.
