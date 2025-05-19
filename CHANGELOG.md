@@ -373,23 +373,53 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 ## What's New
 
--   **Database Time Zone System Configuration**  
-    A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
-    
-    **Example:**
-    
-    If the `$currentUser` object has a timeZone property, you can add the following code:
-    
-    ```php
-    if($currentUser->issetTimeZone() && $currentUser->getTimeZone() != $database->getDatabaseCredentials()->getTimeZone())
-    {
-        date_default_timezone_set($currentUser->getTimeZone());
-        $database->getDatabaseCredentials()->setTimeZone($currentUser->getTimeZone());
-        $database->setTimeZone($currentUser->getTimeZone());
-    }
-    ```
-    
-    This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as `UTC+0`. For time zone conversion, the database uses both the `database.timeZoneSystem` and `database.timeZone` configurations.
+### Database Time Zone System Configuration
+
+A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
+
+**Example:**
+
+If the `$currentUser` object has a timeZone property, you can add the following code:
+
+```php
+if($currentUser->issetTimeZone() && $currentUser->getTimeZone() != $database->getDatabaseCredentials()->getTimeZone())
+{
+    date_default_timezone_set($currentUser->getTimeZone());
+    $database->getDatabaseCredentials()->setTimeZone($currentUser->getTimeZone());
+    $database->setTimeZone($currentUser->getTimeZone());
+}
+```
+
+This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as `UTC+0`. For time zone conversion, the database uses both the `database.timeZoneSystem` and `database.timeZone` configurations.
+
+### IP Forwarding Support for Proxy Access
+
+Implemented IP forwarding logic to correctly capture the client’s real IP address when the application is accessed through a proxy.
+
+**Example:**
+
+-  Enable forwarding via Cloudflare proxy:
+
+```yaml
+ipForwarding:
+    enabled: true
+    headers: 
+        - CF-Connecting-IP
+        - X-Forwarded-For
+        - True-Client-IP
+```
+
+-  Disable forwarding:
+
+```yaml
+ipForwarding:
+    enabled: false
+    headers: [ ]
+```
+
+### Secure Configuration with @EncryptOut and @DecryptIn
+
+Added support for secure configuration management using `@EncryptOut` and `@DecryptIn` annotations. Application configuration values such as database and session settings can now be encrypted and decrypted automatically, enhancing security for sensitive information.
 
 ## Improvements
 

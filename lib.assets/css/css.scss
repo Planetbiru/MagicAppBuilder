@@ -1679,3 +1679,18 @@ li.menu-exists > a::after{
 	}
 }
 }
+
+.application-setting
+{
+	#accordion-setting{
+		#collapse3
+		{
+			.card-body
+			{
+				max-height: 400px;
+				overflow-y: auto;
+			}
+		}
+		
+	}
+}
