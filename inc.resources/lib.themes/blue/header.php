@@ -10,6 +10,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8fbff">
     <title><?php echo $appDocumentTitle;?></title>
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/font-awesome/all.min.css">
