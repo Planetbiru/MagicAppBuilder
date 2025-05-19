@@ -255,6 +255,10 @@ $nameInIndonesian = array(
                                 <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
                             </tr>
                             <tr>
+                                <td>Time Zone System</td>
+                                <td><input class="form-control" type="text" name="database_time_zone_system" id="database_time_zone_system" value="<?php echo $cfgDatabase->getTimeZoneSystem(); ?>"></td>
+                            </tr>
+                            <tr>
                                 <td></td>
                                 <td>
                                     <button class="btn btn-primary" type="button" id="test-database-connection"><i class="fa-solid fa-right-left"></i> Test Connection</button>

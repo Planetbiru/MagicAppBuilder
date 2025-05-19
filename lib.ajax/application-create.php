@@ -260,7 +260,8 @@ $databaseConfig = array(
     'password' => '',
     'database_name' => '',
     'database_schema' => '',
-    'time_zone' => 'Asia/Jakarta'
+    'time_zone' => 'Asia/Jakarta',
+    'time_zone_system' => 'Asia/Jakarta',
 );
 
 $newApp->setEntityInfo($entityInfo);

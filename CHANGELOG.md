@@ -378,3 +378,20 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 -   **Menu Cache Efficiency**  
     The menu caching mechanism has been improved to be more efficient. Updates to the menu cache now consume fewer resources and respond faster, ensuring that menu changes are reflected promptly without unnecessary overhead.
 
+-   **Database Time Zone System Configuration**  
+    A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
+    
+    **Example:**
+    
+    If the `$currentUser` object has a timeZone property, you can add the following code:
+    
+    ```php
+    if($currentUser->issetTimeZone() && $currentUser->getTimeZone() != $database->getDatabaseCredentials()->getTimeZone())
+    {
+        date_default_timezone_set($currentUser->getTimeZone());
+        $database->getDatabaseCredentials()->setTimeZone($currentUser->getTimeZone());
+        $database->setTimeZone($currentUser->getTimeZone());
+    }
+    ```
+    
+    This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as UTC+0. The database will use the `database.timeZoneSystem` configuration instead of `database.timeZone`.
