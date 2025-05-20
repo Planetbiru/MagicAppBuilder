@@ -48,13 +48,10 @@ if (file_exists($appConfigPath)) {
     if (empty($schemaName)) {
         $schemaName = $databaseConfig->getDatabaseSchema();
     }
-    if(stripos($databaseConfig->getDriver(), 'sqlite') !== false)
+    if(stripos($databaseConfig->getDriver(), 'sqlite') !== false && !file_exists(dirname($databaseConfig->getDatabaseFilePath())))
     {
-        if(!file_exists(dirname($databaseConfig->getDatabaseFilePath())))
-        {
-            // Create direcory
-            mkdir(dirname($databaseConfig->getDatabaseFilePath()), 0755, true);
-        }
+        // Create direcory
+        mkdir(dirname($databaseConfig->getDatabaseFilePath()), 0755, true);
     }
     $databaseConfig->setCharset('UTF8');
     $database = new PicoDatabase($databaseConfig);
