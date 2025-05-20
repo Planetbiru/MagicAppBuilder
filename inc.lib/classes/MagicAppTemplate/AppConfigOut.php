@@ -24,7 +24,7 @@ class AppConfigOut extends SecretObject
      * automatic encryption is applied.
      *
      * @EncryptOut
-     * @var string
+     * @var SecretObject
      */
     protected $database;
 
@@ -36,7 +36,7 @@ class AppConfigOut extends SecretObject
      * via the @EncryptOut annotation.
      *
      * @EncryptOut
-     * @var string
+     * @var SecretObject
      */
     protected $sessions;
 }

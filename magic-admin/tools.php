@@ -29,6 +29,7 @@ $dataFilter = null;
 
 $composerJson = dirname(__DIR__) . "/inc.lib/composer.json";
 $composerLock = dirname(__DIR__) . "/inc.lib/composer.lock";
+
 $lastUpdate = date("Y-m-d H:i:s", filemtime($composerLock));
 $composerObject = (new MagicObject())->loadJsonFile($composerJson, false, true, true);
 $bundeledMagicAppVersion = $composerObject->getRequire()->get("planetbiru/magic-app");

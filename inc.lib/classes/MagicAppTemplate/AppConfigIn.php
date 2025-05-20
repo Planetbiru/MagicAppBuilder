@@ -23,7 +23,7 @@ class AppConfigIn extends SecretObject
      * be decrypted automatically when accessed.
      *
      * @DecryptIn
-     * @var string
+     * @var SecretObject
      */
     protected $database;
 
@@ -34,7 +34,7 @@ class AppConfigIn extends SecretObject
      * which is also expected to be encrypted and decrypted via the framework.
      *
      * @DecryptIn
-     * @var string
+     * @var SecretObject
      */
     protected $sessions;
 }
