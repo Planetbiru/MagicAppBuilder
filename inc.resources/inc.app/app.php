@@ -8,7 +8,7 @@ use MagicObject\SecretObject;
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
 // To enable secure configuration, set $enableSecureConfig to true.
-$enableSecureConfig = true;
+$enableSecureConfig = false;
 
 $appConfig = new SecretObject();
 $appConfigPath = dirname(__DIR__)."/inc.cfg/application.yml";

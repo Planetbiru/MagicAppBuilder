@@ -10,6 +10,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $constShowActive = ' show active';
 $constSelected = ' selected';
+$constChecked = ' checked';
 $inputGet = new InputGet();
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -167,7 +168,7 @@ $nameInIndonesian = array(
                                         <tr>
                                         <td><input class="form-control" type="text" name="name[<?php echo $index;?>]" value="<?php echo $location->getName();?>"></td>
                                         <td><input class="form-control" type="text" name="path[<?php echo $index;?>]" value="<?php echo $location->getPath();?>"></td>
-                                        <td><input type="checkbox" name="checked[<?php echo $index;?>]"<?php echo $location->isActive() ? ' checked':'';?>></td>
+                                        <td><input type="checkbox" name="checked[<?php echo $index;?>]"<?php echo $location->isActive() ? $constChecked:'';?>></td>
                                         <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
                                         </tr>
                                         <?php
@@ -316,11 +317,11 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Cookie Secure</td>
-                                <td><label for="sessions_cookie_secure"><input type="checkbox" name="sessions_cookie_secure" id="sessions_cookie_secure" value="1"<?php echo $cfgSession->isCookieSecure() ? ' checked':'';?>> Yes</label></td>
+                                <td><label for="sessions_cookie_secure"><input type="checkbox" name="sessions_cookie_secure" id="sessions_cookie_secure" value="1"<?php echo $cfgSession->isCookieSecure() ? $constChecked:'';?>> Yes</label></td>
                             </tr>
                             <tr>
                                 <td>Cookie HTTP Only</td>
-                                <td><label for="sessions_cookie_http_only"><input type="checkbox" name="sessions_cookie_http_only" id="sessions_cookie_http_only" value="1"<?php echo $cfgSession->isCookieSecure() ? ' checked':'';?>> Yes</label></td>
+                                <td><label for="sessions_cookie_http_only"><input type="checkbox" name="sessions_cookie_http_only" id="sessions_cookie_http_only" value="1"<?php echo $cfgSession->isCookieSecure() ? $constChecked:'';?>> Yes</label></td>
                             </tr>
                             <tr>
                                 <td>Cookie Same Site</td>

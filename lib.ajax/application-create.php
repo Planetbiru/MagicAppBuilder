@@ -9,7 +9,6 @@ use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Database\PicoDatabaseType;
-use Random\Engine\Secure;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -86,6 +85,11 @@ function sendResponse($response, $contentType, $headers, $httpStatus, $async)
 }
 
 $async = false;
+$currentTimeZone = date_default_timezone_get();
+if(empty($currentTimeZone))
+{
+    $currentTimeZone = 'Asia/Jakarta';
+}
 
 $phpIni = new SecretObject($builderConfig->getPhpIni());
 // Set max_execution_time
@@ -261,8 +265,8 @@ $databaseConfig = array(
     'password' => '',
     'database_name' => '',
     'database_schema' => '',
-    'time_zone' => 'Asia/Jakarta',
-    'time_zone_system' => 'Asia/Jakarta',
+    'time_zone' => $currentTimeZone,
+    'time_zone_system' => $currentTimeZone,
 );
 
 $newApp->setEntityInfo($entityInfo);
