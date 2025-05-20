@@ -3,14 +3,12 @@
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoEntityInfo;
-use MagicApp\AppDto\MocroServices\PicoFieldWaitingFor;
 use MagicApp\AppDto\MocroServices\PicoInputField;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoOutputFieldDetail;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputDetail;
 use MagicAdmin\AppEntityLanguageImpl;
-use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 
@@ -22,7 +20,7 @@ $picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
 $data = new PicoUserFormOutputDetail($entity, $picoEntityInfo);
 
 $appConfig = new SecretObject();
-$entityLanguage = new AppEntityLanguage($entity, $appConfig, 'en');
+$entityLanguage = new AppEntityLanguageImpl($entity, $appConfig, 'en');
 
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("applicationId", $entityLanguage->get("applicationId")), "string", new PicoInputField($entity->get("applicationId"), $entity->get("applicationId"))));
 $data->addOutput(new PicoOutputFieldDetail(new PicoInputField("name", $entityLanguage->get("name")), "string", new PicoInputField($entity->get("name"), $entity->get("name"))));
