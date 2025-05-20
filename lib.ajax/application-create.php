@@ -9,7 +9,6 @@ use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Database\PicoDatabaseType;
-use Random\Engine\Secure;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
