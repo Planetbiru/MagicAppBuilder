@@ -452,3 +452,7 @@ Added support for secure configuration management using `@EncryptOut` and `@Decr
         enabled: false
         headers: [ ]
     ```
+
+## Bug Fixes
+
+-   Various bug fixes to improve stability and reliability.
