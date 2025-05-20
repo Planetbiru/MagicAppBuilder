@@ -98,7 +98,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
   <div class="col col-xl-3">
     <div class="card h-100">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Area Chart</h5>
+        <h5 class="card-title">Polar Area Chart</h5>
         <canvas id="area-chart"></canvas>
       </div>
     </div>

@@ -9,6 +9,7 @@ use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
 use MagicObject\Constants\PicoMime;
 use MagicObject\Database\PicoDatabaseType;
+use Random\Engine\Secure;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -260,7 +261,8 @@ $databaseConfig = array(
     'password' => '',
     'database_name' => '',
     'database_schema' => '',
-    'time_zone' => 'Asia/Jakarta'
+    'time_zone' => 'Asia/Jakarta',
+    'time_zone_system' => 'Asia/Jakarta',
 );
 
 $newApp->setEntityInfo($entityInfo);
@@ -340,12 +342,20 @@ resetPassword:
 
 $newApp->setResetPassword($resetPasswordContainer->getResetPassword());
 
+$ipForwarding = new SecretObject();
+$ipForwarding->setEnabled(false);
+$ipForwarding->setHeaders(array(
+    'CF-Connecting-IP',
+    'X-Forwarded-For',
+    'True-Client-IP'
+));
+
+$newApp->setIpForwarding($ipForwarding);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
 
 $now = date("Y-m-d H:i:s");
-
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 $entityApplication->setApplicationId($newAppId);

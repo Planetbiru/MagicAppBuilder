@@ -1477,4 +1477,9 @@ li.menu-exists > a::after {
 .nav .fa::before, .nav .fa::after, .nav .fa-brands::before, .nav .fa-brands::after, .nav .fa-classic::before, .nav .fa-classic::after, .nav .fa-regular::before, .nav .fa-regular::after, .nav .fa-sharp::before, .nav .fa-sharp::after, .nav .fa-solid::before, .nav .fa-solid::after, .nav .fab::before, .nav .fab::after, .nav .far::before, .nav .far::after, .nav .fas::before, .nav .fas::after {
   width: 20px;
   text-align: center;
+}
+
+.application-setting #accordion-setting #collapse3 .card-body {
+  max-height: 400px;
+  overflow-y: auto;
 }/*# sourceMappingURL=css.css.map */

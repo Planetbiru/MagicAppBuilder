@@ -369,3 +369,86 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 **MagicAppBuilder 1.0** is the result of extensive development, testing, and community feedback — offering a dependable and feature-rich platform for building secure, modern, and scalable applications.
 
+# MagicAppBuilder Version 1.1
+
+## What's New
+
+### Database Time Zone System Configuration
+
+A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
+
+**Example:**
+
+If the `$currentUser` object has a timeZone property, you can add the following code:
+
+```php
+if($currentUser->issetTimeZone() && $currentUser->getTimeZone() != $database->getDatabaseCredentials()->getTimeZone())
+{
+    date_default_timezone_set($currentUser->getTimeZone());
+    $database->getDatabaseCredentials()->setTimeZone($currentUser->getTimeZone());
+    $database->setTimeZone($currentUser->getTimeZone());
+}
+```
+
+This code sets the application's time zone based on the user's time zone, while allowing the database to continue operating in a separate time zone, such as `UTC+0`. For time zone conversion, the database uses both the `database.timeZoneSystem` and `database.timeZone` configurations.
+
+### IP Forwarding Support for Proxy Access
+
+Implemented IP forwarding logic to correctly capture the client’s real IP address when the application is accessed through a proxy.
+
+**Example:**
+
+-  Enable forwarding via Cloudflare proxy:
+
+```yaml
+ipForwarding:
+    enabled: true
+    headers: 
+        - CF-Connecting-IP
+        - X-Forwarded-For
+        - True-Client-IP
+```
+
+-  Disable forwarding:
+
+```yaml
+ipForwarding:
+    enabled: false
+    headers: [ ]
+```
+
+### Secure Configuration with @EncryptOut and @DecryptIn
+
+Added support for secure configuration management using `@EncryptOut` and `@DecryptIn` annotations. Application configuration values such as database and session settings can now be encrypted and decrypted automatically, enhancing security for sensitive information.
+
+## Improvements
+
+-   **Menu Cache Efficiency**  
+    The menu caching mechanism has been improved to be more efficient. Updates to the menu cache now consume fewer resources and respond faster, ensuring that menu changes are reflected promptly without unnecessary overhead.
+
+-   **Theme Color for Mobile Browsers**  
+    Added support for dynamic `theme-color` meta tags that automatically adjust to dark mode and light mode on mobile browsers, providing a more integrated and visually consistent user experience.
+
+-   **IP Forwarding Support for Proxy Access**  
+    Implemented IP forwarding logic to correctly capture the client’s real IP address when the application is accessed through a proxy.
+
+    **Example:**
+    
+    -  Enable forwarding via Cloudflare proxy:
+
+    ```yaml
+    ipForwarding:
+        enabled: true
+        headers: 
+            - CF-Connecting-IP
+            - X-Forwarded-For
+            - True-Client-IP
+    ```
+
+    -  Disable forwarding:
+
+    ```yaml
+    ipForwarding:
+        enabled: false
+        headers: [ ]
+    ```

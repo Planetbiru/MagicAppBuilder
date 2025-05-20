@@ -576,10 +576,12 @@ function initPage()
       if(document.body.classList.contains('dark-mode'))
       {
         colorMode = 'dark-mode';
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', themeDark);
       }
       else
       {
         colorMode = 'light-mode';
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', themeLight);
       }
       window.localStorage.setItem('MagicAppBuilder.colorMode', colorMode);
   });

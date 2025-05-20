@@ -5,15 +5,14 @@ namespace MagicAppTemplate;
 use DOMDocument;
 use Exception;
 use MagicApp\Field;
-use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
+use MagicAppTemplate\Entity\App\AppAdminRoleMinImpl;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
 
 /**
@@ -263,11 +262,13 @@ class ApplicationMenu
             $menuData = json_decode($cache->getData(), true);
             if(empty($menuData))
             {
-                throw new NoRecordFoundException('Menu data not found in cache.');
+                // If cache is empty, update the menu cache
+                $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
             }
         }
         catch(Exception $e)
         {
+            // If cache not found, update the menu cache
             $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
         }
 		return $menuData;
@@ -277,57 +278,62 @@ class ApplicationMenu
      * Updates the menu cache for a specific admin level ID.
      *
      * @param string|null $adminLevelId The admin level ID to update the cache for. If null, updates all admin levels.
-     * @return array The updated menu data.
+     * @return array The menu data for the specified admin level ID.
      */
     public function updateMenuCache($adminLevelId = null)
     {
-        if(isset($adminLevelId) && !empty($adminLevelId))
-        {
-            return $this->updateMenuCacheByAdminLevelId($adminLevelId);
-        }
-        else
-        {
-            // Update all menu caches for all admin levels
-            $adminLevelFinder = new AppAdminRoleImpl(null, $this->database);
-            $pageData = $adminLevelFinder->findAll();
-            $menuData = array();
-            foreach($pageData->getResult() as $adminLevel)
-            {
-                $menuData = $this->updateMenuCacheByAdminLevelId($adminLevel->getAdminLevelId());
-            }
-            // Applocation will not use this menuData when update all menu cache
-            // but this is for future use if needed
-            return $menuData;
-        }
+        return $this->updateMenuCacheByAdminLevelId($adminLevelId);
     }
     
     /**
      * Updates the menu cache for a specific admin level ID by admin level ID.
      *
      * @param string $adminLevelId The admin level ID to update the cache for.
-     * @return array The updated menu data.
+     * @return array The menu data for the specified admin level ID.
      */
-    public function updateMenuCacheByAdminLevelId($adminLevelId)
+    public function updateMenuCacheByAdminLevelId($adminLevelId = null)
     {
-        $menuData = $this->getMenuByAdminLevelId($adminLevelId);
-        $dataToStore = json_encode($menuData);
+        $menuData = array();
+        $cacheFinder = new AppMenuCacheImpl(null, $this->database);
+        $cacheSpecs = PicoSpecification::getInstance();
+        if(isset($adminLevelId) && !empty($adminLevelId))
+        {
+            $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));   
+        }
+        
         $now = date('Y-m-d H:i:s');
-        $cache = new AppMenuCacheImpl(null, $this->database);
+        
         try
         {
-            $cache->findOneByAdminLevelId($adminLevelId);
-            $cache->setData($dataToStore);
-            $cache->setTimeEdit($now);
-            $cache->update(); // Update the menu data in the cache
+            $pageData = $cacheFinder->findAll($cacheSpecs);
+            if($pageData->getTotalResult() > 0)
+            {
+                foreach($pageData->getResult() as $cache)
+                {
+                    $menuData = $this->getMenuByAdminLevelId($cache->getAdminLevelId());
+                    $dataToStore = json_encode($menuData);
+                    
+                    $cache->setData($dataToStore);
+                    $cache->setTimeEdit($now);
+                    $cache->update(); // Update the menu data in the cache
+                }
+            }
+            else if(isset($adminLevelId) && !empty($adminLevelId))
+            {
+                $menuData = $this->getMenuByAdminLevelId($adminLevelId);
+                $dataToStore = json_encode($menuData);
+                
+                $cache = new AppMenuCacheImpl(null, $this->database);
+                $cache->setAdminLevelId($adminLevelId);
+                $cache->setData($dataToStore);
+                $cache->setTimeCreate($now);
+                $cache->setTimeEdit($now);
+                $cache->insert(); // Insert the new menu data into the cache
+            }
         }
         catch(Exception $e)
         {
-            $cache = new AppMenuCacheImpl(null, $this->database);
-            $cache->setAdminLevelId($adminLevelId);
-            $cache->setData($dataToStore);
-            $cache->setTimeCreate($now);
-            $cache->setTimeEdit($now);
-            $cache->insert(); // Store the menu data in the cache
+            // Do nothing
         } 
         return $menuData;
     }
@@ -403,7 +409,7 @@ class ApplicationMenu
         $specialAcess = false;
         try
         {
-            $adminLevel = new AppAdminLevelImpl(null, $this->database);
+            $adminLevel = new AppAdminLevelMinImpl(null, $this->database);
             $adminLevel->findOneByAdminLevelId($adminLevelId);
             $specialAcess = $adminLevel->getSpecialAccess();
         }
@@ -488,7 +494,7 @@ class ApplicationMenu
      * Checks whether the current user has permission to access the given module.
      *
      * @param AppModuleImpl $module Module to check access for.
-     * @param AppAdminRoleImpl[] $adminRoles List of admin roles assigned to the current user.
+     * @param AppAdminRoleMinImpl[] $adminRoles List of admin roles assigned to the current user.
      * @return bool Returns true if access is allowed, false otherwise.
      */
     public function isAllowedAccess($module, $adminRoles)
@@ -550,12 +556,12 @@ class ApplicationMenu
      * Loads the admin roles from the database.
      *
      * @param string $adminLevelId The admin level ID to filter the roles.
-     * @return AppAdminRoleImpl[] Array of admin roles.
+     * @return AppAdminRoleMinImpl[] Array of admin roles.
      */
     public function loadAminRole($adminLevelId)
     {
         $adminRoles = [];
-		$adminRole = new AppAdminRoleImpl(null, $this->database);
+		$adminRole = new AppAdminRoleMinImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
