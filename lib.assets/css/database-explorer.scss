@@ -625,17 +625,28 @@ a.all-table{
     color: #fafafa;
 }
 
-.context-menu-relation{
-    width: 280px;
-    max-height: 350px;
-    overflow-y: auto;
-}
-.context-menu ul li[data-type="relation"]{
-    padding: 5px 0;
-}
-.context-menu ul li[data-type="relation"]:hover{
-    background-color: #ffffff;
-}
-.context-menu ul li[data-type="relation"]::before{
-    display: none;
+.context-menu-relation {
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  ul {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    li[data-type="relation"] {
+      padding: 3px 5px;
+
+      &:hover {
+        background-color: #ffffff;
+      }
+
+      &::before {
+        display: none;
+      }
+
+      * {
+        vertical-align: text-top;
+      }
+    }
+  }
 }

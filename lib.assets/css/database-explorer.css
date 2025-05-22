@@ -699,19 +699,23 @@ a.all-table {
 }
 
 .context-menu-relation {
-  width: 280px;
-  max-height: 350px;
+  width: 250px;
+  max-height: 300px;
   overflow-y: auto;
 }
-
-.context-menu ul li[data-type=relation] {
-  padding: 5px 0;
+.context-menu-relation ul {
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
-
-.context-menu ul li[data-type=relation]:hover {
+.context-menu-relation ul li[data-type=relation] {
+  padding: 3px 5px;
+}
+.context-menu-relation ul li[data-type=relation]:hover {
   background-color: #ffffff;
 }
-
-.context-menu ul li[data-type=relation]::before {
+.context-menu-relation ul li[data-type=relation]::before {
   display: none;
+}
+.context-menu-relation ul li[data-type=relation] * {
+  vertical-align: text-top;
 }/*# sourceMappingURL=database-explorer.css.map */
