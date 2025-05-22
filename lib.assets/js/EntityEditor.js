@@ -1546,6 +1546,9 @@ class EntityEditor {
         svg.setAttribute('width', 4);
         svg.setAttribute('height', 4);
         svg.classList.add('erd-svg');
+
+        initDiagramContextMenu(svg);
+
         diagram.appendChild(svg);
         diagramContainer.appendChild(diagram);
         diagramRenderer[id] = new EntityRenderer(`.diagram-container #${id} .erd-svg`);
@@ -1677,10 +1680,11 @@ class EntityEditor {
      */
     clearEntities()
     {
-        let svg = document.querySelector('.diagram-container .all-entities');
-        if(svg)
+        let allDiagramContainer = document.querySelector('.diagram-container .all-entities');
+        if(allDiagramContainer)
         {
-            svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            allDiagramContainer.appendChild(svg);
         }
     }
 

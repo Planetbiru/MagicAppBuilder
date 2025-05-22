@@ -1,0 +1,98 @@
+/* Context Menu Styles */
+.context-menu {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  padding: 5px;
+  width: 180px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add transition for hover effect */
+}
+
+.context-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.context-menu ul li {
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.context-menu ul li:hover {
+  background-color: #f0f0f0;
+}
+
+/* Basic styling for the menu list */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Styling for icons using pseudo-elements */
+.context-menu li::before {
+  content: ""; /* Default content */
+  display: inline-block;
+  margin-right: 6px; /* Space between icon and text */
+  color: inherit; /* Inherit color from the parent li */
+  font-size: 12px;
+  vertical-align: top;
+  font-family: "Font Awesome 5 Free"; /* NOSONAR */
+  font-weight: 900;
+  width: 12px;
+}
+
+/* Icon for 'open' operation (Green) */
+.context-menu [data-operation=open]::before {
+  content: "\f06e"; /* Font Awesome icon for file (open) */
+  color: #4CAF50; /* Green for open */
+}
+
+/* Icon for 'rename' operation (Orange) */
+.context-menu [data-operation=rename]::before {
+  content: "\f044"; /* Font Awesome icon for pencil (rename) */
+  color: #FF9800; /* Orange for rename */
+}
+
+/* Icon for 'download' operation (Blue) */
+.context-menu [data-operation=download]::before, .context-menu [data-operation=compress]::before, .context-menu [data-operation=root-dowload]::before {
+  content: "\f019"; /* Font Awesome icon for download */
+  color: #2196F3; /* Blue for download */
+}
+
+/* Icon for 'delete' operation (Red) */
+.context-menu [data-operation=delete]::before {
+  content: "\f1f8"; /* Font Awesome icon for trash (delete) */
+  color: #F44336; /* Red for delete */
+}
+
+/* Icon for 'new' operation (Purple) */
+.context-menu [data-operation=new-file]::before, .context-menu [data-operation=root-new-file]::before {
+  content: "\f15b"; /* Font Awesome icon for file (new) */
+  color: #007cff; /* Blue for new */
+}
+
+/* Icon for 'new-dir' operation (Yellow) */
+.context-menu [data-operation=new-dir]::before, .context-menu [data-operation=root-new-dir]::before {
+  content: "\f114"; /* Font Awesome icon for folder (new directory) */
+  color: #FFC107; /* Yellow for new directory */
+}
+
+/* Icon for 'upload' operation (Green for upload) */
+.context-menu [data-operation=upload-file]::before {
+  content: "\f093"; /* Font Awesome icon for upload */
+  color: #4CAF50; /* Green for upload */
+}
+
+/* Icon for 'reset' operation (Gray for Reset Content) */
+.context-menu [data-operation=reset]::before, .context-menu [data-operation=refresh-dir]::before {
+  content: "\f021"; /* Font Awesome icon for refresh (reset) */
+  color: #2196F3; /* Blue for reset */
+}/*# sourceMappingURL=context-menu.css.map */
