@@ -27,8 +27,12 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
     <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
+    <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
+
+
+    
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -287,5 +291,13 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
             </div>
         </div>
     </div>
+
+
+<div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
+    <ul>
+        <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
+        <li data-type="relation"><label for="id2"><input id="id2" type="checkbox"> prodi.prodi_id</label></li>
+    </ul>
+</div>
 </body>
 </html>

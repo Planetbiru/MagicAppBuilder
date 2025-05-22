@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '5c3f855bf25d671f4488b29a292ed3f1e1aaa0f1',
+        'reference' => '6f8dfffe465270b2852b2cee8fc52aa0ad32806b',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '5c3f855bf25d671f4488b29a292ed3f1e1aaa0f1',
+            'reference' => '6f8dfffe465270b2852b2cee8fc52aa0ad32806b',
             'dev_requirement' => false,
         ),
         'meyfa/php-svg' => array(

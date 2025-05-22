@@ -14,14 +14,12 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
-use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageFolderImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -47,7 +45,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$messageFolder = new AppMessageFolderImpl(null, $database);
 	$messageFolder->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$messageFolder->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$messageFolder->setAdminId($currentUser->getAdminId());
 	$messageFolder->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$messageFolder->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$messageFolder->setTimeCreate($currentAction->getTime());
@@ -72,7 +70,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$messageFolder = new AppMessageFolderImpl(null, $database);
 	$updater = $messageFolder->where($specification)
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setAdminId($currentUser->getAdminId())
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -222,23 +220,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdmin();?></td>
-						<td>
-							<select class="form-control" name="admin_id" id="admin_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
 							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="" autocomplete="off"/>
@@ -290,23 +271,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
 							<input type="text" class="form-control" name="name" id="name" value="<?php echo $messageFolder->getName();?>" autocomplete="off" required="required"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdmin();?></td>
-						<td>
-							<select class="form-control" name="admin_id" id="admin_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminMinImpl(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->active, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->adminId, Field::of()->name, $messageFolder->getAdminId())
-								; ?>
-							</select>
 						</td>
 					</tr>
 					<tr>

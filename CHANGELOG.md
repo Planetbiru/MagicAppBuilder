@@ -421,6 +421,10 @@ ipForwarding:
 
 Added support for secure configuration management using `@EncryptOut` and `@DecryptIn` annotations. Application configuration values such as database and session settings can now be encrypted and decrypted automatically, enhancing security for sensitive information.
 
+### ERD Relation Selection via Context Menu
+
+When creating an ERD, users can now choose which related tables to display by right-clicking on an entity. MagicAppBuilder will show a context menu listing all tables that can be referenced from the selected entity. Users can check the desired tables, and MagicAppBuilder will update the diagram to add the checked entities automatically.
+
 ## Improvements
 
 -   **Menu Cache Efficiency**  
@@ -452,3 +456,7 @@ Added support for secure configuration management using `@EncryptOut` and `@Decr
         enabled: false
         headers: [ ]
     ```
+
+## Bug Fixes
+
+-   Various bug fixes to improve stability and reliability.

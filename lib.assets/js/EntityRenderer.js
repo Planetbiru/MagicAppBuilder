@@ -319,6 +319,7 @@ class EntityRenderer {
             columnText.setAttribute("font-size", this.columnFontSize);
             columnText.setAttribute("fill", this.columnTextColor);
             columnText.textContent = col.name;
+            columnText.classList.add('diagram-column-name');
             group.appendChild(columnText);
 
             const typeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
