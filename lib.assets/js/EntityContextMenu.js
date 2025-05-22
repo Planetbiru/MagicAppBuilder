@@ -42,7 +42,7 @@ function initDiagramContextMenu(svg)
 /**
  * Render the context menu for a given entity.
  * @param {Element} entity - The SVG group element representing the entity.
- * @returns {int}
+ * @returns {number} The number of relation menu items rendered.
  */
 function renderContextMenu(entity) {
     const contextMenu = document.querySelector('#context-menu');
@@ -93,6 +93,7 @@ function renderContextMenu(entity) {
 /**
  * Select or deselect a table in the table list based on the context menu checkbox.
  * @param {Event} e - The change event from the context menu checkbox.
+ * @returns {void}
  */
 function selectTable(e)
 {
