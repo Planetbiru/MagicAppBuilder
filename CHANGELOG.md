@@ -417,9 +417,9 @@ ipForwarding:
     headers: [ ]
 ```
 
-### Secure Configuration with @EncryptOut and @DecryptIn
+### Secure Configuration with `EncryptOut` and `DecryptIn`
 
-Added support for secure configuration management using `@EncryptOut` and `@DecryptIn` annotations. Application configuration values such as database and session settings can now be encrypted and decrypted automatically, enhancing security for sensitive information.
+Added support for secure configuration management using `EncryptOut` and `DecryptIn` annotations. Application configuration values such as database and session settings can now be encrypted and decrypted automatically, enhancing security for sensitive information.
 
 ### ERD Relation Selection via Context Menu
 
