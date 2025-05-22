@@ -81,6 +81,25 @@ class PicoSpecification // NOSONAR
     }
 
     /**
+     * Creates a specification that always evaluates to true.
+     *
+     * This method returns a PicoSpecification instance containing a predicate
+     * that always evaluates to true (e.g., "1 = 1"). This can be used as a default
+     * or placeholder specification in query building.
+     *
+     * @return self A PicoSpecification instance that always evaluates to true.
+     */
+    public static function alwaysTrue()
+    {
+        $instance = new self;
+        if(isset($field))
+        {
+            $instance->addAnd(PicoPredicate::alwaysTrue());
+        }
+        return $instance;
+    }
+
+    /**
      * Checks if a real join table is required based on the specifications.
      *
      * @return bool true if a join is required, false otherwise.

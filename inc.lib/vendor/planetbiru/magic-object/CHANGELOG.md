@@ -560,3 +560,30 @@ echo $object->toFixedData(4)."\r\n"; // Outputs 100.1235
 
 - **Removed Exception Throwing for Empty Results in Multi-Record Finders**  
   In this version, `EmptyResultException` and `NoRecordFoundException` are no longer thrown when methods for finding multiple records return an empty result. Instead, these methods will simply return an empty array or collection. This change improves developer experience by making it easier to handle cases where no records are found, without the need for additional exception handling.
+
+
+# MagicObject version 3.13
+
+## What's New
+
+### Added: `alwaysTrue()`  Specification Method
+
+A new static method `PicoSpecification::alwaysTrue()` has been added.  
+This method returns a specification that always evaluates to `TRUE` (`WHERE 1 = 1`  in SQL). It is especially useful for scenarios where developers need to update, delete, or retrieve **all records**  from a table without any filtering.
+
+**Example usage:**
+
+```php
+$specs = PicoSpecification::alwaysTrue();
+
+$userFinder = new UserMin(null, $database);
+try {
+    $pageData = $userFinder->findAll($specs);
+    foreach($pageData->getResult() as $user)
+    {
+      echo $user."\r\n";
+    }
+} catch (Exception $e) {
+    // Optional: handle or ignore
+}
+```

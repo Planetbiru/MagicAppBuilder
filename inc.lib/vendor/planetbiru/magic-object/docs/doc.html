@@ -14011,7 +14011,22 @@ to be used when constructing database queries.</p>
 <h2>Properties</h2>
 <h2>Methods</h2>
 <div class='method'>
-<div class="method-identity">1. <span class="method-label">__construct</span></div>
+<div class="method-identity">1. <span class="method-label">alwaysTrue</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">alwaysTrue</span>() : <span class="return-type">self</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Creates a predicate that always evaluates to true.</p>
+<p>This method returns a PicoPredicate instance representing a condition
+that is always true (e.g., &quot;1 = 1&quot;), which can be useful as a default
+or placeholder predicate in query building.</p>
+<h3>Return</h3>
+<div class="return-type">self</div>
+<div class="return-description"><p>A PicoPredicate instance that always evaluates to true.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">2. <span class="method-label">__construct</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__construct</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span>|<span class="parameter-type">null</span> <span class="parameter-name">$field <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
@@ -14030,7 +14045,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">2. <span class="method-label">isRequireJoin</span></div>
+<div class="method-identity">3. <span class="method-label">isRequireJoin</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isRequireJoin</span>() : <span class="return-type">bool</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14042,7 +14057,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">3. <span class="method-label">equals</span></div>
+<div class="method-identity">4. <span class="method-label">equals</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">equals</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14062,7 +14077,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">4. <span class="method-label">notEquals</span></div>
+<div class="method-identity">5. <span class="method-label">notEquals</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">notEquals</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14082,7 +14097,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">5. <span class="method-label">isNull</span></div>
+<div class="method-identity">6. <span class="method-label">isNull</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isNull</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span><br>
@@ -14099,7 +14114,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">6. <span class="method-label">isNotNull</span></div>
+<div class="method-identity">7. <span class="method-label">isNotNull</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isNotNull</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span><br>
@@ -14116,7 +14131,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">7. <span class="method-label">in</span></div>
+<div class="method-identity">8. <span class="method-label">in</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">in</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14136,7 +14151,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">8. <span class="method-label">inRange</span></div>
+<div class="method-identity">9. <span class="method-label">inRange</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">inRange</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14156,7 +14171,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">9. <span class="method-label">between</span></div>
+<div class="method-identity">10. <span class="method-label">between</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">between</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14179,7 +14194,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">10. <span class="method-label">notIn</span></div>
+<div class="method-identity">11. <span class="method-label">notIn</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">notIn</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14199,7 +14214,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">11. <span class="method-label">like</span></div>
+<div class="method-identity">12. <span class="method-label">like</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">like</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14219,7 +14234,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">12. <span class="method-label">notLike</span></div>
+<div class="method-identity">13. <span class="method-label">notLike</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">notLike</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14239,7 +14254,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">13. <span class="method-label">lessThan</span></div>
+<div class="method-identity">14. <span class="method-label">lessThan</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">lessThan</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14259,7 +14274,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">14. <span class="method-label">greaterThan</span></div>
+<div class="method-identity">15. <span class="method-label">greaterThan</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">greaterThan</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14279,7 +14294,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">15. <span class="method-label">lessThanOrEquals</span></div>
+<div class="method-identity">16. <span class="method-label">lessThanOrEquals</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">lessThanOrEquals</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14299,7 +14314,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">16. <span class="method-label">greaterThanOrEquals</span></div>
+<div class="method-identity">17. <span class="method-label">greaterThanOrEquals</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">greaterThanOrEquals</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -14319,7 +14334,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">17. <span class="method-label">getField</span></div>
+<div class="method-identity">18. <span class="method-label">getField</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getField</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14331,7 +14346,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">18. <span class="method-label">getValue</span></div>
+<div class="method-identity">19. <span class="method-label">getValue</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getValue</span>() : <span class="return-type">mixed</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14343,7 +14358,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">19. <span class="method-label">getComparation</span></div>
+<div class="method-identity">20. <span class="method-label">getComparation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getComparation</span>() : <span class="return-type">PicoDataComparation</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14355,7 +14370,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">20. <span class="method-label">getFilterLogic</span></div>
+<div class="method-identity">21. <span class="method-label">getFilterLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getFilterLogic</span>() : <span class="return-type">string</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14367,7 +14382,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">21. <span class="method-label">setFilterLogic</span></div>
+<div class="method-identity">22. <span class="method-label">setFilterLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">setFilterLogic</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$filterLogic</span><br>
@@ -14384,7 +14399,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">22. <span class="method-label">generateLikeStarts</span></div>
+<div class="method-identity">23. <span class="method-label">generateLikeStarts</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">generateLikeStarts</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -14401,7 +14416,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">23. <span class="method-label">generateLikeEnds</span></div>
+<div class="method-identity">24. <span class="method-label">generateLikeEnds</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">generateLikeEnds</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -14418,7 +14433,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">24. <span class="method-label">generateLikeContains</span></div>
+<div class="method-identity">25. <span class="method-label">generateLikeContains</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">generateLikeContains</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -14435,7 +14450,7 @@ an IN condition based on the value type.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">25. <span class="method-label">__call</span></div>
+<div class="method-identity">26. <span class="method-label">__call</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__call</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$method</span>, <br>
@@ -14470,7 +14485,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">26. <span class="method-label">__set</span></div>
+<div class="method-identity">27. <span class="method-label">__set</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__set</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$name</span>, <br>
@@ -14488,7 +14503,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">27. <span class="method-label">getInstance</span></div>
+<div class="method-identity">28. <span class="method-label">getInstance</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">getInstance</span>() : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
@@ -14500,7 +14515,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">28. <span class="method-label">functionLower</span></div>
+<div class="method-identity">29. <span class="method-label">functionLower</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">functionLower</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -14517,7 +14532,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">29. <span class="method-label">functionUpper</span></div>
+<div class="method-identity">30. <span class="method-label">functionUpper</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">functionUpper</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -14534,7 +14549,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">30. <span class="method-label">functionAndValue</span></div>
+<div class="method-identity">31. <span class="method-label">functionAndValue</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">functionAndValue</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$function</span>, <br>
@@ -14554,7 +14569,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">31. <span class="method-label">__toString</span></div>
+<div class="method-identity">32. <span class="method-label">__toString</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__toString</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15138,7 +15153,22 @@ are set, adds a PicoPredicate condition using the given field and value.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">3. <span class="method-label">isRequireJoin</span></div>
+<div class="method-identity">3. <span class="method-label">alwaysTrue</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">alwaysTrue</span>() : <span class="return-type">self</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Creates a specification that always evaluates to true.</p>
+<p>This method returns a PicoSpecification instance containing a predicate
+that always evaluates to true (e.g., &quot;1 = 1&quot;). This can be used as a default
+or placeholder specification in query building.</p>
+<h3>Return</h3>
+<div class="return-type">self</div>
+<div class="return-description"><p>A PicoSpecification instance that always evaluates to true.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">4. <span class="method-label">isRequireJoin</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isRequireJoin</span>() : <span class="return-type">bool</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15150,7 +15180,7 @@ are set, adds a PicoPredicate condition using the given field and value.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">4. <span class="method-label">add</span></div>
+<div class="method-identity">5. <span class="method-label">add</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">add</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span>|<span class="parameter-type">PicoPredicate</span>|<span class="parameter-type">array</span>|<span class="parameter-type">string</span> <span class="parameter-name">$predicate</span><br>
@@ -15169,7 +15199,7 @@ The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">5. <span class="method-label">addAnd</span></div>
+<div class="method-identity">6. <span class="method-label">addAnd</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addAnd</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span>|<span class="parameter-type">PicoPredicate</span>|<span class="parameter-type">array</span>|<span class="parameter-type">string</span> <span class="parameter-name">$predicate</span><br>
@@ -15188,7 +15218,7 @@ The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">6. <span class="method-label">addOr</span></div>
+<div class="method-identity">7. <span class="method-label">addOr</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addOr</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span>|<span class="parameter-type">PicoPredicate</span>|<span class="parameter-type">array</span>|<span class="parameter-type">string</span> <span class="parameter-name">$predicate</span><br>
@@ -15206,7 +15236,7 @@ The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">7. <span class="method-label">addFilter</span></div>
+<div class="method-identity">8. <span class="method-label">addFilter</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addFilter</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span>|<span class="parameter-type">PicoPredicate</span>|<span class="parameter-type">array</span>|<span class="parameter-type">string</span> <span class="parameter-name">$predicate</span>, <br>
@@ -15231,7 +15261,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">8. <span class="method-label">addFilterByArray</span></div>
+<div class="method-identity">9. <span class="method-label">addFilterByArray</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addFilterByArray</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$predicate</span>, <br>
@@ -15251,7 +15281,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">9. <span class="method-label">addSubFilter</span></div>
+<div class="method-identity">10. <span class="method-label">addSubFilter</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addSubFilter</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span>|<span class="parameter-type">array</span> <span class="parameter-name">$predicate</span>, <br>
@@ -15271,7 +15301,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">10. <span class="method-label">isEmpty</span></div>
+<div class="method-identity">11. <span class="method-label">isEmpty</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isEmpty</span>() : <span class="return-type">bool</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15283,7 +15313,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">11. <span class="method-label">isArray</span></div>
+<div class="method-identity">12. <span class="method-label">isArray</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">isArray</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">mixed</span> <span class="parameter-name">$array</span><br>
@@ -15300,7 +15330,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">12. <span class="method-label">isValueEmpty</span></div>
+<div class="method-identity">13. <span class="method-label">isValueEmpty</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">isValueEmpty</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">mixed</span> <span class="parameter-name">$value</span><br>
@@ -15317,7 +15347,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">13. <span class="method-label">getSpecifications</span></div>
+<div class="method-identity">14. <span class="method-label">getSpecifications</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getSpecifications</span>() : <span class="return-type">PicoPredicate[]</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15329,7 +15359,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">14. <span class="method-label">getParentFilterLogic</span></div>
+<div class="method-identity">15. <span class="method-label">getParentFilterLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getParentFilterLogic</span>() : <span class="return-type">string</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15341,7 +15371,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">15. <span class="method-label">setParentFilterLogic</span></div>
+<div class="method-identity">16. <span class="method-label">setParentFilterLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">setParentFilterLogic</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$parentFilterLogic</span><br>
@@ -15358,7 +15388,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">16. <span class="method-label">getWhere</span></div>
+<div class="method-identity">17. <span class="method-label">getWhere</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getWhere</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification[]</span> <span class="parameter-name">$specifications</span><br>
@@ -15375,7 +15405,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">17. <span class="method-label">getColumnName</span></div>
+<div class="method-identity">18. <span class="method-label">getColumnName</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getColumnName</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -15396,7 +15426,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">18. <span class="method-label">createWhereFromSpecification</span></div>
+<div class="method-identity">19. <span class="method-label">createWhereFromSpecification</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createWhereFromSpecification</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoSpecification</span> <span class="parameter-name">$specification</span><br>
@@ -15413,7 +15443,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">19. <span class="method-label">hasValue</span></div>
+<div class="method-identity">20. <span class="method-label">hasValue</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">hasValue</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">mixed</span> <span class="parameter-name">$specification</span><br>
@@ -15430,7 +15460,7 @@ If a raw SQL string is provided, it will be added with the logical operator.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">20. <span class="method-label">__call</span></div>
+<div class="method-identity">21. <span class="method-label">__call</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__call</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$method</span>, <br>
@@ -15468,7 +15498,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">21. <span class="method-label">__set</span></div>
+<div class="method-identity">22. <span class="method-label">__set</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__set</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -15485,7 +15515,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">22. <span class="method-label">addPredicate</span></div>
+<div class="method-identity">23. <span class="method-label">addPredicate</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addPredicate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$field</span>, <br>
@@ -15505,7 +15535,7 @@ the method returns null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">23. <span class="method-label">__toString</span></div>
+<div class="method-identity">24. <span class="method-label">__toString</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__toString</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15518,7 +15548,7 @@ Removes leading logical operators (<code>AND</code>, <code>OR</code>) if present
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">24. <span class="method-label">fromUserInput</span></div>
+<div class="method-identity">25. <span class="method-label">fromUserInput</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">fromUserInput</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">PicoRequestBase</span> <span class="parameter-name">$request</span>, <br>
@@ -15538,7 +15568,7 @@ Removes leading logical operators (<code>AND</code>, <code>OR</code>) if present
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">25. <span class="method-label">toLowerCase</span></div>
+<div class="method-identity">26. <span class="method-label">toLowerCase</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">toLowerCase</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$input</span><br>
@@ -15555,7 +15585,7 @@ Removes leading logical operators (<code>AND</code>, <code>OR</code>) if present
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">26. <span class="method-label">fixInput</span></div>
+<div class="method-identity">27. <span class="method-label">fixInput</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">fixInput</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">mixed</span> <span class="parameter-name">$filterValue</span>, <br>
@@ -15579,7 +15609,7 @@ the input value is returned as-is.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">27. <span class="method-label">fullTextSearch</span></div>
+<div class="method-identity">28. <span class="method-label">fullTextSearch</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">fullTextSearch</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnName</span>, <br>
@@ -15599,7 +15629,7 @@ the input value is returned as-is.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">28. <span class="method-label">fullTextSearchArray</span></div>
+<div class="method-identity">29. <span class="method-label">fullTextSearchArray</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">fullTextSearchArray</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnName</span>, <br>
@@ -15621,7 +15651,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">29. <span class="method-label">filter</span></div>
+<div class="method-identity">30. <span class="method-label">filter</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level">static</span> <span class="php-keyword">function</span> <span class="method-name">filter</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnName</span>, <br>
@@ -15641,7 +15671,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">30. <span class="method-label">getDefaultLogic</span></div>
+<div class="method-identity">31. <span class="method-label">getDefaultLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDefaultLogic</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15653,7 +15683,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">31. <span class="method-label">setDefaultLogic</span></div>
+<div class="method-identity">32. <span class="method-label">setDefaultLogic</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">setDefaultLogic</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$defaultLogic</span><br>
@@ -15670,7 +15700,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">32. <span class="method-label">setDefaultLogicAnd</span></div>
+<div class="method-identity">33. <span class="method-label">setDefaultLogicAnd</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">setDefaultLogicAnd</span>() : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15682,7 +15712,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">33. <span class="method-label">setDefaultLogicOr</span></div>
+<div class="method-identity">34. <span class="method-label">setDefaultLogicOr</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">setDefaultLogicOr</span>() : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
@@ -15694,7 +15724,7 @@ Uses an OR condition between different keyword sets and an AND condition within 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">34. <span class="method-label">getRequireJoin</span></div>
+<div class="method-identity">35. <span class="method-label">getRequireJoin</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getRequireJoin</span>() : <span class="return-type">bool</span><br>{<br>}</div>
 <div class='docblock'>
