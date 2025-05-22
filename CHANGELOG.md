@@ -373,13 +373,13 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 ## What's New
 
-### Database Time Zone System Configuration
+### Database Time Zone Configuration
 
 A new configuration option, `database.timeZoneSystem`, has been added for SQLServer and SQLite databases. This feature allows the system to automatically handle time zone conversions when users operate in different time zones, ensuring accurate date and time management throughout the application.
 
 **Example:**
 
-If the `$currentUser` object has a timeZone property, you can add the following code:
+If the `$currentUser` object has a `timeZone` property, you can use the following code:
 
 ```php
 if($currentUser->issetTimeZone() && $currentUser->getTimeZone() != $database->getDatabaseCredentials()->getTimeZone())
