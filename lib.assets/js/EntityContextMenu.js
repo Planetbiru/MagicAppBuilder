@@ -19,14 +19,20 @@ function initDiagramContextMenu(svg)
     const contextMenu = document.querySelector('#context-menu');
     svg.addEventListener("contextmenu", function (e) {
         const entity = e.target.closest('g.svg-entity');
+        selectedElement = entity;
         if (entity) {
             e.preventDefault();
-
-            renderContextMenu(entity);
-            selectedElement = entity;
-            contextMenu.style.top = `${e.pageY}px`;
-            contextMenu.style.left = `${e.pageX}px`;
-            contextMenu.style.display = "block";
+            let count = renderContextMenu(entity);
+            if(count > 0)
+            {
+                contextMenu.style.top = `${e.pageY}px`;
+                contextMenu.style.left = `${e.pageX}px`;
+                contextMenu.style.display = "block";
+            }
+            else
+            {
+                contextMenu.style.display = "none";
+            }
         } else {
             contextMenu.style.display = "none";
         }
@@ -36,6 +42,7 @@ function initDiagramContextMenu(svg)
 /**
  * Render the context menu for a given entity.
  * @param {Element} entity - The SVG group element representing the entity.
+ * @returns {int}
  */
 function renderContextMenu(entity) {
     const contextMenu = document.querySelector('#context-menu');
@@ -44,6 +51,7 @@ function renderContextMenu(entity) {
 
     const tableName = entity.dataset.entity;
     const columns = entity.querySelectorAll('.diagram-column-name');
+    let count = 0;
 
     columns.forEach((col, index) => {
         const columnName = col.textContent.trim();
@@ -76,8 +84,10 @@ function renderContextMenu(entity) {
 
             li.appendChild(label);
             ul.appendChild(li);
+            count++;
         }
     });
+    return count;
 }
 
 /**
