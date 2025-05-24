@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Export Database', 'Yes', 'No', function(isOk) {
                 if (isOk) 
                 {
-                    exportDatabase(selector);
+                    startExportDatabase(selector);
                 }
                 else 
                 {
@@ -470,6 +470,23 @@ let maxTableIndex = 0;
 let exportConfig = {};
 let exportTableList = [];
 let exportFileName = '';
+let timeoutDownload = setTimeout('', 100);
+let isExporting = false;
+
+/**
+ * Initiates the database export process if no other export is currently running.
+ *
+ * @param {string} selector - A CSS selector targeting the HTML element(s) 
+ *                            to export data from (e.g., a table row).
+ */
+function startExportDatabase(selector)
+{
+    if (!isExporting)
+    {
+        isExporting = true;
+        exportDatabase(selector);
+    }
+}
 
 /**
  * Starts the export process for selected tables.
@@ -485,6 +502,13 @@ function exportDatabase(selector) {
     let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
 
     exportTableList = [];
+
+    // Clear timeout
+    clearTimeout(timeoutDownload);
+    tableIndex = 0;
+    
+    // Generate a timestamped export filename
+    exportFileName = (new Date()).getTime() + '.sql';
 
     // Collect selected tables with structure/data checkboxes
     $(selector).find('tbody').find('tr').each(function () {
@@ -502,10 +526,8 @@ function exportDatabase(selector) {
     });
 
     maxTableIndex = exportTableList.length;
-    tableIndex = 0;
+    
 
-    // Generate a timestamped export filename
-    exportFileName = (new Date()).getTime() + '.sql';
 
     // Save export configuration
     exportConfig = {
@@ -528,6 +550,7 @@ function exportDatabase(selector) {
 function exportTable(selector) {
     // Stop if all tables have been processed
     if (tableIndex >= maxTableIndex) {
+        isExporting = false;
         // Trigger file download after export is complete
         window.open('export-download.php?fileName=' + encodeURIComponent(exportFileName));
     }
@@ -561,8 +584,9 @@ function exportTable(selector) {
                     {
                         tr.attr('data-status', 'finish');
                     }
-                    tableIndex++;
-                    setTimeout(function(){
+                    
+                    timeoutDownload = setTimeout(function(){
+                        tableIndex++;
                         exportTable(selector);
                     }, 20);
                 }
