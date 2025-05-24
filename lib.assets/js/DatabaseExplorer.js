@@ -552,20 +552,31 @@ function exportTable(selector) {
             includeData: currentTable.data ? 1 : 0,
             fileName: exportFileName
         },
-        success: function () {
+        dataType: 'json',
+        success: function (data) {
             // Continue with the next table after success
-            if(tr != null)
+            if(data.success)
             {
-                tr.attr('data-status', 'finish');
+                if(tr != null)
+                {
+                    tr.attr('data-status', 'finish');
+                }
+                tableIndex++;
+                setTimeout(function(){
+                    exportTable(selector);
+                }, 20);
             }
-            tableIndex++;
-            setTimeout(function(){
-                exportTable(selector);
-            }, 20);
+            else if(tr != null)
+            {
+                tr.attr('data-status', 'error');
+            }
             
         },
         error: function () {
-            alert('Failed to export table: ' + currentTable.tableName);
+            if(tr != null)
+            {
+                tr.attr('data-status', 'error');
+            }
         }
     });
 }

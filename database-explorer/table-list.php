@@ -38,6 +38,7 @@ if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseT
 <table width="100%" border="1" class="table-export-database">
     <thead>
         <tr>
+            <td width="20">No</td>
             <td width="98">
                 <input type="checkbox" id="cstructure">
                 <label for="cstructure">Structure</label>
@@ -51,11 +52,14 @@ if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseT
     </thead>
     <tbody>
         <?php 
+        $no = 0;
         foreach($tableList as $table)
         {
             $ecodedTableName = htmlspecialchars($table);
+            $no++;
         ?>
         <tr data-table-name="<?php echo $ecodedTableName; ?>">
+            <td align="right"><?php echo $no;?></td>
             <td>
                 <input type="checkbox" name="structure_export[]" value="<?php echo $ecodedTableName; ?>" id="structure_<?php echo $ecodedTableName; ?>" class="check-for-structure">
                 <label for="structure_<?php echo $ecodedTableName; ?>">Structure</label>
