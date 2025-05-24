@@ -297,23 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelector('[type="submit"][name="___export_database___"]').addEventListener('click', function(event) {
-        event.preventDefault();
-        showConfirmationDialog('Are you sure you want to export the data from the database?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
-            if (isConfirmed) {
-                
-                let hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = '___export_database___';
-                hiddenInput.value = 'true';
-                event.target.closest('form').appendChild(hiddenInput);
-                
-                event.target.closest('form').submit();  // Submit the form containing the button
-                event.target.closest('form').removeChild(hiddenInput);
-            } 
-        });
-    });
-
     let btnTableExport = document.querySelector('[type="submit"][name="___export_table___"]');
     if(btnTableExport != null)
     {
@@ -332,6 +315,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     event.target.closest('form').removeChild(hiddenInput);
                 } 
             });
+        });
+    }
+
+    let btnDatabaseExport = document.querySelector('[type="submit"][name="___export_database___"]');
+    if(btnDatabaseExport != null)
+    {
+        btnDatabaseExport.addEventListener('click', function(event) {
+            let tableName = event.target.getAttribute('value');
+            event.preventDefault();
+
+            let selector = '#exportModal';
+            showExprtDialog(selector, 
+                '<div class="loading-animation"></div>', 
+                'Export Database', 'Yes', 'No', function(isOk) {
+                if (isOk) 
+                {
+                    exportDatabase(selector);
+                }
+                else 
+                {
+                    document.querySelector('#exportModal').style.display = 'none' 
+                } 
+            });
+            listTableToExport(selector, tableName);
         });
     }
     
@@ -457,6 +464,204 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+let tableIndex = 0;
+let maxTableIndex = 0;
+let exportConfig = {};
+let exportTableList = [];
+let exportFileName = '';
+
+/**
+ * Starts the export process for selected tables.
+ * Collects export configuration and selected tables, then begins the export.
+ *
+ * @param {string} selector - The CSS selector for the table containing table rows to export.
+ */
+function exportDatabase(selector) {
+    // Read metadata from <meta> tags
+    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+    let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+
+    exportTableList = [];
+
+    // Collect selected tables with structure/data checkboxes
+    $(selector).find('tbody').find('tr').each(function () {
+        let tableName = $(this).attr('data-table-name');
+        let includeStructure = $(this).find('input[name="structure_export[]"]').is(':checked');
+        let includeData = $(this).find('input[name="data_export[]"]').is(':checked');
+        $(this).attr('data-status', 'none');
+        if (includeStructure || includeData) {
+            exportTableList.push({
+                tableName: tableName,
+                structure: includeStructure,
+                data: includeData
+            });
+        }
+    });
+
+    maxTableIndex = exportTableList.length;
+    tableIndex = 0;
+
+    // Generate a timestamped export filename
+    exportFileName = (new Date()).getTime() + '.sql';
+
+    // Save export configuration
+    exportConfig = {
+        applicationId: applicationId,
+        databaseType: databaseType,
+        databaseName: databaseName,
+        schemaName: schemaName
+    };
+
+    // Begin exporting tables
+    exportTable(selector);
+}
+
+/**
+ * Recursively exports each selected table (structure and/or data) to the server.
+ * After all tables are processed, a download is triggered.
+ *
+ * @param {string} selector - The CSS selector used to find the modal or table.
+ */
+function exportTable(selector) {
+    // Stop if all tables have been processed
+    if (tableIndex >= maxTableIndex) {
+        // Trigger file download after export is complete
+        window.open('export-download.php?fileName=' + encodeURIComponent(exportFileName));
+        return;
+    }
+
+    const currentTable = exportTableList[tableIndex];
+
+    let tr = $(selector).find('table tbody').find('tr[data-table-name="'+currentTable.tableName+'"]').attr('data-status', 'none');
+    if(tr != null)
+    {
+        tr.attr('data-status', 'in-progress');
+    }
+
+    // Send table export request to server
+    $.ajax({
+        type: 'POST',
+        url: 'export-database.php',
+        data: {
+            ...exportConfig,
+            tableName: currentTable.tableName,
+            includeStructure: currentTable.structure ? 1 : 0,
+            includeData: currentTable.data ? 1 : 0,
+            fileName: exportFileName
+        },
+        success: function () {
+            // Continue with the next table after success
+            if(tr != null)
+            {
+                tr.attr('data-status', 'finish');
+            }
+            tableIndex++;
+            setTimeout(function(){
+                exportTable(selector);
+            }, 20);
+            
+        },
+        error: function () {
+            alert('Failed to export table: ' + currentTable.tableName);
+        }
+    });
+}
+
+/**
+ * Loads and displays the export table list inside a modal body via AJAX.
+ * Enables bulk selection for structure/data via checkbox toggles.
+ *
+ * @param {string} selector - The modal selector to inject the table list.
+ * @param {string} tableName - Optional table name to preselect or focus on.
+ */
+function listTableToExport(selector, tableName) {
+    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+    let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+
+    $.ajax({
+        type: 'GET',
+        url: 'table-list.php',
+        data: {
+            applicationId: applicationId,
+            databaseType: databaseType,
+            databaseName: databaseName,
+            schemaName: schemaName,
+            tableName: tableName
+        },
+        success: function(data) {
+            // Inject content into modal
+            $(selector).find('.modal-body').empty().append(data);
+
+            // Enable select-all for structure checkboxes
+            $('#cstructure').on('change', function() {
+                let checked = $(this)[0].checked;
+                $('.check-for-structure').each(function(){
+                    $(this)[0].checked = checked;
+                });
+            });
+
+            // Enable select-all for data checkboxes
+            $('#cdata').on('change', function() {
+                let checked = $(this)[0].checked;
+                $('.check-for-data').each(function(){
+                    $(this)[0].checked = checked;
+                });
+            });
+        }
+    });
+}
+
+/**
+ * Displays a confirmation modal dialog before export.
+ * Executes a callback function with `true` if OK is clicked, otherwise `false`.
+ *
+ * @param {string} selector - The selector for the modal element.
+ * @param {string} message - The message to display inside the modal body.
+ * @param {string} title - The modal title.
+ * @param {string} captionOk - Text for the OK button.
+ * @param {string} captionCancel - Text for the Cancel button.
+ * @param {function} callback - A callback to execute with the user's choice.
+ * @returns {HTMLElement} - The modal DOM element.
+ */
+function showExprtDialog(selector, message, title, captionOk, captionCancel, callback) {
+    const modal = document.querySelector(selector);
+    const okBtn = modal.querySelector('.button-ok');
+    const cancelBtn = modal.querySelector('.button-cancel');
+
+    // Set modal content
+    modal.querySelector('.modal-header h3').innerHTML = title;
+    modal.querySelector('.modal-body').innerHTML = message;
+    okBtn.innerHTML = captionOk;
+    cancelBtn.innerHTML = captionCancel;
+
+    // Show modal
+    modal.style.display = 'block';
+
+    // Remove previous event listeners to prevent duplicates
+    okBtn.removeEventListener('click', handleOkConfig);
+    cancelBtn.removeEventListener('click', handleCancelConfig);
+
+    // Handle OK click
+    function handleOkConfig() {
+        callback(true);
+    }
+
+    // Handle Cancel click
+    function handleCancelConfig() {
+        callback(false);
+    }
+
+    // Add listeners
+    okBtn.addEventListener('click', handleOkConfig);
+    cancelBtn.addEventListener('click', handleCancelConfig);
+
+    return modal;
+}
 
 
 
@@ -695,6 +900,7 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                     editor.prepareDiagram();
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
+                    // NOSONAR
                 }
             } else {
                 console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200

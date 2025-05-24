@@ -1,5 +1,9 @@
 <?php
 
+use DatabaseExplorer\DatabaseExplorer;
+
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
 {
     // Prevent user to access this path
@@ -20,7 +24,7 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
-    <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.js"></script>
+    <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
     <script src="../lib.assets/js/TableParser.min.js"></script>
     <script src="../lib.assets/js/SQLConverter.min.js"></script>
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
@@ -233,6 +237,23 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
                 <button class="btn btn-primary import-from-entity">Import</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-lg" id="exportModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Database</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary button-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary button-cancel">Cancel</button>
             </div>
         </div>
     </div>

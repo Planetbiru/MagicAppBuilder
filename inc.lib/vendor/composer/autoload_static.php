@@ -53,6 +53,13 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
                 0 => __DIR__ . '/../..' . '/classes',
             ),
         ),
+        'D' => 
+        array (
+            'DatabaseExplorer\\' => 
+            array (
+                0 => __DIR__ . '/../..' . '/classes',
+            ),
+        ),
         'A' => 
         array (
             'AppBuilder\\' => 

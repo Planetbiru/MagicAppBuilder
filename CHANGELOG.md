@@ -460,3 +460,43 @@ When creating an ERD, users can now choose which related tables to display by ri
 ## Bug Fixes
 
 -   Various bug fixes to improve stability and reliability.
+
+
+# MagicAppBuilder Version 1.2
+
+## What's New
+
+### Advanced Asynchronous Per-Table Database Export
+
+A powerful new feature has been introduced to allow **asynchronous, per-table database export**, providing users with more control and flexibility when exporting database contents.
+
+Users can now **select individually per table** whether to export:
+
+-   Structure only
+-   Data only
+-   Or both structure and data
+
+This is especially useful for large databases where selective export is essential for performance and data management.
+
+#### Key Features:
+
+-   Asynchronous processing — tables are exported one at a time without freezing the UI.
+-   Real-time status indicators (e.g., `in-progress`, `finish`) for each table export.
+-   Exported content is automatically compiled into a single `.sql` file.
+-   Automatic file download once all selected tables have been processed.
+
+## Improvements
+
+-   **Enhanced Export UI:**  
+    A new intuitive UI allows users to check/uncheck structure and data options for each table using a simple interface.
+    
+-   **Export Status Tracking:**  
+    Visual export status (`...`, `✓`) appears inline in the table list to inform users of the progress and completion of each export operation.
+    
+-   **Reliable Batch Download:**  
+    Exported tables are incrementally appended into one file, ensuring all selected tables are included in the final downloadable `.sql` archive.
+
+## Bug Fixes
+
+-   Fixed several edge cases in database table name detection for SQLite and PostgreSQL.
+-   Improved error handling in AJAX export logic for better feedback when an export fails.

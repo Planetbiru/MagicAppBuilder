@@ -444,6 +444,64 @@ textarea {
     margin: 80px auto 0 auto;
 }
 
+.modal-md .modal-content {
+    display: block;
+    width: 500px; 
+    max-width: calc(100vw - 40px);
+    margin: 80px auto 0 auto;
+}
+
+.modal-lg .modal-content {
+    display: block;
+    width: 800px; 
+    max-width: calc(100vw - 40px); 
+    margin: 80px auto 0 auto;
+}
+
+#exportModal {
+    .modal-content {
+        margin: 20px auto 0 auto;
+    }
+    .modal-body{
+        max-height: calc(100vh - 135px);
+        overflow: auto;
+
+        .table-export-database 
+        {
+            tbody
+            {
+                tr td.table-name
+                {
+                    position: relative;
+                }
+                tr td.table-name::after
+                {
+                    width: 10px;
+                    height: 10px;
+                    position: absolute;
+                    right: 4px;
+                    top: 2px;
+                }
+                /* Show dots for tables currently being exported */
+                tr[data-status="in-progress"] td.table-name::after {
+                    content: '...'; /* Indicates export is in progress */
+                    color: orange;
+                    margin-left: 4px;
+                    font-weight: bold;
+                }
+
+                /* Show nothing (or replace with checkmark if desired) for finished tables */
+                tr[data-status="finish"] td.table-name::after {
+                    content: '✓'; /* Optional: shows checkmark for finished */
+                    color: green;
+                    margin-left: 4px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
 .close-btn {
     font-size: 22px;
     color: #aaa;
@@ -454,7 +512,6 @@ textarea {
 .close-btn:focus {
     color: #000;
 }
-
 
 .modal-header {
     display: flex;
