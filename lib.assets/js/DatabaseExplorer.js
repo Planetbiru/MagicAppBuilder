@@ -530,55 +530,57 @@ function exportTable(selector) {
     if (tableIndex >= maxTableIndex) {
         // Trigger file download after export is complete
         window.open('export-download.php?fileName=' + encodeURIComponent(exportFileName));
-        return;
     }
-
-    const currentTable = exportTableList[tableIndex];
-
-    let tr = $(selector).find('table tbody').find('tr[data-table-name="'+currentTable.tableName+'"]').attr('data-status', 'none');
-    if(tr != null)
+    else
     {
-        tr.attr('data-status', 'in-progress');
-    }
+        const currentTable = exportTableList[tableIndex];
 
-    // Send table export request to server
-    $.ajax({
-        type: 'POST',
-        url: 'export-database.php',
-        data: {
-            ...exportConfig,
-            tableName: currentTable.tableName,
-            includeStructure: currentTable.structure ? 1 : 0,
-            includeData: currentTable.data ? 1 : 0,
-            fileName: exportFileName
-        },
-        dataType: 'json',
-        success: function (data) {
-            // Continue with the next table after success
-            if(data.success)
-            {
+        let tr = $(selector).find('table tbody').find('tr[data-table-name="'+currentTable.tableName+'"]').attr('data-status', 'none');
+        if(tr != null)
+        {
+            tr.attr('data-status', 'in-progress');
+        }
+
+        // Send table export request to server
+        $.ajax({
+            type: 'POST',
+            url: 'export-database.php',
+            data: {
+                ...exportConfig,
+                tableName: currentTable.tableName,
+                includeStructure: currentTable.structure ? 1 : 0,
+                includeData: currentTable.data ? 1 : 0,
+                fileName: exportFileName
+            },
+            dataType: 'json',
+            success: function (data) {
+                // Continue with the next table after success
+                if(data.success)
+                {
+                    if(tr != null)
+                    {
+                        tr.attr('data-status', 'finish');
+                    }
+                    tableIndex++;
+                    setTimeout(function(){
+                        exportTable(selector);
+                    }, 20);
+                }
+                else if(tr != null)
+                {
+                    tr.attr('data-status', 'error');
+                }
+                
+            },
+            error: function () {
                 if(tr != null)
                 {
-                    tr.attr('data-status', 'finish');
+                    tr.attr('data-status', 'error');
                 }
-                tableIndex++;
-                setTimeout(function(){
-                    exportTable(selector);
-                }, 20);
             }
-            else if(tr != null)
-            {
-                tr.attr('data-status', 'error');
-            }
-            
-        },
-        error: function () {
-            if(tr != null)
-            {
-                tr.attr('data-status', 'error');
-            }
-        }
-    });
+        });
+    }
+    
 }
 
 /**
