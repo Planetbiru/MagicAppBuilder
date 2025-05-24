@@ -2057,15 +2057,19 @@ class DatabaseExplorer // NOSONAR
         $form->setAttribute('method', 'post');
         $form->setAttribute('action', '');
 
+        $form1 = $dom->createElement('div');
+        $form1->setAttribute('class', 'query-area');
+        $form2 = $dom->createElement('div');
+        $form2->setAttribute('class', 'button-area');
+
+        $form->appendChild($form1);
+        $form->appendChild($form2);
+
         // Create textarea
         $textarea = $dom->createElement('textarea', htmlspecialchars($lastQueries));
         $textarea->setAttribute('name', 'query');
         $textarea->setAttribute('spellcheck', 'false');
-        $form->appendChild($textarea);
-
-        // Create line break
-        $br = $dom->createElement('br');
-        $form->appendChild($br);
+        $form1->appendChild($textarea);
 
         // Create submit button
         $submit = $dom->createElement('button');
@@ -2074,11 +2078,11 @@ class DatabaseExplorer // NOSONAR
         $submit->setAttribute('class', 'btn btn-success execute');
         $buttonText = $dom->createTextNode('Execute');
         $submit->appendChild($buttonText);
-        $form->appendChild($submit);
+        $form2->appendChild($submit);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
 
         // Create save button
         $save = $dom->createElement('button');
@@ -2086,11 +2090,11 @@ class DatabaseExplorer // NOSONAR
         $save->setAttribute('class', 'btn btn-success save');
         $buttonText = $dom->createTextNode('Save');
         $save->appendChild($buttonText);
-        $form->appendChild($save);
+        $form2->appendChild($save);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
 
         // Create reset button
         $reset = $dom->createElement('button');
@@ -2098,11 +2102,11 @@ class DatabaseExplorer // NOSONAR
         $reset->setAttribute('value', 'Reset');
         $reset->setAttribute('class', 'btn btn-warning reset');
         $reset->appendChild($dom->createTextNode('Reset'));
-        $form->appendChild($reset);
+        $form2->appendChild($reset);
         
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
         
         // Create importStructure button
         $importStructure = $dom->createElement('button');
@@ -2110,11 +2114,11 @@ class DatabaseExplorer // NOSONAR
         $importStructure->setAttribute('value', 'Import Structure');
         $importStructure->setAttribute('class', 'btn btn-primary import-structure');
         $importStructure->appendChild($dom->createTextNode('Import Structure'));
-        $form->appendChild($importStructure);
+        $form2->appendChild($importStructure);
         
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
         
         // Create entityEditor button
         $entityEditor = $dom->createElement('button');
@@ -2122,11 +2126,11 @@ class DatabaseExplorer // NOSONAR
         $entityEditor->setAttribute('value', 'Entity Editor');
         $entityEditor->setAttribute('class', 'btn btn-primary open-entity-editor');
         $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
-        $form->appendChild($entityEditor);
+        $form2->appendChild($entityEditor);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
 
         // Create exportTable button
         $inputGet = new InputGet();
@@ -2139,7 +2143,7 @@ class DatabaseExplorer // NOSONAR
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
 
         // Create exportDatabaseStructure button (Export Struktur Database)
         $exportDatabaseStructure = $dom->createElement('button');
@@ -2148,11 +2152,11 @@ class DatabaseExplorer // NOSONAR
         $exportDatabaseStructure->setAttribute('value', $databaseName);
         $exportDatabaseStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
         $exportDatabaseStructure->appendChild($dom->createTextNode('Export Database Structure'));
-        $form->appendChild($exportDatabaseStructure);
+        $form2->appendChild($exportDatabaseStructure);
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');
-        $form->appendChild($space);
+        $form2->appendChild($space);
 
         // Create exportDatabase button
         $exportDatabase = $dom->createElement('button');
@@ -2161,7 +2165,7 @@ class DatabaseExplorer // NOSONAR
         $exportDatabase->setAttribute('value', $databaseName);
         $exportDatabase->setAttribute('class', ConstantText::BTN_SUCCESS);
         $exportDatabase->appendChild($dom->createTextNode('Export Database'));
-        $form->appendChild($exportDatabase);
+        $form2->appendChild($exportDatabase);
 
        
 
@@ -2169,7 +2173,7 @@ class DatabaseExplorer // NOSONAR
         {
             // Add space between buttons
             $space = $dom->createTextNode(' ');
-            $form->appendChild($space);
+            $form2->appendChild($space);
 
             // Create exportTableStructure button (Export Structure Tabel)
             $exportTableStructure = $dom->createElement('button');
@@ -2178,11 +2182,11 @@ class DatabaseExplorer // NOSONAR
             $exportTableStructure->setAttribute('value', $tableName);
             $exportTableStructure->setAttribute('class', ConstantText::BTN_SUCCESS);
             $exportTableStructure->appendChild($dom->createTextNode('Export Table Structure'));
-            $form->appendChild($exportTableStructure);
+            $form2->appendChild($exportTableStructure);
 
             // Add space between buttons
             $space = $dom->createTextNode(' ');
-            $form->appendChild($space);
+            $form2->appendChild($space);
 
             $exportTable = $dom->createElement('button');
             $exportTable->setAttribute('type', 'submit');
@@ -2190,11 +2194,11 @@ class DatabaseExplorer // NOSONAR
             $exportTable->setAttribute('value', $tableName);
             $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);
             $exportTable->appendChild($dom->createTextNode('Export Table'));
-            $form->appendChild($exportTable);
+            $form2->appendChild($exportTable);
 
             // Add space between buttons
             $space = $dom->createTextNode(' ');
-            $form->appendChild($space);
+            $form2->appendChild($space);
 
             if($inputGet->getAction() == 'insert-form')
             {
@@ -2205,7 +2209,7 @@ class DatabaseExplorer // NOSONAR
                 $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table'");
 
                 $insertData->appendChild($dom->createTextNode('View Data'));
-                $form->appendChild($insertData);
+                $form2->appendChild($insertData);
             }
             else
             {
@@ -2216,7 +2220,7 @@ class DatabaseExplorer // NOSONAR
                 $insertData->setAttribute('onclick', "window.location='?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$table&action=insert-form'");
 
                 $insertData->appendChild($dom->createTextNode('Insert Data'));
-                $form->appendChild($insertData);
+                $form2->appendChild($insertData);
             }
         }
 
