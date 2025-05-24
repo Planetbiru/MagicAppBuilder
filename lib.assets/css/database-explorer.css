@@ -546,9 +546,17 @@ textarea:focus-visible {
   max-height: calc(100vh - 135px);
   overflow: auto;
 }
+#exportModal .modal-body .table-export-database td[align=right] {
+  text-align: right;
+}
+#exportModal .modal-body .table-export-database thead td, #exportModal .modal-body .table-export-database thead th {
+  background-color: #e6e6e6;
+  padding-top: 4px;
+}
 #exportModal .modal-body .table-export-database tbody {
   /* Show dots for tables currently being exported */
   /* Show nothing (or replace with checkmark if desired) for finished tables */
+  /* Show cross mark for tables that failed to export */
 }
 #exportModal .modal-body .table-export-database tbody tr td.table-name {
   position: relative;
@@ -557,7 +565,7 @@ textarea:focus-visible {
   width: 10px;
   height: 10px;
   position: absolute;
-  right: 4px;
+  right: 6px;
   top: 2px;
 }
 #exportModal .modal-body .table-export-database tbody tr[data-status=in-progress] td.table-name::after {
@@ -569,6 +577,12 @@ textarea:focus-visible {
 #exportModal .modal-body .table-export-database tbody tr[data-status=finish] td.table-name::after {
   content: "✓"; /* Optional: shows checkmark for finished */
   color: green;
+  margin-left: 4px;
+  font-weight: bold;
+}
+#exportModal .modal-body .table-export-database tbody tr[data-status=error] td.table-name::after {
+  content: "✗"; /* Indicates export failed */
+  color: red;
   margin-left: 4px;
   font-weight: bold;
 }
