@@ -619,7 +619,7 @@ function listTableToExport(selector, tableName) {
     let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
     let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
     let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-
+    $(selector).find('.modal-body').empty().append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $.ajax({
         type: 'GET',
         url: 'table-list.php',
