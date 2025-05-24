@@ -6,19 +6,16 @@ use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-function isEndsWith($haystack, $needle) {
-    $length = strlen($needle);
-    if ($length === 0) {
-        return true;
-    }
-    return substr($haystack, -$length) === $needle;
-}
 $inputPost = new InputPost();
 
 $batchSize = 100;
 $maxQuerySize = 524288;
 
-$baseDirectory = dirname(__DIR__) . '/tmp/';
+$baseDirectory = realpath(dirname(__DIR__) . '/tmp'); // Ensure absolute path to base directory
+if ($baseDirectory === false) {
+    http_response_code(500);
+    exit(json_encode(["success" => false, "error" => "Base directory not found."]));
+}
 
 // Sanitize application-related input
 $applicationId = $inputPost->getApplicationId();
@@ -31,12 +28,12 @@ $_GET['schemaName'] = $schemaName;
 
 require_once __DIR__ . "/inc.db/config.php";
 
-// Sanitize from GET
-$applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$databaseName = $inputGet->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$schemaName = $inputGet->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+// Sanitize from POST
+$applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$databaseName = $inputPost->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$schemaName = $inputPost->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
-// Make sure tmp folder exists
+// Ensure tmp folder exists
 if (!file_exists($baseDirectory)) {
     mkdir($baseDirectory, 0755, true);
 }
@@ -47,22 +44,31 @@ $tableName = $inputPost->getTableName();
 $includeStructure = $inputPost->getIncludeStructure();
 $includeData = $inputPost->getIncludeData();
 
-// Sanitize file name (allow alphanum, dash, underscore, and `.sql`)
-$fileName = basename(preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $fileName));
-if (!isEndsWith($fileName, '.sql')) {
+// Sanitize file name (allow only alphanum, dash, underscore, and `.sql`)
+$fileName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $fileName);
+$fileName = basename($fileName);
+
+// Validate file extension must be .sql
+if (!preg_match('/\.sql$/i', $fileName)) {
     $fileName .= '.sql';
 }
 
-// Final path
-$filePath = $baseDirectory . $fileName;
+// Build full file path
+$filePath = $baseDirectory . DIRECTORY_SEPARATOR . $fileName;
 
-// Begin export
-$output = '';
+// Ensure the file is located inside the base directory
+$realPath = realpath(dirname($filePath));
+if ($realPath === false || strpos($realPath, $baseDirectory) !== 0) {
+    http_response_code(400);
+    exit(json_encode(["success" => false, "error" => "Invalid file path."]));
+}
+
+// Begin export process
 $tables = [$tableName];
-
 $exporter = new DatabaseExporter($database->getDatabaseType(), $database->getDatabaseConnection());
 
 header('Content-type: application/json');
+
 try {
     if ($includeStructure) {
         $exporter->appendExportData("\r\n-- Database structure of `$tableName`\r\n");
@@ -74,8 +80,9 @@ try {
         $exporter->exportTableData($tables, $schemaName, $batchSize, $maxQuerySize);
     }
 
-    // Write to file
+    // Write export data to file (append mode)
     file_put_contents($filePath, $exporter->getExportData(), FILE_APPEND);
+
     echo json_encode(["success" => true]);
 } catch (Exception $e) {
     echo json_encode(["success" => false, "error" => $e->getMessage()]);
