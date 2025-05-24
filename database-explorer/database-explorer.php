@@ -1,5 +1,9 @@
 <?php
 
+use DatabaseExplorer\DatabaseExplorer;
+
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
 {
     // Prevent user to access this path
@@ -20,7 +24,7 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
-    <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.js"></script>
+    <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
     <script src="../lib.assets/js/TableParser.min.js"></script>
     <script src="../lib.assets/js/SQLConverter.min.js"></script>
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
@@ -30,9 +34,6 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
-
-
-    
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -240,6 +241,23 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
         </div>
     </div>
 
+    <div class="modal modal-lg" id="exportModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Database</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary button-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary button-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal modal-sm" id="settingModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -292,12 +310,10 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
         </div>
     </div>
 
-
-<div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
-    <ul>
-        <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
-        <li data-type="relation"><label for="id2"><input id="id2" type="checkbox"> prodi.prodi_id</label></li>
-    </ul>
-</div>
+    <div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
+        <ul>
+            <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
+        </ul>
+    </div>
 </body>
 </html>

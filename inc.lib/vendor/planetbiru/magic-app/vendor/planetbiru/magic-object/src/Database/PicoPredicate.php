@@ -22,6 +22,24 @@ class PicoPredicate // NOSONAR
     private $filterLogic = null;
 
     /**
+     * Creates a predicate that always evaluates to true.
+     *
+     * This method returns a PicoPredicate instance representing a condition
+     * that is always true (e.g., "1 = 1"), which can be useful as a default
+     * or placeholder predicate in query building.
+     *
+     * @return self A PicoPredicate instance that always evaluates to true.
+     */
+    public static function alwaysTrue()
+    {
+        $predicate = new self;
+        $predicate->field = "1";
+        $predicate->value = 1;
+        $predicate->comparation = PicoDataComparation::equals($predicate->value);
+        return $predicate;
+    }
+
+    /**
      * Constructor. Initializes the predicate with a field and value.
      *
      * If a field is provided, it sets the equality condition or 
