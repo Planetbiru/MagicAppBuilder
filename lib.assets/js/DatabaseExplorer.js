@@ -597,6 +597,7 @@ function exportTable(selector) {
                 
             },
             error: function () {
+                isExporting = false;
                 if(tr != null)
                 {
                     tr.attr('data-status', 'error');
