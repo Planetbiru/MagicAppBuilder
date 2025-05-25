@@ -10,6 +10,8 @@ use PDO;
  * 
  * A class to export both the structure (CREATE TABLE) and data (INSERT INTO) of all tables 
  * from different database types: SQLite, MySQL, and PostgreSQL using PDO.
+ * 
+ * @package DatabaseExplorer
  */
 class DatabaseExporter // NOSONAR
 {
