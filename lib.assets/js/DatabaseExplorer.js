@@ -651,6 +651,15 @@ function listTableToExport(selector, tableName) {
             });
         }
     });
+
+    // Clean up files
+    $.ajax({
+        type: 'GET',
+        url: 'export-clean-up.php',
+        success: function(data){
+
+        }
+    });
 }
 
 /**
