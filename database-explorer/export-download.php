@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 // Polyfill for PHP < 8.0
 if (!function_exists('str_starts_with')) {
     function str_starts_with($haystack, $needle) {
@@ -10,7 +12,7 @@ if (!function_exists('str_starts_with')) {
 $baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); // Ensure real path
 if ($baseDirectory === false) {
     http_response_code(500);
-    exit('Base directory not found.');
+    exit;
 }
 
 $fileName = isset($_GET['fileName']) ? $_GET['fileName'] : '';
