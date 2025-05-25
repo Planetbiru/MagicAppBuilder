@@ -60,31 +60,35 @@ function renderContextMenu(entity) {
 
             let table = columnName.substring(0, columnName.length - 3);
 
-            const li = document.createElement('li');
-            li.dataset.type = 'relation';
+            let testInput = document.querySelector(`.table-list input[data-name="${table}"]`);
+            if(testInput != null)
+            {
+                const li = document.createElement('li');
+                li.dataset.type = 'relation';
 
-            const label = document.createElement('label');
-            const input = document.createElement('input');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
 
-            const inputId = `relation-${index}`;
-            input.type = 'checkbox';
-            input.id = inputId;
-            input.dataset.name = table;
-            input.addEventListener('change', function(e2){
-                selectTable(e2);
-            });
+                const inputId = `relation-${index}`;
+                input.type = 'checkbox';
+                input.id = inputId;
+                input.dataset.name = table;
+                input.addEventListener('change', function(e2){
+                    selectTable(e2);
+                });
 
-            input.checked = isSelectedTable(table);
+                input.checked = isSelectedTable(table);
 
-            label.setAttribute('for', inputId);
-            label.appendChild(input);
+                label.setAttribute('for', inputId);
+                label.appendChild(input);
 
-            const relationText = ` ${columnName}`;
-            label.appendChild(document.createTextNode(relationText));
+                const relationText = ` ${columnName}`;
+                label.appendChild(document.createTextNode(relationText));
 
-            li.appendChild(label);
-            ul.appendChild(li);
-            count++;
+                li.appendChild(label);
+                ul.appendChild(li);
+                count++;
+            }
         }
     });
     return count;
@@ -99,8 +103,11 @@ function selectTable(e)
 {
     let table = e.target.dataset.name;
     let input = document.querySelector(`.table-list input[data-name="${table}"]`);
-    input.checked = e.target.checked;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+    if(input != null)
+    {
+        input.checked = e.target.checked;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 }
 
 /**
