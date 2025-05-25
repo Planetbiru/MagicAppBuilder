@@ -8557,6 +8557,34 @@ catch(Exception $e)
 }
 ```
 
+**Always TRUE Specification**
+
+In certain scenarios, developers may need to update or delete all records in a database table. To achieve this, it is common to use a native SQL query with the condition `WHERE 1 = 1`, which effectively applies no filtering and includes all rows. This approach can also be used when retrieving all records from a table.
+
+To simplify this pattern and make it reusable in a more structured way, MagicObject provides a built-in utility method:
+
+`PicoSpecification::alwaysTrue()`
+
+This method returns a specification that translates to a SQL condition that is always true. It is particularly useful as a default or fallback filter when no specific criteria are applied.
+
+**Use Case Example:**
+
+```php
+$specs = PicoSpecification::alwaysTrue();
+
+$user = new UserMin(null, $database);
+try
+{
+$pageData = $user->findAll($specs);
+}
+catch(Exception $e)
+{
+    // Do nothing
+}
+```
+
+In this example, the `findAll()` method retrieves all user records from the database without applying any filtering conditions, thanks to the `alwaysTrue()` specification.
+
 **String-Based Specification**
 
 Since version **3.6**, **MagicObject** has supported specifications in the form of strings, which are used as part of the `WHERE` clause. The introduction of string-based specifications aims to address limitations that cannot be handled using predicates alone. This feature provides users with greater flexibility, allowing them to write `WHERE` clauses directly, tailored to the syntax and capabilities of their specific DBMS.
