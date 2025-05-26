@@ -25,6 +25,8 @@ use PDOException;
  * - Displaying table data with pagination.
  * - Executing a series of SQL queries and displaying their results.
  * - Creating a query execution form with pre-populated SQL queries.
+ * 
+ * @package DatabaseExplorer
  */
 class DatabaseExplorer // NOSONAR
 {
@@ -286,17 +288,15 @@ class DatabaseExplorer // NOSONAR
      */
     public static function getQueryShowColumns($pdo, $schemaName, $tableName)
     {
-        // Menentukan tipe database (MySQL, PostgreSQL, atau SQLite) berdasarkan PDO
+        // Determine the database type (MySQL, PostgreSQL, or SQLite) based on PDO
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-        // Mendapatkan schema atau database aktif
+        // Get the active schema or database
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
-            // Query untuk MySQL
+            // Query for MySQL
             $sql = "DESCRIBE `$tableName`";
         } elseif ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-            // Mengambil nama schema di PostgreSQL
-            
-            // Query untuk PostgreSQL
+            // Query for PostgreSQL
             $sql = "SELECT 
                     c.column_name AS \"Field\", 
                     CASE 
@@ -330,10 +330,10 @@ class DatabaseExplorer // NOSONAR
                 WHERE c.table_name = '$tableName'
                 AND c.table_schema = '$schemaName'";
         } elseif ($dbType == 'sqlite') {
-            // SQLite tidak memiliki schema, jadi hanya menggunakan query untuk menampilkan kolom
+            // SQLite does not have schemas, so use a simple query to show columns
             $sql = "PRAGMA table_info($tableName)";
         } else {
-            // Jika tipe database tidak didukung
+            // If the database type is not supported
             return null;
         }
 
