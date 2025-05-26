@@ -983,9 +983,11 @@ class EntityEditor {
     {
         let selection = this.getCheckedEntities();
         let diagrams = [];
+        let sortOrder = 0;
         Object.entries(selection).forEach(([id, entities]) => {
             let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
-            diagrams.push({id: id, name: name, entities: entities});
+            diagrams.push({id: id, name: name, sortOrder: sortOrder, entities: entities});
+            sortOrder++;
         });
         if(typeof this.callbackSaveDiagram == 'function')
         {
