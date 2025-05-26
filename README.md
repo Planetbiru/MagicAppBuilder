@@ -262,14 +262,15 @@ composer dump-autoload --ignore-platform-reqs
 
 ## Browser Support
 
-| Browser                | Icon                                                                                     |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| Mozilla Firefox        | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/firefox-browser-icon.png) |
-| Microsoft Edge         | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/edge-browser-icon.png) |
-| Google Chrome          | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/google-chrome-icon.png) |
-| Opera                  | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/opera-icon.png) |
-| Brave                  | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png) |
-| Vivaldi                | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/vivaldi-icon.png) |
+| Icon                                                                                                       | Browser          | Minimum Version |
+| ---------------------------------------------------------------------------------------------------------- | ---------------- | --------------- |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/firefox-browser-icon.png) | Mozilla Firefox  | 138             |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/edge-browser-icon.png)    | Microsoft Edge   | 136             |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/google-chrome-icon.png)   | Google Chrome    | 136             |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/opera-icon.png)           | Opera            | 134             |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png)   | Brave            | 1.78            |
+| ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/vivaldi-icon.png)         | Vivaldi          | 7.4             |
+
 
 ## Conclusion
 
