@@ -588,6 +588,7 @@ class EntityEditor {
             this.callbackLoadTemplate();
         }
         this.template = {columns: []};
+        this.clearBeforeImport = true;
     }
 
     /**
@@ -2110,7 +2111,26 @@ class EntityEditor {
                 _this.clearEntities(); // Clear the existing entities
                 _this.clearDiagrams(); // Clear the existing diagrams
 
-                _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities            
+                let importedEntities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities  
+                if(_this.clearBeforeImport)
+                {
+                    _this.entities = importedEntities;    
+                }
+                else
+                {
+                    let existing = [];
+                    _this.entities.forEach((entity) => {
+                        existing.push(entity.name);
+                    });
+                    importedEntities.forEach((entity) => {
+                        if(!existing.includes(entity.name))
+                        {
+                            entity.index = _this.entities.length;
+                            _this.entities.push(entity);
+                        }
+                    });    
+                }
+                          
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
@@ -2124,20 +2144,42 @@ class EntityEditor {
     }
 
     /**
-     * Triggers the import action by simulating a click on the import file element.
-     * This function locates the DOM element based on the `selector` property and 
-     * clicks on it to initiate the import process.
+     * Triggers the import action for JSON entities by simulating a click
+     * on the file input element associated with JSON import.
+     * 
+     * This method sets `clearBeforeImport` to `true`, which indicates that
+     * any existing data should be cleared before importing new data. It then 
+     * locates the DOM element using the `selector` property combined with 
+     * the `.import-file-json` class, and simulates a click to prompt file selection.
      */
     uploadEntities() {
+        this.clearBeforeImport = true;
         document.querySelector(this.selector + " .import-file-json").click();
     }
 
     /**
-     * Triggers the import action by simulating a click on the import file element.
-     * This function locates the DOM element based on the `selector` property and 
-     * clicks on it to initiate the import process.
+     * Triggers the import action for SQL data by simulating a click
+     * on the file input element associated with SQL import.
+     * 
+     * This method sets `clearBeforeImport` to `true`, meaning existing data
+     * will be cleared before new data is imported. It locates the file input
+     * element using the `selector` property and triggers a click event.
      */
     importSQL() {
+        this.clearBeforeImport = true;
+        document.querySelector(this.selector + " .import-file-sql").click();
+    }
+
+    /**
+     * Appends data from an SQL file without clearing existing data,
+     * by simulating a click on the file input element associated with SQL import.
+     * 
+     * This method sets `clearBeforeImport` to `false`, allowing the imported
+     * SQL data to be appended to the current dataset. It uses the `selector` 
+     * property to locate the appropriate DOM element and triggers a click.
+     */
+    appendFromSQL() {
+        this.clearBeforeImport = false;
         document.querySelector(this.selector + " .import-file-sql").click();
     }
 

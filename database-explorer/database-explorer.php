@@ -162,12 +162,13 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
                     <div class="editor-container">
                         <div class="button-container">
                             <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
-                            <button class="btn" onclick="editor.uploadEntities()">Upload Entity</button>
-                            <button class="btn" onclick="editor.downloadEntities()">Download Entity</button>
-                            <button class="btn" onclick="editor.importSQL()">Upload SQL</button>
-                            <button class="btn" onclick="editor.downloadSQL()">Download SQL</button>
-                            <button class="btn" onclick="downloadSVG()">Download SVG</button>
-                            <button class="btn" onclick="downloadPNG()">Download PNG</button>
+                            <button class="btn" onclick="editor.uploadEntities()">Import Entity</button>
+                            <button class="btn" onclick="editor.downloadEntities()">Export Entity</button>
+                            <button class="btn" onclick="editor.importSQL()">Import SQL</button>
+                            <button class="btn" onclick="editor.appendFromSQL()">Append Table from SQL</button>
+                            <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
+                            <button class="btn" onclick="downloadSVG()">Export SVG</button>
+                            <button class="btn" onclick="downloadPNG()">Export PNG</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
