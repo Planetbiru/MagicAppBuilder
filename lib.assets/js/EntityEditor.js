@@ -901,11 +901,33 @@ class EntityEditor {
         element.scrollTop = element.scrollHeight;
 
     }
+    
+    /**
+     * Saves the currently edited entity and updates the diagram if needed.
+     * 
+     * This method serves as the main handler for saving an entity. It first calls
+     * `doSaveEntity()` to either create a new entity or update an existing one
+     * based on the current form data. After saving:
+     * 
+     * - It checks if there is an active diagram tab in `.tabs-link-container`.
+     * - If a diagram tab is active, it re-selects it by calling `selectDiagram()`,
+     *   which will re-render the associated diagram with the updated entity data.
+     * 
+     * This function ensures that both the data and visual representation stay in sync.
+     */
+    saveEntity() {
+        this.doSaveEntity();
+        let activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
+        if(activeDiagram)
+        {
+            this.selectDiagram(activeDiagram);
+        }
+    }
 
     /**
      * Saves the current entity, either updating an existing one or creating a new one.
      */
-    saveEntity() {
+    doSaveEntity() {
         const entityName = document.querySelector(this.selector+" .entity-name").value;
         const columns = [];
         const columnNames = document.querySelectorAll(this.selector+" #table-entity-editor .column-name");
