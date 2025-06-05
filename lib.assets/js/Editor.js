@@ -152,10 +152,9 @@ function format() {
 }
 
 /**
- * Checks if an element is hidden.
- * 
+ * Returns whether the given element is hidden (display:none or visibility:hidden).
  * @param {HTMLElement} el - The HTML element to check.
- * @returns {boolean} True if the element is hidden; otherwise, false.
+ * @returns {boolean} True if the element is hidden, false otherwise.
  */
 function isHidden(el) {
   return el.display == 'none' ||

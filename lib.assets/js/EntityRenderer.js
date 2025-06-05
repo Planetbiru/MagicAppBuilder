@@ -1,4 +1,3 @@
-
 /**
  * Class representing an Entity-Relationship Diagram (ERD) generator.
  * This class generates a visual representation of database tables and their relationships
@@ -607,6 +606,14 @@ class EntityRenderer {
         };
 
         img.src = svgUrl;
+    }
+
+    /**
+     * Returns the SVG element currently used for rendering.
+     * @returns {SVGElement} The SVG element.
+     */
+    getSVGElement() {
+        return this.svg;
     }
 
 }
