@@ -560,6 +560,57 @@ public function onBeforeLoad($data)
 
 In this example, if the incoming data is not an `EntityAlbum`, an `InvalidArgumentException` is thrown, preventing further processing of invalid data.
 
+#### Validation Support in MagicDto
+
+MagicDto supports property validation using annotations, ensuring that data loaded into a DTO meets the required constraints before serialization or further processing. You can use the following validation annotations in your DTO classes:
+
+##### Presence & Nullability
+- **@Required**: Ensures the property value is not `null`.
+- **@NotEmpty**: Ensures a string or array is not empty.
+- **@NotBlank**: Ensures a string is not empty and not just whitespace.
+
+##### Value Range & Size
+- **@Min**: Asserts that a numeric property's value is greater than or equal to a minimum value.
+- **@Max**: Asserts that a numeric property's value is less than or equal to a maximum value.
+- **@DecimalMin**: Validates that a numeric property is greater than or equal to a specified decimal value.
+- **@DecimalMax**: Validates that a numeric property is less than or equal to a specified decimal value.
+- **@Range**: Validates that a numeric property's value falls within an inclusive range.
+- **@Size**: Verifies that the length of a string or the count of an array is within a specified range.
+- **@Length**: Specifically for string lengths within a range.
+- **@Digits**: Checks that a numeric property has at most a specified number of integer and fractional digits.
+
+##### Numeric Sign
+- **@Positive**: Ensures a numeric value is positive (> 0).
+- **@PositiveOrZero**: Ensures a numeric value is positive or zero (>= 0).
+- **@Negative**: Ensures a numeric value is negative (< 0).
+- **@NegativeOrZero**: Ensures a numeric value is negative or zero (<= 0).
+
+##### Pattern & Format
+- **@Pattern**: Validates a string property against a specified regular expression.
+- **@Email**: Checks if a string property is a well-formed email address.
+- **@Url**: Ensures a string is a valid URL.
+- **@Ip**: Ensures a string is a valid IP address.
+- **@DateFormat**: Ensures a string matches a specific date format.
+- **@Phone**: Ensures a string is a valid phone number.
+- **@NoHtml**: Checks if a string property contains any HTML tags.
+
+##### Date & Time
+- **@Past**: Ensures a property represents a date/time in the past.
+- **@Future**: Ensures a property represents a date/time in the future.
+- **@PastOrPresent**: Ensures a date/time is in the past or present.
+- **@FutureOrPresent**: Ensures a property represents a date/time in the future or the present.
+
+##### Boolean
+- **@AssertTrue**: Asserts that a boolean property's value is strictly `true`.
+
+##### Enum & Allowed Values
+- **@Enum**: Ensures a property value is one of a predefined set of allowed values, with an option for case-sensitive or case-insensitive comparison.
+
+##### Nested Validation
+- **@Valid**: Recursively validates nested DTOs or objects.
+
+To use validation, simply annotate your DTO properties as needed. When you load data into a MagicDto instance, call the `validate()` method to enforce all validation rules before serialization or further processing.
+
 #### Explanation
 
 - **@Source**: This annotation specifies the path to the property within the nested object structure. In this case, `artist->agency->name` indicates that the `agencyName` will pull data from the `name` property of the `Agency` object linked to the `Artist`.

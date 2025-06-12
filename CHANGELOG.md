@@ -508,3 +508,8 @@ This is especially useful for large databases where selective export is essentia
 ### Append Entities from SQL Without Clearing Existing Data
 
 You can now import entities from an SQL file without removing the existing ones. This feature is useful when you want to add one or more new entities from an SQL file to your current project without overwriting or clearing the existing entities.
+
+## Bug Fixes
+
+-   Bug fixes in the entity editor when designing database structures.
+

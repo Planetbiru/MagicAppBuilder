@@ -1268,6 +1268,873 @@ service httpd restart</code></pre>
 </article>
 
 <article class="article" id="part10">
+<h2>Property Validation</h2>
+<p>The <code>ValidationUtil</code> class has been significantly enhanced to provide a robust and flexible object property validation mechanism. Inspired by Jakarta Bean Validation (JSR 380), developers can now apply a comprehensive set of annotations directly in property docblocks to enforce data integrity.</p>
+<p>The following validation annotations are now supported, grouped by their function:</p>
+<h3>Presence &amp; Nullability</h3>
+<ul>
+<li><strong><code>@Required(message="...")</code></strong>: Ensures the property value is not <code>null</code>.</li>
+<li><strong><code>@NotEmpty(message="...")</code></strong>: Checks if a string is not empty (<code>""</code>) or an array is not empty.</li>
+<li><strong><code>@NotBlank(message="...")</code></strong>: Validates that a string is not empty and not just whitespace characters.</li>
+</ul>
+<h3>Value Range &amp; Size</h3>
+<ul>
+<li><strong><code>@Min(value=X, message="...")</code></strong>: Asserts that a numeric property's value is greater than or equal to a minimum value.</li>
+<li><strong><code>@Max(value=X, message="...")</code></strong>: Asserts that a numeric property's value is less than or equal to a maximum value.</li>
+<li><strong><code>@DecimalMin(value="...", message="...")</code></strong>: Validates that a numeric property (can be float/string) is greater than or equal to a specified decimal value.</li>
+<li><strong><code>@DecimalMax(value="...", message="...")</code></strong>: Validates that a numeric property (can be float/string) is less than or equal to a specified decimal value.</li>
+<li><strong><code>@Range(min=X, max=Y, message="...")</code></strong>: Validates that a numeric property's value falls within an inclusive range.</li>
+<li><strong><code>@Size(min=X, max=Y, message="...")</code></strong>: Verifies that the length of a string or the count of an array is within a specified range.</li>
+<li><strong><code>@Length(min=X, max=Y, message="...")</code></strong>: Similar to <code>@Size</code>, specifically for string lengths within a range.</li>
+<li><strong><code>@Digits(integer=X, fraction=Y, message="...")</code></strong>: Checks that a numeric property has at most <code>X</code> integer digits and <code>Y</code> fractional digits.</li>
+</ul>
+<h3>Numeric Sign</h3>
+<ul>
+<li><strong><code>@Positive(message="...")</code></strong>: Ensures a numeric value is positive (&gt; 0).</li>
+<li><strong><code>@PositiveOrZero(message="...")</code></strong>: Ensures a numeric value is positive or zero (&gt;= 0).</li>
+<li><strong><code>@Negative(message="...")</code></strong>: Ensures a numeric value is negative (&lt; 0).</li>
+<li><strong><code>@NegativeOrZero(message="...")</code></strong>: Ensures a numeric value is negative or zero (&lt;= 0).</li>
+</ul>
+<h3>Pattern &amp; Format</h3>
+<ul>
+<li><strong><code>@Pattern(regexp="...", message="...")</code></strong>: Validates a string property against a specified regular expression.</li>
+<li><strong><code>@Email(message="...")</code></strong>: Checks if a string property is a well-formed email address.</li>
+<li><strong><code>@Url(message="...")</code></strong>: Ensures a string is a valid URL.</li>
+<li><strong><code>@Ip(message="...")</code></strong>: Ensures a string is a valid IP address.</li>
+<li><strong><code>@DateFormat(format="...", message="...")</code></strong>: Ensures a string matches a specific date format.</li>
+<li><strong><code>@Phone(message="...")</code></strong>: Ensures a string is a valid phone number.</li>
+<li><strong><code>@NoHtml(message="...")</code></strong>: Checks if a string property contains any HTML tags.</li>
+</ul>
+<h3>Date &amp; Time</h3>
+<ul>
+<li><strong><code>@Past(message="...")</code></strong>: Ensures a <code>DateTimeInterface</code> property represents a date/time in the past.</li>
+<li><strong><code>@Future(message="...")</code></strong>: Ensures a <code>DateTimeInterface</code> property represents a date/time in the future.</li>
+<li><strong><code>@PastOrPresent(message="...")</code></strong>: Ensures a date/time is in the past or present.</li>
+<li><strong><code>@FutureOrPresent(message="...")</code></strong>: Ensures a <code>DateTimeInterface</code> property represents a date/time in the future or the present.</li>
+</ul>
+<h3>Boolean</h3>
+<ul>
+<li><strong><code>@AssertTrue(message="...")</code></strong>: Asserts that a boolean property's value is strictly <code>true</code>.</li>
+</ul>
+<h3>Enum &amp; Allowed Values</h3>
+<ul>
+<li><strong><code>@Enum(message="...", allowedValues={...}, caseSensitive=true|false)</code></strong>: Ensures a string property's value is one of a predefined set of allowed values, with an option for case-sensitive or case-insensitive comparison.</li>
+</ul>
+<h3>Nested Validation</h3>
+<ul>
+<li><strong><code>@Valid</code></strong>: Recursively validates nested <code>MagicObject</code> instances.</li>
+</ul>
+<p>These new validation capabilities provide a declarative and robust way to ensure data consistency and reduce boilerplate validation code in your MagicObject entities.</p>
+<p><strong>Class <code>UserProfile</code></strong></p>
+<pre><code class="language-php">// Define an example entity class demonstrating various validations
+class UserProfile extends MagicObject
+{
+    /**
+     * @Required(message="Username cannot be null")
+     * @NotBlank(message="Username cannot be blank")
+     * @Length(min=4, max=20, message="Username must be 4-20 characters long")
+     * @Pattern(regexp="^[a-zA-Z0-9_]+$", message="Username can only contain letters, numbers, and underscores")
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * @Email(message="Invalid email address format")
+     * @Required(message="Email cannot be null")
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * @Min(value=18, message="Age must be at least 18")
+     * @Max(value=99, message="Age cannot exceed 99")
+     * @var int
+     */
+    protected $age;
+
+    /**
+     * @NoHtml(message="About Me field contains unsupported HTML tags")
+     * @Size(max=500, message="About Me cannot exceed 500 characters")
+     * @var string
+     */
+    protected $aboutMe;
+
+    /**
+     * @Past(message="Birth date must be in the past")
+     * @var DateTime
+     */
+    protected $birthDate;
+
+    /**
+     * @Enum(message="Gender must be 'Male' or 'Female'", allowedValues={"Male", "Female"})
+     * @var string
+     */
+    protected $gender;
+
+    /**
+     * @Enum(message="Status must be 'active', 'inactive', or 'pending'", allowedValues={"active", "inactive", "pending"}, caseSensitive=false)
+     * @var string
+     */
+    protected $status;
+
+    // A nested object to demonstrate @Valid
+    /**
+     * @Valid
+     * @var Address
+     */
+    protected $address;</code></pre>
+<p><strong>Class <code>Address</code></strong></p>
+<pre><code class="language-php">class Address extends MagicObject
+{
+    /**
+     * @Required(message="Street cannot be null")
+     * @NotBlank(message="Street cannot be blank")
+     * @var string
+     */
+    protected $street;
+
+    /**
+     * @Required(message="City cannot be null")
+     * @NotBlank(message="City cannot be blank")
+     * @var string
+     */
+    protected $city;
+}</code></pre>
+<p><strong>Validation</strong></p>
+<pre><code class="language-php">// Test 1: Valid user profile
+try {
+    $user = new UserProfile();
+    $user-&gt;setUsername("john_doe");
+    $user-&gt;setEmail("john.doe@example.com");
+    $user-&gt;setAge(30);
+    $user-&gt;setAboutMe("Hello, I am John Doe. I like programming.");
+    $user-&gt;setBirthDate(new DateTime('1995-01-15'));
+    $user-&gt;setGender("Male");
+    $user-&gt;setStatus("active");
+
+    $address = new Address();
+    $address-&gt;setStreet("123 Main St");
+    $address-&gt;setCity("Anytown");
+    $user-&gt;setAddress($address);
+
+    ValidationUtil::getInstance()-&gt;validate($user);
+    echo "Test 1: Valid User Profile - PASSED.\n";
+} catch (InvalidValueException $e) {
+    echo "Test 1: FAILED (Unexpected) - " . $e-&gt;getPropertyName() . ": " . $e-&gt;getValidationMessage() . "\n";
+}
+
+// Test 2: Invalid username (too short)
+try {
+    $user = new UserProfile();
+    $user-&gt;setUsername("joh"); // Too short
+    $user-&gt;setEmail("john.doe@example.com");
+    $user-&gt;setAge(30);
+    $user-&gt;setAboutMe("Hello, I am John Doe.");
+    $user-&gt;setBirthDate(new DateTime('1995-01-15'));
+    $user-&gt;setGender("Male");
+    $user-&gt;setStatus("active");
+
+    $address = new Address();
+    $address-&gt;setStreet("123 Main St");
+    $address-&gt;setCity("Anytown");
+    $user-&gt;setAddress($address);
+
+    ValidationUtil::getInstance()-&gt;validate($user);
+    echo "Test 2: Valid User Profile (should have failed) - PASSED.\n";
+} catch (InvalidValueException $e) {
+    echo "Test 2: FAILED (Expected) - " . $e-&gt;getPropertyName() . ": " . $e-&gt;getValidationMessage() . "\n";
+}
+
+// Test 3: Invalid email format
+try {
+    $user = new UserProfile();
+    $user-&gt;setUsername("jane_doe");
+    $user-&gt;setEmail("invalid-email"); // Invalid format
+    $user-&gt;setAge(25);
+    $user-&gt;setAboutMe("Hello, I am Jane Doe.");
+    $user-&gt;setBirthDate(new DateTime('1999-03-20'));
+    $user-&gt;setGender("Female");
+    $user-&gt;setStatus("inactive");
+
+    $address = new Address();
+    $address-&gt;setStreet("123 Main St");
+    $address-&gt;setCity("Anytown");
+    $user-&gt;setAddress($address);
+
+    ValidationUtil::getInstance()-&gt;validate($user);
+    echo "Test 3: Valid User Profile (should have failed) - PASSED.\n";
+} catch (InvalidValueException $e) {
+    echo "Test 3: FAILED (Expected) - " . $e-&gt;getPropertyName() . ": " . $e-&gt;getValidationMessage() . "\n";
+}
+
+// Test 4: Invalid Enum value (case-sensitive)
+try {
+    $user = new UserProfile();
+    $user-&gt;setUsername("test_user");
+    $user-&gt;setEmail("test@example.com");
+    $user-&gt;setAge(40);
+    $user-&gt;setAboutMe("Some text.");
+    $user-&gt;setBirthDate(new DateTime('1980-05-01'));
+    $user-&gt;setGender("male"); // Should fail due to case-sensitivity (expected "Male")
+    $user-&gt;setStatus("pending");
+
+    $address = new Address();
+    $address-&gt;setStreet("123 Main St");
+    $address-&gt;setCity("Anytown");
+    $user-&gt;setAddress($address);
+
+    ValidationUtil::getInstance()-&gt;validate($user);
+    echo "Test 4: Valid User Profile (should have failed) - PASSED.\n";
+} catch (InvalidValueException $e) {
+    echo "Test 4: FAILED (Expected) - " . $e-&gt;getPropertyName() . ": " . $e-&gt;getValidationMessage() . "\n";
+}
+
+// Test 5: Nested validation failure
+try {
+    $user = new UserProfile();
+    $user-&gt;setUsername("test_nest");
+    $user-&gt;setEmail("nest@example.com");
+    $user-&gt;setAge(22);
+    $user-&gt;setAboutMe("Testing nested validation.");
+    $user-&gt;setBirthDate(new DateTime('2000-01-01'));
+    $user-&gt;setGender("Female");
+    $user-&gt;setStatus("active");
+
+    $address = new Address();
+    $address-&gt;setStreet(""); // Blank street, should fail @NotBlank
+    $address-&gt;setCity("Anytown");
+    $user-&gt;setAddress($address);
+
+    ValidationUtil::getInstance()-&gt;validate($user);
+    echo "Test 5: Valid User Profile (should have failed due to nested object) - PASSED.\n";
+} catch (InvalidValueException $e) {
+    echo "Test 5: FAILED (Expected due to nested object) - " . $e-&gt;getPropertyName() . ": " . $e-&gt;getValidationMessage() . "\n";
+}</code></pre>
+<p>MagicObject allows users to validate an entity or object using a <strong>reference class</strong>. This approach is useful for validating form inputs during <code>INSERT</code> and <code>UPDATE</code> operations directly on the same entity, but when different validation rules are required for each operation.</p>
+<p>For example:</p>
+<p><strong>Class <code>Album</code></strong></p>
+<pre><code class="language-php">/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE, prettify=true)
+ * @Table(name="album")
+ * @Cache(enable="true")
+ * @package MusicProductionManager\Data\Entity
+ */
+class Album extends MagicObject
+{
+    /**
+     * Album ID
+     * @Id
+     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @NotNull
+     * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
+     * @Label(content="Album ID")
+     * @var string
+     */
+    protected $albumId;
+
+    /**
+     * Name
+     * @Column(name="name", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Name")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Title
+     * @Column(name="title", type="text", nullable=true)
+     * @Label(content="Title")
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * Description
+     * @Column(name="description", type="longtext", nullable=true)
+     * @Label(content="Description")
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * Producer ID
+     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Producer ID")
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * Producer
+     * @JoinColumn(name="producer_id", referenceColumnName="producer_id")
+     * @Label(content="Producer")
+     * @var Producer
+     */ 
+    protected $producer;
+
+    /**
+     * Release Date
+     * @Column(name="release_date", type="date", nullable=true)
+     * @Label(content="Release Date")
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * Number Of Song
+     * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
+     * @Label(content="Number Of Song")
+     * @var int
+     */
+    protected $numberOfSong;
+
+    /**
+     * Duration
+     * @Column(name="duration", type="float", nullable=true)
+     * @Label(content="Duration")
+     * @var float
+     */
+    protected $duration;
+
+    /**
+     * Image Path
+     * @Column(name="image_path", type="text", nullable=true)
+     * @Label(content="Image Path")
+     * @var string
+     */
+    protected $imagePath;
+
+    /**
+     * Sort Order
+     * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
+     * @Label(content="Sort Order")
+     * @var int
+     */
+    protected $sortOrder;
+
+    /**
+     * Time Create
+     * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
+
+    /**
+     * Time Edit
+     * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
+
+    /**
+     * Admin Create
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @var string
+     */
+    protected $adminCreate;
+
+    /**
+     * Admin Edit
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @var string
+     */
+    protected $adminEdit;
+
+    /**
+     * IP Create
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @var string
+     */
+    protected $ipCreate;
+
+    /**
+     * IP Edit
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @var string
+     */
+    protected $ipEdit;
+
+    /**
+     * Active
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var bool
+     */
+    protected $active;
+
+    /**
+     * As Draft
+     * @Column(name="as_draft", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var bool
+     */
+    protected $asDraft;
+
+}</code></pre>
+<p><strong>Class <code>Producer</code></strong></p>
+<pre><code class="language-php">/**
+ * @Entity
+ * @JSON(property-naming-strategy=SNAKE_CASE)
+ * @Table(name="producer")
+ */
+class Producer extends MagicObject
+{
+    /**
+     * Producer ID
+     * 
+     * @Id
+     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @NotNull
+     * @Column(name="producer_id", type="varchar(40)", length=40, nullable=false)
+     * @Label(content="Producer ID")
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * Name
+     * 
+     * @Column(name="name", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Name")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Gender
+     * 
+     * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
+     * @Label(content="Gender")
+     * @var string
+     */
+    protected $gender;
+
+    /**
+     * Birth Day
+     * 
+     * @Column(name="birth_day", type="date", nullable=true)
+     * @Label(content="Birth Day")
+     * @var string
+     */
+    protected $birthDay;
+
+    /**
+     * Phone
+     * 
+     * @Column(name="phone", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone")
+     * @var string
+     */
+    protected $phone;
+
+    /**
+     * Phone2
+     * 
+     * @Column(name="phone2", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone2")
+     * @var string
+     */
+    protected $phone2;
+
+    /**
+     * Phone3
+     * 
+     * @Column(name="phone3", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="Phone3")
+     * @var string
+     */
+    protected $phone3;
+
+    /**
+     * Email
+     * 
+     * @Column(name="email", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email")
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * Email2
+     * 
+     * @Column(name="email2", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email2")
+     * @var string
+     */
+    protected $email2;
+
+    /**
+     * Email3
+     * 
+     * @Column(name="email3", type="varchar(100)", length=100, nullable=true)
+     * @Label(content="Email3")
+     * @var string
+     */
+    protected $email3;
+
+    /**
+     * Website
+     * 
+     * @Column(name="website", type="text", nullable=true)
+     * @Label(content="Website")
+     * @var string
+     */
+    protected $website;
+
+    /**
+     * Address
+     * 
+     * @Column(name="address", type="text", nullable=true)
+     * @Label(content="Address")
+     * @var string
+     */
+    protected $address;
+
+    /**
+     * Picture
+     * 
+     * @Column(name="picture", type="tinyint(1)", length=1, nullable=true)
+     * @var bool
+     */
+    protected $picture;
+
+    /**
+     * Image Path
+     * 
+     * @Column(name="image_path", type="text", nullable=true)
+     * @Label(content="Image Path")
+     * @var string
+     */
+    protected $imagePath;
+
+    /**
+     * Image Update
+     * 
+     * @Column(name="image_update", type="timestamp", length=26, nullable=true)
+     * @Label(content="Image Update")
+     * @var string
+     */
+    protected $imageUpdate;
+
+    /**
+     * Time Create
+     * 
+     * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
+
+    /**
+     * Time Edit
+     * 
+     * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
+
+    /**
+     * Admin Create
+     * 
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @var string
+     */
+    protected $adminCreate;
+
+    /**
+     * Admin Edit
+     * 
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @var string
+     */
+    protected $adminEdit;
+
+    /**
+     * IP Create
+     * 
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @var string
+     */
+    protected $ipCreate;
+
+    /**
+     * IP Edit
+     * 
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @var string
+     */
+    protected $ipEdit;
+
+    /**
+     * Active
+     * 
+     * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=true)
+     * @DefaultColumn(value="1")
+     * @var bool
+     */
+    protected $active;
+
+}</code></pre>
+<p><strong>Class <code>AlbumValidatorForInsert</code></strong></p>
+<pre><code class="language-php">class AlbumValidatorForInsert extends MagicObject
+{
+    /**
+     * @Required
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @Required
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * @Valid
+     * @var ProducerValidator
+     */ 
+    protected $producer;
+
+    /**
+     * @Required
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * @Positive
+     * @var int
+     */
+    protected $numberOfSong;
+
+    /**
+     * @Positive
+     * @var float
+     */
+    protected $duration;
+
+    /**
+     * @Positive
+     * @var int
+     */
+    protected $sortOrder;
+
+    /**
+     * @Required
+     * @var bool
+     */
+    protected $active;
+
+}</code></pre>
+<p><strong>Class <code>AlbumValidatorForUpdate</code></strong></p>
+<pre><code class="language-php">class AlbumValidatorForUpdate extends MagicObject
+{
+    /**
+     * @Required
+     * @NotBlank
+     * @var string
+     */
+    protected $albumId;
+
+    /**
+     * @Required
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @Required
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * @Valid
+     * @var ProducerValidator
+     */ 
+    protected $producer;
+
+    /**
+     * @Required
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * @Positive
+     * @var int
+     */
+    protected $numberOfSong;
+
+    /**
+     * @Positive
+     * @var float
+     */
+    protected $duration;
+
+    /**
+     * @Positive
+     * @var int
+     */
+    protected $sortOrder;
+
+    /**
+     * @Required
+     * @var bool
+     */
+    protected $active;
+
+}</code></pre>
+<p><strong>Class <code>ProducerValidator</code></strong></p>
+<pre><code class="language-php">class ProducerValidator extends MagicObject
+{
+    /**
+     * @Required
+     * @NotBlank
+     * @var string
+     */
+    protected $producerId;
+
+    /**
+     * @Size(min=2, max=100)
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @Enum(allowedValues={"M", "F"})
+     * @var string
+     */
+    protected $gender;
+
+    /**
+     * @Past
+     * @var string
+     */
+    protected $birthDay;
+
+    /**
+     * @Pattern(regexp="^(0|\\+62)[0-9]{8,15}$")
+     * @var string
+     */
+    protected $phone;
+
+    /**
+     * @Email
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * @Required
+     * @var bool
+     */
+    protected $active;
+}</code></pre>
+<p>Kelas referensi tidak perlu mengandung semua properti dari input yang akan divalidasi. Cukup property yang akan divalidasi saja yang harus ada pada kelas referensi. Setiap properti boleh mengandung lebih dari satu anotasi validasi.</p>
+<p><strong>Insert Validation</strong></p>
+<pre><code class="language-php">$album = new Album(null, $database);
+$album-&gt;setName("New Album");
+$album-&gt;setTitle("The Journey Begins");
+$album-&gt;setDescription("This is the debut album of the artist.");
+$album-&gt;setProducerId("prod-9876");
+$album-&gt;setReleaseDate("2025-06-07"); // format YYYY-MM-DD
+$album-&gt;setNumberOfSong(10);
+$album-&gt;setDuration(42.5); // in minutes, for example
+$album-&gt;setImagePath("/uploads/albums/123456.jpg");
+$album-&gt;setSortOrder(1);
+$album-&gt;setTimeCreate(date("Y-m-d H:i:s")); // usually auto-generated
+$album-&gt;setAdminCreate("admin001");
+$album-&gt;setIpCreate($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+$album-&gt;setActive(true);
+$album-&gt;setAsDraft(false);
+
+try
+{
+    $album-&gt;validate(null, null, new AlbumValidatorForInsert());
+
+    // Save to database (e.g. using ORM method `insert()`)
+    $album-&gt;insert();
+}
+catch(Exception $e)
+{
+    error_log($e-&gt;getMessage());
+}</code></pre>
+<p><strong>Insert Validation</strong></p>
+<pre><code class="language-php">$album = new Album(null, $database);
+$album-&gt;setAlbumId("123456");
+$album-&gt;setName("New Album");
+$album-&gt;setTitle("The Journey Begins");
+$album-&gt;setDescription("This is the debut album of the artist.");
+$album-&gt;setProducerId("prod-9876");
+$album-&gt;setReleaseDate("2025-06-07"); // format YYYY-MM-DD
+$album-&gt;setNumberOfSong(10);
+$album-&gt;setDuration(42.5); // in minutes, for example
+$album-&gt;setImagePath("/uploads/albums/123456.jpg");
+$album-&gt;setSortOrder(1);
+$album-&gt;setTimeCreate(date("Y-m-d H:i:s")); // usually auto-generated
+$album-&gt;setAdminCreate("admin001");
+$album-&gt;setIpCreate($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+$album-&gt;setActive(true);
+$album-&gt;setAsDraft(false);
+
+try
+{
+    $album-&gt;validate(null, null, new AlbumValidatorForUpdate());
+
+    // Save to database (e.g. using ORM method `update()`)
+    $album-&gt;update();
+}
+catch(Exception $e)
+{
+    error_log($e-&gt;getMessage());
+}</code></pre>
+<p>In the example above, <code>$producer</code> isn't validated because its value isn't set via input. The value that <em>is</em> validated is <code>$producerId</code>, which refers to <code>producer_id</code> in the <code>producer</code> table. The <strong><code>@Valid</code> annotation</strong> will validate the properties of the <code>$producer</code> object (an instance of the <code>Producer</code> class) by referencing the <code>ProducerValidator</code> class. When either <code>$album-&gt;validate(null, null, new AlbumValidatorForInsert())</code> or <code>$album-&gt;validate(null, null, new AlbumValidatorForUpdate())</code> is executed, MagicObject will also validate <code>$producer</code>. The <code>@Valid</code> annotation is processed first, and if it's found, other validation annotations won't be processed.</p>
+<p>The <code>validate</code> method has 3 parameters, as follows:</p>
+<ol>
+<li>string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).</li>
+<li>array|null $messageTemplate Optional custom message templates for validation errors.</li>
+<li>MagicObject $reference Optional reference object for validation context.</li>
+</ol>
+<p>Users can create their own validation message templates as follows:</p>
+<pre><code class="language-php">$messageTemplate = array(
+    'required' =&gt; "Field '\${property}' cannot be null",
+    'notEmpty' =&gt; "Field '\${property}' cannot be empty",
+    'notBlank' =&gt; "Field '\${property}' cannot be blank",
+    'size' =&gt; "Field '\${property}' must be between \${min} and \${max} characters",
+    'min' =&gt; "Field '\${property}' must be at least \${min}",
+    'max' =&gt; "Field '\${property}' must be less than \${max}",
+    'pattern' =&gt; "Invalid format for field '\${property}'",
+    'email' =&gt; "Invalid email address for field '\${property}'",
+    'past' =&gt; "Date for field '\${property}' must be in the past",
+    'future' =&gt; "Date for field '\${property}' must be in the future",
+    'decimalMin' =&gt; "Value for field '\${property}' must be at least \${min}",
+    'decimalMax' =&gt; "Value for field '\${property}' must be less than \${max}",
+    'digits' =&gt; "Value for field '\${property}' must have at most \${integer} integer digits and \${fraction} fractional digits",
+    'assertTrue' =&gt; "Field '\${property}' must be true",
+    'futureOrPresent' =&gt; "Date for field '\${property}' cannot be in the past",
+    'length' =&gt; "Field '\${property}' must be between \${min} and \${max} characters",
+    'range' =&gt; "Value for field '\${property}' must be between \${min} and \${max}",
+    'noHtml' =&gt; "Field '\${property}' contains HTML tags and must be removed",
+    'enum' =&gt; "Field '\${property}' has an invalid value. Allowed values: \${allowedValues}.",
+);</code></pre>
+<p>This template can be saved in localization so that it can be translated into various languages. Please note that the %s and %d formatters must match the example above. If the format is wrong, the validation message cannot be generated correctly.</p>
+</article>
+
+<article class="article" id="part11">
 <h2>Secret Object</h2>
 <h3>Definition</h3>
 <p>Secret Objects are very important in applications that use very sensitive and secret configurations. This configuration must be encrypted so that it cannot be seen either when someone tries to open the configuration file, environment variables, or even when the developer accidentally debugs an object related to the database so that the properties of the database object are exposed including the host name, database name, username and even password.</p>
@@ -1867,7 +2734,7 @@ catch(Exception $e)
 </code></pre>
 </article>
 
-<article class="article" id="part11">
+<article class="article" id="part12">
 <h2>MagicDto</h2>
 <h3>Introduction to DTOs</h3>
 <p>A Data Transfer Object (DTO) is a design pattern used to transfer data between software application subsystems or layers. DTOs encapsulate data, reducing the number of method calls needed to retrieve or send information. JSON (JavaScript Object Notation) has become the standard for data serialization due to its simplicity and ease of integration with various programming languages.</p>
@@ -2370,6 +3237,62 @@ echo $albumDto;</code></pre>
     return $data;
 }</code></pre>
 <p>In this example, if the incoming data is not an <code>EntityAlbum</code>, an <code>InvalidArgumentException</code> is thrown, preventing further processing of invalid data.</p>
+<h4>Validation Support in MagicDto</h4>
+<p>MagicDto supports property validation using annotations, ensuring that data loaded into a DTO meets the required constraints before serialization or further processing. You can use the following validation annotations in your DTO classes:</p>
+<h5>Presence &amp; Nullability</h5>
+<ul>
+<li><strong>@Required</strong>: Ensures the property value is not <code>null</code>.</li>
+<li><strong>@NotEmpty</strong>: Ensures a string or array is not empty.</li>
+<li><strong>@NotBlank</strong>: Ensures a string is not empty and not just whitespace.</li>
+</ul>
+<h5>Value Range &amp; Size</h5>
+<ul>
+<li><strong>@Min</strong>: Asserts that a numeric property's value is greater than or equal to a minimum value.</li>
+<li><strong>@Max</strong>: Asserts that a numeric property's value is less than or equal to a maximum value.</li>
+<li><strong>@DecimalMin</strong>: Validates that a numeric property is greater than or equal to a specified decimal value.</li>
+<li><strong>@DecimalMax</strong>: Validates that a numeric property is less than or equal to a specified decimal value.</li>
+<li><strong>@Range</strong>: Validates that a numeric property's value falls within an inclusive range.</li>
+<li><strong>@Size</strong>: Verifies that the length of a string or the count of an array is within a specified range.</li>
+<li><strong>@Length</strong>: Specifically for string lengths within a range.</li>
+<li><strong>@Digits</strong>: Checks that a numeric property has at most a specified number of integer and fractional digits.</li>
+</ul>
+<h5>Numeric Sign</h5>
+<ul>
+<li><strong>@Positive</strong>: Ensures a numeric value is positive (&gt; 0).</li>
+<li><strong>@PositiveOrZero</strong>: Ensures a numeric value is positive or zero (&gt;= 0).</li>
+<li><strong>@Negative</strong>: Ensures a numeric value is negative (&lt; 0).</li>
+<li><strong>@NegativeOrZero</strong>: Ensures a numeric value is negative or zero (&lt;= 0).</li>
+</ul>
+<h5>Pattern &amp; Format</h5>
+<ul>
+<li><strong>@Pattern</strong>: Validates a string property against a specified regular expression.</li>
+<li><strong>@Email</strong>: Checks if a string property is a well-formed email address.</li>
+<li><strong>@Url</strong>: Ensures a string is a valid URL.</li>
+<li><strong>@Ip</strong>: Ensures a string is a valid IP address.</li>
+<li><strong>@DateFormat</strong>: Ensures a string matches a specific date format.</li>
+<li><strong>@Phone</strong>: Ensures a string is a valid phone number.</li>
+<li><strong>@NoHtml</strong>: Checks if a string property contains any HTML tags.</li>
+</ul>
+<h5>Date &amp; Time</h5>
+<ul>
+<li><strong>@Past</strong>: Ensures a property represents a date/time in the past.</li>
+<li><strong>@Future</strong>: Ensures a property represents a date/time in the future.</li>
+<li><strong>@PastOrPresent</strong>: Ensures a date/time is in the past or present.</li>
+<li><strong>@FutureOrPresent</strong>: Ensures a property represents a date/time in the future or the present.</li>
+</ul>
+<h5>Boolean</h5>
+<ul>
+<li><strong>@AssertTrue</strong>: Asserts that a boolean property's value is strictly <code>true</code>.</li>
+</ul>
+<h5>Enum &amp; Allowed Values</h5>
+<ul>
+<li><strong>@Enum</strong>: Ensures a property value is one of a predefined set of allowed values, with an option for case-sensitive or case-insensitive comparison.</li>
+</ul>
+<h5>Nested Validation</h5>
+<ul>
+<li><strong>@Valid</strong>: Recursively validates nested DTOs or objects.</li>
+</ul>
+<p>To use validation, simply annotate your DTO properties as needed. When you load data into a MagicDto instance, call the <code>validate()</code> method to enforce all validation rules before serialization or further processing.</p>
 <h4>Explanation</h4>
 <ul>
 <li><strong>@Source</strong>: This annotation specifies the path to the property within the nested object structure. In this case, <code>artist-&gt;agency-&gt;name</code> indicates that the <code>agencyName</code> will pull data from the <code>name</code> property of the <code>Agency</code> object linked to the <code>Artist</code>.</li>
@@ -2380,7 +3303,7 @@ echo $albumDto;</code></pre>
 <p>MagicDto is a powerful solution for managing data transfer in applications that need to communicate with external systems. By leveraging flexible naming strategies and clear annotations, it simplifies the process of creating and maintaining DTOs, ensuring seamless data exchange. Whether you’re building a new application or integrating with legacy systems, MagicDto can help you navigate the complexities of data serialization and improve overall application reliability.</p>
 </article>
 
-<article class="article" id="part12">
+<article class="article" id="part13">
 <h2>Input POST/GET/COOKIE/REQUEST/SERVER</h2>
 <p>In PHP, handling user input can be done through various superglobals, such as <code>$_POST</code>, <code>$_GET</code>, <code>$_COOKIE</code>, <code>$_REQUEST</code>, and <code>$_SERVER</code>. Each of these superglobals serves a specific purpose for gathering data from different types of requests.</p>
 <h3>Input POST</h3>
@@ -2507,7 +3430,7 @@ PicoFilterConstant::FILTER_SANITIZE_ASCII               = 601;</code></pre>
 <p>In summary, handling input in PHP through superglobals is straightforward but requires careful filtering to ensure security. Using classes like <code>InputPost</code>, <code>InputGet</code>, <code>InputCookie</code>, <code>InputRequest</code>, and <code>InputServer</code> can abstract the underlying superglobal accesses, making the code cleaner and potentially more secure by enforcing consistent input handling and sanitization practices.</p>
 </article>
 
-<article class="article" id="part13">
+<article class="article" id="part14">
 <h2>Session</h2>
 <p>Session variables keep information about one single user, and are available to all pages in one application.</p>
 <h3>Session with File</h3>
@@ -2642,7 +3565,7 @@ $sessions-&gt;startSession();</code></pre>
 <p>This implementation provides a robust framework for session management in a PHP application, allowing flexibility in storage options (files or Redis) while emphasizing security through encryption. The use of YAML for configuration keeps the setup clean and easily adjustable. By encapsulating session configuration in dedicated classes, you enhance maintainability and security.</p>
 </article>
 
-<article class="article" id="part14">
+<article class="article" id="part15">
 <h2>Database</h2>
 <h3>Overview</h3>
 <p><code>PicoDatabase</code> is a PHP class designed for simplified database interactions using PDO (PHP Data Objects). It provides methods to connect to a database, execute SQL commands, manage transactions, and fetch results in various formats. This manual outlines how to use the class, its features, and provides examples for reference.</p>
@@ -2945,7 +3868,7 @@ try {
 <p><code>PicoDatabase</code> is a robust class for managing database operations in PHP applications. By following the examples and method descriptions provided in this manual, you can effectively utilize its features for your database interactions. For further assistance, refer to the source code and documentation available at <a href="https://github.com/Planetbiru/MagicObject">MagicObject GitHub</a>.</p>
 </article>
 
-<article class="article" id="part15">
+<article class="article" id="part16">
 <h2>MagicObject with PDO</h2>
 <h3>Overview</h3>
 <p>With the release of <strong>MagicObject 2.7</strong>, a significant update has been introduced to allow users to leverage <strong>PDO</strong> (PHP Data Objects) for database connections. In previous versions, <strong>MagicObject</strong> required the use of <strong>PicoDatabase</strong>, its custom database handling class. However, recognizing that many developers are accustomed to establishing database connections via traditional PDO, this new version introduces flexibility by allowing PDO connections to be passed directly to the <strong>MagicObject</strong> constructor.</p>
@@ -2971,7 +3894,7 @@ try {
 <p>Version 2.7 of <strong>MagicObject</strong> introduces an important enhancement by allowing PDO connections to be used alongside <strong>PicoDatabase</strong>. This update provides greater flexibility for developers, allowing them to work with traditional PDO connections if they choose, while still benefiting from the advanced features of <strong>MagicObject</strong> for database interactions. This change aligns with the goal of making <strong>MagicObject</strong> more accessible to a wider range of developers, whether they are just starting with <strong>MagicObject</strong> or are looking to transition from an existing PDO-based application.</p>
 </article>
 
-<article class="article" id="part16">
+<article class="article" id="part17">
 <h2>ORM</h2>
 <p>ORM (Object-Relational Mapping) is a class used to access the database. ORM is derived from MagicObject. Some annotations are required to activate all ORM features.</p>
 <p>MagicObject version 2.7 introduces new features for transactional database management, namely <code>startTransaction()</code>, <code>commit()</code>, and <code>rollback()</code>. These functions allow ORMs to directly initiate and manage transactions within their scope. The <code>startTransaction()</code> function begins a new transaction, while <code>commit()</code> ensures that all changes made during the transaction are permanently saved to the database. On the other hand, <code>rollback()</code> can be used to revert any changes made during the transaction in case of an error or interruption. These functions require an active database connection to operate, providing a streamlined way for ORMs to manage data consistency and integrity within their transactions.</p>
@@ -7039,7 +7962,7 @@ catch(Exception $e)
 }</code></pre>
 </article>
 
-<article class="article" id="part17">
+<article class="article" id="part18">
 <h3>Specification</h3>
 <p>Specifications are implemented in the PicoSpecification and PicoPredicate classes. PicoSpecification is a framework that can contain one or more PicoPredicate.</p>
 <p>For example, we have the following query:</p>
@@ -7633,7 +8556,7 @@ try {
 </ul>
 </article>
 
-<article class="article" id="part18">
+<article class="article" id="part19">
 <h3>Pageable and Sortable</h3>
 <p>In MagicObject, pageable is used to divide data rows into several pages. This is required by the application to display a lot of data per page. While sortable is used to sort data before the data is divided per page.</p>
 <p>Pageable can stand alone without sortable. However, this method is not recommended because the data sequence is not as expected. If new data is entered, users will have difficulty finding where it is located in the list and on which page the data will appear. The solution is to add a sortable that will sort the data based on certain columns. For example, the time of data creation is descending, then the new data will be on the first page. Conversely, if sorted based on the time of data creation is ascending, then the new data will be on the last page.</p>
@@ -7961,7 +8884,7 @@ $pageable = new PicoPageable(new PicoLimit(0, 100), $sortable);
 <p><code>ORDER BY user_name ASC, email DESC, phone ASC LIMIT 200 OFFSET 400</code></p>
 </article>
 
-<article class="article" id="part19">
+<article class="article" id="part20">
 <h2>Find All with Option</h2>
 <ol>
 <li><code>MagicObject::FIND_OPTION_NO_COUNT_DATA</code></li>
@@ -8385,7 +9308,7 @@ while($data = $result-&gt;fetch())
 }</code></pre>
 </article>
 
-<article class="article" id="part20">
+<article class="article" id="part21">
 <h2>Filtering, Ordering and Pagination</h2>
 <p>MagicObject will filter data according to the given criteria. On the other hand, MagicObject will only retrieve data on the specified page by specifying <code>limit</code> and <code>offset</code> data in the <code>select</code> query.</p>
 <p>Example parameters:</p>
@@ -9268,7 +10191,7 @@ require_once "inc/footer.php";
 ?&gt;</code></pre>
 </article>
 
-<article class="article" id="part21">
+<article class="article" id="part22">
 <h2>Native Query</h2>
 <p>In MagicObject version 2, native queries have been introduced as an efficient way to interact with the database.</p>
 <p>Native queries offer significant performance improvements when handling large volumes of data, allowing users to craft highly efficient queries that meet diverse requirements.</p>
@@ -10124,7 +11047,7 @@ class SupervisorExport extends MagicObject
 <p>By leveraging the native query feature in MagicObject, you can create efficient and maintainable database interactions, enhancing your application's performance and security.</p>
 </article>
 
-<article class="article" id="part22">
+<article class="article" id="part23">
 <h2>Multiple Database Connections</h2>
 <p>MagicObject version 2 introduces support for multiple database connections, enabling users to manage entities stored across different databases seamlessly. When performing operations such as JOINs with entities from multiple databases, it is essential to define a database connection for each entity involved.</p>
 <h3>Example Scenario</h3>
@@ -10289,7 +11212,7 @@ $song-&gt;databaseEntity($databaseEntity);</code></pre>
 <p>With MagicObject version 2, managing entities across multiple database connections is straightforward. By defining the correct associations and utilizing the provided methods, users can effectively work with complex data structures that span multiple databases. Make sure to handle exceptions properly to ensure robustness in your application.</p>
 </article>
 
-<article class="article" id="part23">
+<article class="article" id="part24">
 <h2>Dump Database</h2>
 <p>We can dump database to another database type. We do not need any database converter. Just define the target database type when we dump the database.</p>
 <h3>Database Dump Overview</h3>
@@ -10803,7 +11726,7 @@ $dumpForSong-&gt;dumpData($pageData, PicoDatabaseType::DATABASE_TYPE_MYSQL, new 
 <p>This approach allows developers to quickly switch between database types and manage their database schemas and data efficiently. The use of dedicated instances of PicoDatabaseDump for multiple tables ensures clarity and organization in your database operations.</p>
 </article>
 
-<article class="article" id="part24">
+<article class="article" id="part25">
 <h2>Object Label</h2>
 <pre><code>&lt;?php
 
@@ -10928,7 +11851,7 @@ echo $userType-&gt;labelAdminCreate();
 // it will print "Admin Create"</code></pre>
 </article>
 
-<article class="article" id="part25">
+<article class="article" id="part26">
 <h2>Database Query Builder</h2>
 <p>Database Query Builder is a feature for creating object-based database queries. The output of the Database Query Builder is a query that can be directly executed by the database used.</p>
 <p>Database Query Builder is actually designed for all relational databases but is currently only available in two languages, namely MySQL and PostgreSQL. MagicObject internally uses the Database Query Builder to create queries based on given methods and parameters.</p>
@@ -11195,7 +12118,7 @@ where song.active = true
 <p>This way, <code>$active</code> will be escaped before being executed by the database. You don't need to escape it first.</p>
 </article>
 
-<article class="article" id="part26">
+<article class="article" id="part27">
 <h2>PicoSqlite</h2>
 <h3>Overview</h3>
 <p><code>PicoSqlite</code> is a PHP class designed for simplified interactions with SQLite databases using PDO (PHP Data Objects). This class extends <code>PicoDatabase</code> and provides methods for connecting to the database, creating tables, and performing basic CRUD (Create, Read, Update, Delete) operations.</p>
@@ -11562,7 +12485,7 @@ catch(Exception $e)
 <p><code>PicoSqlite</code> provides an efficient way to interact with SQLite databases. Its straightforward API allows developers to perform common database operations with minimal code. For more advanced database operations, consider extending the class or using additional PDO features.</p>
 </article>
 
-<article class="article" id="part27">
+<article class="article" id="part28">
 <h2>File Upload</h2>
 <h3>Overview</h3>
 <p>Uploading files can be challenging, especially for novice developers. This guide explains how to manage single and multiple file uploads in PHP, highlighting the differences and providing straightforward examples.</p>
@@ -11631,7 +12554,7 @@ else
 <p>This implementation offers a straightforward way to manage file uploads in PHP, abstracting complexities for developers. By using methods like <code>getAll()</code> and <code>isMultiple()</code>, developers can seamlessly handle both types of uploads without needing to write separate logic for each scenario. This approach not only improves code maintainability but also enhances the developer experience.</p>
 </article>
 
-<article class="article" id="part28">
+<article class="article" id="part29">
 <h2>Resumable File Download</h2>
 <h3>Namespace</h3>
 <p><code>MagicObject\File</code></p>
@@ -11700,7 +12623,7 @@ if($finished &amp;&amp; file_exists($path))
 </ul>
 </article>
 
-<article class="article" id="part29">
+<article class="article" id="part30">
 <h2>Language</h2>
 <p>MagicObject supports multilingual applications. MagicObject allows developers to create entities that support a wide variety of languages that users can choose from. At the same time, different users can use different languages.</p>
 <p>To create table with multiple language, create new class from <code>DataTable</code> object. We can copy data from aother object to <code>DataTable</code> easly.</p>
@@ -11920,7 +12843,7 @@ $apa = $rumah;
 echo $apa;</code></pre>
 </article>
 
-<article class="article" id="part30">
+<article class="article" id="part31">
 <h2>Database Migration</h2>
 <p>MagicObject allows users to import data from a database with different table names and column names between the source database and the destination database. This feature is used by developers who develop applications that are already used in production environments.</p>
 <p>On the one hand, the application requires a new database structure according to what is defined by the developer. On the other hand, users want to use existing data.</p>
@@ -12014,7 +12937,7 @@ $config-&gt;loadYamlFile('import.yml', true, true, true);
 
 $fp = fopen(__DIR__.'/db.sql', 'w');
 fclose($fp);
-$sql = PicoDatabaseUtilMySql::importData($config, function($sql, $source, $target){
+$sql = (new PicoDatabaseUtilMySql())-&gt;importData($config, function($sql, $source, $target){
     $fp = fopen(__DIR__.'/db.sql', 'a');
     fwrite($fp, $sql.";\r\n\r\n");
     fclose($fp);
@@ -12059,7 +12982,7 @@ require_once dirname(__DIR__) . "/vendor/autoload.php";
 $config = new SecretObject();
 $config-&gt;loadYamlFile('import.yml', true, true, true);
 
-PicoDatabaseUtilMySql::autoConfigureImportData($config);
+(new PicoDatabaseUtilMySql())-&gt;autoConfigureImportData($config);
 file_put_contents('import.yml', $config-&gt;dumpYaml(0, 2));</code></pre>
 <p><strong>Executing Script</strong></p>
 <pre><code class="language-bash">php configure-import.php</code></pre>

@@ -24,6 +24,7 @@ use MagicObject\Exceptions\FindOptionException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidQueryInputException;
 use MagicObject\Exceptions\InvalidReturnTypeException;
+use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\Exceptions\NoDatabaseConnectionException;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
@@ -36,6 +37,7 @@ use MagicObject\Util\PicoEnvironmentVariable;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
+use MagicObject\Util\ValidationUtil;
 use PDO;
 use ReflectionClass;
 use ReflectionMethod;
@@ -182,7 +184,7 @@ class MagicObject extends stdClass // NOSONAR
      * The constructor can accept different types of data to populate the object and can 
      * also accept a PDO connection or a PicoDatabase instance to set up the database connection.
      *
-     * @param self|array|stdClass|object|null $data Initial data to populate the object. This can be:
+     * @param MagicObject|array|stdClass|object|null $data Initial data to populate the object. This can be:
      *        - `self`: An instance of the same class to clone data.
      *        - `array`: An associative array of data, which will be camel-cased.
      *        - `stdClass`: A standard object to populate the properties.
@@ -1401,7 +1403,7 @@ class MagicObject extends stdClass // NOSONAR
      * This method copies property values from the provided source object to the current instance.
      * Optionally, a filter can be applied to specify which properties to copy, and whether null values should be included.
      *
-     * @param self|mixed $source The source object or data from which values will be copied. If a non-object is provided, this may result in unexpected behavior.
+     * @param MagicObject|mixed $source The source object or data from which values will be copied. If a non-object is provided, this may result in unexpected behavior.
      * @param array|null $filter An optional array of property names to filter which properties are copied. If null, all properties are copied.
      * @param bool $includeNull Flag indicating whether to include properties with null values. If false, properties with null values will be excluded from the copy.
      * @return self Returns the current instance for method chaining.
@@ -1449,7 +1451,7 @@ class MagicObject extends stdClass // NOSONAR
      *
      * All property names will be automatically camelized before processing.
      *
-     * @param self $other The MagicObject instance to merge with the current object.
+     * @param MagicObject $other The MagicObject instance to merge with the current object.
      * @return self Returns the current object instance for method chaining.
      */
     public function mergeWith($other)
@@ -3062,7 +3064,7 @@ class MagicObject extends stdClass // NOSONAR
     /**
      * Recursively stringify an object or array of objects.
      *
-     * @param self $value The object to stringify.
+     * @param MagicObject $value The object to stringify.
      * @param bool $snake Flag to indicate whether to convert property names to snake_case.
      * @return mixed The stringified object or array.
      */
@@ -3108,5 +3110,30 @@ class MagicObject extends stdClass // NOSONAR
         $snake = $this->_snakeYaml();
         $input = $this->valueArray($snake);
         return PicoYamlUtil::dump($input, $inline, $indent, $flags);
+    }
+
+    /**
+     * Validate the current object using ValidationUtil.
+     *
+     * This method checks the properties of the current object against validation annotations.
+     * If any validation rule fails, an InvalidValueException will be thrown.
+     *
+     * @param string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).
+     * @param array|null $messageTemplate Optional custom message templates for validation errors.
+     * @param MagicObject $reference Optional reference to another MagicObject instance for loading data.
+     * @throws InvalidValueException If validation fails.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function validate($parentPropertyName = null, $messageTemplate = null, $reference = null)
+    {
+        $objectToValidate = $this;
+        if(isset($reference) && $reference instanceof MagicObject)
+        {
+            // If a reference object is provided, wrap the current object in it
+            // to validate against the reference's annotations.
+            $objectToValidate = $reference->loadData($this);
+        }
+        ValidationUtil::getInstance($messageTemplate)->validate($objectToValidate, $parentPropertyName);
+        return $this;
     }
 }

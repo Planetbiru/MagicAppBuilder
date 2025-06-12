@@ -327,7 +327,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * 
      * @return string The corresponding SQLite data type (e.g., 'BOOLEAN', 'NVARCHAR(255)', 'REAL', 'NUMERIC', 'TEXT').
      */
-    private function mysqlToSqliteType($type) // NOSONAR
+    public function mysqlToSqliteType($type) // NOSONAR
     {
         // Trim any whitespace and convert to lowercase for easier comparison
         $typeCheck = trim(strtolower($type));
@@ -395,6 +395,63 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         // Return the mapped SQLite data type
         return $type;
     }
+
+    /**
+     * Converts SQLite data types to MySQL-compatible types.
+     *
+     * This function maps SQLite data types to their closest MySQL equivalents. It supports:
+     * - `BOOLEAN` to `TINYINT(1)`,
+     * - `INTEGER` to `INT`,
+     * - `REAL` to `DOUBLE`,
+     * - `NUMERIC` to `DECIMAL`,
+     * - `TEXT` to `TEXT`,
+     * - `DATETIME`, `DATE`, `TIME`, `TIMESTAMP` to corresponding MySQL temporal types,
+     * - `NVARCHAR(N)` to `VARCHAR(N)` (or `NVARCHAR` to `VARCHAR`).
+     *
+     * @param string $type The SQLite data type (e.g., 'BOOLEAN', 'NVARCHAR(255)', 'REAL', 'NUMERIC', 'TEXT').
+     * 
+     * @return string The corresponding MySQL data type (e.g., 'TINYINT(1)', 'VARCHAR(255)', 'DOUBLE', 'DECIMAL', 'TEXT').
+     */
+    public function sqliteToMysqlType($type) // NOSONAR
+    {
+        // Trim and normalize to lowercase for comparison
+        $typeCheck = trim(strtolower($type));
+
+        // Predefined mappings from SQLite to MySQL
+        $map = array(
+            'boolean'   => 'TINYINT(1)',
+            'int'       => 'INT',
+            'integer'   => 'INT',
+            'real'      => 'DOUBLE',
+            'numeric'   => 'DECIMAL',
+            'text'      => 'TEXT',
+            'datetime'  => 'DATETIME',
+            'date'      => 'DATE',
+            'time'      => 'TIME',
+            'timestamp' => 'TIMESTAMP'
+        );
+
+        // Handle NVARCHAR(n)
+        if (preg_match('/^nvarchar\((\d+)\)$/i', $typeCheck, $matches)) {
+            return 'VARCHAR(' . $matches[1] . ')';
+        }
+
+        // Handle plain NVARCHAR
+        if (stripos($typeCheck, 'nvarchar') === 0) {
+            return 'VARCHAR';
+        }
+
+        // Fallback to map
+        foreach ($map as $key => $val) {
+            if (stripos($typeCheck, $key) === 0) {
+                return $val;
+            }
+        }
+
+        // If unknown type, return it as-is (optionally you could return 'TEXT' or throw warning)
+        return strtoupper($type);
+    }
+
 
     /**
      * Creates a column definition for a SQL statement (SQLite).
