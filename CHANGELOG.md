@@ -505,9 +505,13 @@ This is especially useful for large databases where selective export is essentia
 
 ## What's New
 
-### Append Entities from SQL Without Clearing Existing Data
+### Add Entities from SQL Without Clearing Existing Data
 
 You can now import entities from an SQL file without removing the existing ones. This feature is useful when you want to add one or more new entities from an SQL file to your current project without overwriting or clearing the existing entities.
+
+### Input Validation
+
+User input validation now leverages the input validation features introduced in MagicObject version 3.14, providing more robust and consistent validation across the application.
 
 ## Bug Fixes
 
