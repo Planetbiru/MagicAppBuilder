@@ -21,6 +21,7 @@ includes:
   - object-from-yaml
   - object-from-ini
   - environment-variable
+  - property-validation
   - secret-object
   - magic-dto
   - input
