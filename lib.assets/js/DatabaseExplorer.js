@@ -12,6 +12,14 @@ let scrollElement = null;
 const SCROLL_POSITION_KEY = 'scrollPosition.tableList';
 let timeout = setTimeout('', 10000);
 
+let tableIndex = 0;
+let maxTableIndex = 0;
+let exportConfig = {};
+let exportTableList = [];
+let exportFileName = '';
+let timeoutDownload = setTimeout('', 100);
+let isExporting = false;
+
 /**
  * Creates a debounced version of the given function that delays its execution
  * until after a specified wait time has passed since the last invocation.
@@ -127,7 +135,6 @@ function init() {
     {
         let sql = queryGenerated.value;
         let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
-
         let converted = '';
         if(type.toLowerCase() != 'mysql' && type.toLowerCase() != 'mariadb')
         {
@@ -172,7 +179,6 @@ function init() {
     document.querySelector('.draw-relationship').addEventListener('change', function(e){
         editor.refreshEntities();
         editor.updateDiagram();
-
     });
     
 }
@@ -196,8 +202,6 @@ function openStructure(file)
     };
     reader.readAsText(file); // Read the file as text
 }
-
-
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -355,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let randomId = (new Date()).getTime();
         let id = 'diagram-'+randomId;
         editor.addDiagram(ul, diagramName, id, [], false);
-
         editor.saveDiagram();
     });
 
@@ -414,7 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         editor.updateDiagram();
     });
-
     
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
@@ -464,14 +466,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-let tableIndex = 0;
-let maxTableIndex = 0;
-let exportConfig = {};
-let exportTableList = [];
-let exportFileName = '';
-let timeoutDownload = setTimeout('', 100);
-let isExporting = false;
 
 /**
  * Initiates the database export process if no other export is currently running.
@@ -527,8 +521,6 @@ function exportDatabase(selector) {
 
     maxTableIndex = exportTableList.length;
     
-
-
     // Save export configuration
     exportConfig = {
         applicationId: applicationId,
@@ -609,9 +601,9 @@ function exportTable(selector) {
 }
 
 /**
- * Loads and displays the export table list inside a modal body via AJAX.
- * Enables bulk selection for structure/data via checkbox toggles.
- *
+ * Fetches the list of tables to export and displays them in the export modal.
+ * Also sets up select-all checkboxes for structure and data.
+ * 
  * @param {string} selector - The modal selector to inject the table list.
  * @param {string} tableName - Optional table name to preselect or focus on.
  */
@@ -710,12 +702,10 @@ function showExprtDialog(selector, message, title, captionOk, captionCancel, cal
     return modal;
 }
 
-
-
 /**
- * Updates the margin-left of the tabs to scroll them left or right.
+ * Updates the left margin of the tab list to scroll tabs horizontally.
  * 
- * @param {number} step - The amount to adjust the margin-left by. Positive values scroll right, negative values scroll left.
+ * @param {number} step - The number of pixels to move the margin left (negative to scroll right).
  */
 function updateMarginLeft(step) {
     currentMarginLeft += step;
@@ -947,7 +937,7 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                     editor.prepareDiagram();
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
-                    // NOSONAR
+                    console.error("Error parsing JSON from fetchEntityFromServer:", err.message, response);
                 }
             } else {
                 console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200
