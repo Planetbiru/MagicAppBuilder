@@ -500,3 +500,11 @@ This is especially useful for large databases where selective export is essentia
 
 -   Fixed several edge cases in database table name detection for SQLite and PostgreSQL.
 -   Improved error handling in AJAX export logic for better feedback when an export fails.
+
+# MagicAppBuilder Version 1.3
+
+## What's New
+
+### Append Entities from SQL Without Clearing Existing Data
+
+You can now import entities from an SQL file without removing the existing ones. This feature is useful when you want to add one or more new entities from an SQL file to your current project without overwriting or clearing the existing entities.

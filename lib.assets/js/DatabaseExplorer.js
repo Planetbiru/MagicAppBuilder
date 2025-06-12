@@ -609,9 +609,9 @@ function exportTable(selector) {
 }
 
 /**
- * Loads and displays the export table list inside a modal body via AJAX.
- * Enables bulk selection for structure/data via checkbox toggles.
- *
+ * Fetches the list of tables to export and displays them in the export modal.
+ * Also sets up select-all checkboxes for structure and data.
+ * 
  * @param {string} selector - The modal selector to inject the table list.
  * @param {string} tableName - Optional table name to preselect or focus on.
  */
@@ -713,9 +713,9 @@ function showExprtDialog(selector, message, title, captionOk, captionCancel, cal
 
 
 /**
- * Updates the margin-left of the tabs to scroll them left or right.
+ * Updates the left margin of the tab list to scroll tabs horizontally.
  * 
- * @param {number} step - The amount to adjust the margin-left by. Positive values scroll right, negative values scroll left.
+ * @param {number} step - The number of pixels to move the margin left (negative to scroll right).
  */
 function updateMarginLeft(step) {
     currentMarginLeft += step;
@@ -947,7 +947,7 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                     editor.prepareDiagram();
                     if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
                 } catch (err) {
-                    // NOSONAR
+                    console.error("Error parsing JSON from fetchEntityFromServer:", err.message, response);
                 }
             } else {
                 console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200

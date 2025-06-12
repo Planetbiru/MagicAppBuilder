@@ -478,15 +478,44 @@ class Entity {
 
 function Diagram(name, sortOrder, originalEntities)
 {
+    /**
+     * Array of entity names included in this diagram.
+     * @type {string[]}
+     */
     this.entitieNames = [];
+    /**
+     * Name of the diagram.
+     * @type {string}
+     */
     this.name = name;
+    /**
+     * Sort order of the diagram.
+     * @type {number}
+     */
     this.sortOrder = sortOrder;
+    /**
+     * Original entities available for the diagram.
+     * @type {Entity[]}
+     */
     this.originalEntities = originalEntities;
+    /**
+     * Whether this diagram is active.
+     * @type {boolean}
+     */
     this.active = false;
+    /**
+     * Creates the ERD for this diagram.
+     * @param {number} updatedWidth - The width for rendering.
+     * @param {boolean} drawRelationship - Whether to draw relationships.
+     */
     this.createERD = function(updatedWidth, drawRelationship)
     {
         this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
     }
+    /**
+     * Gets the entities included in this diagram.
+     * @returns {Entity[]} The entities in the diagram.
+     */
     this.getData = function()
     {
         let entities = [];
@@ -588,6 +617,7 @@ class EntityEditor {
             this.callbackLoadTemplate();
         }
         this.template = {columns: []};
+        this.clearBeforeImport = true;
     }
 
     /**
@@ -900,11 +930,33 @@ class EntityEditor {
         element.scrollTop = element.scrollHeight;
 
     }
+    
+    /**
+     * Saves the currently edited entity and updates the diagram if needed.
+     * 
+     * This method serves as the main handler for saving an entity. It first calls
+     * `doSaveEntity()` to either create a new entity or update an existing one
+     * based on the current form data. After saving:
+     * 
+     * - It checks if there is an active diagram tab in `.tabs-link-container`.
+     * - If a diagram tab is active, it re-selects it by calling `selectDiagram()`,
+     *   which will re-render the associated diagram with the updated entity data.
+     * 
+     * This function ensures that both the data and visual representation stay in sync.
+     */
+    saveEntity() {
+        this.doSaveEntity();
+        let activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
+        if(activeDiagram)
+        {
+            this.selectDiagram(activeDiagram);
+        }
+    }
 
     /**
      * Saves the current entity, either updating an existing one or creating a new one.
      */
-    saveEntity() {
+    doSaveEntity() {
         const entityName = document.querySelector(this.selector+" .entity-name").value;
         const columns = [];
         const columnNames = document.querySelectorAll(this.selector+" #table-entity-editor .column-name");
@@ -951,6 +1003,9 @@ class EntityEditor {
         }
     }
 
+    /**
+     * Updates the diagram view for all diagrams in the container.
+     */
     updateDiagram()
     {
         let _this = this;
@@ -983,9 +1038,11 @@ class EntityEditor {
     {
         let selection = this.getCheckedEntities();
         let diagrams = [];
+        let sortOrder = 0;
         Object.entries(selection).forEach(([id, entities]) => {
             let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
-            diagrams.push({id: id, name: name, entities: entities});
+            diagrams.push({id: id, name: name, sortOrder: sortOrder, entities: entities});
+            sortOrder++;
         });
         if(typeof this.callbackSaveDiagram == 'function')
         {
@@ -1263,7 +1320,12 @@ class EntityEditor {
         return entities;
     };
 
-    getCheckedEntities = function() {
+    /**
+     * Gets the checked (selected) entities for each diagram.
+     * 
+     * @returns {Object} An object where each key is a diagram ID and the value is an array of selected entity names.
+     */
+    getCheckedEntities() {
         let diagramEntities = {};
         let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
         diagrams.forEach((diagram) => {
@@ -1273,8 +1335,13 @@ class EntityEditor {
         });
         return diagramEntities;
     };
-    
-    setCheckedEntities = function(diagramEntities) {
+
+    /**
+     * Sets the checked (selected) entities for each diagram.
+     * 
+     * @param {Object} diagramEntities - An object where each key is a diagram ID and the value is an array of entity names to set as checked.
+     */
+    setCheckedEntities(diagramEntities) {
         let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
         diagrams.forEach((diagram) => {
             let id = diagram.getAttribute('id');
@@ -1284,8 +1351,22 @@ class EntityEditor {
             }
         });
     };
+
+    /**
+     * Restores checked entities for the currently active diagram tab.
+     * Calls selectDiagram() for the active diagram tab to update the UI.
+     */
+    restoreCheckedEntitiesFromCurrentDiagram()
+    {
+        let li = document.querySelector('.tabs-link-container .diagram-tab.active');
+        this.selectDiagram(li);
+    }
     
-    restoreCheckedEntities = function()
+    /**
+     * Restores checked (selected) entities in the UI for the currently active diagram.
+     * Updates the checkboxes in the table list to match the entities of the active diagram.
+     */
+    restoreCheckedEntities()
     {
         let diagram = document.querySelector('.diagram-entity.tab-content.active');
         if(diagram)
@@ -1298,7 +1379,7 @@ class EntityEditor {
             });
         }
     }
-    
+
     /**
      * Renders the entities to the DOM.
      * This method updates the UI by rendering a list of entities as checkboxes,
@@ -1307,6 +1388,8 @@ class EntityEditor {
      * 
      * The method also updates the width of the ERD (Entity-Relationship Diagram) based on 
      * the available space in the container and re-renders the ERD with the updated width.
+     * 
+     * @returns {void}
      */
     renderEntities() {
         // Get the container element for the entities
@@ -1575,6 +1658,7 @@ class EntityEditor {
             li.setAttribute('data-edit-mode', 'false');
             _this.updateDiagram();
             _this.saveDiagram();
+            _this.restoreCheckedEntitiesFromCurrentDiagram();
         });
 
         newTab.querySelector('.edit-diagram').addEventListener('click', function(e){
@@ -1587,6 +1671,7 @@ class EntityEditor {
             li.setAttribute('data-edit-mode', 'true');
             input.select();
             _this.updateDiagram();
+            _this.restoreCheckedEntitiesFromCurrentDiagram();
         });
 
         newTab.querySelector('.delete-diagram').addEventListener('click', function(e){
@@ -1781,6 +1866,7 @@ class EntityEditor {
 
             // Re-render the entities after the change
             this.renderEntities();
+            this.restoreCheckedEntitiesFromCurrentDiagram();
             this.exportToSQL();
             
             if(typeof this.callbackSaveEntity == 'function')
@@ -1807,6 +1893,7 @@ class EntityEditor {
 
             // Re-render the entities after the change
             this.renderEntities();
+            this.restoreCheckedEntitiesFromCurrentDiagram();
             this.exportToSQL();
             
             if(typeof this.callbackSaveEntity == 'function')
@@ -1835,6 +1922,7 @@ class EntityEditor {
 
         // Re-render the sorted list of entities
         this.renderEntities();
+        this.restoreCheckedEntitiesFromCurrentDiagram();
         this.exportToSQL();
         if(typeof this.callbackSaveEntity == 'function')
         {
@@ -1864,6 +1952,7 @@ class EntityEditor {
             if (isConfirmed) {
                 _this.entities.splice(index, 1);
                 _this.renderEntities();
+                _this.restoreCheckedEntitiesFromCurrentDiagram();
                 _this.exportToSQL();
                 if(typeof _this.callbackSaveEntity == 'function')
                 {
@@ -2105,14 +2194,36 @@ class EntityEditor {
                 contents = translator.translate(contents, 'mysql').split('`').join('');
                 let parser = new TableParser(contents);
 
-                _this.clearEntities(); // Clear the existing entities
-                _this.clearDiagrams(); // Clear the existing diagrams
 
-                _this.entities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities            
-                _this.renderEntities(); // Update the view with the fetched entities
+                let importedEntities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities  
+                if(_this.clearBeforeImport)
+                {
+                    _this.entities = importedEntities;    
+                    _this.clearEntities(); // Clear the existing entities
+                    _this.clearDiagrams(); // Clear the existing diagrams
+                    _this.renderEntities(); // Update the view with the fetched entities
+                }
+                else
+                {
+                    let existing = [];
+                    _this.entities.forEach((entity) => {
+                        existing.push(entity.name);
+                    });
+                    importedEntities.forEach((entity) => {
+                        if(!existing.includes(entity.name))
+                        {
+                            entity.index = _this.entities.length;
+                            _this.entities.push(entity);
+                        }
+                    });    
+                    _this.renderEntities(); // Update the view with the fetched entities
+                }
+                
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
                 }
+
+                _this.restoreCheckedEntitiesFromCurrentDiagram(); // Restore checked entities from the current diagram
                 
             } catch (err) {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
@@ -2122,20 +2233,42 @@ class EntityEditor {
     }
 
     /**
-     * Triggers the import action by simulating a click on the import file element.
-     * This function locates the DOM element based on the `selector` property and 
-     * clicks on it to initiate the import process.
+     * Triggers the import action for JSON entities by simulating a click
+     * on the file input element associated with JSON import.
+     * 
+     * This method sets `clearBeforeImport` to `true`, which indicates that
+     * any existing data should be cleared before importing new data. It then 
+     * locates the DOM element using the `selector` property combined with 
+     * the `.import-file-json` class, and simulates a click to prompt file selection.
      */
     uploadEntities() {
+        this.clearBeforeImport = true;
         document.querySelector(this.selector + " .import-file-json").click();
     }
 
     /**
-     * Triggers the import action by simulating a click on the import file element.
-     * This function locates the DOM element based on the `selector` property and 
-     * clicks on it to initiate the import process.
+     * Triggers the import action for SQL data by simulating a click
+     * on the file input element associated with SQL import.
+     * 
+     * This method sets `clearBeforeImport` to `true`, meaning existing data
+     * will be cleared before new data is imported. It locates the file input
+     * element using the `selector` property and triggers a click event.
      */
     importSQL() {
+        this.clearBeforeImport = true;
+        document.querySelector(this.selector + " .import-file-sql").click();
+    }
+
+    /**
+     * Appends data from an SQL file without clearing existing data,
+     * by simulating a click on the file input element associated with SQL import.
+     * 
+     * This method sets `clearBeforeImport` to `false`, allowing the imported
+     * SQL data to be appended to the current dataset. It uses the `selector` 
+     * property to locate the appropriate DOM element and triggers a click.
+     */
+    appendFromSQL() {
+        this.clearBeforeImport = false;
         document.querySelector(this.selector + " .import-file-sql").click();
     }
 
