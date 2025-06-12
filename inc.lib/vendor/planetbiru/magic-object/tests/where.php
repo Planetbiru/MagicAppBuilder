@@ -457,3 +457,11 @@ catch(Exception $e)
 {
 	error_log($e);
 }
+
+$album2 = new EntityAlbum(null, $database);
+$album2->where(PicoSpecification::getInstance())->setName(['Album 1', 'Album 2'])
+	->setNumberOfSong(11)
+	->setActive(true)
+	->setAsDraft(false)
+	->validate()
+	;

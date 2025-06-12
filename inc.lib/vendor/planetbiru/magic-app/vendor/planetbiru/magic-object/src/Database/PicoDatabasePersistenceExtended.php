@@ -2,8 +2,10 @@
 
 namespace MagicObject\Database;
 
+use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\MagicObject;
+use MagicObject\Util\ValidationUtil;
 
 /**
  * Database persistence extended
@@ -59,23 +61,18 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     }
 
     /**
-     * Magic method to handle undefined methods for setting properties.
+     * Magic method to handle dynamic method calls for property setting.
      *
      * This method dynamically handles method calls that start with "set".
-     * It allows setting properties of the object in a more flexible way,
-     * using a consistent naming convention.
      *
-     * Supported dynamic method:
-     *
-     * - `set<PropertyName>`: Sets the value of the specified property.
-     *   - If the property name follows "set", the method extracts the property name
-     *     and assigns the provided value to it.
-     *   - If no value is provided, it sets the property to null.
+     * Supported dynamic method pattern:
+     * - `set<PropertyName>($value)`: Sets the value of the specified property and adds it to the internal map.
      *   - Example: `$obj->setFoo($value)` sets the property `foo` to `$value`.
-     * 
+     *   - If no value is provided, it sets the property to null.
+     *
      * @param string $method The name of the method that was called.
-     * @param mixed[] $params The parameters passed to the method, expected to be an array.
-     * @return $this Returns the current instance for method chaining.
+     * @param array $params The parameters passed to the method.
+     * @return self Returns the current instance for method chaining.
      */
     public function __call($method, $params)
     {
@@ -87,8 +84,33 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
             }
             $this->object->set($var, $params[0]);
             $this->addToMap($var, $params[0]);
-            return $this;
         }
+        return $this;
+    }
+
+    /**
+     * Validate the current object using ValidationUtil.
+     *
+     * This method checks the properties of the current object against validation annotations.
+     * If any validation rule fails, an InvalidValueException will be thrown.
+     *
+     * @param string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).
+     * @param array|null $messageTemplate Optional custom message templates for validation errors.
+     * @param MagicObject $reference Optional reference object for validation context.
+     * @throws InvalidValueException If validation fails.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function validate($parentPropertyName = null, $messageTemplate = null, $reference = null)
+    {
+        $objectToValidate = $this->object;
+        if(isset($reference) && $reference instanceof MagicObject)
+        {
+            // If a reference object is provided, wrap the current object in it
+            // to validate against the reference's annotations.
+            $objectToValidate = $reference->loadData($this->object);
+        }
+        ValidationUtil::getInstance($messageTemplate)->validate($objectToValidate, $parentPropertyName);
+        return $this;
     }
     
     /**

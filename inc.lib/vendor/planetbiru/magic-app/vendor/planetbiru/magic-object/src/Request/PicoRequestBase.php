@@ -3,12 +3,13 @@
 namespace MagicObject\Request;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
+use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoStringUtil;
+use MagicObject\Util\ValidationUtil;
 use ReflectionClass;
 use stdClass;
-
 
 /**
  * Base class for handling HTTP requests, including input sanitization, data manipulation, 
@@ -134,12 +135,29 @@ class PicoRequestBase extends stdClass // NOSONAR
             {
                 $params[3] = false;
             }
-            return $this->filterValue($value, $filter, $params[1], $params[2], $params[3]);
+            $val = $this->filterValue($value, $filter, $params[1], $params[2], $params[3]);
+            if($this->hasProperty($var))
+            {
+                $this->{$var} = $val;
+            }
+            return $val;
         }
         else
         {
             return $value;
         }
+    }
+
+    /**
+     * Check if a property exists in the object.
+     *
+     * This method checks if a property with the given name is defined in the object.
+     *
+     * @param string $propertyName The name of the property to check.
+     * @return boolean Returns true if the property exists, false otherwise.
+     */
+    public function hasProperty($propertyName) {
+        return property_exists($this, $propertyName);
     }
 
     /**
@@ -908,6 +926,23 @@ class PicoRequestBase extends stdClass // NOSONAR
                 }
             }
         }
+    }
+
+    /**
+     * Validate the current request object using ValidationUtil.
+     *
+     * This method checks the properties of the current object against validation annotations.
+     * If any validation rule fails, an InvalidValueException will be thrown.
+     *
+     * @param string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).
+     * @param array|null $messageTemplate Optional custom message templates for validation errors.
+     * @throws \MagicObject\Exceptions\InvalidValueException If validation fails.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function validate($parentPropertyName = null, $messageTemplate = null)
+    {
+        ValidationUtil::getInstance($messageTemplate)->validate($this, $parentPropertyName);
+        return $this;
     }
 
 }
