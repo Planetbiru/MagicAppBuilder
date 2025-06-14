@@ -654,7 +654,8 @@ handled.</p>
 </ul>
 <h3>Parameters</h3>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"></div>
+<div class="parameter-description"><p>The data to load, which can be one of the specified types
+or null.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -697,7 +698,9 @@ The method handles various property types including self-references, magic objec
 DateTime instances, and standard class objects.</p>
 <h3>Return</h3>
 <div class="return-type">stdClass</div>
-<div class="return-description"><p>An object containing the values of the properties, where each property</p></div>
+<div class="return-description"><p>An object containing the values of the properties, where each property
+name corresponds to the JSON property or the original key if no
+JSON property is defined.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -764,7 +767,8 @@ it returns null.</p>
 <div class="parameter-description"><p>The date string or Unix timestamp to be parsed.</p></div>
 <h3>Return</h3>
 <div class="return-type">DateTime|null</div>
-<div class="return-description"><p>Returns a DateTime object if parsing is successful,</p></div>
+<div class="return-description"><p>Returns a DateTime object if parsing is successful,
+or null if no formats matched.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -1310,11 +1314,11 @@ is present in both classes but has been redefined in the child class.</p>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span>|<span class="parameter-type">null</span> <span class="parameter-name">$parentPropertyName <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span>|<span class="parameter-type">null</span> <span class="parameter-name">$messageTemplate <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span>|<span class="parameter-type">null</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
 ) : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Validate the current object using ValidationUtil.</p>
+<p>Validate the current object based on property annotations.</p>
 <p>This method checks the properties of the current object against validation annotations.
 If any validation rule fails, an InvalidValueException will be thrown.</p>
 <h3>Parameters</h3>
@@ -1323,7 +1327,9 @@ If any validation rule fails, an InvalidValueException will be thrown.</p>
 <div class="parameter-name">$messageTemplate</div>
 <div class="parameter-description"><p>Optional custom message templates for validation errors.</p></div>
 <div class="parameter-name">$reference</div>
-<div class="parameter-description"><p>Optional reference to another MagicObject instance for loading data.</p></div>
+<div class="parameter-description"><p>Optional reference object. If provided and is an instance of MagicObject,
+validation will use the property annotations from the reference class
+(not from the validated object's class), but the data to validate is taken from the current object.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -1473,9 +1479,21 @@ The constructor can accept different types of data to populate the object and ca
 also accept a PDO connection or a PicoDatabase instance to set up the database connection.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>Initial data to populate the object. This can be:</p></div>
+<div class="parameter-description"><p>Initial data to populate the object. This can be:</p>
+<ul>
+<li><code>self</code>: An instance of the same class to clone data.</li>
+<li><code>array</code>: An associative array of data, which will be camel-cased.</li>
+<li><code>stdClass</code>: A standard object to populate the properties.</li>
+<li><code>object</code>: A generic object to populate the properties.</li>
+<li><code>null</code>: No data, leaving the object empty.</li>
+</ul></div>
 <div class="parameter-name">$database</div>
-<div class="parameter-description"><p>A database connection instance, either:</p></div>
+<div class="parameter-description"><p>A database connection instance, either:</p>
+<ul>
+<li><code>PicoDatabase</code>: An already instantiated PicoDatabase object.</li>
+<li><code>PDO</code>: A PDO connection object, which will be converted into a PicoDatabase instance using <code>PicoDatabase::fromPdo()</code>.</li>
+<li><code>null</code>: No database connection.</li>
+</ul></div>
 <h3>Throws</h3>
 <div class="return-type">InvalidAnnotationException</div>
 <div class="return-description"><p>If the annotations are invalid or cannot be parsed.</p></div>
@@ -1787,7 +1805,8 @@ all properties of the object, including those with null values, will be saved.
 If FALSE, only the properties with non-null values will be saved.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$includeNull</div>
-<div class="parameter-description"><p>If TRUE, all properties, including null, will be saved.</p></div>
+<div class="parameter-description"><p>If TRUE, all properties, including null, will be saved.
+If FALSE, only non-null values will be saved.</p></div>
 <h3>Return</h3>
 <div class="return-type">PDOStatement</div>
 <div class="return-description"><p>Returns a PDOStatement object for further database interaction.</p></div>
@@ -1812,7 +1831,8 @@ If <code>$includeNull</code> is TRUE, properties with null values will be includ
 If FALSE, only properties with non-null values will be included.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$includeNull</div>
-<div class="parameter-description"><p>If TRUE, all properties, including null, will be saved.</p></div>
+<div class="parameter-description"><p>If TRUE, all properties, including null, will be saved.
+If FALSE, only non-null values will be included in the query.</p></div>
 <h3>Return</h3>
 <div class="return-type">PicoDatabaseQueryBuilder</div>
 <div class="return-description"><p>Returns a PicoDatabaseQueryBuilder object for query construction.</p></div>
@@ -1906,7 +1926,15 @@ created for each row fetched.</li>
 </ul>
 <h3>Return</h3>
 <div class="return-type">mixed</div>
-<div class="return-description"><p>The result based on the return type of the caller function:</p></div>
+<div class="return-description"><p>The result based on the return type of the caller function:</p>
+<ul>
+<li>null if the return type is void.</li>
+<li>integer for the number of affected rows if the return type is int.</li>
+<li>object for a single result if the return type is object.</li>
+<li>an array of associative arrays for multiple results if the return type is array.</li>
+<li>a JSON string if the return type is string.</li>
+<li>instances of a specified class if the return type matches a class name.</li>
+</ul></div>
 <h3>Throws</h3>
 <div class="return-type">PDOException</div>
 <div class="return-description"><p>If there is an error executing the database query.</p></div>
@@ -2116,7 +2144,8 @@ The specification is an instance of <code>PicoSpecification</code> which defines
 <div class="parameter-description"><p>The specification to define the WHERE condition.</p></div>
 <h3>Return</h3>
 <div class="return-type">PicoDatabasePersistenceExtended</div>
-<div class="return-description"><p>Returns an instance of <code>PicoDatabasePersistenceExtended</code></p></div>
+<div class="return-description"><p>Returns an instance of <code>PicoDatabasePersistenceExtended</code>
+that applies the WHERE condition based on the provided specification.</p></div>
 <h3>Throws</h3>
 <div class="return-type">NoDatabaseConnectionException</div>
 <div class="return-description"><p>If there is no active database connection.</p></div>
@@ -2357,7 +2386,8 @@ in a dot-notation-like fashion, where each key corresponds to a level in the obj
 exist or the value at any level is not set, the function will return <code>null</code>.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">string</div>
-<div class="parameter-description"><p>...$keys The keys used to retrieve the value at various levels of the object.</p></div>
+<div class="parameter-description"><p>...$keys The keys used to retrieve the value at various levels of the object.
+Each key corresponds to a property in the object, and the keys are automatically camelized.</p></div>
 <h3>Return</h3>
 <div class="return-type">mixed|null</div>
 <div class="return-description"><p>The value found at the specified keys in the object, or <code>null</code> if any key is not found.</p></div>
@@ -3721,11 +3751,11 @@ invokes the appropriate method according to its name and parameters.</p>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span>|<span class="parameter-type">null</span> <span class="parameter-name">$parentPropertyName <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span>|<span class="parameter-type">null</span> <span class="parameter-name">$messageTemplate <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span>|<span class="parameter-type">null</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
 ) : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Validate the current object using ValidationUtil.</p>
+<p>Validate the current object based on property annotations.</p>
 <p>This method checks the properties of the current object against validation annotations.
 If any validation rule fails, an InvalidValueException will be thrown.</p>
 <h3>Parameters</h3>
@@ -3734,7 +3764,9 @@ If any validation rule fails, an InvalidValueException will be thrown.</p>
 <div class="parameter-name">$messageTemplate</div>
 <div class="parameter-description"><p>Optional custom message templates for validation errors.</p></div>
 <div class="parameter-name">$reference</div>
-<div class="parameter-description"><p>Optional reference to another MagicObject instance for loading data.</p></div>
+<div class="parameter-description"><p>Optional reference object. If provided and is an instance of MagicObject,
+validation will use the property annotations from the reference class
+(not from the validated object's class), but the data to validate is taken from the current object.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -3884,9 +3916,11 @@ allows the optional specification of a callback function for secure key generati
 The data is processed and loaded into the object upon instantiation.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>The initial data for the object. Can be an</p></div>
+<div class="parameter-description"><p>The initial data for the object. Can be an
+associative array, an object, or null.</p></div>
 <div class="parameter-name">$secureCallback</div>
-<div class="parameter-description"><p>An optional callback function for generating</p></div>
+<div class="parameter-description"><p>An optional callback function for generating
+secure keys. If provided, it must be callable.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -4532,9 +4566,11 @@ choose whether to include properties with null values.</p>
 <div class="parameter-name">$source</div>
 <div class="parameter-description"><p>The source object from which to copy values.</p></div>
 <div class="parameter-name">$filter</div>
-<div class="parameter-description"><p>An optional array of property names to filter which values</p></div>
+<div class="parameter-description"><p>An optional array of property names to filter which values
+should be copied. If null, all properties will be considered.</p></div>
 <div class="parameter-name">$includeNull</div>
-<div class="parameter-description"><p>A flag indicating whether to include properties with null</p></div>
+<div class="parameter-description"><p>A flag indicating whether to include properties with null
+values. Defaults to false, meaning null values will be excluded.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -4761,7 +4797,8 @@ Nested arrays are also processed.</p>
 <p>This method attempts to convert an array into a friendly YAML format.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$inline</div>
-<div class="parameter-description"><p>The level where to switch to inline YAML. If set to NULL,</p></div>
+<div class="parameter-description"><p>The level where to switch to inline YAML. If set to NULL,
+MagicObject will use the maximum value of array depth.</p></div>
 <div class="parameter-name">$indent</div>
 <div class="parameter-description"><p>The number of spaces to use for indentation of nested nodes.</p></div>
 <div class="parameter-name">$flags</div>
@@ -4834,7 +4871,8 @@ from overriding its value.</p>
 property configuration.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>Initial data for the object.</p></div>
+<div class="parameter-description"><p>Initial data for the object.
+Can be an associative array, another SetterGetter instance, or a stdClass.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -4850,7 +4888,8 @@ property configuration.</p>
 camelizing keys.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>Data to load, which can be another SetterGetter instance,</p></div>
+<div class="parameter-description"><p>Data to load, which can be another SetterGetter instance,
+an array, or an object.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -5776,7 +5815,8 @@ PicoDatabase object.</p>
 <div class="parameter-description"><p>The PDO connection object representing an active connection to the database.</p></div>
 <h3>Return</h3>
 <div class="return-type">PicoDatabase</div>
-<div class="return-description"><p>Returns a new instance of the PicoDatabase class,</p></div>
+<div class="return-description"><p>Returns a new instance of the PicoDatabase class,
+with the PDO connection and database type set.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -5813,10 +5853,19 @@ by converting the database offset to a corresponding PHP time zone where possibl
 <div class="parameter-description"><p>The database type constant as defined in <code>PicoDatabaseType</code>.</p></div>
 <h3>Return</h3>
 <div class="return-type">SecretObject</div>
-<div class="return-description"><p>A <code>SecretObject</code> instance containing the following properties:</p></div>
+<div class="return-description"><p>A <code>SecretObject</code> instance containing the following properties:</p>
+<ul>
+<li><code>driver</code>: The database driver (e.g., 'mysql', 'pgsql').</li>
+<li><code>host</code>: The database host (e.g., 'localhost').</li>
+<li><code>port</code>: The database port (e.g., 3306 for MySQL, 5432 for PostgreSQL).</li>
+<li><code>databaseName</code>: The name of the database.</li>
+<li><code>databaseSchema</code>: The schema name (if applicable, e.g., 'public' for PostgreSQL).</li>
+<li><code>timeZone</code>: The database time zone (e.g., 'UTC+02:00').</li>
+</ul></div>
 <h3>Throws</h3>
 <div class="return-type">PDOException</div>
-<div class="return-description"><p>If an error occurs during database interaction, such as a query failure or</p></div>
+<div class="return-description"><p>If an error occurs during database interaction, such as a query failure or
+attribute access issue.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -5944,7 +5993,8 @@ using <code>SET search_path</code>.</li>
 </ul>
 <h3>Parameters</h3>
 <div class="parameter-name">$withDatabase</div>
-<div class="parameter-description"><p>Flag to specify whether to select a database upon connection (default is true).</p></div>
+<div class="parameter-description"><p>Flag to specify whether to select a database upon connection (default is true).
+If true, the database is selected; otherwise, only the connection is made.</p></div>
 <h3>Return</h3>
 <div class="return-type">bool</div>
 <div class="return-description"><p>true if the connection is successfully established, false otherwise.</p></div>
@@ -6052,7 +6102,14 @@ If the provided database type is not supported, it throws an <code>UnsupportedDa
 <div class="parameter-description"><p>The database type string (e.g., 'SQLite', 'PostgreSQL', 'MariaDB', 'MySQL', 'SQLServer').</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The corresponding <code>PicoDatabaseType</code> constant, one of:</p></div>
+<div class="return-description"><p>The corresponding <code>PicoDatabaseType</code> constant, one of:</p>
+<ul>
+<li><code>PicoDatabaseType::DATABASE_TYPE_SQLITE</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_PGSQL</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_MARIADB</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_SQLSERVER</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_MYSQL</code></li>
+</ul></div>
 <h3>Throws</h3>
 <div class="return-type">UnsupportedDatabaseException</div>
 <div class="return-description"><p>If the database type is unsupported.</p></div>
@@ -6075,7 +6132,13 @@ It supports SQLite, PostgreSQL, MySQL/MariaDB, and SQL Server types.</p>
 <div class="parameter-description"><p>The type of the database (e.g., 'sqlite', 'postgres', 'pgsql', 'mysql', 'mariadb', 'sqlsrv').</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The corresponding database driver constant, one of:</p></div>
+<div class="return-description"><p>The corresponding database driver constant, one of:</p>
+<ul>
+<li><code>PicoDatabaseType::DATABASE_TYPE_SQLITE</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_PGSQL</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_MYSQL</code></li>
+<li><code>PicoDatabaseType::DATABASE_TYPE_SQLSERVER</code></li>
+</ul></div>
 </div>
 </div>
 <div class='method'>
@@ -6144,7 +6207,8 @@ The method generates the appropriate SQL command based on the type of the databa
 and executes it to apply the time zone setting.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$timeZoneOffset</div>
-<div class="parameter-description"><p>The time zone offset to set for the session. It can either be a valid UTC offset (e.g., '+00:00')</p></div>
+<div class="parameter-description"><p>The time zone offset to set for the session. It can either be a valid UTC offset (e.g., '+00:00')
+or a named time zone (e.g., 'Europe/London').</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -6277,7 +6341,8 @@ until the transaction is committed.</p>
 <div class="parameter-description"><p>Optional parameters to bind to the query.</p></div>
 <h3>Return</h3>
 <div class="return-type">PDOStatement|false</div>
-<div class="return-description"><p>Returns a <code>PDOStatement</code> object if the query was executed successfully,</p></div>
+<div class="return-description"><p>Returns a <code>PDOStatement</code> object if the query was executed successfully,
+or <code>false</code> if the execution failed.</p></div>
 <h3>Throws</h3>
 <div class="return-type">PDOException</div>
 <div class="return-description"><p>If an error occurs while executing the query.</p></div>
@@ -6928,7 +6993,8 @@ MagicObject\Database<h4>Authors</h4>
 <div class="parameter-name">$entity</div>
 <div class="parameter-description"><p>The entity to add.</p></div>
 <div class="parameter-name">$database</div>
-<div class="parameter-description"><p>The database to associate with the entity. If null,</p></div>
+<div class="parameter-description"><p>The database to associate with the entity. If null,
+the current database of the entity will be used.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -10085,7 +10151,8 @@ of hours and minutes (e.g., '+07:00', '-03:00').</p>
 in the format of hours and minutes (e.g., '+07:00', '-03:00').</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$timeZoneOffsetSystem</div>
-<div class="parameter-description"><p>The timezone offset to set for the system.</p></div>
+<div class="parameter-description"><p>The timezone offset to set for the system.
+Must be in the format '+hh:mm' or '-hh:mm'.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -10184,10 +10251,8 @@ record selection capabilities.</p>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">map</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$map</span> = <span class="property-default">array()</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array An array of property-value pairs where each entry contains the name of a property and its corresponding value.</span> <span class="property-name">$map</span> = <span class="property-default">array()</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array An array of property-value pairs where each entry contains the name of a property and its corresponding value.</p>
 </div>
 </div>
 <div class="property">
@@ -10350,11 +10415,11 @@ to an internal map for further processing.</p>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span>|<span class="parameter-type">null</span> <span class="parameter-name">$parentPropertyName <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span>|<span class="parameter-type">null</span> <span class="parameter-name">$messageTemplate <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span>|<span class="parameter-type">null</span> <span class="parameter-name">$reference <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span><br>
 ) : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Validate the current object using ValidationUtil.</p>
+<p>Validate the current object based on property annotations.</p>
 <p>This method checks the properties of the current object against validation annotations.
 If any validation rule fails, an InvalidValueException will be thrown.</p>
 <h3>Parameters</h3>
@@ -10363,7 +10428,9 @@ If any validation rule fails, an InvalidValueException will be thrown.</p>
 <div class="parameter-name">$messageTemplate</div>
 <div class="parameter-description"><p>Optional custom message templates for validation errors.</p></div>
 <div class="parameter-name">$reference</div>
-<div class="parameter-description"><p>Optional reference object for validation context.</p></div>
+<div class="parameter-description"><p>Optional reference object. If provided and is an instance of MagicObject,
+validation will use the property annotations from the reference class
+(not from the validated object's class), but the data to validate is taken from the current object.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -10406,7 +10473,11 @@ the 'where' specification and the 'set' mapping, making it easier to inspect
 the internal data during development.</p>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The JSON string representation of the object, containing:</p></div>
+<div class="return-description"><p>The JSON string representation of the object, containing:</p>
+<ul>
+<li>'where': The string representation of the object's specification (as generated by __toString).</li>
+<li>'set': The current mapping of the object.</li>
+</ul></div>
 </div>
 </div>
 </div>
@@ -11137,10 +11208,14 @@ newline characters.</li>
 </ul>
 <h3>Parameters</h3>
 <div class="parameter-name">$query</div>
-<div class="parameter-description"><p>The SQL query string to escape. This should be a valid</p></div>
+<div class="parameter-description"><p>The SQL query string to escape. This should be a valid
+SQL statement that may contain special characters
+requiring escaping.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The escaped SQL query string. This result can be safely used</p></div>
+<div class="return-description"><p>The escaped SQL query string. This result can be safely used
+in database queries to avoid syntax errors and SQL injection
+vulnerabilities.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -11159,10 +11234,12 @@ characters in string values and converts arrays or objects to their JSON
 representation.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$value</div>
-<div class="parameter-description"><p>The value to be escaped. Can be null, string, boolean,</p></div>
+<div class="parameter-description"><p>The value to be escaped. Can be null, string, boolean,
+numeric, array, or object.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The escaped value. This will be a string representation</p></div>
+<div class="return-description"><p>The escaped value. This will be a string representation
+of the value, properly formatted for SQL usage.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -12974,9 +13051,18 @@ It supports different formats for both page and sortable parameters.</p>
  ?&gt;</code></pre>
 <h3>Parameters</h3>
 <div class="parameter-name">$page</div>
-<div class="parameter-description"><p>The page or limit configuration. Can be:</p></div>
+<div class="parameter-description"><p>The page or limit configuration. Can be:</p>
+<ul>
+<li><code>PicoPage</code> instance (for page number and size),</li>
+<li><code>PicoLimit</code> instance (for offset and limit),</li>
+<li>array with two elements representing page and size (e.g., <code>[1, 100]</code>).</li>
+</ul></div>
 <div class="parameter-name">$sortable</div>
-<div class="parameter-description"><p>The sorting configuration. Can be:</p></div>
+<div class="parameter-description"><p>The sorting configuration. Can be:</p>
+<ul>
+<li><code>PicoSortable</code> instance (for sorting by multiple fields),</li>
+<li>array of field-direction pairs (e.g., <code>['userName', 'asc', 'email', 'desc']</code>).</li>
+</ul></div>
 </div>
 </div>
 <div class='method'>
@@ -13511,11 +13597,17 @@ It includes a span with the <code>page-selector-step-one</code> class and a link
 and start/end buttons.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$pageNumberFormat</div>
-<div class="parameter-description"><p>The format template for rendering page numbers.</p></div>
+<div class="parameter-description"><p>The format template for rendering page numbers.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-html"> &lt;span class="page-selector page-selector-number%s" data-page-number="%d"&gt;&lt;a href="%s"&gt;%s&lt;/a&gt;&lt;/span&gt;</code></pre></div>
 <div class="parameter-name">$stepOneFormat</div>
-<div class="parameter-description"><p>The format template for rendering step buttons.</p></div>
+<div class="parameter-description"><p>The format template for rendering step buttons.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-html"> &lt;span class="page-selector page-selector-step-one%s" data-page-number="%d"&gt;&lt;a href="%s"&gt;%s&lt;/a&gt;&lt;/span&gt;</code></pre></div>
 <div class="parameter-name">$startEndFormat</div>
-<div class="parameter-description"><p>The format template for rendering start and end buttons.</p></div>
+<div class="parameter-description"><p>The format template for rendering start and end buttons.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-html"> &lt;span class="page-selector page-selector-end%s" data-page-number="%d"&gt;&lt;a href="%s"&gt;%s&lt;/a&gt;&lt;/span&gt;</code></pre></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -13534,7 +13626,16 @@ and start/end buttons.</p>
 and applies its settings to the pagination control. The object contains the following properties:</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$paginationConfig</div>
-<div class="parameter-description"><p>The configuration object containing pagination settings.</p></div>
+<div class="parameter-description"><p>The configuration object containing pagination settings.</p>
+<ul>
+<li><code>button_prev</code>: Symbol for the &quot;previous&quot; button.</li>
+<li><code>button_next</code>: Symbol for the &quot;next&quot; button.</li>
+<li><code>button_first</code>: Symbol for the &quot;first&quot; button.</li>
+<li><code>button_last</code>: Symbol for the &quot;last&quot; button.</li>
+<li><code>template_page_number</code>: Format for page number buttons.</li>
+<li><code>template_step_one</code>: Format for step-one navigation buttons.</li>
+<li><code>template_start_end</code>: Format for start/end navigation buttons.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -15224,7 +15325,8 @@ allowing for the combination of predicates using logical operators (AND, OR).</p
 are set, adds a PicoPredicate condition using the given field and value.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$field</div>
-<div class="parameter-description"><p>The name of the field to be used in the predicate.</p></div>
+<div class="parameter-description"><p>The name of the field to be used in the predicate.
+If null, no predicate is added.</p></div>
 <div class="parameter-name">$value</div>
 <div class="parameter-description"><p>The value to compare against the field in the predicate.</p></div>
 <h3>Return</h3>
@@ -15272,7 +15374,13 @@ or placeholder specification in query building.</p>
 The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code>, an array representing a predicate, or a raw SQL condition as a string.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$predicate</div>
-<div class="parameter-description"><p>The filter condition to be added.</p></div>
+<div class="parameter-description"><p>The filter condition to be added.</p>
+<ul>
+<li><code>PicoPredicate</code>: Represents a structured condition.</li>
+<li><code>PicoSpecification</code>: A collection of conditions.</li>
+<li><code>array</code>: Must contain at least two elements where the first is a column name and the second is a value.</li>
+<li><code>string</code>: A raw SQL fragment.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -15291,7 +15399,13 @@ The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code
 The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code>, an array representing a predicate, or a raw SQL condition as a string.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$predicate</div>
-<div class="parameter-description"><p>The filter condition to be added.</p></div>
+<div class="parameter-description"><p>The filter condition to be added.</p>
+<ul>
+<li><code>PicoPredicate</code>: Represents a structured condition.</li>
+<li><code>PicoSpecification</code>: A collection of conditions.</li>
+<li><code>array</code>: Must contain at least two elements where the first is a column name and the second is a value.</li>
+<li><code>string</code>: A raw SQL fragment.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -15309,7 +15423,13 @@ The condition can be a <code>PicoPredicate</code>, <code>PicoSpecification</code
 <p>Similar to <code>addAnd()</code>, but applies logical OR instead of AND.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$predicate</div>
-<div class="parameter-description"><p>The filter condition to be added.</p></div>
+<div class="parameter-description"><p>The filter condition to be added.</p>
+<ul>
+<li><code>PicoPredicate</code>: Represents a structured condition.</li>
+<li><code>PicoSpecification</code>: A collection of conditions.</li>
+<li><code>array</code>: Must contain at least two elements where the first is a column name and the second is a value.</li>
+<li><code>string</code>: A raw SQL fragment.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>Returns the current instance for method chaining.</p></div>
@@ -15332,7 +15452,13 @@ If the predicate is an array, it will be processed accordingly.
 If a raw SQL string is provided, it will be added with the logical operator.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$predicate</div>
-<div class="parameter-description"><p>The filter condition to be added.</p></div>
+<div class="parameter-description"><p>The filter condition to be added.</p>
+<ul>
+<li><code>PicoPredicate</code>: Represents a structured condition.</li>
+<li><code>PicoSpecification</code>: A collection of conditions.</li>
+<li><code>array</code>: Must contain at least two elements where the first is a column name and the second is a value.</li>
+<li><code>string</code>: A raw SQL fragment.</li>
+</ul></div>
 <div class="parameter-name">$logic</div>
 <div class="parameter-description"><p>The logical operator (<code>AND</code> or <code>OR</code>) to be applied.</p></div>
 <h3>Return</h3>
@@ -19107,19 +19233,15 @@ efficiently by sending them in chunks.</p>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">filepath</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$filepath</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">string The path to the file being downloaded.</span> <span class="property-name">$filepath</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var string The path to the file being downloaded.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">filename</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$filename</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">string The filename to be used in the download response.</span> <span class="property-name">$filename</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var string The filename to be used in the download response.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -19304,7 +19426,8 @@ into corresponding HTML elements from plain strings or JSON-encoded arrays.</p>
 <div class="parameter-description"><p>The JSON string or plain string.</p></div>
 <h3>Return</h3>
 <div class="return-type">array|string|null</div>
-<div class="return-description"><p>Returns an array if valid JSON array, original string if not,</p></div>
+<div class="return-description"><p>Returns an array if valid JSON array, original string if not,
+or null if input is empty.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -20151,15 +20274,20 @@ If the <code>$forceCreateNewTable</code> flag is set to true, the method will ge
 instead of an <code>ALTER TABLE</code> query, effectively creating a new table with the specified columns.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$entity</div>
-<div class="parameter-description"><p>A single entity or an array of entities representing the columns to be added.</p></div>
+<div class="parameter-description"><p>A single entity or an array of entities representing the columns to be added.
+Each entity contains the column name, type, and other related information.</p></div>
 <div class="parameter-name">$database</div>
-<div class="parameter-description"><p>The database connection used to fetch the current table schema. If null,</p></div>
+<div class="parameter-description"><p>The database connection used to fetch the current table schema. If null,
+the default database will be used.</p></div>
 <div class="parameter-name">$createIfNotExists</div>
-<div class="parameter-description"><p>Flag indicating whether to generate a CREATE TABLE query if the table does not exist.</p></div>
+<div class="parameter-description"><p>Flag indicating whether to generate a CREATE TABLE query if the table does not exist.
+Default is false.</p></div>
 <div class="parameter-name">$dropIfExists</div>
-<div class="parameter-description"><p>Flag indicating whether to generate a DROP TABLE query if the table already exists,</p></div>
+<div class="parameter-description"><p>Flag indicating whether to generate a DROP TABLE query if the table already exists,
+before the CREATE TABLE query. Default is false.</p></div>
 <div class="parameter-name">$forceCreateNewTable</div>
-<div class="parameter-description"><p>Flag indicating whether to generate a <code>CREATE TABLE</code> query instead of <code>ALTER TABLE</code>,</p></div>
+<div class="parameter-description"><p>Flag indicating whether to generate a <code>CREATE TABLE</code> query instead of <code>ALTER TABLE</code>,
+effectively creating a new table. Default is false.</p></div>
 <h3>Return</h3>
 <div class="return-type">string[]</div>
 <div class="return-description"><p>An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns.</p></div>
@@ -20285,20 +20413,27 @@ necessary ALTER TABLE queries. If columns already exist in the database, they wi
 the table (and columns) from scratch, even if the columns already exist.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$entities</div>
-<div class="parameter-description"><p>An array of entity objects representing the columns to be added. Each entity contains</p></div>
+<div class="parameter-description"><p>An array of entity objects representing the columns to be added. Each entity contains
+the column name, type, and other related information.</p></div>
 <div class="parameter-name">$tableName</div>
 <div class="parameter-description"><p>The name of the table to alter. If null, the table name will be derived from the entities.</p></div>
 <div class="parameter-name">$database</div>
-<div class="parameter-description"><p>The database connection used to fetch the current table schema. If null, it will</p></div>
+<div class="parameter-description"><p>The database connection used to fetch the current table schema. If null, it will
+be inferred from the entities.</p></div>
 <div class="parameter-name">$createIfNotExists</div>
-<div class="parameter-description"><p>Flag indicating whether a <code>CREATE TABLE</code> query should be generated if the table does not exist.</p></div>
+<div class="parameter-description"><p>Flag indicating whether a <code>CREATE TABLE</code> query should be generated if the table does not exist.
+Default is false.</p></div>
 <div class="parameter-name">$dropIfExists</div>
-<div class="parameter-description"><p>Flag indicating whether a <code>DROP TABLE</code> query should be generated if the table already exists,</p></div>
+<div class="parameter-description"><p>Flag indicating whether a <code>DROP TABLE</code> query should be generated if the table already exists,
+before the <code>CREATE TABLE</code> query. Default is false.</p></div>
 <div class="parameter-name">$forceCreateNewTable</div>
-<div class="parameter-description"><p>Flag indicating whether to generate a <code>CREATE TABLE</code> query instead of an <code>ALTER TABLE</code> query.</p></div>
+<div class="parameter-description"><p>Flag indicating whether to generate a <code>CREATE TABLE</code> query instead of an <code>ALTER TABLE</code> query.
+If true, the table (and its columns) will be created from scratch, even if the columns
+already exist. Default is false.</p></div>
 <h3>Return</h3>
 <div class="return-type">string[]</div>
-<div class="return-description"><p>An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query is a string</p></div>
+<div class="return-description"><p>An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query is a string
+representing a complete SQL statement.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -20320,10 +20455,13 @@ even if the columns already exist in the database.</p>
 <div class="parameter-name">$entity</div>
 <div class="parameter-description"><p>The entity representing the table and its columns to be added.</p></div>
 <div class="parameter-name">$forceCreateNewTable</div>
-<div class="parameter-description"><p>Flag indicating whether to generate a CREATE TABLE query, even if the table and</p></div>
+<div class="parameter-description"><p>Flag indicating whether to generate a CREATE TABLE query, even if the table and
+columns already exist. When true, a CREATE TABLE query will be generated to create
+the table and its columns from scratch. Default is false.</p></div>
 <h3>Return</h3>
 <div class="return-type">string[]</div>
-<div class="return-description"><p>An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query</p></div>
+<div class="return-description"><p>An array of SQL queries (either ALTER TABLE or CREATE TABLE) to add the columns. Each query
+is a string representing a complete SQL statement.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -20454,11 +20592,14 @@ database type. It requires a model instance to retrieve table information if not
 <div class="parameter-name">$databaseType</div>
 <div class="parameter-description"><p>Target database type (e.g., MySQL, MariaDB).</p></div>
 <div class="parameter-name">$entity</div>
-<div class="parameter-description"><p>Optional model instance used to retrieve table information</p></div>
+<div class="parameter-description"><p>Optional model instance used to retrieve table information
+if it is not already set.</p></div>
 <div class="parameter-name">$maxRecord</div>
 <div class="parameter-description"><p>Maximum number of records to process in a single query (default is 100).</p></div>
 <div class="parameter-name">$callbackFunction</div>
-<div class="parameter-description"><p>Optional callback function to process the generated SQL</p></div>
+<div class="parameter-description"><p>Optional callback function to process the generated SQL
+statements. The function should accept a single string parameter
+representing the SQL statement.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>SQL dump as a string; returns an empty string for unsupported database types.</p></div>
@@ -20622,7 +20763,8 @@ on database column information.</p>
 <div class="parameter-description"><p>Whether to modify the column name into a more readable label (default is true).</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>PHP code for the property with a docblock, including the appropriate annotations like</p></div>
+<div class="return-description"><p>PHP code for the property with a docblock, including the appropriate annotations like
+<code>@Label</code> and <code>@var</code>, ready to be inserted into a class.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -20959,7 +21101,8 @@ date/time types, and special cases such as JSON and UUID. It helps in ensuring
 proper handling of database types across different database systems.</p>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>Associative array of type mappings where the keys are database column types</p></div>
+<div class="return-description"><p>Associative array of type mappings where the keys are database column types
+and the values are corresponding PHP types.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -21016,6 +21159,38 @@ Optionally, it can prettify property names for human readability.</p>
 <h3>Return</h3>
 <div class="return-type">int|false</div>
 <div class="return-description"><p>The number of bytes written to the file, or false on failure.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">11. <span class="method-label">generateValidatorClass</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">generateValidatorClass</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$namespace</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$className</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$moduleCode</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$validationDefinition</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$applyKey</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Generate validator class string with annotated properties.</p>
+<p>This method builds a PHP class definition as a string for a validator class. Each property in the
+class corresponds to a field defined in the validation definition and is annotated with validation
+rules and data type information.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$namespace</div>
+<div class="parameter-description"><p>The namespace of the class to be generated.</p></div>
+<div class="parameter-name">$className</div>
+<div class="parameter-description"><p>The name of the class to be generated.</p></div>
+<div class="parameter-name">$moduleCode</div>
+<div class="parameter-description"><p>The module code</p></div>
+<div class="parameter-name">$validationDefinition</div>
+<div class="parameter-description"><p>An array of field validation definitions (usually decoded from JSON).</p></div>
+<div class="parameter-name">$applyKey</div>
+<div class="parameter-description"><p>The key to determine if a rule should be applied (either 'applyInsert' or 'applyUpdate').</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>Returns a string containing the PHP class definition with annotated properties.</p></div>
 </div>
 </div>
 </div>
@@ -21385,19 +21560,15 @@ including checking for containment, intersections, and equality with other latit
 <div class="property">
 <div class="property-identity">1. <span class="property-label">_swLat</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_swLat</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The southwestern latitude value.</span> <span class="property-name">$_swLat</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The southwestern latitude value.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">_neLat</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_neLat</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The northeastern latitude value.</span> <span class="property-name">$_neLat</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The northeastern latitude value.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -21561,19 +21732,15 @@ including equality checks and string representations.</p>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">_lat</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_lat</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The latitude value.</span> <span class="property-name">$_lat</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The latitude value.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">_lng</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_lng</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The longitude value.</span> <span class="property-name">$_lng</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The longitude value.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -21695,19 +21862,15 @@ MagicObject\Geometry<h4>Authors</h4>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">_latBounds</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_latBounds</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">LatBounds The latitude bounds of the bounding box.</span> <span class="property-name">$_latBounds</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var LatBounds The latitude bounds of the bounding box.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">_lngBounds</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_lngBounds</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">LngBounds The longitude bounds of the bounding box.</span> <span class="property-name">$_lngBounds</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var LngBounds The longitude bounds of the bounding box.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -22029,19 +22192,15 @@ MagicObject\Geometry<h4>Authors</h4>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">_swLng</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_swLng</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The southwestern longitude value.</span> <span class="property-name">$_swLng</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The southwestern longitude value.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">_neLng</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$_neLng</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">float The northeastern longitude value.</span> <span class="property-name">$_neLng</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var float The northeastern longitude value.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -23434,7 +23593,8 @@ the label corresponding to the current language. If not, it
 returns an empty JSON object.</p>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>A JSON-encoded string of the label for the current language,</p></div>
+<div class="return-description"><p>A JSON-encoded string of the label for the current language,
+or an empty JSON object if the current language is not set.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -24227,127 +24387,141 @@ MagicObject\Pagination<h4>Authors</h4>
 <div class='method'>
 <div class="method-identity">9. <span class="method-label">getArgumentValueByNameOrDefaultInt</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultInt</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultInt</span>() : <span class="return-type">int</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return int</p>
+<h3>Return</h3>
+<div class="return-type">int</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">10. <span class="method-label">getArgumentValueByNameOrDefaultFloat</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultFloat</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultFloat</span>() : <span class="return-type">float</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return float</p>
+<h3>Return</h3>
+<div class="return-type">float</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">11. <span class="method-label">getArgumentValueByNameOrDefaultBool</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultBool</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultBool</span>() : <span class="return-type">bool</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return bool</p>
+<h3>Return</h3>
+<div class="return-type">bool</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">12. <span class="method-label">getArgumentValueByNameOrDefaultString</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultString</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultString</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return string</p>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">13. <span class="method-label">getArgumentValueByNameOrDefaultArray</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultArray</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultArray</span>() : <span class="return-type">array</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array</p>
+<h3>Return</h3>
+<div class="return-type">array</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">14. <span class="method-label">getArgumentValueByNameOrDefaultObject</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultObject</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultObject</span>() : <span class="return-type">object</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return object</p>
+<h3>Return</h3>
+<div class="return-type">object</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">15. <span class="method-label">getArgumentValueByNameOrDefaultArrayObject</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultArrayObject</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultArrayObject</span>() : <span class="return-type">array</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array</p>
+<h3>Return</h3>
+<div class="return-type">array</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">16. <span class="method-label">getArgumentValueByNameOrDefaultJson</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJson</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJson</span>() : <span class="return-type">array</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array|null</p>
+<h3>Return</h3>
+<div class="return-type">array|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">17. <span class="method-label">getArgumentValueByNameOrDefaultJsonObject</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObject</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObject</span>() : <span class="return-type">object</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return object|null</p>
+<h3>Return</h3>
+<div class="return-type">object|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">18. <span class="method-label">getArgumentValueByNameOrDefaultJsonArray</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArray</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArray</span>() : <span class="return-type">array</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array|null</p>
+<h3>Return</h3>
+<div class="return-type">array|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">19. <span class="method-label">getArgumentValueByNameOrDefaultJsonObjectArray</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObjectArray</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObjectArray</span>() : <span class="return-type">object</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return object|null</p>
+<h3>Return</h3>
+<div class="return-type">object|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">20. <span class="method-label">getArgumentValueByNameOrDefaultJsonArrayObject</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArrayObject</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArrayObject</span>() : <span class="return-type">array</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array|null</p>
+<h3>Return</h3>
+<div class="return-type">array|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">21. <span class="method-label">getArgumentValueByNameOrDefaultJsonObjectArrayObject</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObjectArrayObject</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonObjectArrayObject</span>() : <span class="return-type">object</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return object|null</p>
+<h3>Return</h3>
+<div class="return-type">object|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 <div class='method'>
 <div class="method-identity">22. <span class="method-label">getArgumentValueByNameOrDefaultJsonArrayObjectArray</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArrayObjectArray</span>()<br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getArgumentValueByNameOrDefaultJsonArrayObjectArray</span>() : <span class="return-type">array</span>|<span class="return-type">null</span><br>{<br>}</div>
 <div class='docblock'>
-<h3>Description</h3>
-<p>@return array|null</p>
+<h3>Return</h3>
+<div class="return-type">array|null</div>
+<div class="return-description"></div>
 </div>
 </div>
 </div>
@@ -24390,6 +24564,18 @@ It supports options for recursively converting objects and parsing specific type
 <h3>Description</h3>
 <p>Flag to force input data to be scalar only.</p>
 <p>The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
 from overriding its value.</p>
 </div>
 </div>
@@ -24450,6 +24636,18 @@ from overriding its value.</p>
 from overriding its value.</p>
 </div>
 </div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
 </div>
 <div class="class-item" id="MagicObject-Request-InputFiles">
 <h1>MagicObject\Request\InputFiles</h1>
@@ -24504,6 +24702,18 @@ from overriding its value.</p>
 <h3>Description</h3>
 <p>Flag for recursive data processing.</p>
 <p>The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
 from overriding its value.</p>
 </div>
 </div>
@@ -24563,6 +24773,18 @@ from overriding its value.</p>
 from overriding its value.</p>
 </div>
 </div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
 <h2>Methods</h2>
 <div class='method'>
 <div class="method-identity">2. <span class="method-label">requestPost</span></div>
@@ -24616,6 +24838,18 @@ from overriding its value.</p>
 <h3>Description</h3>
 <p>Flag for recursive data processing.</p>
 <p>The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
 from overriding its value.</p>
 </div>
 </div>
@@ -24693,6 +24927,18 @@ from overriding its value.</p>
 <h3>Description</h3>
 <p>Flag for recursive data processing.</p>
 <p>The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
 from overriding its value.</p>
 </div>
 </div>
@@ -24855,6 +25101,18 @@ from overriding its value.</p>
 from overriding its value.</p>
 </div>
 </div>
+<div class="property">
+<div class="property-identity">3. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
 <h2>Methods</h2>
 <div class='method'>
 <div class="method-identity">2. <span class="method-label">getRequestBody</span></div>
@@ -24953,6 +25211,18 @@ from overriding its value.</p>
 <h3>Description</h3>
 <p>Flag for recursive data processing.</p>
 <p>The property name starts with an underscore to prevent child classes
+from overriding its value.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">4. <span class="property-label">_fieldsRetrieved</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$_fieldsRetrieved</span> = <span class="property-default">array()</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array to keep track of fields that have been retrieved.</p>
+<p>This property is used to avoid redundant data retrieval and processing.
+The property name starts with an underscore to prevent child classes
 from overriding its value.</p>
 </div>
 </div>
@@ -25520,10 +25790,12 @@ string representations of boolean and null values to their actual boolean and nu
 After conversion, it returns the modified array.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$input</div>
-<div class="parameter-description"><p>The input array that will be modified in-place. This array can have nested</p></div>
+<div class="parameter-description"><p>The input array that will be modified in-place. This array can have nested
+structures that will also be processed by the <code>convertBooleanAndNull</code> function.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>The modified input array with the &quot;true&quot;, &quot;false&quot;, and &quot;null&quot; strings converted</p></div>
+<div class="return-description"><p>The modified input array with the &quot;true&quot;, &quot;false&quot;, and &quot;null&quot; strings converted
+to their actual boolean and null types.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -25541,7 +25813,8 @@ values. If a nested array is encountered, the function will call itself recursiv
 the nested array.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">&$array</div>
-<div class="parameter-description"><p>The array to be modified. It is passed by reference, so the original array</p></div>
+<div class="parameter-description"><p>The array to be modified. It is passed by reference, so the original array
+will be directly modified.</p></div>
 <h3>Return</h3>
 <div class="return-type">void</div>
 <div class="return-description"><p>This function does not return any value; it modifies the array in place.</p></div>
@@ -25556,7 +25829,7 @@ the nested array.</p>
 ) : <span class="return-type">self</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Validate the current request object using ValidationUtil.</p>
+<p>Validate the current object based on property annotations.</p>
 <p>This method checks the properties of the current object against validation annotations.
 If any validation rule fails, an InvalidValueException will be thrown.</p>
 <h3>Parameters</h3>
@@ -25570,6 +25843,21 @@ If any validation rule fails, an InvalidValueException will be thrown.</p>
 <h3>Throws</h3>
 <div class="return-type">\MagicObject\Exceptions\InvalidValueException</div>
 <div class="return-description"><p>If validation fails.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">31. <span class="method-label">formData</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">formData</span>() : <span class="return-type">array</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Retrieve form data as an associative array.</p>
+<p>This method collects the values of all fields that have been retrieved from the object
+and returns them as an associative array. The keys are the field names, and the values
+are the corresponding values from the object.</p>
+<h3>Return</h3>
+<div class="return-type">array</div>
+<div class="return-description"><p>An associative array containing field names and their values.</p></div>
 </div>
 </div>
 </div>
@@ -25597,10 +25885,8 @@ MagicObject\Response\Generated<h4>Authors</h4>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">data</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$data</span> = <span class="property-default">array()</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array</span> <span class="property-name">$data</span> = <span class="property-default">array()</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -27901,10 +28187,15 @@ It uses predefined mappings for MySQL to PostgreSQL and MySQL to SQLite conversi
 <div class="parameter-name">$columnType</div>
 <div class="parameter-description"><p>The column type to be converted (e.g., &quot;varchar&quot;, &quot;int&quot;).</p></div>
 <div class="parameter-name">$databaseType</div>
-<div class="parameter-description"><p>The target database type. This can be one of the following:</p></div>
+<div class="parameter-description"><p>The target database type. This can be one of the following:</p>
+<ul>
+<li>PicoDatabaseType::DATABASE_TYPE_POSTGRESQL</li>
+<li>PicoDatabaseType::DATABASE_TYPE_SQLITE</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The corresponding column type for the target database, in uppercase.</p></div>
+<div class="return-description"><p>The corresponding column type for the target database, in uppercase.
+If no match is found in the predefined mappings, the original column type is returned.</p></div>
 </div>
 </div>
 </div>
@@ -28382,7 +28673,11 @@ If found, it returns the query string representation of the object.</p>
 <div class="parameter-description"><p>The value to determine the PDO parameter type for.</p></div>
 <h3>Return</h3>
 <div class="return-type">stdClass</div>
-<div class="return-description"><p>An object with:</p></div>
+<div class="return-description"><p>An object with:</p>
+<ul>
+<li><code>type</code>: The corresponding PDO parameter type (e.g., <code>PDO::PARAM_STR</code>).</li>
+<li><code>value</code>: The formatted value for the PDO parameter.</li>
+</ul></div>
 </div>
 </div>
 <div class='method'>
@@ -29581,10 +29876,13 @@ using an optional callback function, and the buffer is reset for the next batch.
 <div class="parameter-name">$maxRecord</div>
 <div class="parameter-description"><p>The maximum number of records to fetch in a single query (default is 100).</p></div>
 <div class="parameter-name">$callbackFunction</div>
-<div class="parameter-description"><p>Optional callback function to process the generated SQL</p></div>
+<div class="parameter-description"><p>Optional callback function to process the generated SQL
+statements. If provided, the function will be called with the
+generated SQL statement as an argument when the batch size is reached.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>An array of records that are fetched and processed. This will return the remaining</p></div>
+<div class="return-description"><p>An array of records that are fetched and processed. This will return the remaining
+records if there are any after the batch processing.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -29609,11 +29907,14 @@ function to handle the generated SQL statements.</p>
 <div class="parameter-name">$picoTableName</div>
 <div class="parameter-description"><p>Name of the target table.</p></div>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>Data to be dumped. Can be a PicoPageData instance,</p></div>
+<div class="parameter-description"><p>Data to be dumped. Can be a PicoPageData instance,
+a MagicObject instance, or an array of MagicObject instances.</p></div>
 <div class="parameter-name">$maxRecord</div>
 <div class="parameter-description"><p>Maximum number of records to process in a single query (default is 100).</p></div>
 <div class="parameter-name">$callbackFunction</div>
-<div class="parameter-description"><p>Optional callback function to process the generated SQL</p></div>
+<div class="parameter-description"><p>Optional callback function to process the generated SQL
+statements. The function should accept a single string parameter
+representing the SQL statement.</p></div>
 <h3>Return</h3>
 <div class="return-type">string|null</div>
 <div class="return-description"><p>SQL INSERT statements or null if no data was processed.</p></div>
@@ -29930,7 +30231,8 @@ formatting of values.</p>
 <div class="parameter-name">$tableName</div>
 <div class="parameter-description"><p>Name of the table where data will be inserted.</p></div>
 <div class="parameter-name">$data</div>
-<div class="parameter-description"><p>An array of associative arrays, where each associative array</p></div>
+<div class="parameter-description"><p>An array of associative arrays, where each associative array
+represents a record to be inserted.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The generated SQL INSERT statement with placeholders for values.</p></div>
@@ -30026,7 +30328,8 @@ and adjusting default values and column types.</p>
 <div class="parameter-description"><p>The MySQL CREATE TABLE query to be converted.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The converted PostgreSQL CREATE TABLE query, with MySQL-specific syntax</p></div>
+<div class="return-description"><p>The converted PostgreSQL CREATE TABLE query, with MySQL-specific syntax
+replaced by PostgreSQL equivalents, including type conversions and other adjustments.</p></div>
 <h3>Throws</h3>
 <div class="return-type">InvalidArgumentException</div>
 <div class="return-description"><p>If the input query is not a valid MySQL CREATE TABLE query.</p></div>
@@ -30051,7 +30354,8 @@ and makes necessary adjustments for MySQL compatibility.</p>
 <div class="parameter-description"><p>The PostgreSQL CREATE TABLE query to be converted.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The converted MySQL CREATE TABLE query, with PostgreSQL-specific syntax</p></div>
+<div class="return-description"><p>The converted MySQL CREATE TABLE query, with PostgreSQL-specific syntax
+replaced by MySQL equivalents, including type conversions and other adjustments.</p></div>
 <h3>Throws</h3>
 <div class="return-type">InvalidArgumentException</div>
 <div class="return-description"><p>If the input query is not a valid PostgreSQL CREATE TABLE query.</p></div>
@@ -30320,11 +30624,19 @@ including the column name, data type, nullability, default value, primary key st
 and auto-increment settings. The resulting definition is formatted for use in a CREATE TABLE statement.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column:</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column:</p>
+<ul>
+<li>string 'name': The name of the column.</li>
+<li>string 'type': The data type of the column (e.g., VARCHAR, INT).</li>
+<li>bool|string 'nullable': Indicates if the column allows NULL values
+('true' or true for NULL; otherwise, NOT NULL).</li>
+<li>mixed MagicObject::KEY_DEFAULT_VALUE: The default value for the column (optional).</li>
+</ul></div>
 <div class="parameter-name">$autoIncrementKeys</div>
 <div class="parameter-description"><p>An array of column names that should have AUTO_INCREMENT property.</p></div>
 <div class="parameter-name">$primaryKeys</div>
-<div class="parameter-description"><p>An array of primary key columns, each being an associative array</p></div>
+<div class="parameter-description"><p>An array of primary key columns, each being an associative array
+with at least a 'name' key.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.</p></div>
@@ -30449,7 +30761,9 @@ and default values.</p>
 <div class="parameter-description"><p>The name of the table to retrieve column information from.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>An array of associative arrays containing details about each column,</p></div>
+<div class="return-description"><p>An array of associative arrays containing details about each column,
+where each associative array includes 'column_name', 'data_type',
+'is_nullable', and 'column_default'.</p></div>
 <h3>Throws</h3>
 <div class="return-type">Exception</div>
 <div class="return-description"><p>If the database connection fails or the query cannot be executed.</p></div>
@@ -30504,7 +30818,13 @@ including the column name, data type, nullability, and default value. The result
 definition is formatted for use in a CREATE TABLE statement.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column:</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column:</p>
+<ul>
+<li>string name: The name of the column.</li>
+<li>string type: The data type of the column (e.g., VARCHAR, INT).</li>
+<li>bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).</li>
+<li>mixed defaultValue: The default value for the column (optional).</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.</p></div>
@@ -30528,14 +30848,17 @@ integer types. If the column is not an auto-increment key, it returns
 the original type.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column,</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column,
+including its name and type.</p></div>
 <div class="parameter-name">$type</div>
 <div class="parameter-description"><p>The original data type of the column.</p></div>
 <div class="parameter-name">$autoIncrementKeys</div>
-<div class="parameter-description"><p>An array of column names that are designated as</p></div>
+<div class="parameter-description"><p>An array of column names that are designated as
+auto-increment keys.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The adjusted SQL data type for the column, suitable for use</p></div>
+<div class="return-description"><p>The adjusted SQL data type for the column, suitable for use
+in a CREATE TABLE statement.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -30555,14 +30878,25 @@ should be auto-incrementing. If the column is specified as auto-increment, it wi
 PostgreSQL's SERIAL or BIGSERIAL data types, depending on the column type.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column:</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column:</p>
+<ul>
+<li>string 'name': The name of the column.</li>
+<li>string 'type': The data type of the column (e.g., VARCHAR, INT).</li>
+<li>bool|string 'nullable': Indicates if the column allows NULL values
+('true' or true for NULL; otherwise, NOT NULL).</li>
+<li>mixed MagicObject::KEY_DEFAULT_VALUE: The default value for the column (optional).</li>
+</ul></div>
 <div class="parameter-name">$autoIncrementKeys</div>
-<div class="parameter-description"><p>An optional array of column names that should</p></div>
+<div class="parameter-description"><p>An optional array of column names that should
+be treated as auto-incrementing.</p></div>
 <div class="parameter-name">$primaryKeys</div>
-<div class="parameter-description"><p>An array of primary key columns, each being an associative</p></div>
+<div class="parameter-description"><p>An array of primary key columns, each being an associative
+array with at least a 'name' key. This is used to identify
+if the column is a primary key.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion</p></div>
+<div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion
+in a CREATE TABLE statement.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -30685,7 +31019,8 @@ It extracts the table name from the <code>@Table</code> annotation and processes
 to determine the column definitions from the <code>@Column</code> annotations.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$entity</div>
-<div class="parameter-description"><p>The instance of the class whose properties will be used</p></div>
+<div class="parameter-description"><p>The instance of the class whose properties will be used
+to generate the table structure.</p></div>
 <div class="parameter-name">$createIfNotExists</div>
 <div class="parameter-description"><p>If true, the query will include an &quot;IF NOT EXISTS&quot; clause.</p></div>
 <div class="parameter-name">$dropIfExists</div>
@@ -30782,7 +31117,16 @@ default values, and any additional attributes such as primary keys and auto-incr
 <div class="parameter-description"><p>The name of the table to retrieve column information from.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>An array of associative arrays containing details about each column,</p></div>
+<div class="return-description"><p>An array of associative arrays containing details about each column,
+where each associative array includes:</p>
+<ul>
+<li>'Field': The name of the column.</li>
+<li>'Type': The data type of the column.</li>
+<li>'Null': Indicates if the column allows NULL values ('YES' or 'NO').</li>
+<li>'Key': Indicates if the column is a primary key ('PRI' or null).</li>
+<li>'Default': The default value of the column, or 'None' if not set.</li>
+<li>'Extra': Additional attributes of the column, such as 'auto_increment'.</li>
+</ul></div>
 <h3>Throws</h3>
 <div class="return-type">Exception</div>
 <div class="return-description"><p>If the database connection fails or the query cannot be executed.</p></div>
@@ -30894,10 +31238,20 @@ The resulting definition is formatted for use in a CREATE TABLE statement, suita
 and the PRIMARY KEY constraint is added with auto-increment behavior (SQLite uses INTEGER PRIMARY KEY AUTOINCREMENT).</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column:</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column:</p>
+<ul>
+<li>string 'name': The name of the column.</li>
+<li>string 'type': The data type of the column (e.g., VARCHAR, INT).</li>
+<li>bool|string 'nullable': Indicates if the column allows NULL values
+('true' or true for NULL; otherwise, NOT NULL).</li>
+<li>mixed 'defaultValue': The default value for the column (optional).</li>
+<li>bool 'primary_key': Whether the column is a primary key (optional).</li>
+<li>bool 'auto_increment': Whether the column is auto-incrementing (optional).</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion</p></div>
+<div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion
+in a CREATE TABLE statement.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -31049,7 +31403,9 @@ default values, and whether they are part of the primary key.</p>
 <div class="parameter-description"><p>The name of the table to retrieve column information from.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>An array of associative arrays containing details about each column,</p></div>
+<div class="return-description"><p>An array of associative arrays containing details about each column,
+where each associative array includes 'column_name', 'data_type',
+'is_nullable', 'column_default', and 'is_identity'.</p></div>
 <h3>Throws</h3>
 <div class="return-type">Exception</div>
 <div class="return-description"><p>If the database connection fails or the query cannot be executed.</p></div>
@@ -31106,11 +31462,19 @@ including the column name, data type, nullability, default value, primary key st
 and auto-increment settings. The resulting definition is formatted for use in a CREATE TABLE statement.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$column</div>
-<div class="parameter-description"><p>An associative array containing details about the column:</p></div>
+<div class="parameter-description"><p>An associative array containing details about the column:</p>
+<ul>
+<li>string 'name': The name of the column.</li>
+<li>string 'type': The data type of the column (e.g., VARCHAR, INT).</li>
+<li>bool|string 'nullable': Indicates if the column allows NULL values
+('true' or true for NULL; otherwise, NOT NULL).</li>
+<li>mixed MagicObject::KEY_DEFAULT_VALUE: The default value for the column (optional).</li>
+</ul></div>
 <div class="parameter-name">$autoIncrementKeys</div>
 <div class="parameter-description"><p>An array of column names that should have IDENTITY(1,1) property.</p></div>
 <div class="parameter-name">$primaryKeys</div>
-<div class="parameter-description"><p>An array of primary key columns, each being an associative array</p></div>
+<div class="parameter-description"><p>An array of primary key columns, each being an associative array
+with at least a 'name' key.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.</p></div>
@@ -31201,7 +31565,8 @@ and adjusting default values and column types.</p>
 <div class="parameter-description"><p>The MySQL CREATE TABLE query to be converted.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The converted SQL Server CREATE TABLE query, with MySQL-specific syntax</p></div>
+<div class="return-description"><p>The converted SQL Server CREATE TABLE query, with MySQL-specific syntax
+replaced by SQL Server equivalents, including type conversions and other adjustments.</p></div>
 <h3>Throws</h3>
 <div class="return-type">InvalidArgumentException</div>
 <div class="return-description"><p>If the input query is not a valid MySQL CREATE TABLE query.</p></div>
@@ -32387,7 +32752,12 @@ delimiters, comments, and empty lines. It returns an array of queries, each with
 <div class="parameter-description"><p>The input SQL text to be parsed.</p></div>
 <h3>Return</h3>
 <div class="return-type">array</div>
-<div class="return-description"><p>An array of queries, each containing the SQL query string and its corresponding delimiter.</p></div>
+<div class="return-description"><p>An array of queries, each containing the SQL query string and its corresponding delimiter.
+Each item in the array is an associative array with two keys:</p>
+<ul>
+<li>'query': the SQL query string.</li>
+<li>'delimiter': the delimiter used for that query (e.g., &quot;;&quot;).</li>
+</ul></div>
 </div>
 </div>
 <div class='method'>
@@ -34152,25 +34522,21 @@ with this source code.</p>
 <div class="property">
 <div class="property-identity">10. <span class="property-label">instances</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$instances</span> = <span class="property-default">array()</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array Holds instances of the class.</span> <span class="property-name">$instances</span> = <span class="property-default">array()</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array Holds instances of the class.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">11. <span class="property-label">definitionData</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$definitionData</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">mixed Contains the definition data for reference links.</span> <span class="property-name">$definitionData</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var mixed Contains the definition data for reference links.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">12. <span class="property-label">specialCharacters</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$specialCharacters</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array List of special characters used in parsing.</span> <span class="property-name">$specialCharacters</span> = <span class="property-default">array (
   0 =&gt; '\\',
   1 =&gt; '`',
   2 =&gt; '*',
@@ -34190,47 +34556,39 @@ with this source code.</p>
   16 =&gt; '|',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array List of special characters used in parsing.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">13. <span class="property-label">strongRegex</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$strongRegex</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array Regular expressions for strong emphasis syntax.</span> <span class="property-name">$strongRegex</span> = <span class="property-default">array (
   '*' =&gt; '/^[*]{2}((?:\\\\\\*|[^*]|[*][^*]*[*])+?)[*]{2}(?![*])/s',
   '_' =&gt; '/^__((?:\\\\_|[^_]|_[^_]*_)+?)__(?!_)/us',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array Regular expressions for strong emphasis syntax.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">14. <span class="property-label">emRegex</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$emRegex</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array Regular expressions for emphasis syntax.</span> <span class="property-name">$emRegex</span> = <span class="property-default">array (
   '*' =&gt; '/^[*]((?:\\\\\\*|[^*]|[*][*][^*]+?[*][*])+?)[*](?![*])/s',
   '_' =&gt; '/^_((?:\\\\_|[^_]|__[^_]*__)+?)_(?!_)\\b/us',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array Regular expressions for emphasis syntax.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">15. <span class="property-label">regexHtmlAttribute</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$regexHtmlAttribute</span> = <span class="property-default">'[a-zA-Z_:][\\w:.-]*(?:\\s*=\\s*(?:[^&quot;\'=&lt;&gt;`\\s]+|&quot;[^&quot;]*&quot;|\'[^\']*\'))?'</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">string Regular expression for validating HTML attributes.</span> <span class="property-name">$regexHtmlAttribute</span> = <span class="property-default">'[a-zA-Z_:][\\w:.-]*(?:\\s*=\\s*(?:[^&quot;\'=&lt;&gt;`\\s]+|&quot;[^&quot;]*&quot;|\'[^\']*\'))?'</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var string Regular expression for validating HTML attributes.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">16. <span class="property-label">voidElements</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$voidElements</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array List of void elements that do not have closing tags.</span> <span class="property-name">$voidElements</span> = <span class="property-default">array (
   0 =&gt; 'area',
   1 =&gt; 'base',
   2 =&gt; 'br',
@@ -34246,14 +34604,12 @@ with this source code.</p>
   12 =&gt; 'source',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array List of void elements that do not have closing tags.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">17. <span class="property-label">textLevelElements</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type"></span> <span class="property-name">$textLevelElements</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array List of text-level elements for inline formatting.</span> <span class="property-name">$textLevelElements</span> = <span class="property-default">array (
   0 =&gt; 'a',
   1 =&gt; 'br',
   2 =&gt; 'bdo',
@@ -34296,8 +34652,6 @@ with this source code.</p>
   39 =&gt; 'time',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array List of text-level elements for inline formatting.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -35413,7 +35767,8 @@ and string <code>"null"</code> to the <code>null</code> value.</li>
 </ol>
 <h3>Parameters</h3>
 <div class="parameter-name">&$array</div>
-<div class="parameter-description"><p>The input array which will be modified in-place. The function updates</p></div>
+<div class="parameter-description"><p>The input array which will be modified in-place. The function updates
+the original array by converting string values and keys as described.</p></div>
 <h3>Return</h3>
 <div class="return-type">void</div>
 <div class="return-description"><p>This function modifies the array by reference and does not return any value.</p></div>
@@ -35701,7 +36056,16 @@ Initializes the cURL handle.</p>
 <div class="parameter-name">$decimal</div>
 <div class="parameter-description"><p>The decimal value to convert.</p></div>
 <div class="parameter-name">$params</div>
-<div class="parameter-description"><p>An associative array containing the following optional parameters:</p></div>
+<div class="parameter-description"><p>An associative array containing the following optional parameters:</p>
+<ul>
+<li>bool $inSeconds Whether the input is in seconds. If true, the input is treated as seconds.
+If false, the input is treated as decimal degrees. Default is false.</li>
+<li>string $separator The separator between degree, minute, and second. Default is &quot;:&quot;.</li>
+<li>int $decimalPlaces The number of decimal places for seconds. Default is 0.</li>
+<li>bool $withSign Whether to include a sign ('+' or '-') for negative values. Default is false.</li>
+<li>int $zeroPadding The number of leading zeros to pad for degree, minute, and second. Default is 0.</li>
+<li>bool $trimDegreeMinute Whether to trim degree and minute if they are zero. Default is false.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
 <div class="return-description"><p>The formatted DMS string.</p></div>
@@ -35806,7 +36170,8 @@ it returns null.</p>
 <div class="parameter-description"><p>The date string or Unix timestamp to be parsed.</p></div>
 <h3>Return</h3>
 <div class="return-type">DateTime|null</div>
-<div class="return-description"><p>Returns a DateTime object if parsing is successful,</p></div>
+<div class="return-description"><p>Returns a DateTime object if parsing is successful,
+or null if no formats matched.</p></div>
 </div>
 </div>
 </div>
@@ -37562,9 +37927,12 @@ serialization.</p>
  $yaml = PicoYamlUtil::dump($data, null, 4, 0);</code></pre>
 <h3>Parameters</h3>
 <div class="parameter-name">$input</div>
-<div class="parameter-description"><p>The PHP value to be converted to YAML.</p></div>
+<div class="parameter-description"><p>The PHP value to be converted to YAML.
+Can be an array, object, etc.</p></div>
 <div class="parameter-name">$inline</div>
-<div class="parameter-description"><p>The level at which to switch to inline YAML.</p></div>
+<div class="parameter-description"><p>The level at which to switch to inline YAML.
+If NULL, the method uses the maximum value
+of the array depth.</p></div>
 <div class="parameter-name">$indent</div>
 <div class="parameter-description"><p>The number of spaces to use for indentation of nested nodes.</p></div>
 <div class="parameter-name">$flags</div>
@@ -38715,7 +39083,8 @@ beginning or end of the line, as well as inline references such as <code>&lt;&lt
 <div class="parameter-description"><p>The line to check for group anchors or aliases.</p></div>
 <h3>Return</h3>
 <div class="return-type">string|false</div>
-<div class="return-description"><p>Returns the group reference (anchor or alias) if found,</p></div>
+<div class="return-description"><p>Returns the group reference (anchor or alias) if found,
+or <code>false</code> if no group reference is present.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -38790,7 +39159,8 @@ always be wrapped in quotes during the dumping process.</p>
 in quotes during the dumping process.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$dumpForceQuotes</div>
-<div class="parameter-description"><p>The value indicating whether to force quotes</p></div>
+<div class="parameter-description"><p>The value indicating whether to force quotes
+(true for forced quotes, false otherwise).</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>The current instance to allow method chaining.</p></div>
@@ -38823,7 +39193,8 @@ structures should be interpreted as objects instead of arrays.</p>
 considered as objects (true) or as empty arrays (false).</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$emptyHashAsObject</div>
-<div class="parameter-description"><p>The value to indicate whether empty hashes</p></div>
+<div class="parameter-description"><p>The value to indicate whether empty hashes
+should be treated as objects.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>The current instance to allow method chaining.</p></div>
@@ -38856,25 +39227,21 @@ for decoding HTML entities.</p>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">encodingFrom</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$encodingFrom</span> = <span class="property-default">'ISO-8859-2'</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">string $encodingFrom The source encoding (default is ISO-8859-2).</span> <span class="property-name">$encodingFrom</span> = <span class="property-default">'ISO-8859-2'</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var string $encodingFrom The source encoding (default is ISO-8859-2).</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">2. <span class="property-label">encodingTo</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$encodingTo</span> = <span class="property-default">'UTF-8'</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">string $encodingTo The target encoding (default is UTF-8).</span> <span class="property-name">$encodingTo</span> = <span class="property-default">'UTF-8'</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var string $encodingTo The target encoding (default is UTF-8).</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">3. <span class="property-label">mapChrChr</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$mapChrChr</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array $mapChrChr Mapping of character codes to corresponding character codes.</span> <span class="property-name">$mapChrChr</span> = <span class="property-default">array (
   138 =&gt; 169,
   140 =&gt; 166,
   141 =&gt; 171,
@@ -38892,14 +39259,12 @@ for decoding HTML entities.</p>
   158 =&gt; 190,
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array $mapChrChr Mapping of character codes to corresponding character codes.</p>
 </div>
 </div>
 <div class="property">
 <div class="property-identity">4. <span class="property-label">mapChrString</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type"></span> <span class="property-name">$mapChrString</span> = <span class="property-default">array (
+<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array $mapChrString Mapping of character codes to HTML entities.</span> <span class="property-name">$mapChrString</span> = <span class="property-default">array (
   128 =&gt; '&amp;euro;',
   130 =&gt; '&amp;sbquo;',
   132 =&gt; '&amp;bdquo;',
@@ -38928,8 +39293,6 @@ for decoding HTML entities.</p>
   187 =&gt; '&amp;raquo;',
 )</span>;</div>
 <div class="docblock">
-<h3>Description</h3>
-<p>@var array $mapChrString Mapping of character codes to HTML entities.</p>
 </div>
 </div>
 <h2>Methods</h2>
@@ -39036,7 +39399,8 @@ as used in Spring Boot, by parsing PHP docblock comments.</p>
 <p>Get a new instance of ValidationUtil.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$customTemplates</div>
-<div class="parameter-description"><p>Optional. An associative array of custom message templates.</p></div>
+<div class="parameter-description"><p>Optional. An associative array of custom message templates.
+These templates will override or extend the default messages.</p></div>
 <h3>Return</h3>
 <div class="return-type">self</div>
 <div class="return-description"><p>A new instance of ValidationUtil.</p></div>
@@ -39117,7 +39481,8 @@ with custom templates provided as an argument.</p>
 If any validation rule fails, an InvalidValueException is thrown.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$object</div>
-<div class="parameter-description"><p>The object to be validated. It's expected that properties might be</p></div>
+<div class="parameter-description"><p>The object to be validated. It's expected that properties might be
+accessed via Reflection, so protected/private properties are handled.</p></div>
 <div class="parameter-name">$parentPropertyName</div>
 <div class="parameter-description"><p>Optional. The name of the parent property, used for nested validation messages.</p></div>
 <h3>Throws</h3>
@@ -39795,7 +40160,8 @@ Ensures a string is a valid phone number (basic pattern).</p>
 <p>Checks if a value is blank.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$value</div>
-<div class="parameter-description"><p>The value to check.</p></div>
+<div class="parameter-description"><p>The value to check.
+Blank is defined as null, an empty string, or a string containing only whitespace.</p></div>
 <h3>Return</h3>
 <div class="return-type">boolean</div>
 <div class="return-description"><p>True if the value is blank, false otherwise.</p></div>
@@ -40068,7 +40434,8 @@ supports both short and long payload lengths.</p>
 <div class="parameter-description"><p>The frame data to decode, typically received from the WebSocket.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The decoded payload data. If the frame is not a valid WebSocket frame,</p></div>
+<div class="return-description"><p>The decoded payload data. If the frame is not a valid WebSocket frame,
+the behavior is undefined and may result in an empty string.</p></div>
 </div>
 </div>
 <div class='method'>
@@ -40085,10 +40452,17 @@ based on the HyBi 10 protocol. The frame header determines how the WebSocket pay
 is treated during transmission.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$type</div>
-<div class="parameter-description"><p>The type of frame. Acceptable values are:</p></div>
+<div class="parameter-description"><p>The type of frame. Acceptable values are:</p>
+<ul>
+<li>'text': Represents a text frame.</li>
+<li>'close': Represents a close frame.</li>
+<li>'ping': Represents a ping frame.</li>
+<li>'pong': Represents a pong frame.</li>
+</ul></div>
 <h3>Return</h3>
 <div class="return-type">int</div>
-<div class="return-description"><p>The frame header byte corresponding to the specified type.</p></div>
+<div class="return-description"><p>The frame header byte corresponding to the specified type.
+Defaults to the header byte for text frames if the type is unrecognized.</p></div>
 </div>
 </div>
 <div class='method'>

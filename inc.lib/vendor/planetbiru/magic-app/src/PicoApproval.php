@@ -503,9 +503,7 @@ class PicoApproval
     /**
      * Get the current user.
      *
-     * This method returns the username or identifier of the current user.
-     *
-     * @return string The current user's identifier or name.
+     * @return string Current user's identifier or name.
      */
     public function getCurrentUser()
     {
@@ -513,11 +511,21 @@ class PicoApproval
     }
 
     /**
+     * Set the current user.
+     *
+     * @param string $currentUser Current user's identifier or name.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCurrentUser($currentUser)
+    {
+        $this->currentUser = $currentUser;
+        return $this;
+    }
+
+    /**
      * Get the current time.
      *
-     * This method returns the current timestamp or time when the action was performed.
-     *
-     * @return string The current time in a formatted string (e.g., 'Y-m-d H:i:s').
+     * @return string Current time in a formatted string (e.g., 'Y-m-d H:i:s').
      */
     public function getCurrentTime()
     {
@@ -525,11 +533,21 @@ class PicoApproval
     }
 
     /**
+     * Set the current time.
+     *
+     * @param string $currentTime Current time in a formatted string.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCurrentTime($currentTime)
+    {
+        $this->currentTime = $currentTime;
+        return $this;
+    }
+
+    /**
      * Get the current IP address.
      *
-     * This method returns the IP address of the user making the request or action.
-     *
-     * @return string The current IP address of the user.
+     * @return string Current IP address of the user.
      */
     public function getCurrentIp()
     {
@@ -537,9 +555,21 @@ class PicoApproval
     }
 
     /**
-     * Get callback after approval
+     * Set the current IP address.
      *
-     * @return callable|null
+     * @param string $currentIp Current IP address of the user.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCurrentIp($currentIp)
+    {
+        $this->currentIp = $currentIp;
+        return $this;
+    }
+
+    /**
+     * Get callback after approval.
+     *
+     * @return callable|null Callback function after approval, or null if not set.
      */ 
     public function getCallbackAfterApprove()
     {
@@ -547,12 +577,36 @@ class PicoApproval
     }
 
     /**
-     * Get callback after rejection
+     * Set callback after approval.
      *
-     * @return callable|null
+     * @param callable|null $callbackAfterApprove Callback function after approval.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCallbackAfterApprove($callbackAfterApprove)
+    {
+        $this->callbackAfterApprove = $callbackAfterApprove;
+        return $this;
+    }
+
+    /**
+     * Get callback after rejection.
+     *
+     * @return callable|null Callback function after rejection, or null if not set.
      */ 
     public function getCallbackAfterReject()
     {
         return $this->callbackAfterReject;
+    }
+
+    /**
+     * Set callback after rejection.
+     *
+     * @param callable|null $callbackAfterReject Callback function after rejection.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCallbackAfterReject($callbackAfterReject)
+    {
+        $this->callbackAfterReject = $callbackAfterReject;
+        return $this;
     }
 }

@@ -1341,4 +1341,6 @@ class ScriptGenerator //NOSONAR
         file_put_contents($path, $str);
         return $this;
     }
+
+
 }

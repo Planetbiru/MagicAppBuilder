@@ -2,6 +2,8 @@
 
 namespace AppBuilder;
 
+use MagicObject\Generator\PicoEntityGenerator;
+
 class ScriptGeneratorMicroservices extends ScriptGenerator
 {
     /**
@@ -322,6 +324,11 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         
         // Do not update referenced entities automatically
         $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, false);
+
+
+        // Generate validator
+        
+
         $this->updateMenu($appConf, $request);
         return $fileGenerated;
     }   

@@ -121,6 +121,13 @@ class AppFeatures // NOSONAR
     private $backendOnly = false;
 
     /**
+     * Use input validator
+     *
+     * @var boolean
+     */
+    private $validator = false;
+
+    /**
      * Constructor
      *
      * Initializes the AppFeatures instance based on the provided feature settings.
@@ -383,6 +390,24 @@ class AppFeatures // NOSONAR
     public function setUserActivityLogger($userActivityLogger)
     {
         $this->userActivityLogger = $userActivityLogger;
+
+        return $this;
+    }
+
+    /**
+     * Get validator
+     */
+    public function isValidator()
+    {
+        return $this->validator;
+    }
+
+    /**
+     * Set validator
+     */
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
 
         return $this;
     }

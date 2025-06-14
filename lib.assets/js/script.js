@@ -5231,12 +5231,14 @@ function switchApplication(currentApplication) {
  * @param {string} selector - The jQuery selector for the table containing fields.
  * @returns {void} This function does not return a value.
  */
-function generateScript(selector) {
+function generateScript(selector) // NOSONAR
+{
   let fields = [];
   $(selector)
     .find("tr")
     .each(function (e) {
       let fieldName = $(this).attr("data-field-name");
+      let fieldType = $(this).attr('data-field-type');
       let fieldLabel = $(this).find("input.input-field-name").val();
       let includeInsert = $(this).find("input.include-insert")[0].checked;
       let includeEdit = $(this).find("input.include-edit")[0].checked;
@@ -5272,6 +5274,7 @@ function generateScript(selector) {
       let field = {
         fieldName: fieldName,
         fieldLabel: fieldLabel,
+        fieldType: fieldType,
         includeInsert: includeInsert,
         includeEdit: includeEdit,
         includeDetail: includeDetail,
@@ -5403,12 +5406,14 @@ function buildValidationDefinition(fields) {
     for (const index in fields) {
       if (fields.hasOwnProperty(index)) {
         const fieldName = fields[index].fieldName;
+        const fieldType = fields[index].fieldType;
 
         if (validation.hasOwnProperty(fieldName)) {
           const validations = validation[fieldName];
 
           result[idx] = {};
           result[idx].fieldName = fieldName;
+          result[idx].fieldType = fieldType;
           result[idx].validation = [];
 
           validations.forEach(validationRule => {
@@ -5831,11 +5836,15 @@ function loadColumn(tableName, selector) {
         field = data[i].column_name;
         args = { data_type: data[i].data_type, column_type: data[i].column_type };
         domHtml = generateRow(field, args, skippedOnInsertEdit);
-        $(selector).append(domHtml);
+        let tr = $(domHtml);
+        
 
-        $('[data-field-name="'+field+'"]').attr('data-include-detail', 'true');
-        $('[data-field-name="'+field+'"]').attr('data-include-list', 'true');
-        $('[data-field-name="'+field+'"]').attr('data-element-type', 'text');
+        tr.attr('data-include-detail', 'true');
+        tr.attr('data-include-list', 'true');
+        tr.attr('data-element-type', 'text');
+        tr.attr('data-field-type', data[i].data_type);
+
+        $(selector).append(tr);
       }
 
       if (typeof answer.primary_keys != 'undefined' && answer.primary_keys.length) {

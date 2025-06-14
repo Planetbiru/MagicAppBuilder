@@ -714,4 +714,114 @@ class ' . $className . ' extends MagicObject
 
         return file_put_contents($path, $classStr);
     }
+
+    /**
+     * Generate validator class string with annotated properties.
+     *
+     * This method builds a PHP class definition as a string for a validator class. Each property in the
+     * class corresponds to a field defined in the validation definition and is annotated with validation
+     * rules and data type information.
+     *
+     * @param string $namespace              The namespace of the class to be generated.
+     * @param string $className              The name of the class to be generated.
+     * @param string $moduleCode             The module code
+     * @param array $validationDefinition    An array of field validation definitions (usually decoded from JSON).
+     * @param string $applyKey               The key to determine if a rule should be applied (either 'applyInsert' or 'applyUpdate').
+     *
+     * @return string                        Returns a string containing the PHP class definition with annotated properties.
+     */
+    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey)
+    {
+        $properties = array();
+
+        $typeMap = $this->getTypeMap();
+        $columnMap = $this->getColumnMap();
+        $propTypes = array();
+
+        foreach ($validationDefinition as $itemObject) {
+            $item = $itemObject->valueArray();
+            $field = $item['fieldName'];
+            $fieldType = $item['fieldType'];
+            $canonicalFieldType = isset($columnMap[$fieldType]) ? $columnMap[$fieldType] : $fieldType;
+            $dataType = $this->getDataType($typeMap, $canonicalFieldType);
+            
+            $camelField = PicoStringUtil::camelize($field);
+            $propTypes[$camelField] = $dataType;
+
+            foreach ($item['validation'] as $rule) {
+                if (!empty($rule[$applyKey])) {
+                    if (!isset($properties[$camelField])) {
+                        $properties[$camelField] = array();
+                    }
+
+                    $type = $rule['type'];
+                    $annotationParts = array();
+                    foreach ($rule as $key => $value) {
+                        if (in_array($key, ['type', 'applyInsert', 'applyUpdate'])) {
+                            continue;
+                        }
+                        if (is_string($value)) {
+                            $annotationParts[] = $key . '="' . $value . '"';
+                        } else {
+                            $annotationParts[] = $key . '=' . $value;
+                        }
+                    }
+
+                    $annotation = array();
+                    $annotation[] = "\t" . ' * @' . $type . '(' . implode(', ', $annotationParts) . ')';
+                    $properties[$camelField][] = implode("\r\n", $annotation);
+                }
+            }
+        }
+
+        $output = "<?php\r\n\r\n";
+        if (!empty($namespace)) {
+            $output .= "namespace " . $namespace . ";\r\n\r\n";
+        }
+        $output .= "use MagicObject\\MagicObject;\r\n\r\n";
+
+        // Build class docblock
+        $output .= "/**\r\n";
+        $output .= " * Represents a validator class for the `" . $moduleCode . "` module.\r\n";
+        $output .= " *\r\n";
+        $output .= " * This class is auto-generated and intended for " . ($applyKey === 'applyInsert' ? 'insert' : 'update') . " validation.\r\n";
+        $output .= " * You can add additional validation rules as needed.\r\n";
+        $output .= " *\r\n";
+        $output .= " * Validated properties:\r\n";
+        $no = 1;
+        foreach ($properties as $propertyName => $annotations) {
+            $types = array();
+            foreach ($annotations as $annotation) {
+                // Extract type name from first line of annotation (e.g., * @Required(...) => Required)
+                if (preg_match('/\*\s+@(\w+)/', $annotation, $matches)) {
+                    $types[] = $matches[1];
+                }
+            }
+            $uniqueTypes = array_unique($types);
+            $output .= " * $no. **`\$$propertyName`** (" . implode(', ', $uniqueTypes) . ")\r\n";
+            $no++;
+        }
+        $output .= " * \r\n * @package $namespace\r\n";
+        $output .= " */\r\n";
+
+        $output .= "class " . $className . " extends MagicObject\n{";
+
+        foreach ($properties as $property => $annotations) {
+            $output .= "\r\n";
+            $output .= "\t/**\r\n";
+            foreach ($annotations as $annotation) {
+                $output .= $annotation . "\r\n";
+            }
+            $dataType = $propTypes[$property];
+            $output .= "\t" . ' * @var ' . $dataType . "\r\n";
+            $output .= "\t */\r\n";
+            $output .= "\tprotected \$" . $property . ";\r\n";
+        }
+
+        $output .= "}\r\n";
+
+        return $output;
+    }
+
+
 }
