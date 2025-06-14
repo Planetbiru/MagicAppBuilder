@@ -7,6 +7,7 @@ let ajaxPending = 0;
 let referenceResource = '';
 let currentEntityName = '';
 let currentTableName = '';
+let currentTableStructure = {};
 
 /**
  * Increments the `ajaxPending` counter and updates the visual representation of the pending bar.
@@ -408,12 +409,13 @@ function restoreFeatureForm() {
   });
 }
 
+let validatorBuilder = null;
 
 /**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
-  
+  validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output');
   $(document).on('click', '#button-load-module-features', function (e) {
     e.preventDefault();
     restoreFeatureForm();
@@ -5118,6 +5120,10 @@ function updateTableName(
   let approvalPrimaryKeyName = approvalTableName + "_id";
   let trashTableName = masterTableName + "_trash";
   let trashPrimaryKeyName = trashTableName + "_id";
+
+  let insertValidatorClass = masterEntityName + "InsertValidator";
+  let updateValidatorClass = masterEntityName + "UpdateValidator";
+
   $(this).attr("data-value", masterTableName);
 
   $('[name="primary_key_master"]').val(masterPrimaryKeyName);
@@ -5132,6 +5138,9 @@ function updateTableName(
   $('[name="module_code"]').val(moduleCode);
   $('[name="module_name"]').val(moduleName);
   $('[name="module_icon"]').val('fa fa-file');
+
+  $('[name="insert_validator_class"]').val(insertValidatorClass);
+  $('[name="update_validator_class"]').val(updateValidatorClass);
 }
 
 /**
@@ -5298,6 +5307,7 @@ function generateScript(selector) {
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let backendOnly = $("#backend_only")[0].checked && true; //NOSONAR
+  let useValidator = $("#validator")[0].checked && true; //NOSONAR
   let entity = {
     mainEntity: {
       entityName: $('[name="entity_master_name"]').val(),
@@ -5337,6 +5347,7 @@ function generateScript(selector) {
     approvalType: approvalType,
     approvalPosition: approvalPosition,
     approvalByAnotherUser: approvalByAnotherUser,
+    validator: useValidator,
     backendOnly: backendOnly,
     subquery: subquery,
     ajaxSupport: ajaxSupport
@@ -5345,9 +5356,19 @@ function generateScript(selector) {
   let specification = getSpecificationModule();
   let sortable = getSortableModule();
 
+  let validationDefinition = buildValidationDefinition(fields);
+
+  let validator = {
+    insertValidatorClass: $('[name="insert_validator_class"]').val(),
+    updateValidatorClass: $('[name="update_validator_class"]').val(),
+    updateValidationDefintion: $('[name="update_validation_definition"]').prop("checked"),
+    validationDefinition: validationDefinition
+  };
+
   let dataToPost = {
     entity: entity,
     fields: fields,
+    validator: validator,
     specification: specification,
     sortable: sortable,
     features: features,
@@ -5361,6 +5382,84 @@ function generateScript(selector) {
     updateEntity: $('[name="update_entity"]')[0].checked,
   };
   generateAllCode(dataToPost);
+}
+
+let validation = {};
+
+/**
+ * Builds a serial array of validation definitions based on the given field definitions.
+ *
+ * This function maps each field in the input array to its corresponding validation rules
+ * (from a global `validation` object), and constructs a flattened array of validation
+ * definitions, each with a `fieldName` property attached.
+ *
+ * @param {Array<Object>} fields - The array of field definition objects, each containing a `fieldName`.
+ * @returns {Array<Object>} An array of validation objects with the `fieldName` included.
+ */
+function buildValidationDefinition(fields) {
+  if (typeof validation !== 'undefined' && validation) {
+    let result = [];
+    let idx = 0;
+    for (const index in fields) {
+      if (fields.hasOwnProperty(index)) {
+        const fieldName = fields[index].fieldName;
+
+        if (validation.hasOwnProperty(fieldName)) {
+          const validations = validation[fieldName];
+
+          result[idx] = {};
+          result[idx].fieldName = fieldName;
+          result[idx].validation = [];
+
+          validations.forEach(validationRule => {
+            result[idx].validation.push(validationRule);
+          });
+          idx++;
+        }
+      }
+    }
+
+    return result;
+  }
+}
+
+/**
+ * Extracts a grouped validation definition object from a serial array of validation entries.
+ *
+ * This function takes an array where each item contains a `fieldName` and its `validation`,
+ * and transforms it into an object where each key is the `fieldName` and the value is
+ * the corresponding validation definition.
+ *
+ * Example input:
+ * [
+ *   { fieldName: "Name", validation: [{ type: "Required" }] },
+ *   { fieldName: "Email", validation: [{ type: "Email" }] }
+ * ]
+ *
+ * Output:
+ * {
+ *   Name: [{ type: "Required" }],
+ *   Email: [{ type: "Email" }]
+ * }
+ *
+ * @param {Array<Object>} validationDefinition - Array of validation definitions with `fieldName` and `validation`.
+ * @returns {Object} A plain object mapping each field name to its validation definition array.
+ */
+function extractValidationDefinition(validationDefinition)
+{
+  let extractedValidation = {};
+  if (typeof validationDefinition !== 'undefined' && validationDefinition) {
+    for(let i in validationDefinition)
+    {
+      if(validationDefinition[i] !== 'undefined' && validationDefinition[i])
+      {
+        let fieldName = validationDefinition[i].fieldName;
+        let definition = validationDefinition[i].validation;
+        extractedValidation[fieldName] = definition;
+      }
+    }
+  }
+  return extractedValidation;
 }
 
 /**
@@ -5720,6 +5819,7 @@ function loadColumn(tableName, selector) {
     data: { table_name: tableName },
     dataType: "json",
     success: function (answer) {
+      currentTableStructure = answer;
       decreaseAjaxPending();
       $(selector).empty();
       let data = answer.fields;
@@ -5894,6 +5994,15 @@ function restoreForm(data)  //NOSONAR
       }
     }
 
+    // validator
+    if(data.validator)
+    {
+      let extractedValidation = extractValidationDefinition(data.validator.validationDefinition);
+      validation = extractedValidation;
+      validatorBuilder.setValidation(validation);
+      validatorBuilder.markValidation();
+    }
+
     // restore features
     if(data.features)
     {
@@ -5934,6 +6043,7 @@ function restoreForm(data)  //NOSONAR
       $('#approval_by_other_user')[0].checked = isTrue(data.features.approvalByAnotherUser);
       $('#with_trash')[0].checked = isTrue(data.features.trashRequired);
       $('#subquery')[0].checked = isTrue(data.features.subquery);
+      $('#validator')[0].checked = isTrue(data.features.validator);
       $('#ajax_support')[0].checked = isTrue(data.features.ajaxSupport);
       $('#backend_only')[0].checked = isTrue(data.features.backendOnly);
       if(isTrue(data.features.backendOnly))
@@ -6549,6 +6659,9 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
       <td>
         ${generateSelectFilter(field, args)}
+      </td>
+      <td>
+        <button type="button" class="btn btn-sm btn-primary validation-button">Validation</button>
       </td>
     </tr>
   `;

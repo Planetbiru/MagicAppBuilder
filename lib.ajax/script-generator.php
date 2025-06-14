@@ -65,7 +65,9 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
     }
 
     // Save the request data to the JSON file
-    file_put_contents($path, json_encode(json_decode((string) $request), JSON_PRETTY_PRINT));
+    $options = $builderConfig->getData()->getPrettifyModuleData() ? JSON_PRETTY_PRINT : 0;
+    file_put_contents($path, json_encode(json_decode((string) $request), $options));
+    
     $fileGenerated = 0;
 
     if ($appConfig->getApplication() != null && $request->issetFields()) {

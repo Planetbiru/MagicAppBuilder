@@ -16,6 +16,27 @@ if(!$database->isConnected())
 
 $inputPost = new InputPost();
 
+/**
+ * Extract maximum length from column_type string if applicable.
+ *
+ * @param string $columnType
+ * @return int|null
+ */
+function getMaximumLength($columnType)
+{
+    // Normalize to lowercase for comparison
+    $type = strtolower($columnType);
+
+    // Regex to match types with length like varchar(255), character varying(100), etc.
+    if (preg_match('/^(varchar|character varying|char|character)\s*\((\d+)\)/i', $type, $matches)) {
+        return (int)$matches[2];
+    }
+
+    // For text types or other types without explicit length
+    return null;
+}
+
+
 try {
     $databaseName = $databaseConfig->getDatabaseName();
     $databaseSchema = $databaseConfig->getDatabaseSchema();
@@ -124,9 +145,10 @@ try {
     foreach ($rows as $i => $data) {
         $cols[] = $data['column_name'];
         $fields[] = array(
-            "column_name" => $data['column_name'],
-            "column_type" => $data['column_type'  ],
-            "data_type"   => $data['data_type'  ]
+            "column_name"    => $data['column_name'],
+            "column_type"    => $data['column_type'],
+            "data_type"      => $data['data_type'  ],
+            'maximum_length' => getMaximumLength($data['column_type'])
         );
         
         if (strtoupper($data['column_key']) == 'PRI') {

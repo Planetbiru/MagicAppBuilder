@@ -1319,6 +1319,31 @@ li.menu-exists > a::after {
   overflow-y: auto;
 }
 
+.modal .json-output {
+  max-height: 160px;
+  overflow: auto;
+  border: 1px solid #dddddd;
+  padding: 16px;
+}
+.modal .field-validations {
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 5px 12px;
+  margin-bottom: 1rem;
+}
+
+.main-table tbody tr[data-has-validation=true] .validation-button::before {
+  font-family: "Font Awesome 6 Free";
+  content: "\f14a"; /* fa-check-square */
+  margin-right: 0.5em;
+}
+
+.main-table tbody tr[data-has-validation=false] .validation-button::before {
+  font-family: "Font Awesome 6 Free";
+  content: "\f0c8"; /* fa-square */
+  margin-right: 0.5em;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

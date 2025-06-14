@@ -125,32 +125,35 @@
 <td>Trash Entity Name</td>
 <td><input type="text" class="form-control" name="entity_trash_name" id="entity_trash_name" autocomplete="off"></td>
 </tr>
-</tbody>
-</table>
-
-<h4>Module Option</h4>
-<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
-<tbody>
-<tr>
-<td>Target</td>
-<td>
-<select class="form-control" name="current_module_location" id="current_module_location">
-</select>  
-</td>
-</tr>
-<tr>
-<td>&nbsp;</td>
-<td>
-<button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
-<button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
-</td>
-</tr>
 <tr>
 <td>Update Entity</td>
 <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> Yes</label></td>
 </tr>
 </tbody>
 </table>
+
+<hr />
+
+<h4>Validator</h4>
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Insert Validator Class</td>
+<td><input type="text" class="form-control" name="insert_validator_class" id="insert_validator_class" autocomplete="off">
+</td>
+</tr>
+<tr>
+<td>Update Validator Class</td>
+<td><input type="text" class="form-control" name="update_validator_class" id="update_validator_class" autocomplete="off">
+</td>
+</tr>
+<tr>
+<td>Update Validation Definition</td>
+<td><label for="update_validation_definition"><input type="checkbox" name="update_validation_definition" id="update_validation_definition"> Yes</label></td>
+</tr>
+</tbody>
+</table>
+<hr />
 
 <h4>Module</h4>
 <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -166,6 +169,20 @@
 <tr>
 <td>Module Name</td>
 <td><input type="text" class="form-control" name="module_name" id="module_name" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Target</td>
+<td>
+<select class="form-control" name="current_module_location" id="current_module_location">
+</select>  
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> Update Current Location</button>
+<button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> Manage</button>
+</td>
 </tr>
 <tr>
 <td>Module Icon</td>
@@ -236,6 +253,7 @@
 <td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
 <td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
 <td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
+<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Validation">Validation</td>
 </tr>
 <tr>
 <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text<div class='horizontal-line'></div>The input control <br>is a single-line text-based element.">TE</td>
@@ -527,6 +545,10 @@
 <tr>
 <td>Trash</td>
 <td><label for="with_trash"><input type="checkbox" name="with_trash" id="with_trash" value="1"> Trash</label> &nbsp;</td>
+</tr>
+<tr>
+<td>Validator</td>
+<td><label for="validator"><input type="checkbox" name="validator" id="validator" value="1"> Validator</label> &nbsp;</td>
 </tr>
 <tr>
 <td>Backend Only</td>
@@ -1256,6 +1278,76 @@
 <button type="button" class="btn btn-success button-create-entity"><i class="fa-solid fa-floppy-disk"></i> OK</button>
 <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
 </div>
+</div>
+</div>
+</div>
+
+<div class="modal fade field-validation-modal" id="fieldValidationModal" tabindex="-1" aria-labelledby="fieldValidationModal" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<form onsubmit="event.preventDefault(); validatorBuilder.saveAllValidation(true);">
+<div class="modal-header">
+<h5 class="modal-title" id="validationModalLabel">Add Validation</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+
+<span class="form-label">Validation for <strong><span id="field-to-validate"></span></strong></span>
+<div class="field-validations-list mt-2"></div>
+<button type="button" class="btn btn-primary mt-2 add-validation"><i class="fa-solid fa-plus"></i> Add Validation</button>
+
+<h4>JSON Output</h4>
+<pre id="jsonOutput" class="json-output">{}</pre>
+</div>
+<div class="modal-footer">
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Save</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<div class="modal fade validation-modal" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<form onsubmit="event.preventDefault(); validatorBuilder.saveValidation();">
+<div class="modal-header">
+<h5 class="modal-title" id="validationModalLabel">Add Validation</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="mb-3">
+<div class="form-label">Validation Type</div>
+<select class="form-control validation-type">
+<option value="">-- Select Validation --</option>
+</select>
+</div>
+<div class="validation-props"></div>
+
+<div class="mt-3">
+<div class="form-check">
+<input class="form-check-input apply-insert" type="checkbox" value="" id="apply-insert">
+<label class="form-check-label" for="apply-insert">
+Apply to Insert
+</label>
+</div>
+<div class="form-check">
+<input class="form-check-input apply-update" type="checkbox" value="" id="apply-update">
+<label class="form-check-label" for="apply-update">
+Apply to Update
+</label>
+</div>
+</div>
+
+</div>
+<div class="modal-footer">
+<button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add</button>
+</div>
+</form>
 </div>
 </div>
 </div>
