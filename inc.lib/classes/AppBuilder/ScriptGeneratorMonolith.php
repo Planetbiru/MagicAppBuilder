@@ -3,6 +3,7 @@
 namespace AppBuilder;
 
 use MagicObject\Generator\PicoEntityGenerator;
+use stdClass;
 
 class ScriptGeneratorMonolith extends ScriptGenerator
 {
@@ -184,10 +185,36 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $activationSection = null;
         $deactivationSection = null;
 
+        // Generate validator
+        $validationInfo = new stdClass;
+        if($appFeatures->isValidator())
+        {
+            $entityGenerator = new PicoEntityGenerator(null, null, null, null);
+            $validator = $request->getValidator();
+            $namespace = str_replace("/", "\\", dirname(dirname(trim($appConf->getBaseEntityDataNamespace(), "\\/")))). "\\Validator";
+            
+            $insertPath = $appConf->getBaseApplicationDirectory() . "/inc.lib/classes/$namespace/".$validator->getInsertValidatorClass().".php";
+            $updatePath = $appConf->getBaseApplicationDirectory() . "/inc.lib/classes/$namespace/".$validator->getUpdateValidatorClass().".php";
+            if(!file_exists(dirname($insertPath)))
+            {
+                mkdir(dirname($insertPath), 0755, true);
+            }
+            $insertValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getInsertValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyInsert');
+            file_put_contents($insertPath, $insertValidator);
+            $updateValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getUpdateValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyUpdate');
+            file_put_contents($updatePath, $updateValidator);
+
+            $validationInfo->namespace = $namespace;
+            $validationInfo->insertValidationClass = $validator->getInsertValidatorClass();
+            $validationInfo->updateValidationClass = $validator->getUpdateValidatorClass();
+        }
+        
+
         // prepare CRUD section begin
         if($approvalRequired) {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
+            $appBuilder->setValidatiorInfo($validationInfo);
 
             // CRUD
             $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval, $callbackCreateSuccess, $callbackCreateFailed);
@@ -325,24 +352,6 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         // Do not update referenced entities automatically
         $fileGenerated += $this->generateEntitiesIfNotExists($database, $appConf, $entityInfo, $referenceEntities, false);
         
-        // Generate validator
-        if($appFeatures->isValidator())
-        {
-            $entityGenerator = new PicoEntityGenerator(null, null, null, null);
-            $validator = $request->getValidator();
-            $namespace = str_replace("/", "\\", dirname(dirname(trim($appConf->getBaseEntityDataNamespace(), "\\/")))). "\\Validator";
-            
-            $insertPath = $appConf->getBaseApplicationDirectory() . "/inc.lib/classes/$namespace/".$validator->getInsertValidatorClass().".php";
-            $updatePath = $appConf->getBaseApplicationDirectory() . "/inc.lib/classes/$namespace/".$validator->getUpdateValidatorClass().".php";
-            if(!file_exists(dirname($insertPath)))
-            {
-                mkdir(dirname($insertPath), 0755, true);
-            }
-            $insertValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getInsertValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyInsert');
-            file_put_contents($insertPath, $insertValidator);
-            $updateValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getUpdateValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyUpdate');
-            file_put_contents($updatePath, $updateValidator);
-        }
         
         return $fileGenerated;
     }   

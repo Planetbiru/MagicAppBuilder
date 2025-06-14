@@ -179,6 +179,13 @@ class AppBuilderBase //NOSONAR
     private $inGroup;
 
     /**
+     * Validator information
+     *
+     * @var stdClass
+     */
+    protected $validatorInfo;
+
+    /**
      * Constructor
      *
      * Initializes the object with application and entity configurations.
@@ -5660,5 +5667,27 @@ $subqueryMap = '.$referece.';
     public function isCallable($function)
     {
         return isset($function) && is_callable($function);
+    }
+
+    /**
+     * Set validation info
+     *
+     * @param stdClass $validatorInfo
+     * @return self
+     */
+    public function setValidatiorInfo($validatorInfo)
+    {
+        $this->validatorInfo = $validatorInfo;
+        return $this;
+    }
+
+    /**
+     * Set validation info
+     *
+     * @return stdClass
+     */
+    public function getValidatiorInfo()
+    {
+        return $this->validatorInfo;
     }
 }

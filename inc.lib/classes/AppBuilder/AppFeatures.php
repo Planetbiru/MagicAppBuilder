@@ -152,6 +152,7 @@ class AppFeatures // NOSONAR
             $this->approvalByAnotherUser = $this->isTrue($features->get('approvalByAnotherUser'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
             $this->backendOnly = $this->isTrue($features->get('backendOnly'));
+            $this->validator = $this->isTrue($features->get('validator'));
         }
     }
     

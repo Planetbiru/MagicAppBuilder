@@ -85,6 +85,9 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::TAB1."try";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+
+        // TODO: Add validation here
+
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
@@ -99,6 +102,9 @@ class AppBuilderApproval extends AppBuilderBase
         }
 
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
+        // TODO: Add catch(InvalidValueException $e)
+
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))
@@ -195,6 +201,8 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName.parent::BRACKETS.");";
 
+        // TODO: Add validation
+
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;
 
         $lines[] = "";
@@ -221,6 +229,9 @@ class AppBuilderApproval extends AppBuilderBase
         }
         
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
+        // TODO: Add catch(InvalidValueException $e)
+
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))
