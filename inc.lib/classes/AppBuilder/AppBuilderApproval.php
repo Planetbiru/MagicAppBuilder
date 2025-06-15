@@ -86,7 +86,6 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1."try";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
 
-        // TODO: Add validation here
         if($this->appFeatures->isValidator())
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."());";
@@ -107,7 +106,6 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
-        // TODO: Add catch(InvalidValueException $e)
         if($this->appFeatures->isValidator())
         {
             $lines[] = "\tcatch(InvalidValueException \$e)";
@@ -215,7 +213,6 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName.parent::BRACKETS.");";
 
-        // TODO: Add validation
         if($this->appFeatures->isValidator())
         {
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName."->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."());";
@@ -248,7 +245,6 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
-        // TODO: Add catch(InvalidValueException $e)
         if($this->appFeatures->isValidator())
         {
             $lines[] = "\tcatch(InvalidValueException \$e)";
