@@ -40,33 +40,38 @@ Of course, an application isn’t made up entirely of basic CRUD modules. But at
 
 Even though MagicAppBuilder uses a high-level abstraction, developers can still add custom code to gain full control over the application. Customization is completely unrestricted, as developers can freely write native PHP code without being locked into any specific library. MagicAppBuilder is perfect for large projects needing fast delivery without sacrificing control or customization.
 
-
 ## System Requirements
 
-To run **MagicAppBuilder**, ensure your environment meets the following minimum requirements:
+To run **MagicAppBuilder**, your environment must meet the following minimum requirements:
 
 -   **Web Server:**
     
-    -   Apache (recommended)
+    -   **Apache** (recommended)
         
-    -   Nginx or other compatible web servers may also be used with proper configuration
+    -   Compatible alternatives like **Nginx** may be used with proper configuration
         
 -   **PHP Runtime:**
     
-    -   Version **5.6 or later**
+    -   Version **5.6 or above**
         
-    -   Recommended: PHP **7.4 or above** for better performance and security
+    -   **Recommended:** PHP **7.4 or newer** for improved performance and security
         
 -   **Supported Databases:**
     
-    -   **SQLite** (lightweight, file-based database)
+    -   **SQLite** – _Required_. SQLite is used as the default database engine during the application-building process.
         
-    -   **MariaDB** (drop-in replacement for MySQL, recommended)
+        > ⚠️ **Note:** If the SQLite PHP extension is not installed or enabled, MagicAppBuilder will **not work**.
+        
+    -   **MariaDB** – Fully supported for production environments
         
     -   **MySQL**
         
     -   **PostgreSQL**
 
+> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
+> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
+
+> ⚙️ **SQL Server (Microsoft SQL Server)** may also be used during the production phase by optimizing MagicObject accordingly. However, converting your database structure to SQL Server format may require third-party tools or manual adjustments.
 
 ## Dependency
 
