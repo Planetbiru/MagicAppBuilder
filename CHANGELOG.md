@@ -501,6 +501,7 @@ This is especially useful for large databases where selective export is essentia
 -   Fixed several edge cases in database table name detection for SQLite and PostgreSQL.
 -   Improved error handling in AJAX export logic for better feedback when an export fails.
 
+
 # MagicAppBuilder Version 1.3
 
 ## What's New
@@ -513,7 +514,28 @@ You can now import entities from an SQL file without removing the existing ones.
 
 User input validation now leverages the input validation features introduced in MagicObject version 3.14, providing more robust and consistent validation across the application.
 
+### Validator Builder
+
+A new **Validator Builder** is introduced, allowing developers to generate validation classes based on field definitions and annotations. These classes use PHP attributes such as `@Required`, `@Email`, `@Min`, etc., and are generated automatically per module and action (insert/update).
+
+### Validation Integration with MagicObject
+
+MagicObject has been updated to support automatic validation via annotations. When validation rules are defined in the generated validator class, MagicObject can now automatically enforce them on property assignment or during data binding.
+
+### Validate on Insert and Update
+
+All **insert** and **update** operations now include automatic validation. The corresponding validator class is applied based on the current operation type, ensuring only valid data is processed or persisted.
+
+### Exception Handling for Invalid Data
+
+If validation fails during insert or update operations, a specific **validation exception** is thrown immediately to stop the operation. This prevents invalid data from reaching the database.
+
+### Form Restoration and Error Highlighting
+
+When a validation error occurs, the form is **automatically restored** to its previous state, and the field with the error is **highlighted** on the client side. This improves user experience and guides users to correct their input.
+
 ## Bug Fixes
 
 -   Bug fixes in the entity editor when designing database structures.
-
+    
+-   Resolved issues related to entity field synchronization and missing metadata after import.
