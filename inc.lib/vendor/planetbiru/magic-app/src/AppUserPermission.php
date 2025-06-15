@@ -166,24 +166,15 @@ class AppUserPermission
      */
     public function loadPermission()
     {
-        if($this->appConfig->getBypassRole())
-        {
-            $this->allowedList =  true;
-            $this->allowedDetail =  true;
-            $this->allowedCreate =  true;
-            $this->allowedUpdate =  true;
-            $this->allowedDelete =  true;
-            $this->allowedApprove =  true;
-            $this->allowedSortOrder =  true;
-            $this->allowedExport =  true;
-        }
-        else if(
+        if($this->appConfig->getBypassRole() || 
+        (
             $this->currentModule != null
             && $this->currentModule->getAppModule() != null 
             && $this->currentModule->getAppModule()->getSpecialAccess() 
             && $this->getCurrentUser() != null
             && $this->getCurrentUser()->getAdminLevel() != null
-            && $this->getCurrentUser()->getAdminLevel()->getSpecialAccess())
+            && $this->getCurrentUser()->getAdminLevel()->getSpecialAccess()
+        ))
         {
             $this->allowedList =  true;
             $this->allowedDetail =  true;

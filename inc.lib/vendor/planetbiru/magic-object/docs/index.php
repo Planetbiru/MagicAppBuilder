@@ -101,19 +101,40 @@ class PhpDocumentCreator // NOSONAR
         $docblock = preg_replace('/^\s*\*/m', '', $docblock);
 
         // Separate the description and tags
-        preg_match('/\s*(.*?)\s*(\s+\@.*)?$/s', $docblock, $matches);
-        $parsed['description'] = trim($matches[1]);
+        $lines = preg_split('/\r?\n/', $docblock);
+        $descLines = [];
+        $tags = [];
+        $currentTag = null;
+        $currentTagContent = '';
 
-        // Extract tags from the docblock
-        if (isset($matches[2])) {
-            preg_match_all('/\s*\@(\w+)\s+([^\n]+)/', $matches[2], $tagMatches, PREG_SET_ORDER);
-            foreach ($tagMatches as $tagMatch) {
-                $parsed['tags'][] = [
-                    'tag' => $tagMatch[1],
-                    'description' => trim($tagMatch[2])
-                ];
+        foreach ($lines as $line) {
+            if (preg_match('/^\s*@(\w+)\s*(.*)$/', $line, $m)) {
+                // Save previous tag if exists
+                if ($currentTag !== null) {
+                    $tags[] = [
+                        'tag' => $currentTag,
+                        'description' => trim($currentTagContent)
+                    ];
+                }
+                $currentTag = $m[1];
+                $currentTagContent = $m[2];
+            } else if ($currentTag !== null) {
+                // Continuation of previous tag (multiline)
+                $currentTagContent .= "\n" . $line;
+            } else {
+                $descLines[] = $line;
             }
         }
+        // Save last tag if exists
+        if ($currentTag !== null) {
+            $tags[] = [
+                'tag' => $currentTag,
+                'description' => trim($currentTagContent)
+            ];
+        }
+
+        $parsed['description'] = trim(implode("\n", $descLines));
+        $parsed['tags'] = $tags;
 
         return $parsed;
     }

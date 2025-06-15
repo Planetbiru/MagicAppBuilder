@@ -714,4 +714,143 @@ class ' . $className . ' extends MagicObject
 
         return file_put_contents($path, $classStr);
     }
+
+    /**
+     * Generates a PHP validator class string with annotated properties.
+     *
+     * This method constructs a PHP class definition as a string. The generated class extends
+     * `MagicObject` and contains properties corresponding to fields defined in the validation
+     * definition. Each property is annotated with relevant validation rules and data type
+     * information.
+     *
+     * The generated class includes:
+     * - Namespace declaration
+     * - PHPDoc block summarizing validated properties
+     * - Validation annotations (Required, Min, etc.)
+     * - Proper data type hinting for each property
+     *
+     * @param string $namespace             The PHP namespace where the validator class belongs.
+     * @param string $className             The base name of the class to be generated.
+     * @param string $moduleCode            The code name of the module this validator is for.
+     * @param array  $validationDefinition  An array of field definitions, each containing field name, type, and validation rules.
+     * @param string $applyKey              Determines which rules to apply, usually 'applyInsert' or 'applyUpdate'.
+     *
+     * @return string Returns the full PHP source code of the generated class as a string.
+     */
+
+    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey) // NOSONAR
+    {
+        $properties = array();
+
+        $typeMap = $this->getTypeMap();
+        $columnMap = $this->getColumnMap();
+        $propTypes = array();
+
+        foreach ($validationDefinition as $itemObject) {
+            $item = $itemObject->valueArray();
+            $field = $item['fieldName'];
+            $fieldType = $item['fieldType'];
+            $canonicalFieldType = isset($columnMap[$fieldType]) ? $columnMap[$fieldType] : $fieldType;
+            $dataType = $this->getDataType($typeMap, $canonicalFieldType);
+            
+            $camelField = PicoStringUtil::camelize($field);
+            $propTypes[$camelField] = $dataType;
+
+            foreach ($item['validation'] as $rule) {
+                if (!empty($rule[$applyKey])) {
+                    if (!isset($properties[$camelField])) {
+                        $properties[$camelField] = array();
+                    }
+
+                    $type = $rule['type'];
+                    $annotationParts = array();
+                    foreach ($rule as $key => $value) {
+                        if (in_array($key, ['type', 'applyInsert', 'applyUpdate'])) {
+                            continue;
+                        }
+                        if (is_string($value)) {
+                            $annotationParts[] = $key . '="' . $value . '"';
+                        } else {
+                            $annotationParts[] = $key . '=' . $value;
+                        }
+                    }
+
+                    $annotation = array();
+                    $annotation[] = "\t" . ' * @' . $type . '(' . implode(', ', $annotationParts) . ')';
+                    $properties[$camelField][] = implode("\r\n", $annotation);
+                }
+            }
+        }
+
+        $output = "<?php\r\n\r\n";
+        if (!empty($namespace)) {
+            $output .= "namespace " . $namespace . ";\r\n\r\n";
+        }
+        $output .= "use MagicObject\\MagicObject;\r\n\r\n";
+
+        // Build class docblock
+        $output .= "/**\r\n";
+        $output .= " * Represents a validator class for the `" . $moduleCode . "` module.\r\n";
+        $output .= " *\r\n";
+        $output .= " * This class is auto-generated and intended for " . ($applyKey === 'applyInsert' ? 'insert' : 'update') . " validation.\r\n";
+        $output .= " * You can add additional validation rules as needed.\r\n";
+        $output .= " *\r\n";
+        $output .= " * Validated properties:\r\n";
+        $no = 1;
+        foreach ($properties as $propertyName => $annotations) {
+            $types = array();
+            foreach ($annotations as $annotation) {
+                if (preg_match('/\*\s+@(\w+)\((.*)\)/', $annotation, $matches)) {
+                    $type = $matches[1];
+                    $rawAttributes = $matches[2];
+                    $attrList = [];
+
+                    // Parse attributes
+                    preg_match_all('/(\w+)\s*=\s*(?:"([^"]*)"|([^,]+))/', $rawAttributes, $attrMatches, PREG_SET_ORDER);
+                    foreach ($attrMatches as $attr) {
+                        $key = $attr[1];
+                        $attr3 = isset($attr[3]) ? $attr[3] : '';
+                        $rawValue = isset($attr[2]) && $attr[2] !== '' ? $attr[2] : $attr3;
+
+                        if (is_numeric($rawValue)) {
+                            $value = $rawValue; // keep numeric as-is
+                        } else {
+                            $value = '"' . $rawValue . '"'; // wrap string with double quotes
+                        }
+
+                        if ($value !== "" && $value != '""') {
+                            $attrList[] = "$key=$value";
+                        }
+                    }
+
+                    $types[] = $type . (!empty($attrList) ? '(' . implode(', ', $attrList) . ')' : '');
+                }
+            }
+            $uniqueTypes = array_unique($types);
+            $output .= " * $no. **`\$$propertyName`** ( " . implode(', ', $uniqueTypes) . " )\r\n";
+            $no++;
+        }
+        $output .= " * \r\n * @package $namespace\r\n";
+        $output .= " */\r\n";
+
+        $output .= "class " . $className . " extends MagicObject\n{";
+
+        foreach ($properties as $property => $annotations) {
+            $output .= "\r\n";
+            $output .= "\t/**\r\n";
+            foreach ($annotations as $annotation) {
+                $output .= $annotation . "\r\n";
+            }
+            $dataType = $propTypes[$property];
+            $output .= "\t" . ' * @var ' . $dataType . "\r\n";
+            $output .= "\t */\r\n";
+            $output .= "\tprotected \$" . $property . ";\r\n";
+        }
+
+        $output .= "}\r\n";
+
+        return $output;
+    }
+
+
 }

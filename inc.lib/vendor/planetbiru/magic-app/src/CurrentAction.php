@@ -70,9 +70,7 @@ class CurrentAction
     /**
      * Get the current timestamp.
      *
-     * Returns the current time in the format `Y-m-d H:i:s` for logging or tracking user actions.
-     *
-     * @return string Formatted current time.
+     * @return string Current time in 'Y-m-d H:i:s' format.
      */
     public function getTime()
     {
@@ -82,9 +80,7 @@ class CurrentAction
     /**
      * Get the current user.
      *
-     * Returns the current user, which was set during object construction.
-     *
-     * @return string The current user.
+     * @return string Current user.
      */
     public function getUser()
     {
@@ -94,9 +90,7 @@ class CurrentAction
     /**
      * Get the current IP address.
      *
-     * Returns the IP address of the user, which was retrieved during object construction.
-     *
-     * @return string The current IP address.
+     * @return string Current IP address.
      */
     public function getIp()
     {

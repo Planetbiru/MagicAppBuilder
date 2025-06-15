@@ -23,6 +23,11 @@ class PhpDocumentCreator // NOSONAR
     
     const DUPLICATED_WHITESPACE_EXP = '/\s\s+/';
 
+    /**
+     * Parsedown
+     *
+     * @var Parsedown
+     */
     private $parsedown = null;
 
     /**
@@ -96,19 +101,40 @@ class PhpDocumentCreator // NOSONAR
         $docblock = preg_replace('/^\s*\*/m', '', $docblock);
 
         // Separate the description and tags
-        preg_match('/\s*(.*?)\s*(\s+\@.*)?$/s', $docblock, $matches);
-        $parsed['description'] = trim($matches[1]);
+        $lines = preg_split('/\r?\n/', $docblock);
+        $descLines = [];
+        $tags = [];
+        $currentTag = null;
+        $currentTagContent = '';
 
-        // Extract tags from the docblock
-        if (isset($matches[2])) {
-            preg_match_all('/\s*\@(\w+)\s+([^\n]+)/', $matches[2], $tagMatches, PREG_SET_ORDER);
-            foreach ($tagMatches as $tagMatch) {
-                $parsed['tags'][] = [
-                    'tag' => $tagMatch[1],
-                    'description' => trim($tagMatch[2])
-                ];
+        foreach ($lines as $line) {
+            if (preg_match('/^\s*@(\w+)\s*(.*)$/', $line, $m)) {
+                // Save previous tag if exists
+                if ($currentTag !== null) {
+                    $tags[] = [
+                        'tag' => $currentTag,
+                        'description' => trim($currentTagContent)
+                    ];
+                }
+                $currentTag = $m[1];
+                $currentTagContent = $m[2];
+            } else if ($currentTag !== null) {
+                // Continuation of previous tag (multiline)
+                $currentTagContent .= "\n" . $line;
+            } else {
+                $descLines[] = $line;
             }
         }
+        // Save last tag if exists
+        if ($currentTag !== null) {
+            $tags[] = [
+                'tag' => $currentTag,
+                'description' => trim($currentTagContent)
+            ];
+        }
+
+        $parsed['description'] = trim(implode("\n", $descLines));
+        $parsed['tags'] = $tags;
 
         return $parsed;
     }
@@ -592,7 +618,7 @@ class PhpDocumentCreator // NOSONAR
 
         return $output; // Return the accumulated output
     }
-
+    
     /**
      * Displays constants and their values with formatted HTML output.
      *
@@ -1103,29 +1129,29 @@ class PhpDocumentCreator // NOSONAR
 
 }
 
-?><!DOCTYPE html>
+ob_start(); 
+
+$srcDir = dirname(__DIR__) . '/src';
+
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MagicApp Documentation</title>
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 
 <div class="page">
-
 <?php
-
-$srcDir = dirname(__DIR__) . '/src';
 
 if (is_dir($srcDir)) {
     $docCreator = new PhpDocumentCreator();
 
     $files = $docCreator->scanDirectory($srcDir);
-    
-    $structure = $docCreator->scanDirectoryToc($srcDir); // Replace with your directory path
+    $structure = $docCreator->scanDirectoryToc($srcDir);
     ?>
     <div class="sidebar">
     <h3>Table of Content</h3>
@@ -1135,14 +1161,12 @@ if (is_dir($srcDir)) {
     </div>
     <div class="mainbar">
     <?php
-
     $rendered = [];
     foreach ($files as $file) {
-        if(!in_array($file, $rendered))
-        {
+        if (!in_array($file, $rendered)) {
             echo $docCreator->getAllDocblocks($file);
+            $rendered[] = $file;
         }
-        $rendered[] = $file;
     }
     ?>
     </div>
@@ -1154,9 +1178,14 @@ if (is_dir($srcDir)) {
 </div>
 <script src="highlight.min.js"></script>
 <script>
-    // Menyorot kode setelah halaman dimuat
     hljs.highlightAll();
-
 </script>
 </body>
 </html>
+<?php
+
+$htmlOutput = ob_get_clean();
+
+file_put_contents(__DIR__ . '/doc.html', $htmlOutput);
+
+echo "Documentation has been generated and saved to documentation.html\n";

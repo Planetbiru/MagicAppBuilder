@@ -52,6 +52,7 @@ function basenameRequestUri($uri)
   <script type="text/javascript" src="lib.assets/cm/addon/mode/loadmode.min.js"></script>
   <script type="text/javascript" src="lib.assets/cm/mode/meta.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Sortable.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/Validator.min.js"></script>
   <link rel="stylesheet" type="text/css" href="lib.assets/css/fontawesome/css/all.min.css">
 </head>
 

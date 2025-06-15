@@ -587,6 +587,55 @@ function initPage()
   });
 }
 
+/**
+ * Restore form fields with provided data and highlight the error field.
+ *
+ * @param {Object} formData - An object where each key is the field name and the value is the field value.
+ * @param {string} errorField - The name of the field that contains an error.
+ * @param {string} formSelector - A CSS selector string that identifies the form.
+ */
+function restoreFormData(formData, errorField, formSelector) {
+    const form = document.querySelector(formSelector);
+    if (!form) {
+        console.warn("Form not found:", formSelector);
+        return;
+    }
+
+    for (const [name, value] of Object.entries(formData)) {
+        const elements = form.querySelectorAll(`[name="${name}"]`);
+
+        elements.forEach(element => {
+            const type = element.type;
+
+            if (type === 'checkbox') {
+                element.checked = Array.isArray(value)
+                    ? value.includes(element.value)
+                    : Boolean(value);
+            } else if (type === 'radio') {
+                element.checked = element.value === value;
+            } else if (element.tagName === 'SELECT') {
+                Array.from(element.options).forEach(option => {
+                    option.selected = Array.isArray(value)
+                        ? value.includes(option.value)
+                        : option.value === value;
+                });
+            } else {
+                element.value = value;
+            }
+
+            // Highlight error field
+            if (name === errorField) {
+                element.classList.add('is-invalid');
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.focus();
+            } else {
+                element.classList.remove('is-invalid');
+            }
+        });
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   initPage();
   initCheckAll();

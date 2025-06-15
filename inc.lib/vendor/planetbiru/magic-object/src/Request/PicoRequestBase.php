@@ -3,7 +3,6 @@
 namespace MagicObject\Request;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
-use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoStringUtil;
@@ -52,6 +51,17 @@ class PicoRequestBase extends stdClass // NOSONAR
      * @var bool
      */
     protected $_recursive = false; // NOSONAR
+
+    /**
+     * Array to keep track of fields that have been retrieved.
+     * 
+     * This property is used to avoid redundant data retrieval and processing.
+     * The property name starts with an underscore to prevent child classes 
+     * from overriding its value.
+     *
+     * @var array
+     */
+    protected $_fieldsRetrieved = array(); // NOSONAR
 
     /**
      * Constructor to initialize the request handler and process class annotations.
@@ -120,6 +130,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     {
         $var = PicoStringUtil::camelize($propertyName);
         $value = isset($this->{$var}) ? $this->{$var} : null;
+        $this->_fieldsRetrieved[] = $var; // Keep track of retrieved fields
         if(isset($params) && !empty($params))
         {
             $filter = $params[0];
@@ -929,7 +940,7 @@ class PicoRequestBase extends stdClass // NOSONAR
     }
 
     /**
-     * Validate the current request object using ValidationUtil.
+     * Validate the current object based on property annotations.
      *
      * This method checks the properties of the current object against validation annotations.
      * If any validation rule fails, an InvalidValueException will be thrown.
@@ -943,6 +954,24 @@ class PicoRequestBase extends stdClass // NOSONAR
     {
         ValidationUtil::getInstance($messageTemplate)->validate($this, $parentPropertyName);
         return $this;
+    }
+
+    /**
+     * Retrieve form data as an associative array.
+     *
+     * This method collects the values of all fields that have been retrieved from the object
+     * and returns them as an associative array. The keys are the field names, and the values
+     * are the corresponding values from the object.
+     *
+     * @return array An associative array containing field names and their values.
+     */
+    public function formData()
+    {
+        $data = array();
+        foreach($this->_fieldsRetrieved as $field)
+        {
+            $data[$field] = $this->get($field);
+        }
     }
 
 }

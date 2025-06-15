@@ -74,6 +74,13 @@ class AppBuilder extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+
+        // TODO: Add validation
+        if($this->appFeatures->isValidator())
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."());";
+        }
+
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'newId = '.parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."();";
         if($this->isCallable($callbackSuccess))
@@ -86,6 +93,19 @@ class AppBuilder extends AppBuilderBase
             $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'currentModule->redirectTo(UserAction::DETAIL, '.AppBuilderBase::getStringOf($mainEntity->getPrimaryKey()).', $newId);'; //NOSONAR
         }
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
+        // TODO: Add catch(InvalidValueException $e)
+        if($this->appFeatures->isValidator())
+        {
+            $lines[] = "\tcatch(InvalidValueException \$e)";
+            $lines[] = "\t{";
+            $lines[] = "\t\t\$currentModule->setErrorMessage(\$e->getMessage());";
+            $lines[] = "\t\t\$currentModule->setErrorField(\$e->getPropertyName());";
+            $lines[] = "\t\t\$currentModule->setCurrentAction(UserAction::CREATE);";
+            $lines[] = "\t\t\$currentModule->setFormData(\$inputPost->formData());";
+            $lines[] = "\t}";
+        }
+
         $lines[] = parent::TAB1."catch(Exception \$e)"; //NOSONAR
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))
@@ -172,6 +192,13 @@ class AppBuilder extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::PHP_TRY;
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+
+        // TODO: Add validation
+        if($this->appFeatures->isValidator())
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR."updater->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."());";
+        }
+
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'updater->update();';
         if($updatePk)
         {
@@ -207,6 +234,19 @@ class AppBuilder extends AppBuilderBase
         }
         
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+
+        // TODO: Add catch(InvalidValueException $e)
+        if($this->appFeatures->isValidator())
+        {
+            $lines[] = "\tcatch(InvalidValueException \$e)";
+            $lines[] = "\t{";
+            $lines[] = "\t\t\$currentModule->setErrorMessage(\$e->getMessage());";
+            $lines[] = "\t\t\$currentModule->setErrorField(\$e->getPropertyName());";
+            $lines[] = "\t\t\$currentModule->setCurrentAction(UserAction::UPDATE);";
+            $lines[] = "\t\t\$currentModule->setFormData(\$inputPost->formData());";
+            $lines[] = "\t}";
+        }
+
         $lines[] = parent::TAB1."catch(Exception \$e)";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
         if($this->isCallable($callbackFailed))

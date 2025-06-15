@@ -49,6 +49,7 @@ data:
     next: '<i class=\"fa-solid fa-angle-right\"></i>'
     first: '<i class=\"fa-solid fa-angles-left\"></i>'
     last: '<i class=\"fa-solid fa-angles-right\"></i>'
+    prettify_module_data: false
 
 languages:
     -

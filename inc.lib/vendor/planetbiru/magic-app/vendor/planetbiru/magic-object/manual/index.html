@@ -1311,6 +1311,16 @@ service httpd restart</code></pre>
 <li><strong><code>@Future(message="...")</code></strong>: Ensures a <code>DateTimeInterface</code> property represents a date/time in the future.</li>
 <li><strong><code>@PastOrPresent(message="...")</code></strong>: Ensures a date/time is in the past or present.</li>
 <li><strong><code>@FutureOrPresent(message="...")</code></strong>: Ensures a <code>DateTimeInterface</code> property represents a date/time in the future or the present.</li>
+<li><strong><code>@BeforeDate(date="...", message="...")</code></strong>: Ensures a date is before a specified date.</li>
+<li><strong><code>@AfterDate(date="...", message="...")</code></strong>: Ensures a date is after a specified date.</li>
+</ul>
+<h3>String Content &amp; Structure</h3>
+<ul>
+<li><strong><code>@Alpha(message="...")</code></strong>: Ensures a string contains only alphabetic characters.</li>
+<li><strong><code>@AlphaNumeric(message="...")</code></strong>: Ensures a string contains only alphanumeric characters.</li>
+<li><strong><code>@StartsWith(prefix="...", caseSensitive=true|false, message="...")</code></strong>: Ensures a string starts with a specified prefix, with optional case sensitivity.</li>
+<li><strong><code>@EndsWith(suffix="...", caseSensitive=true|false, message="...")</code></strong>: Ensures a string ends with a specified suffix, with optional case sensitivity.</li>
+<li><strong><code>@Contains(substring="...", caseSensitive=true|false, message="...")</code></strong>: Ensures a string contains a specified substring, with optional case sensitivity.</li>
 </ul>
 <h3>Boolean</h3>
 <ul>
@@ -2102,7 +2112,7 @@ catch(Exception $e)
 {
     error_log($e-&gt;getMessage());
 }</code></pre>
-<p>In the example above, <code>$producer</code> isn't validated because its value isn't set via input. The value that <em>is</em> validated is <code>$producerId</code>, which refers to <code>producer_id</code> in the <code>producer</code> table. The <strong><code>@Valid</code> annotation</strong> will validate the properties of the <code>$producer</code> object (an instance of the <code>Producer</code> class) by referencing the <code>ProducerValidator</code> class. When either <code>$album-&gt;validate(null, null, new AlbumValidatorForInsert())</code> or <code>$album-&gt;validate(null, null, new AlbumValidatorForUpdate())</code> is executed, MagicObject will also validate <code>$producer</code>. The <code>@Valid</code> annotation is processed first, and if it's found, other validation annotations won't be processed.</p>
+<p>In the example above, <code>$producer</code> isn't validated because its value isn't set via input. The value that <em>is</em> validated is <code>$producerId</code>, which refers to <code>producer_id</code> in the <code>producer</code> table. The <strong><code>@Valid annotation</code></strong> will validate the properties of the <code>$producer</code> object (an instance of the <code>Producer</code> class) by referencing the <code>ProducerValidator</code> class. When either <code>$album-&gt;validate(null, null, new AlbumValidatorForInsert())</code> or <code>$album-&gt;validate(null, null, new AlbumValidatorForUpdate())</code> is executed, MagicObject will also validate <code>$producer</code>. The <code>@Valid</code> annotation is processed first, and if it's found, other validation annotations won't be processed.</p>
 <p>The <code>validate</code> method has 3 parameters, as follows:</p>
 <ol>
 <li>string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).</li>
@@ -2129,7 +2139,23 @@ catch(Exception $e)
     'length' =&gt; "Field '\${property}' must be between \${min} and \${max} characters",
     'range' =&gt; "Value for field '\${property}' must be between \${min} and \${max}",
     'noHtml' =&gt; "Field '\${property}' contains HTML tags and must be removed",
+    'positive' =&gt; "Field '\${property}' must be a positive number",
+    'positiveOrZero' =&gt; "Field '\${property}' must be zero or a positive number",
+    'negative' =&gt; "Field '\${property}' must be a negative number",
+    'negativeOrZero' =&gt; "Field '\${property}' must be zero or a negative number",
+    'pastOrPresent' =&gt; "Date for field '\${property}' must be in the past or present",
+    'url' =&gt; "Field '\${property}' must be a valid URL",
+    'ip' =&gt; "Field '\${property}' must be a valid IP address",
+    'dateFormat' =&gt; "Field '\${property}' must match the date format '\${format}'",
+    'phone' =&gt; "Field '\${property}' must be a valid phone number",
     'enum' =&gt; "Field '\${property}' has an invalid value. Allowed values: \${allowedValues}.",
+    'alpha' =&gt; "Field '\${property}' must contain only alphabetic characters",
+    'alphaNumeric' =&gt; "Field '\${property}' must contain only alphanumeric characters",
+    'startsWith' =&gt; "Field '\${property}' must start with '\${prefix}'",
+    'endsWith' =&gt; "Field '\${property}' must end with '\${suffix}'",
+    'contains' =&gt; "Field '\${property}' must contain '\${substring}'",
+    'beforeDate' =&gt; "Field '\${property}' must be before '\${date}'",
+    'afterDate' =&gt; "Field '\${property}' must be after '\${date}'",
 );</code></pre>
 <p>This template can be saved in localization so that it can be translated into various languages. Please note that the %s and %d formatters must match the example above. If the format is wrong, the validation message cannot be generated correctly.</p>
 </article>
@@ -3272,6 +3298,13 @@ echo $albumDto;</code></pre>
 <li><strong>@DateFormat</strong>: Ensures a string matches a specific date format.</li>
 <li><strong>@Phone</strong>: Ensures a string is a valid phone number.</li>
 <li><strong>@NoHtml</strong>: Checks if a string property contains any HTML tags.</li>
+<li><strong>@Alpha</strong>: Ensures a string contains only alphabetic characters.  </li>
+<li><strong>@AlphaNumeric</strong>: Ensures a string contains only alphanumeric characters.  </li>
+<li><strong>@StartsWith</strong>: Ensures a string starts with a specified prefix.  </li>
+<li><strong>@EndsWith</strong>: Ensures a string ends with a specified suffix.  </li>
+<li><strong>@Contains</strong>: Ensures a string contains a specified substring.  </li>
+<li><strong>@BeforeDate</strong>: Ensures a date is before a specified date.  </li>
+<li><strong>@AfterDate</strong>: Ensures a date is after a specified date.  </li>
 </ul>
 <h5>Date &amp; Time</h5>
 <ul>

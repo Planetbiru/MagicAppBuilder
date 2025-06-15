@@ -8,7 +8,7 @@ use MagicObject\Request\InputServer;
 use MagicObject\SecretObject;
 use MagicObject\Util\PicoStringUtil;
 
-class PicoModule
+class PicoModule // NOSONAR
 {
     const HEADER_LOCATION = "Location: ";
 
@@ -74,6 +74,34 @@ class PicoModule
      * @var AppModule|mixed
      */
     private $appModule;
+
+    /**
+     * Error message for the module.
+     *
+     * @var string|null
+     */
+    protected $errorMessage = null;
+
+    /**
+     * Property field has invalid data.
+     *
+     * @var string|null
+     */
+    protected $errorField = null;
+
+    /**
+     * Current action being performed by the module.
+     *
+     * @var string|null
+     */
+    protected $currentAction = null;
+
+    /**
+     * Form data for the module.
+     *
+     * @var array
+     */
+    protected $formData = array();
 
     /**
      * Constructor for the PicoModule class.
@@ -320,5 +348,137 @@ class PicoModule
     public function getTargetDirectory()
     {
         return $this->targetDirectory;
+    }
+
+    /**
+     * Get error message for the module.
+     *
+     * @return string|null Error message or null if none.
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * Set error message for the module.
+     *
+     * @param string|null $errorMessage Error message to set.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+
+        return $this;
+    }
+
+    /**
+     * Get field that has invalid data.
+     *
+     * @return string|null Field name with invalid data, or null if none.
+     */
+    public function getErrorField()
+    {
+        return $this->errorField;
+    }
+
+    /**
+     * Set field that has invalid data.
+     *
+     * @param string|null $errorField Field name with invalid data.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setErrorField($errorField)
+    {
+        $this->errorField = $errorField;
+
+        return $this;
+    }
+
+    /**
+     * Check if there is a field with invalid data.
+     *
+     * @return bool True if there is an error field, false otherwise.
+     */
+    public function hasErrorField()
+    {
+        return !empty($this->errorField);
+    }
+
+    /**
+     * Get current action being performed by the module.
+     *
+     * @return string|null Current action or null if none.
+     */
+    public function getCurrentAction()
+    {
+        return $this->currentAction;
+    }
+
+    /**
+     * Set current action being performed by the module.
+     *
+     * @param string|null $currentAction Current action to set.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCurrentAction($currentAction)
+    {
+        $this->currentAction = $currentAction;
+
+        return $this;
+    }
+
+    /**
+     * Get form data for the module.
+     *
+     * @return array Form data array.
+     */
+    public function getFormData()
+    {
+        return $this->formData;
+    }
+
+    /**
+     * Set form data for the module.
+     *
+     * @param array $formData Form data to set.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setFormData($formData)
+    {
+        $this->formData = $formData;
+
+        return $this;
+    }
+
+    /**
+     * Outputs JavaScript to restore and highlight form data in the browser.
+     *
+     * This method generates a `<script>` block that invokes the JavaScript function `restoreFormData`,
+     * passing the given form data, error field, and form selector. It is typically used after form
+     * submission fails validation on the server side, allowing the form to be repopulated and the
+     * specific field with an error to be visually indicated.
+     *
+     * Example output:
+     * ```html
+     * <script type='text/javascript'>
+     * restoreFormData({...}, 'fieldName', '#form-id');
+     * </script>
+     * ```
+     *
+     * @param array  $formData    An associative array of field values to restore.
+     * @param string $errorField  The name of the field that failed validation (to be highlighted).
+     * @param string $formSelector A CSS selector (e.g., `#form-id`) used to locate the form in the DOM.
+     *
+     * @return self Returns the current instance to allow method chaining.
+     */
+
+    public function restoreFormData($formData, $errorField, $formSelector)
+    {
+        echo "<script type='text/javascript'>\n";
+        echo "restoreFormData(" . json_encode($formData) . ", '$errorField', '$formSelector');\n";
+        echo "</script>\n";
+        return $this;
     }
 }

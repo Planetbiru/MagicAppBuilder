@@ -7,16 +7,23 @@ use MagicObject\Exceptions\DatabaseConversionException;
 /**
  * Class PicoDatabaseConverter
  *
- * This class is responsible for translating database query structures between different SQL dialects.
- * It takes SQL queries written in one dialect (e.g., MySQL) and converts them into another dialect (e.g., PostgreSQL, SQLite).
- * The class handles differences in syntax, keywords, functions, and other database-specific features.
+ * This class provides robust conversion utilities for translating SQL table structures
+ * and queries between different SQL dialects: MySQL, PostgreSQL, and SQLite.
  *
- * Key functionalities of this class include:
- * - Translating data types between different SQL flavors.
- * - Adjusting query syntax to match the conventions of different database systems.
- * - Converting SQL-specific expressions like `AUTO_INCREMENT` to equivalent expressions in other databases.
+ * Key functionalities:
+ * - Converts CREATE TABLE statements between MySQL, PostgreSQL, and SQLite, including:
+ *   - Data type mapping and normalization
+ *   - Identifier quoting and syntax adaptation
+ *   - Handling of constraints, keys, and auto-increment fields
+ *   - Keyword and function normalization
+ * - Supports round-trip conversion (e.g., MySQL → PostgreSQL → MySQL)
+ * - Can parse and split SQL column/constraint definitions, respecting nested parentheses
+ * - Provides type translation utilities for mapping field types between dialects
+ * - Offers value quoting, escaping, and PHP type conversion helpers for SQL literals
+ * - Enables migration and data-dump scenarios between different RDBMS platforms
  *
- * This class is typically used when migrating databases or working with systems that need to support multiple database engines.
+ * This class is typically used for database migration, schema portability, and
+ * interoperability between different database engines, without requiring entity definitions.
  *
  * @package MagicObject\Util\Database
  */
@@ -81,7 +88,7 @@ class PicoDatabaseConverter // NOSONAR
      *
      * @return void
      */
-    public function initTypes()
+    public function initTypes() // NOSONAR
     {
         $this->dbToSqlite = [
             "tinyint(1)" => "BOOLEAN", // NOSONAR
@@ -460,8 +467,8 @@ class PicoDatabaseConverter // NOSONAR
 
             default:
                 // Fallback: treat as string
-                $result = (string) $value;
-                return $this->quoteString($result);
+                $result = (string) $value; // NOSONAR
+                return $this->quoteString($result); // quote and escape the string
         }
     }
 
@@ -724,7 +731,6 @@ class PicoDatabaseConverter // NOSONAR
         }
 
         $columnsSection = substr($sql, $startPos + 1, $i - $startPos - 2);
-        $tableOptions = trim(substr($sql, $i));
 
         // Parse lines manually to preserve commas inside data types or defaults
         $lines = preg_split('/,(?![^\(\)]*\))/', $columnsSection);
@@ -760,12 +766,12 @@ class PicoDatabaseConverter // NOSONAR
                 // Handle BOOLEAN (tinyint(1))
                 if (preg_match('/tinyint\s*\(\s*1\s*\)/i', $columnType)) {
                     $translatedType = 'BOOLEAN';
-                    $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT TRUE', $columnDefinition);
-                    $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT FALSE', $columnDefinition);
+                    $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT TRUE', $columnDefinition); // NOSONAR
+                    $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT FALSE', $columnDefinition); // NOSONAR
                 }
 
                 // Remove MySQL-specific ON UPDATE
-                if (stripos($columnDefinition, 'ON UPDATE CURRENT_TIMESTAMP') !== false) {
+                if (stripos($columnDefinition, 'ON UPDATE CURRENT_TIMESTAMP') !== false) /* NOSONAR */ {
                     $columnDefinition = str_ireplace('ON UPDATE CURRENT_TIMESTAMP', '', $columnDefinition);
                 }
 
@@ -780,7 +786,7 @@ class PicoDatabaseConverter // NOSONAR
             elseif (preg_match('/^(PRIMARY KEY|UNIQUE KEY)\s*`?([^`]+)?`?\s*\((.+)\)/i', $line, $keyMatches)) {
                 $keyType = strtoupper($keyMatches[1]);
                 $keyName = $keyMatches[2];
-                $keyColumns = preg_replace('/`([^`]+)`/', '"$1"', $keyMatches[3]);
+                $keyColumns = preg_replace('/`([^`]+)`/', '"$1"', $keyMatches[3]); // NOSONAR
 
                 if ($keyType === 'PRIMARY KEY') {
                     $tableConstraints[] = 'PRIMARY KEY (' . $keyColumns . ')';
@@ -801,13 +807,13 @@ class PicoDatabaseConverter // NOSONAR
             $newLines = array_merge($newLines, $tableConstraints);
         }
 
-        $finalSql = "CREATE TABLE " . $ifNotExists . $tableName . " (\n    " . implode(",\n    ", $newLines) . "\n)";
+        $finalSql = "CREATE TABLE " . $ifNotExists . $tableName . " (\n    " . implode(",\n    ", $newLines) . "\n)"; // NOSONAR
 
         // Clean up MySQL table options
-        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql);
+        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // NOSONAR
 
         $finalSql = str_replace('`', '"', $finalSql); // Convert backticks to double quotes for PostgreSQL
         $finalSql = str_replace('"PRIMARY" KEY', 'PRIMARY KEY', $finalSql); // Fix PostgreSQL's PRIMARY KEY quoting
@@ -839,7 +845,7 @@ class PicoDatabaseConverter // NOSONAR
      * @return string The translated SQLite CREATE TABLE statement.
      * @throws DatabaseConversionException If the SQL format is invalid.
      */
-    public function mysqlToSQLite($sql)
+    public function mysqlToSQLite($sql) // NOSONAR
     {
         $sql = trim($sql);
 
@@ -857,8 +863,14 @@ class PicoDatabaseConverter // NOSONAR
         $i = $startPos + 1;
         $len = strlen($sql);
         while ($i < $len && $depth > 0) {
-            if ($sql[$i] === '(') $depth++;
-            elseif ($sql[$i] === ')') $depth--;
+            if ($sql[$i] === '(') 
+            {
+                $depth++;
+            }
+            elseif ($sql[$i] === ')') 
+            {
+                $depth--;
+            }
             $i++;
         }
 
@@ -867,7 +879,6 @@ class PicoDatabaseConverter // NOSONAR
         }
 
         $columnsSection = substr($sql, $startPos + 1, $i - $startPos - 2);
-        $tableOptions = trim(substr($sql, $i));
         $lines = preg_split('/,(?![^\(]*\))/m', $columnsSection);
 
         $newLines = [];
@@ -875,10 +886,13 @@ class PicoDatabaseConverter // NOSONAR
 
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line === '') continue;
+            if ($line === '') 
+            {
+                continue;
+            }
 
             // Column definition
-            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_\(\)]+)(.*)$/i', $line, $colMatches)) {
+            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_\(\)]+)(.*)$/i', $line, $colMatches)) /* NOSONAR */ {
                 $columnName = $this->quoteIdentifier($colMatches[1], 'sqlite');
                 $columnType = strtolower(trim($colMatches[2]));
                 $columnDefinition = trim($colMatches[3]);
@@ -939,10 +953,10 @@ class PicoDatabaseConverter // NOSONAR
         $finalSql = "CREATE TABLE " . $ifNotExists . $tableName . " (\n    " . implode(",\n    ", $newLines) . "\n)";
 
         // Bersihkan ENGINE, CHARSET, COLLATE, COMMENT
-        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql);
+        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
+        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // NOSONAR
 
         $finalSql = str_replace('"PRIMARY" KEY', 'PRIMARY KEY', $finalSql); // Fix PostgreSQL's PRIMARY KEY quoting
         $finalSql = str_replace('"UNIQUE" KEY', 'UNIQUE', $finalSql); // Fix PostgreSQL's UNIQUE KEY quoting
@@ -1068,7 +1082,7 @@ class PicoDatabaseConverter // NOSONAR
             // Table-level PRIMARY KEY
             elseif (preg_match('/^PRIMARY KEY\s*\((.*?)\)/i', $line, $pkMatch)) {
                 $keyColumns = trim($pkMatch[1]);
-                $keyColumns = preg_replace_callback('/"([^"]+)"/', function ($m) {
+                $keyColumns = preg_replace_callback('/"([^"]+)"/', function ($m) /* NOSONAR */ {
                     return $this->quoteIdentifier($m[1], 'mysql');
                 }, $keyColumns);
                 $primaryKeys = array_merge($primaryKeys, array_map(function($v) {
@@ -1167,7 +1181,7 @@ class PicoDatabaseConverter // NOSONAR
      * @return string The translated MySQL CREATE TABLE statement.
      * @throws DatabaseConversionException If the SQL format is invalid.
      */
-    public function sqliteToMySQL($sql)
+    public function sqliteToMySQL($sql) // NOSONAR
     {
         $sql = trim($sql);
         $sql = preg_replace('/\s+/', ' ', $sql); // Normalize spaces
@@ -1195,10 +1209,13 @@ class PicoDatabaseConverter // NOSONAR
 
         foreach ($lines as $line) {
             $line = trim($line);
-            if (empty($line)) continue;
+            if (empty($line)) 
+            {
+                continue; // Skip empty lines
+            }
 
             // Column definition
-            if (preg_match('/^("?)([^"\s]+)\1\s+([a-zA-Z0-9_()]+)(.*)$/i', $line, $colMatches)) {
+            if (preg_match('/^("?)([^"\s]+)\1\s+([a-zA-Z0-9_()]+)(.*)$/i', $line, $colMatches)) /* NOSONAR */ {
                 $columnRaw = $colMatches[2];
                 $columnName = $this->quoteIdentifier($columnRaw, 'mysql');
                 $columnType = strtolower(trim($colMatches[3]));
@@ -1271,7 +1288,7 @@ class PicoDatabaseConverter // NOSONAR
         $finalSql = "CREATE TABLE " . $ifNotExists . $tableName . " (\n    " . implode("\n    ", $newLines) . "\n)";
         $finalSql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-        $finalSql = preg_replace('/`PRIMARY` KEY/i', 'PRIMARY KEY', $finalSql);
+        $finalSql = preg_replace('/`PRIMARY` KEY/i', 'PRIMARY KEY', $finalSql); // NOSONAR
         $finalSql = str_replace('"', '`', $finalSql);
 
         return $this->fixLine(trim($finalSql));
@@ -1345,9 +1362,8 @@ class PicoDatabaseConverter // NOSONAR
      * @return string The translated CREATE TABLE statement.
      * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
      */
-    public function translateCreateTable($sql, $sourceDialect, $targetDialect)
+    public function translateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
     {
-        //$sql = $this->normalizeCreateTableSql($sql);
         $sourceDialect = $this->normalizeDialect($sourceDialect);
         $targetDialect = $this->normalizeDialect($targetDialect);
 

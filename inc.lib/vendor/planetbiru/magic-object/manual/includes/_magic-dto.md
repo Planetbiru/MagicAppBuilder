@@ -593,6 +593,13 @@ MagicDto supports property validation using annotations, ensuring that data load
 - **@DateFormat**: Ensures a string matches a specific date format.
 - **@Phone**: Ensures a string is a valid phone number.
 - **@NoHtml**: Checks if a string property contains any HTML tags.
+- **@Alpha**: Ensures a string contains only alphabetic characters.  
+- **@AlphaNumeric**: Ensures a string contains only alphanumeric characters.  
+- **@StartsWith**: Ensures a string starts with a specified prefix.  
+- **@EndsWith**: Ensures a string ends with a specified suffix.  
+- **@Contains**: Ensures a string contains a specified substring.  
+- **@BeforeDate**: Ensures a date is before a specified date.  
+- **@AfterDate**: Ensures a date is after a specified date.  
 
 ##### Date & Time
 - **@Past**: Ensures a property represents a date/time in the past.

@@ -39,6 +39,15 @@ The following validation annotations are now supported, grouped by their functio
 -   **`@Future(message="...")`**: Ensures a `DateTimeInterface` property represents a date/time in the future.
 -   **`@PastOrPresent(message="...")`**: Ensures a date/time is in the past or present.
 -   **`@FutureOrPresent(message="...")`**: Ensures a `DateTimeInterface` property represents a date/time in the future or the present.
+-   **`@BeforeDate(date="...", message="...")`**: Ensures a date is before a specified date.
+-   **`@AfterDate(date="...", message="...")`**: Ensures a date is after a specified date.
+
+### String Content & Structure
+-   **`@Alpha(message="...")`**: Ensures a string contains only alphabetic characters.
+-   **`@AlphaNumeric(message="...")`**: Ensures a string contains only alphanumeric characters.
+-   **`@StartsWith(prefix="...", caseSensitive=true|false, message="...")`**: Ensures a string starts with a specified prefix, with optional case sensitivity.
+-   **`@EndsWith(suffix="...", caseSensitive=true|false, message="...")`**: Ensures a string ends with a specified suffix, with optional case sensitivity.
+-   **`@Contains(substring="...", caseSensitive=true|false, message="...")`**: Ensures a string contains a specified substring, with optional case sensitivity.
 
 ### Boolean
 -   **`@AssertTrue(message="...")`**: Asserts that a boolean property's value is strictly `true`.
@@ -872,7 +881,7 @@ catch(Exception $e)
 }
 ```
 
-In the example above, `$producer` isn't validated because its value isn't set via input. The value that _is_ validated is `$producerId`, which refers to `producer_id` in the `producer` table. The **`@Valid` annotation** will validate the properties of the `$producer` object (an instance of the `Producer` class) by referencing the `ProducerValidator` class. When either `$album->validate(null, null, new AlbumValidatorForInsert())` or `$album->validate(null, null, new AlbumValidatorForUpdate())` is executed, MagicObject will also validate `$producer`. The `@Valid` annotation is processed first, and if it's found, other validation annotations won't be processed.
+In the example above, `$producer` isn't validated because its value isn't set via input. The value that _is_ validated is `$producerId`, which refers to `producer_id` in the `producer` table. The **`@Valid annotation`** will validate the properties of the `$producer` object (an instance of the `Producer` class) by referencing the `ProducerValidator` class. When either `$album->validate(null, null, new AlbumValidatorForInsert())` or `$album->validate(null, null, new AlbumValidatorForUpdate())` is executed, MagicObject will also validate `$producer`. The `@Valid` annotation is processed first, and if it's found, other validation annotations won't be processed.
 
 
 The `validate` method has 3 parameters, as follows:
@@ -902,7 +911,23 @@ $messageTemplate = array(
     'length' => "Field '\${property}' must be between \${min} and \${max} characters",
     'range' => "Value for field '\${property}' must be between \${min} and \${max}",
     'noHtml' => "Field '\${property}' contains HTML tags and must be removed",
+    'positive' => "Field '\${property}' must be a positive number",
+    'positiveOrZero' => "Field '\${property}' must be zero or a positive number",
+    'negative' => "Field '\${property}' must be a negative number",
+    'negativeOrZero' => "Field '\${property}' must be zero or a negative number",
+    'pastOrPresent' => "Date for field '\${property}' must be in the past or present",
+    'url' => "Field '\${property}' must be a valid URL",
+    'ip' => "Field '\${property}' must be a valid IP address",
+    'dateFormat' => "Field '\${property}' must match the date format '\${format}'",
+    'phone' => "Field '\${property}' must be a valid phone number",
     'enum' => "Field '\${property}' has an invalid value. Allowed values: \${allowedValues}.",
+    'alpha' => "Field '\${property}' must contain only alphabetic characters",
+    'alphaNumeric' => "Field '\${property}' must contain only alphanumeric characters",
+    'startsWith' => "Field '\${property}' must start with '\${prefix}'",
+    'endsWith' => "Field '\${property}' must end with '\${suffix}'",
+    'contains' => "Field '\${property}' must contain '\${substring}'",
+    'beforeDate' => "Field '\${property}' must be before '\${date}'",
+    'afterDate' => "Field '\${property}' must be after '\${date}'",
 );
 ```
 

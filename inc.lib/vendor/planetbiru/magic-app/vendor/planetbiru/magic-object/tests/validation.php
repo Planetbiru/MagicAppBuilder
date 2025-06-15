@@ -111,7 +111,7 @@ class RegistrationValidator extends MagicObject
     protected $age;
 
     /**
-     * @Enum(allowedValues={"male", "female", "other"})
+     * @Enum(allowedValues={"male", "female", "other"}, message=" ")
      * @var string
      */
     protected $gender;

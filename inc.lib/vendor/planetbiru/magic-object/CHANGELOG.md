@@ -595,7 +595,21 @@ try {
 
 ### Table Structure Conversion Support
 
-Added support for converting table structures between **MySQL**, **PostgreSQL**, and **SQLite**. This feature is especially useful for database **migration** scenarios where compatibility and portability are required across different RDBMS platforms.
+MagicObject 3.14 introduces a robust SQL dialect conversion utility, powered by the `PicoDatabaseConverter` class, for seamless translation of table structures between **MySQL**, **PostgreSQL**, and **SQLite**.
+
+**Key features of the conversion utility:**
+- Converts `CREATE TABLE` statements between MySQL, PostgreSQL, and SQLite, including:
+    - Data type mapping and normalization
+    - Identifier quoting and syntax adaptation
+    - Handling of constraints, keys, and auto-increment fields
+    - Keyword and function normalization
+- Supports round-trip conversion (e.g., MySQL → PostgreSQL → MySQL)
+- Can parse and split SQL column/constraint definitions, respecting nested parentheses
+- Provides type translation utilities for mapping field types between dialects
+- Offers value quoting, escaping, and PHP type conversion helpers for SQL literals
+- Enables migration and data-dump scenarios between different RDBMS platforms
+
+This class is typically used for database migration, schema portability, and interoperability between different database engines, without requiring entity definitions.
 
 Developers can now easily transform `CREATE TABLE` statements from one dialect to another with proper handling of:
 
@@ -604,17 +618,6 @@ Developers can now easily transform `CREATE TABLE` statements from one dialect t
 -   Keyword and syntax normalization
 
 Table structure conversion can be performed without the need to create entities beforehand. In addition to converting table structures, MagicObject version 3.14 also provides tools to dump data from one database to another DBMS.
-
-Developers can now easily transform `CREATE TABLE` statements from one dialect to another with proper handling of:
-
--   Data type conversion
-    
--   Identifier quoting
-    
--   Keyword and syntax normalization
-    
-Table structure conversion can be performed without the need to create entities beforehand.
-In addition to converting table structures, MagicObject version 3.14 also provides tools to dump data from one database to another DBMS.
 
 #### Example Use Case
 
@@ -725,6 +728,8 @@ The following validation annotations are now supported, grouped by their functio
 -   **`@Future(message="...")`**: Ensures a `DateTimeInterface` property represents a date/time in the future.
 -   **`@PastOrPresent(message="...")`**: Ensures a date/time is in the past or present.
 -   **`@FutureOrPresent(message="...")`**: Ensures a `DateTimeInterface` property represents a date/time in the future or the present.
+-   **`@BeforeDate(date="...", message="...")`**: Ensures a date is before a specified date.
+-   **`@AfterDate(date="...", message="...")`**: Ensures a date is after a specified date.
 
 #### Boolean
 -   **`@AssertTrue(message="...")`**: Asserts that a boolean property's value is strictly `true`.
@@ -732,8 +737,15 @@ The following validation annotations are now supported, grouped by their functio
 #### Enum & Allowed Values
 -   **`@Enum(message="...", allowedValues={...}, caseSensitive=true|false)`**: Ensures a string property's value is one of a predefined set of allowed values, with an option for case-sensitive or case-insensitive comparison.
 
+#### String Content & Structure
+-   **`@Alpha(message="...")`**: Ensures a string contains only alphabetic characters.
+-   **`@AlphaNumeric(message="...")`**: Ensures a string contains only alphanumeric characters.
+-   **`@StartsWith(prefix="...", caseSensitive=true|false, message="...")`**: Ensures a string starts with a specified prefix, with optional case sensitivity.
+-   **`@EndsWith(suffix="...", caseSensitive=true|false, message="...")`**: Ensures a string ends with a specified suffix, with optional case sensitivity.
+-   **`@Contains(substring="...", caseSensitive=true|false, message="...")`**: Ensures a string contains a specified substring, with optional case sensitivity.
+
 #### Nested Validation
--   **`@Valid`**: Recursively validates nested `MagicObject` instances.
+-   **`@Valid`**: Recursively validates nested `MagicObject` and `MagicDto` instances.
 
 **Class `UserProfile`**
 
