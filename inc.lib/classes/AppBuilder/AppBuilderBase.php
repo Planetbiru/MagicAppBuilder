@@ -181,7 +181,7 @@ class AppBuilderBase //NOSONAR
     /**
      * Validator information
      *
-     * @var stdClass
+     * @var AppValidatorInfo
      */
     protected $validatorInfo;
 
@@ -677,6 +677,29 @@ class AppBuilderBase //NOSONAR
 
         $objectName = lcfirst($entityName);
         $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
+        $phpCode = <<<HTML
+        <?php
+        if(\$currentModule->hasErrorField())
+        {
+        ?>
+        <div class="alert alert-error"><?php echo \$currentModule->getErrorMessage(); ?></div>
+        <?php
+            \$currentModule->restoreFormData(\$currentModule->getFormData(), \$currentModule->getErrorField(), '#createform');
+        }
+        ?>
+        HTML;
+
+        $fragment = $dom->createDocumentFragment();
+        $fragment->appendXML("<div>{$phpCode}</div>"); // Bungkus dalam elemen sementara agar bisa diproses
+
+        $container = $fragment->firstChild;
+        while ($container->firstChild) {
+            $dom->appendChild($container->firstChild);
+        }
+
         
         $form = $this->createElementForm($dom, 'createform');
         if(AppBuilderBase::hasInputFile($fields))
@@ -733,6 +756,26 @@ class AppBuilderBase //NOSONAR
 
         $objectName = lcfirst($entityName);
         $dom = new DOMDocument();
+
+        $phpCode = <<<HTML
+        <?php
+        if(\$currentModule->hasErrorField())
+        {
+        ?>
+        <div class="alert alert-error"><?php echo \$currentModule->getErrorMessage(); ?></div>
+        <?php
+            \$currentModule->restoreFormData(\$currentModule->getFormData(), \$currentModule->getErrorField(), '#updateform');
+        }
+        ?>
+        HTML;
+
+        $fragment = $dom->createDocumentFragment();
+        $fragment->appendXML("<div>{$phpCode}</div>"); // Bungkus dalam elemen sementara agar bisa diproses
+
+        $container = $fragment->firstChild;
+        while ($container->firstChild) {
+            $dom->appendChild($container->firstChild);
+        }
         
         $form = $this->createElementForm($dom, 'updateform');
         if(AppBuilderBase::hasInputFile($fields))
@@ -5672,7 +5715,7 @@ $subqueryMap = '.$referece.';
     /**
      * Set validation info
      *
-     * @param stdClass $validatorInfo
+     * @param ValidatorInfo $validatorInfo
      * @return self
      */
     public function setValidatiorInfo($validatorInfo)

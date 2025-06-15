@@ -716,21 +716,29 @@ class ' . $className . ' extends MagicObject
     }
 
     /**
-     * Generate validator class string with annotated properties.
+     * Generates a PHP validator class string with annotated properties.
      *
-     * This method builds a PHP class definition as a string for a validator class. Each property in the
-     * class corresponds to a field defined in the validation definition and is annotated with validation
-     * rules and data type information.
+     * This method constructs a PHP class definition as a string. The generated class extends
+     * `MagicObject` and contains properties corresponding to fields defined in the validation
+     * definition. Each property is annotated with relevant validation rules and data type
+     * information.
      *
-     * @param string $namespace              The namespace of the class to be generated.
-     * @param string $className              The name of the class to be generated.
-     * @param string $moduleCode             The module code
-     * @param array $validationDefinition    An array of field validation definitions (usually decoded from JSON).
-     * @param string $applyKey               The key to determine if a rule should be applied (either 'applyInsert' or 'applyUpdate').
+     * The generated class includes:
+     * - Namespace declaration
+     * - PHPDoc block summarizing validated properties
+     * - Validation annotations (Required, Min, etc.)
+     * - Proper data type hinting for each property
      *
-     * @return string                        Returns a string containing the PHP class definition with annotated properties.
+     * @param string $namespace             The PHP namespace where the validator class belongs.
+     * @param string $className             The base name of the class to be generated.
+     * @param string $moduleCode            The code name of the module this validator is for.
+     * @param array  $validationDefinition  An array of field definitions, each containing field name, type, and validation rules.
+     * @param string $applyKey              Determines which rules to apply, usually 'applyInsert' or 'applyUpdate'.
+     *
+     * @return string Returns the full PHP source code of the generated class as a string.
      */
-    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey)
+
+    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey) // NOSONAR
     {
         $properties = array();
 
@@ -792,13 +800,34 @@ class ' . $className . ' extends MagicObject
         foreach ($properties as $propertyName => $annotations) {
             $types = array();
             foreach ($annotations as $annotation) {
-                // Extract type name from first line of annotation (e.g., * @Required(...) => Required)
-                if (preg_match('/\*\s+@(\w+)/', $annotation, $matches)) {
-                    $types[] = $matches[1];
+                if (preg_match('/\*\s+@(\w+)\((.*)\)/', $annotation, $matches)) {
+                    $type = $matches[1];
+                    $rawAttributes = $matches[2];
+                    $attrList = [];
+
+                    // Parse attributes
+                    preg_match_all('/(\w+)\s*=\s*(?:"([^"]*)"|([^,]+))/', $rawAttributes, $attrMatches, PREG_SET_ORDER);
+                    foreach ($attrMatches as $attr) {
+                        $key = $attr[1];
+                        $attr3 = isset($attr[3]) ? $attr[3] : '';
+                        $rawValue = isset($attr[2]) && $attr[2] !== '' ? $attr[2] : $attr3;
+
+                        if (is_numeric($rawValue)) {
+                            $value = $rawValue; // keep numeric as-is
+                        } else {
+                            $value = '"' . $rawValue . '"'; // wrap string with double quotes
+                        }
+
+                        if ($value !== "" && $value != '""') {
+                            $attrList[] = "$key=$value";
+                        }
+                    }
+
+                    $types[] = $type . (!empty($attrList) ? '(' . implode(', ', $attrList) . ')' : '');
                 }
             }
             $uniqueTypes = array_unique($types);
-            $output .= " * $no. **`\$$propertyName`** (" . implode(', ', $uniqueTypes) . ")\r\n";
+            $output .= " * $no. **`\$$propertyName`** ( " . implode(', ', $uniqueTypes) . " )\r\n";
             $no++;
         }
         $output .= " * \r\n * @package $namespace\r\n";

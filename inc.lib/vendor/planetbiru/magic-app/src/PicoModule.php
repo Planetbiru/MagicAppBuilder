@@ -453,20 +453,31 @@ class PicoModule // NOSONAR
     }
 
     /**
-     * Outputs JavaScript to restore form data on the client side.
+     * Outputs JavaScript to restore and highlight form data in the browser.
      *
-     * This method prints a script tag that calls the JavaScript function `restoreFormData`
-     * with the provided form data as a JSON object and highlights the specified error field.
-     * It is typically used to repopulate form fields and indicate which field had a validation error.
+     * This method generates a `<script>` block that invokes the JavaScript function `restoreFormData`,
+     * passing the given form data, error field, and form selector. It is typically used after form
+     * submission fails validation on the server side, allowing the form to be repopulated and the
+     * specific field with an error to be visually indicated.
      *
-     * @param array $formData The form data to restore on the client side.
-     * @param string $errorField The field that had an error, used to highlight it.
-     * @return self Returns the current instance for method chaining.
+     * Example output:
+     * ```html
+     * <script type='text/javascript'>
+     * restoreFormData({...}, 'fieldName', '#form-id');
+     * </script>
+     * ```
+     *
+     * @param array  $formData    An associative array of field values to restore.
+     * @param string $errorField  The name of the field that failed validation (to be highlighted).
+     * @param string $formSelector A CSS selector (e.g., `#form-id`) used to locate the form in the DOM.
+     *
+     * @return self Returns the current instance to allow method chaining.
      */
-    public function restoreFormData($formData, $errorField)
+
+    public function restoreFormData($formData, $errorField, $formSelector)
     {
         echo "<script type='text/javascript'>\n";
-        echo "restoreFormData(" . json_encode($formData) . ", '".$errorField."');\n";
+        echo "restoreFormData(" . json_encode($formData) . ", '$errorField', '$formSelector');\n";
         echo "</script>\n";
         return $this;
     }

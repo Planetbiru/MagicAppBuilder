@@ -21173,24 +21173,32 @@ Optionally, it can prettify property names for human readability.</p>
 ) : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Generate validator class string with annotated properties.</p>
-<p>This method builds a PHP class definition as a string for a validator class. Each property in the
-class corresponds to a field defined in the validation definition and is annotated with validation
-rules and data type information.</p>
+<p>Generates a PHP validator class string with annotated properties.</p>
+<p>This method constructs a PHP class definition as a string. The generated class extends
+<code>MagicObject</code> and contains properties corresponding to fields defined in the validation
+definition. Each property is annotated with relevant validation rules and data type
+information.</p>
+<p>The generated class includes:</p>
+<ul>
+<li>Namespace declaration</li>
+<li>PHPDoc block summarizing validated properties</li>
+<li>Validation annotations (Required, Min, etc.)</li>
+<li>Proper data type hinting for each property</li>
+</ul>
 <h3>Parameters</h3>
 <div class="parameter-name">$namespace</div>
-<div class="parameter-description"><p>The namespace of the class to be generated.</p></div>
+<div class="parameter-description"><p>The PHP namespace where the validator class belongs.</p></div>
 <div class="parameter-name">$className</div>
-<div class="parameter-description"><p>The name of the class to be generated.</p></div>
+<div class="parameter-description"><p>The base name of the class to be generated.</p></div>
 <div class="parameter-name">$moduleCode</div>
-<div class="parameter-description"><p>The module code</p></div>
+<div class="parameter-description"><p>The code name of the module this validator is for.</p></div>
 <div class="parameter-name">$validationDefinition</div>
-<div class="parameter-description"><p>An array of field validation definitions (usually decoded from JSON).</p></div>
+<div class="parameter-description"><p>An array of field definitions, each containing field name, type, and validation rules.</p></div>
 <div class="parameter-name">$applyKey</div>
-<div class="parameter-description"><p>The key to determine if a rule should be applied (either 'applyInsert' or 'applyUpdate').</p></div>
+<div class="parameter-description"><p>Determines which rules to apply, usually 'applyInsert' or 'applyUpdate'.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>Returns a string containing the PHP class definition with annotated properties.</p></div>
+<div class="return-description"><p>Returns the full PHP source code of the generated class as a string.</p></div>
 </div>
 </div>
 </div>

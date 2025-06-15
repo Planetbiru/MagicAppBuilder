@@ -77,6 +77,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $entityMainName = $entityMain->getEntityName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
+        $validatorRequired = $appFeatures->isValidator();
         $sortOrder = $appFeatures->isSortOrder();    
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
@@ -85,6 +86,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $uses = $this->addUseFromFieldType($uses, $request->getFields());   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
+        $uses = $this->addUseFromValidator($uses, $validatorRequired);
         if(!$appFeatures->isBackendOnly())
         {
             $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);
@@ -186,7 +188,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $deactivationSection = null;
 
         // Generate validator
-        $validationInfo = new stdClass;
+        $validationInfo = new AppValidatorInfo();
         if($appFeatures->isValidator())
         {
             $entityGenerator = new PicoEntityGenerator(null, null, null, null);
@@ -214,7 +216,10 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         if($approvalRequired) {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
-            $appBuilder->setValidatiorInfo($validationInfo);
+            if($appFeatures->isValidator())
+            {
+                $appBuilder->setValidatiorInfo($validationInfo);
+            }
 
             // CRUD
             $createSection = $appBuilder->createInsertApprovalSection($entityMain, $insertFields, $approvalRequired, $entityApproval, $callbackCreateSuccess, $callbackCreateFailed);
@@ -245,6 +250,10 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
+            if($appFeatures->isValidator())
+            {
+                $appBuilder->setValidatiorInfo($validationInfo);
+            }
             
             // CRUD        
             $createSection = $appBuilder->createInsertSection($entityMain, $insertFields, $callbackCreateSuccess, $callbackCreateFailed);
