@@ -88,7 +88,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         if($this->appFeatures->isValidator())
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."());";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."());";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
@@ -215,7 +215,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         if($this->appFeatures->isValidator())
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName."->validate(null, null, new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."());";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."());";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;

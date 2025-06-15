@@ -76,6 +76,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         $entityMainName = $entityMain->getEntityName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
+        $validatorRequired = $appFeatures->isValidator();
         $sortOrder = $appFeatures->isSortOrder();    
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
@@ -84,6 +85,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         $uses = $this->addUseFromFieldType($uses, $request->getFields());   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
+        $uses = $this->addUseFromValidator($uses, $appConf, $validatorRequired);
         if(!$appFeatures->isBackendOnly())
         {
             $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);

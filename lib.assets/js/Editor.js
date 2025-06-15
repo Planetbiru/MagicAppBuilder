@@ -7,6 +7,10 @@ let transEd1 = null;
 let transEd2 = null;
 let transEd3 = null;
 let transEd4 = null;
+
+let transEd5 = null;
+let transEd6 = null;
+
 let currentTab = "";
 let lastLine1 = -1;
 let lastLine2 = -1;
@@ -119,6 +123,20 @@ function clearTtransEd4() {
   }, 1);
 }
 
+function clearTtransEd5() {
+  transEd5.getDoc().setValue('');
+  setTimeout(function () {
+    transEd5.refresh();
+  }, 1);
+}
+
+function clearTtransEd6() {
+  transEd6.getDoc().setValue('');
+  setTimeout(function () {
+    transEd6.refresh();
+  }, 1);
+}
+
 /**
  * Formats the content of all editors using auto-formatting.
  * 
@@ -197,6 +215,12 @@ let initEditor = function () {
     if( currId == 'file-manager-tab') {
       fileManagerEditor.refresh();
     }
+
+    if (currId == 'translate-app-tab') {
+        transEd5.refresh();
+        transEd6.refresh();
+    }
+
     
   });
 
@@ -332,6 +356,29 @@ let initEditor = function () {
     }
   );
 
+  transEd5 = CodeMirror.fromTextArea(
+    document.querySelector('.app-translate-original'),
+    {
+      lineNumbers: true,
+      lineWrapping: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      indentWithTabs: true,
+      readOnly: true
+    }
+  );
+
+  transEd6 = CodeMirror.fromTextArea(
+    document.querySelector('.app-translate-target'),
+    {
+      lineNumbers: true,
+      lineWrapping: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      indentWithTabs: true,
+    }
+  );
+
   transEd3.on('focus', function () {
     focused['transEd3'] = true;
     hilightLine3();
@@ -351,6 +398,27 @@ let initEditor = function () {
       hilightLine4();
     }
   });
+
+  transEd5.on('focus', function () {
+    focused['transEd5'] = true;
+    hilightLine5();
+  });
+  transEd6.on('focus', function () {
+    focused['transEd6'] = true;
+    hilightLine6();
+  });
+  transEd5.on('cursorActivity', function () {
+    if (typeof focused['transEd5'] != 'undefined') {
+      hilightLine5();
+    }
+  });
+
+  transEd6.on('cursorActivity', function () {
+    if (typeof focused['transEd6'] != 'undefined') {
+      hilightLine6();
+    }
+  });
+
 
   let modeModule;
   let specModule;
@@ -483,6 +551,43 @@ function hilightLine4() {
     $('.module-translation-status').text(translationStatus);
   }
 }
+
+function hilightLine5() {
+  let cursor = transEd5.getCursor();
+  let lineNumber = cursor.line;
+
+  transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
+  transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
+
+  transEd5.addLineClass(lineNumber, 'background', 'highlight-line');
+  transEd6.addLineClass(lineNumber, 'background', 'highlight-line');
+
+  lastLine2 = lineNumber;
+
+  let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined;
+  if (translationStatus) {
+    $('.app-translation-status').text(translationStatus);
+  }
+}
+
+function hilightLine6() {
+  let cursor = transEd6.getCursor();
+  let lineNumber = cursor.line;
+
+  transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
+  transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
+
+  transEd5.addLineClass(lineNumber, 'background', 'highlight-line');
+  transEd6.addLineClass(lineNumber, 'background', 'highlight-line');
+
+  lastLine2 = lineNumber;
+
+  let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined;
+  if (translationStatus) {
+    $('.app-translation-status').text(translationStatus);
+  }
+}
+
 
 /**
  * Initializes the CodeMirror editor for the file manager.
