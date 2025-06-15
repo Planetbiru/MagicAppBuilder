@@ -2,15 +2,25 @@
 
 ## History and Introduction
 
+
 Imagine a large application consisting of dozens of modules. Each module includes the following features:
 
 1.  Creation of new data
+    
 2.  Modification of existing data
+    
 3.  Deletion of existing data
+    
 4.  Approval required for creating, modifying, or deleting data
+    
 5.  A rule that the user who approves the creation, modification, or deletion of data must be different from the user who performs the action
-6.  Data export functionality to Microsoft Excel and CSV formats
-7.  Support for multiple languages
+    
+6.  Input validation to ensure data integrity before saving, including automatic rule enforcement and user-friendly error handling
+    
+7.  Data export functionality to Microsoft Excel and CSV formats
+    
+8.  Support for multiple languages
+
 
 This project must be completed within a very short time—less than 3 months.
 
@@ -22,7 +32,7 @@ Why? Because with MagicAppBuilder, a CRUD module—complete with features like f
 
 There’s still plenty of time left afterward to manually fine-tune or edit the program code as needed.
 
-If a single module can be built in just 10 minutes, then in one day, a developer can create at least **20 new CRUD modules**. Within **two weeks**, that same developer could produce **200 standard CRUD modules**, each packed with all the essential features mentioned above.
+Even though theoretically one developer could produce more than 40 modules in a day, in practice, considering the need for testing, breaks, discussion, and quality checks, a more realistic target is **20 modules per day**. With that pace, a developer can build up to **100 CRUD modules in one week** (5 working days), each equipped with all the essential features listed above.
 
 Of course, an application isn’t made up entirely of basic CRUD modules. But at the very least, building those modules shouldn’t consume unnecessary time. The time saved can be far better spent on more demanding tasks such as data processing, report generation, and comprehensive testing.
 
@@ -114,6 +124,32 @@ The system is built with localization in mind. It supports multiple languages, a
 **16. Advanced Data Filters**
 
 The system provides dynamic filters that adapt to the data type, ensuring accurate and efficient data querying based on user-defined criteria.
+
+
+**17. Input Validation**
+
+MagicAppBuilder now features **automatic input validation**, powered by enhancements in **MagicObject version 3.14 and above**. This ensures that all user-submitted data—whether during insert, update, or approval workflows—is strictly validated according to rules defined at the field level.
+
+### Key Capabilities:
+
+-   **Validator Class Generator**: MagicAppBuilder can auto-generate validator classes from entity definitions using field-based annotations like `@Required`, `@Email`, `@Min`, `@Max`, `@ValidEnum`, and many more. These annotations are added per property and aligned with each module's logic for insert and update operations.
+    
+-   **Rule-Based Validation on Insert and Update**: Before any insert or update action is executed, MagicObject automatically runs validation rules on the input. Only data that passes all checks will be persisted to the database.
+    
+-   **Exception Handling for Invalid Data**: If any validation rule fails, an exception is thrown immediately to halt execution. This prevents invalid or malicious data from entering the system.
+    
+-   **Graceful Error Feedback and Form Restoration**: When invalid input is detected, MagicAppBuilder:
+    
+    -   Highlights the specific field(s) that failed validation
+        
+    -   Restores the form with previously entered data
+        
+    -   Displays an appropriate error message
+        
+    -   Allows the user to correct the input without starting over
+        
+-   **JavaScript Integration for Client Feedback**: A helper script (`restoreFormData`) is automatically injected to repopulate form fields and visually indicate the field that caused the validation failure, improving the user experience.
+
 
 ## Using MagicAppBuilder
 
