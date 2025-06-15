@@ -86,7 +86,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $uses = $this->addUseFromFieldType($uses, $request->getFields());   
         $uses = $this->addUseFromApproval($uses, $appConf, $approvalRequired, $entity);
         $uses = $this->addUseFromTrash($uses, $appConf, $trashRequired, $entity);
-        $uses = $this->addUseFromValidator($uses, $validatorRequired);
+        $uses = $this->addUseFromValidator($uses, $appConf, $validatorRequired);
         if(!$appFeatures->isBackendOnly())
         {
             $uses = $this->addUseFromReference($uses, $appConf, $referenceEntitiesUse);

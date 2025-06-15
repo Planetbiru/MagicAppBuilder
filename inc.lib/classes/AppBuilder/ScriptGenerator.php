@@ -189,14 +189,16 @@ class ScriptGenerator //NOSONAR
      * Adds a use statement for the trash entity if trash functionality is required.
      *
      * @param string[] $uses Array of existing use statements.
+     * @param AppSecretObject $appConf Application configuration object.
      * @param boolean $validatorRequired Indicates if trash is required.
      * @return string[] Updated array of use statements.
      */
-    public function addUseFromValidator($uses, $validatorRequired)
+    public function addUseFromValidator($uses, $appConf, $validatorRequired)
     {
         if($validatorRequired) 
         {
             $uses[] = "use MagicObject\\Exceptions\\InvalidValueException;";
+            $uses[] = "use ".str_replace("/", "\\", dirname(dirname($appConf->getBaseEntityDataNamespace())))."\\AppValidatorMessage;";
         }
         return $uses;
     }
