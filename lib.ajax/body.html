@@ -38,6 +38,9 @@
           <button class="nav-link" id="translate-application-tab" data-toggle="tab" data-target="#translate-application" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Module</button>
         </li>
         <li class="nav-item" role="presentation">
+          <button class="nav-link" id="translate-validation-menu-tab" data-toggle="tab" data-target="#translate-validation-menu" type="button" role="tab" aria-controls="config" aria-selected="true">Translate Validation & Menu</button>
+        </li>
+        <li class="nav-item" role="presentation">
           <button class="nav-link" id="file-manager-tab" data-toggle="tab" data-target="#file-manager" type="button" role="tab" aria-controls="config" aria-selected="true">File Manager</button>
         </li>
         <li class="nav-item" role="presentation">
@@ -722,6 +725,7 @@
                   <option value="untranslated">Untranslated</option>
                   <option value="all">All</option>
                 </select>
+                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> Reload</button>
                 <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
               </div>
@@ -763,6 +767,7 @@
                   <option value="untranslated">Untranslated</option>
                   <option value="all">All</option>
                 </select>
+                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> Reload</button>
                 <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
               </div>
@@ -775,6 +780,49 @@
                   <input type="hidden" class="module-property-name" value="">
                   <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
                   <span class="module-translation-status"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="translate-validation-menu" class="tab-pane fade" role="tabpanel" aria-labelledby="translate-validation-menu-tab">
+        <div class="container-translate-app">
+          <div class="row">
+            <div class="col col-2">
+              <div class="form-control-container column-title">
+                <h4>Section</h4>
+              </div>
+              <div class="column-body">
+                <div><button class="btn btn-secondary load-menu-group-translation form-control">Menu Group</button></div>
+                <div><button class="btn btn-secondary load-menu-translation form-control">Menu</button></div>
+                <div><button class="btn btn-secondary load-validation-translation form-control">Validation</button></div>
+              </div>
+            </div>
+            <div class="col col-10">
+              <div class="form-control-container column-title"> 
+                <span>Target Language</span>
+                <select class="form-control target-language" data-translate-for="module">
+                </select>
+                <span>Filter</span>
+                <select class="form-control filter-translate" data-translate-for="module">
+                  <option value="untranslated">Untranslated</option>
+                  <option value="all">All</option>
+                </select>
+                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> Reload</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
+              </div>
+              <div class="column-body">
+                <div class="row">
+                  <div class="col-6"><textarea class="app-translate-original app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                  <div class="col-6"><textarea class="app-translate-target app-code" spellcheck="false" contenteditable="true"></textarea></div>
+                </div>
+                <div class="form-control-container button-area">
+                  <input type="hidden" class="module-property-name" value="">
+                  <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
+                  <span class="app-translation-status"></span>
                 </div>
               </div>
             </div>

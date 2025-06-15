@@ -1625,6 +1625,13 @@ let initAll = function () {
     reloadTranslate(translateFor);
   });
 
+  $(document).on('click', '.reload-entity-translation', function(e){
+    let val = $(this).parent().find('.filter-translate').val();
+    let translateFor = $(this).parent().find('.filter-translate').attr('data-translate-for');
+    $('.filter-translate').val(val);
+    reloadTranslate(translateFor);
+  });
+
   $(document).on('change', '.select-module', function (e) {
     let checked = $(this)[0].checked;
     $(this).closest('.module-group').find('ul li').each(function (e) {
@@ -1644,6 +1651,35 @@ let initAll = function () {
     $(this).closest('table').find('tbody').append(clone);
     fixLanguageForm();
   });
+
+  $(document).on('click', '.load-menu-translation, .load-validation-translation, .load-menu-group-translation', function () {
+    const isMenu = $(this).hasClass('load-menu-translation');
+    const isValidation = $(this).hasClass('load-validation-translation');
+    const isMenuGroup = $(this).hasClass('load-menu-group-translation');
+
+    // Toggle active class for each button
+    $('.load-menu-translation')
+      .toggleClass('btn-primary', isMenu)
+      .toggleClass('btn-secondary', !isMenu);
+
+    $('.load-validation-translation')
+      .toggleClass('btn-primary', isValidation)
+      .toggleClass('btn-secondary', !isValidation);
+
+    $('.load-menu-group-translation')
+      .toggleClass('btn-primary', isMenuGroup)
+      .toggleClass('btn-secondary', !isMenuGroup);
+
+    // Load corresponding translation data
+    if (isMenu) {
+      loadMenuTranslation();
+    } else if (isValidation) {
+      loadValidationTranslation();
+    } else if (isMenuGroup) {
+      loadMenuGroupTranslation();
+    }
+  });
+
 
   $(document).on('click', 'table.language-manager .language-remover', function (e) {
     let count = $(this).closest('tbody').find('tr').length;
@@ -4074,6 +4110,7 @@ function reloadTranslate(translateFor) {
 
 let entityTranslationData = [];
 let moduleTranslationData = [];
+let appTranslationData = [];
 
 /**
  * Translates the specified entity and updates the UI with the results.
@@ -7394,4 +7431,153 @@ function setLanguage(languages) {
  */
 function getReferenceResource() {
   return referenceResource;
+}
+
+
+/**
+ * Loads menu translation data from the server based on the selected target language.
+ *
+ * This function sends an AJAX GET request to 'menu-translate.php' with the selected language ID.
+ * It populates two CodeMirror editors (`transEd5` and `transEd6`) with the original and translated texts.
+ * It also updates the `.module-property-name` element with a list of property names.
+ * Editors are refreshed and any previous line highlights are cleared.
+ *
+ * @returns {void}
+ */
+function loadMenuTranslation()
+{
+  let languageId = $('.container-translate-app .target-language').val();
+  increaseAjaxPending();
+  $.ajax({
+    method: "GET",
+    url: "lib.ajax/menu-translate.php",
+    data: { action: 'get', targetLanguage: languageId },
+    success: function (data) {
+      appTranslationData = data;
+      decreaseAjaxPending();
+
+      $('.module-translation-status').text('');
+      let textOut1 = [];
+      let textOut2 = [];
+      let propertyNames = [];
+      for (let i in data) {
+        textOut1.push(data[i].original);
+        textOut2.push(data[i].translated);
+        propertyNames.push(data[i].propertyName);
+      }
+      transEd5.getDoc().setValue(textOut1.join('\r\n'));
+      transEd6.getDoc().setValue(textOut2.join('\r\n'));
+      setTimeout(() => {
+        transEd5.refresh();
+        transEd6.refresh();
+      }, 50); 
+      $('.module-property-name').val(propertyNames.join('|'));
+      focused = {};
+      transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
+      transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
+      lastLine2 = -1; //NOSONAR
+    },
+    error: function (err) {
+      decreaseAjaxPending();
+    },
+  });
+}
+
+/**
+ * Loads validation translation data from the server based on the selected target language.
+ *
+ * This function sends an AJAX GET request to 'validation-translate.php' with the selected language ID.
+ * It fills two CodeMirror editors (`transEd5` and `transEd6`) with the original and translated validation messages.
+ * The `.module-property-name` field is updated with a pipe-separated list of property names.
+ * Editors are refreshed and any previously highlighted lines are cleared.
+ *
+ * @returns {void}
+ */
+function loadValidationTranslation()
+{
+  let languageId = $('.container-translate-app .target-language').val();
+  increaseAjaxPending();
+  $.ajax({
+    method: "GET",
+    url: "lib.ajax/validation-translate.php",
+    data: { action: 'get', targetLanguage: languageId },
+    success: function (data) {
+      appTranslationData = data;
+      decreaseAjaxPending();
+
+      $('.module-translation-status').text('');
+      let textOut1 = [];
+      let textOut2 = [];
+      let propertyNames = [];
+      for (let i in data) {
+        textOut1.push(data[i].original);
+        textOut2.push(data[i].translated);
+        propertyNames.push(data[i].propertyName);
+      }
+      transEd5.getDoc().setValue(textOut1.join('\r\n'));
+      transEd6.getDoc().setValue(textOut2.join('\r\n'));
+      setTimeout(() => {
+        transEd5.refresh();
+        transEd6.refresh();
+      }, 50); 
+      $('.module-property-name').val(propertyNames.join('|'));
+      focused = {};
+      transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
+      transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
+      lastLine2 = -1; //NOSONAR
+    },
+    error: function (err) {
+      decreaseAjaxPending();
+    },
+  });
+}
+
+
+/**
+ * Loads menu group translation data from the server based on the selected target language.
+ *
+ * Sends an AJAX GET request to 'menu-group-translate.php' and populates the CodeMirror editors
+ * with original and translated strings. It also updates the `.module-property-name` element
+ * with a list of property names and refreshes the editors.
+ *
+ * @function
+ * @returns {void}
+ */
+function loadMenuGroupTranslation()
+{
+  let languageId = $('.container-translate-app .target-language').val();
+  increaseAjaxPending();
+  $.ajax({
+    method: "GET",
+    url: "lib.ajax/menu-group-translate.php",
+    data: { action: 'get', targetLanguage: languageId },
+    success: function (data) {
+      appTranslationData = data;
+      decreaseAjaxPending();
+
+      $('.module-translation-status').text('');
+      let textOut1 = [];
+      let textOut2 = [];
+      let propertyNames = [];
+      for (let i in data) {
+        textOut1.push(data[i].original);
+        textOut2.push(data[i].translated);
+        propertyNames.push(data[i].propertyName);
+      }
+      transEd5.getDoc().setValue(textOut1.join('\r\n'));
+      transEd6.getDoc().setValue(textOut2.join('\r\n'));
+      setTimeout(() => {
+        transEd5.refresh();
+        transEd6.refresh();
+      }, 100); 
+      $('.module-property-name').val(propertyNames.join('|'));
+      focused = {};
+      transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
+      transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
+      lastLine2 = -1;
+    },
+    error: function (err) {
+      decreaseAjaxPending();
+    },
+  });
 }
