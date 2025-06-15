@@ -3,7 +3,7 @@
 ## History and Introduction
 
 
-Imagine a large application consisting of dozens of modules. Each module includes the following features:
+Imagine you're tasked with building a large-scale application composed of **hundreds of modules**—each requiring features such as:
 
 1.  Creation of new data
     
