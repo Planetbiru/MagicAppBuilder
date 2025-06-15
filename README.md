@@ -72,6 +72,10 @@ To run **MagicAppBuilder**, your environment must meet the following minimum req
 > After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
 > In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
 
+> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
+> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
+
+> ⚙️ **SQL Server (Microsoft SQL Server)** may also be used during the production phase by optimizing MagicObject accordingly. However, converting your database structure to SQL Server format may require third-party tools or manual adjustments.
 
 ## Dependency
 
