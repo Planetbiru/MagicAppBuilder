@@ -43,14 +43,41 @@ Even though MagicAppBuilder uses a high-level abstraction, developers can still 
 
 ## System Requirements
 
-- **Web Server:** Apache Server
-- **PHP Runtime Version:** 5.6 or above
-- **Database:** SQLite and MariaDB, MySQL or PostgreSQL
+To run **MagicAppBuilder**, ensure your environment meets the following minimum requirements:
+
+-   **Web Server:**
+    
+    -   Apache (recommended)
+        
+    -   Nginx or other compatible web servers may also be used with proper configuration
+        
+-   **PHP Runtime:**
+    
+    -   Version **5.6 or later**
+        
+    -   Recommended: PHP **7.4 or above** for better performance and security
+        
+-   **Supported Databases:**
+    
+    -   **SQLite** (lightweight, file-based database)
+        
+    -   **MariaDB** (drop-in replacement for MySQL, recommended)
+        
+    -   **MySQL**
+        
+    -   **PostgreSQL**
+
 
 ## Dependency
 
-- **MagicApp:** The core application that facilitates the rapid generation of CRUD modules.
-- **MagicObject:** A library for creating entities from database tables.
+MagicAppBuilder relies on the following core components:
+
+-   **MagicApp**  
+    The main application engine responsible for the rapid generation of fully functional CRUD modules, including UI components, form handling, and data management logic.
+    
+-   **MagicObject**  
+    A powerful library that automates the creation of entity classes directly from database tables, enabling seamless data binding and reducing boilerplate code.
+
 
 ## Advantages of MagicAppBuilder
 
